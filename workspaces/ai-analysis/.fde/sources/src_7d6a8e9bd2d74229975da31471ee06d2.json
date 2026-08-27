@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_7d6a8e9bd2d74229975da31471ee06d2",
+  "originalName": "04-业务现状与目标汇报.pptx",
+  "storedName": "04-业务现状与目标汇报.pptx",
+  "relativePath": "fde-resources/04-业务现状与目标汇报.pptx",
+  "mimeType": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  "extension": "pptx",
+  "bytes": 445049,
+  "createdAt": "2026-08-27T03:17:06.404Z",
+  "modifiedAt": "2026-08-27T03:17:06.404Z",
+  "mtimeMs": 1787800626403.9182,
+  "previewKind": "office",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 445049,
+    "sourceMtimeMs": 1787800626403.9182,
+    "derivedPath": ".fde/derived/src_7d6a8e9bd2d74229975da31471ee06d2.md",
+    "updatedAt": "2026-08-27T03:17:06.445Z"
+  }
+}

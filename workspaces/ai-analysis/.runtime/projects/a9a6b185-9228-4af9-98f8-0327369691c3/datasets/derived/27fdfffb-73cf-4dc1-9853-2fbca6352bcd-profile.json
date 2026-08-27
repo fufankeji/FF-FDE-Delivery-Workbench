@@ -1,0 +1,278 @@
+{
+  "schema_version": 1,
+  "rows": 520,
+  "columns": 27,
+  "duplicate_rows": 4,
+  "missing_cells": 844,
+  "fields": [
+    {
+      "name": "order_line_id",
+      "dtype": "str",
+      "nulls": 0,
+      "null_rate": 0.0,
+      "unique": 516
+    },
+    {
+      "name": "order_id",
+      "dtype": "str",
+      "nulls": 0,
+      "null_rate": 0.0,
+      "unique": 515
+    },
+    {
+      "name": "customer_id",
+      "dtype": "str",
+      "nulls": 0,
+      "null_rate": 0.0,
+      "unique": 267
+    },
+    {
+      "name": "order_date",
+      "dtype": "datetime64[us]",
+      "nulls": 0,
+      "null_rate": 0.0,
+      "unique": 84
+    },
+    {
+      "name": "paid_at",
+      "dtype": "datetime64[us]",
+      "nulls": 0,
+      "null_rate": 0.0,
+      "unique": 514
+    },
+    {
+      "name": "channel",
+      "dtype": "str",
+      "nulls": 0,
+      "null_rate": 0.0,
+      "unique": 5
+    },
+    {
+      "name": "region",
+      "dtype": "str",
+      "nulls": 0,
+      "null_rate": 0.0,
+      "unique": 5
+    },
+    {
+      "name": "province",
+      "dtype": "str",
+      "nulls": 1,
+      "null_rate": 0.0019230769230769232,
+      "unique": 10
+    },
+    {
+      "name": "city",
+      "dtype": "str",
+      "nulls": 0,
+      "null_rate": 0.0,
+      "unique": 10
+    },
+    {
+      "name": "warehouse",
+      "dtype": "str",
+      "nulls": 0,
+      "null_rate": 0.0,
+      "unique": 3
+    },
+    {
+      "name": "category",
+      "dtype": "str",
+      "nulls": 0,
+      "null_rate": 0.0,
+      "unique": 6
+    },
+    {
+      "name": "sku_id",
+      "dtype": "str",
+      "nulls": 0,
+      "null_rate": 0.0,
+      "unique": 430
+    },
+    {
+      "name": "quantity",
+      "dtype": "int64",
+      "nulls": 0,
+      "null_rate": 0.0,
+      "unique": 4,
+      "min": 1.0,
+      "median": 1.0,
+      "mean": 1.3923076923076922,
+      "max": 4.0,
+      "outliers_iqr": 14
+    },
+    {
+      "name": "unit_price",
+      "dtype": "float64",
+      "nulls": 0,
+      "null_rate": 0.0,
+      "unique": 514,
+      "min": 19.03,
+      "median": 239.22,
+      "mean": 311.0520384615385,
+      "max": 1283.11,
+      "outliers_iqr": 39
+    },
+    {
+      "name": "discount_amount",
+      "dtype": "float64",
+      "nulls": 0,
+      "null_rate": 0.0,
+      "unique": 400,
+      "min": 0.0,
+      "median": 18.285,
+      "mean": 32.75628846153846,
+      "max": 410.83,
+      "outliers_iqr": 46
+    },
+    {
+      "name": "freight_amount",
+      "dtype": "int64",
+      "nulls": 0,
+      "null_rate": 0.0,
+      "unique": 4,
+      "min": 0.0,
+      "median": 0.0,
+      "mean": 0.7307692307692307,
+      "max": 10.0,
+      "outliers_iqr": 46
+    },
+    {
+      "name": "paid_amount",
+      "dtype": "float64",
+      "nulls": 0,
+      "null_rate": 0.0,
+      "unique": 499,
+      "min": 0.0,
+      "median": 267.96500000000003,
+      "mean": 378.2141923076923,
+      "max": 2848.97,
+      "outliers_iqr": 37
+    },
+    {
+      "name": "order_status",
+      "dtype": "str",
+      "nulls": 0,
+      "null_rate": 0.0,
+      "unique": 3
+    },
+    {
+      "name": "promised_delivery_date",
+      "dtype": "datetime64[us]",
+      "nulls": 0,
+      "null_rate": 0.0,
+      "unique": 86
+    },
+    {
+      "name": "shipped_at",
+      "dtype": "datetime64[us]",
+      "nulls": 15,
+      "null_rate": 0.028846153846153848,
+      "unique": 500
+    },
+    {
+      "name": "delivered_at",
+      "dtype": "datetime64[us]",
+      "nulls": 67,
+      "null_rate": 0.12884615384615383,
+      "unique": 370
+    },
+    {
+      "name": "return_flag",
+      "dtype": "str",
+      "nulls": 0,
+      "null_rate": 0.0,
+      "unique": 2
+    },
+    {
+      "name": "aftersale_type",
+      "dtype": "str",
+      "nulls": 497,
+      "null_rate": 0.9557692307692308,
+      "unique": 5
+    },
+    {
+      "name": "customer_level",
+      "dtype": "str",
+      "nulls": 0,
+      "null_rate": 0.0,
+      "unique": 4
+    },
+    {
+      "name": "first_order_flag",
+      "dtype": "str",
+      "nulls": 0,
+      "null_rate": 0.0,
+      "unique": 2
+    },
+    {
+      "name": "campaign_code",
+      "dtype": "str",
+      "nulls": 0,
+      "null_rate": 0.0,
+      "unique": 7
+    },
+    {
+      "name": "satisfaction_score",
+      "dtype": "Int64",
+      "nulls": 264,
+      "null_rate": 0.5076923076923077,
+      "unique": 6,
+      "min": 1.0,
+      "median": 5.0,
+      "mean": 4.48828125,
+      "max": 6.0,
+      "outliers_iqr": 7
+    }
+  ],
+  "correlations": {
+    "quantity": {
+      "quantity": 1.0,
+      "unit_price": -0.04219,
+      "discount_amount": 0.35212,
+      "freight_amount": -0.14689,
+      "paid_amount": 0.42019,
+      "satisfaction_score": -0.08154
+    },
+    "unit_price": {
+      "quantity": -0.04219,
+      "unit_price": 1.0,
+      "discount_amount": 0.5268,
+      "freight_amount": -0.28692,
+      "paid_amount": 0.7488,
+      "satisfaction_score": 0.08011
+    },
+    "discount_amount": {
+      "quantity": 0.35212,
+      "unit_price": 0.5268,
+      "discount_amount": 1.0,
+      "freight_amount": -0.14073,
+      "paid_amount": 0.60604,
+      "satisfaction_score": -0.00457
+    },
+    "freight_amount": {
+      "quantity": -0.14689,
+      "unit_price": -0.28692,
+      "discount_amount": -0.14073,
+      "freight_amount": 1.0,
+      "paid_amount": -0.24837,
+      "satisfaction_score": 0.05548
+    },
+    "paid_amount": {
+      "quantity": 0.42019,
+      "unit_price": 0.7488,
+      "discount_amount": 0.60604,
+      "freight_amount": -0.24837,
+      "paid_amount": 1.0,
+      "satisfaction_score": 0.03126
+    },
+    "satisfaction_score": {
+      "quantity": -0.08154,
+      "unit_price": 0.08011,
+      "discount_amount": -0.00457,
+      "freight_amount": 0.05548,
+      "paid_amount": 0.03126,
+      "satisfaction_score": 1.0
+    }
+  }
+}

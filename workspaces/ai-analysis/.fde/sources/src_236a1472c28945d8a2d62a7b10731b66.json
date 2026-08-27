@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "sourceId": "src_236a1472c28945d8a2d62a7b10731b66",
+  "originalName": "06-现有经营报表截图.png",
+  "storedName": "06-现有经营报表截图.png",
+  "relativePath": "fde-resources/06-现有经营报表截图.png",
+  "mimeType": "image/png",
+  "extension": "png",
+  "bytes": 162354,
+  "createdAt": "2026-08-27T03:17:06.412Z",
+  "modifiedAt": "2026-08-27T03:17:06.412Z",
+  "mtimeMs": 1787800626411.9495,
+  "previewKind": "image",
+  "parse": {
+    "status": "needs-ocr",
+    "message": "图片资料需要 OCR 才能生成文本。"
+  }
+}

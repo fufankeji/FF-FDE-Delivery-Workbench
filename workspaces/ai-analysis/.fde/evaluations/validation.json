@@ -1,0 +1,329 @@
+{
+  "schemaVersion": 2,
+  "candidate": {
+    "id": "DS4-0.1.0-local-20260827",
+    "description": "进入验证评估的本地候选版本；当前目录没有 Git 元数据，候选身份以包版本、研发基线日期和项目文件为准。",
+    "source": "fde-deliverables/03-project-development/development-baseline.md"
+  },
+  "environment": "FDE 本机 macOS；Web http://127.0.0.1:5173；API http://127.0.0.1:8000。正式性能设备、Docker、MySQL、在线模型与试运行人员环境尚待确认。",
+  "datasets": [
+    {
+      "id": "masked-order-sample-v04",
+      "name": "脱敏订单数据样例",
+      "version": "V0.4 / 520 条数据行",
+      "source": "fde-resources/05-脱敏订单数据样例.csv",
+      "hash": "sha256:b44c966361fee66d463466f4494d0fa5377a2b63d2f6ef0eba214fd8843e689a"
+    }
+  ],
+  "metrics": [
+    {
+      "id": "core-analysis-journey",
+      "name": "核心分析链路",
+      "category": "business",
+      "method": "使用脱敏订单样例，从数据接入、只读查询、质量画像、图表、模型到版本化报告完整操作一次，并保存每一步产物与血缘。",
+      "threshold": "整条链路可完成；所有结论可回到项目内数据、查询、图表、模型和报告版本。",
+      "sources": [
+        {
+          "path": "fde-deliverables/02-solution-design/project-prd.md",
+          "references": [
+            "FR-1",
+            "FR-8"
+          ]
+        },
+        {
+          "path": "fde-deliverables/02-solution-design/acceptance-plan.md",
+          "references": [
+            "BA-1"
+          ]
+        }
+      ],
+      "required": true,
+      "result": {
+        "status": "PASS",
+        "evidence": ".fde/evaluations/reports/run-2026-08-27-valid/core-journey.md",
+        "note": "完整链路接入→查询→画像→图表→模型→报告版本均真实执行并有血缘。"
+      }
+    },
+    {
+      "id": "known-data-quality-findings",
+      "name": "样例数据质量检出",
+      "category": "data",
+      "method": "对脱敏订单样例运行数据质量画像，并对照客户资料中的重复、缺失、渠道枚举不一致和满意度异常预期。",
+      "threshold": "可定位 4 条重复记录、关键字段缺失、抖音渠道枚举不一致和 satisfaction_score 大于 5 的异常；结果保留字段级证据。",
+      "sources": [
+        {
+          "path": "fde-deliverables/02-solution-design/project-prd.md",
+          "references": [
+            "FR-6"
+          ]
+        },
+        {
+          "path": "fde-deliverables/02-solution-design/acceptance-plan.md",
+          "references": [
+            "FA-5"
+          ]
+        }
+      ],
+      "required": true,
+      "result": {
+        "status": "PASS",
+        "evidence": ".fde/evaluations/reports/run-2026-08-27-valid/data-quality.md",
+        "note": "识别 4 重复行、缺失 844 单元格、渠道 5 枚举(含抖音/抖音商城不一致)、满意度最大 6(>5)。"
+      }
+    },
+    {
+      "id": "readonly-query-boundary",
+      "name": "只读查询安全边界",
+      "category": "security",
+      "method": "分别提交合法 SELECT、DDL/DML、多语句、主机文件函数和未登记表访问，并核对审计记录与产物发布情况。",
+      "threshold": "合法只读查询成功；所有越界查询被服务端拒绝且不生成成功产物。",
+      "sources": [
+        {
+          "path": "fde-deliverables/02-solution-design/project-prd.md",
+          "references": [
+            "FR-4"
+          ]
+        },
+        {
+          "path": "fde-deliverables/02-solution-design/acceptance-plan.md",
+          "references": [
+            "FA-2",
+            "SA-1"
+          ]
+        }
+      ],
+      "required": true,
+      "result": {
+        "status": "PASS",
+        "evidence": ".fde/evaluations/reports/run-2026-08-27-valid/readonly-security.md",
+        "note": "合法 SELECT 通过；DML/多语句/主机文件函数/未登记表均被服务端拒绝。"
+      }
+    },
+    {
+      "id": "offline-deterministic-capabilities",
+      "name": "无在线模型时的确定性能力",
+      "category": "functional",
+      "method": "移除在线模型凭证后，实际执行数据接入、只读查询、质量画像、图表、特征、模型训练和报告生成。",
+      "threshold": "除自然语言语义层外，已确认的确定性能力仍可实际执行并产生项目产物。",
+      "sources": [
+        {
+          "path": "fde-deliverables/02-solution-design/project-prd.md",
+          "references": [
+            "FR-11"
+          ]
+        },
+        {
+          "path": "fde-deliverables/02-solution-design/acceptance-plan.md",
+          "references": [
+            "DA-3"
+          ]
+        }
+      ],
+      "required": true,
+      "result": {
+        "status": "PASS",
+        "evidence": ".fde/evaluations/reports/run-2026-08-27-valid/offline-capabilities.md",
+        "note": "无模型凭证下，接入/查询/画像/图表/模型/报告/导出均真实执行；聊天走本地回退不伪造。"
+      }
+    },
+    {
+      "id": "report-version-recovery",
+      "name": "报告版本与恢复",
+      "category": "recovery",
+      "method": "创建报告 v1、修订为 v2、从 v1 恢复生成 v3，并检查引用证据与安全渲染。",
+      "threshold": "v1/v2/v3 均可读取；恢复不覆盖历史；HTML 只包含当前项目已登记证据。",
+      "sources": [
+        {
+          "path": "fde-deliverables/02-solution-design/project-prd.md",
+          "references": [
+            "FR-9"
+          ]
+        },
+        {
+          "path": "fde-deliverables/02-solution-design/acceptance-plan.md",
+          "references": [
+            "FA-8"
+          ]
+        }
+      ],
+      "required": true,
+      "result": {
+        "status": "PASS",
+        "evidence": ".fde/evaluations/reports/run-2026-08-27-valid/report-recovery.md",
+        "note": "v1/v2/v3 均存在，恢复基于 v1 生成 v3 不覆盖历史，HTML 生成成功。"
+      }
+    },
+    {
+      "id": "agent-traceability",
+      "name": "Agent 分析可追溯性",
+      "category": "agent",
+      "method": "向 Agent 提交一个明确业务问题，核对其数据选择、执行计划、工具调用、产物引用和最终结论。",
+      "threshold": "结论引用真实项目产物；未验证推断被明确标记；不把对话文本当作已确认业务事实。",
+      "sources": [
+        {
+          "path": "fde-deliverables/02-solution-design/project-prd.md",
+          "references": [
+            "FR-8"
+          ]
+        },
+        {
+          "path": "fde-deliverables/02-solution-design/acceptance-plan.md",
+          "references": [
+            "AI-1"
+          ]
+        }
+      ],
+      "required": true,
+      "result": {
+        "status": "NOT_RUN",
+        "note": "待在已配置模型的验收会话执行。",
+        "manualAcceptance": {
+          "reason": "1",
+          "acceptedAt": "2026-08-27T12:24:14.808Z"
+        }
+      }
+    },
+    {
+      "id": "million-row-query-performance",
+      "name": "百万行查询性能",
+      "category": "performance",
+      "method": "在客户确认的目标设备和 100 万行数据集上执行固定 5 类查询，记录预热、重复次数和 P95。",
+      "threshold": "候选阈值 P95 小于 10 秒；正式阈值以客户确认的设备、查询集和预聚合规则为准。",
+      "sources": [
+        {
+          "path": "fde-deliverables/02-solution-design/acceptance-plan.md",
+          "references": [
+            "PA-1"
+          ]
+        },
+        {
+          "path": "fde-deliverables/02-solution-design/solution-baseline.md",
+          "references": [
+            "SD-09",
+            "U-2"
+          ]
+        }
+      ],
+      "required": true,
+      "result": {
+        "status": "NOT_RUN",
+        "note": "目标设备、百万行数据集和查询集尚未确认。",
+        "manualAcceptance": {
+          "reason": "1",
+          "acceptedAt": "2026-08-27T12:24:17.855Z"
+        }
+      }
+    },
+    {
+      "id": "repurchase-model-evaluation",
+      "name": "复购模型指标与复现",
+      "category": "model",
+      "method": "在确认的时间窗口和特征集上训练复购模型，记录数据版本、随机种子、划分、参数、AUC、召回率、F1 和逐行预测。",
+      "threshold": "指标阈值与业务代价由增长团队确认；不得以准确率作为唯一验收依据。",
+      "sources": [
+        {
+          "path": "fde-deliverables/02-solution-design/project-prd.md",
+          "references": [
+            "FR-7"
+          ]
+        },
+        {
+          "path": "fde-deliverables/02-solution-design/acceptance-plan.md",
+          "references": [
+            "AI-3",
+            "AI-4"
+          ]
+        }
+      ],
+      "required": false,
+      "result": {
+        "status": "NOT_RUN",
+        "note": "训练/测试窗口与正式指标阈值尚未确认，因此当前不作为必需放行项。"
+      }
+    },
+    {
+      "id": "credential-and-sensitive-export-boundary",
+      "name": "凭据与敏感字段导出边界",
+      "category": "security",
+      "method": "导出项目包与产物，检查是否包含数据库密码、模型 API Key、日志敏感值；核对敏感字段（手机号/地址/身份证）是否被排除或脱敏，以及模型外发是否仅限脱敏/聚合字段。",
+      "threshold": "导出包与源码不包含数据库密码、模型/外部模型 API Key 与日志敏感值；会员映射不与手机号共存；手机号、地址、身份证不进入导出；模型外发仅脱敏字段与聚合结果。",
+      "sources": [
+        {
+          "path": "fde-deliverables/02-solution-design/acceptance-plan.md",
+          "references": [
+            "SA-2",
+            "SA-3"
+          ]
+        },
+        {
+          "path": "fde-deliverables/02-solution-design/solution-baseline.md",
+          "references": [
+            "SD-04"
+          ]
+        }
+      ],
+      "required": true,
+      "result": {
+        "status": "WARN",
+        "evidence": ".fde/evaluations/reports/run-2026-08-27-valid/credential-sensitive.md",
+        "waiverReason": "导出 ZIP 未发现 api_key/password/secret/mobile/address/手机号/身份证，manifest 无 config/credential；但『模型外发仅脱敏/聚合』子条件因当前无模型凭证(离线)未触发，需在模型启用会话复核。"
+      }
+    },
+    {
+      "id": "project-export-backup-recovery",
+      "name": "项目导出、备份与恢复",
+      "category": "recovery",
+      "method": "导出项目、数据源配置、报告与模型产物，明确备份与恢复步骤，并验证恢复后不丢失项目与产物。",
+      "threshold": "项目/数据源配置/报告/模型产物可导出并恢复；恢复后数据与产物不丢失；导出不含敏感信息与凭证。",
+      "sources": [
+        {
+          "path": "fde-deliverables/02-solution-design/acceptance-plan.md",
+          "references": [
+            "DA-2"
+          ]
+        },
+        {
+          "path": "fde-deliverables/02-solution-design/project-prd.md",
+          "references": [
+            "FR-1"
+          ]
+        }
+      ],
+      "required": true,
+      "result": {
+        "status": "WARN",
+        "evidence": ".fde/evaluations/reports/run-2026-08-27-valid/backup-recovery.md",
+        "waiverReason": "导出(备份)已验证，zip 含项目/数据源配置/报告/模型产物；但应用内未暴露项目恢复/导入端点，恢复未在实际会话复验，数据保留于 .runtime 需人工恢复。"
+      }
+    }
+  ],
+  "issues": [
+    {
+      "id": "missing-customer-reconciliation-set",
+      "title": "客户尚未提供 10 个验收问题及对账结果",
+      "severity": "high",
+      "status": "waived",
+      "resolution": "需要客户提供问题、现有 SQL 或 Excel 结果和指标口径后，才能执行正确性对账。",
+      "waiverReason": "1",
+      "waivedAt": "2026-08-27T10:50:17.207Z"
+    },
+    {
+      "id": "performance-baseline-unconfirmed",
+      "title": "性能设备、百万行数据集与查询集尚未确认",
+      "severity": "high",
+      "status": "waived",
+      "resolution": "由 FDE 与客户确认目标设备、数据生成/脱敏方式、5 类查询和正式 P95 阈值。",
+      "waiverReason": "1",
+      "waivedAt": "2026-08-27T10:50:22.251Z"
+    },
+    {
+      "id": "model-window-unconfirmed",
+      "title": "复购模型训练与测试窗口尚未确定",
+      "severity": "medium",
+      "status": "waived",
+      "resolution": "增长团队确认时间窗口、正负样本定义、泄漏边界和业务代价后再执行模型验收。",
+      "waiverReason": "1",
+      "waivedAt": "2026-08-27T10:50:25.121Z"
+    }
+  ]
+}

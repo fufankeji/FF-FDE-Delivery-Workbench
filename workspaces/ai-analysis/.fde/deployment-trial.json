@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "candidateVersion": "DS4-0.1.0-local-20260827",
+  "environment": {
+    "name": "FDE 本机 macOS 单机（本地优先试点）",
+    "summary": "本地优先单机部署；页面 http://127.0.0.1:5173/ ，API http://127.0.0.1:8000/api ，文档 http://127.0.0.1:8000/docs 。离线确定性环境（无模型凭证）。正式性能设备、Docker、MySQL、在线/私有模型、多用户试运行环境尚未纳入。",
+    "authorized": true
+  },
+  "status": "ready",
+  "evidence": {
+    "validationBaseline": "fde-deliverables/04-validation/validation-baseline.md",
+    "deployment": "fde-deliverables/05-deployment-trial/deployment-runbook.md",
+    "health": ".fde/deployment-trial/evidence/environment-health.md",
+    "rollback": "fde-deliverables/05-deployment-trial/deployment-runbook.md",
+    "trial": "fde-deliverables/05-deployment-trial/trial-operation-report.md"
+  },
+  "issues": [
+    {
+      "id": "IT-ACC-TRIAL-AUTH",
+      "title": "未记录 FDE 对目标部署与试运行的目标/动作授权",
+      "severity": "high",
+      "status": "accepted",
+      "evidence": "fde-deliverables/05-deployment-trial/deployment-baseline.md",
+      "resolution": "FDE 明确授权目标环境与试运行动作，并将 environment.authorized 置为 true；未经授权不得启动/停止/回滚目标部署。",
+      "decisionReason": "1"
+    },
+    {
+      "id": "IT-ACC-RECONCILIATION",
+      "title": "客户尚未提供 10 个验收问题及现有 SQL/Excel 对账结果",
+      "severity": "high",
+      "status": "accepted",
+      "evidence": "fde-deliverables/04-validation/validation-report.md",
+      "resolution": "客户提供问题、现有 SQL/Excel 结果与指标口径后，执行正确性对账并补验证指标。",
+      "decisionReason": "1"
+    },
+    {
+      "id": "IT-ACC-PERF-BASELINE",
+      "title": "性能设备、百万行数据集、固定查询集与正式 P95 阈值未确认",
+      "severity": "high",
+      "status": "accepted",
+      "evidence": "fde-deliverables/04-validation/validation-report.md",
+      "resolution": "FDE 与客户确认目标设备、数据生成/脱敏方式、5 类查询与正式 P95 阈值后，执行性能测试。",
+      "decisionReason": "1"
+    },
+    {
+      "id": "IT-ACC-MODEL-WINDOW",
+      "title": "复购模型训练/测试窗口、阈值与业务代价未确认",
+      "severity": "medium",
+      "status": "accepted",
+      "evidence": ".fde/evaluations/validation.json",
+      "resolution": "增长团队确认时间窗口、正负样本定义、泄漏边界与业务代价后执行模型验证。",
+      "decisionReason": "1"
+    },
+    {
+      "id": "IT-ACC-ANALYST-TRIAL",
+      "title": "3 名分析师的独立试运行记录尚不存在",
+      "severity": "medium",
+      "status": "accepted",
+      "evidence": "fde-deliverables/05-deployment-trial/trial-operation-report.md",
+      "resolution": "授权后由 3 名分析师各完成一次独立分析并导出项目，记录使用问题。",
+      "decisionReason": "1"
+    },
+    {
+      "id": "IT-ACC-ROLLBACK-DRILL",
+      "title": "回滚/恢复演练证据未产生",
+      "severity": "medium",
+      "status": "accepted",
+      "evidence": "fde-deliverables/05-deployment-trial/deployment-runbook.md",
+      "resolution": "授权后执行回滚演练并记录证据。",
+      "decisionReason": "1"
+    },
+    {
+      "id": "IT-AGR-TRACE",
+      "title": "Agent 分析可追溯性未执行（需模型凭证）",
+      "severity": "medium",
+      "status": "accepted",
+      "evidence": "fde-deliverables/04-validation/validation-report.md",
+      "resolution": "在配置模型凭证的会话执行 Agent 可追溯性验证。",
+      "decisionReason": "1"
+    },
+    {
+      "id": "IT-SEC-MODEL-OUTBOUND",
+      "title": "「模型外发仅脱敏/聚合」子条件未复核",
+      "severity": "medium",
+      "status": "accepted",
+      "evidence": "fde-deliverables/04-validation/validation-report.md",
+      "resolution": "配置模型凭证后复核；验收接受理由需 FDE 决策（Agent 不得标 accepted）。",
+      "decisionReason": "1"
+    },
+    {
+      "id": "IT-RISK-EXPORT-RECOVERY",
+      "title": "应用内无项目恢复/导入端点，恢复需人工",
+      "severity": "medium",
+      "status": "accepted",
+      "evidence": "fde-deliverables/05-deployment-trial/deployment-runbook.md",
+      "resolution": "导出（备份）已验证；恢复能力未暴露，需 FDE/IT 决策补充导入或在恢复策略中接受人工恢复（决策理由由 FDE 记录）。",
+      "decisionReason": "1"
+    }
+  ]
+}

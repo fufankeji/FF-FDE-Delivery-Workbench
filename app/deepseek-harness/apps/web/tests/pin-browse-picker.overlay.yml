@@ -1,0 +1,4 @@
+# The shipped Web composition already pins the in-browser directory picker.
+# Keep this smoke overlay as an explicit no-op until its CLI invocation drops
+# the compatibility path.
+[]

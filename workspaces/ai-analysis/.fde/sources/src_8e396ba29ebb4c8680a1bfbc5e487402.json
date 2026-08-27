@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_8e396ba29ebb4c8680a1bfbc5e487402",
+  "originalName": "01-项目需求初稿.docx",
+  "storedName": "01-项目需求初稿.docx",
+  "relativePath": "fde-resources/01-项目需求初稿.docx",
+  "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "extension": "docx",
+  "bytes": 49883,
+  "createdAt": "2026-08-27T03:17:06.391Z",
+  "modifiedAt": "2026-08-27T03:17:06.391Z",
+  "mtimeMs": 1787800626391.0405,
+  "previewKind": "office",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 49883,
+    "sourceMtimeMs": 1787800626391.0405,
+    "derivedPath": ".fde/derived/src_8e396ba29ebb4c8680a1bfbc5e487402.md",
+    "updatedAt": "2026-08-27T03:17:06.448Z"
+  }
+}

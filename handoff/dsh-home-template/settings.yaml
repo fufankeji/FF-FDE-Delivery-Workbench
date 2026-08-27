@@ -1,0 +1,16 @@
+ui-onboarding:
+  welcomeNoticeVersion: 2026-08-13.1
+ui-theme:
+  preference: light
+agent-default-model:
+  provider: deepseek-official
+  model: deepseek-v4-flash-vision-exp
+  reasoningEffort: high
+dsh-better-sidebar:
+  agentTerminalTools: true
+  browserAllowedLoopback: "127.0.0.1:5173"
+  tabsEnabled:
+    subagent: false
+    sidechat: false
+    terminal: true
+    browser: true

@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_0bfd60afe6ec4558a87e01011b34b1ae",
+  "originalName": "03-数据源与字段清单.xlsx",
+  "storedName": "03-数据源与字段清单.xlsx",
+  "relativePath": "fde-resources/03-数据源与字段清单.xlsx",
+  "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "extension": "xlsx",
+  "bytes": 31025,
+  "createdAt": "2026-08-27T03:17:06.400Z",
+  "modifiedAt": "2026-08-27T03:17:06.400Z",
+  "mtimeMs": 1787800626399.986,
+  "previewKind": "office",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 31025,
+    "sourceMtimeMs": 1787800626399.986,
+    "derivedPath": ".fde/derived/src_0bfd60afe6ec4558a87e01011b34b1ae.md",
+    "updatedAt": "2026-08-27T03:17:06.441Z"
+  }
+}

@@ -1,0 +1,14 @@
+*.sh text eol=lf
+*.mjs text eol=lf
+*.jsonl -diff
+*.sqlite3 binary
+*.db binary
+*.docx binary
+*.xlsx binary
+*.pptx binary
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.parquet binary
+*.zip binary

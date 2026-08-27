@@ -1,0 +1,1154 @@
+{
+  "unit": {
+    "name": "session_projcache",
+    "version": 3
+  },
+  "global": null,
+  "tables": {
+    "sessions": {
+      "session-47dd782d-c3c3-4295-8972-0979105d6f7a": {
+        "identity": {
+          "createdAt": 1787746522894,
+          "cwd": "__FDE_WORKSPACE_PATH__"
+        },
+        "rows": {
+          "sessionStats": {
+            "ver": 1,
+            "seq": 5190,
+            "val": {
+              "turns": 2,
+              "steps": 14,
+              "llmMs": 77610,
+              "toolMs": 959,
+              "ttftMs": 28521,
+              "ttftSteps": 14,
+              "decodeMs": 45525,
+              "decodeTokens": 5237,
+              "lastTurn": 2,
+              "openStep": null,
+              "pendingCalls": {}
+            }
+          },
+          "title": {
+            "ver": 1,
+            "seq": 5190,
+            "val": "项目安装方式说明文档"
+          },
+          "goal": {
+            "ver": 4,
+            "seq": 5190,
+            "val": null
+          },
+          "tokenUsage": {
+            "ver": 1,
+            "seq": 5190,
+            "val": {
+              "totals": {
+                "uncachedInputTokens": 79354,
+                "outputTokens": 5237,
+                "cacheReadTokens": 242944,
+                "cacheWriteTokens": 0
+              },
+              "last": {
+                "turn": 2,
+                "step": 6,
+                "buckets": {
+                  "uncachedInputTokens": 10531,
+                  "outputTokens": 260,
+                  "cacheReadTokens": 53632,
+                  "cacheWriteTokens": 0
+                }
+              }
+            }
+          },
+          "contextPressure": {
+            "ver": 4,
+            "seq": 5190,
+            "val": {
+              "surfaceTokens": 56937,
+              "contextWindow": 1000000,
+              "pressureTokens": 64163,
+              "sampledSurfaceTokens": 49197
+            }
+          },
+          "contextBreakdown": {
+            "ver": 2,
+            "seq": 5190,
+            "val": {
+              "systemTokens": 1591,
+              "toolsTokens": 8559,
+              "messageTokens": 56937
+            }
+          },
+          "subagentTiming": {
+            "ver": 2,
+            "seq": 5190,
+            "val": {
+              "descriptorSeen": false,
+              "settledMs": 0
+            }
+          },
+          "subagent": {
+            "ver": 2,
+            "seq": 5190,
+            "val": {}
+          },
+          "permissions": {
+            "ver": 1,
+            "seq": 5190,
+            "val": {
+              "preset": "workspace-write",
+              "sandbox": "workspace-write",
+              "approval": "ask"
+            }
+          },
+          "sessionListMetadata": {
+            "ver": 1,
+            "seq": 5190,
+            "val": {
+              "blank": false,
+              "lastPromptAt": 1787796941766
+            }
+          },
+          "imageLimits": {
+            "ver": 1,
+            "seq": 5190,
+            "val": null
+          },
+          "todos": {
+            "ver": 2,
+            "seq": 5190,
+            "val": null
+          },
+          "plan": {
+            "ver": 2,
+            "seq": 5190,
+            "val": {
+              "active": false,
+              "wanted": null,
+              "running": null
+            }
+          }
+        }
+      },
+      "session-4192c474-a0d1-42a5-ad57-78d6672914b2": {
+        "identity": {
+          "createdAt": 1787787325237,
+          "cwd": "__FDE_WORKSPACE_PATH__"
+        },
+        "rows": {
+          "sessionStats": {
+            "ver": 1,
+            "seq": 193330,
+            "val": {
+              "turns": 20,
+              "steps": 255,
+              "llmMs": 2658606,
+              "toolMs": 550442,
+              "ttftMs": 918113,
+              "ttftSteps": 255,
+              "decodeMs": 1740280,
+              "decodeTokens": 200896,
+              "lastTurn": 20,
+              "openStep": null,
+              "pendingCalls": {}
+            }
+          },
+          "title": {
+            "ver": 1,
+            "seq": 193330,
+            "val": "客户需求初步解读结论"
+          },
+          "goal": {
+            "ver": 4,
+            "seq": 193330,
+            "val": null
+          },
+          "tokenUsage": {
+            "ver": 1,
+            "seq": 193330,
+            "val": {
+              "totals": {
+                "uncachedInputTokens": 2160872,
+                "outputTokens": 200896,
+                "cacheReadTokens": 49115776,
+                "cacheWriteTokens": 0
+              },
+              "last": {
+                "turn": 20,
+                "step": 13,
+                "buckets": {
+                  "uncachedInputTokens": 126,
+                  "outputTokens": 523,
+                  "cacheReadTokens": 359552,
+                  "cacheWriteTokens": 0
+                }
+              }
+            }
+          },
+          "contextPressure": {
+            "ver": 4,
+            "seq": 193330,
+            "val": {
+              "surfaceTokens": 244594,
+              "contextWindow": 1000000,
+              "pressureTokens": 359678,
+              "sampledSurfaceTokens": 244315
+            }
+          },
+          "contextBreakdown": {
+            "ver": 2,
+            "seq": 193330,
+            "val": {
+              "systemTokens": 1670,
+              "toolsTokens": 11809,
+              "messageTokens": 244594
+            }
+          },
+          "subagentTiming": {
+            "ver": 2,
+            "seq": 193330,
+            "val": {
+              "descriptorSeen": false,
+              "settledMs": 0
+            }
+          },
+          "subagent": {
+            "ver": 2,
+            "seq": 193330,
+            "val": {}
+          },
+          "permissions": {
+            "ver": 1,
+            "seq": 193330,
+            "val": {
+              "preset": "workspace-write",
+              "sandbox": "workspace-write",
+              "approval": "ask"
+            }
+          },
+          "sessionListMetadata": {
+            "ver": 1,
+            "seq": 193330,
+            "val": {
+              "blank": false,
+              "lastPromptAt": 1787837242528
+            }
+          },
+          "imageLimits": {
+            "ver": 1,
+            "seq": 193330,
+            "val": null
+          },
+          "todos": {
+            "ver": 2,
+            "seq": 193330,
+            "val": null
+          },
+          "plan": {
+            "ver": 2,
+            "seq": 193330,
+            "val": {
+              "active": false,
+              "wanted": null,
+              "running": null
+            }
+          }
+        }
+      },
+      "session-eb061a23-8ab4-4669-ad72-e1ae1adae07c": {
+        "identity": {
+          "createdAt": 1787805564128,
+          "cwd": "__FDE_WORKSPACE_PATH__"
+        },
+        "rows": {
+          "sessionStats": {
+            "ver": 1,
+            "seq": 2,
+            "val": {
+              "turns": 0,
+              "steps": 0,
+              "llmMs": 0,
+              "toolMs": 0,
+              "ttftMs": 0,
+              "ttftSteps": 0,
+              "decodeMs": 0,
+              "decodeTokens": 0,
+              "lastTurn": null,
+              "openStep": null,
+              "pendingCalls": {}
+            }
+          },
+          "title": {
+            "ver": 1,
+            "seq": 2,
+            "val": null
+          },
+          "goal": {
+            "ver": 4,
+            "seq": 2,
+            "val": null
+          },
+          "tokenUsage": {
+            "ver": 1,
+            "seq": 2,
+            "val": {
+              "totals": {
+                "uncachedInputTokens": 0,
+                "outputTokens": 0,
+                "cacheReadTokens": 0,
+                "cacheWriteTokens": 0
+              },
+              "last": null
+            }
+          },
+          "contextPressure": {
+            "ver": 4,
+            "seq": 2,
+            "val": {
+              "surfaceTokens": 0
+            }
+          },
+          "contextBreakdown": {
+            "ver": 2,
+            "seq": 2,
+            "val": {
+              "systemTokens": 0,
+              "toolsTokens": 0,
+              "messageTokens": 0
+            }
+          },
+          "subagentTiming": {
+            "ver": 2,
+            "seq": 2,
+            "val": {
+              "descriptorSeen": false,
+              "settledMs": 0
+            }
+          },
+          "subagent": {
+            "ver": 2,
+            "seq": 2,
+            "val": {}
+          },
+          "permissions": {
+            "ver": 1,
+            "seq": 2,
+            "val": {
+              "preset": "workspace-write",
+              "sandbox": "workspace-write",
+              "approval": "ask"
+            }
+          },
+          "sessionListMetadata": {
+            "ver": 1,
+            "seq": 2,
+            "val": {
+              "blank": true,
+              "lastPromptAt": null
+            }
+          },
+          "imageLimits": {
+            "ver": 1,
+            "seq": 2,
+            "val": null
+          },
+          "todos": {
+            "ver": 2,
+            "seq": 2,
+            "val": null
+          },
+          "plan": {
+            "ver": 2,
+            "seq": 2,
+            "val": {
+              "active": false,
+              "wanted": null,
+              "running": null
+            }
+          }
+        }
+      },
+      "3a5427e5-3d12-4b41-9f7c-b9475f04ce8f": {
+        "identity": {
+          "createdAt": 1787810531109,
+          "cwd": "__FDE_WORKSPACE_PATH__"
+        },
+        "rows": {
+          "sessionStats": {
+            "ver": 1,
+            "seq": 12929,
+            "val": {
+              "turns": 1,
+              "steps": 6,
+              "llmMs": 129926,
+              "toolMs": 308,
+              "ttftMs": 11382,
+              "ttftSteps": 6,
+              "decodeMs": 118544,
+              "decodeTokens": 13260,
+              "lastTurn": 1,
+              "openStep": null,
+              "pendingCalls": {}
+            }
+          },
+          "title": {
+            "ver": 1,
+            "seq": 12929,
+            "val": "你是代码审计代理。在 /Users/mu"
+          },
+          "goal": {
+            "ver": 4,
+            "seq": 12929,
+            "val": null
+          },
+          "tokenUsage": {
+            "ver": 1,
+            "seq": 12929,
+            "val": {
+              "totals": {
+                "uncachedInputTokens": 44943,
+                "outputTokens": 13260,
+                "cacheReadTokens": 166784,
+                "cacheWriteTokens": 0
+              },
+              "last": {
+                "turn": 1,
+                "step": 6,
+                "buckets": {
+                  "uncachedInputTokens": 993,
+                  "outputTokens": 8493,
+                  "cacheReadTokens": 48768,
+                  "cacheWriteTokens": 0
+                }
+              }
+            }
+          },
+          "contextPressure": {
+            "ver": 4,
+            "seq": 12929,
+            "val": {
+              "surfaceTokens": 43813,
+              "contextWindow": 1000000,
+              "pressureTokens": 49761,
+              "sampledSurfaceTokens": 36555
+            }
+          },
+          "contextBreakdown": {
+            "ver": 2,
+            "seq": 12929,
+            "val": {
+              "systemTokens": 1649,
+              "toolsTokens": 9558,
+              "messageTokens": 43813
+            }
+          },
+          "subagentTiming": {
+            "ver": 2,
+            "seq": 12929,
+            "val": {
+              "descriptorSeen": true,
+              "settledMs": 130231
+            }
+          },
+          "subagent": {
+            "ver": 2,
+            "seq": 12929,
+            "val": {
+              "identity": {
+                "mode": "one-shot",
+                "seq": 5
+              }
+            }
+          },
+          "permissions": {
+            "ver": 1,
+            "seq": 12929,
+            "val": {
+              "preset": null,
+              "sandbox": "workspace-write",
+              "approval": "never"
+            }
+          },
+          "sessionListMetadata": {
+            "ver": 1,
+            "seq": 12929,
+            "val": {
+              "blank": false,
+              "lastPromptAt": 1787810531212
+            }
+          },
+          "imageLimits": {
+            "ver": 1,
+            "seq": 12929,
+            "val": null
+          },
+          "todos": {
+            "ver": 2,
+            "seq": 12929,
+            "val": null
+          },
+          "plan": {
+            "ver": 2,
+            "seq": 12929,
+            "val": {
+              "active": false,
+              "wanted": null,
+              "running": null
+            }
+          }
+        }
+      },
+      "b2143085-1222-4148-86b6-3283e08c5aa5": {
+        "identity": {
+          "createdAt": 1787810531117,
+          "cwd": "__FDE_WORKSPACE_PATH__"
+        },
+        "rows": {
+          "sessionStats": {
+            "ver": 1,
+            "seq": 7052,
+            "val": {
+              "turns": 1,
+              "steps": 6,
+              "llmMs": 78164,
+              "toolMs": 244,
+              "ttftMs": 11835,
+              "ttftSteps": 6,
+              "decodeMs": 66329,
+              "decodeTokens": 7430,
+              "lastTurn": 1,
+              "openStep": null,
+              "pendingCalls": {}
+            }
+          },
+          "title": {
+            "ver": 1,
+            "seq": 7052,
+            "val": "你是代码审计代理。在 /Users/mu"
+          },
+          "goal": {
+            "ver": 4,
+            "seq": 7052,
+            "val": null
+          },
+          "tokenUsage": {
+            "ver": 1,
+            "seq": 7052,
+            "val": {
+              "totals": {
+                "uncachedInputTokens": 31014,
+                "outputTokens": 7430,
+                "cacheReadTokens": 134656,
+                "cacheWriteTokens": 0
+              },
+              "last": {
+                "turn": 1,
+                "step": 6,
+                "buckets": {
+                  "uncachedInputTokens": 136,
+                  "outputTokens": 2493,
+                  "cacheReadTokens": 35968,
+                  "cacheWriteTokens": 0
+                }
+              }
+            }
+          },
+          "contextPressure": {
+            "ver": 4,
+            "seq": 7052,
+            "val": {
+              "surfaceTokens": 24834,
+              "contextWindow": 1000000,
+              "pressureTokens": 36104,
+              "sampledSurfaceTokens": 23311
+            }
+          },
+          "contextBreakdown": {
+            "ver": 2,
+            "seq": 7052,
+            "val": {
+              "systemTokens": 1649,
+              "toolsTokens": 9558,
+              "messageTokens": 24834
+            }
+          },
+          "subagentTiming": {
+            "ver": 2,
+            "seq": 7052,
+            "val": {
+              "descriptorSeen": true,
+              "settledMs": 78459
+            }
+          },
+          "subagent": {
+            "ver": 2,
+            "seq": 7052,
+            "val": {
+              "identity": {
+                "mode": "one-shot",
+                "seq": 5
+              }
+            }
+          },
+          "permissions": {
+            "ver": 1,
+            "seq": 7052,
+            "val": {
+              "preset": null,
+              "sandbox": "workspace-write",
+              "approval": "never"
+            }
+          },
+          "sessionListMetadata": {
+            "ver": 1,
+            "seq": 7052,
+            "val": {
+              "blank": false,
+              "lastPromptAt": 1787810531196
+            }
+          },
+          "imageLimits": {
+            "ver": 1,
+            "seq": 7052,
+            "val": null
+          },
+          "todos": {
+            "ver": 2,
+            "seq": 7052,
+            "val": null
+          },
+          "plan": {
+            "ver": 2,
+            "seq": 7052,
+            "val": {
+              "active": false,
+              "wanted": null,
+              "running": null
+            }
+          }
+        }
+      },
+      "4de97b02-5619-4437-84c3-dd703cef61fd": {
+        "identity": {
+          "createdAt": 1787810531126,
+          "cwd": "__FDE_WORKSPACE_PATH__"
+        },
+        "rows": {
+          "sessionStats": {
+            "ver": 1,
+            "seq": 12465,
+            "val": {
+              "turns": 1,
+              "steps": 17,
+              "llmMs": 152082,
+              "toolMs": 541,
+              "ttftMs": 34896,
+              "ttftSteps": 17,
+              "decodeMs": 117186,
+              "decodeTokens": 13158,
+              "lastTurn": 1,
+              "openStep": null,
+              "pendingCalls": {}
+            }
+          },
+          "title": {
+            "ver": 1,
+            "seq": 12465,
+            "val": "你是代码审计代理。在 /Users/mu"
+          },
+          "goal": {
+            "ver": 4,
+            "seq": 12465,
+            "val": null
+          },
+          "tokenUsage": {
+            "ver": 1,
+            "seq": 12465,
+            "val": {
+              "totals": {
+                "uncachedInputTokens": 63953,
+                "outputTokens": 13158,
+                "cacheReadTokens": 760704,
+                "cacheWriteTokens": 0
+              },
+              "last": {
+                "turn": 1,
+                "step": 17,
+                "buckets": {
+                  "uncachedInputTokens": 3573,
+                  "outputTokens": 4911,
+                  "cacheReadTokens": 67840,
+                  "cacheWriteTokens": 0
+                }
+              }
+            }
+          },
+          "contextPressure": {
+            "ver": 4,
+            "seq": 12465,
+            "val": {
+              "surfaceTokens": 58243,
+              "contextWindow": 1000000,
+              "pressureTokens": 71413,
+              "sampledSurfaceTokens": 54471
+            }
+          },
+          "contextBreakdown": {
+            "ver": 2,
+            "seq": 12465,
+            "val": {
+              "systemTokens": 1649,
+              "toolsTokens": 9558,
+              "messageTokens": 58243
+            }
+          },
+          "subagentTiming": {
+            "ver": 2,
+            "seq": 12465,
+            "val": {
+              "descriptorSeen": true,
+              "settledMs": 152702
+            }
+          },
+          "subagent": {
+            "ver": 2,
+            "seq": 12465,
+            "val": {
+              "identity": {
+                "mode": "one-shot",
+                "seq": 5
+              }
+            }
+          },
+          "permissions": {
+            "ver": 1,
+            "seq": 12465,
+            "val": {
+              "preset": null,
+              "sandbox": "workspace-write",
+              "approval": "never"
+            }
+          },
+          "sessionListMetadata": {
+            "ver": 1,
+            "seq": 12465,
+            "val": {
+              "blank": false,
+              "lastPromptAt": 1787810531183
+            }
+          },
+          "imageLimits": {
+            "ver": 1,
+            "seq": 12465,
+            "val": null
+          },
+          "todos": {
+            "ver": 2,
+            "seq": 12465,
+            "val": null
+          },
+          "plan": {
+            "ver": 2,
+            "seq": 12465,
+            "val": {
+              "active": false,
+              "wanted": null,
+              "running": null
+            }
+          }
+        }
+      },
+      "d0290707-affb-450a-b73d-786801b01d9c": {
+        "identity": {
+          "createdAt": 1787810531133,
+          "cwd": "__FDE_WORKSPACE_PATH__"
+        },
+        "rows": {
+          "sessionStats": {
+            "ver": 1,
+            "seq": 10403,
+            "val": {
+              "turns": 1,
+              "steps": 11,
+              "llmMs": 120489,
+              "toolMs": 329,
+              "ttftMs": 23387,
+              "ttftSteps": 11,
+              "decodeMs": 97102,
+              "decodeTokens": 10888,
+              "lastTurn": 1,
+              "openStep": null,
+              "pendingCalls": {}
+            }
+          },
+          "title": {
+            "ver": 1,
+            "seq": 10403,
+            "val": "你是代码审计代理。在 /Users/mu"
+          },
+          "goal": {
+            "ver": 4,
+            "seq": 10403,
+            "val": null
+          },
+          "tokenUsage": {
+            "ver": 1,
+            "seq": 10403,
+            "val": {
+              "totals": {
+                "uncachedInputTokens": 62707,
+                "outputTokens": 10888,
+                "cacheReadTokens": 459008,
+                "cacheWriteTokens": 0
+              },
+              "last": {
+                "turn": 1,
+                "step": 11,
+                "buckets": {
+                  "uncachedInputTokens": 993,
+                  "outputTokens": 6718,
+                  "cacheReadTokens": 65408,
+                  "cacheWriteTokens": 0
+                }
+              }
+            }
+          },
+          "contextPressure": {
+            "ver": 4,
+            "seq": 10403,
+            "val": {
+              "surfaceTokens": 57244,
+              "contextWindow": 1000000,
+              "pressureTokens": 66401,
+              "sampledSurfaceTokens": 51804
+            }
+          },
+          "contextBreakdown": {
+            "ver": 2,
+            "seq": 10403,
+            "val": {
+              "systemTokens": 1649,
+              "toolsTokens": 9558,
+              "messageTokens": 57244
+            }
+          },
+          "subagentTiming": {
+            "ver": 2,
+            "seq": 10403,
+            "val": {
+              "descriptorSeen": true,
+              "settledMs": 120869
+            }
+          },
+          "subagent": {
+            "ver": 2,
+            "seq": 10403,
+            "val": {
+              "identity": {
+                "mode": "one-shot",
+                "seq": 5
+              }
+            }
+          },
+          "permissions": {
+            "ver": 1,
+            "seq": 10403,
+            "val": {
+              "preset": null,
+              "sandbox": "workspace-write",
+              "approval": "never"
+            }
+          },
+          "sessionListMetadata": {
+            "ver": 1,
+            "seq": 10403,
+            "val": {
+              "blank": false,
+              "lastPromptAt": 1787810531220
+            }
+          },
+          "imageLimits": {
+            "ver": 1,
+            "seq": 10403,
+            "val": null
+          },
+          "todos": {
+            "ver": 2,
+            "seq": 10403,
+            "val": null
+          },
+          "plan": {
+            "ver": 2,
+            "seq": 10403,
+            "val": {
+              "active": false,
+              "wanted": null,
+              "running": null
+            }
+          }
+        }
+      },
+      "8e43ca22-0925-4591-b9d2-9a56ff8025cf": {
+        "identity": {
+          "createdAt": 1787810683859,
+          "cwd": "__FDE_WORKSPACE_PATH__"
+        },
+        "rows": {
+          "sessionStats": {
+            "ver": 1,
+            "seq": 17881,
+            "val": {
+              "turns": 1,
+              "steps": 15,
+              "llmMs": 195354,
+              "toolMs": 938,
+              "ttftMs": 32920,
+              "ttftSteps": 15,
+              "decodeMs": 162434,
+              "decodeTokens": 18640,
+              "lastTurn": 1,
+              "openStep": null,
+              "pendingCalls": {}
+            }
+          },
+          "title": {
+            "ver": 1,
+            "seq": 17881,
+            "val": "你是代码审计代理。在 /Users/mu"
+          },
+          "goal": {
+            "ver": 4,
+            "seq": 17881,
+            "val": null
+          },
+          "tokenUsage": {
+            "ver": 1,
+            "seq": 17881,
+            "val": {
+              "totals": {
+                "uncachedInputTokens": 49088,
+                "outputTokens": 18640,
+                "cacheReadTokens": 490240,
+                "cacheWriteTokens": 0
+              },
+              "last": {
+                "turn": 1,
+                "step": 15,
+                "buckets": {
+                  "uncachedInputTokens": 3741,
+                  "outputTokens": 3762,
+                  "cacheReadTokens": 56960,
+                  "cacheWriteTokens": 0
+                }
+              }
+            }
+          },
+          "contextPressure": {
+            "ver": 4,
+            "seq": 17881,
+            "val": {
+              "surfaceTokens": 44645,
+              "contextWindow": 1000000,
+              "pressureTokens": 60701,
+              "sampledSurfaceTokens": 42404
+            }
+          },
+          "contextBreakdown": {
+            "ver": 2,
+            "seq": 17881,
+            "val": {
+              "systemTokens": 1649,
+              "toolsTokens": 9558,
+              "messageTokens": 44645
+            }
+          },
+          "subagentTiming": {
+            "ver": 2,
+            "seq": 17881,
+            "val": {
+              "descriptorSeen": true,
+              "settledMs": 196207
+            }
+          },
+          "subagent": {
+            "ver": 2,
+            "seq": 17881,
+            "val": {
+              "identity": {
+                "mode": "one-shot",
+                "seq": 5
+              }
+            }
+          },
+          "permissions": {
+            "ver": 1,
+            "seq": 17881,
+            "val": {
+              "preset": null,
+              "sandbox": "workspace-write",
+              "approval": "never"
+            }
+          },
+          "sessionListMetadata": {
+            "ver": 1,
+            "seq": 17881,
+            "val": {
+              "blank": false,
+              "lastPromptAt": 1787810683932
+            }
+          },
+          "imageLimits": {
+            "ver": 1,
+            "seq": 17881,
+            "val": null
+          },
+          "todos": {
+            "ver": 2,
+            "seq": 17881,
+            "val": null
+          },
+          "plan": {
+            "ver": 2,
+            "seq": 17881,
+            "val": {
+              "active": false,
+              "wanted": null,
+              "running": null
+            }
+          }
+        }
+      },
+      "ca27b3e9-0a8a-47ff-81f2-020a0c895688": {
+        "identity": {
+          "createdAt": 1787810683851,
+          "cwd": "__FDE_WORKSPACE_PATH__"
+        },
+        "rows": {
+          "sessionStats": {
+            "ver": 1,
+            "seq": 11342,
+            "val": {
+              "turns": 1,
+              "steps": 13,
+              "llmMs": 132692,
+              "toolMs": 428,
+              "ttftMs": 28344,
+              "ttftSteps": 13,
+              "decodeMs": 104348,
+              "decodeTokens": 11805,
+              "lastTurn": 1,
+              "openStep": null,
+              "pendingCalls": {}
+            }
+          },
+          "title": {
+            "ver": 1,
+            "seq": 11342,
+            "val": "你是代码审计代理。在 /Users/mu"
+          },
+          "goal": {
+            "ver": 4,
+            "seq": 11342,
+            "val": null
+          },
+          "tokenUsage": {
+            "ver": 1,
+            "seq": 11342,
+            "val": {
+              "totals": {
+                "uncachedInputTokens": 92391,
+                "outputTokens": 11805,
+                "cacheReadTokens": 672384,
+                "cacheWriteTokens": 0
+              },
+              "last": {
+                "turn": 1,
+                "step": 13,
+                "buckets": {
+                  "uncachedInputTokens": 108,
+                  "outputTokens": 3314,
+                  "cacheReadTokens": 101120,
+                  "cacheWriteTokens": 0
+                }
+              }
+            }
+          },
+          "contextPressure": {
+            "ver": 4,
+            "seq": 11342,
+            "val": {
+              "surfaceTokens": 78792,
+              "contextWindow": 1000000,
+              "pressureTokens": 101228,
+              "sampledSurfaceTokens": 76876
+            }
+          },
+          "contextBreakdown": {
+            "ver": 2,
+            "seq": 11342,
+            "val": {
+              "systemTokens": 1649,
+              "toolsTokens": 9558,
+              "messageTokens": 78792
+            }
+          },
+          "subagentTiming": {
+            "ver": 2,
+            "seq": 11342,
+            "val": {
+              "descriptorSeen": true,
+              "settledMs": 133234
+            }
+          },
+          "subagent": {
+            "ver": 2,
+            "seq": 11342,
+            "val": {
+              "identity": {
+                "mode": "one-shot",
+                "seq": 5
+              }
+            }
+          },
+          "permissions": {
+            "ver": 1,
+            "seq": 11342,
+            "val": {
+              "preset": null,
+              "sandbox": "workspace-write",
+              "approval": "never"
+            }
+          },
+          "sessionListMetadata": {
+            "ver": 1,
+            "seq": 11342,
+            "val": {
+              "blank": false,
+              "lastPromptAt": 1787810683936
+            }
+          },
+          "imageLimits": {
+            "ver": 1,
+            "seq": 11342,
+            "val": null
+          },
+          "todos": {
+            "ver": 2,
+            "seq": 11342,
+            "val": null
+          },
+          "plan": {
+            "ver": 2,
+            "seq": 11342,
+            "val": {
+              "active": false,
+              "wanted": null,
+              "running": null
+            }
+          }
+        }
+      }
+    }
+  }
+}

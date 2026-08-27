@@ -1,0 +1,28 @@
+{
+  "unit": {
+    "name": "workspace",
+    "version": 2
+  },
+  "global": {
+    "initialized": true,
+    "workspaceIds": [
+      "22caf7a1-28f1-4590-aa62-6500f166eb8b"
+    ],
+    "archivedSessionIds": []
+  },
+  "tables": {
+    "workspaces": {
+      "22caf7a1-28f1-4590-aa62-6500f166eb8b": {
+        "path": "__FDE_WORKSPACE_PATH__",
+        "title": "数据分析项目",
+        "sessionIds": [
+          "session-eb061a23-8ab4-4669-ad72-e1ae1adae07c",
+          "session-4192c474-a0d1-42a5-ad57-78d6672914b2",
+          "session-47dd782d-c3c3-4295-8972-0979105d6f7a"
+        ],
+        "createdAt": "2026-08-26T12:15:22.801Z",
+        "updatedAt": "2026-08-27T04:39:24.135Z"
+      }
+    }
+  }
+}

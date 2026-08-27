@@ -1,0 +1,6 @@
+# Bilingual-pair consistency record (docs/i18n/README.md): the git blob hash of each
+# side as of the last confirmed-consistent state. Both languages carry equal authority;
+# after editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write .agents/notes/implemented/feature/2026-08-26-workspace-fde-stage-progress.md
+2026-08-26-workspace-fde-stage-progress.md: d5be67ac29c0c428318d3da1aaca579ff6c9d173
+2026-08-26-workspace-fde-stage-progress.zh.md: 529f66d3d774b4c0d28ac98f642ab57c22bb8b5c

@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "run_id": "f85359d1-ac6e-449e-afb0-35edac24cd6a",
+  "user_message_id": "ecde17db-59f5-44fb-bc62-275c6bed8820",
+  "intent": "normal",
+  "status": "succeeded",
+  "runtime": "local-fallback",
+  "model": null,
+  "started_at": "2026-08-27T10:13:24.396517+00:00",
+  "finished_at": "2026-08-27T10:13:24.396832+00:00",
+  "duration_seconds": 0.000191,
+  "tool_calls": [],
+  "selected_source_ids": [
+    "ee4d589b-37fd-4185-90a5-9f6fbc27297a"
+  ],
+  "selected_skill_ids": [],
+  "output_artifacts": [],
+  "events": [],
+  "error": null
+}

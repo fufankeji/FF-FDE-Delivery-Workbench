@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "rows": 520,
+  "columns": 5,
+  "duplicate_rows": 4,
+  "missing_cells": 0,
+  "fields": [
+    {
+      "name": "channel",
+      "dtype": "str",
+      "nulls": 0,
+      "null_rate": 0.0,
+      "unique": 5
+    },
+    {
+      "name": "quantity",
+      "dtype": "int64",
+      "nulls": 0,
+      "null_rate": 0.0,
+      "unique": 4,
+      "min": 1.0,
+      "median": 1.0,
+      "mean": 1.3923076923076922,
+      "max": 4.0,
+      "outliers_iqr": 14
+    },
+    {
+      "name": "unit_price",
+      "dtype": "float64",
+      "nulls": 0,
+      "null_rate": 0.0,
+      "unique": 514,
+      "min": 19.03,
+      "median": 239.22,
+      "mean": 311.0520384615385,
+      "max": 1283.11,
+      "outliers_iqr": 39
+    },
+    {
+      "name": "paid_amount",
+      "dtype": "float64",
+      "nulls": 0,
+      "null_rate": 0.0,
+      "unique": 499,
+      "min": 0.0,
+      "median": 267.96500000000003,
+      "mean": 378.2141923076923,
+      "max": 2848.97,
+      "outliers_iqr": 37
+    },
+    {
+      "name": "order_status",
+      "dtype": "str",
+      "nulls": 0,
+      "null_rate": 0.0,
+      "unique": 3
+    }
+  ],
+  "correlations": {
+    "quantity": {
+      "quantity": 1.0,
+      "unit_price": -0.04219,
+      "paid_amount": 0.42019
+    },
+    "unit_price": {
+      "quantity": -0.04219,
+      "unit_price": 1.0,
+      "paid_amount": 0.7488
+    },
+    "paid_amount": {
+      "quantity": 0.42019,
+      "unit_price": 0.7488,
+      "paid_amount": 1.0
+    }
+  }
+}

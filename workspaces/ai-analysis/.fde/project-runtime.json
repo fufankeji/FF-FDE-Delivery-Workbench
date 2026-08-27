@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "revision": 6,
+  "operationId": "runtime_9e9056bd01a1426c9bcb0dc5225810e7",
+  "action": "start",
+  "status": "running",
+  "sessionId": "session-4192c474-a0d1-42a5-ad57-78d6672914b2",
+  "updatedAt": "2026-08-27T08:47:51.361Z",
+  "message": "项目已在运行（复用现有服务，未重复启动）：前端 http://127.0.0.1:5173（HTTP 200，页面 DS4-AI数据分析系统）；后端 http://127.0.0.1:8000/api/health 返回 {\"status\":\"ok\",...}；OpenAPI 3.1.0（57 路径）与 /docs 均可用。AGENTS.md 已存在，服务由「项目运行」终端管理。",
+  "previewUrl": "http://127.0.0.1:5173/",
+  "docsUrl": "http://127.0.0.1:8000/docs",
+  "openapiSource": "http://127.0.0.1:8000/openapi.json",
+  "baseUrl": "http://127.0.0.1:8000/",
+  "terminalTitle": "项目运行"
+}

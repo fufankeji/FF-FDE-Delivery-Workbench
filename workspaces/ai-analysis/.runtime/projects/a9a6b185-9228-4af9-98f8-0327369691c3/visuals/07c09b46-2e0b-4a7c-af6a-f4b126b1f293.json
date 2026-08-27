@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "chart_type": "bar",
+  "title": "各渠道支付金额",
+  "dataset_artifact_id": "2227e3a2-57ef-4d55-aecb-f0b1bace38e2",
+  "encoding": {
+    "x": "channel",
+    "y": [
+      "paid_amount"
+    ]
+  },
+  "theme": "northlight",
+  "data_scope": {
+    "total_rows": 520,
+    "rows_used": 500,
+    "truncated": true,
+    "strategy": "first_rows",
+    "max_points": 500
+  }
+}

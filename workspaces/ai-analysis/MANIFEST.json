@@ -1,0 +1,735 @@
+{
+  "schema_version": 1,
+  "bundle": "DS4-AI数据分析系统",
+  "public_name": "DS4-AI数据分析系统",
+  "release_date": "2026-08-05",
+  "file_count": 145,
+  "total_bytes": 46130169,
+  "files": [
+    {
+      "path": ".env.example",
+      "size": 124,
+      "sha256": "2e3409473f699d92b3fb83da5c9d26c3875d9fc6818cda891395b2d91500514b"
+    },
+    {
+      "path": ".gitignore",
+      "size": 204,
+      "sha256": "57422398eaa50b7bdbd7d64251ae97fd62bed1d80c2e5dc0e996062865ddfe4c"
+    },
+    {
+      "path": "README.md",
+      "size": 5968,
+      "sha256": "85b23f524919a9e6bf0e78b89c51d8df361104858ba7ace3096262e40289aae1"
+    },
+    {
+      "path": "RELEASE.txt",
+      "size": 61,
+      "sha256": "6041ca5af562b49408fb3570cb6b8d384f8f1c6afa12d38e1a18fa11c47e7476"
+    },
+    {
+      "path": "backend/northlight/__init__.py",
+      "size": 77,
+      "sha256": "99d8be06539a6f1fa6d0d2c30e748e18fe883c5b4cc7a6db339a688073e25cfa"
+    },
+    {
+      "path": "backend/northlight/agent_runtime.py",
+      "size": 46556,
+      "sha256": "cd39a8a1a5f0af538eba5713cc0b3afc86a3adb0e715add3843f38104d9315ac"
+    },
+    {
+      "path": "backend/northlight/analysis_service.py",
+      "size": 8535,
+      "sha256": "ecb5de757f939ac4a8cf17dcb1cd891d649f0f02d34f7071789d3f70321920d2"
+    },
+    {
+      "path": "backend/northlight/api.py",
+      "size": 43850,
+      "sha256": "1423ee7f6049ed971ce5d80e99be5ffd694647de203dc04401580eb53a4179df"
+    },
+    {
+      "path": "backend/northlight/connection_settings.py",
+      "size": 5415,
+      "sha256": "5911d378004bc5e24f28f4bf3ea955d440fa3ae14f5e404e4630e39cfd43a753"
+    },
+    {
+      "path": "backend/northlight/data_assets.py",
+      "size": 16377,
+      "sha256": "56bd8324dedea25aeabe94c33f8956774a5bf7c969a436035c18f9f0ab6059d2"
+    },
+    {
+      "path": "backend/northlight/data_sources.py",
+      "size": 15825,
+      "sha256": "f7d0df4cc933400779201a4a3da60486629a893ef93fc23612303af34c93975f"
+    },
+    {
+      "path": "backend/northlight/database.py",
+      "size": 1649,
+      "sha256": "c5258d21930813f47cd18bc54a888f74ae947ee24cbc926106933176c15cc1db"
+    },
+    {
+      "path": "backend/northlight/domain.py",
+      "size": 9125,
+      "sha256": "f1b113d4b59d1a6fa3b3de297a0f5535a70e5fe7be37a886b56acbba466d7b23"
+    },
+    {
+      "path": "backend/northlight/main.py",
+      "size": 1726,
+      "sha256": "695947eae79753d587fad5fab3353699b753dd2a469ca51ad7d9cbb9f892e9ba"
+    },
+    {
+      "path": "backend/northlight/ml_service.py",
+      "size": 22719,
+      "sha256": "1fead3db437bd68b87efbf641a23e12023e303cce5c35ceb5e390e96aba210e3"
+    },
+    {
+      "path": "backend/northlight/model_jobs.py",
+      "size": 5919,
+      "sha256": "ef9f38f883abae6728a2518f984293ff9554fc8935376559a85e0b45011e53d2"
+    },
+    {
+      "path": "backend/northlight/models.py",
+      "size": 9847,
+      "sha256": "416fa4a9e8c681d5d35bc50d8904d2cce14d315d50a97e8c71f68f1090a0cf4c"
+    },
+    {
+      "path": "backend/northlight/query_service.py",
+      "size": 12125,
+      "sha256": "e0d70794ef342e0466a89891f1a7d49a025bf2344a80b11d08dc2976e438e69c"
+    },
+    {
+      "path": "backend/northlight/report_service.py",
+      "size": 32177,
+      "sha256": "be9e6baed1a6f936ffa191d2c3a03cef2250d531b65252d8ff843b0a69061dd2"
+    },
+    {
+      "path": "backend/northlight/repository.py",
+      "size": 19218,
+      "sha256": "cd3e336460e5ea622a74a413b685f02c856aa07b98a1854a142942c0d79ad5a1"
+    },
+    {
+      "path": "backend/northlight/runtime_probe.py",
+      "size": 3657,
+      "sha256": "fd4d5a041a3a55f717d968bf93c3683662931f16be1b6b5f400ee879e9216c8a"
+    },
+    {
+      "path": "backend/northlight/serialization.py",
+      "size": 384,
+      "sha256": "667984cd39214d4b567df82c9efd6ebb6f8ef21c51828a34f2b149a5213218ef"
+    },
+    {
+      "path": "backend/northlight/settings.py",
+      "size": 979,
+      "sha256": "47ac166ef7bb8f1666e51ff6fb73485622966574e1082ac192ea1817fbfc008e"
+    },
+    {
+      "path": "backend/northlight/skill_service.py",
+      "size": 27235,
+      "sha256": "69cb904e9ce83204a6c19b9b7236f9a9ca166ad0f860a961d5ed5c30556663a9"
+    },
+    {
+      "path": "backend/northlight/skills/anomaly-investigation/SKILL.md",
+      "size": 1708,
+      "sha256": "0bebc5581667459b8b45c1a0a4ed5b911b45fc437867abec14a809ec64deeaf7"
+    },
+    {
+      "path": "backend/northlight/skills/complete-analysis-report/SKILL.md",
+      "size": 2193,
+      "sha256": "63cf2cd71d1b8c6413f5016b131086a4adbf86ce3b03339518c83ce86867979a"
+    },
+    {
+      "path": "backend/northlight/skills/customer-segmentation/SKILL.md",
+      "size": 1659,
+      "sha256": "2070b1c2fe544830c5fe58817d80f6174c307acaa2a7b919c3feed7a53974ebf"
+    },
+    {
+      "path": "backend/northlight/skills/data-quality-audit/SKILL.md",
+      "size": 1940,
+      "sha256": "aa751d22e556b472db8e41591f81b42b9e582981a22d073bedf936a5cbd8877f"
+    },
+    {
+      "path": "backend/northlight/skills/feature-engineering-guardrails/SKILL.md",
+      "size": 1768,
+      "sha256": "df434111ef17177ee4f6bc3eddf7655ccc6baf924160d94a78c860727d2be928"
+    },
+    {
+      "path": "backend/northlight/skills/metric-root-cause-analysis/SKILL.md",
+      "size": 1717,
+      "sha256": "17ef6862489018f0e51219c3bf227e200948125449a4800ab7c3065b84742913"
+    },
+    {
+      "path": "backend/northlight/skills/model-evaluation-and-fusion/SKILL.md",
+      "size": 1801,
+      "sha256": "70410d6c7b1c4c3ff460d60cfd760a3cb4089ac694019c50ef9f21b29d69c707"
+    },
+    {
+      "path": "backend/northlight/skills/sql-business-analysis/SKILL.md",
+      "size": 1674,
+      "sha256": "59bbc9f818abe22d96cc6c271ad40b6cbe93a1b082f8938c59682992daab6e17"
+    },
+    {
+      "path": "backend/northlight/skills/time-series-diagnostics/SKILL.md",
+      "size": 1691,
+      "sha256": "141baf2634c08b09af87c5868d096bb325466afecaa5aae49123c669c881c0bb"
+    },
+    {
+      "path": "backend/northlight/skills/visualization-storytelling/SKILL.md",
+      "size": 1687,
+      "sha256": "e128887ccf7533ab61f73c60ffaf3d19cc82929553e364e3205763da61cc39cf"
+    },
+    {
+      "path": "backend/northlight/templates/report.html.j2",
+      "size": 5452,
+      "sha256": "a902cc6add3f2144b7032aa2838f366a84e2aedfdf13e3f89aed00745cff5107"
+    },
+    {
+      "path": "backend/northlight/workspace.py",
+      "size": 2938,
+      "sha256": "ce3e3cfb11020997144eedb183be9a81befb9de797a5e059672a182ba85406dc"
+    },
+    {
+      "path": "backend/tests/conftest.py",
+      "size": 744,
+      "sha256": "b440d22d5f834e6adf551365be19fb7c512c1b5da297622a2990a4f36973ff8b"
+    },
+    {
+      "path": "backend/tests/test_agent_ml.py",
+      "size": 19646,
+      "sha256": "5793407510fcd7082127ec6ba7e0bdd2a4de80dcc365dfedb8e07ace0d199cc2"
+    },
+    {
+      "path": "backend/tests/test_analysis.py",
+      "size": 1855,
+      "sha256": "1f0f4bede596b67900e65ef360638b9e14af05cddc7d2f338759c295b5cfbf9b"
+    },
+    {
+      "path": "backend/tests/test_data_assets.py",
+      "size": 3734,
+      "sha256": "ce6f90bef130f82f3b5890641715606af38ab33ccd93a67e0608baf9b3a1d51e"
+    },
+    {
+      "path": "backend/tests/test_data_query.py",
+      "size": 11613,
+      "sha256": "e0b6b788b08aa011d0a3973193b3f3eefa111c62c25cc2437560b5d25f3aa547"
+    },
+    {
+      "path": "backend/tests/test_lan_access.py",
+      "size": 879,
+      "sha256": "bed8dbcd7e1530e642e6149c271f8a27713c8efc296dc1c13d3cb07f40c1c12b"
+    },
+    {
+      "path": "backend/tests/test_model_connection_api.py",
+      "size": 3433,
+      "sha256": "21d46f1752395f1b3b466e51fc4ea9272ddff77fbe284570b445bca41562d339"
+    },
+    {
+      "path": "backend/tests/test_reports_skills.py",
+      "size": 16281,
+      "sha256": "436190aaaccd7f47b3bf42ef8c3dc8dac3ea09f1c484aa64070b5a9ba04186a2"
+    },
+    {
+      "path": "backend/tests/test_sandbox_contract.py",
+      "size": 376,
+      "sha256": "ade9fd77f743062a6bee56fa3e8a3009b80602f28ba281563420b630f03e5c44"
+    },
+    {
+      "path": "backend/tests/test_settings.py",
+      "size": 1827,
+      "sha256": "a39d141fd2d550aafe61f358a31278e46c36b910ea0dc72d1977a05f3301b84b"
+    },
+    {
+      "path": "backend/tests/test_skill_sandbox_integration.py",
+      "size": 4379,
+      "sha256": "14652af3de363c566fb1c81244f4b747e6d41de77df1958427cf6bbfae3e6496"
+    },
+    {
+      "path": "backend/tests/test_workspace_repository.py",
+      "size": 3188,
+      "sha256": "12fd62e8b402cabf9b0270b48fc9368ee9390c975afeb7e3147345b8a9032575"
+    },
+    {
+      "path": "design/assets/candidates/ai-mountain-round-01/01-data-topography.png",
+      "size": 1999679,
+      "sha256": "4a3df6cb408a4c8914c57c9e8c2c762676da21d546a5ff49534f213ca209f1d5"
+    },
+    {
+      "path": "design/assets/candidates/ai-mountain-round-01/02-neural-ridge.png",
+      "size": 1906804,
+      "sha256": "4f72987ca15f6636f560b106bf339b15664160234886ded0eab27b6d2ccff0d0"
+    },
+    {
+      "path": "design/assets/candidates/ai-mountain-round-01/03-predictive-spectrum.png",
+      "size": 1887243,
+      "sha256": "556d15f6651215e6f78363e586ea9cbd4c7e9b010755f1ca1f9f17b42cc9f302"
+    },
+    {
+      "path": "design/assets/candidates/ai-mountain-round-01/README.md",
+      "size": 5818,
+      "sha256": "4c16864a8486bb8715523458019a2012f490f0ccd5edce769ef11c9edac55a9a"
+    },
+    {
+      "path": "design/assets/candidates/ai-subject-round-02/01-orbital-data-engine.png",
+      "size": 2217859,
+      "sha256": "296d22defb90462d8a85acef067e0cc8af1b9b3123ae6dab8227a742e9aac9a8"
+    },
+    {
+      "path": "design/assets/candidates/ai-subject-round-02/02-neural-organism.png",
+      "size": 2681380,
+      "sha256": "d0f8707f4683bbb7bbdc952f6ed279691ec1c8921ce2814f5deb3cd6dacb90bc"
+    },
+    {
+      "path": "design/assets/candidates/ai-subject-round-02/03-liquid-data-storm.png",
+      "size": 2463937,
+      "sha256": "7d83b75e9e1f1e14d24c1905c1cda7110342711d5602b55c54c589dde10706b8"
+    },
+    {
+      "path": "design/assets/candidates/ai-subject-round-02/README.md",
+      "size": 6415,
+      "sha256": "6c43fe6a9cef14f7aaf37551f821ccafb1151d584a5f6188d855f3c1dc55a96b"
+    },
+    {
+      "path": "design/assets/manifest.json",
+      "size": 1404,
+      "sha256": "a37ac88ed76245b403cd52c9cafa766b86f0a0a7e4eca27f7dc1c81ec9172c39"
+    },
+    {
+      "path": "design/assets/mountain-night.png",
+      "size": 1514458,
+      "sha256": "6d3b0e622f3a0436b651c0ca54ffa36ee0c0b9767201ae53d19523efaf6a00c6"
+    },
+    {
+      "path": "design/assets/mountain-report.png",
+      "size": 1770894,
+      "sha256": "7dda66e93677322c6258bbdc4dcfa954a84856eb5fa0d610bdba423c344dc289"
+    },
+    {
+      "path": "design/assets/source/mountain-report-chroma.png",
+      "size": 2220764,
+      "sha256": "5dc296a994924d5cafb183b8f93ebb1a1130e2e9ddb2b1649f3887b607ad8a63"
+    },
+    {
+      "path": "design/component-inventory.md",
+      "size": 2602,
+      "sha256": "717030e18abc9ea711494a66644f90b07498af12007f64a029125c2259101458"
+    },
+    {
+      "path": "design/tokens.json",
+      "size": 3999,
+      "sha256": "e50cd0c3348f6dc7e73f457315ba2864424c4d2dc548b89ed45afdd1dc8102f9"
+    },
+    {
+      "path": "fixtures/skills/custom-analysis/SKILL.md",
+      "size": 546,
+      "sha256": "b223166c1cac3a450f4ecbd3f4ec7e823882f7c1a3969514d47b60361d3b05a2"
+    },
+    {
+      "path": "fixtures/skills/custom-analysis/scripts/summarize.py",
+      "size": 742,
+      "sha256": "35ee647976ea991e12bbfacc7a4793d2eb880885216ce94d56d6d087918c2346"
+    },
+    {
+      "path": "fixtures/skills/custom-report/SKILL.md",
+      "size": 619,
+      "sha256": "abd45cf3d7495d6acdd56705fded2eb801f2c9214665a01ef1c54ef312eb0f36"
+    },
+    {
+      "path": "frontend/e2e/architecture.spec.ts",
+      "size": 2209,
+      "sha256": "619093b1fb7ee38f180b4efcbf79133acb79fb706ef5a991daea40227d70ee73"
+    },
+    {
+      "path": "frontend/e2e/fixtures/orders.csv",
+      "size": 115,
+      "sha256": "7233bdc7c1b712a07a05f01a001677d8512d3df95088c4729ee46a8b541f9ef4"
+    },
+    {
+      "path": "frontend/e2e/product.spec.ts",
+      "size": 12998,
+      "sha256": "3e2cd49543a93d4dba91328c14321289490e76190c9c3e7286fa241780e74344"
+    },
+    {
+      "path": "frontend/e2e/task-workbench.spec.ts",
+      "size": 6498,
+      "sha256": "bf30d0845fcbd0de65976a2b42a4f0a24ab197265aecb42f29ac2b0100fce190"
+    },
+    {
+      "path": "frontend/e2e/ui-layout.spec.ts",
+      "size": 5749,
+      "sha256": "c591d3f018b4b9acb3700bdaa03bfe410347f95cd5dc08242f5733e3458845e5"
+    },
+    {
+      "path": "frontend/eslint.config.js",
+      "size": 742,
+      "sha256": "09f01c2562bbffba0bd70132d69a02ae6a7670ad9bef9b042b80afac4788c745"
+    },
+    {
+      "path": "frontend/index.html",
+      "size": 386,
+      "sha256": "4f3fb0c960e91176fa7350e98cfaaaae97bf7f501b711378605d8641aa7073ea"
+    },
+    {
+      "path": "frontend/package.json",
+      "size": 1195,
+      "sha256": "f25f896870f245cf35da7a7751c3ff771ec42c7141df45fc42e913f668829b94"
+    },
+    {
+      "path": "frontend/playwright.config.ts",
+      "size": 1477,
+      "sha256": "c5741d1bc27c050950cdaa83e9101744075a5b6ab9038fc904cc8fb8ae20df0b"
+    },
+    {
+      "path": "frontend/pnpm-lock.yaml",
+      "size": 130720,
+      "sha256": "a85cb2f04e614592822ac33b7cc07451b53f00f8b0acd08b64c7a9d28802065c"
+    },
+    {
+      "path": "frontend/public/assets/ds4-shell-ambient-dark.png",
+      "size": 1324525,
+      "sha256": "7243dd41c561cb400192484811b60f84fc80350153d244e1afd3ac97b5574d51"
+    },
+    {
+      "path": "frontend/public/assets/ds4-shell-ambient-light.png",
+      "size": 1311043,
+      "sha256": "2f3701678f80d32c829c501665b55b3879fdc891a66e6c90d4c50bebfc55de1e"
+    },
+    {
+      "path": "frontend/public/assets/fan-space-logo.png",
+      "size": 17497,
+      "sha256": "522944bbaee48d98190c8c5a0a0ac80f05b71b1975838807742a782e2aeceedc"
+    },
+    {
+      "path": "frontend/public/assets/liquid-data-storm-light.png",
+      "size": 2333644,
+      "sha256": "15212d3277ed94dd47ccddb7c2275389a7fffdc61ad0e44dedbfea9e06c5713e"
+    },
+    {
+      "path": "frontend/public/assets/liquid-data-storm.png",
+      "size": 2463937,
+      "sha256": "7d83b75e9e1f1e14d24c1905c1cda7110342711d5602b55c54c589dde10706b8"
+    },
+    {
+      "path": "frontend/public/assets/mountain-night-light.png",
+      "size": 1897693,
+      "sha256": "33b21ce53ec351b70b379625c62842bec387201fd01957dc37b2fb163d1ff6c7"
+    },
+    {
+      "path": "frontend/public/assets/mountain-night.png",
+      "size": 1514458,
+      "sha256": "6d3b0e622f3a0436b651c0ca54ffa36ee0c0b9767201ae53d19523efaf6a00c6"
+    },
+    {
+      "path": "frontend/public/assets/mountain-report.png",
+      "size": 1770894,
+      "sha256": "7dda66e93677322c6258bbdc4dcfa954a84856eb5fa0d610bdba423c344dc289"
+    },
+    {
+      "path": "frontend/public/assets/neural-organism-light.png",
+      "size": 2390751,
+      "sha256": "ab9f8495fc8b9ee9e2b897c37b9ed9858e477578fb77a9d02fc71ba2feca24c0"
+    },
+    {
+      "path": "frontend/public/assets/neural-organism.png",
+      "size": 2681380,
+      "sha256": "d0f8707f4683bbb7bbdc952f6ed279691ec1c8921ce2814f5deb3cd6dacb90bc"
+    },
+    {
+      "path": "frontend/public/assets/orbital-data-engine-light.png",
+      "size": 2362954,
+      "sha256": "8efcfc8472f4683eea3ec3daabdd97fe5da40515e858d063105e70aa1f3338d8"
+    },
+    {
+      "path": "frontend/public/assets/orbital-data-engine.png",
+      "size": 2217859,
+      "sha256": "296d22defb90462d8a85acef067e0cc8af1b9b3123ae6dab8227a742e9aac9a8"
+    },
+    {
+      "path": "frontend/src/api.ts",
+      "size": 18870,
+      "sha256": "694c08b171b65af5759b0409ff637130b5fe470da3067fc9fe8bc8707c5ae1dc"
+    },
+    {
+      "path": "frontend/src/app/App.tsx",
+      "size": 1912,
+      "sha256": "384a9ec3d022dccacc9377f61ede45e2f87319888a1806168ad0b73d071d4de2"
+    },
+    {
+      "path": "frontend/src/components/AppShell.test.tsx",
+      "size": 4386,
+      "sha256": "c6c9469b2b3b1e70ed7c9d62785e0686f2ac7e8b2aa4b73daa17126625b46784"
+    },
+    {
+      "path": "frontend/src/components/AppShell.tsx",
+      "size": 9185,
+      "sha256": "3d796a30aee9f32e1dda74343daa22851731d8568a846dabe5382536857fe731"
+    },
+    {
+      "path": "frontend/src/components/AppearanceControls.tsx",
+      "size": 2643,
+      "sha256": "7b0c366067c58bb182f6e087d643eae3e5d3f4b9c511649a8d05fc96942a7d33"
+    },
+    {
+      "path": "frontend/src/components/ReportCanvas.test.tsx",
+      "size": 1053,
+      "sha256": "43227dd5955450da38cdc23ccdac8ea8a3a48b8f1e8f94293487b394bef9e04b"
+    },
+    {
+      "path": "frontend/src/components/ReportCanvas.tsx",
+      "size": 15243,
+      "sha256": "518a85fd78a483a12c91f2362100475de787e58a09fdbce2bb3ae5223ce87a4f"
+    },
+    {
+      "path": "frontend/src/components/Ui.test.tsx",
+      "size": 904,
+      "sha256": "845e437e0900163786432311377ca296664b4b648d6d574f96743544b62a3983"
+    },
+    {
+      "path": "frontend/src/components/Ui.tsx",
+      "size": 1893,
+      "sha256": "3572f3aaf46e7b91c74d86777d48545260c7c3640ddb616cec7d5a34e17482a4"
+    },
+    {
+      "path": "frontend/src/design/backgroundThemes.ts",
+      "size": 2238,
+      "sha256": "84374c7289350e763b6ea4fe219a04bf805e457e82b41b6679f8868c51777cd6"
+    },
+    {
+      "path": "frontend/src/design/colorMode.ts",
+      "size": 1765,
+      "sha256": "78bd60d7ae4de83be00cb08c00b48a57365abc838fd3321b5025f8a7397446f1"
+    },
+    {
+      "path": "frontend/src/design/theme.ts",
+      "size": 971,
+      "sha256": "5277c725e83d30c99188c0d9b9c0f7375986e2fee1f491492ea61977bc1f43b5"
+    },
+    {
+      "path": "frontend/src/features/architecture/architecture-manifest.json",
+      "size": 54918,
+      "sha256": "71b6fd77a62db42affc2bc614d767a781cf4946430110f124021b832c1748de4"
+    },
+    {
+      "path": "frontend/src/features/architecture/screenshots/rw-01-architecture-overview.png",
+      "size": 1155786,
+      "sha256": "08aab12eed530ac248688d52dbb40ca58365f78bba22a7cf5f5e8e51914642ac"
+    },
+    {
+      "path": "frontend/src/features/architecture/screenshots/rw-02-node-explanation.png",
+      "size": 1162446,
+      "sha256": "630b56bd08956ff4fd8879b4e780d8942f0eee68e148659d536112476cf9fda1"
+    },
+    {
+      "path": "frontend/src/features/architecture/screenshots/rw-03-source-dialog.png",
+      "size": 357696,
+      "sha256": "1e9a862ac27c0556acb3363737a89c3af0b7e737c82d8a3b303a64b154a100f4"
+    },
+    {
+      "path": "frontend/src/features/architecture/screenshots/rw-04-modeling-flow.png",
+      "size": 1173687,
+      "sha256": "3e7f2538a8b2c09414ed40f01464daae945c1fa8c5a1deb1f4f11949f7afd48a"
+    },
+    {
+      "path": "frontend/src/main.tsx",
+      "size": 975,
+      "sha256": "786711086573e7bf034737429c00fd380f3f3a969b1da9cf3514d1ae573aa0c7"
+    },
+    {
+      "path": "frontend/src/pages/ArchitecturePage.test.tsx",
+      "size": 1771,
+      "sha256": "003519acec33f9f0920a929758614af516d113fe1760935ccc9d88b0856f201b"
+    },
+    {
+      "path": "frontend/src/pages/ArchitecturePage.tsx",
+      "size": 16451,
+      "sha256": "98a065d04b220aea3f7ea65a7f38509af0c28ddd8f68b3e1ef397d11460990b6"
+    },
+    {
+      "path": "frontend/src/pages/ArtifactsPage.tsx",
+      "size": 3334,
+      "sha256": "1d115dd6055f9fcf58ef5621114a9f64df4674140bd7e65a5419b38c5c4bd64a"
+    },
+    {
+      "path": "frontend/src/pages/ChatPage.test.tsx",
+      "size": 8007,
+      "sha256": "a1195386af2061b8b3bcc3e900c88acd0e9fb809e1822e0f2483bdac88de2ba3"
+    },
+    {
+      "path": "frontend/src/pages/ChatPage.tsx",
+      "size": 47353,
+      "sha256": "ee78f8eb09aea8ab162a69bcf21effe822d237b00d19316cbcbb185699820192"
+    },
+    {
+      "path": "frontend/src/pages/DataPage.tsx",
+      "size": 22666,
+      "sha256": "17a838ec406be6239533cfa9ebc5da692e68672e263742d744a6c24b7cae2427"
+    },
+    {
+      "path": "frontend/src/pages/DesignSystemPage.test.tsx",
+      "size": 1938,
+      "sha256": "ddae765cf4ce4f9555420300823854b6ead10e430ee2c44cb28b37e0e32a59a8"
+    },
+    {
+      "path": "frontend/src/pages/DesignSystemPage.tsx",
+      "size": 552,
+      "sha256": "b246e2c8e0fce60f42024f496247d1f99baef4762fda5929fb38652d9ec1f0b1"
+    },
+    {
+      "path": "frontend/src/pages/ExplorePage.test.tsx",
+      "size": 648,
+      "sha256": "39a6f561afe60a9bcebc1bdbf9a2a2cf0aec163c203cb461a78aa5f412e3de4c"
+    },
+    {
+      "path": "frontend/src/pages/ExplorePage.tsx",
+      "size": 9672,
+      "sha256": "6d46178734556924f440d9edc5d8ed5e693a355c52ff968082c9ea524e640980"
+    },
+    {
+      "path": "frontend/src/pages/HomePage.test.tsx",
+      "size": 1480,
+      "sha256": "0f42907f0a49834dbe8a43574a0631cdccb4595016cfdc2bef8dd7eb5a5711cc"
+    },
+    {
+      "path": "frontend/src/pages/HomePage.tsx",
+      "size": 7105,
+      "sha256": "fba2984e0a6b18ed83b1e0271c356e422c06c45bdc3ab47156438bfce4654a2e"
+    },
+    {
+      "path": "frontend/src/pages/ManagementPages.test.tsx",
+      "size": 8507,
+      "sha256": "d7b824943044ccf0c788aa5fc6a1a797ea2747f528a657d0ace4b63e6b42ad8e"
+    },
+    {
+      "path": "frontend/src/pages/ModelPage.tsx",
+      "size": 13485,
+      "sha256": "2c46bec62af2ef36abe23ecef476a7f9f10786c5c14d06a3d847e0a7f6d6fcfe"
+    },
+    {
+      "path": "frontend/src/pages/ReportsPage.tsx",
+      "size": 2648,
+      "sha256": "8bd2215c4471c76565b181021b56c8ecdcf4dc278e9c721fba1441ccb33cde7b"
+    },
+    {
+      "path": "frontend/src/pages/SettingsPage.tsx",
+      "size": 17296,
+      "sha256": "a92fbc2bd0a75666b5c7cefd37d36668311e22a22df37dfc87a364672699c12a"
+    },
+    {
+      "path": "frontend/src/pages/SkillsPage.tsx",
+      "size": 13141,
+      "sha256": "46da2ee833f7edf49146d2ec847d485a6d68b528de54d0ee4fff231c74cf8eed"
+    },
+    {
+      "path": "frontend/src/pages/SourcesPage.tsx",
+      "size": 8739,
+      "sha256": "0fb024874c4828fc2fe05eb8b0424d476d30cb731635932ed498f2879fbfb4f9"
+    },
+    {
+      "path": "frontend/src/styles/app.css",
+      "size": 194709,
+      "sha256": "9e003d699963c9c99b66ba8070c9e9e0383e1c18809ec084f1b7a5bd2f45fdaf"
+    },
+    {
+      "path": "frontend/src/styles/tokens.css",
+      "size": 3575,
+      "sha256": "098f453f96b0f061f3ebeee881df442213290fe65d1355f348cbc59db88417f2"
+    },
+    {
+      "path": "frontend/src/test/setup.ts",
+      "size": 43,
+      "sha256": "9b328c4843431fa76d8de00008fc159e95f99a840211085ff3b8f25e53d14409"
+    },
+    {
+      "path": "frontend/src/types.ts",
+      "size": 5063,
+      "sha256": "547f289ebf70ca084977ccf7933138b4f303690f5507fe87fedd64002bf63cc2"
+    },
+    {
+      "path": "frontend/tsconfig.app.json",
+      "size": 507,
+      "sha256": "a7266d1c85fa6947c70073256d9a73e4c459e97b0b4ef24b5c48dcab498ef4c5"
+    },
+    {
+      "path": "frontend/tsconfig.json",
+      "size": 115,
+      "sha256": "c9282416074477d08cc7640977168c2e8265cac3c3a4e984ba3d340f85684d56"
+    },
+    {
+      "path": "frontend/tsconfig.node.json",
+      "size": 231,
+      "sha256": "3dc28b63563e20fab0d9f652f3039ed50e6c46bbdec66631a14822e8309b230d"
+    },
+    {
+      "path": "frontend/vite.config.ts",
+      "size": 1007,
+      "sha256": "c7b44b1c0db9be2fe3cb647e04e3362166cfa18b168aecfaf21c8c0554500440"
+    },
+    {
+      "path": "pyproject.toml",
+      "size": 1571,
+      "sha256": "7f2f4a489a6f0e400baf3bda914ba6559f54f9561ba1642d8ca33d0d10fe6e96"
+    },
+    {
+      "path": "sandbox/Dockerfile",
+      "size": 429,
+      "sha256": "a2b29620c46a13758c15ea69146bb535a2c8d12a1858136e9b85c8f1e16414b4"
+    },
+    {
+      "path": "scripts/benchmark_million.py",
+      "size": 3365,
+      "sha256": "9b14db725fb607b7e45545af24eb951c15a16d1b887d4b690232c85b0e0a12be"
+    },
+    {
+      "path": "scripts/build-sandbox.sh",
+      "size": 336,
+      "sha256": "545b6629ea55bd69187b34cb58ac4b684a7e16df3ff4ec842d2ea343e87754f6"
+    },
+    {
+      "path": "scripts/build_architecture_manifest.py",
+      "size": 20079,
+      "sha256": "87555bc33d778ca2c8bab1105e28acdab6d857203bbadb8cb2ead7ceafbca55d"
+    },
+    {
+      "path": "scripts/dev.sh",
+      "size": 1918,
+      "sha256": "111de256400034549cdeaaefa906c11567a64d2b1e66345800ab30db3c48d954"
+    },
+    {
+      "path": "scripts/load_olist_mysql.py",
+      "size": 3531,
+      "sha256": "0be02e4b9a6afa2560ef667d3993136a82cc55d0fd6e57eed379de47823bc8e7"
+    },
+    {
+      "path": "scripts/mysql-local.sh",
+      "size": 1889,
+      "sha256": "bf870d3a8ad85e06f7cd89a0afe7dd8fe19ab73226c972320a886d8b2769ec77"
+    },
+    {
+      "path": "scripts/prepare_olist.py",
+      "size": 6258,
+      "sha256": "e426e72beca3e8cae02b60993da338ca9bf33f6593b71bc68ac7ca52f40f2643"
+    },
+    {
+      "path": "scripts/run-sandbox.sh",
+      "size": 1119,
+      "sha256": "26f64dd9117112e8e08ce26cb83ac3d57f7fb3c3baf710c716d5880341238805"
+    },
+    {
+      "path": "scripts/serve_api.py",
+      "size": 510,
+      "sha256": "88f7c165db213f383a7fdd92cb1a13e7fbdabfe53b8a04c4ba8015857ee017ee"
+    },
+    {
+      "path": "scripts/start.sh",
+      "size": 3589,
+      "sha256": "2989e76b067c31d889065a06f976044e81f806d1796869597de34f21ab15476b"
+    },
+    {
+      "path": "scripts/stop.sh",
+      "size": 1137,
+      "sha256": "0d700f46c0fb03a83cb740b2be62b751656e7f2ad213658eb676d6c0b80947d7"
+    },
+    {
+      "path": "uv.lock",
+      "size": 210002,
+      "sha256": "61fe8aafc0ab06d5d2488974524a8fdf2c95b0c19e4dcb10d975985805fa4edb"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+# Root product documents are intentionally kept out of the handoff repository.
+/docs/
+
+# Restored local DeepSeek Harness state. The sanitized template is versioned
+# under handoff/dsh-home-template instead.
+/.runtime/
+
+# Secrets and machine-local configuration.
+**/.env
+**/.env.local
+**/.env.production
+**/.credentials.yaml
+**/.anonymous-user-id
+
+# Dependencies and reproducible caches.
+**/node_modules/
+**/.venv/
+**/.uv-cache/
+**/.pnpm-store/
+**/.mypy_cache/
+**/.pytest_cache/
+**/.ruff_cache/
+**/__pycache__/
+
+# Build and test output.
+**/dist/
+**/lib/
+**/.dist/
+**/.generated/
+**/.turbo/
+**/.vite/
+**/coverage/
+**/*.tsbuildinfo
+**/*.pyc
+**/*.pyo
+
+# Runtime-only project files. The tracked SQLite snapshot is force-added once.
+/workspaces/*/.runtime/logs/
+/workspaces/*/.runtime/exports/
+/workspaces/*/.runtime/*.pid
+
+# Generated delivery archives are published as private GitHub Release assets
+# instead of growing normal Git history.
+/workspaces/ai-analysis/fde-deliverables/06-acceptance-handover/packages/*.zip
+/workspaces/ai-analysis/.fde/evaluations/reports/**/*.zip
+
+# OS and editor noise.
+**/.DS_Store
+*.log
+*.swp

@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_a4b57442677547678d6afacecb610b1f",
+  "originalName": "05-脱敏订单数据样例.csv",
+  "storedName": "05-脱敏订单数据样例.csv",
+  "relativePath": "fde-resources/05-脱敏订单数据样例.csv",
+  "mimeType": "text/csv; charset=utf-8",
+  "extension": "csv",
+  "bytes": 127488,
+  "createdAt": "2026-08-27T03:17:06.409Z",
+  "modifiedAt": "2026-08-27T03:17:06.409Z",
+  "mtimeMs": 1787800626408.891,
+  "previewKind": "office",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 127488,
+    "sourceMtimeMs": 1787800626408.891,
+    "derivedPath": ".fde/derived/src_a4b57442677547678d6afacecb610b1f.md",
+    "updatedAt": "2026-08-27T03:17:06.448Z"
+  }
+}

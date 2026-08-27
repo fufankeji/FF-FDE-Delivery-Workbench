@@ -1,0 +1,525 @@
+diff --git a/lib/client.js b/lib/client.js
+index 6cf688cbba1345a61e6db0738638ae215ad1d2e0..9aa44dee99d3796bf9813e4c766eb68cf4aabdb7 100644
+--- a/lib/client.js	
++++ b/lib/client.js
+@@ -41,13 +41,13 @@ window.__ModuleLoader__.load({
+ 		];
+ 		/** Fallback prefs used whenever the settings document is unreachable or malformed. */
+ 		const SIDEBAR_PREFS_DEFAULTS = {
+-			openByDefault: false,
++			openByDefault: true,
+ 			defaultWidthPercent: 35,
+-			autoOpenSubagent: true,
+-			autoOpenJobs: true,
++			autoOpenSubagent: false,
++			autoOpenJobs: false,
+ 			agentTerminalTools: false,
+ 			agentOpenTools: false,
+-			bottomPanelAutoTerminal: true,
++			bottomPanelAutoTerminal: false,
+ 			terminalFontFamily: "",
+ 			terminalFontSize: 13,
+ 			interceptOpenPath: true,
+@@ -62,11 +62,16 @@ window.__ModuleLoader__.load({
+ 			htmlViewerNoSandbox: false,
+ 			htmlViewerDefaultUnsafe: false,
+ 			browserNoSandbox: false,
+-			browserInterceptLinks: true,
++			browserInterceptLinks: false,
+ 			browserInterceptHttp: true,
+ 			browserInterceptHttps: false,
+ 			browserAllowedLoopback: "",
+-			tabsEnabled: {},
++			tabsEnabled: {
++				subagent: false,
++				sidechat: false,
++				terminal: false,
++				browser: false
++			},
+ 			viewersEnabled: {},
+ 			pluginSettings: {}
+ 		};
+@@ -9729 +9734,4 @@ window.__ModuleLoader__.load({
+-			tag.textContent = css$4;
++			tag.textContent = css$4.replace(
++				"[data-dsh-panel-host]{z-index:25;pointer-events:none;position:fixed;inset:0;overflow:hidden}",
++				"[data-dsh-panel-host]{z-index:25;pointer-events:none;position:fixed;inset:0;overflow:clip}"
++			);
+@@ -12263,8 +12271,29 @@ window.__ModuleLoader__.load({
+ 		* drop over the file window uploads here and never reaches DSH's chat
+ 		* intake.
+ 		*/
++		const AGENT_TREE_REFRESH_DEBOUNCE_MS = 300;
++		const PROJECT_SOURCES_CHANGED_EVENT = "fde:project-sources-changed";
++		function isMutationToolName(value) {
++			return typeof value === "string" && (value === "write" || value === "edit" || value.endsWith("/write") || value.endsWith("/edit"));
++		}
++		function latestFileMutationInBlock(value) {
++			if (value === null || typeof value !== "object") return 0;
++			const node = value;
++			let latest = 0;
++			if (node.kind === "tool-result" && node.isError !== true && (isMutationToolName(node.call?.name) || node.callView?.card === "diff" || node.callView?.card === "generic" && node.callView.kind === "edit") && typeof node.seq === "number" && Number.isFinite(node.seq)) latest = node.seq;
++			if (!Array.isArray(node.subCalls)) return latest;
++			for (const child of node.subCalls) latest = Math.max(latest, latestFileMutationInBlock(child));
++			return latest;
++		}
++		function latestFileMutationSeq(snapshot) {
++			if (snapshot === null || typeof snapshot !== "object") return 0;
++			let latest = 0;
++			if (Array.isArray(snapshot.nodes)) for (const node of snapshot.nodes) latest = Math.max(latest, latestFileMutationInBlock(node));
++			if (Array.isArray(snapshot.runningCalls)) for (const call of snapshot.runningCalls) latest = Math.max(latest, latestFileMutationInBlock(call));
++			return latest;
++		}
+ 		function TreePanel(props) {
+-			const { sessionId, cwd, expanded, revealed, onToggle, onOpenFile, onOpenFileNewTab, onOpenFileSide, openWithTargets, openWithPinned, openWithSsh, onOpenWith, onToggleOpenWithPin, onReferenceFile, full } = props;
++			const { ctx, sessionId, cwd, expanded, revealed, onToggle, onOpenFile, onOpenFileNewTab, onOpenFileSide, openWithTargets, openWithPinned, openWithSsh, onOpenWith, onToggleOpenWithPin, onReferenceFile, full } = props;
+ 			const [query, setQuery] = (0, react.useState)("");
+ 			const [results, setResults] = (0, react.useState)(null);
+ 			const [error, setError] = (0, react.useState)(null);
+@@ -12282,6 +12311,41 @@ window.__ModuleLoader__.load({
+ 			const cancelledRef = (0, react.useRef)(false);
+ 			const fileInputRef = (0, react.useRef)(null);
+ 			const folderInputRef = (0, react.useRef)(null);
++			(0, react.useEffect)(() => {
++				if (cwd === void 0) return;
++				const session = ctx.sessions.binding?.(sessionId)?.session;
++				if (session?.getSnapshot === void 0 || session.subscribe === void 0) return;
++				let latest = latestFileMutationSeq(session.getSnapshot());
++				let timer;
++				const onSnapshot = () => {
++					const next = latestFileMutationSeq(session.getSnapshot?.());
++					if (next <= latest) return;
++					latest = next;
++					window.clearTimeout(timer);
++					timer = window.setTimeout(() => {
++						setRefreshTick((tick) => tick + 1);
++					}, AGENT_TREE_REFRESH_DEBOUNCE_MS);
++				};
++				const unsubscribe = session.subscribe(onSnapshot);
++				return () => {
++					unsubscribe();
++					window.clearTimeout(timer);
++				};
++			}, [
++				ctx,
++				sessionId,
++				cwd
++			]);
++			(0, react.useEffect)(() => {
++				if (cwd === void 0) return;
++				const onProjectSourcesChanged = (event) => {
++					if (event.detail?.path === cwd) setRefreshTick((tick) => tick + 1);
++				};
++				window.addEventListener(PROJECT_SOURCES_CHANGED_EVENT, onProjectSourcesChanged);
++				return () => {
++					window.removeEventListener(PROJECT_SOURCES_CHANGED_EVENT, onProjectSourcesChanged);
++				};
++			}, [cwd]);
+ 			/** Start one upload session into `dir` (absolute, inside the workspace). */
+ 			const startUpload = (dir, items) => {
+ 				if (items.length === 0 || cwd === void 0 || upload !== null) return;
+@@ -12360,7 +12424,8 @@ window.__ModuleLoader__.load({
+ 			}, [
+ 				sessionId,
+ 				cwd,
+-				needle
++				needle,
++				refreshTick
+ 			]);
+ 			const busy = upload !== null;
+ 			return /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
+@@ -12783,6 +12848,7 @@ window.__ModuleLoader__.load({
+ 			if (treeOnly || folderRoot !== void 0) return /* @__PURE__ */ (0, react_jsx_runtime.jsx)("div", {
+ 				className: sidebar_module_css_default.editor,
+ 				children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)(TreePanel, {
++					ctx,
+ 					full: true,
+ 					sessionId: scope.sessionId,
+ 					cwd: folderRoot ?? scope.cwd,
+@@ -12915,6 +12981,7 @@ window.__ModuleLoader__.load({
+ 							onPointerUp: onResizeEnd,
+ 							onPointerCancel: onResizeEnd
+ 						}), /* @__PURE__ */ (0, react_jsx_runtime.jsx)(TreePanel, {
++							ctx,
+ 							sessionId: scope.sessionId,
+ 							cwd: scope.cwd,
+ 							expanded,
+@@ -19580,7 +19647,7 @@ Mode: this is a continuable side conversation. Your answers stay in this side th
+ 				children: /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
+ 					className: sidebar_module_css_default.toggleCluster,
+ 					"data-dsh-toggle-cluster": true,
+-					children: [!narrow && /* @__PURE__ */ (0, react_jsx_runtime.jsx)(_deepseek_ai_dsh_client_ui_primitives.Tooltip, {
++					children: [false && !narrow && /* @__PURE__ */ (0, react_jsx_runtime.jsx)(_deepseek_ai_dsh_client_ui_primitives.Tooltip, {
+ 						label: t("noSession"),
+ 						side: "bottom",
+ 						delayMs: 500,
+@@ -19701,7 +19768,7 @@ Mode: this is a continuable side conversation. Your answers stay in this side th
+ 					/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
+ 						className: sidebar_module_css_default.toggleCluster,
+ 						"data-dsh-toggle-cluster": true,
+-						children: [!narrow && /* @__PURE__ */ (0, react_jsx_runtime.jsx)(_deepseek_ai_dsh_client_ui_primitives.Tooltip, {
++						children: [false && !narrow && /* @__PURE__ */ (0, react_jsx_runtime.jsx)(_deepseek_ai_dsh_client_ui_primitives.Tooltip, {
+ 							label: state.bottomOpen ? t("collapseBottomPanel") : t("expandBottomPanel"),
+ 							side: "bottom",
+ 							delayMs: 500,
+diff --git a/lib/index.js b/lib/index.js
+index 6eff381b88ea57652bccd2f18f7557519dcb1074..48c689cae6c022a06064b90e2268bfb020305612 100644
+--- a/lib/index.js	
++++ b/lib/index.js
+@@ -25,13 +25,13 @@ import { snapshotSubagentDescriptor } from "@deepseek-ai/dsh-subagent";
+ const SIDEBAR_PREFS_NS = "dsh-better-sidebar";
+ /** Fallback prefs used whenever the settings document is unreachable or malformed. */
+ const SIDEBAR_PREFS_DEFAULTS = {
+-	openByDefault: false,
++	openByDefault: true,
+ 	defaultWidthPercent: 35,
+-	autoOpenSubagent: true,
+-	autoOpenJobs: true,
++	autoOpenSubagent: false,
++	autoOpenJobs: false,
+ 	agentTerminalTools: false,
+ 	agentOpenTools: false,
+-	bottomPanelAutoTerminal: true,
++	bottomPanelAutoTerminal: false,
+ 	terminalFontFamily: "",
+ 	terminalFontSize: 13,
+ 	interceptOpenPath: true,
+@@ -46,11 +46,16 @@ const SIDEBAR_PREFS_DEFAULTS = {
+ 	htmlViewerNoSandbox: false,
+ 	htmlViewerDefaultUnsafe: false,
+ 	browserNoSandbox: false,
+-	browserInterceptLinks: true,
++	browserInterceptLinks: false,
+ 	browserInterceptHttp: true,
+ 	browserInterceptHttps: false,
+ 	browserAllowedLoopback: "",
+-	tabsEnabled: {},
++	tabsEnabled: {
++		subagent: false,
++		sidechat: false,
++		terminal: false,
++		browser: false
++	},
+ 	viewersEnabled: {},
+ 	pluginSettings: {}
+ };
+@@ -93,13 +98,13 @@ function resolveSidebarConfig(config) {
+ }
+ /** Schemastery schema for the user-facing preferences (validated by the settings service). */
+ const PrefsSchema = z.object({
+-	openByDefault: z.boolean().default(false),
++	openByDefault: z.boolean().default(true),
+ 	defaultWidthPercent: z.number().step(1).min(20).max(60).default(35),
+-	autoOpenSubagent: z.boolean().default(true),
+-	autoOpenJobs: z.boolean().default(true),
++	autoOpenSubagent: z.boolean().default(false),
++	autoOpenJobs: z.boolean().default(false),
+ 	agentTerminalTools: z.boolean().default(false),
+ 	agentOpenTools: z.boolean().default(false),
+-	bottomPanelAutoTerminal: z.boolean().default(true),
++	bottomPanelAutoTerminal: z.boolean().default(false),
+ 	terminalFontFamily: z.string().default(""),
+ 	terminalFontSize: z.number().step(1).min(9).max(32).default(13),
+ 	interceptOpenPath: z.boolean().default(true),
+@@ -119,11 +124,16 @@ const PrefsSchema = z.object({
+ 	htmlViewerNoSandbox: z.boolean().default(false),
+ 	htmlViewerDefaultUnsafe: z.boolean().default(false),
+ 	browserNoSandbox: z.boolean().default(false),
+-	browserInterceptLinks: z.boolean().default(true),
++	browserInterceptLinks: z.boolean().default(false),
+ 	browserInterceptHttp: z.boolean().default(true),
+ 	browserInterceptHttps: z.boolean().default(false),
+ 	browserAllowedLoopback: z.string().default(""),
+-	tabsEnabled: z.dict(z.boolean()).default({}),
++	tabsEnabled: z.dict(z.boolean()).default({
++		subagent: false,
++		sidechat: false,
++		terminal: false,
++		browser: false
++	}),
+ 	viewersEnabled: z.dict(z.boolean()).default({}),
+ 	pluginSettings: z.dict(z.dict(z.any())).default({})
+ });
+diff --git a/src/client/EditorHost.tsx b/src/client/EditorHost.tsx
+index d394c737c14dbedce36469f06a6eb0c24b230b3f..b2f61e3203dd402a4cbeb2a3d13149ab3004b712 100644
+--- a/src/client/EditorHost.tsx	
++++ b/src/client/EditorHost.tsx
+@@ -368,6 +368,7 @@ export function EditorHost(props: {
+     return (
+       <div className={css.editor}>
+         <TreePanel
++          ctx={ctx}
+           full
+           sessionId={scope.sessionId}
+           cwd={folderRoot ?? scope.cwd}
+@@ -488,6 +489,7 @@ export function EditorHost(props: {
+               onPointerCancel={onResizeEnd}
+             />
+             <TreePanel
++              ctx={ctx}
+               sessionId={scope.sessionId}
+               cwd={scope.cwd}
+               expanded={expanded}
+diff --git a/src/client/Sidebar.tsx b/src/client/Sidebar.tsx
+index 97c8160b07f0c81db36eed4dbec181267d7c0ac2..e7749a3793cf240dfec6f0d0199374ecd5cdad0e 100644
+--- a/src/client/Sidebar.tsx	
++++ b/src/client/Sidebar.tsx
+@@ -1225,7 +1225,7 @@ export function Sidebar(props: { ctx: Context; store: SidebarStore }) {
+     return (
+       <div data-dsh-panel-host {...osFileDragShield}>
+         <div className={css.toggleCluster} data-dsh-toggle-cluster>
+-          {!narrow && (
++          {false && !narrow && (
+             <Tooltip label={t('noSession')} side="bottom" delayMs={500}>
+               <button type="button" className={css.toggleButton} aria-disabled="true" aria-label={t('noSession')}>
+                 <IconPanelBottomOutline16 />
+@@ -1351,7 +1351,7 @@ export function Sidebar(props: { ctx: Context; store: SidebarStore }) {
+           Narrow viewports merge the two workbenches into the one drawer —
+           there is no bottom panel, so its toggle button is not offered.
+         */}
+-        {!narrow && (
++        {false && !narrow && (
+           <Tooltip label={state.bottomOpen ? t('collapseBottomPanel') : t('expandBottomPanel')} side="bottom" delayMs={500}>
+             <button
+               type="button"
+diff --git a/src/client/TreePanel.tsx b/src/client/TreePanel.tsx
+index e304328eb8060966700e7911f6f046b8f8f46897..f05170d31af8dc1f04d0f5c543fa7b44b55f673c 100644
+--- a/src/client/TreePanel.tsx	
++++ b/src/client/TreePanel.tsx
+@@ -18,6 +18,7 @@
+ import { useEffect, useRef, useState, type InputHTMLAttributes } from 'react'
+ import clsx from 'clsx'
+ import { IconFolderOpen16, IconRefreshOutline16 } from '@deepseek-ai/dsh-client-ui-primitives'
++import type { Context } from '../context-types.ts'
+ import { api } from './api.ts'
+ import { FileTree } from './FileTree.tsx'
+ import { IconUploadOutline16 } from './icons.tsx'
+@@ -41,7 +42,55 @@ interface UploadSession {
+   controller: AbortController
+ }
+ 
++/** Collapse a burst of Agent file tools into one visible-tree reload. */
++const AGENT_TREE_REFRESH_DEBOUNCE_MS = 300
++const PROJECT_SOURCES_CHANGED_EVENT = 'fde:project-sources-changed'
++
++function isMutationToolName(value: unknown): boolean {
++  return typeof value === 'string'
++    && (value === 'write' || value === 'edit' || value.endsWith('/write') || value.endsWith('/edit'))
++}
++
++/** Highest settled file-mutation seq in one tool block and its subcalls. */
++function latestFileMutationInBlock(value: unknown): number {
++  if (value === null || typeof value !== 'object') return 0
++  const node = value as {
++    kind?: unknown
++    seq?: unknown
++    isError?: unknown
++    call?: { name?: unknown } | null
++    callView?: { card?: unknown; kind?: unknown } | null
++    subCalls?: readonly unknown[]
++  }
++  let latest = 0
++  if (node.kind === 'tool-result' && node.isError !== true
++    && (isMutationToolName(node.call?.name)
++      || node.callView?.card === 'diff'
++      || (node.callView?.card === 'generic' && node.callView.kind === 'edit'))
++    && typeof node.seq === 'number' && Number.isFinite(node.seq)) {
++    latest = node.seq
++  }
++  if (!Array.isArray(node.subCalls)) return latest
++  for (const child of node.subCalls) latest = Math.max(latest, latestFileMutationInBlock(child))
++  return latest
++}
++
++/** Highest settled file-mutation seq in history or the live Code Mode tree. */
++function latestFileMutationSeq(snapshot: unknown): number {
++  if (snapshot === null || typeof snapshot !== 'object') return 0
++  const view = snapshot as { nodes?: unknown; runningCalls?: unknown }
++  let latest = 0
++  if (Array.isArray(view.nodes)) {
++    for (const node of view.nodes) latest = Math.max(latest, latestFileMutationInBlock(node))
++  }
++  if (Array.isArray(view.runningCalls)) {
++    for (const call of view.runningCalls) latest = Math.max(latest, latestFileMutationInBlock(call))
++  }
++  return latest
++}
++
+ export function TreePanel(props: {
++  ctx: Context
+   sessionId: string
+   cwd: string | undefined
+   expanded: string[]
+@@ -64,7 +113,7 @@ export function TreePanel(props: {
+    *  at a fixed width. */
+   full?: boolean
+ }) {
+-  const { sessionId, cwd, expanded, revealed, onToggle, onOpenFile, onOpenFileNewTab, onOpenFileSide, openWithTargets, openWithPinned, openWithSsh, onOpenWith, onToggleOpenWithPin, onReferenceFile, full } = props
++  const { ctx, sessionId, cwd, expanded, revealed, onToggle, onOpenFile, onOpenFileNewTab, onOpenFileSide, openWithTargets, openWithPinned, openWithSsh, onOpenWith, onToggleOpenWithPin, onReferenceFile, full } = props
+   const [query, setQuery] = useState('')
+   const [results, setResults] = useState<{ matches: string[]; truncated: boolean } | null>(null)
+   const [error, setError] = useState<string | null>(null)
+@@ -83,6 +132,38 @@ export function TreePanel(props: {
+   const fileInputRef = useRef<HTMLInputElement>(null)
+   const folderInputRef = useRef<HTMLInputElement>(null)
+ 
++  useEffect(() => {
++    if (cwd === undefined) return
++    const session = ctx.sessions.binding?.(sessionId)?.session
++    if (session?.getSnapshot === undefined || session.subscribe === undefined) return
++    let latest = latestFileMutationSeq(session.getSnapshot())
++    let timer: number | undefined
++    const onSnapshot = (): void => {
++      const next = latestFileMutationSeq(session.getSnapshot?.())
++      if (next <= latest) return
++      latest = next
++      window.clearTimeout(timer)
++      timer = window.setTimeout(() => {
++        setRefreshTick(tick => tick + 1)
++      }, AGENT_TREE_REFRESH_DEBOUNCE_MS)
++    }
++    const unsubscribe = session.subscribe(onSnapshot)
++    return () => {
++      unsubscribe()
++      window.clearTimeout(timer)
++    }
++  }, [ctx, sessionId, cwd])
++
++  useEffect(() => {
++    if (cwd === undefined) return
++    const onProjectSourcesChanged = (event: Event): void => {
++      const detail = (event as CustomEvent<{ path?: unknown }>).detail
++      if (detail?.path === cwd) setRefreshTick(tick => tick + 1)
++    }
++    window.addEventListener(PROJECT_SOURCES_CHANGED_EVENT, onProjectSourcesChanged)
++    return () => { window.removeEventListener(PROJECT_SOURCES_CHANGED_EVENT, onProjectSourcesChanged) }
++  }, [cwd])
++
+   /** Start one upload session into `dir` (absolute, inside the workspace). */
+   const startUpload = (dir: string, items: UploadItem[]): void => {
+     if (items.length === 0 || cwd === undefined || upload !== null) return
+@@ -149,7 +230,7 @@ export function TreePanel(props: {
+       window.clearTimeout(timer)
+       controller.abort()
+     }
+-  }, [sessionId, cwd, needle])
++  }, [sessionId, cwd, needle, refreshTick])
+ 
+   const busy = upload !== null
+ 
+diff --git a/src/client/sidebar.module.css b/src/client/sidebar.module.css
+index 26e1862d3dc43d7b009676656dd639303cfe43ee..ff84d995e6f2ef57164f93d086e40276464f6841 100644
+--- a/src/client/sidebar.module.css
++++ b/src/client/sidebar.module.css
+@@ -43,6 +43,8 @@
+      hidden panels extended the document's scrollable area, making the whole
+      page draggable left-right and up-down while any panel was collapsed.
+      The host is exactly viewport-sized (inset: 0), so the clip is invisible
+-     until a panel slides in from the edge; internal scroll containers and
+-     the app's fixed overlay stack are unaffected. */
+-  overflow: hidden;
++     until a panel slides in from the edge. `clip` deliberately avoids making
++     the host a programmatic scroll container: a nested review surface may
++     call scrollIntoView() without moving the whole dock. Internal scroll
++     containers and the app's fixed overlay stack are unaffected. */
++  overflow: clip;
+diff --git a/src/config.ts b/src/config.ts
+index b28b2a7868faebd510ece59c93636a9de6b03c67..d930de53ec346b6fdd777c9b87af91bdee0cc607 100644
+--- a/src/config.ts	
++++ b/src/config.ts
+@@ -117,13 +117,13 @@ export function resolveSidebarConfig(config: SidebarConfig | undefined): Resolve
+ 
+ /** Schemastery schema for the user-facing preferences (validated by the settings service). */
+ export const PrefsSchema: z<SidebarPrefs> = z.object({
+-  openByDefault: z.boolean().default(false),
++  openByDefault: z.boolean().default(true),
+   defaultWidthPercent: z.number().step(1).min(WIDTH_PERCENT_MIN).max(WIDTH_PERCENT_MAX).default(WIDTH_PERCENT_DEFAULT),
+-  autoOpenSubagent: z.boolean().default(true),
+-  autoOpenJobs: z.boolean().default(true),
++  autoOpenSubagent: z.boolean().default(false),
++  autoOpenJobs: z.boolean().default(false),
+   agentTerminalTools: z.boolean().default(false),
+   agentOpenTools: z.boolean().default(false),
+-  bottomPanelAutoTerminal: z.boolean().default(true),
++  bottomPanelAutoTerminal: z.boolean().default(false),
+   terminalFontFamily: z.string().default(''),
+   terminalFontSize: z.number().step(1).min(TERMINAL_FONT_SIZE_MIN).max(TERMINAL_FONT_SIZE_MAX).default(TERMINAL_FONT_SIZE_DEFAULT),
+   interceptOpenPath: z.boolean().default(true),
+@@ -138,14 +138,19 @@ export const PrefsSchema: z<SidebarPrefs> = z.object({
+   htmlViewerNoSandbox: z.boolean().default(false),
+   htmlViewerDefaultUnsafe: z.boolean().default(false),
+   browserNoSandbox: z.boolean().default(false),
+-  browserInterceptLinks: z.boolean().default(true),
++  browserInterceptLinks: z.boolean().default(false),
+   browserInterceptHttp: z.boolean().default(true),
+   browserInterceptHttps: z.boolean().default(false),
+   browserAllowedLoopback: z.string().default(''),
+   // Per-feature enable switches are OPEN maps (any tab/viewer id, built-in or
+   // external): an absent key means enabled, so old documents resolve to {}
+   // (everything on) with no migration. Non-boolean values fail validation.
+-  tabsEnabled: z.dict(z.boolean()).default({}),
++  tabsEnabled: z.dict(z.boolean()).default({
++    subagent: false,
++    sidechat: false,
++    terminal: false,
++    browser: false,
++  }),
+   viewersEnabled: z.dict(z.boolean()).default({}),
+   // Plugin-owned settings blobs (v0.12.0+) are an OPEN nested map: any
+   // descriptor id may carry any JSON-serializable values. This is the
+diff --git a/src/context-types.ts b/src/context-types.ts
+index a62333bcea3ea2ee6e0f405b80c5428b9f3a0395..384488eca764d0ee0c15a9b734fc25bca1cdcb0a 100644
+--- a/src/context-types.ts	
++++ b/src/context-types.ts
+@@ -377,6 +377,10 @@ export interface SidebarSessionsService {
+   binding?(id: string): {
+     session: {
+       rename(title: string): Promise<unknown>
++      /** Current immutable Conversation snapshot. */
++      getSnapshot?(): { nodes?: readonly unknown[]; runningCalls?: readonly unknown[] }
++      /** Subscribe to snapshot changes. */
++      subscribe?(fn: () => void): () => void
+     }
+   } | undefined
+   /**
+diff --git a/src/prefs-shared.ts b/src/prefs-shared.ts
+index 0b4408417bcf08a57cd765286b88f0e20550a6bf..162e0000763973ab133c3e59fba384862c7a8193 100644
+--- a/src/prefs-shared.ts	
++++ b/src/prefs-shared.ts
+@@ -242,13 +242,13 @@ export type TitleBarScheme = typeof TITLE_BAR_SCHEMES[number]
+ 
+ /** Fallback prefs used whenever the settings document is unreachable or malformed. */
+ export const SIDEBAR_PREFS_DEFAULTS: SidebarPrefs = {
+-  openByDefault: false,
++  openByDefault: true,
+   defaultWidthPercent: WIDTH_PERCENT_DEFAULT,
+-  autoOpenSubagent: true,
+-  autoOpenJobs: true,
++  autoOpenSubagent: false,
++  autoOpenJobs: false,
+   agentTerminalTools: false,
+   agentOpenTools: false,
+-  bottomPanelAutoTerminal: true,
++  bottomPanelAutoTerminal: false,
+   terminalFontFamily: '',
+   terminalFontSize: TERMINAL_FONT_SIZE_DEFAULT,
+   interceptOpenPath: true,
+@@ -263,11 +263,16 @@ export const SIDEBAR_PREFS_DEFAULTS: SidebarPrefs = {
+   htmlViewerNoSandbox: false,
+   htmlViewerDefaultUnsafe: false,
+   browserNoSandbox: false,
+-  browserInterceptLinks: true,
++  browserInterceptLinks: false,
+   browserInterceptHttp: true,
+   browserInterceptHttps: false,
+   browserAllowedLoopback: '',
+-  tabsEnabled: {},
++  tabsEnabled: {
++    subagent: false,
++    sidechat: false,
++    terminal: false,
++    browser: false,
++  },
+   viewersEnabled: {},
+   pluginSettings: {},
+ }

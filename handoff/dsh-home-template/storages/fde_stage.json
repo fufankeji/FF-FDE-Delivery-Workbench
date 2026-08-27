@@ -1,0 +1,33 @@
+{
+  "unit": {
+    "name": "fde_stage",
+    "version": 1
+  },
+  "global": null,
+  "tables": {
+    "projects": {
+      "22caf7a1-28f1-4590-aa62-6500f166eb8b": {
+        "currentStage": "completed",
+        "revision": 11,
+        "createdAt": "2026-08-26T15:00:37.569Z",
+        "updatedAt": "2026-08-27T14:07:01.254Z",
+        "returns": [
+          {
+            "from": "completed",
+            "to": "handoff",
+            "reason": "123",
+            "returnedAt": "2026-08-27T14:06:30.003Z",
+            "revision": 8
+          },
+          {
+            "from": "handoff",
+            "to": "pilot",
+            "reason": "123",
+            "returnedAt": "2026-08-27T14:06:40.812Z",
+            "revision": 9
+          }
+        ]
+      }
+    }
+  }
+}

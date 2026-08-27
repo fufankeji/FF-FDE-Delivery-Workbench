@@ -1,0 +1,313 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`sidebar shell snapshots > renders the collapsed rail after the crossfade settles, in place 1`] = `
+<div
+  data-slot="sidebar"
+  style="display: contents;"
+>
+  <div
+    class="root fading quietBars"
+    style="width: 300px;"
+  >
+    <div
+      class="logoRow"
+    >
+      <div
+        class="brand wide"
+      >
+        <span
+          class="brandIdentity"
+        >
+          <span
+            class="brandMark"
+          >
+            <div
+              data-slot="sidebar.brand.mark"
+              style="display: contents;"
+            >
+              <svg
+                aria-hidden="true"
+                data-content="965fe321"
+                fill="none"
+                height="17.6580310880829"
+                viewBox="0 0 23.16 17.04"
+                width="24"
+              />
+            </div>
+          </span>
+          <span
+            class="brandName"
+          >
+            <div
+              data-slot="sidebar.brand.name"
+              style="display: contents;"
+            >
+              <span
+                class="fallbackBrandName"
+              >
+                DSH Local Build
+              </span>
+              <span
+                class="buildRevision"
+              >
+                abc1234
+              </span>
+            </div>
+          </span>
+        </span>
+      </div>
+      <button
+        aria-label="Open sidebar"
+        class="iconButton toggle"
+        type="button"
+      >
+        <svg
+          class="panelIcon"
+          data-content="35f95b0c"
+          fill="none"
+          height="16"
+          viewBox="0 0 16 16"
+          width="16"
+          xmlns="http://www.w3.org/2000/svg"
+        />
+      </button>
+    </div>
+    <div
+      class="regionArea"
+    >
+      <div
+        data-slot="sidebar.workspaces"
+        style="display: contents;"
+      />
+    </div>
+    <div
+      class="footArea"
+    >
+      <div
+        class="footerActions"
+      >
+        <div
+          data-slot="sidebar.footer.action"
+          style="display: contents;"
+        />
+      </div>
+      <div
+        class="settingsArea"
+      >
+        <div
+          data-slot="sidebar.settings"
+          style="display: contents;"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`sidebar shell snapshots > renders the expanded column (wordmark, capsule, empty holes) 1`] = `
+<div
+  data-slot="sidebar"
+  style="display: contents;"
+>
+  <div
+    class="root quietBars"
+    style="width: 300px;"
+  >
+    <div
+      class="logoRow"
+    >
+      <div
+        class="brand wide"
+      >
+        <span
+          class="brandIdentity"
+        >
+          <span
+            class="brandMark"
+          >
+            <div
+              data-slot="sidebar.brand.mark"
+              style="display: contents;"
+            >
+              <svg
+                aria-hidden="true"
+                data-content="965fe321"
+                fill="none"
+                height="17.6580310880829"
+                viewBox="0 0 23.16 17.04"
+                width="24"
+              />
+            </div>
+          </span>
+          <span
+            class="brandName"
+          >
+            <div
+              data-slot="sidebar.brand.name"
+              style="display: contents;"
+            >
+              <span
+                class="fallbackBrandName"
+              >
+                DSH Local Build
+              </span>
+              <span
+                class="buildRevision"
+              >
+                abc1234
+              </span>
+            </div>
+          </span>
+        </span>
+      </div>
+      <button
+        aria-label="Collapse sidebar"
+        class="iconButton toggle"
+        type="button"
+      >
+        <svg
+          class="panelIcon"
+          data-content="35f95b0c"
+          fill="none"
+          height="16"
+          viewBox="0 0 16 16"
+          width="16"
+          xmlns="http://www.w3.org/2000/svg"
+        />
+      </button>
+    </div>
+    <div
+      class="regionArea"
+    >
+      <div
+        data-slot="sidebar.workspaces"
+        style="display: contents;"
+      />
+    </div>
+    <div
+      class="footArea"
+    >
+      <div
+        class="footerActions"
+      >
+        <div
+          data-slot="sidebar.footer.action"
+          style="display: contents;"
+        />
+      </div>
+      <div
+        class="settingsArea"
+      >
+        <div
+          data-slot="sidebar.settings"
+          style="display: contents;"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`sidebar shell snapshots > renders the expanded column in the default locale (zh, no setLocale) 1`] = `
+<div
+  data-slot="sidebar"
+  style="display: contents;"
+>
+  <div
+    class="root quietBars"
+    style="width: 300px;"
+  >
+    <div
+      class="logoRow"
+    >
+      <div
+        class="brand wide"
+      >
+        <span
+          class="brandIdentity"
+        >
+          <span
+            class="brandMark"
+          >
+            <div
+              data-slot="sidebar.brand.mark"
+              style="display: contents;"
+            >
+              <svg
+                aria-hidden="true"
+                data-content="965fe321"
+                fill="none"
+                height="17.6580310880829"
+                viewBox="0 0 23.16 17.04"
+                width="24"
+              />
+            </div>
+          </span>
+          <span
+            class="brandName"
+          >
+            <div
+              data-slot="sidebar.brand.name"
+              style="display: contents;"
+            >
+              <span
+                class="fallbackBrandName"
+              >
+                DSH Local Build
+              </span>
+              <span
+                class="buildRevision"
+              >
+                abc1234
+              </span>
+            </div>
+          </span>
+        </span>
+      </div>
+      <button
+        aria-label="收起侧边栏"
+        class="iconButton toggle"
+        type="button"
+      >
+        <svg
+          class="panelIcon"
+          data-content="35f95b0c"
+          fill="none"
+          height="16"
+          viewBox="0 0 16 16"
+          width="16"
+          xmlns="http://www.w3.org/2000/svg"
+        />
+      </button>
+    </div>
+    <div
+      class="regionArea"
+    >
+      <div
+        data-slot="sidebar.workspaces"
+        style="display: contents;"
+      />
+    </div>
+    <div
+      class="footArea"
+    >
+      <div
+        class="footerActions"
+      >
+        <div
+          data-slot="sidebar.footer.action"
+          style="display: contents;"
+        />
+      </div>
+      <div
+        class="settingsArea"
+      >
+        <div
+          data-slot="sidebar.settings"
+          style="display: contents;"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+`;

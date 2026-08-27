@@ -1,0 +1,14 @@
+{
+  "task": "clustering",
+  "features": [
+    "quantity",
+    "unit_price",
+    "paid_amount"
+  ],
+  "algorithm": "kmeans",
+  "random_state": 42,
+  "metrics": {
+    "silhouette": 0.5560275698887369,
+    "clusters": 4
+  }
+}

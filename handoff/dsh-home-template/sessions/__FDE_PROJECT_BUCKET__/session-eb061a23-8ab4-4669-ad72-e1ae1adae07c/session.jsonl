@@ -1,0 +1,5 @@
+{"type":"session","version":0,"id":"session-eb061a23-8ab4-4669-ad72-e1ae1adae07c","createdAt":1787805564128,"cwd":"__FDE_WORKSPACE_PATH__","delegationDepth":0,"agentPreset":"standard"}
+{"type":"permission/preset","seq":0,"time":1787805564132,"data":{"preset":"workspace-write"}}
+{"type":"sandbox/mode","seq":1,"time":1787805564133,"data":{"mode":"workspace-write"}}
+{"type":"approval/policy","seq":2,"time":1787805564133,"data":{"policy":"ask"}}
+{"type":"session/end-seed","seq":3,"time":1787806159652,"data":{}}

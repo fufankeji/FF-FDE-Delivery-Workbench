@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_9e25bd35b34a4850808f16cc78c88a3f",
+  "originalName": "02-业务访谈纪要.pdf",
+  "storedName": "02-业务访谈纪要.pdf",
+  "relativePath": "fde-resources/02-业务访谈纪要.pdf",
+  "mimeType": "application/pdf",
+  "extension": "pdf",
+  "bytes": 28322,
+  "createdAt": "2026-08-27T03:17:06.396Z",
+  "modifiedAt": "2026-08-27T03:17:06.396Z",
+  "mtimeMs": 1787800626396.1052,
+  "previewKind": "pdf",
+  "parse": {
+    "status": "needs-ocr",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 28322,
+    "sourceMtimeMs": 1787800626396.1052,
+    "updatedAt": "2026-08-27T03:17:06.538Z",
+    "message": "all 8 pages contain no extractable text (pages needing OCR: 1-8)"
+  }
+}

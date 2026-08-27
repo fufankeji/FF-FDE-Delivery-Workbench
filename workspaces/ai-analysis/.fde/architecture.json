@@ -1,0 +1,280 @@
+{
+  "version": 1,
+  "revision": 2,
+  "title": "DS4-AI 智能经营分析工作台（本地单机试点）候选架构",
+  "summary": "本地优先、单机试点的智能经营分析工作台：以对话式工作台接入需求，通过 FastAPI/SSE 网关与 Agent 编排将业务问题转成只读查询、探索、模型实验与版本化报告，由项目仓储与独立项目文件空间保存可追溯证据。依据已确认决策收敛：3 名分析师单机试点、文件优先（CSV/Excel/SQLite）+ 只读副本接入、模型仅使用脱敏字段与本地/私有模型（敏感字段不外发）、2026-10-01 按演示核心链路理解。无在线模型时确定性能力仍可用。",
+  "status": "confirmed",
+  "updatedAt": "2026-08-27T05:44:41.352Z",
+  "groups": [
+    {
+      "id": "experience",
+      "label": "交互与接入层"
+    },
+    {
+      "id": "intelligence",
+      "label": "Agent 智能编排层"
+    },
+    {
+      "id": "capability",
+      "label": "分析能力层"
+    },
+    {
+      "id": "foundation",
+      "label": "证据与存储底座"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "workbench",
+      "label": "对话式分析工作台",
+      "kind": "entry",
+      "group": "experience",
+      "note": "React · 单机本地 · 实时结果与报告"
+    },
+    {
+      "id": "api-stream",
+      "label": "FastAPI + SSE 网关",
+      "kind": "core",
+      "group": "experience",
+      "note": "请求校验与事件流"
+    },
+    {
+      "id": "agent-runtime",
+      "label": "任务意图与 Run 编排",
+      "kind": "core",
+      "group": "intelligence",
+      "note": "计划、执行、取消与恢复"
+    },
+    {
+      "id": "deepseek",
+      "label": "本地/私有模型服务",
+      "kind": "external",
+      "group": "intelligence",
+      "note": "仅脱敏字段与聚合；敏感字段不外发"
+    },
+    {
+      "id": "tool-router",
+      "label": "意图最小工具路由",
+      "kind": "core",
+      "group": "intelligence",
+      "note": "按任务开放受控能力"
+    },
+    {
+      "id": "skill-runtime",
+      "label": "Skills 与隔离沙箱",
+      "kind": "core",
+      "group": "intelligence",
+      "note": "渐进披露与无网络受限执行"
+    },
+    {
+      "id": "source-service",
+      "label": "多数据源接入与画像",
+      "kind": "default",
+      "group": "capability",
+      "note": "文件优先：CSV · Excel · SQLite · MySQL 只读副本"
+    },
+    {
+      "id": "query-engine",
+      "label": "只读查询引擎",
+      "kind": "default",
+      "group": "capability",
+      "note": "SQL AST · 仅 SELECT · 限时限行"
+    },
+    {
+      "id": "analysis-engine",
+      "label": "探索与特征工程",
+      "kind": "default",
+      "group": "capability",
+      "note": "画像、清洗与衍生数据（不覆盖原始）"
+    },
+    {
+      "id": "model-jobs",
+      "label": "异步训练进程",
+      "kind": "default",
+      "group": "capability",
+      "note": "并发、取消与超时"
+    },
+    {
+      "id": "ml-service",
+      "label": "机器学习能力",
+      "kind": "default",
+      "group": "capability",
+      "note": "模型、指标与逐行预测；本地/私有"
+    },
+    {
+      "id": "report-service",
+      "label": "版本化分析报告",
+      "kind": "output",
+      "group": "capability",
+      "note": "Markdown 与自包含 HTML"
+    },
+    {
+      "id": "external-data",
+      "label": "本地文件与数据库",
+      "kind": "external",
+      "group": "foundation",
+      "note": "客户原始/脱敏数据来源"
+    },
+    {
+      "id": "repository",
+      "label": "项目仓储与产物血缘",
+      "kind": "store",
+      "group": "foundation",
+      "note": "领域实体与证据索引"
+    },
+    {
+      "id": "metadata-store",
+      "label": "SQLite 元数据",
+      "kind": "store",
+      "group": "foundation",
+      "note": "事务化项目状态"
+    },
+    {
+      "id": "project-workspace",
+      "label": "独立项目文件空间",
+      "kind": "store",
+      "group": "foundation",
+      "note": "数据、代码、模型与报告；凭证排除"
+    }
+  ],
+  "edges": [
+    {
+      "from": "workbench",
+      "to": "api-stream",
+      "label": "请求与管理操作"
+    },
+    {
+      "from": "api-stream",
+      "to": "agent-runtime",
+      "label": "进入 Agent Run"
+    },
+    {
+      "from": "agent-runtime",
+      "to": "deepseek",
+      "label": "最小上下文(脱敏/聚合)"
+    },
+    {
+      "from": "deepseek",
+      "to": "tool-router",
+      "label": "结构化工具调用"
+    },
+    {
+      "from": "tool-router",
+      "to": "agent-runtime",
+      "label": "事件与产物 ID",
+      "dashed": true
+    },
+    {
+      "from": "tool-router",
+      "to": "skill-runtime",
+      "label": "Skill 调用"
+    },
+    {
+      "from": "tool-router",
+      "to": "query-engine",
+      "label": "只读 SQL"
+    },
+    {
+      "from": "tool-router",
+      "to": "analysis-engine",
+      "label": "探索与清洗"
+    },
+    {
+      "from": "tool-router",
+      "to": "model-jobs",
+      "label": "启动训练"
+    },
+    {
+      "from": "model-jobs",
+      "to": "ml-service",
+      "label": "隔离训练"
+    },
+    {
+      "from": "tool-router",
+      "to": "report-service",
+      "label": "生成与修订"
+    },
+    {
+      "from": "external-data",
+      "to": "source-service",
+      "label": "文件或只读表"
+    },
+    {
+      "from": "source-service",
+      "to": "query-engine",
+      "label": "已画像数据源"
+    },
+    {
+      "from": "source-service",
+      "to": "repository",
+      "label": "指纹与画像"
+    },
+    {
+      "from": "query-engine",
+      "to": "repository",
+      "label": "SQL 与血缘"
+    },
+    {
+      "from": "analysis-engine",
+      "to": "repository",
+      "label": "质量指标与配置"
+    },
+    {
+      "from": "ml-service",
+      "to": "repository",
+      "label": "模型与指标"
+    },
+    {
+      "from": "skill-runtime",
+      "to": "repository",
+      "label": "运行记录"
+    },
+    {
+      "from": "report-service",
+      "to": "repository",
+      "label": "版本与证据"
+    },
+    {
+      "from": "repository",
+      "to": "metadata-store",
+      "label": "事务元数据"
+    },
+    {
+      "from": "source-service",
+      "to": "project-workspace",
+      "label": "隔离复制"
+    },
+    {
+      "from": "query-engine",
+      "to": "project-workspace",
+      "label": "查询片段"
+    },
+    {
+      "from": "analysis-engine",
+      "to": "project-workspace",
+      "label": "衍生数据与代码"
+    },
+    {
+      "from": "ml-service",
+      "to": "project-workspace",
+      "label": "模型与预测"
+    },
+    {
+      "from": "report-service",
+      "to": "project-workspace",
+      "label": "Markdown 与 HTML"
+    },
+    {
+      "from": "agent-runtime",
+      "to": "api-stream",
+      "label": "Token、状态与消息",
+      "dashed": true
+    },
+    {
+      "from": "api-stream",
+      "to": "workbench",
+      "label": "实时呈现",
+      "dashed": true
+    }
+  ]
+}

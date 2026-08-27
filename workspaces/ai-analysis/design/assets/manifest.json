@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "assets": [
+    {
+      "id": "mountain-night",
+      "file": "mountain-night.png",
+      "source": "Codex built-in imagegen with B4 as a visual reference",
+      "purpose": "Localized welcome, navigation and empty-state brand background",
+      "dimensions": [1672, 941],
+      "alpha": false,
+      "sha256": "6d3b0e622f3a0436b651c0ca54ffa36ee0c0b9767201ae53d19523efaf6a00c6",
+      "constraints": "Never use as a full application screenshot background; keep text over the dark negative-space region."
+    },
+    {
+      "id": "mountain-report",
+      "file": "mountain-report.png",
+      "source": "Codex built-in imagegen chroma-key source plus local alpha extraction",
+      "source_file": "source/mountain-report-chroma.png",
+      "purpose": "Localized lower-right report and paper-surface illustration",
+      "dimensions": [1672, 941],
+      "alpha": true,
+      "sha256": "7dda66e93677322c6258bbdc4dcfa954a84856eb5fa0d610bdba423c344dc289",
+      "constraints": "Use at low visual dominance and keep report text readable; do not recolor as a semantic status."
+    }
+  ],
+  "procedural_assets": [
+    "paper grain via CSS radial/linear gradients and SVG feTurbulence",
+    "glass and ceramic surfaces via CSS backgrounds, borders and backdrop-filter",
+    "copper glow via tokenized box-shadow",
+    "lineage and execution motion via SVG paths and CSS animation"
+  ]
+}

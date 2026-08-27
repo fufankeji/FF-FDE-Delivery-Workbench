@@ -1,0 +1,232 @@
+{
+  "base": "http://127.0.0.1:8000/api",
+  "step_results": [
+    {
+      "step": "health",
+      "ok": true,
+      "detail": {
+        "status_code": 200,
+        "json": {
+          "status": "ok",
+          "model": "credential_not_in_process",
+          "mysql": "not_configured",
+          "sandbox": "docker"
+        }
+      }
+    },
+    {
+      "step": "create_project",
+      "ok": true,
+      "detail": {
+        "id": "a9a6b185-9228-4af9-98f8-0327369691c3",
+        "title": "验证旅程-脱敏样例",
+        "created_at": "2026-08-27T10:13:22.927659Z"
+      }
+    },
+    {
+      "step": "attach_csv",
+      "ok": true,
+      "detail": {
+        "source_id": "ee4d589b-37fd-4185-90a5-9f6fbc27297a",
+        "type": "csv",
+        "status": "ready",
+        "rows": 520,
+        "fingerprint": "b44c966361fee66d"
+      }
+    },
+    {
+      "step": "query_select",
+      "ok": true,
+      "detail": {
+        "artifact_id": "2227e3a2-57ef-4d55-aecb-f0b1bace38e2",
+        "type": "extract",
+        "cols": [
+          "channel",
+          "quantity",
+          "unit_price",
+          "paid_amount",
+          "order_status"
+        ],
+        "sha256": "49f1f3b6bcbba55f",
+        "lineage": [
+          "ee4d589b-37fd-4185-90a5-9f6fbc27297a"
+        ]
+      }
+    },
+    {
+      "step": "profile",
+      "ok": true,
+      "detail": {
+        "artifact_id": "fcb41ee5-6e5e-4631-b70f-0808c5fb2074",
+        "type": "profile",
+        "metadata_keys": [
+          "schema_version",
+          "rows",
+          "columns",
+          "duplicate_rows",
+          "missing_cells",
+          "fields",
+          "correlations"
+        ]
+      }
+    },
+    {
+      "step": "chart",
+      "ok": true,
+      "detail": {
+        "artifact_id": "04454dcd-e892-4167-b1f7-6dfaf12c15af",
+        "type": "visual",
+        "metadata": {
+          "chart_type": "bar",
+          "x": "channel",
+          "y": [
+            "paid_amount"
+          ],
+          "data_scope": {
+            "total_rows": 520,
+            "rows_used": 500,
+            "truncated": true,
+            "strategy": "first_rows",
+            "max_points": 500
+          }
+        }
+      }
+    },
+    {
+      "step": "model_run",
+      "ok": true,
+      "detail": {
+        "result_keys": [
+          "code",
+          "model",
+          "predictions"
+        ],
+        "model_id": "5bbfe04f-b371-49ff-8923-2f8ab1f5da83",
+        "metrics_id": null,
+        "predictions_id": "83abc2f3-f826-4107-b698-e325fd94e029"
+      }
+    },
+    {
+      "step": "report_v1",
+      "ok": true,
+      "detail": {
+        "report_key": "fa6741a1-e17f-44ee-afc0-7b69ef4869a9",
+        "version": 1
+      }
+    },
+    {
+      "step": "report_v2",
+      "ok": true,
+      "detail": {
+        "version": 2,
+        "based_on": null
+      }
+    },
+    {
+      "step": "report_v3_restore",
+      "ok": true,
+      "detail": {
+        "version": 3,
+        "based_on": 1
+      }
+    },
+    {
+      "step": "report_versions",
+      "ok": true,
+      "detail": {
+        "versions": [
+          3,
+          2,
+          1
+        ]
+      }
+    },
+    {
+      "step": "report_html",
+      "ok": true,
+      "detail": {
+        "status_code": 200,
+        "detail": {
+          "path": "reports/html/fa6741a1-e17f-44ee-afc0-7b69ef4869a9-v2.html"
+        }
+      }
+    },
+    {
+      "step": "export_zip",
+      "ok": true,
+      "detail": {
+        "path": ".fde/evaluations/reports/run-2026-08-27-valid/northlight-a9a6b185-9228-4af9-98f8-0327369691c3.zip",
+        "bytes": 2211953,
+        "filename": "attachment; filename*=utf-8''%E9%AA%8C%E8%AF%81%E6%97%85%E7%A8%8B-%E8%84%B1%E6%95%8F%E6%A0%B7%E4%BE%8B.northlight.zip"
+      }
+    },
+    {
+      "step": "readonly_legit_select",
+      "ok": true,
+      "detail": {
+        "status_code": 200,
+        "detail": "{\"id\":\"b04609fa-5ad0-49ee-a30f-fec9f07f1f0a\",\"project_id\":\"a9a6b185-9228-4af9-98f8-0327369691c3\",\"type\":\"extract\",\"name\":\"legit_select\",\"path\":\"datasets/extracts/e1876152-51f9-4458-bea0-236da8b554a3.p"
+      }
+    },
+    {
+      "step": "readonly_delete_dml",
+      "ok": true,
+      "detail": {
+        "status_code": 400,
+        "detail": "Only read-only SELECT queries are allowed"
+      }
+    },
+    {
+      "step": "readonly_multi_statement",
+      "ok": true,
+      "detail": {
+        "status_code": 400,
+        "detail": "Exactly one SQL statement is allowed"
+      }
+    },
+    {
+      "step": "readonly_host_file_function",
+      "ok": true,
+      "detail": {
+        "status_code": 400,
+        "detail": "File-source queries cannot call DuckDB table functions"
+      }
+    },
+    {
+      "step": "readonly_unregistered_table",
+      "ok": true,
+      "detail": {
+        "status_code": 400,
+        "detail": "File-source queries may read only the registered data view"
+      }
+    },
+    {
+      "step": "offline_chat_local_fallback",
+      "ok": true,
+      "detail": {
+        "status_code": 200,
+        "intent": "normal",
+        "runtime_note": "",
+        "artifacts": [
+          "4db42b44-34ad-46b2-85f4-0f3da9d65ef6"
+        ],
+        "tool_calls": [],
+        "content_excerpt": "当前本地分析功能可用，但 DeepSeek-V4-Flash 凭证尚未注入本进程；普通对话需要模型连接后回答。"
+      }
+    },
+    {
+      "step": "system_overview",
+      "ok": true,
+      "detail": {
+        "model": "credential_not_in_process",
+        "project_count": 1,
+        "data_asset_count": 0
+      }
+    }
+  ],
+  "project_id": "a9a6b185-9228-4af9-98f8-0327369691c3",
+  "source_id": "ee4d589b-37fd-4185-90a5-9f6fbc27297a",
+  "query_artifact_id": "2227e3a2-57ef-4d55-aecb-f0b1bace38e2",
+  "report_key": "fa6741a1-e17f-44ee-afc0-7b69ef4869a9",
+  "export_path": ".fde/evaluations/reports/run-2026-08-27-valid/northlight-a9a6b185-9228-4af9-98f8-0327369691c3.zip"
+}
