@@ -9,36 +9,49 @@
   flex: none;
   display: flex;
   align-items: center;
-  gap: 8px;
-  width: calc(100% + 4px);
-  height: 42px;
-  margin: 4px -2px;
-  padding: 0 10px 0 8px;
+  gap: 11px;
+  width: 100%;
+  height: 40px;
+  margin: 0;
+  padding: 0 10px;
   box-sizing: border-box;
-  border: none;
-  border-radius: 12px;
+  border: 0;
+  border-radius: 10px;
   background: transparent;
   cursor: pointer;
   overflow: hidden;
-  color: var(--dsw-alias-label-primary);
+  color: var(--dsw-alias-label-secondary);
   font-family: inherit;
   font-size: 14px;
   line-height: 22px;
+  transition: color 140ms var(--ds-ease-in-out), background 140ms var(--ds-ease-in-out);
 }
 
-.trigger:hover {
+.trigger:hover,
+.trigger[aria-expanded='true'] {
+  color: var(--dsw-alias-label-primary);
   background: var(--dsw-alias-interactive-bg-hover);
+}
+
+.trigger[aria-expanded='true'] {
+  color: var(--dsw-alias-state-business-primary);
+  background: color-mix(in srgb, var(--dsw-alias-state-business-primary) 9%, transparent);
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--dsw-alias-state-business-primary);
+  outline-offset: 2px;
 }
 
 /* Rail trigger: the same 36x36 circle box as the other rail controls. */
 .trigger.rail {
   width: 36px;
   height: 36px;
-  margin: 8px 0 10px;
+  margin: 0;
   justify-content: center;
   gap: 0;
   padding: 0;
-  border-radius: 50%;
+  border-radius: 10px;
 }
 
 .triggerLabel {

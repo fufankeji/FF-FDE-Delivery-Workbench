@@ -246,6 +246,8 @@
   flex: none;
   display: flex;
   flex-direction: column;
+  gap: 2px;
+  margin-top: 6px;
 }
 
 .settingsArea,
