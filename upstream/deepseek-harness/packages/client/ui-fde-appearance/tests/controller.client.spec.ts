@@ -29,27 +29,27 @@ function bench(storage: AppearanceStorage | undefined = window.localStorage) {
 }
 
 describe('AppearanceController', () => {
-  it('applies the whale skin by default and restores a saved bundled choice', () => {
+  it('applies the cloud cat skin by default and restores a saved bundled choice', () => {
     const first = bench()
     const disposeFirst = first.controller.start()
-    expect(first.controller.getSnapshot()).toMatchObject({ status: 'ready', settings: { builtinTheme: 'whale-maid' } })
+    expect(first.controller.getSnapshot()).toMatchObject({ status: 'ready', settings: { builtinTheme: 'cloud-cat' } })
     expect(document.body.getAttribute('data-fde-skin')).toBe('active')
     expect(document.body.style.getPropertyValue('--fde-background-image'))
-      .toContain(BUNDLED_APPEARANCE_THEMES['whale-maid'].imageUrl)
+      .toContain(BUNDLED_APPEARANCE_THEMES['cloud-cat'].imageUrl)
 
-    const cat = BUNDLED_APPEARANCE_THEMES['cloud-cat']
+    const whale = BUNDLED_APPEARANCE_THEMES['whale-maid']
     first.controller.save({
-      builtinTheme: cat.id, imageDataUrl: null, focusY: cat.focusY,
-      glassStrength: cat.glassStrength, palette: cat.palette,
+      builtinTheme: whale.id, imageDataUrl: null, focusY: whale.focusY,
+      glassStrength: whale.glassStrength, palette: whale.palette,
     })
     expect(normalizeSettings(JSON.parse(window.localStorage.getItem(APPEARANCE_STORAGE_KEY) ?? '') as unknown))
-      .toMatchObject({ builtinTheme: 'cloud-cat' })
+      .toMatchObject({ builtinTheme: 'whale-maid' })
     disposeFirst()
 
     const restored = bench()
     restored.controller.start()
-    expect(restored.controller.getSnapshot().settings.builtinTheme).toBe('cloud-cat')
-    expect(document.body.style.getPropertyValue('--fde-background-image')).toContain(cat.imageUrl)
+    expect(restored.controller.getSnapshot().settings.builtinTheme).toBe('whale-maid')
+    expect(document.body.style.getPropertyValue('--fde-background-image')).toContain(whale.imageUrl)
   })
 
   it('removes only its skin effects for the original interface and on dispose', () => {
@@ -74,23 +74,23 @@ describe('AppearanceController', () => {
     const storage: AppearanceStorage = {
       getItem: () => stored,
       setItem: (_key, value) => {
-        if (normalizeSettings(JSON.parse(value) as unknown).builtinTheme === 'cloud-cat') throw new Error('quota')
+        if (normalizeSettings(JSON.parse(value) as unknown).builtinTheme === 'whale-maid') throw new Error('quota')
         stored = value
       },
     }
     const fixture = bench(storage)
     fixture.controller.start()
     const beforeImage = document.body.style.getPropertyValue('--fde-background-image')
-    const cat = BUNDLED_APPEARANCE_THEMES['cloud-cat']
+    const whale = BUNDLED_APPEARANCE_THEMES['whale-maid']
     expect(() => { fixture.controller.save({
-      builtinTheme: cat.id, imageDataUrl: null, focusY: cat.focusY,
-      glassStrength: cat.glassStrength, palette: cat.palette,
+      builtinTheme: whale.id, imageDataUrl: null, focusY: whale.focusY,
+      glassStrength: whale.glassStrength, palette: whale.palette,
     }) }).toThrow('quota')
     expect(fixture.controller.getSnapshot()).toMatchObject({
-      status: 'error', issue: 'save-failed', settings: { builtinTheme: 'whale-maid' },
+      status: 'error', issue: 'save-failed', settings: { builtinTheme: 'cloud-cat' },
     })
     expect(document.body.style.getPropertyValue('--fde-background-image')).toBe(beforeImage)
-    expect(normalizeSettings(JSON.parse(stored) as unknown)).toMatchObject({ builtinTheme: 'whale-maid' })
+    expect(normalizeSettings(JSON.parse(stored) as unknown)).toMatchObject({ builtinTheme: 'cloud-cat' })
   })
 
   it('falls back atomically from invalid storage and validates custom settings', () => {
@@ -101,7 +101,7 @@ describe('AppearanceController', () => {
     const fixture = bench(storage)
     fixture.controller.start()
     expect(fixture.controller.getSnapshot()).toMatchObject({
-      status: 'error', issue: 'invalid-stored-value', settings: { builtinTheme: 'whale-maid' },
+      status: 'error', issue: 'invalid-stored-value', settings: { builtinTheme: 'cloud-cat' },
     })
     expect(() => normalizeSettings({ ...DEFAULT_APPEARANCE, builtinTheme: 'unknown' })).toThrow('appearance-theme-invalid')
     expect(normalizeSettings({

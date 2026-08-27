@@ -2,6 +2,19 @@
  * only guards against overflow during the sidebar collapse crossfade). */
 
 .triggerLabel {
+  min-width: 0;
   overflow: hidden;
   white-space: nowrap;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.triggerIcon {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: currentColor;
 }

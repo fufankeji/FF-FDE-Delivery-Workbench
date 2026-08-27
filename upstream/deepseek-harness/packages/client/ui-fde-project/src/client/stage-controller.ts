@@ -209,7 +209,7 @@ export class ProjectStageController {
     expectedRevision: number,
     operation: (workspaceId: string, expectedRevision: number, signal?: AbortSignal) => Promise<ProjectStageValue>,
   ): Promise<void> {
-    if (this.disposed) throw new Error('项目进度已关闭。')
+    if (this.disposed) throw new Error('项目管理已关闭。')
     this.requests.get(workspaceId)?.abort()
     const controller = new AbortController()
     this.requests.set(workspaceId, controller)

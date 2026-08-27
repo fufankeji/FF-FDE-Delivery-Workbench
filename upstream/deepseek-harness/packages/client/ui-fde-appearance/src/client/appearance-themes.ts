@@ -12,7 +12,7 @@ export interface BundledAppearanceTheme {
 }
 
 /** Theme used before a user makes a persisted choice. */
-export const DEFAULT_BUILTIN_APPEARANCE_THEME: BuiltinAppearanceTheme = 'whale-maid'
+export const DEFAULT_BUILTIN_APPEARANCE_THEME: BuiltinAppearanceTheme = 'cloud-cat'
 
 /** Fixed themes shipped with the FDE Web frontend. */
 export const BUNDLED_APPEARANCE_THEMES = Object.freeze({

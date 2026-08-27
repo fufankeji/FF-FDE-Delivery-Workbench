@@ -6,6 +6,7 @@ import { makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
 import { ApiDocsView } from '../src/client/ApiDocsView.tsx'
 import { ArchitectureView } from '../src/client/ArchitectureView.tsx'
 import { EvaluationView } from '../src/client/EvaluationView.tsx'
+import { ObservabilityView } from '../src/client/ObservabilityView.tsx'
 import { zh } from '../src/client/locales.ts'
 import type { ProjectViewProps } from '../src/client/slots.ts'
 
@@ -123,6 +124,62 @@ describe('FDE project views', () => {
     expect(screen.getByText('输入关系')).toBeTruthy()
     expect(screen.getByText('输出关系')).toBeTruthy()
     expect(screen.getByRole('button', { name: '取消节点锁定' })).toBeTruthy()
+  })
+
+  it('renders project activity as range-aware visual analytics without telemetry notices', () => {
+    const workspaceId = 'w-1' as WorkspaceId
+    const todayId = 'today' as SessionId
+    const olderId = 'older' as SessionId
+    const today = new Date()
+    today.setHours(12, 0, 0, 0)
+    const now = today.getTime()
+    const summary = (id: SessionId, displayTitle: string, updatedAt: number, inputTokens: number) => ({
+      id, displayTitle, running: false, blank: false, updatedAt,
+      projectionValues: {
+        sessionStats: { turns: 2, steps: 4, llmMs: 1_200, toolMs: 300, ttftMs: 180, ttftSteps: 2, decodeMs: 600, decodeTokens: 60 },
+        tokenUsage: { uncachedInputTokens: inputTokens, cacheReadTokens: 100, cacheWriteTokens: 20, outputTokens: 80 },
+      } as never,
+    })
+    const props = {
+      sessionId: todayId,
+      useSession: (() => undefined) as never,
+      useProjection: (() => undefined) as never,
+      useInput: (() => undefined) as never,
+      inputActions: {} as never,
+      useSessions: hook({ byId: {
+        [todayId]: summary(todayId, '今日方案会话', now - 60 * 60 * 1_000, 600),
+        [olderId]: summary(olderId, '历史调研会话', now - 2 * 24 * 60 * 60 * 1_000, 400),
+      } }),
+      useWorkspaces: hook({ items: [{ workspaceId, path: '/project', title: '数据分析项目', sessionIds: [todayId, olderId] }] }),
+      t: makeTranslate(zh),
+    } as unknown as ProjectViewProps
+
+    render(<ObservabilityView {...props} />)
+
+    expect(screen.queryByText('本地观测可用')).toBeNull()
+    expect(screen.queryByText('需要跨项目追踪时再启用外部服务')).toBeNull()
+    expect(screen.getByText('Token 活跃趋势')).toBeTruthy()
+    expect(screen.getByText('模型效率')).toBeTruthy()
+    expect(screen.getByText('会话活跃热力')).toBeTruthy()
+    expect(screen.getByText('平均首 Token')).toBeTruthy()
+    expect(screen.getByRole('img', { name: /今天 Token 用量与执行步骤趋势/ })).toBeTruthy()
+    expect(screen.getByText('今日方案会话')).toBeTruthy()
+    expect(screen.queryByText('历史调研会话')).toBeNull()
+
+    const activeCell = screen.getByRole('button', { name: /800 Token，4 步/ })
+    fireEvent.mouseEnter(activeCell)
+    expect(screen.getByText('点击色块锁定')).toBeTruthy()
+    expect(screen.getAllByText('800').length).toBeGreaterThan(0)
+    fireEvent.click(activeCell)
+    expect(screen.getByRole('button', { name: '取消锁定' })).toBeTruthy()
+    fireEvent.mouseLeave(activeCell)
+    expect(screen.getByRole('button', { name: '取消锁定' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '取消锁定' }))
+    expect(screen.queryByText('点击色块锁定')).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: '近 7 天' }))
+    expect(screen.getByRole('img', { name: /近 7 天 Token 用量与执行步骤趋势/ })).toBeTruthy()
+    expect(screen.getByText('历史调研会话')).toBeTruthy()
   })
 
   it('shows plan generation, FDE confirmation, and keeps fixed cases behind a second explicit action', async () => {

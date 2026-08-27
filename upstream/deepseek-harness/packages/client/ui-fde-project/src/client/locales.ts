@@ -4,10 +4,10 @@ export const NS = 'fdeProject'
 
 /** Canonical Simplified Chinese product copy. */
 export const zh = {
-  'launcher.label': '项目进度',
-  'progress.title': '项目进度',
+  'launcher.label': '项目管理',
+  'progress.title': '项目管理',
   'progress.subtitle': '查看全部项目的交付阶段、时间安排和当前工作。',
-  'progress.close': '关闭项目进度',
+  'progress.close': '关闭项目管理',
   'progress.overview': '项目概览',
   'progress.timeline': '交付时间轴',
   'progress.total': '项目总数',
@@ -51,10 +51,10 @@ export type FdeProjectKey = keyof typeof zh
 
 /** English counterpart of the FDE project copy. */
 export const en: Record<FdeProjectKey, string> = {
-  'launcher.label': 'Project progress',
-  'progress.title': 'Project progress',
+  'launcher.label': 'Project management',
+  'progress.title': 'Project management',
   'progress.subtitle': 'See every project stage, schedule, and current activity.',
-  'progress.close': 'Close project progress',
+  'progress.close': 'Close project management',
   'progress.overview': 'Overview',
   'progress.timeline': 'Timeline',
   'progress.total': 'Projects',

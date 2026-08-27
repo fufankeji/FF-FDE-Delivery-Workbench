@@ -48,15 +48,15 @@ describe('AppearanceSection', () => {
   it('shows six bundled skins and applies an explicitly saved choice', async () => {
     renderSection()
     expect(screen.getAllByRole('button', { name: /官方原版|大肥鱼拟人|云端猫咪|九天·/ })).toHaveLength(6)
-    const cat = screen.getByRole('button', { name: /云端猫咪/ })
-    fireEvent.click(cat)
-    expect(cat.getAttribute('aria-pressed')).toBe('true')
+    const whale = screen.getByRole('button', { name: /大肥鱼拟人/ })
+    fireEvent.click(whale)
+    expect(whale.getAttribute('aria-pressed')).toBe('true')
     expect(screen.getByText(/已更新预览/)).toBeTruthy()
-    expect(document.body.style.getPropertyValue('--fde-background-image')).toContain('default-background.webp')
+    expect(document.body.style.getPropertyValue('--fde-background-image')).toContain('cloud-cat-background.webp')
 
     fireEvent.click(screen.getByRole('button', { name: '保存并应用' }))
     await waitFor(() => {
-      expect(document.body.style.getPropertyValue('--fde-background-image')).toContain('cloud-cat-background.webp')
+      expect(document.body.style.getPropertyValue('--fde-background-image')).toContain('default-background.webp')
     })
     expect(screen.getByText(/刷新后仍会保留/)).toBeTruthy()
   })
@@ -69,7 +69,7 @@ describe('AppearanceSection', () => {
 
     fireEvent.click(screen.getByRole('button', { name: '恢复默认' }))
     await waitFor(() => {
-      expect(document.body.style.getPropertyValue('--fde-background-image')).toContain('default-background.webp')
+      expect(document.body.style.getPropertyValue('--fde-background-image')).toContain('cloud-cat-background.webp')
     })
 
     const input = screen.getByLabelText('选择图片') as HTMLInputElement
