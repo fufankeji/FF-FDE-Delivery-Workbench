@@ -86,9 +86,26 @@ export const SOLUTION_DESIGN_SKILL = {
 
 ## 系统架构
 
-- 先调用 \`architecture_get\` 读取当前项目架构和 revision，再用 \`architecture_set\` 提交完整候选并携带精确 expected revision。
-- 不要直接写 \`.fde/architecture.json\`，不要把任务步骤、运行轨迹或隐藏推理画成架构节点。
-- 架构候选由 FDE 在“系统架构”中审阅确认；你不能自行确认。
+### 先取证，再建模
+
+1. 先调用 \`architecture_get\`，保留它返回的完整候选、revision 和仍代表相同概念的 ID。
+2. 读取已确认的需求基线和本阶段五份固定文档，再只读检查真实源码：依赖清单与应用入口、API/事件/消息入口、核心服务和领域边界、存储、模型或 Agent 集成、外部系统、部署配置及交付输出。
+3. 文档与源码不一致时，源码用于描述当前实现，文档用于描述待实施候选；在 summary 或相关节点 note 中标明差异和未知项，不虚构已经存在或部署的组件。项目尚无实现源码时，只能根据已确认文档建立候选架构。
+
+### 建模规则
+
+- 按入口到交付输出的主链路排列 2–7 个职责分组；极小项目可以少于 2 个，不为凑数拆层。每组通常保留 1–8 个主要节点。
+- 节点只表示重要运行组件、业务能力、数据存储、外部边界或独立交付输出，不把目录、文件、类、函数、任务步骤、运行轨迹或隐藏推理画成节点。
+- \`entry\` 表示人员或系统入口；\`core\` 表示编排、应用、领域或 AI 核心能力；\`store\` 表示持久数据、证据或产物；\`external\` 表示第三方、私有模型、客户系统等外部边界；\`output\` 表示可独立交付的报告、API 或结果；只有都不适用时才使用 \`default\`。
+- ID 使用稳定的 kebab-case。保留仍代表同一概念的现有 ID；label 简短明确，note 说明真实职责、依据、限制或未知项，不写空泛宣传语。
+- 只提交关键运行时、数据流、控制流或依赖关系。边从实际发起方指向接收方，label 使用简短动作；不提交可由已有边推导的传递关系、重复关系或类级调用。\`dashed\` 只用于可选、异步或尚待落实的候选关系，并在 label 或 note 中说明含义。
+- \`groups\` 的数组顺序对应入口到输出的顺序；同组节点按主要路径优先排列。优先保留主链路和重要分支，不枚举所有调用。
+
+### 提交候选
+
+- 提交前检查分组和节点 ID 唯一、节点引用的分组存在、边的两端存在、没有自环或重复边；除真实孤立边界外，每个主要节点都应接入一条有意义的关系。
+- 用 \`architecture_set\` 一次提交完整候选，并携带 \`architecture_get\` 返回的精确 expected revision。不要直接写 \`.fde/architecture.json\`。
+- 新候选保持待审阅状态，由 FDE 在“系统架构”中确认；你不能自行确认或推进阶段。
 
 ## 工作规则
 
@@ -101,8 +118,8 @@ export const SOLUTION_DESIGN_SKILL = {
 /** Runtime Skill loaded on demand while an FDE is planning and executing development. */
 export const PROJECT_DEVELOPMENT_SKILL = {
   name: 'fde-project-development',
-  description: '按统一 docs 规范拆分、实施和追踪 FDE 项目研发，并在开发完成时形成固定收口产物。',
-  whenToUse: '当前项目处于项目开发，用户要求规划、拆分、实施、检查研发进度或收口开发时使用。',
+  description: '按统一 docs 规范拆分、实施和追踪 FDE 项目研发，同步结构性架构变化，并在开发完成时形成固定收口产物。',
+  whenToUse: '当前项目处于项目开发，用户要求规划、拆分、实施、检查研发进度或收口开发，或者要求生成或更新系统架构时使用。',
   source: 'bundled',
   content: `# FDE 项目开发规范
 
@@ -126,6 +143,13 @@ Feature 文档 frontmatter 使用 \`document\`、\`feature\`、\`status\`、\`ti
 - \`- [x]\` 只在源码、测试、构建或运行证据真实存在后使用，并在任务下记录最窄证据；文档存在本身不等于完成。
 - 新事实影响上游时，先更新受影响的 PRD/总规格/Feature，再继续开发；不要另建任务数据库或让页面状态反写 docs。
 - 观测从项目开发阶段可用；评估只在 FDE 进入验证评估后使用。观测或评估结果都不能自动勾选任务、更新基线或推进阶段。
+
+## 系统架构同步
+
+- 新增、移除或替换主要服务、入口、存储、外部集成、模型或 Agent 边界、部署边界、关键数据路径，属于需要同步架构的结构性变更。普通重构、内部类或函数调整不更新项目架构。
+- 当用户明确要求生成或更新系统架构，或本次实现包含结构性变更时，先调用 \`architecture_get\`，再重新读取受影响的已确认文档和真实源码，最后调用 \`architecture_set\` 提交完整候选。
+- 保留仍代表同一概念的现有 ID，只调整受影响的分组、节点和关键关系；提交内容仍须包含完整架构，并遵循方案设计 Skill 中的取证、分组、节点类型和关系密度规则。
+- \`architecture_set\` 产生的新版本仍是待审阅候选，需要 FDE 重新确认；不能自行确认、回退或推进项目阶段。
 
 ## 开发收口
 
@@ -190,13 +214,13 @@ export function requirementResearchPrompt(stage: FdeStageId): string {
 /** Short solution-aware prompt; the complete Skill body remains on-demand. */
 export function solutionDesignPrompt(stage: FdeStageId): string {
   if (stage !== 'solution') return ''
-  return '当前 FDE 项目处于“方案设计”。当用户要求设计、收敛或更新项目方案时，先加载 Skill `fde-solution-design`，更新 `fde-deliverables/02-solution-design/` 的五个固定文件（包含项目 PRD），并通过 architecture_get/architecture_set 维护项目级候选架构。所有产物均为候选；你不能确认架构、客户结论或推进项目阶段。'
+  return '当前 FDE 项目处于“方案设计”。当用户要求设计、收敛或更新项目方案时，先加载 Skill `fde-solution-design`，更新 `fde-deliverables/02-solution-design/` 的五个固定文件（包含项目 PRD），并先取证、后建模，通过 architecture_get/architecture_set 维护有序、可追溯的项目级候选架构。所有产物均为候选；你不能确认架构、客户结论或推进项目阶段。'
 }
 
 /** Short development-aware prompt; the complete Skill body remains on-demand. */
 export function projectDevelopmentPrompt(stage: FdeStageId): string {
   if (stage !== 'development') return ''
-  return '当前 FDE 项目处于“项目开发”。当用户要求规划、拆分、实施或检查研发进度时，先加载 Skill `fde-project-development`，按项目 `docs/` 的 PRD、产品总规格、Feature Map 和逐 Feature spec/plan/tasks 原位维护，并用真实工程证据更新任务。开发收口产物固定在 `fde-deliverables/03-project-development/`。你不能虚构日期或证据，也不能推进项目阶段。'
+  return '当前 FDE 项目处于“项目开发”。当用户要求规划、拆分、实施、检查研发进度，或要求生成或更新系统架构时，先加载 Skill `fde-project-development`，按项目 `docs/` 的 PRD、产品总规格、Feature Map 和逐 Feature spec/plan/tasks 原位维护，并用真实工程证据更新任务。出现主要服务、入口、存储、外部集成或关键数据路径等结构性变更时，同步更新系统架构候选。开发收口产物固定在 `fde-deliverables/03-project-development/`。你不能虚构日期或证据，也不能推进项目阶段。'
 }
 
 /** Short validation-aware prompt; the complete Skill body remains on-demand. */

@@ -135,8 +135,14 @@ describe('FDE project real Loader composition through cordis.yml', () => {
   it('publishes one traceable Wiki revision from a real parsed Source and exposes it to the project UI', async () => {
     const { ctx, workspace, sourceId, routes } = await boot()
     expect(ctx.tools.schemas().map(schema => schema.name)).toEqual(expect.arrayContaining([
-      'requirement_wiki_get', 'requirement_wiki_publish',
+      'architecture_get', 'architecture_set', 'requirement_wiki_get', 'requirement_wiki_publish',
     ]))
+    const architectureSet = ctx.tools.schemas().find(schema => schema.name === 'architecture_set')
+    expect(architectureSet?.description).toContain('evidence-backed')
+    const architectureParameters = JSON.stringify(architectureSet?.parameters)
+    expect(architectureParameters).toContain('ordered from entry to delivery output')
+    expect(architectureParameters).toContain('Major runtime components')
+    expect(architectureParameters).toContain('Material runtime, data-flow, control-flow, or dependency')
     const start = routes.get(FdeProject.FDE_REQUIREMENT_WIKI_START_PATH)
     if (start === undefined) throw new Error('Wiki start route was not registered')
 

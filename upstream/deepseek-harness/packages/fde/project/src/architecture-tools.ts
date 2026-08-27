@@ -41,34 +41,40 @@ export function registerProjectArchitectureTools(ctx: Context): void {
 
   const set = defineTool({
     name: 'architecture_set',
-    description: 'Publish one complete candidate architecture for the current FDE project. Call architecture_get first and pass its exact expectedRevision.',
+    description: 'Publish one complete evidence-backed candidate architecture for the current FDE project. Preserve stable ids, order responsibility groups from entry to output, include only material relationships, and pass the exact expectedRevision returned by architecture_get.',
     parameters: {
       expectedRevision: { type: 'integer', required: true, description: 'Exact revision from architecture_get; 0 when absent.' },
-      title: { type: 'string', required: true, description: 'Architecture title.' },
-      summary: { type: 'string', description: 'Business and technical objective summary.' },
+      title: { type: 'string', required: true, description: 'Concise title naming the actual system or candidate architecture.' },
+      summary: { type: 'string', description: 'Scope, current-versus-candidate status, key evidence, constraints, and unresolved differences.' },
       groups: {
-        type: 'array', required: true, description: 'System layers or responsibility groups.',
+        type: 'array', required: true, description: 'Stable responsibility groups ordered from entry to delivery output; use kebab-case ids.',
         items: { type: 'object', additionalProperties: false, properties: {
-          id: { type: 'string', required: true }, label: { type: 'string', required: true },
+          id: { type: 'string', required: true, description: 'Stable kebab-case group id.' },
+          label: { type: 'string', required: true, description: 'Short responsibility label.' },
         } },
       },
       nodes: {
-        type: 'array', required: true, description: 'System components.',
+        type: 'array', required: true, description: 'Major runtime components, capabilities, stores, external boundaries, or delivery outputs.',
         items: { type: 'object', additionalProperties: false, properties: {
-          id: { type: 'string', required: true },
-          label: { type: 'string', required: true },
-          kind: { type: 'string', required: true, enum: [...ARCHITECTURE_NODE_KINDS] },
-          note: { type: 'string' },
-          group: { type: 'string' },
+          id: { type: 'string', required: true, description: 'Stable kebab-case component id; preserve it while the concept remains the same.' },
+          label: { type: 'string', required: true, description: 'Short component or capability name.' },
+          kind: {
+            type: 'string',
+            required: true,
+            enum: [...ARCHITECTURE_NODE_KINDS],
+            description: 'entry=user/system entry; core=orchestration/domain/AI core; store=durable data/evidence; external=outside boundary; output=deliverable; default=other.',
+          },
+          note: { type: 'string', description: 'Real responsibility, source evidence, constraint, candidate status, or unresolved fact.' },
+          group: { type: 'string', description: 'Id of the declared responsibility group that owns this node.' },
         } },
       },
       edges: {
-        type: 'array', required: true, description: 'Directed relationships between existing node ids.',
+        type: 'array', required: true, description: 'Material runtime, data-flow, control-flow, or dependency relationships between existing node ids.',
         items: { type: 'object', additionalProperties: false, properties: {
-          from: { type: 'string', required: true },
-          to: { type: 'string', required: true },
-          label: { type: 'string' },
-          dashed: { type: 'boolean' },
+          from: { type: 'string', required: true, description: 'Id of the component initiating the relationship.' },
+          to: { type: 'string', required: true, description: 'Id of the component receiving the relationship.' },
+          label: { type: 'string', description: 'Short action, data, or dependency label.' },
+          dashed: { type: 'boolean', description: 'True only for optional, asynchronous, or not-yet-implemented candidate relationships.' },
         } },
       },
     },

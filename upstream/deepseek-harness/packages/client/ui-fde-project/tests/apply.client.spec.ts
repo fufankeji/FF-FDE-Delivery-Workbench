@@ -8,7 +8,7 @@ import { ObservabilityView } from '../src/client/ObservabilityView.tsx'
 import { ProjectProgressLauncher } from '../src/client/ProjectProgressLauncher.tsx'
 import { ProjectProgressOverlay } from '../src/client/ProjectProgressOverlay.tsx'
 import { ProjectRuntimeHeader } from '../src/client/ProjectRuntimeHeader.tsx'
-import type { ProjectPageInjected, ProjectRuntimeHeaderInjected } from '../src/client/slots.ts'
+import type { ProjectPageInjected, ProjectRuntimeHeaderInjected, ProjectViewInjected } from '../src/client/slots.ts'
 
 afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks() })
 
@@ -100,7 +100,7 @@ describe('ui-fde-project apply', () => {
         },
       }), { status: 200 })
     })
-    vi.stubGlobal('fetch', fetchImpl as typeof fetch)
+    vi.stubGlobal('fetch', fetchImpl)
     const slots = ctx.get('slots') as SlotRegistry
     slots.register({
       name: 'root',
@@ -132,6 +132,15 @@ describe('ui-fde-project apply', () => {
       const label = view.options.label
       return typeof label === 'function' ? label() : label
     })).toEqual(['系统架构'])
+    const architectureInjected = (views[0]!.inject as unknown as (sessionId: string) => ProjectViewInjected)('session-1')
+    await architectureInjected.requestArchitectureDraft(4)
+    const architectureInstruction = prompt.mock.calls[0]?.[0][0]?.text
+    expect(architectureInstruction).toContain('architecture_get')
+    expect(architectureInstruction).toContain('2–7 个职责分组')
+    expect(architectureInstruction).toContain('保留仍代表同一概念的现有 ID')
+    expect(architectureInstruction).toContain('关键运行时、数据流、控制流或依赖关系')
+    expect(architectureInstruction).toContain('页面当前显示的 revision 是 4')
+    prompt.mockClear()
 
     await injected.completeSolution('workspace-1', 2)
     await vi.waitFor(() => { expect(slots.entries('conversation.view')).toHaveLength(2) })

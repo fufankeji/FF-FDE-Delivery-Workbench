@@ -209,7 +209,15 @@ export function apply(ctx: ClientContext): void {
       if (session === undefined) throw new Error('当前会话不可用。')
       const result = await session.prompt([{
         type: 'text',
-        text: `请根据当前项目已经确认的需求、方案和真实源码完善系统架构。先调用 architecture_get 读取当前版本，再调用 architecture_set 提交完整候选；本次页面看到的 revision 是 ${String(currentRevision)}。架构应突出真实系统分组、组件、存储、外部依赖和关键连接，不要把任务步骤、运行轨迹或隐藏推理画成节点。`,
+        text: `请刷新当前 FDE 项目的系统架构，并把结果作为待审阅候选提交。
+
+1. 先调用 architecture_get 读取当前架构和 expectedRevision。页面当前显示的 revision 是 ${String(currentRevision)}；如果工具返回值不同，以工具返回值为准，并说明版本已经变化。
+2. 先读取已确认的需求和方案，再只读检查真实源码的依赖清单、应用入口、API/事件入口、核心服务、存储、模型或外部集成、部署配置和交付输出。源码与文档不一致时区分当前实现与待实施候选，不虚构组件。
+3. 按入口到交付输出的主链路使用 2–7 个职责分组；极小项目可以更少，不凑数。每组只保留主要运行组件、能力、存储、外部边界或独立输出，不把目录、文件、类、函数、任务步骤或运行轨迹画成节点。
+4. 正确使用节点类型：entry 表示入口，core 表示编排/领域/AI 核心，store 表示持久数据或证据，external 表示系统外部边界，output 表示独立交付结果，其他情况才使用 default。
+5. ID 使用稳定的 kebab-case，保留仍代表同一概念的现有 ID。label 保持简短，note 写清真实职责、依据、限制或未知项。
+6. 只提交关键运行时、数据流、控制流或依赖关系；边从实际发起方指向接收方，不提交传递关系、重复关系或类级调用。dashed 只用于可选、异步或尚待落实的候选关系。
+7. 检查所有分组和节点引用、重复边及自环后，只调用一次 architecture_set，携带 architecture_get 返回的精确 expectedRevision 并提交完整候选。不要自行确认架构或推进项目阶段。`,
       }], 'queue')
       if (!result.ok) throw new Error(result.error.message)
     },

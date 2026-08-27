@@ -18,7 +18,9 @@ FDE 工作台把一个 Harness Workspace 作为一个交付项目，并允许该
 
 OpenAPI 工具复用 MIT 许可 `dsh-openapi` 提交 `fb854355b89e495ded090b9e2eb94c33430d2366` 的解析、目录、校验、重定向、私网限制、凭据 Header、超时和有界响应实现。系统不直接挂载上游插件的静态目录。`openapi_list`、`openapi_describe` 和 `openapi_call` 在每次执行时通过 `workspaceRegistry` 解析调用 Agent 的 cwd，并且只加载该 Workspace 的显式配置。工具 Schema 在项目之间保持稳定，执行路径负责项目隔离，默认只允许 `GET` 和 `HEAD`。
 
-系统架构复用 MIT 许可 `dsh-planchart` 提交 `e63a6359ed43e6ae35cac505f10a8d128f53eba7` 的分组、节点与边思路，但不使用它的 Session 计划或右侧 steps UI。`architecture_get` 返回项目精确 revision；`architecture_set` 只在 `expectedRevision` 匹配时接受一份完整候选，校验有界的分组、节点和边后，通过带锁的原子替换提交。浏览器提供确定性布局、缩放、SVG/PNG 导出和精确 revision 确认路由。项目进度中的候选架构行只负责导航，不负责确认：它打开目标项目最新的可见普通 Session，并通过按 Session 寻址的 Conversation 服务选择“系统架构”页。确认动作仍在完整架构页中；下一次刷新快照后，已确认行变为不可点击。生成或修改候选必须由用户明确向当前 Agent 提交提示；确认不会推进交付阶段。
+系统架构复用 MIT 许可 `dsh-planchart` 提交 `e63a6359ed43e6ae35cac505f10a8d128f53eba7` 的分组、节点与边思路，但不使用它的 Session 计划或右侧 steps UI。`architecture_get` 返回项目精确 revision；`architecture_set` 只在 `expectedRevision` 匹配时接受一份完整候选，校验有界的分组、节点和边后，通过带锁的原子替换提交。方案设计 Skill 与浏览器刷新动作要求 Agent 先检查已确认文档，以及真实源码的入口、服务、存储、集成、部署配置和交付输出，再进行建模。候选保留稳定 ID，沿主路径排列二至七个职责分组，区分当前实现与待实施组件，并且只保留主要节点以及关键运行时、数据、控制或依赖关系。项目开发期间，只有用户明确要求，或主要服务、入口、存储、集成、部署边界和数据路径发生结构性变化时，才按相同规则提交完整候选；内部重构不触发架构更新。
+
+浏览器根据这些有序分组、节点与边生成响应式信号流布局，并提供动态连线、节点聚焦、相关路径强调、明暗主题适配、缩放、SVG/PNG 导出和精确 revision 确认路由。项目进度中的候选架构行只负责导航，不负责确认：它打开目标项目最新的可见普通 Session，并通过按 Session 寻址的 Conversation 服务选择“系统架构”页。确认动作仍在完整架构页中；下一次刷新快照后，已确认行变为不可点击。生成或修改候选必须由用户明确向当前 Agent 提交提示；确认不会推进交付阶段。
 
 来自提交 `64791ff93ac01bac5bb6e6a14f48d072b479464b` 的 `dsh-observe@0.2.0` 以 `enabled: false`、无 OTLP/Langfuse 后端、关闭 Prompt/Completion 采集的配置安装。因此本地“观测”页面直接汇总既有 Session 的 `sessionStats` 与 `tokenUsage` 投影，不采集、不外发。后续部署可以配置外部后端，而不需要替换项目页面。
 
@@ -40,4 +42,4 @@ OpenAPI 工具复用 MIT 许可 `dsh-openapi` 提交 `fb854355b89e495ded090b9e2e
 
 左侧栏保持项目管理与交付工作之间的稳定入口，中间保持官方 Conversation，右侧 Dock 保持 Files、Editor 和 Git。API、架构、观测和评估状态跨 Session 持续可见，因为项目文件与 Host 记录持有事实，而不是组件内存。跨插件深链使用按 Session 寻址的 Conversation View 动作，不使用 DOM 点击或直接改写持久化状态。缺失文件、关闭的导出器、无效报告和不可用 API 页面保持明确，不会被替换为演示数据。
 
-五个项目工具向 Agent 请求增加稳定 Schema：三个 OpenAPI 工具和两个系统架构工具。只有调用后的结果会进入上下文。外部观测导出在部署配置明确启用前保持不存在，评估只在直接点击后才可能产生费用。企业与周期元数据仍属于当前浏览器的 Workspace 视图存储；iframe 拒绝嵌入时提供外部打开，而不绕过跨域策略；评估页面把长时间进程控制交给当前 Agent 及其现有取消路径。
+五个项目工具向 Agent 请求增加稳定 Schema：三个 OpenAPI 工具和两个系统架构工具。只有调用后的结果会进入上下文。架构质量取决于 Agent 能读取的证据，因此缺失源码或尚未解决的文档差异会保留为带标记的候选事实，不会被伪装成确定结论。稳定 ID 使跨 revision 的聚焦与变更审阅保持连贯；限制分组和关系数量则以不生成穷举调用图为代价，换取可读的项目级系统模型。外部观测导出在部署配置明确启用前保持不存在，评估只在直接点击后才可能产生费用。企业与周期元数据仍属于当前浏览器的 Workspace 视图存储；iframe 拒绝嵌入时提供外部打开，而不绕过跨域策略；评估页面把长时间进程控制交给当前 Agent 及其现有取消路径。
