@@ -27,6 +27,14 @@ linkWorkspacePackages: true
 overrides:
   '@deepseek-ai/cosmokit': 'link:vendor/cosmokit'
   '@deepseek-ai/schemastery': 'link:vendor/schemastery'
+  # dsh-eval-harness 0.4.0 still declares the pre-release package numbers it
+  # was built against. Its runtime only imports defineTool; use this locked
+  # checkout's compatible DSH packages instead of resolving obsolete trees.
+  'dsh-eval-harness>@deepseek-ai/dsh-llm': 'link:packages/llm/llm'
+  'dsh-eval-harness>@deepseek-ai/dsh-scope': 'link:packages/core/scope'
+  'dsh-eval-harness>@deepseek-ai/dsh-session': 'link:packages/core/session'
+  'dsh-eval-harness>@deepseek-ai/dsh-timeout': 'link:packages/util/timeout'
+  'dsh-eval-harness>@deepseek-ai/dsh-tools': 'link:packages/core/tools'
 
 peerDependencyRules:
   allowedVersions:
@@ -53,6 +61,10 @@ allowBuilds:
   # The Python runtime deploy includes the reviewed workspace postinstall that
   # restores the executable bit on node-pty's macOS spawn helper.
   '@deepseek-ai/dsh-subprocess-local@file:packages/subprocess/subprocess-local': true
+  # Reviewed third-party FDE integrations. dsh-observe compiles its published
+  # TypeScript source; dsh-eval-harness builds the exact Git revision.
+  dsh-observe: true
+  dsh-eval-harness@https://codeload.github.com/BiBoyang/dsh-eval-harness/tar.gz/2f59376e2a2f22c151f75de446d5cde764dd5aff: true
 
 minimumReleaseAgeExclude:
   # Fresh pi-ai releases carry the model catalog updates that are the whole
@@ -67,6 +79,9 @@ minimumReleaseAgeExclude:
   - node-addon-require-builtin-win32-ia32-msvc@0.1.4
   - node-addon-require-builtin-win32-x64-msvc@0.1.4
   - node-addon-require-builtin@0.1.4
+  - dsh-file-review-tab@0.2.0
+  - dsh-observe@0.2.0
 
 patchedDependencies:
+  dsh-better-sidebar@0.16.1: patches/dsh-better-sidebar@0.16.1.patch
   node-pty@1.2.0-beta.15: patches/node-pty@1.2.0-beta.15.patch

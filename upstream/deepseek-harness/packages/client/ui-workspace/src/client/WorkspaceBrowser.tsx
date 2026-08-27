@@ -1,29 +1,29 @@
 /**
  * The workspace/session browsing region filling the sidebar shell's
- * `sidebar.workspaces` hole: section header (title + view options + add
- * workspace), search, the grouped tree or flat list, and the workspace
+ * `sidebar.workspaces` hole: New Project action, section header, search, the
+ * grouped tree or flat list, and the workspace
  * dialogs. Wide state renders the full browser; rail state renders the two
- * region icons (search / add workspace) as 36px controls on the shell's shared
+ * region icons (New Project / search) as 36px controls on the shell's shared
  * rail entry path, each requesting expansion through the owner share. Adding
  * is the header button's one action, so it raises the directory flow with no
  * menu in between; the flow and its error dialog live in WorkspacePicker
  * (same package — direct composition, no slot between them).
  */
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
 import clsx from 'clsx'
 import {
   Button, IconCloseFill14, IconPersonalizationOutline16,
   IconProjectAddOutline16, IconSearchOutline16, Menu, Modal, Tooltip,
 } from '@deepseek-ai/dsh-client-ui-primitives'
+import { abbreviateHomePath } from '@deepseek-ai/dsh-client-runtime/client'
 import type {
   SessionId, SessionListState, SessionSearchResultItem, WorkspaceId, WorkspaceView,
 } from '@deepseek-ai/dsh-client-runtime/client'
-import type { WorkspaceBrowserProps } from './contract/slots.ts'
-import type { SessionNode, SessionOrderBy } from './tree.ts'
+import type { ProjectActionOwnerProps, WorkspaceBrowserProps } from './contract/slots.ts'
+import type { GroupNode, SessionNode, SessionOrderBy } from './tree.ts'
 import { deriveFlat, deriveGroups, deriveSearchResults, UNGROUPED_KEY } from './tree.ts'
 import { ProjectRowItem, SearchResultItem, SessionNodeItem } from './rows/Rows.tsx'
-import { FLAT_SESSION_ORDER_KEY } from './stores.ts'
-import { WorkspacePickFlow } from './WorkspacePicker.tsx'
+import { FLAT_SESSION_ORDER_KEY, type ProjectMetadata } from './stores.ts'
 import css from './WorkspaceBrowser.module.css'
 
 /**
@@ -47,6 +47,36 @@ function sanitizeSearchQuery(value: string): string {
   const next = withoutNul.charCodeAt(end)
   if (last >= 0xD800 && last <= 0xDBFF && next >= 0xDC00 && next <= 0xDFFF) end--
   return withoutNul.slice(0, end)
+}
+
+function randomProjectSuffix(): string {
+  const bytes = new Uint8Array(2)
+  globalThis.crypto?.getRandomValues(bytes)
+  const value = globalThis.crypto === undefined
+    ? Math.floor(Math.random() * 0x10000)
+    : (bytes[0] ?? 0) * 256 + (bytes[1] ?? 0)
+  return value.toString(36).padStart(4, '0').slice(-4)
+}
+
+/** Generate a short ASCII project-directory name independent from the business title. */
+export function defaultProjectDirectoryName(date = new Date(), suffix = randomProjectSuffix()): string {
+  const y = String(date.getFullYear())
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  const safeSuffix = suffix.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 4).padEnd(4, '0')
+  return `fde-${y}${m}${d}-${safeSuffix}`
+}
+
+/** Validate one portable directory segment for new FDE projects. */
+export function isValidProjectDirectoryName(value: string): boolean {
+  return /^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(value) && !value.endsWith('.')
+}
+
+/** Display-only path preview; actual joining stays on the Host createDirectory API. */
+function projectPathPreview(parent: string, name: string): string {
+  if (parent === '') return name
+  const separator = parent.includes('\\') && !parent.includes('/') ? '\\' : '/'
+  return `${parent.replace(/[/\\]+$/, '')}${separator}${name}`
 }
 
 /** Immutable membership toggle for the local expand-all array. */
@@ -235,6 +265,8 @@ type SessionTreeProps = Pick<
   setSessionOrder: (accountKey: string, order: string[]) => void
   /** Registry-global archive set (hidden rows). */
   archivedSessionIds: readonly SessionNode['id'][]
+  /** Browser-persisted FDE project facts keyed by canonical Workspace path. */
+  projectMetadataByPath: Readonly<Record<string, ProjectMetadata>>
   /** Open the browser-owned rename dialog for a real Workspace group. */
   onRenameRequest: (workspaceId: WorkspaceId, currentTitle: string) => void
   /** Open the browser-owned delete-confirmation dialog for a real Workspace group. */
@@ -245,6 +277,8 @@ type SessionTreeProps = Pick<
   onSessionArchive: (sessionId: SessionNode['id']) => void
   /** Session order behavior: fixed after edits, or additionally promoted by user activity. */
   orderBy: SessionOrderBy
+  /** Render every composed project action for one exact Workspace. */
+  renderProjectActions: (owner: ProjectActionOwnerProps) => ReactNode
 }
 
 /** The scrolling session tree; unmounting drops the sessions subscription and expand-all state. */
@@ -254,6 +288,7 @@ function SessionTree({
   insertWorkspaceBefore, insertSessionBefore, orderBy,
   groupExpansion, setGroupExpanded,
   sessionOrderByAccount, sessionUpdatedAtByAccount, syncSessionOrderAccount, setSessionOrder, home, t,
+  projectMetadataByPath, renderProjectActions,
 }: SessionTreeProps) {
   const list = useSessions(s => s)
   const current = list.current
@@ -329,6 +364,26 @@ function SessionTree({
     }),
     [list, orderedWorkspaces, archivedSessionIds, expandedGroups, sessionOrderByAccount],
   )
+  const openProject = (group: GroupNode): void => {
+    if (group.workspaceId === undefined) {
+      setGroupExpanded(group.key, !group.expanded)
+      return
+    }
+    setGroupExpanded(group.key, true)
+    const workspace = workspaces.find(candidate => candidate.workspaceId === group.workspaceId)
+    const archived = new Set(archivedSessionIds)
+    let targetId: SessionId | undefined
+    let targetUpdatedAt = Number.NEGATIVE_INFINITY
+    for (const id of workspace?.sessionIds ?? []) {
+      const candidate = list.byId[id]
+      if (candidate === undefined || candidate.origin === 'subagent' || archived.has(id)) continue
+      if (candidate.updatedAt <= targetUpdatedAt) continue
+      targetId = candidate.id
+      targetUpdatedAt = candidate.updatedAt
+    }
+    if (targetId === undefined) startSession(group.workspaceId)
+    else open(targetId)
+  }
   const now = Date.now()
   const commitSessionDrag = (activeDrag: DragState, over: NonNullable<DragState['over']>): void => {
     if (sessionDropCommitted.current) return
@@ -453,7 +508,9 @@ function SessionTree({
               <ProjectRowItem
                 group={group}
                 home={home}
+                metadata={group.cwd === undefined ? undefined : projectMetadataByPath[group.cwd]}
                 t={t}
+                onOpen={() => { openProject(group) }}
                 onToggle={() => {
                   if (group.expanded) {
                     setExpandedSessionGroups(keys => keys.filter(key => key !== group.key))
@@ -466,6 +523,13 @@ function SessionTree({
                     startSession(group.workspaceId)
                   }
                 }}
+                projectActions={group.workspaceId === undefined || group.cwd === undefined
+                  ? undefined
+                  : renderProjectActions({
+                    workspaceId: group.workspaceId,
+                    title: group.label,
+                    path: group.cwd,
+                  })}
                 drag={workspaceDragProps}
                 actions={group.workspaceId === undefined
                   ? undefined
@@ -758,6 +822,7 @@ export function WorkspaceBrowser({
   archiveSession,
   insertSessionBefore,
   createWorkspace,
+  createDirectory,
   searchSessions,
   searchResultLimit,
   useDirectoryFlow,
@@ -777,6 +842,8 @@ export function WorkspaceBrowser({
   const groupExpansion = useStore(s => s.groupExpansion)
   const sessionOrderByAccount = useStore(s => s.sessionOrderByAccount)
   const sessionUpdatedAtByAccount = useStore(s => s.sessionUpdatedAtByAccount)
+  const projectMetadataByPath = useStore(s => s.projectMetadataByPath ?? {})
+  const defaultProjectRoot = useStore(s => s.defaultProjectRoot ?? '')
   const currentBlankSessionId = useSessions((state) => {
     const current = state.current
     return current !== undefined && state.byId[current]?.blank === true ? current : undefined
@@ -823,10 +890,22 @@ export function WorkspaceBrowser({
   })
   const searchRoot = useRef<HTMLDivElement | null>(null)
   const searchInput = useRef<HTMLInputElement | null>(null)
-  // Section-header ＋ opens the picker menu (same popover in wide and rail
-  // states; the menu anchors on this button).
-  const [wsPickerOpen, setWsPickerOpen] = useState(false)
-  const wsPlusRef = useRef<HTMLButtonElement>(null)
+  const [projectFormOpen, setProjectFormOpen] = useState(false)
+  const [projectName, setProjectName] = useState('')
+  const [companyName, setCompanyName] = useState('')
+  const [scheduleMode, setScheduleMode] = useState<'pending-confirmation' | 'estimated'>('pending-confirmation')
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
+  const [storageParent, setStorageParent] = useState('')
+  const [projectDirectoryName, setProjectDirectoryName] = useState('')
+  const [rememberProjectRoot, setRememberProjectRoot] = useState(true)
+  const [directoryMode, setDirectoryMode] = useState<'location' | 'import' | null>(null)
+  const [directoryBusy, setDirectoryBusy] = useState(false)
+  const [creatingProject, setCreatingProject] = useState(false)
+  const [projectFormAttempted, setProjectFormAttempted] = useState(false)
+  const [projectFormError, setProjectFormError] = useState<string | null>(null)
+  const pendingScheduleRef = useRef<HTMLButtonElement>(null)
+  const estimatedScheduleRef = useRef<HTMLButtonElement>(null)
   const composingRef = useRef(false)
 
   // Rail search = expand + land in the search box: the flag arms before the
@@ -900,6 +979,140 @@ export function WorkspaceBrowser({
       controller.abort()
     }
   }, [normalizedQuery, searchSessions])
+
+  const projectNameTrimmed = projectName.trim()
+  const projectDirectoryNameTrimmed = projectDirectoryName.trim()
+  const projectPreviewPath = storageParent === ''
+    ? ''
+    : projectPathPreview(storageParent, projectDirectoryNameTrimmed)
+  const storageParentLabel = storageParent === ''
+    ? t('projectForm.location.unset')
+    : home === undefined ? storageParent : abbreviateHomePath(storageParent, home)
+  const projectPreviewLabel = projectPreviewPath === ''
+    ? t('projectForm.location.unset')
+    : home === undefined ? projectPreviewPath : abbreviateHomePath(projectPreviewPath, home)
+  const projectValidationError = (): string | null => {
+    if (projectNameTrimmed === '') return t('projectForm.error.name')
+    if (!isValidProjectDirectoryName(projectDirectoryNameTrimmed)) return t('projectForm.error.nameInvalid')
+    if (workspaces.some(workspace => workspace.title === projectNameTrimmed)) {
+      return t('conflict.named', { name: projectNameTrimmed })
+    }
+    if (scheduleMode === 'estimated' && (startDate === '' || endDate === '')) {
+      return t('projectForm.error.schedule')
+    }
+    if (scheduleMode === 'estimated' && endDate < startDate) {
+      return t('projectForm.error.scheduleOrder')
+    }
+    if (storageParent.trim() === '') return t('projectForm.error.location')
+    return null
+  }
+  const resetProjectForm = (): void => {
+    setProjectName('')
+    setCompanyName('')
+    setScheduleMode('pending-confirmation')
+    setStartDate('')
+    setEndDate('')
+    setStorageParent(defaultProjectRoot)
+    setProjectDirectoryName(defaultProjectDirectoryName())
+    setRememberProjectRoot(true)
+    setProjectFormAttempted(false)
+    setProjectFormError(null)
+  }
+  const openProjectForm = (): void => {
+    resetProjectForm()
+    setProjectFormOpen(true)
+  }
+  const chooseScheduleMode = (mode: 'pending-confirmation' | 'estimated'): void => {
+    setScheduleMode(mode)
+    setProjectFormError(null)
+  }
+  const handleScheduleKeyDown = (event: KeyboardEvent<HTMLButtonElement>): void => {
+    let next: 'pending-confirmation' | 'estimated' | undefined
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowUp' || event.key === 'Home') {
+      next = 'pending-confirmation'
+    } else if (event.key === 'ArrowRight' || event.key === 'ArrowDown' || event.key === 'End') {
+      next = 'estimated'
+    }
+    if (next === undefined) return
+    event.preventDefault()
+    chooseScheduleMode(next)
+    const targetRef = next === 'pending-confirmation' ? pendingScheduleRef : estimatedScheduleRef
+    targetRef.current?.focus()
+  }
+  const closeProjectForm = (): void => {
+    if (creatingProject || directoryBusy) return
+    setProjectFormOpen(false)
+    setDirectoryMode(null)
+    setProjectFormError(null)
+  }
+  const presentProjectFailure = (reason: unknown): void => {
+    const message = reason instanceof Error ? reason.message : String(reason)
+    setProjectFormError(message.includes('directory-exists')
+      ? t('projectForm.error.exists')
+      : t('projectForm.error.create', { message }))
+    setProjectFormOpen(true)
+  }
+  const importProject = (path: string): void => {
+    setDirectoryBusy(true)
+    void createWorkspace({ path }).then((workspace) => {
+      setDirectoryBusy(false)
+      setDirectoryMode(null)
+      setProjectFormOpen(false)
+      actions.setGroupExpanded(workspace.workspaceId as string, true)
+      startSession(workspace.workspaceId)
+    }).catch((reason: unknown) => {
+      setDirectoryBusy(false)
+      setDirectoryMode(null)
+      presentProjectFailure(reason)
+    })
+  }
+  const handleDirectoryPicked = (path: string): void => {
+    if (directoryMode === 'location') {
+      setStorageParent(path)
+      setDirectoryMode(null)
+      setProjectFormError(null)
+      return
+    }
+    if (directoryMode === 'import') importProject(path)
+  }
+  const confirmCreateProject = (): void => {
+    setProjectFormAttempted(true)
+    const validationError = projectValidationError()
+    if (validationError !== null) {
+      setProjectFormError(validationError)
+      return
+    }
+    setCreatingProject(true)
+    setProjectFormError(null)
+    void createDirectory(storageParent, projectDirectoryNameTrimmed)
+      .then(path => createWorkspace({ path }))
+      .then(async (workspace) => {
+        if (workspace.title !== projectNameTrimmed) {
+          await renameWorkspace(workspace.workspaceId, projectNameTrimmed)
+        }
+        const schedule: ProjectMetadata['schedule'] = scheduleMode === 'pending-confirmation'
+          ? { status: 'pending-confirmation' }
+          : { status: 'estimated', startDate, endDate }
+        actions.setProjectMetadata(workspace.path, {
+          name: projectNameTrimmed,
+          companyName: companyName.trim(),
+          schedule,
+          storagePath: workspace.path,
+          projectRoot: storageParent,
+          directoryName: projectDirectoryNameTrimmed,
+          createdAt: new Date().toISOString(),
+        })
+        if (rememberProjectRoot) actions.setDefaultProjectRoot(storageParent)
+        actions.setGroupExpanded(workspace.workspaceId as string, true)
+        setCreatingProject(false)
+        setProjectFormOpen(false)
+        startSession(workspace.workspaceId)
+      })
+      .catch((reason: unknown) => {
+        setCreatingProject(false)
+        presentProjectFailure(reason)
+      })
+  }
 
   // Rename dialog (browser-owned so it outlives row unmounts during collapse).
   const [renameTarget, setRenameTarget] = useState<{ workspaceId: WorkspaceId; currentTitle: string } | null>(null)
@@ -1009,6 +1222,19 @@ export function WorkspaceBrowser({
 
   return (
     <div className={clsx(css.root, !wide && css.rail)}>
+      {directoryFlowAvailable && (
+        <Tooltip label={t('workspace.add')} delayMs={500} disabled={wide}>
+          <button
+            type="button"
+            className={css.newProject}
+            aria-label={t('workspace.add')}
+            onClick={openProjectForm}
+          >
+            <IconProjectAddOutline16 size={wide ? 14 : 18} />
+            {wide && <span className={css.newProjectLabel}>{t('workspace.add')}</span>}
+          </button>
+        </Tooltip>
+      )}
       <div className={css.sectionHeader}>
         {wide && (
           <span className={clsx(css.sectionLabel, css.wide, searchExpanded && css.sectionLabelHidden)}>
@@ -1021,7 +1247,6 @@ export function WorkspaceBrowser({
               ref={searchRoot}
               className={clsx(css.search, searchExpanded && css.searchExpanded)}
               onClick={() => {
-                setWsPickerOpen(false)
                 setSearchExpanded(true)
                 searchInput.current?.focus()
               }}
@@ -1033,7 +1258,6 @@ export function WorkspaceBrowser({
                   aria-label={t('search.sessions.aria')}
                   aria-expanded={searchExpanded}
                   onClick={() => {
-                    setWsPickerOpen(false)
                     setSearchExpanded(true)
                   }}
                 >
@@ -1082,43 +1306,20 @@ export function WorkspaceBrowser({
               t={t}
             />
           )}
-          {/* Adding is the button's one action, so a composition with no
-              picking affordance has nothing to offer here: the region hides the
-              button rather than leaving a dead one in the header. */}
-          {directoryFlowAvailable && (
-            <Tooltip label={t('workspace.add')} side="bottom" delayMs={500}>
-              <button
-                ref={wsPlusRef}
-                type="button"
-                className={css.iconButton}
-                aria-label={t('workspace.add')}
-                onClick={() => {
-                  setWsPickerOpen(v => !v)
-                }}
-              >
-                <IconProjectAddOutline16 size={wide ? 16 : 18} />
-              </button>
-            </Tooltip>
-          )}
         </div>
-        {/* Add flow + its error dialog (same package — direct composition). */}
-        <WorkspacePickFlow
-          t={t}
-          open={wsPickerOpen}
-          anchorRef={wsPlusRef}
-          useWorkspaces={useWorkspaces}
-          createWorkspace={createWorkspace}
-          useDirectoryFlow={useDirectoryFlow}
-          renderDirectoryFlow={owner => renderSlot('sidebar.workspaces.directoryFlow', owner)}
-          addOnly
-          side="right"
-          onPick={(workspaceId) => {
-            setWsPickerOpen(false)
-            startSession(workspaceId)
-          }}
-          onClose={() => { setWsPickerOpen(false) }}
-        />
       </div>
+
+      {renderSlot('sidebar.workspaces.directoryFlow', {
+        open: directoryMode !== null,
+        busy: directoryBusy,
+        onPicked: handleDirectoryPicked,
+        onCancel: () => { setDirectoryMode(null); setDirectoryBusy(false) },
+        onError: (message) => {
+          setDirectoryMode(null)
+          setDirectoryBusy(false)
+          presentProjectFailure(message)
+        },
+      })}
 
       {/* The collapsed rail keeps search as its own 36px control. */}
       {!wide && <div className={css.search}>
@@ -1182,12 +1383,14 @@ export function WorkspaceBrowser({
                 syncSessionOrderAccount={actions.syncSessionOrderAccount}
                 setSessionOrder={actions.setSessionOrder}
                 archivedSessionIds={archivedSessionIds}
+                projectMetadataByPath={projectMetadataByPath}
                 startSession={startSession}
                 open={open}
                 insertWorkspaceBefore={insertWorkspaceBefore}
                 insertSessionBefore={insertSessionBefore}
                 orderBy={orderBy}
                 home={home}
+                renderProjectActions={owner => renderSlot('sidebar.workspaces.projectActions', owner)}
                 t={t}
                 onRenameRequest={(workspaceId, currentTitle) => {
                   setRenameTarget({ workspaceId, currentTitle })
@@ -1201,6 +1404,167 @@ export function WorkspaceBrowser({
               />
             ))}
       </div>
+
+      <Modal
+        open={projectFormOpen}
+        onClose={closeProjectForm}
+        closeLabel={t('close')}
+        title={t('projectForm.title')}
+        className={css.projectDialog ?? ''}
+        footer={(
+          <>
+            <Button variant="outline" disabled={creatingProject || directoryBusy} onClick={closeProjectForm}>
+              {t('cancel')}
+            </Button>
+            <Button variant="primary" disabled={creatingProject || directoryBusy} onClick={confirmCreateProject}>
+              {creatingProject ? t('projectForm.submitting') : t('projectForm.submit')}
+            </Button>
+          </>
+        )}
+      >
+        <div className={css.projectForm}>
+          <label className={css.projectField}>
+            <span className={css.projectFieldLabel}>{t('projectForm.name')}</span>
+            <input
+              className={css.projectInput}
+              value={projectName}
+              autoFocus
+              disabled={creatingProject || directoryBusy}
+              placeholder={t('projectForm.name.placeholder')}
+              onChange={(event) => { setProjectName(event.target.value); setProjectFormError(null) }}
+            />
+          </label>
+
+          <label className={css.projectField}>
+            <span className={css.projectFieldLabel}>{t('projectForm.company')}</span>
+            <input
+              className={css.projectInput}
+              value={companyName}
+              disabled={creatingProject || directoryBusy}
+              placeholder={t('projectForm.company.placeholder')}
+              onChange={(event) => { setCompanyName(event.target.value); setProjectFormError(null) }}
+            />
+          </label>
+
+          <div className={css.projectField}>
+            <span className={css.projectFieldLabel}>{t('projectForm.schedule')}</span>
+            <div
+              className={css.projectScheduleSegments}
+              role="radiogroup"
+              aria-label={t('projectForm.schedule')}
+            >
+              <button
+                ref={pendingScheduleRef}
+                type="button"
+                className={css.projectScheduleOption}
+                role="radio"
+                aria-checked={scheduleMode === 'pending-confirmation'}
+                tabIndex={scheduleMode === 'pending-confirmation' ? 0 : -1}
+                disabled={creatingProject || directoryBusy}
+                onClick={() => { chooseScheduleMode('pending-confirmation') }}
+                onKeyDown={handleScheduleKeyDown}
+              >
+                {t('projectForm.schedule.pending')}
+              </button>
+              <button
+                ref={estimatedScheduleRef}
+                type="button"
+                className={css.projectScheduleOption}
+                role="radio"
+                aria-checked={scheduleMode === 'estimated'}
+                tabIndex={scheduleMode === 'estimated' ? 0 : -1}
+                disabled={creatingProject || directoryBusy}
+                onClick={() => { chooseScheduleMode('estimated') }}
+                onKeyDown={handleScheduleKeyDown}
+              >
+                {t('projectForm.schedule.estimated')}
+              </button>
+            </div>
+          </div>
+
+          {scheduleMode === 'estimated' && (
+            <div className={css.projectDateRow}>
+              <label className={css.projectField}>
+                <span className={css.projectFieldLabel}>{t('projectForm.startDate')}</span>
+                <input
+                  className={css.projectInput}
+                  type="date"
+                  value={startDate}
+                  disabled={creatingProject || directoryBusy}
+                  onChange={(event) => { setStartDate(event.target.value); setProjectFormError(null) }}
+                />
+              </label>
+              <label className={css.projectField}>
+                <span className={css.projectFieldLabel}>{t('projectForm.endDate')}</span>
+                <input
+                  className={css.projectInput}
+                  type="date"
+                  value={endDate}
+                  disabled={creatingProject || directoryBusy}
+                  onChange={(event) => { setEndDate(event.target.value); setProjectFormError(null) }}
+                />
+              </label>
+            </div>
+          )}
+
+          <div className={css.projectField}>
+            <span className={css.projectFieldLabel}>{t('projectForm.location')}</span>
+            <div className={css.projectLocationRow}>
+              <span className={css.projectLocationValue} title={storageParent}>
+                {storageParentLabel}
+              </span>
+              <Button
+                variant="outline"
+                disabled={creatingProject || directoryBusy || !directoryFlowAvailable}
+                onClick={() => { setDirectoryMode('location'); setProjectFormError(null) }}
+              >
+                {t('projectForm.changeLocation')}
+              </Button>
+            </div>
+          </div>
+
+          <label className={css.projectField}>
+            <span className={css.projectFieldLabel}>{t('projectForm.directoryName')}</span>
+            <input
+              className={css.projectInput}
+              value={projectDirectoryName}
+              disabled={creatingProject || directoryBusy}
+              placeholder={t('projectForm.directoryName.placeholder')}
+              onChange={(event) => { setProjectDirectoryName(event.target.value); setProjectFormError(null) }}
+            />
+          </label>
+
+          <div className={css.projectField}>
+            <span className={css.projectFieldLabel}>{t('projectForm.finalPath')}</span>
+            <span className={css.projectLocationValue} title={projectPreviewPath}>
+              {projectPreviewLabel}
+            </span>
+          </div>
+
+          <label className={css.projectRememberRow}>
+            <input
+              type="checkbox"
+              checked={rememberProjectRoot}
+              disabled={creatingProject || directoryBusy || storageParent === ''}
+              onChange={(event) => { setRememberProjectRoot(event.target.checked) }}
+            />
+            <span>{t('projectForm.rememberLocation')}</span>
+          </label>
+
+          <Button
+            variant="outline"
+            className={css.projectImport}
+            disabled={creatingProject || directoryBusy || !directoryFlowAvailable}
+            onClick={() => { setDirectoryMode('import'); setProjectFormError(null) }}
+          >
+            {t('projectForm.import')}
+          </Button>
+
+          {(projectFormAttempted || projectFormError !== null) && projectFormError !== null
+            ? <div className={css.projectError} role="alert">{projectFormError}</div>
+            : null}
+        </div>
+      </Modal>
 
       <Modal
         open={renameTarget !== null}

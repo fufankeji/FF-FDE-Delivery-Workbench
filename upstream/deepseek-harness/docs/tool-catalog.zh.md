@@ -19,6 +19,7 @@
 
 | 工具包 | 模型可见名称 | 依赖 | 写入／影响 | 随产品发布的别名 | 部署说明 |
 | --- | --- | --- | --- | --- | --- |
+| `@deepseek-ai/dsh-fde-project` | `architecture_get`、`architecture_set`、`openapi_call`、`openapi_describe`、`openapi_list` | `ctx.tools`、`ctx.workspaceRegistry and a registered calling Agent Workspace at execution time`、`locked dsh-openapi implementation` | `tool/call`、`project .fde/architecture.json for architecture_set`、`bounded external HTTP only for openapi_call`、`tool/result` | - | 每次执行都通过 Workspace 注册表解析调用 Agent 的 cwd。OpenAPI 工具只加载该项目配置，architecture_set 在原子替换前要求精确 revision。 |
 | `@deepseek-ai/dsh-tool-ask-user` | `ask_user_question` | `ctx.tools`、`ctx.userQuestions` | `tool/call`、`tool/result after a UI/provider answers the question` | - | ask_user_question 会暂停工具调用，直到当前 UI 提供方返回人类答案。 |
 | `@deepseek-ai/dsh-tools` | `run_code` | `ctx.tools`、`ctx.codeRuntime (execution time)`、`ctx.systemPrompt` | `tool/call`、`one tool/code-dispatch-start + tool/code-dispatch pair per bridged sub-call`、`tool/result` | - | 在 `mode: code`／`mode: both` 下，它由工具注册表所有，作为可过滤能力层之外的保留传输机制（参见 Code Mode Agent Note）。在 `code` 下，它是注册表对协议格式（wire format）的唯一贡献；其他可见能力在使用已加载运行时语言生成的 SDK 章节中声明。程序通过 binding 调用这些能力，调用按照原生并发约定调度：启动顺序和策略遵循提交顺序，并发安全的函数体最多重叠执行 `maxParallelSubCalls` 个。调用会重新进入完整且受守卫保护的工具流水线，并将每个嵌套执行关联到此外层结果。 |
 | `@deepseek-ai/dsh-plan-mode` | `exit_plan_mode` | `ctx.tools`、`ctx.systemPrompt`、`ctx.userQuestions (execution time, opportunistic)` | `tool/call`、`plan/mode inactive on an approved review`、`tool/result` | - | 规划未激活时，exit_plan_mode 仍保留在面向模型的 schema 中，这样状态转换不会在规划策略变更之外额外造成工具目录变动。其执行路径会拒绝规划模式之外的调用；在规划模式下，它通过用户交互 seam 提交计划（批准／根据反馈继续规划），批准后会在步骤边界记录规划模式已停用。 |
@@ -45,6 +46,248 @@
 | `@deepseek-ai/dsh-tool-todo` | `todo_write` | `ctx.tools`、`owning Agent session` | `tool/call`、`todo/write`、`tool/result` | - | todo_write 是会话所有的状态；UI 将最新的 todo/write 事件渲染为检查清单。`allowParallelInProgress` 是没有默认值的必填项，因此本目录明确选择 `true`，对应描述允许同时存在多个 `in_progress` 项。选择 `false` 的部署会获得同一工具，但描述会要求只能有 1 个活动任务。 |
 | `@deepseek-ai/dsh-tool-workflow` | `workflow` | `ctx.tools`、`ctx.workflowEngine`、`ctx.systemPrompt`、`a calling Agent (exec.agent parents the script children)` | `tool/call`、`tool/result` | - | - |
 | `@deepseek-ai/dsh-tool-web` | `web_fetch`、`web_search` | `ctx.tools`、`ctx.web`、`ctx.systemPrompt` | `tool/call`、`tool/result` | - | web_search 和 web_fetch 将提供方选择置于 ctx.web 之后，使模型可见 schema 在更换后端时保持稳定。 |
+
+<a id="deepseek-aidsh-fde-project"></a>
+
+## `@deepseek-ai/dsh-fde-project`
+
+### `architecture_get`
+
+在提出修改前，读取当前 FDE 项目的系统架构及其精确 revision。
+
+```json
+{
+  "type": "object",
+  "properties": {}
+}
+```
+
+来源：[`packages/fde/project/src/architecture-tools.ts`](../packages/fde/project/src/architecture-tools.ts)
+
+### `architecture_set`
+
+为当前 FDE 项目发布一份完整候选架构。必须先调用 architecture_get，并传入其精确 expectedRevision。
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "expectedRevision": {
+      "type": "integer",
+      "description": "Exact revision from architecture_get; 0 when absent."
+    },
+    "title": {
+      "type": "string",
+      "description": "Architecture title."
+    },
+    "summary": {
+      "type": "string",
+      "description": "Business and technical objective summary."
+    },
+    "groups": {
+      "type": "array",
+      "description": "System layers or responsibility groups.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label"
+        ]
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "description": "System components.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "default",
+              "entry",
+              "core",
+              "store",
+              "external",
+              "output"
+            ]
+          },
+          "note": {
+            "type": "string"
+          },
+          "group": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "kind"
+        ]
+      }
+    },
+    "edges": {
+      "type": "array",
+      "description": "Directed relationships between existing node ids.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "dashed": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "from",
+          "to"
+        ]
+      }
+    }
+  },
+  "required": [
+    "expectedRevision",
+    "title",
+    "groups",
+    "nodes",
+    "edges"
+  ]
+}
+```
+
+来源：[`packages/fde/project/src/architecture-tools.ts`](../packages/fde/project/src/architecture-tools.ts)
+
+### `openapi_call`
+
+调用当前 FDE 项目 OpenAPI 配置中已经声明并允许的一项操作。
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "api": {
+      "type": "string",
+      "description": "Use project for the current FDE project."
+    },
+    "operationId": {
+      "type": "string",
+      "description": "Operation id returned by openapi_list."
+    },
+    "path": {
+      "type": "object",
+      "description": "Declared path parameters.",
+      "additionalProperties": true
+    },
+    "query": {
+      "type": "object",
+      "description": "Declared query parameters.",
+      "additionalProperties": true
+    },
+    "headers": {
+      "type": "object",
+      "description": "Declared non-credential header parameters.",
+      "additionalProperties": true
+    },
+    "cookies": {
+      "type": "object",
+      "description": "Declared cookie parameters.",
+      "additionalProperties": true
+    },
+    "body": {
+      "type": "string",
+      "description": "Raw request body, usually JSON."
+    },
+    "contentType": {
+      "type": "string",
+      "description": "Request content type."
+    }
+  },
+  "required": [
+    "api",
+    "operationId"
+  ]
+}
+```
+
+来源：[`packages/fde/project/src/openapi-tools.ts`](../packages/fde/project/src/openapi-tools.ts)
+
+### `openapi_describe`
+
+描述当前 FDE 项目中的一项操作，包括参数、请求体和响应。
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "api": {
+      "type": "string",
+      "description": "Use project for the current FDE project."
+    },
+    "operationId": {
+      "type": "string",
+      "description": "Operation id returned by openapi_list."
+    }
+  },
+  "required": [
+    "api",
+    "operationId"
+  ]
+}
+```
+
+来源：[`packages/fde/project/src/openapi-tools.ts`](../packages/fde/project/src/openapi-tools.ts)
+
+### `openapi_list`
+
+列出并搜索当前 FDE 项目拥有的 OpenAPI 定义中的操作。
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "api": {
+      "type": "string",
+      "description": "Optional API id; the current project id is project."
+    },
+    "search": {
+      "type": "string",
+      "description": "Optional case-insensitive operation search."
+    },
+    "limit": {
+      "type": "number",
+      "description": "Maximum operations to return (1-100, default 50)."
+    }
+  }
+}
+```
+
+来源：[`packages/fde/project/src/openapi-tools.ts`](../packages/fde/project/src/openapi-tools.ts)
+
+每次执行都通过 Workspace 注册表解析调用 Agent 的 cwd。OpenAPI 工具只加载该项目配置，architecture_set 在原子替换前要求精确 revision。
 
 <a id="deepseek-aidsh-tool-ask-user"></a>
 

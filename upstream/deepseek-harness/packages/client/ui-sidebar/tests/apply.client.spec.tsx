@@ -10,11 +10,9 @@ async function bench(declare = true) {
   const ctx = new Context()
   await ctx.plugin(SlotRegistry).await()
   const layout = { toggleSidebar: vi.fn() }
-  const workspaces = { startSession: vi.fn() }
   const sessions = { open: vi.fn(), clear: vi.fn() }
   ctx.provide('layout', layout)
   ctx.provide('sessions', sessions as never)
-  ctx.provide('workspaces', workspaces as never)
   ctx.provide('locale', new LocaleRuntime(ctx))
   const slots = ctx.get('slots') as SlotRegistry
   if (declare) {
@@ -23,12 +21,12 @@ async function bench(declare = true) {
       () => null,
     )
   }
-  return { ctx, slots, layout, workspaces, sessions }
+  return { ctx, slots, layout, sessions }
 }
 
 describe('ui-sidebar apply', () => {
   it('declares only the services it uses', () => {
-    expect(inject).toEqual(['slots', 'layout', 'sessions', 'workspaces', 'locale'])
+    expect(inject).toEqual(['slots', 'layout', 'locale'])
   })
 
   it('registers the shell and declares its child seats', async () => {
@@ -43,12 +41,7 @@ describe('ui-sidebar apply', () => {
     // Copy rides the standard locale seat, not the inject face.
     expect(b.slots.entries('sidebar')[0]!.locale).toBe('sidebar')
     const injected = (b.slots.entries('sidebar')[0]!.inject as () => SidebarRootInjected)()
-    expect(Object.keys(injected)).toEqual(['startSession', 'toggleSidebar'])
-    // Both arms delegate to the runtime's shared New Session action.
-    injected.startSession('workspace' as never)
-    expect(b.workspaces.startSession).toHaveBeenCalledWith('workspace')
-    injected.startSession()
-    expect(b.workspaces.startSession).toHaveBeenLastCalledWith(undefined)
+    expect(Object.keys(injected)).toEqual(['toggleSidebar'])
     injected.toggleSidebar()
     expect(b.layout.toggleSidebar).toHaveBeenCalledOnce()
   })

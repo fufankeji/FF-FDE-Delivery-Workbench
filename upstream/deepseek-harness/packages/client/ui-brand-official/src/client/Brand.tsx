@@ -1,22 +1,33 @@
-import { BrandWordmark, FishLogo } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { HeroBrandMarkOwnerProps } from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type { SidebarBrandMarkOwnerProps } from '@deepseek-ai/dsh-client-ui-sidebar/client'
 
 type OfficialBrandMarkProps = HeroBrandMarkOwnerProps & SidebarBrandMarkOwnerProps
+const FF_LOGO_SRC = '/ff-brand/ff-logo.png'
+const FF_LOGO_RADIUS = '20%'
 
 /**
- * Render the official mark with the presentation requested by its host surface.
+ * Render the FF mark with the presentation requested by its host surface.
  * @param props - Host-supplied mark presentation.
- * @returns the official whale mark.
+ * @returns the shared FF logo image.
  */
 export function OfficialBrandMark({ size, className }: OfficialBrandMarkProps) {
-  return <FishLogo size={size} className={className} />
+  return (
+    <img
+      src={FF_LOGO_SRC}
+      alt=""
+      aria-hidden="true"
+      width={size}
+      height={size}
+      className={className}
+      style={{ objectFit: 'contain', borderRadius: FF_LOGO_RADIUS }}
+    />
+  )
 }
 
 /**
- * Render the official name artwork without its independently slotted mark.
- * @returns the official name wordmark.
+ * Render the FDE product name without its independently slotted mark.
+ * @returns the exact confirmed product name.
  */
 export function OfficialBrandName() {
-  return <BrandWordmark includeMark={false} />
+  return <span>FF-FDE工作台</span>
 }

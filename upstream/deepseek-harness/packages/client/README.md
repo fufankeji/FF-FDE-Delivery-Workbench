@@ -22,6 +22,11 @@ The browser side of the dsh web GUI: shell boot, browser-host communication, sha
 | [`ui-sidebar/`](ui-sidebar/README.md) | Presents workspace and session navigation. |
 | [`ui-brand-official/`](ui-brand-official/README.md) | Fills the generic browser-brand slots with the official name and marks. |
 | [`ui-workspace/`](ui-workspace/README.md) | Provides workspace selection and creation surfaces. |
+| [`ui-fde-appearance/`](ui-fde-appearance/README.md) | Provides browser-local bundled skins and custom background settings for the FDE profile. |
+| [`ui-fde-project/`](ui-fde-project/README.md) | Provides global project progress and project API, architecture, observability, and evaluation views. |
+| [`ui-fde-document-preview/`](ui-fde-document-preview/README.md) | Provides one read-only Office/document preview for project details and Better Sidebar. |
+| [`ui-fde-stage/`](ui-fde-stage/README.md) | Presents the Workspace-scoped six-stage FDE project progress. |
+| [`ui-fde-sources/`](ui-fde-sources/README.md) | Adds project-scoped file intake without changing a conversation draft. |
 | [`ui-conversation/`](ui-conversation/README.md) | Presents the active conversation and its input surface. |
 | [`ui-tool/`](ui-tool/README.md) | Composes Tool call trees and keyed per-Tool views. |
 | [`ui-workflow-run/`](ui-workflow-run/README.md) | Replays durable workflow runs as nested Chat disclosures with live-only child navigation. |

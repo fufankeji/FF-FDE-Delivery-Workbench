@@ -15,6 +15,21 @@ export type SessionGroupBy = 'workspace' | 'flat'
 /** Session order: user-arranged only, or user-arranged plus activity promotion. */
 export type SessionOrderBy = 'manual' | 'updated'
 
+/** Initial project facts captured by the FDE creation form. */
+export interface ProjectMetadata {
+  name: string
+  companyName: string
+  schedule: { status: 'pending-confirmation' } | {
+    status: 'estimated'
+    startDate: string
+    endDate: string
+  }
+  storagePath: string
+  projectRoot?: string
+  directoryName?: string
+  createdAt: string
+}
+
 /** Workspace browser viewing state persisted across surface remounts and reloads. */
 type WorkspaceViewState = {
   groupBy: SessionGroupBy
@@ -25,6 +40,10 @@ type WorkspaceViewState = {
   sessionOrderByAccount: Record<string, string[]>
   /** Last observed update timestamps per order account for one-time promotion events. */
   sessionUpdatedAtByAccount: Record<string, Record<string, number>>
+  /** FDE project metadata keyed by the Host-canonical Workspace path. */
+  projectMetadataByPath: Record<string, ProjectMetadata>
+  /** User-confirmed default parent directory for newly created projects. */
+  defaultProjectRoot?: string
 }
 
 /**
@@ -43,6 +62,8 @@ type WorkspaceViewActions = {
     updatedAt: Record<string, number>,
   ) => void
   setSessionOrder: (draft: WorkspaceViewState, accountKey: string, order: string[]) => void
+  setProjectMetadata: (draft: WorkspaceViewState, path: string, metadata: ProjectMetadata) => void
+  setDefaultProjectRoot: (draft: WorkspaceViewState, path: string) => void
 }
 
 /**
@@ -57,8 +78,9 @@ export function createWorkspaceViewStore(): EngineStoreHandle<WorkspaceViewState
       groupExpansion: {},
       sessionOrderByAccount: {},
       sessionUpdatedAtByAccount: {},
+      projectMetadataByPath: {},
     }),
-    persist: 'dsh.workspace.view.v5',
+    persist: 'dsh.workspace.view.v6',
     actions: {
       setGroupBy: (d, mode: SessionGroupBy) => { d.groupBy = mode },
       setOrderBy: (d, mode: SessionOrderBy) => { d.orderBy = mode },
@@ -82,6 +104,11 @@ export function createWorkspaceViewStore(): EngineStoreHandle<WorkspaceViewState
       setSessionOrder: (d, accountKey: string, order: string[]) => {
         d.sessionOrderByAccount[accountKey] = order
       },
+      setProjectMetadata: (d, path: string, metadata: ProjectMetadata) => {
+        d.projectMetadataByPath ??= {}
+        d.projectMetadataByPath[path] = metadata
+      },
+      setDefaultProjectRoot: (d, path: string) => { d.defaultProjectRoot = path },
     },
   })
 }

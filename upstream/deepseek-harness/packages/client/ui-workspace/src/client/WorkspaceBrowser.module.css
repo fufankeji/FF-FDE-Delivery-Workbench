@@ -19,6 +19,209 @@
   padding-right: 0;
 }
 
+.newProject {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 38px;
+  margin: 0 2px 8px;
+  padding: 8px 16px;
+  box-sizing: border-box;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 12px;
+  background: var(--dsw-alias-button-elevated-fill);
+  color: var(--dsw-alias-label-primary);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 22px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.newProject:hover {
+  background: var(--dsw-alias-button-floating-hover);
+}
+
+.rail .newProject {
+  align-self: flex-start;
+  width: 36px;
+  height: 36px;
+  margin: 0 0 12px;
+  padding: 0;
+  gap: 0;
+  border-color: transparent;
+  background: transparent;
+}
+
+.rail .newProject:hover {
+  background: var(--dsw-alias-interactive-bg-hover);
+}
+
+.newProjectLabel {
+  max-width: 200px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.projectDialog {
+  width: min(560px, 100%);
+}
+
+.projectForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.projectField {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.projectFieldLabel {
+  color: var(--dsw-alias-label-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.projectInput {
+  box-sizing: border-box;
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 10px;
+  outline: none;
+  background: var(--dsw-alias-bg-layer-2);
+  color: var(--dsw-alias-label-primary);
+  font: inherit;
+}
+
+.projectInput:focus {
+  border-color: var(--dsw-alias-state-business-primary);
+}
+
+.projectInput::placeholder {
+  color: var(--dsw-alias-label-caption);
+}
+
+.projectScheduleSegments {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 11px;
+  background: var(--dsw-alias-interactive-bg-hover);
+}
+
+.projectScheduleOption {
+  min-width: 0;
+  height: 34px;
+  padding: 0 12px;
+  overflow: hidden;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--dsw-alias-label-secondary);
+  font: inherit;
+  font-size: 13px;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--ds-transition-duration-fast) var(--ds-ease-in-out),
+    border-color var(--ds-transition-duration-fast) var(--ds-ease-in-out),
+    color var(--ds-transition-duration-fast) var(--ds-ease-in-out);
+}
+
+.projectScheduleOption:hover:not(:disabled):not([aria-checked='true']) {
+  background: var(--dsw-alias-interactive-bg-hover-solid);
+  color: var(--dsw-alias-label-primary);
+}
+
+.projectScheduleOption[aria-checked='true'] {
+  border-color: var(--dsw-alias-button-ghost-active-border);
+  background: var(--dsw-alias-button-elevated-fill);
+  color: var(--dsw-alias-label-primary);
+  box-shadow: var(--dsw-shadow-lv1);
+}
+
+.projectScheduleOption:focus-visible {
+  outline: 2px solid var(--dsw-alias-state-business-primary);
+  outline-offset: 1px;
+}
+
+.projectScheduleOption:disabled {
+  color: var(--dsw-alias-label-dimmed);
+  cursor: not-allowed;
+}
+
+.projectDateRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.projectLocationRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.projectLocationValue {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 12px;
+  overflow: hidden;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 10px;
+  color: var(--dsw-alias-label-secondary);
+  font-size: 13px;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.projectImport {
+  align-self: flex-start;
+}
+
+.projectRememberRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--dsw-alias-label-secondary);
+  font-size: 13px;
+  line-height: 20px;
+  cursor: pointer;
+}
+
+.projectRememberRow input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+}
+
+.projectError {
+  color: var(--dsw-alias-state-error-primary);
+  font-size: 12px;
+  line-height: 18px;
+}
+
+@media (max-width: 560px) {
+  .projectDateRow {
+    grid-template-columns: 1fr;
+  }
+}
+
 .iconButton {
   flex: none;
   display: inline-flex;

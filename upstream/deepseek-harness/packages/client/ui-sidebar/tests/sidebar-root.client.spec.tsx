@@ -24,7 +24,6 @@ afterEach(() => {
 const neverHook = (() => { throw new Error('shell must not read global hooks') }) as never
 
 function mountShell({ collapsed = false, width = 300 }: { collapsed?: boolean; width?: number } = {}) {
-  const startSession = vi.fn()
   const toggleSidebar = vi.fn()
   let regionOwner: SidebarSectionOwnerProps | undefined
   let settingsOwner: SidebarSettingsOwnerProps | undefined
@@ -36,7 +35,7 @@ function mountShell({ collapsed = false, width = 300 }: { collapsed?: boolean; w
     <SidebarRoot
       collapsed={current.collapsed} width={current.width}
       useSessions={neverHook} useWorkspaces={neverHook}
-      startSession={startSession} toggleSidebar={toggleSidebar} t={t}
+      toggleSidebar={toggleSidebar} t={t}
       renderSlot={((
         key: string,
         owner: SidebarFooterActionOwnerProps | SidebarSectionOwnerProps | SidebarSettingsOwnerProps,
@@ -58,7 +57,6 @@ function mountShell({ collapsed = false, width = 300 }: { collapsed?: boolean; w
   )
   const view = render(root())
   return {
-    startSession,
     toggleSidebar,
     regionOwner: () => {
       if (regionOwner === undefined) throw new Error('region owner not rendered')
@@ -80,15 +78,12 @@ function mountShell({ collapsed = false, width = 300 }: { collapsed?: boolean; w
 }
 
 describe('SidebarRoot shell', () => {
-  it('routes New Session (capsule + wordmark) and the column toggle', () => {
+  it('renders presentation-only brand identity and routes the column toggle', () => {
     const b = mountShell()
     expect(screen.getByTestId('custom-brand-mark')).toBeTruthy()
     expect(screen.getByTestId('custom-brand-name')).toBeTruthy()
-    // Expanded, both the wordmark and the capsule start a session.
-    const starters = screen.getAllByRole('button', { name: 'New session' })
-    expect(starters).toHaveLength(2)
-    for (const button of starters) fireEvent.click(button)
-    expect(b.startSession).toHaveBeenCalledTimes(2)
+    expect(screen.queryByRole('button', { name: 'New session' })).toBeNull()
+    expect(screen.getByTestId('custom-brand-name').closest('button')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Collapse sidebar' }))
     expect(b.toggleSidebar).toHaveBeenCalledOnce()
   })
@@ -98,7 +93,7 @@ describe('SidebarRoot shell', () => {
     const { container } = render(<SidebarRoot
       collapsed={false} width={300}
       useSessions={neverHook} useWorkspaces={neverHook}
-      startSession={vi.fn()} toggleSidebar={vi.fn()} t={t}
+      toggleSidebar={vi.fn()} t={t}
       renderSlot={((_key: string, _owner: unknown, options?: { fallback?: ReactNode }) =>
         options?.fallback ?? null) as SidebarRootComponentProps['renderSlot']}
     />)

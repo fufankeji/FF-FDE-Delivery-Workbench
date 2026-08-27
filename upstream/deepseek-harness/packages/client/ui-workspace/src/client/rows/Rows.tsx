@@ -5,7 +5,7 @@
  * except workspace Rename/Delete and session Rename/Fork/Archive; the session
  * and workspace hover cards are suppressed while a menu is open.
  */
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import clsx from 'clsx'
 import {
   HoverCard, IconArchiveOutline20, IconBranchOutline16, IconEditOutline16,
@@ -15,6 +15,7 @@ import {
 import type { StateDotState } from '@deepseek-ai/dsh-client-ui-primitives'
 import { abbreviateHomePath } from '@deepseek-ai/dsh-client-runtime/client'
 import type { WorkspaceBrowserProps } from '../contract/slots.ts'
+import type { ProjectMetadata } from '../stores.ts'
 import type { GroupNode, SearchResultNode, SessionNode } from '../tree.ts'
 import { relativeTime } from '../tree.ts'
 import css from './Rows.module.css'
@@ -52,16 +53,30 @@ function createdLabel(createdAt: number, t: RowTranslate): string {
 }
 
 /** Hover-card body: workspace title, display directory path, absolute creation time. */
-function WorkspaceHoverContent({ label, cwd, createdAt, t }: {
+function WorkspaceHoverContent({ label, cwd, createdAt, metadata, t }: {
   label: string
   cwd: string | undefined
   createdAt: number
+  metadata?: ProjectMetadata | undefined
   t: RowTranslate
 }) {
   return (
     <div className={css.hoverContent}>
       <div className={css.hoverTitle}>{label}</div>
       <div className={css.hoverPath}>{cwd}</div>
+      {metadata?.companyName !== '' && metadata?.companyName !== undefined
+        ? <div className={css.hoverMeta}>{t('projectMeta.company', { name: metadata.companyName })}</div>
+        : null}
+      {metadata === undefined
+        ? null
+        : <div className={css.hoverMeta}>
+          {metadata.schedule.status === 'pending-confirmation'
+            ? t('projectMeta.schedule.pending')
+            : t('projectMeta.schedule.estimated', {
+              start: metadata.schedule.startDate,
+              end: metadata.schedule.endDate,
+            })}
+        </div>}
       <div className={css.hoverTime}>{createdLabel(createdAt, t)}</div>
     </div>
   )
@@ -102,6 +117,7 @@ function rowHalf(e: { clientY: number; currentTarget: HTMLElement }): 'before' |
  * Workspace shows its hover card (the ungrouped bucket has none).
  * `containsCurrent` arrives on the node (derivation fact, no renderer scan).
  * @param props.group - derived group node.
+ * @param props.onOpen - open the project's most recent Session.
  * @param props.onToggle - expand/collapse the group.
  * @param props.onCreate - start a frontend Session inside this Workspace.
  * @param props.drag - optional workspace-row drag wiring.
@@ -109,22 +125,27 @@ function rowHalf(e: { clientY: number; currentTarget: HTMLElement }): 'before' |
  * @param props.t - the browser root's locale seat.
  * @returns the row element.
  */
-export function ProjectRowItem({ group, onToggle, onCreate, actions, drag, home, t }: {
+export function ProjectRowItem({ group, onOpen, onToggle, onCreate, projectActions, actions, drag, home, metadata, t }: {
   group: GroupNode
+  onOpen: () => void
   onToggle: () => void
   onCreate: () => void
+  /** Optional project-scoped actions contributed through the WorkspaceBrowser child slot. */
+  projectActions?: ReactNode
   /** Real-Workspace actions; absent for the ungrouped bucket (no menu shown). */
   actions?: { rename: () => void; delete: () => void } | undefined
   /** Present only for real Workspace rows in the grouped view. */
   drag?: WorkspaceRowDragProps | undefined
   /** Host account home; POSIX home-rooted hover paths display as `~`. */
   home?: string | undefined
+  /** Browser-persisted FDE project facts for the Workspace path. */
+  metadata?: ProjectMetadata | undefined
   t: RowTranslate
 }) {
   const row = group
   // The ungrouped bucket has no workspace title: its label is dictionary copy.
   const label = row.workspaceId === undefined ? t('group.ungrouped') : row.label
-  const active = group.expanded && group.containsCurrent
+  const active = group.containsCurrent
   const [menuOpen, setMenuOpen] = useState(false)
   const workspaceMenuItems = [
     { id: 'rename', label: t('rename'), icon: <IconEditOutline16 /> },
@@ -135,7 +156,8 @@ export function ProjectRowItem({ group, onToggle, onCreate, actions, drag, home,
       className={clsx(css.projectRow, menuOpen && css.menuOpen)}
       role="treeitem"
       aria-expanded={row.expanded}
-      onClick={onToggle}
+      aria-selected={group.containsCurrent}
+      onClick={onOpen}
       draggable={drag !== undefined}
       onDragStart={drag === undefined
         ? undefined
@@ -149,13 +171,19 @@ export function ProjectRowItem({ group, onToggle, onCreate, actions, drag, home,
       <span className={clsx(css.slot, css.folder, active && css.folderActive)}>
         {row.expanded ? <IconFolderOpen16 /> : <IconFolderClose16 />}
       </span>
-      <span className={clsx(css.slot, css.chevron)}>
+      <button
+        type="button"
+        className={clsx(css.slot, css.chevron)}
+        aria-label={t('actions.toggleProject.aria', { name: label })}
+        onClick={(event) => { event.stopPropagation(); onToggle() }}
+      >
         <IconTriangleRightFill14 className={clsx(css.arrow, row.expanded && css.arrowOpen)} />
-      </span>
+      </button>
       <span className={css.projectText}>
         <span className={css.title}>{label}</span>
       </span>
       <span className={css.rowActions}>
+        {projectActions}
         {actions !== undefined && (
           <Menu
             open={menuOpen}
@@ -204,6 +232,7 @@ export function ProjectRowItem({ group, onToggle, onCreate, actions, drag, home,
         label={row.label}
         cwd={row.cwd === undefined ? undefined : abbreviateHomePath(row.cwd, home)}
         createdAt={row.createdAt}
+        metadata={metadata}
         t={t}
       />}
       disabled={menuOpen}

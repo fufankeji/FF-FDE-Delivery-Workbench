@@ -120,8 +120,8 @@ describe.skipIf(MODE === 'record')('web e2e: details panel follows the current S
     await expect.poll(() => detailsTrack(page), { timeout: 5_000 }).toBe(0)
     expect(await page.getByText('Details', { exact: true }).isVisible()).toBe(false)
 
-    await page.getByRole('button', { name: /^(?:New session|新.*会话)$/ }).last().click()
-    await page.getByText('Into the Unknown', { exact: false }).waitFor({ timeout: 15_000 })
+    await page.getByRole('button', { name: /^(?:New session in |在“).*(?:”中新建会话)?$/ }).first().click()
+    await page.getByText('见所未见，成所未成', { exact: false }).waitFor({ timeout: 15_000 })
     await expect.poll(() => detailsTrack(page), { timeout: 5_000 }).toBe(0)
     expect(await page.getByText('Details', { exact: true }).isVisible()).toBe(false)
 

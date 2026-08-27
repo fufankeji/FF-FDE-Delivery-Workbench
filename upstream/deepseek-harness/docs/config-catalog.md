@@ -418,7 +418,7 @@ export interface ConnectionConfig {
 }
 ```
 
-Source: [`packages/client/connection/src/index.ts:50`](../packages/client/connection/src/index.ts)
+Source: [`packages/client/connection/src/index.ts:51`](../packages/client/connection/src/index.ts)
 
 <a id="deepseek-aidsh-client-hmr"></a>
 
@@ -634,6 +634,53 @@ export interface Config {
 ```
 
 Source: [`packages/experimental/tool-agent-team/src/index.ts:17`](../packages/experimental/tool-agent-team/src/index.ts)
+
+<a id="deepseek-aidsh-fde-project"></a>
+
+## `@deepseek-ai/dsh-fde-project`
+
+Requires: `tools` · `webServer` · `workspaceRegistry`
+
+```ts config-catalog
+/** Bounded OpenAPI parsing and request limits enforced by dsh-openapi. */
+export interface Config extends ProjectOpenApiPolicy {}
+
+/** Runtime limits owned by the FDE adapter; dsh-openapi enforces them. */
+export interface ProjectOpenApiPolicy {
+  /** Cooperative load and request timeout in milliseconds. */
+  readonly timeoutMs: number
+  /** Maximum OpenAPI source bytes accepted from a local file or remote response. */
+  readonly maxSpecBytes: number
+  /** Maximum response bytes returned from one API call. */
+  readonly maxResponseBytes: number
+  /** Maximum redirect hops, with every destination revalidated. */
+  readonly maxRedirects: number
+  /** Maximum operations indexed from one project OpenAPI document. */
+  readonly maxOperations: number
+}
+```
+
+Source: [`packages/fde/project/src/index.ts:37`](../packages/fde/project/src/index.ts)
+
+<a id="deepseek-aidsh-fde-source"></a>
+
+## `@deepseek-ai/dsh-fde-source`
+
+Requires: `webServer` · `workspaceRegistry`
+
+```ts config-catalog
+/** Host deployment limits for project resource upload. */
+export interface Config {
+  /** Maximum bytes accepted for one imported project file. */
+  maxFileBytes?: number
+  /** Maximum files accepted in one all-or-nothing import batch. */
+  maxFiles?: number
+  /** Maximum aggregate file-content bytes accepted in one import batch. */
+  maxBatchBytes?: number
+}
+```
+
+Source: [`packages/fde/source/src/index.ts:80`](../packages/fde/source/src/index.ts)
 
 <a id="deepseek-aidsh-file-reference-local"></a>
 
@@ -3238,6 +3285,11 @@ These load from a `cordis.yml` entry with no `config:` block; they declare no co
 - `@deepseek-ai/dsh-client-ui-deliverables` — requires `systemPrompt` ([`packages/client/ui-deliverables/src/index.ts`](../packages/client/ui-deliverables/src/index.ts))
 - `@deepseek-ai/dsh-client-ui-directory-picker-browse` ([`packages/client/ui-directory-picker-browse/src/index.ts`](../packages/client/ui-directory-picker-browse/src/index.ts))
 - `@deepseek-ai/dsh-client-ui-directory-picker-native` ([`packages/client/ui-directory-picker-native/src/index.ts`](../packages/client/ui-directory-picker-native/src/index.ts))
+- `@deepseek-ai/dsh-client-ui-fde-appearance` ([`packages/client/ui-fde-appearance/src/index.ts`](../packages/client/ui-fde-appearance/src/index.ts))
+- `@deepseek-ai/dsh-client-ui-fde-document-preview` ([`packages/client/ui-fde-document-preview/src/index.ts`](../packages/client/ui-fde-document-preview/src/index.ts))
+- `@deepseek-ai/dsh-client-ui-fde-project` ([`packages/client/ui-fde-project/src/index.ts`](../packages/client/ui-fde-project/src/index.ts))
+- `@deepseek-ai/dsh-client-ui-fde-sources` ([`packages/client/ui-fde-sources/src/index.ts`](../packages/client/ui-fde-sources/src/index.ts))
+- `@deepseek-ai/dsh-client-ui-fde-stage` ([`packages/client/ui-fde-stage/src/index.ts`](../packages/client/ui-fde-stage/src/index.ts))
 - `@deepseek-ai/dsh-client-ui-goal` ([`packages/client/ui-goal/src/index.ts`](../packages/client/ui-goal/src/index.ts))
 - `@deepseek-ai/dsh-client-ui-input-trigger` ([`packages/client/ui-input-trigger/src/index.ts`](../packages/client/ui-input-trigger/src/index.ts))
 - `@deepseek-ai/dsh-client-ui-jobs` ([`packages/client/ui-jobs/src/index.ts`](../packages/client/ui-jobs/src/index.ts))
@@ -3267,6 +3319,7 @@ These load from a `cordis.yml` entry with no `config:` block; they declare no co
 - `@deepseek-ai/dsh-command-goal` — requires `commands` · `goals` ([`packages/goal/command-goal/src/index.ts`](../packages/goal/command-goal/src/index.ts))
 - `@deepseek-ai/dsh-commands` ([`packages/interaction/commands/src/index.ts`](../packages/interaction/commands/src/index.ts))
 - `@deepseek-ai/dsh-cordis-client-runner` ([`packages/extensions/cordis-client-runner/src/index.ts`](../packages/extensions/cordis-client-runner/src/index.ts))
+- `@deepseek-ai/dsh-fde-stage` — requires `storageDomain` · `workspaceRegistry` · `webServer` ([`packages/fde/stage/src/index.ts`](../packages/fde/stage/src/index.ts))
 - `@deepseek-ai/dsh-fs-e2b` — requires `e2b` ([`packages/e2b/fs-e2b/src/index.ts`](../packages/e2b/fs-e2b/src/index.ts))
 - `@deepseek-ai/dsh-fs-observation-policy` ([`packages/fs/fs-observation-policy/src/index.ts`](../packages/fs/fs-observation-policy/src/index.ts))
 - `@deepseek-ai/dsh-goal-round-driver` — requires `agents` · `goals` · `sessions` ([`packages/goal/goal-round-driver/src/index.ts`](../packages/goal/goal-round-driver/src/index.ts))

@@ -1,16 +1,14 @@
-- button "New session"
+- text: FF-FDE工作台
 - button "Collapse sidebar":
   - img
-- button "New session":
+- button "New project":
   - img
-  - text: New Session
-- text: Workspaces
+  - text: New project
+- text: Projects
 - button "Search sessions":
   - img
 - textbox "Search sessions..."
 - button "View options":
-  - img
-- button "Add workspace":
   - img
 - tree "Sessions":
   - treeitem "workspace" [expanded]:
@@ -20,8 +18,8 @@
 - button "Settings":
   - img
   - text: Settings
-- text: Into the Unknown Preview
-- button "Choose workspace":
+- text: 见所未见，成所未成
+- button "Choose project":
   - img
   - text: workspace
   - img

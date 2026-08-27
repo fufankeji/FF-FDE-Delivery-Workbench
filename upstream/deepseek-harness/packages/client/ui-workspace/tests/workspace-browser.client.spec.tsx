@@ -10,7 +10,9 @@ import { zh as commonZh } from '@deepseek-ai/dsh-client-locale/src/locales/zh.ts
 import type { WorkspaceBrowserProps } from '../src/client/contract/slots.ts'
 import { createWorkspaceViewStore, FLAT_SESSION_ORDER_KEY } from '../src/client/stores.ts'
 import { UNGROUPED_KEY } from '../src/client/tree.ts'
-import { WorkspaceBrowser } from '../src/client/WorkspaceBrowser.tsx'
+import {
+  defaultProjectDirectoryName, isValidProjectDirectoryName, WorkspaceBrowser,
+} from '../src/client/WorkspaceBrowser.tsx'
 import { zh } from '../src/client/locales.ts'
 
 afterEach(cleanup)
@@ -79,6 +81,7 @@ function mount(overrides: Partial<WorkspaceBrowserProps> = {}) {
     insertWorkspaceBefore: vi.fn(async () => {}),
     insertSessionBefore: vi.fn(async () => {}),
     createWorkspace: vi.fn(async () => workspace('created', [])),
+    createDirectory: vi.fn(async (path, name) => `${path}/${name}`),
     useDirectoryFlow: bindSnapshotSelector({ getSnapshot: () => true, subscribe: () => () => {} }),
     useHostDescription: selector => selector(undefined),
     renderSlot: ((_name: string, owner: { open: boolean }) => (owner.open ? <div data-testid="directory-flow" /> : null)) as never,
@@ -96,6 +99,22 @@ function rerender(b: ReturnType<typeof mount>, overrides: Partial<WorkspaceBrows
 }
 
 describe('WorkspaceBrowser', () => {
+  it('renders project action contributions only for a real Workspace', () => {
+    const renderSlot = vi.fn((name: string, owner: { title?: string; open?: boolean }) => {
+      if (name === 'sidebar.workspaces.projectActions') return <span>Action for {owner.title}</span>
+      return owner.open === true ? <div data-testid="directory-flow" /> : null
+    }) as never
+    mount({
+      useWorkspaces: hook(workspaceState([workspace('alpha', [])])),
+      renderSlot,
+    })
+    expect(screen.getByText('Action for alpha')).toBeTruthy()
+    expect(renderSlot).toHaveBeenCalledWith('sidebar.workspaces.projectActions', expect.objectContaining({
+      workspaceId: 'alpha',
+      title: 'alpha',
+    }))
+  })
+
   it('workspace hover card shows a POSIX home descendant as ~', () => {
     vi.useFakeTimers()
     try {
@@ -145,7 +164,7 @@ describe('WorkspaceBrowser', () => {
       useSessions: hook(sessions),
       useWorkspaces: hook(workspaceState([workspace('alpha', ['alpha-s']), workspace('beta', ['beta-s'])])),
     })
-    expect(screen.getByText('工作区')).toBeTruthy()
+    expect(screen.getByText('项目')).toBeTruthy()
     expect(screen.getByText('alpha')).toBeTruthy()
     // Sessions hidden while their group is folded.
     expect(screen.queryByText('alpha-s')).toBeNull()
@@ -154,9 +173,9 @@ describe('WorkspaceBrowser', () => {
     expect(screen.getByText('分组方式')).toBeTruthy() // the menu heading label
     expect(screen.getByRole('separator')).toBeTruthy()
     expect(screen.getAllByRole('menuitem').map(item => item.textContent)).toEqual([
-      '按工作区', '单列表', '手动排序', '最近更新',
+      '按项目', '单列表', '手动排序', '最近更新',
     ])
-    expect(screen.getByRole('menuitem', { name: '按工作区' }).querySelector('svg')).toBeTruthy()
+    expect(screen.getByRole('menuitem', { name: '按项目' }).querySelector('svg')).toBeTruthy()
     expect(screen.getByRole('menuitem', { name: '手动排序' }).querySelector('svg')).toBeTruthy()
     fireEvent.click(screen.getByRole('menuitem', { name: '单列表' }))
     // Store-driven flip: title changes, rows flatten newest-first, headers gone.
@@ -169,9 +188,9 @@ describe('WorkspaceBrowser', () => {
     // Back to workspace grouping through the same menu.
     fireEvent.click(screen.getByRole('button', { name: '视图选项' }))
     expect(screen.getByRole('menuitem', { name: '手动排序' }).hasAttribute('disabled')).toBe(false)
-    fireEvent.click(screen.getByRole('menuitem', { name: '按工作区' }))
+    fireEvent.click(screen.getByRole('menuitem', { name: '按项目' }))
     expect(b.store.getSnapshot().groupBy).toBe('workspace')
-    expect(screen.getByText('工作区')).toBeTruthy()
+    expect(screen.getByText('项目')).toBeTruthy()
 
     // Escape closes the menu without picking.
     fireEvent.click(screen.getByRole('button', { name: '视图选项' }))
@@ -234,19 +253,36 @@ describe('WorkspaceBrowser', () => {
     ])
   })
 
-  it('expands a group on click and opens a session row', () => {
+  it('opens the most recently updated project session without creating one', () => {
     const open = vi.fn()
+    const startSession = vi.fn()
     mount({
-      useSessions: hook(sessionState([summary('alpha-s', 1)])),
-      useWorkspaces: hook(workspaceState([workspace('alpha', ['alpha-s'])])),
+      useSessions: hook(sessionState([summary('older', 1), summary('newer', 2)])),
+      useWorkspaces: hook(workspaceState([workspace('alpha', ['older', 'newer'])])),
       open,
+      startSession,
     })
     fireEvent.click(screen.getByText('alpha'))
-    fireEvent.click(screen.getByText('alpha-s'))
-    expect(open).toHaveBeenCalledWith(sid('alpha-s'))
-    // Collapse hides the row again.
+    expect(open).toHaveBeenCalledWith(sid('newer'))
+    expect(startSession).not.toHaveBeenCalled()
+    expect(screen.getByText('older')).toBeTruthy()
+    expect(screen.getByText('newer')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '展开或收起项目“alpha”' }))
+    expect(screen.queryByText('older')).toBeNull()
+  })
+
+  it('creates the first blank session only when a project has no recoverable session', () => {
+    const open = vi.fn()
+    const startSession = vi.fn()
+    mount({
+      useSessions: hook(sessionState([])),
+      useWorkspaces: hook(workspaceState([workspace('alpha', [])])),
+      open,
+      startSession,
+    })
     fireEvent.click(screen.getByText('alpha'))
-    expect(screen.queryByText('alpha-s')).toBeNull()
+    expect(startSession).toHaveBeenCalledWith(wid('alpha'))
+    expect(open).not.toHaveBeenCalled()
   })
 
   it('shows five sessions by default and clears transient show-all when the Workspace collapses', () => {
@@ -265,9 +301,9 @@ describe('WorkspaceBrowser', () => {
     expect(screen.getByText('session-7')).toBeTruthy()
     expect(screen.getByRole('button', { name: '收起' })).toBeTruthy()
 
-    fireEvent.click(screen.getByText('alpha'))
+    fireEvent.click(screen.getByRole('button', { name: '展开或收起项目“alpha”' }))
     expect(b.store.getSnapshot().groupExpansion).toEqual({ alpha: false })
-    fireEvent.click(screen.getByText('alpha'))
+    fireEvent.click(screen.getByRole('button', { name: '展开或收起项目“alpha”' }))
     expect(b.store.getSnapshot().groupExpansion).toEqual({ alpha: true })
     expect(screen.queryByText('session-6')).toBeNull()
     expect(screen.getByRole('button', { name: '展开其余 2 个会话' })).toBeTruthy()
@@ -388,8 +424,9 @@ describe('WorkspaceBrowser', () => {
     })
     fireEvent.click(screen.getByText('alpha'))
     expect(screen.getByText('child-s')).toBeTruthy()
-    expect(screen.queryByRole('button', { name: /展开|收起/ })).toBeNull()
-    expect(screen.getByText('child-s').closest('[role="treeitem"]')?.getAttribute('draggable')).toBe('true')
+    const childRow = screen.getByText('child-s').closest('[role="treeitem"]')
+    expect(childRow?.hasAttribute('aria-expanded')).toBe(false)
+    expect(childRow?.getAttribute('draggable')).toBe('true')
   })
 
   it('expands the target group before starting a session from its ＋', () => {
@@ -418,7 +455,7 @@ describe('WorkspaceBrowser', () => {
     })
     // The loose session's group is UNGROUPED_KEY: expanded by the effect.
     expect(screen.getByText('loose')).toBeTruthy()
-    expect(screen.queryByRole('button', { name: '工作区“未分组”的操作' })).toBeNull()
+    expect(screen.queryByRole('button', { name: '项目“未分组”的操作' })).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: '在“未分组”中新建会话' }))
     expect(startSession).not.toHaveBeenCalled()
   })
@@ -434,7 +471,7 @@ describe('WorkspaceBrowser', () => {
     // expansion list unchanged (no duplicate key, group still open).
     rerender(b, { useSessions: hook({ ...first, current: sid('b') }) })
     expect(screen.getByText('b')).toBeTruthy()
-    fireEvent.click(screen.getByText('alpha'))
+    fireEvent.click(screen.getByRole('button', { name: '展开或收起项目“alpha”' }))
     expect(screen.queryByText('b')).toBeNull()
   })
 
@@ -773,7 +810,7 @@ describe('WorkspaceBrowser', () => {
       const expandSidebar = vi.fn()
       const b = mount({ wide: false, expandSidebar })
       // No wide chrome in rail state.
-      expect(screen.queryByText('工作区')).toBeNull()
+      expect(screen.queryByText('项目')).toBeNull()
       expect(screen.queryByPlaceholderText('搜索会话…')).toBeNull()
       fireEvent.click(screen.getByRole('button', { name: '搜索会话' }))
       expect(expandSidebar).toHaveBeenCalledTimes(1)
@@ -812,16 +849,139 @@ describe('WorkspaceBrowser', () => {
     }
   })
 
-  it('rail add-workspace raises the directory flow in place, with no menu and no expansion', () => {
+  it('rail New project opens the structured form without expanding the sidebar', () => {
     const expandSidebar = vi.fn()
     mount({ wide: false, expandSidebar, useWorkspaces: hook(workspaceState([workspace('alpha', [])])) })
-    fireEvent.click(screen.getByRole('button', { name: '添加工作区' }))
+    fireEvent.click(screen.getByRole('button', { name: '新建项目' }))
     expect(expandSidebar).not.toHaveBeenCalled()
-    // Adding is the header's only action, so the gesture IS that action: no
-    // one-row popover, and existing workspaces stay in the tree below.
     expect(screen.queryByRole('menu')).toBeNull()
-    expect(screen.queryByRole('menuitem', { name: 'alpha' })).toBeNull()
+    expect(screen.getByRole('dialog', { name: '新建项目' })).toBeTruthy()
+    expect(screen.queryByTestId('directory-flow')).toBeNull()
+  })
+
+  it('requires a chosen root, creates with an independent ASCII name, remembers metadata and location, and enters', async () => {
+    type DirectoryOwner = {
+      open: boolean
+      busy: boolean
+      onPicked: (path: string) => void
+      onCancel: () => void
+      onError: (message: string) => void
+    }
+    let directoryOwner: DirectoryOwner | undefined
+    const createDirectory = vi.fn(async (path: string, name: string) => `${path}/${name}`)
+    const createWorkspace = vi.fn(async ({ path }: { path: string }) => ({
+      ...workspace('created', [], '智能客服升级'),
+      path,
+    }))
+    const startSession = vi.fn()
+    const b = mount({
+      createDirectory,
+      createWorkspace,
+      startSession,
+      renderSlot: ((_name: string, owner: DirectoryOwner) => {
+        directoryOwner = owner
+        return owner.open ? <div data-testid="directory-flow" /> : null
+      }) as never,
+      useHostDescription: selector => selector({
+        version: '0', cwd: '/tmp', attachedSessions: 0, home: '/home/u', canOpenPath: false,
+      }),
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: '新建项目' }))
+    fireEvent.click(screen.getByRole('button', { name: '创建并进入' }))
+    expect(screen.getByRole('alert').textContent).toBe('请输入项目名称。')
+    expect(createDirectory).not.toHaveBeenCalled()
+
+    fireEvent.change(screen.getByLabelText('项目名称'), { target: { value: '智能客服升级' } })
+    fireEvent.change(screen.getByLabelText('所属企业 / 业务方'), { target: { value: '示例科技' } })
+    const directoryInput = screen.getByLabelText<HTMLInputElement>('项目目录名')
+    expect(directoryInput.value).toMatch(/^fde-\d{8}-[a-z0-9]{4}$/)
+    expect(screen.getAllByText('尚未选择')).toHaveLength(2)
+    expect(screen.getByLabelText<HTMLInputElement>('记住为默认项目存储位置').checked).toBe(true)
+    const pendingSchedule = screen.getByRole('radio', { name: '待确认' })
+    const estimatedSchedule = screen.getByRole('radio', { name: '设置预计日期' })
+    expect(pendingSchedule.getAttribute('aria-checked')).toBe('true')
+    pendingSchedule.focus()
+    fireEvent.keyDown(pendingSchedule, { key: 'ArrowRight' })
+    expect(estimatedSchedule.getAttribute('aria-checked')).toBe('true')
+    expect(document.activeElement).toBe(estimatedSchedule)
+    fireEvent.change(screen.getByLabelText('预计开始日期'), { target: { value: '2026-09-10' } })
+    fireEvent.change(screen.getByLabelText('预计交付日期'), { target: { value: '2026-09-01' } })
+    fireEvent.click(screen.getByRole('button', { name: '创建并进入' }))
+    expect(screen.getByRole('alert').textContent).toBe('预计交付日期不能早于预计开始日期。')
+
+    fireEvent.change(screen.getByLabelText('预计交付日期'), { target: { value: '2026-10-15' } })
+    fireEvent.click(screen.getByRole('button', { name: '创建并进入' }))
+    expect(screen.getByRole('alert').textContent).toBe('请选择项目存储位置。')
+    fireEvent.click(screen.getByRole('button', { name: '更改' }))
     expect(screen.getByTestId('directory-flow')).toBeTruthy()
+    act(() => { directoryOwner?.onPicked('/projects-root') })
+    expect(screen.getByTitle('/projects-root')).toBeTruthy()
+    const expectedPath = `/projects-root/${directoryInput.value}`
+    expect(screen.getByTitle(expectedPath)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '创建并进入' }))
+    await waitFor(() => { expect(startSession).toHaveBeenCalledWith(wid('created')) })
+    expect(createDirectory).toHaveBeenCalledWith('/projects-root', directoryInput.value)
+    expect(createWorkspace).toHaveBeenCalledWith({ path: expectedPath })
+    expect(b.store.getSnapshot().projectMetadataByPath[expectedPath]).toMatchObject({
+      name: '智能客服升级',
+      companyName: '示例科技',
+      schedule: { status: 'estimated', startDate: '2026-09-10', endDate: '2026-10-15' },
+      storagePath: expectedPath,
+      projectRoot: '/projects-root',
+      directoryName: directoryInput.value,
+    })
+    expect(b.store.getSnapshot().defaultProjectRoot).toBe('/projects-root')
+    expect(screen.queryByRole('dialog', { name: '新建项目' })).toBeNull()
+    b.view.unmount()
+    const restored = createWorkspaceViewStore().create().getSnapshot()
+    expect(restored.projectMetadataByPath[expectedPath]).toMatchObject({ companyName: '示例科技' })
+    expect(restored.defaultProjectRoot).toBe('/projects-root')
+
+    const reopened = mount()
+    fireEvent.click(screen.getByRole('button', { name: '新建项目' }))
+    expect(screen.getByTitle('/projects-root')).toBeTruthy()
+    reopened.view.unmount()
+  })
+
+  it('keeps import as a separate directory flow and enters the adopted project', async () => {
+    type DirectoryOwner = {
+      open: boolean
+      busy: boolean
+      onPicked: (path: string) => void
+      onCancel: () => void
+      onError: (message: string) => void
+    }
+    let directoryOwner: DirectoryOwner | undefined
+    const createWorkspace = vi.fn(async ({ path }: { path: string }) => ({
+      ...workspace('imported', [], 'existing-project'),
+      path,
+    }))
+    const startSession = vi.fn()
+    mount({
+      createWorkspace,
+      startSession,
+      renderSlot: ((_name: string, owner: DirectoryOwner) => {
+        directoryOwner = owner
+        return owner.open ? <div data-testid="directory-flow" /> : null
+      }) as never,
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: '新建项目' }))
+    fireEvent.click(screen.getByRole('button', { name: '导入已有项目' }))
+    expect(screen.getByTestId('directory-flow')).toBeTruthy()
+    act(() => { directoryOwner?.onPicked('/projects/existing-project') })
+    await waitFor(() => { expect(startSession).toHaveBeenCalledWith(wid('imported')) })
+    expect(createWorkspace).toHaveBeenCalledWith({ path: '/projects/existing-project' })
+    expect(screen.queryByRole('dialog', { name: '新建项目' })).toBeNull()
+  })
+
+  it('generates and validates portable ASCII project-directory names', () => {
+    expect(defaultProjectDirectoryName(new Date(2026, 7, 26), 'A7K3')).toBe('fde-20260826-a7k3')
+    expect(isValidProjectDirectoryName('fde-20260826-a7k3')).toBe(true)
+    expect(isValidProjectDirectoryName('智能客服升级')).toBe(false)
+    expect(isValidProjectDirectoryName('.hidden')).toBe(false)
+    expect(isValidProjectDirectoryName('project.')).toBe(false)
   })
 
   it('hides the add button when no directory-flow occupant is composed', () => {
@@ -830,7 +990,7 @@ describe('WorkspaceBrowser', () => {
       useDirectoryFlow: bindSnapshotSelector({ getSnapshot: () => false, subscribe: () => () => {} }),
     })
     // Nothing to add with, so the header offers no dead button.
-    expect(screen.queryByRole('button', { name: '添加工作区' })).toBeNull()
+    expect(screen.queryByRole('button', { name: '新建项目' })).toBeNull()
     expect(screen.getByText('alpha')).toBeTruthy()
   })
 
@@ -1098,9 +1258,9 @@ describe('WorkspaceBrowser', () => {
       useWorkspaces: hook(workspaceState([workspace('alpha', [], 'Alpha'), workspace('beta', [], 'Beta')])),
       renameWorkspace,
     })
-    fireEvent.click(screen.getByRole('button', { name: '工作区“Alpha”的操作' }))
+    fireEvent.click(screen.getByRole('button', { name: '项目“Alpha”的操作' }))
     fireEvent.click(screen.getByRole('menuitem', { name: '重命名' }))
-    const input = screen.getByLabelText<HTMLInputElement>('工作区名称')
+    const input = screen.getByLabelText<HTMLInputElement>('项目名称')
     expect(input.value).toBe('Alpha')
     // Unchanged and blank names stay blocked.
     expect(screen.getByRole<HTMLButtonElement>('button', { name: '重命名' }).disabled).toBe(true)
@@ -1108,7 +1268,7 @@ describe('WorkspaceBrowser', () => {
     expect(screen.getByRole<HTMLButtonElement>('button', { name: '重命名' }).disabled).toBe(true)
     // A duplicate of another workspace's title shows the inline conflict.
     fireEvent.change(input, { target: { value: ' Beta ' } })
-    expect(screen.getByRole('alert').textContent).toBe('已存在名为“Beta”的工作区。')
+    expect(screen.getByRole('alert').textContent).toBe('已存在名为“Beta”的项目。')
     expect(screen.getByRole<HTMLButtonElement>('button', { name: '重命名' }).disabled).toBe(true)
     fireEvent.change(input, { target: { value: 'Gamma' } })
     fireEvent.click(screen.getByRole('button', { name: '重命名' }))
@@ -1127,9 +1287,9 @@ describe('WorkspaceBrowser', () => {
       useWorkspaces: hook(workspaceState([workspace('alpha', [], 'Alpha')])),
       renameWorkspace,
     })
-    fireEvent.click(screen.getByRole('button', { name: '工作区“Alpha”的操作' }))
+    fireEvent.click(screen.getByRole('button', { name: '项目“Alpha”的操作' }))
     fireEvent.click(screen.getByRole('menuitem', { name: '重命名' }))
-    const input = screen.getByLabelText<HTMLInputElement>('工作区名称')
+    const input = screen.getByLabelText<HTMLInputElement>('项目名称')
     // Enter with a blocked draft (unchanged) does nothing.
     fireEvent.keyDown(input, { key: 'Enter' })
     expect(renameWorkspace).not.toHaveBeenCalled()
@@ -1151,9 +1311,9 @@ describe('WorkspaceBrowser', () => {
       useWorkspaces: hook(workspaceState([workspace('alpha', [], 'Alpha')])),
       renameWorkspace,
     })
-    fireEvent.click(screen.getByRole('button', { name: '工作区“Alpha”的操作' }))
+    fireEvent.click(screen.getByRole('button', { name: '项目“Alpha”的操作' }))
     fireEvent.click(screen.getByRole('menuitem', { name: '重命名' }))
-    fireEvent.change(screen.getByLabelText('工作区名称'), { target: { value: 'Other' } })
+    fireEvent.change(screen.getByLabelText('项目名称'), { target: { value: 'Other' } })
     fireEvent.click(screen.getByRole('button', { name: '重命名' }))
     await waitFor(() => { expect(screen.getByRole('alert').textContent).toBe('denied') })
   })
@@ -1165,31 +1325,31 @@ describe('WorkspaceBrowser', () => {
       useWorkspaces: hook(workspaceState([workspace('alpha', ['session'], 'Alpha')])),
       deleteWorkspace,
     })
-    fireEvent.click(screen.getByRole('button', { name: '工作区“Alpha”的操作' }))
-    fireEvent.click(screen.getByRole('menuitem', { name: '删除工作区' }))
-    const dialog = screen.getByRole('dialog', { name: '删除工作区' })
-    expect(dialog.textContent).toContain('将把“Alpha”从工作区列表中移除')
-    expect(dialog.textContent).toContain('文件夹与会话记录会保留')
+    fireEvent.click(screen.getByRole('button', { name: '项目“Alpha”的操作' }))
+    fireEvent.click(screen.getByRole('menuitem', { name: '从工作台移除' }))
+    const dialog = screen.getByRole('dialog', { name: '从工作台移除' })
+    expect(dialog.textContent).toContain('将把“Alpha”从工作台项目列表中移除')
+    expect(dialog.textContent).toContain('本地项目目录与会话记录会保留')
     expect(dialog.textContent).toContain('其会话将显示在“未分组”下')
 
-    const confirm = screen.getByRole<HTMLButtonElement>('button', { name: '删除工作区' })
+    const confirm = screen.getByRole<HTMLButtonElement>('button', { name: '从工作台移除' })
     fireEvent.click(confirm)
     fireEvent.click(confirm)
     expect(deleteWorkspace).toHaveBeenCalledOnce()
     expect(deleteWorkspace).toHaveBeenCalledWith(wid('alpha'))
     expect(confirm.disabled).toBe(true)
     expect(screen.getByRole<HTMLButtonElement>('button', { name: '取消' }).disabled).toBe(true)
-    expect(screen.getByRole('status').textContent).toBe('正在删除工作区…')
+    expect(screen.getByRole('status').textContent).toBe('正在从工作台移除…')
     fireEvent.keyDown(document, { key: 'Escape' })
     fireEvent.click(screen.getByRole('button', { name: '关闭' }))
-    expect(screen.getByRole('dialog', { name: '删除工作区' })).toBeTruthy()
+    expect(screen.getByRole('dialog', { name: '从工作台移除' })).toBeTruthy()
     await act(async () => { resolveDelete() })
     // RPC success alone does not close: the component waits until its
     // useWorkspaces projection has committed the removal, preventing a stale
     // Workspace frame from leaking into the next gesture.
-    expect(screen.getByRole('dialog', { name: '删除工作区' })).toBeTruthy()
+    expect(screen.getByRole('dialog', { name: '从工作台移除' })).toBeTruthy()
     rerender(browser, { useWorkspaces: hook(workspaceState([])) })
-    expect(screen.queryByRole('dialog', { name: '删除工作区' })).toBeNull()
+    expect(screen.queryByRole('dialog', { name: '从工作台移除' })).toBeNull()
   })
 
   it('keeps the delete dialog open on failure and allows retry or cancellation', async () => {
@@ -1200,15 +1360,15 @@ describe('WorkspaceBrowser', () => {
       useWorkspaces: hook(workspaceState([workspace('alpha', [], 'Alpha')])),
       deleteWorkspace,
     })
-    fireEvent.click(screen.getByRole('button', { name: '工作区“Alpha”的操作' }))
-    fireEvent.click(screen.getByRole('menuitem', { name: '删除工作区' }))
-    fireEvent.click(screen.getByRole('button', { name: '删除工作区' }))
+    fireEvent.click(screen.getByRole('button', { name: '项目“Alpha”的操作' }))
+    fireEvent.click(screen.getByRole('menuitem', { name: '从工作台移除' }))
+    fireEvent.click(screen.getByRole('button', { name: '从工作台移除' }))
     await waitFor(() => { expect(screen.getByRole('alert').textContent).toBe('storage unavailable') })
-    expect(screen.getByRole('dialog', { name: '删除工作区' })).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: '删除工作区' }))
+    expect(screen.getByRole('dialog', { name: '从工作台移除' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '从工作台移除' }))
     await waitFor(() => { expect(screen.getByRole('alert').textContent).toBe('denied') })
     fireEvent.click(screen.getByRole('button', { name: '取消' }))
-    expect(screen.queryByRole('dialog', { name: '删除工作区' })).toBeNull()
+    expect(screen.queryByRole('dialog', { name: '从工作台移除' })).toBeNull()
   })
 
   it('Cancel, Escape, and Close dismiss deletion without calling the action', () => {
@@ -1218,8 +1378,8 @@ describe('WorkspaceBrowser', () => {
       deleteWorkspace,
     })
     const open = () => {
-      fireEvent.click(screen.getByRole('button', { name: '工作区“Alpha”的操作' }))
-      fireEvent.click(screen.getByRole('menuitem', { name: '删除工作区' }))
+      fireEvent.click(screen.getByRole('button', { name: '项目“Alpha”的操作' }))
+      fireEvent.click(screen.getByRole('menuitem', { name: '从工作台移除' }))
     }
     open()
     fireEvent.click(screen.getByRole('button', { name: '取消' }))
@@ -1228,7 +1388,7 @@ describe('WorkspaceBrowser', () => {
     open()
     fireEvent.click(screen.getByRole('button', { name: '关闭' }))
     expect(deleteWorkspace).not.toHaveBeenCalled()
-    expect(screen.queryByRole('dialog', { name: '删除工作区' })).toBeNull()
+    expect(screen.queryByRole('dialog', { name: '从工作台移除' })).toBeNull()
   })
 
   it('search hides drag affordances (rows are not draggable during search)', () => {

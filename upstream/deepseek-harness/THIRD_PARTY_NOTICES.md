@@ -36,6 +36,11 @@ External packages that a workspace package resolves at runtime. The tier covers 
 | [`@anthropic-ai/sdk`](https://github.com/anthropics/anthropic-sdk-typescript) | MIT |
 | [`@babel/code-frame`](https://github.com/babel/babel) | MIT |
 | [`@earendil-works/pi-ai`](https://github.com/earendil-works/pi) | MIT |
+| [`@file-viewer/react`](https://github.com/flyfish-dev/file-viewer-react) | Apache-2.0 |
+| [`@file-viewer/renderer-presentation`](https://github.com/flyfish-dev/file-viewer) | Apache-2.0 |
+| [`@file-viewer/renderer-spreadsheet`](https://github.com/flyfish-dev/file-viewer) | Apache-2.0 |
+| [`@file-viewer/renderer-word`](https://github.com/flyfish-dev/file-viewer) | Apache-2.0 |
+| [`@jiaoqsh/dsh-document`](https://github.com/jiaoqsh/dsh-document) | MIT |
 | [`@joplin/turndown-plugin-gfm`](https://github.com/laurent22/joplin-turndown-plugin-gfm) | MIT |
 | [`@jridgewell/gen-mapping`](https://github.com/jridgewell/sourcemaps) | MIT |
 | [`@modelcontextprotocol/sdk`](https://github.com/modelcontextprotocol/typescript-sdk) | MIT |
@@ -52,10 +57,16 @@ External packages that a workspace package resolves at runtime. The tier covers 
 | [`@types/mdast`](https://github.com/DefinitelyTyped/DefinitelyTyped) | MIT |
 | [`@vscode/ripgrep`](https://github.com/microsoft/vscode-ripgrep) | MIT |
 | [`anser`](https://github.com/IonicaBizau/anser) | MIT |
+| [`buffer`](https://github.com/feross/buffer) | MIT |
 | [`chokidar`](https://github.com/paulmillr/chokidar) | MIT |
 | [`clsx`](https://github.com/lukeed/clsx) | MIT |
 | [`commander`](https://github.com/tj/commander.js) | MIT |
 | [`diff`](https://github.com/kpdecker/jsdiff) | BSD-3-Clause |
+| [`dsh-better-sidebar`](https://github.com/omdsh-dev/DSH-better-sidebar) | MIT |
+| [`dsh-eval-harness`](https://github.com/BiBoyang/dsh-eval-harness) | MIT |
+| [`dsh-file-review-tab`](https://github.com/Lzh3070/dsh-file-review-tab) | MIT |
+| [`dsh-observe`](https://github.com/PerryLink/dsh-observe) | Apache-2.0 |
+| [`dsh-openapi`](https://github.com/Degurechaff57/dsh-openapi) | MIT |
 | [`e2b`](https://github.com/e2b-dev/e2b) | MIT |
 | [`eventsource-parser`](https://github.com/rexxars/eventsource-parser) | MIT |
 | [`fflate`](https://github.com/101arrowz/fflate) | MIT |
@@ -79,10 +90,12 @@ External packages that a workspace package resolves at runtime. The tier covers 
 | [`node-pty`](https://github.com/microsoft/node-pty) | MIT |
 | [`open`](https://github.com/sindresorhus/open) | MIT |
 | [`picomatch`](https://github.com/micromatch/picomatch) | MIT |
+| [`process`](https://github.com/shtylman/node-process) | MIT |
 | [`react`](https://github.com/facebook/react) | MIT |
 | [`react-dom`](https://github.com/facebook/react) | MIT |
 | [`sharp`](https://github.com/lovell/sharp) | Apache-2.0 |
 | [`shiki`](https://github.com/shikijs/shiki) | MIT |
+| [`stream-browserify`](https://github.com/browserify/stream-browserify) | MIT |
 | [`supports-color`](https://github.com/chalk/supports-color) | MIT |
 | [`tsx`](https://github.com/privatenumber/tsx) | MIT |
 | [`turndown`](https://github.com/mixmark-io/turndown) | MIT |
@@ -95,6 +108,7 @@ External packages that a workspace package resolves at runtime. The tier covers 
 
 pnpm applies local patches to the following packages at install time, so shipped artifacts carry modified copies; each patch file is the complete record of the modification:
 
+- `dsh-better-sidebar@0.16.1` — [`patches/dsh-better-sidebar@0.16.1.patch`](patches/dsh-better-sidebar@0.16.1.patch)
 - `node-pty@1.2.0-beta.15` — [`patches/node-pty@1.2.0-beta.15.patch`](patches/node-pty@1.2.0-beta.15.patch)
 
 ## Official Claude Code platform payloads

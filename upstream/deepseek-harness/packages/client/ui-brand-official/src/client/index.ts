@@ -1,4 +1,4 @@
-/** Official DeepSeek Harness occupants for the generic browser-brand slots. */
+/** FF-FDE occupants for the generic browser-brand slots. */
 import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
@@ -8,11 +8,10 @@ import { OfficialBrandMark, OfficialBrandName } from './Brand.tsx'
 export const inject = ['slots']
 
 /**
- * Fill every shipped brand slot as one declaration-aware registration set.
+ * Fill every shipped brand slot with the FF-FDE product identity.
  * @param ctx - Client root context.
  */
 export function apply(ctx: ClientContext): void {
-  if (process.env.DSH_CLIENT_BUILD_PROFILE !== 'official') return
   ctx.slots.inject('sidebar.brand.mark', () =>
     ctx.slots.inject('sidebar.brand.name', () =>
       ctx.slots.inject('conversation.hero.brand.mark', function* () {

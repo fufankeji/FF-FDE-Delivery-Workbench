@@ -15,6 +15,7 @@ This table connects model-visible tool names to the plugin package and service s
 
 | Tool package | Model-visible names | Requires | Writes / affects | Shipped aliases | Deployment note |
 | --- | --- | --- | --- | --- | --- |
+| `@deepseek-ai/dsh-fde-project` | `architecture_get`, `architecture_set`, `openapi_call`, `openapi_describe`, `openapi_list` | `ctx.tools`, `ctx.workspaceRegistry and a registered calling Agent Workspace at execution time`, `locked dsh-openapi implementation` | `tool/call`, `project .fde/architecture.json for architecture_set`, `bounded external HTTP only for openapi_call`, `tool/result` | - | Every execution resolves the calling Agent cwd through the Workspace registry. OpenAPI tools load only that project configuration, and architecture_set requires an exact revision before atomic replacement. |
 | `@deepseek-ai/dsh-tool-ask-user` | `ask_user_question` | `ctx.tools`, `ctx.userQuestions` | `tool/call`, `tool/result after a UI/provider answers the question` | - | ask_user_question pauses the tool call until the active UI provider returns a human answer. |
 | `@deepseek-ai/dsh-tools` | `run_code` | `ctx.tools`, `ctx.codeRuntime (execution time)`, `ctx.systemPrompt` | `tool/call`, `one tool/code-dispatch-start + tool/code-dispatch pair per bridged sub-call`, `tool/result` | - | Owned by the tool registry as a reserved transport outside filterable capability layers under `mode: code` / `mode: both` (see the Code Mode Agent Note). Under `code` it is the registry's only wire contribution; the other visible capabilities are declared in a generated SDK section in the loaded runtime's language, and a program calls them through bindings scheduled under the native concurrency contract (submission-ordered starts and policy; concurrency-safe bodies overlap up to `maxParallelSubCalls`) that re-enter the complete guarded tool pipeline and link each nested execution to this outer result. |
 | `@deepseek-ai/dsh-plan-mode` | `exit_plan_mode` | `ctx.tools`, `ctx.systemPrompt`, `ctx.userQuestions (execution time, opportunistic)` | `tool/call`, `plan/mode inactive on an approved review`, `tool/result` | - | exit_plan_mode stays in the model-facing schema while planning is inactive so transitions add no tool-catalog churn on top of the plan-policy change. Its execute path rejects calls outside plan mode; in plan mode it presents the plan over the user-questions seam (approve / keep planning with feedback), and approval logs plan mode inactive at the step boundary. |
@@ -41,6 +42,248 @@ This table connects model-visible tool names to the plugin package and service s
 | `@deepseek-ai/dsh-tool-todo` | `todo_write` | `ctx.tools`, `owning Agent session` | `tool/call`, `todo/write`, `tool/result` | - | todo_write is session-owned state; UIs render the latest todo/write event as a checklist. `allowParallelInProgress` is required with no default, so the catalog states its choice: `true`, whose description invites several `in_progress` items. A deployment choosing `false` receives the same tool with a description asking for exactly one active task. |
 | `@deepseek-ai/dsh-tool-workflow` | `workflow` | `ctx.tools`, `ctx.workflowEngine`, `ctx.systemPrompt`, `a calling Agent (exec.agent parents the script children)` | `tool/call`, `tool/result` | - | - |
 | `@deepseek-ai/dsh-tool-web` | `web_fetch`, `web_search` | `ctx.tools`, `ctx.web`, `ctx.systemPrompt` | `tool/call`, `tool/result` | - | web_search and web_fetch keep provider selection behind ctx.web so model-visible schemas stay stable across backend swaps. |
+
+<a id="deepseek-aidsh-fde-project"></a>
+
+## `@deepseek-ai/dsh-fde-project`
+
+### `architecture_get`
+
+Read the current FDE project system architecture and its exact revision before proposing changes.
+
+```json
+{
+  "type": "object",
+  "properties": {}
+}
+```
+
+Source: [`packages/fde/project/src/architecture-tools.ts`](../packages/fde/project/src/architecture-tools.ts)
+
+### `architecture_set`
+
+Publish one complete candidate architecture for the current FDE project. Call architecture_get first and pass its exact expectedRevision.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "expectedRevision": {
+      "type": "integer",
+      "description": "Exact revision from architecture_get; 0 when absent."
+    },
+    "title": {
+      "type": "string",
+      "description": "Architecture title."
+    },
+    "summary": {
+      "type": "string",
+      "description": "Business and technical objective summary."
+    },
+    "groups": {
+      "type": "array",
+      "description": "System layers or responsibility groups.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label"
+        ]
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "description": "System components.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "default",
+              "entry",
+              "core",
+              "store",
+              "external",
+              "output"
+            ]
+          },
+          "note": {
+            "type": "string"
+          },
+          "group": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "kind"
+        ]
+      }
+    },
+    "edges": {
+      "type": "array",
+      "description": "Directed relationships between existing node ids.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "dashed": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "from",
+          "to"
+        ]
+      }
+    }
+  },
+  "required": [
+    "expectedRevision",
+    "title",
+    "groups",
+    "nodes",
+    "edges"
+  ]
+}
+```
+
+Source: [`packages/fde/project/src/architecture-tools.ts`](../packages/fde/project/src/architecture-tools.ts)
+
+### `openapi_call`
+
+Call one operation declared and allowed by the current FDE project OpenAPI configuration.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "api": {
+      "type": "string",
+      "description": "Use project for the current FDE project."
+    },
+    "operationId": {
+      "type": "string",
+      "description": "Operation id returned by openapi_list."
+    },
+    "path": {
+      "type": "object",
+      "description": "Declared path parameters.",
+      "additionalProperties": true
+    },
+    "query": {
+      "type": "object",
+      "description": "Declared query parameters.",
+      "additionalProperties": true
+    },
+    "headers": {
+      "type": "object",
+      "description": "Declared non-credential header parameters.",
+      "additionalProperties": true
+    },
+    "cookies": {
+      "type": "object",
+      "description": "Declared cookie parameters.",
+      "additionalProperties": true
+    },
+    "body": {
+      "type": "string",
+      "description": "Raw request body, usually JSON."
+    },
+    "contentType": {
+      "type": "string",
+      "description": "Request content type."
+    }
+  },
+  "required": [
+    "api",
+    "operationId"
+  ]
+}
+```
+
+Source: [`packages/fde/project/src/openapi-tools.ts`](../packages/fde/project/src/openapi-tools.ts)
+
+### `openapi_describe`
+
+Describe one operation from the current FDE project, including parameters, request body, and responses.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "api": {
+      "type": "string",
+      "description": "Use project for the current FDE project."
+    },
+    "operationId": {
+      "type": "string",
+      "description": "Operation id returned by openapi_list."
+    }
+  },
+  "required": [
+    "api",
+    "operationId"
+  ]
+}
+```
+
+Source: [`packages/fde/project/src/openapi-tools.ts`](../packages/fde/project/src/openapi-tools.ts)
+
+### `openapi_list`
+
+List and search operations from the OpenAPI definition owned by the current FDE project.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "api": {
+      "type": "string",
+      "description": "Optional API id; the current project id is project."
+    },
+    "search": {
+      "type": "string",
+      "description": "Optional case-insensitive operation search."
+    },
+    "limit": {
+      "type": "number",
+      "description": "Maximum operations to return (1-100, default 50)."
+    }
+  }
+}
+```
+
+Source: [`packages/fde/project/src/openapi-tools.ts`](../packages/fde/project/src/openapi-tools.ts)
+
+Every execution resolves the calling Agent cwd through the Workspace registry. OpenAPI tools load only that project configuration, and architecture_set requires an exact revision before atomic replacement.
 
 <a id="deepseek-aidsh-tool-ask-user"></a>
 

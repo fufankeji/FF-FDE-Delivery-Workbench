@@ -11,7 +11,7 @@
  * Each registration also declares one **directory-flow hole** (`single`
  * kind): the slot a composed picker package's client half fills with its
  * picking interaction — a renderless native-chooser driver or an in-app
- * browsing dialog. ui-workspace owns the trigger (the "Add workspace…"
+ * browsing dialog. ui-workspace owns the trigger (the "New project…"
  * entry, present only while the hole is occupied) and the adoption
  * semantics (`createWorkspace({ path })`, the retryable error dialog,
  * Choose again); the occupant owns everything between `open` and the picked path,
@@ -51,12 +51,24 @@ export interface DirectoryFlowOwnerProps {
   onError: (message: string) => void
 }
 
+/** Project-row contribution currency for actions that belong to one exact Workspace. */
+export interface ProjectActionOwnerProps {
+  /** Stable Host Workspace identity; actions must never fall back to a current or recent project. */
+  workspaceId: WorkspaceId
+  /** User-visible project label. */
+  title: string
+  /** Canonical Host directory backing this project. */
+  path: string
+}
+
 declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface SlotMap {
     /** Directory-flow hole under the conversation empty-state picker (declared by the WorkspacePicker entry). */
     'conversation.hero.workspace.directoryFlow': { kind: 'single'; scope: 'root'; owner: DirectoryFlowOwnerProps }
     /** Directory-flow hole under the sidebar browsing region (declared by the WorkspaceBrowser entry). */
     'sidebar.workspaces.directoryFlow': { kind: 'single'; scope: 'root'; owner: DirectoryFlowOwnerProps }
+    /** Compact actions rendered inside every real project row; the owner addresses one Workspace explicitly. */
+    'sidebar.workspaces.projectActions': { kind: 'list'; scope: 'root'; owner: ProjectActionOwnerProps }
   }
 }
 
@@ -69,7 +81,7 @@ export type DirectoryFlowSlotName =
  * Directory-picking share both trigger surfaces consume. Occupancy rides the
  * inject face's reserved `hooks` compartment: the renderer binds the source
  * into the `useDirectoryFlow` selector hook, so an empty hole hides the
- * "Add workspace…" entry reactively and the surface withdraws an open
+ * "New project…" entry reactively and the surface withdraws an open
  * flow whose occupant unloaded mid-interaction (nobody is left to cancel).
  */
 export type DirectoryPickingInjected = {
@@ -137,12 +149,14 @@ export type WorkspaceBrowserInjected = {
   insertSessionBefore: (workspaceId: WorkspaceId, sessionId: SessionId, beforeSessionId?: SessionId) => Promise<void>
   /** Adopt a picked host directory as a real Workspace before targeting a Session. */
   createWorkspace: (input: { path: string }) => Promise<WorkspaceView>
+  /** Create one project directory below a user-selected parent. */
+  createDirectory: (path: string, name: string) => Promise<string>
 }
 
 /** Full browser props: shell owner share + viewing store + injected actions + the locale seat. */
 export type WorkspaceBrowserProps =
   PropsRuntime<'sidebar.workspaces'>
-  & PropsRenderSlots<'sidebar.workspaces.directoryFlow'>
+  & PropsRenderSlots<'sidebar.workspaces.directoryFlow' | 'sidebar.workspaces.projectActions'>
   & PropsStore<ReturnType<typeof createWorkspaceViewStore>>
   & Omit<WorkspaceBrowserInjected, 'hooks'>
   & PropsHooks<WorkspaceBrowserInjected['hooks']>

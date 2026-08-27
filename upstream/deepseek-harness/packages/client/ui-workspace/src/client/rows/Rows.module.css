@@ -150,7 +150,13 @@
 
 
 /* Project leading slot: folder by default, expand arrow on row hover. */
-.projectRow .chevron { display: none; }
+.projectRow .chevron {
+  display: none;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
 .projectRow:hover .chevron { display: inline-flex; }
 .projectRow:hover .folder { display: none; }
 
@@ -311,6 +317,13 @@
   font-size: 12px;
   line-height: 16px;
   color: #CFD3D6;
+}
+
+.hoverMeta {
+  font-size: 12px;
+  line-height: 16px;
+  color: #CFD3D6;
+  overflow-wrap: break-word;
 }
 
 .hoverStatus {

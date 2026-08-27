@@ -1,0 +1,6 @@
+# Bilingual-pair consistency record (docs/i18n/README.md): the git blob hash of each
+# side as of the last confirmed-consistent state. Both languages carry equal authority;
+# after editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write .agents/notes/implemented/feature/2026-08-27-fde-browser-local-appearance.md
+2026-08-27-fde-browser-local-appearance.md: 3b8333dfa3daacb639503542819fb73da53115de
+2026-08-27-fde-browser-local-appearance.zh.md: 8f26ddaf01a865b61fdee06a96792038dd595f51

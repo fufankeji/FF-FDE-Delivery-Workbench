@@ -2,11 +2,11 @@
  * Sidebar shell: column geometry only. Collapse is a slide plus crossfade:
  * content freezes at its expanded width (inline style) and fades out in place
  * while the sliding column (AppFrame grid tracks) clips it — nothing reflows
- * mid-slide. At settle the wide-only content unmounts and the four upper
- * controls enter the 56px rail from the same horizontal offset (one icon each,
+ * mid-slide. At settle the wide-only content unmounts and the upper controls
+ * enter the 56px rail from the same horizontal offset (one icon each,
  * same top-down order) on one fade that ends with the slide. The bottom-pinned
  * settings control only fades. The workspace/session browsing region between
- * the New Session button and the foot is the `sidebar.workspaces` registrant's,
+ * the brand row and the foot is the `sidebar.workspaces` registrant's,
  * and the foot holds `sidebar.settings` plus `sidebar.footer.action`; the shell
  * hands them the wide flag (plus an expand request callback for the browser).
  *
@@ -18,7 +18,7 @@
 import { useEffect, useRef, useState } from 'react'
 import clsx from 'clsx'
 import {
-  FishLogo, IconNewChatOutline16, IconPanelLeftOutline16, Tooltip,
+  FishLogo, IconPanelLeftOutline16, Tooltip,
 } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { SidebarRootComponentProps } from './contract/slots.ts'
 import css from './SidebarRoot.module.css'
@@ -42,7 +42,6 @@ const SCROLLBAR_LINGER_MS = 2000
 export function SidebarRoot({
   collapsed,
   width,
-  startSession,
   toggleSidebar,
   t,
   renderSlot,
@@ -126,16 +125,11 @@ export function SidebarRoot({
       onPointerLeave={() => { armLinger() }}
     >
       <div className={css.logoRow}>
-        {/* Expanded, the brand doubles as a New Session shortcut; the
-            collapsed rail's logo is the expand toggle below instead. */}
+        {/* Product identity is presentation only. Project/session actions live
+            in the workspace browser below. */}
         {wide && (
-          <button
-            type="button"
-            className={clsx(css.brand, css.wide)}
-            aria-label={t('session.new.label')}
-            onClick={() => { startSession() }}
-          >
-            <span className={css.brandIdentity} aria-hidden="true">
+          <div className={clsx(css.brand, css.wide)}>
+            <span className={css.brandIdentity}>
               <span className={css.brandMark}>
                 {renderSlot('sidebar.brand.mark', { size: 24 }, { fallback: <FishLogo size={24} /> })}
               </span>
@@ -152,7 +146,7 @@ export function SidebarRoot({
                 })}
               </span>
             </span>
-          </button>
+          </div>
         )}
         {/* Rail resting state is the whale mark; hovering swaps in the panel
             icon (the expand affordance, figma sidebar-hover flow). */}
@@ -173,19 +167,6 @@ export function SidebarRoot({
           </button>
         </Tooltip>
       </div>
-
-      {/* Expanded, the button carries its own label — tooltip only on the rail. */}
-      <Tooltip label={t('session.new.label')} delayMs={500} disabled={wide}>
-        <button
-          type="button"
-          className={css.newSession}
-          aria-label={t('session.new.label')}
-          onClick={() => { startSession() }}
-        >
-          <IconNewChatOutline16 size={wide ? 14 : 18} />
-          {wide && <span className={clsx(css.newSessionLabel, css.wide)}>{t('session.new')}</span>}
-        </button>
-      </Tooltip>
 
       {/* The browsing region fills the column between the controls and the
           foot in both states; its rail icon column rides the same slot. */}

@@ -99,10 +99,10 @@ describe('resident composer', () => {
     fireEvent.click(textarea!)
     expect(view.getByTestId('workspace-probe').textContent).toBe('true:0')
     expect(textarea!.getAttribute('aria-expanded')).toBe('true')
-    fireEvent.click(view.getByRole('button', { name: '选择工作区' }))
+    fireEvent.click(view.getByRole('button', { name: '选择项目' }))
     fireEvent.keyDown(textarea!, { key: 'Enter' })
     expect(view.getByTestId('workspace-probe').textContent).toBe('true:0')
-    expect(view.getByRole('button', { name: '选择工作区' })).toBeTruthy()
+    expect(view.getByRole('button', { name: '选择项目' })).toBeTruthy()
     await runtime.dispose()
   })
 
@@ -128,7 +128,7 @@ describe('resident composer', () => {
     const scrollBody = view.container.querySelector('[data-conversation-scroll]')!
     const composerSeat = view.container.querySelector('[data-composer-seat]')!
     const textarea = view.container.querySelector('textarea')!
-    const workspaceChip = view.getByRole('button', { name: '选择工作区' })
+    const workspaceChip = view.getByRole('button', { name: '选择项目' })
     const workspaceProbe = view.getByTestId('workspace-probe')
     expect(textarea.disabled).toBe(false)
     expect(textarea.readOnly).toBe(true)
@@ -147,7 +147,7 @@ describe('resident composer', () => {
     expect(view.container.querySelector('[data-conversation-scroll]')).toBe(scrollBody)
     expect(view.container.querySelector('[data-composer-seat]')).toBe(composerSeat)
     expect(view.container.querySelector('textarea')).toBe(textarea)
-    expect(view.getByRole('button', { name: '选择工作区' })).toBe(workspaceChip)
+    expect(view.getByRole('button', { name: '选择项目' })).toBe(workspaceChip)
     expect(view.getByTestId('workspace-probe')).toBe(workspaceProbe)
     expect(workspaceProbe.textContent).toBe('true:1')
     expect(textarea.disabled).toBe(false)

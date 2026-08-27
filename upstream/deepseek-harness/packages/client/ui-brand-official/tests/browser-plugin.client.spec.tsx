@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { Context } from '@deepseek-ai/cordis'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 import { cleanup, render } from '@testing-library/react'
 import { SlotRegistry } from '@deepseek-ai/dsh-client-runtime/client'
 import { apply, inject } from '../src/client/index.ts'
@@ -8,7 +8,6 @@ import { OfficialBrandMark, OfficialBrandName } from '../src/client/Brand.tsx'
 
 afterEach(() => {
   cleanup()
-  vi.unstubAllEnvs()
 })
 
 const HOLES = [
@@ -34,15 +33,7 @@ describe('official browser-brand plugin', () => {
     expect(inject).toEqual(['slots'])
   })
 
-  it('leaves every slot empty outside the official build profile', async () => {
-    vi.stubEnv('DSH_CLIENT_BUILD_PROFILE', 'local')
-    const subject = await bench()
-    await subject.ctx.plugin({ inject: [...inject], apply }).await()
-    for (const hole of HOLES) expect(subject.slots.entries(hole)).toHaveLength(0)
-  })
-
   it('fills declarations before or after apply and removes every occupant on teardown', async () => {
-    vi.stubEnv('DSH_CLIENT_BUILD_PROFILE', 'official')
     const before = await bench()
     const fiber = before.ctx.plugin({ inject: [...inject], apply })
     await fiber.await()
@@ -65,15 +56,17 @@ describe('official browser-brand plugin', () => {
     for (const hole of HOLES) expect(after.slots.entries(hole)).toHaveLength(1)
   })
 
-  it('renders the official name independently from both requested mark sizes', () => {
+  it('renders the FF-FDE name independently from both requested mark sizes', () => {
     const name = render(<OfficialBrandName />)
-    expect(name.container.querySelector('svg')?.getAttribute('viewBox')).toBe('26 0 156 24')
+    expect(name.getByText('FF-FDE工作台')).toBeTruthy()
     name.unmount()
 
     const mark = render(<OfficialBrandMark size={34} className="hero-mark" />)
-    expect(mark.container.querySelector('svg')?.getAttribute('width')).toBe('34')
-    expect(mark.container.querySelector('svg')?.getAttribute('class')).toBe('hero-mark')
+    expect(mark.container.querySelector('img')?.getAttribute('src')).toBe('/ff-brand/ff-logo.png')
+    expect(mark.container.querySelector('img')?.getAttribute('width')).toBe('34')
+    expect(mark.container.querySelector('img')?.getAttribute('class')).toBe('hero-mark')
+    expect(mark.container.querySelector('img')?.style.borderRadius).toBe('20%')
     mark.rerender(<OfficialBrandMark size={24} />)
-    expect(mark.container.querySelector('svg')?.getAttribute('width')).toBe('24')
+    expect(mark.container.querySelector('img')?.getAttribute('width')).toBe('24')
   })
 })

@@ -66,6 +66,7 @@ import * as ToolWeb from '@deepseek-ai/dsh-tool-web'
 import VmWorkflowEngine from '@deepseek-ai/dsh-workflow-worker-thread'
 import * as ToolRalph from '@deepseek-ai/dsh-tool-ralph'
 import * as ToolWorkflow from '@deepseek-ai/dsh-tool-workflow'
+import { registerProjectArchitectureTools, registerProjectOpenApiTools } from '@deepseek-ai/dsh-fde-project'
 import { githubSlug } from './verify-md-links.ts'
 
 /** Attachment seam marker that makes the attachments-conditional `read_image` schema harvestable. */
@@ -186,6 +187,32 @@ export interface ToolPackage {
  * guard proves it is exhaustive against the on-disk glob.
  */
 const TOOL_PACKAGES: ToolPackage[] = [
+  {
+    pkg: '@deepseek-ai/dsh-fde-project',
+    dir: 'project',
+    source: {
+      architecture_get: 'packages/fde/project/src/architecture-tools.ts',
+      architecture_set: 'packages/fde/project/src/architecture-tools.ts',
+      openapi_list: 'packages/fde/project/src/openapi-tools.ts',
+      openapi_describe: 'packages/fde/project/src/openapi-tools.ts',
+      openapi_call: 'packages/fde/project/src/openapi-tools.ts',
+    },
+    requires: ['ctx.tools', 'ctx.workspaceRegistry and a registered calling Agent Workspace at execution time', 'locked dsh-openapi implementation'],
+    writes: ['tool/call', 'project .fde/architecture.json for architecture_set', 'bounded external HTTP only for openapi_call', 'tool/result'],
+    mount(ctx) {
+      registerProjectArchitectureTools(ctx)
+      registerProjectOpenApiTools(ctx, {
+        timeoutMs: 30_000,
+        maxSpecBytes: 2_097_152,
+        maxResponseBytes: 262_144,
+        maxRedirects: 3,
+        maxOperations: 1_000,
+      })
+      return Promise.resolve()
+    },
+    note:
+      'Every execution resolves the calling Agent cwd through the Workspace registry. OpenAPI tools load only that project configuration, and architecture_set requires an exact revision before atomic replacement.',
+  },
   {
     pkg: '@deepseek-ai/dsh-tool-ask-user',
     dir: 'tool-ask-user',

@@ -73,6 +73,81 @@
     - id: workspace
       name: '@deepseek-ai/dsh-workspace'
 
+    # FDE project-level ordinary files: one explicit Workspace batch lands in
+    # its visible fde-resources directory without creating a Session message.
+    - id: fde-source
+      name: '@deepseek-ai/dsh-fde-source'
+
+    # FDE project progress: initialize and read one Workspace-scoped current
+    # stage. The current slice exposes no transition operation.
+    - id: fde-stage
+      name: '@deepseek-ai/dsh-fde-stage'
+
+    # Read-only project artifacts used by API docs, architecture, and
+    # evaluation pages. Every request resolves a registered Workspace first.
+    - id: fde-project
+      name: '@deepseek-ai/dsh-fde-project'
+      config:
+        timeoutMs: 30000
+        maxSpecBytes: 2097152
+        maxResponseBytes: 262144
+        maxRedirects: 3
+        maxOperations: 1000
+
+    # DSH-native evaluation tools. The UI never calls these automatically;
+    # an explicit user action asks the current Agent to run project cases.
+    - id: fde-evaluation-tools
+      name: 'dsh-eval-harness'
+
+    # Observability exporter is installed but privacy-safe by default: local
+    # project summaries work without capture or outbound transmission.
+    - id: fde-observe
+      name: 'dsh-observe'
+      config:
+        enabled: false
+        otlp: null
+        langfuse: null
+        capture:
+          turns: true
+          steps: true
+          tools: true
+          llm: true
+        llm:
+          prompt: false
+          completion: false
+        metadata:
+          sessionId: true
+          cwd: false
+          agentPreset: true
+          model: true
+        metrics:
+          tokens: true
+          cost: true
+          contextTokens: true
+        pricing: []
+        sanitize:
+          enabled: true
+          redactKeys: []
+          redactPatterns: []
+          truncatePromptChars: 4000
+          truncateCompletionChars: 4000
+          truncateToolInputChars: 2000
+          truncateToolOutputChars: 2000
+          truncateAttributeChars: 512
+        batch:
+          maxRecords: 256
+          flushIntervalMs: 5000
+          maxQueueRecords: 2000
+          maxBufferRecords: 10000
+          bufferRetryIntervalMs: 30000
+        retry:
+          maxAttempts: 5
+          baseDelayMs: 1000
+          factor: 2
+          maxDelayMs: 60000
+        remote:
+          enabled: false
+
     - id: session-projection-cache
       name: '@deepseek-ai/dsh-session-projection-cache'
       config:
@@ -90,11 +165,15 @@
     - id: session-stats
       name: '@deepseek-ai/dsh-session-stats'
 
-    # Resolve bind host, SSH launch, and display once at boot, then mount the
-    # matching dual-face directory picker. Mount -native or -browse directly in
-    # an overlay to pin the interaction.
-    - id: directory-picker
-      name: '@deepseek-ai/dsh-host-directory-picker-auto'
+    # FDE project creation needs both in-app parent selection and
+    # host.createDirectory. Pin the official browse pair: the adaptive chooser
+    # resolves to native on a local macOS loopback launch, but native has no
+    # directory-creation capability.
+    - id: directory-picker-browse
+      name: '@deepseek-ai/dsh-host-directory-picker-browse'
+
+    - id: ui-directory-picker-browse
+      name: '@deepseek-ai/dsh-client-ui-directory-picker-browse'
 
     # Read-only projection of current Loader entries for trusted client RPCs.
     - id: plugin-inventory
@@ -200,6 +279,11 @@
     - id: ui-settings-general
       name: '@deepseek-ai/dsh-client-ui-settings-general'
 
+    # Browser-local skins and custom background settings. This remains
+    # independent from project, Session, and Agent persistence.
+    - id: ui-fde-appearance
+      name: '@deepseek-ai/dsh-client-ui-fde-appearance'
+
     - id: ui-settings-models
       name: '@deepseek-ai/dsh-client-ui-settings-models'
 
@@ -232,10 +316,36 @@
     # Remove this entry to turn the surface off; the tail hole renders empty.
     - id: ui-deliverables
       name: '@deepseek-ai/dsh-client-ui-deliverables'
+      disabled: true
 
 
     - id: ui-workspace
       name: '@deepseek-ai/dsh-client-ui-workspace'
+
+    - id: ui-fde-sources
+      name: '@deepseek-ai/dsh-client-ui-fde-sources'
+
+    - id: ui-fde-stage
+      name: '@deepseek-ai/dsh-client-ui-fde-stage'
+
+    # Global project progress plus project API, architecture, observation,
+    # and evaluation views. This replaces the old session-level flow tab.
+    - id: ui-fde-project
+      name: '@deepseek-ai/dsh-client-ui-fde-project'
+
+    # FDE project development surface: keep the project/session sidebar and
+    # official Conversation untouched; open Files/Editor/Git as one right-side
+    # workbench, then register per-session Agent file review into that same dock.
+    - id: fde-workbench
+      name: 'dsh-better-sidebar'
+
+    # Shared read-only Office renderer for Project Details and the right-side
+    # Files editor. It registers only presentation capabilities.
+    - id: ui-fde-document-preview
+      name: '@deepseek-ai/dsh-client-ui-fde-document-preview'
+
+    - id: fde-file-review
+      name: 'dsh-file-review-tab'
 
     # Input triggers: the '/' | '@' pipeline (ui-input-trigger), the command surface over
     # it (ui-commands), and the reference sources (ui-skill / ui-reference).

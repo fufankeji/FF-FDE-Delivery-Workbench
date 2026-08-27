@@ -1,0 +1,20 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib/types",
+    "types": ["node"]
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../../../vendor/cordis" },
+    { "path": "../../../vendor/schemastery" },
+    { "path": "../../util/atomic-write" },
+    { "path": "../../client/connection/tsconfig.host.json" },
+    { "path": "../../core/tools" },
+    { "path": "../../host/webserver" },
+    { "path": "../../llm/llm" },
+    { "path": "../../runtime-diagnostics/invariants" },
+    { "path": "../../workspace/workspace" }
+  ]
+}
