@@ -1,9 +1,10 @@
 import { describe, expect, it, vi } from 'vitest'
-import { FdeProjectSurfaceController, fetchProjectSurface } from '../src/client/controller.ts'
+import { confirmValidationPlan, FdeProjectSurfaceController, fetchProjectSurface, startProjectRuntime } from '../src/client/controller.ts'
 
 const value = {
   workspaceId: 'w-1',
   title: '项目一',
+  runtime: { schemaVersion: 1, revision: 0, status: 'stopped', updatedAt: '1970-01-01T00:00:00.000Z' },
   apiDocs: { status: 'unconfigured', message: '尚未配置' },
   architecture: null,
   evaluation: { casesCount: 0, reports: [] },
@@ -36,6 +37,28 @@ describe('FDE project surface controller', () => {
     } finally {
       globalThis.fetch = original
     }
+  })
+
+  it('begins one project runtime operation through the exact same-origin route', async () => {
+    const starting = { ...value, runtime: {
+      schemaVersion: 1 as const, revision: 1, status: 'starting' as const,
+      action: 'start' as const, operationId: `runtime_${'1'.repeat(32)}`,
+      sessionId: 'session-1', updatedAt: '2026-08-27T00:00:00.000Z',
+    } }
+    const fetchImpl = vi.fn(async () => new Response(JSON.stringify({ ok: true, value: starting }), { status: 200 }))
+    await expect(startProjectRuntime('w-1', 'session-1', fetchImpl)).resolves.toEqual(starting)
+    expect(fetchImpl).toHaveBeenCalledWith('/api/fde-project/runtime/start', expect.objectContaining({
+      method: 'POST', body: JSON.stringify({ workspaceId: 'w-1', sessionId: 'session-1' }),
+    }))
+  })
+
+  it('confirms one exact validation contract through the same-origin route', async () => {
+    const digest = `sha256:${'1'.repeat(64)}`
+    const fetchImpl = vi.fn(async () => new Response(JSON.stringify({ ok: true, value }), { status: 200 }))
+    await expect(confirmValidationPlan('w-1', digest, fetchImpl)).resolves.toEqual(value)
+    expect(fetchImpl).toHaveBeenCalledWith('/api/fde-project/validation/confirm-plan', expect.objectContaining({
+      method: 'POST', body: JSON.stringify({ workspaceId: 'w-1', contractDigest: digest }),
+    }))
   })
 
   it('cancels a pending project read when another project becomes active', async () => {

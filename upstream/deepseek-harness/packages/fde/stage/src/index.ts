@@ -3,17 +3,17 @@
 import type { Context } from '@deepseek-ai/cordis'
 import type {} from '@deepseek-ai/dsh-agent'
 import { isTrustedApiRequest } from '@deepseek-ai/dsh-client-connection'
-import { loadDevelopmentDocs, loadRequirementArtifacts, loadSolutionArtifacts, readProjectArchitecture } from '@deepseek-ai/dsh-fde-project'
+import { loadDevelopmentDocs, loadRequirementArtifacts, loadSolutionArtifacts, loadValidationStage, readProjectArchitecture } from '@deepseek-ai/dsh-fde-project'
 import type {} from '@deepseek-ai/dsh-host-webserver'
 import type {} from '@deepseek-ai/dsh-skill'
 import type {} from '@deepseek-ai/dsh-storage-domain'
 import type {} from '@deepseek-ai/dsh-system-prompt'
 import { WorkspaceId } from '@deepseek-ai/dsh-workspace'
-import { createCompleteDevelopmentRoute, createCompleteRequirementsRoute, createCompleteSolutionRoute, createStageRoute } from './http.ts'
+import { createCompleteDevelopmentRoute, createCompleteRequirementsRoute, createCompleteSolutionRoute, createCompleteValidationRoute, createStageRoute } from './http.ts'
 import { fdeStageDomainSpec, type FdeStageId } from './spec.ts'
 import { FdeStageState } from './state.ts'
 
-export { FdeStageRequestError, createCompleteDevelopmentRoute, createCompleteRequirementsRoute, createCompleteSolutionRoute, createStageRoute } from './http.ts'
+export { FdeStageRequestError, createCompleteDevelopmentRoute, createCompleteRequirementsRoute, createCompleteSolutionRoute, createCompleteValidationRoute, createStageRoute } from './http.ts'
 export { FDE_STAGE_IDS, fdeStageDomainSpec, fdeStageId, projectStageRecord } from './spec.ts'
 export type { FdeStageId, ProjectStageRecord } from './spec.ts'
 export { FdeStageConflictError, FdeStageState, FdeStageTransitionError } from './state.ts'
@@ -26,6 +26,8 @@ export const FDE_STAGE_COMPLETE_REQUIREMENTS_PATH = '/api/fde-stage/requirements
 export const FDE_STAGE_COMPLETE_SOLUTION_PATH = '/api/fde-stage/solution/complete'
 /** Fixed manual gate from project development to validation. */
 export const FDE_STAGE_COMPLETE_DEVELOPMENT_PATH = '/api/fde-stage/development/complete'
+/** Fixed manual gate from validation to pilot deployment. */
+export const FDE_STAGE_COMPLETE_VALIDATION_PATH = '/api/fde-stage/validation/complete'
 /** Cordis plugin name. */
 export const name = 'fde-stage'
 /** Required durable Workspace, model guidance, and same-origin Web services. */
@@ -123,7 +125,7 @@ Feature 文档 frontmatter 使用 \`document\`、\`feature\`、\`status\`、\`ti
 - 实施前读对应 spec、plan 和 tasks；变更必须能回到需求、验收和任务。
 - \`- [x]\` 只在源码、测试、构建或运行证据真实存在后使用，并在任务下记录最窄证据；文档存在本身不等于完成。
 - 新事实影响上游时，先更新受影响的 PRD/总规格/Feature，再继续开发；不要另建任务数据库或让页面状态反写 docs。
-- 评估可以从项目开发阶段使用，但评估结果不能自动勾选任务、更新基线或推进阶段。
+- 观测从项目开发阶段可用；评估只在 FDE 进入验证评估后使用。观测或评估结果都不能自动勾选任务、更新基线或推进阶段。
 
 ## 开发收口
 
@@ -134,6 +136,49 @@ Feature 文档 frontmatter 使用 \`document\`、\`feature\`、\`status\`、\`ti
 3. \`fde-deliverables/03-project-development/development-baseline.md\`
 
 三份文件分别记录实现范围与剩余项、安装运行和故障恢复、候选版本与测试/评估证据及已知风险。它们仍是候选阶段产物；你不能声称 FDE 已确认，不得改变项目阶段。是否进入验证评估只能由 FDE 在项目进度页决定。`,
+} as const
+
+/** Runtime Skill loaded on demand while an FDE validates one release candidate. */
+export const VALIDATION_SKILL = {
+  name: 'fde-validation',
+  description: '为当前候选版本建立验证合同，记录真实指标证据和问题，并形成验证计划、验证报告与验证基线。',
+  whenToUse: '当前项目处于验证评估，用户要求设计验证、执行检查、登记结果、分析问题或收口验证时使用。',
+  source: 'bundled',
+  content: `# FDE 验证评估规范
+
+只在当前项目的验证评估阶段使用本 Skill。先读取需求基线、项目 PRD、验收方案、方案基线、项目开发基线、当前候选版本和已有验证文件，再判断当前是“评估方案准备”还是“开始验证”。不得把开发期测试摘要冒充本轮验证结果。
+
+## 两种工作模式
+
+- 评估方案准备：生成或完善结构化合同和 \`validation-plan.md\`；所有未真实执行的指标保持 NOT_RUN，不生成验证报告或验证基线。
+- 开始验证：只有当前合同已有 FDE 确认记录时才执行；按已确认的方法与阈值保存真实证据，随后更新合同结果、验证报告与验证基线。
+- \`.fde/evaluations/validation-plan-approval.json\` 由平台写入。Agent 不得创建、修改或删除该文件，也不能代替 FDE 确认方案。
+
+## 验证合同
+
+在 \`.fde/evaluations/validation.json\` 维护唯一结构化合同，\`schemaVersion\` 固定为 2，包含候选版本、验证环境、可选数据集、指标和问题：
+
+- 每个指标都写清名称、类别、方法、阈值和是否必需；类别只使用 business、functional、data、model、performance、security、recovery、agent。
+- 每个指标必须包含非空 \`metrics[].sources\`。每项来源写项目相对 \`path\` 和文档内 \`references\` 编号，例如验收条件、需求 ID 或方案决策 ID；来源文件必须真实存在于当前项目。不要从 Agent 自己新写的验证计划反向证明指标来源。
+- 指标结果只使用 PASS、WARN、FAIL、NOT_RUN。PASS/WARN 必须引用当前项目中的真实证据文件；WARN 还必须写明接受理由。
+- 修改候选版本、验证环境、数据/用例、指标来源、方法或阈值时，先把受影响指标重置为 NOT_RUN；平台会让旧的 FDE 确认失效。停止执行并请 FDE 重新确认后才能继续。
+- 数据集只在项目确实需要时登记版本、来源或哈希，不为凑格式虚构数据集。
+- critical/high 问题在 open 状态时阻止进入部署试运行；waived 问题必须记录接受理由。
+- 不得编造指标值、阈值、执行时间、数据集版本或验证证据。信息不足时保留 NOT_RUN，并明确下一步需要执行什么。
+
+## 固定产物
+
+1. \`fde-deliverables/04-validation/validation-plan.md\`：候选版本、范围、指标来源、环境、数据/用例、指标阈值、执行顺序、证据位置和职责。
+2. \`fde-deliverables/04-validation/validation-report.md\`：逐项结果、实际值、证据、问题、偏差、风险和是否建议进入部署试运行。
+3. \`fde-deliverables/04-validation/validation-baseline.md\`：通过验证的候选版本、环境与数据版本、已确认指标结果、接受风险和可追溯证据。
+
+## 工作规则
+
+- 验证输入来自已确认的验收方案、研发基线、候选版本、验证环境、数据/用例和客户最新约束；不要复制一套独立需求。
+- 同一轮持续更新固定路径，不创建 final、v2、new 等平行最终稿。
+- 评估页面按“生成评估方案 → FDE 确认方案 → 开始验证”推进；固定 YAML 用例只是可选验证方法，不等于完整验证流程。
+- 文件与指标就绪只表示可以提交，不等于 FDE 已确认；不得绕过或伪造确认记录。
+- 你不能修改项目阶段。是否进入部署试运行只能由 FDE 在项目进度页核对全部阻塞项后决定。`,
 } as const
 
 /** Short stage-aware prompt; the complete Skill body remains on-demand. */
@@ -154,6 +199,12 @@ export function projectDevelopmentPrompt(stage: FdeStageId): string {
   return '当前 FDE 项目处于“项目开发”。当用户要求规划、拆分、实施或检查研发进度时，先加载 Skill `fde-project-development`，按项目 `docs/` 的 PRD、产品总规格、Feature Map 和逐 Feature spec/plan/tasks 原位维护，并用真实工程证据更新任务。开发收口产物固定在 `fde-deliverables/03-project-development/`。你不能虚构日期或证据，也不能推进项目阶段。'
 }
 
+/** Short validation-aware prompt; the complete Skill body remains on-demand. */
+export function validationPrompt(stage: FdeStageId): string {
+  if (stage !== 'validation') return ''
+  return '当前 FDE 项目处于“验证评估”。当用户要求准备方案或执行验证时，先加载 Skill `fde-validation`，严格区分“评估方案准备”和“开始验证”。指标必须追溯到此前已确认文档；只有 FDE 确认当前方案后才能执行。只记录真实结果和项目内证据；你不能确认方案或推进项目阶段。'
+}
+
 /**
  * Open the project-stage domain and register the read/initialize route.
  * @param ctx - Host context carrying storage, Workspace registry, and WebServer.
@@ -165,6 +216,7 @@ export async function apply(ctx: Context): Promise<void> {
   ctx.skills.register(REQUIREMENT_RESEARCH_SKILL)
   ctx.skills.register(SOLUTION_DESIGN_SKILL)
   ctx.skills.register(PROJECT_DEVELOPMENT_SKILL)
+  ctx.skills.register(VALIDATION_SKILL)
   ctx.systemPrompt.section({
     name: 'fde:requirement-research',
     order: 90,
@@ -174,7 +226,7 @@ export async function apply(ctx: Context): Promise<void> {
       const workspace = ctx.workspaceRegistry.list().find(item => item.path === cwd)
       if (workspace === undefined) return ''
       const stage = state.current(workspace.id)?.currentStage ?? 'requirements'
-      return requirementResearchPrompt(stage) || solutionDesignPrompt(stage) || projectDevelopmentPrompt(stage)
+      return requirementResearchPrompt(stage) || solutionDesignPrompt(stage) || projectDevelopmentPrompt(stage) || validationPrompt(stage)
     },
   })
   const handler = createStageRoute({
@@ -241,6 +293,23 @@ export async function apply(ctx: Context): Promise<void> {
     path: FDE_STAGE_COMPLETE_DEVELOPMENT_PATH,
     handler: completeDevelopment,
   }), `fde-stage: ${FDE_STAGE_COMPLETE_DEVELOPMENT_PATH}`)
+  const completeValidation = createCompleteValidationRoute({
+    trusted: request => isTrustedApiRequest(request, []),
+    workspaceExists: id => ctx.workspaceRegistry.get(WorkspaceId(id)) !== undefined,
+    validation: async (workspaceId) => {
+      const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
+      if (workspace === undefined) throw new Error('当前项目不存在或已被移除。')
+      const snapshot = await loadValidationStage(workspace.path)
+      return { gateReady: snapshot.gateReady, blockers: snapshot.blockers }
+    },
+    complete: async (workspaceId, expectedRevision) => await state.completeValidation(workspaceId, expectedRevision),
+    reportFailure: (error) => { ctx.logger.warn(error instanceof Error ? error : new Error(String(error))) },
+  })
+  ctx.effect(() => ctx.webServer.register({
+    kind: 'exact',
+    path: FDE_STAGE_COMPLETE_VALIDATION_PATH,
+    handler: completeValidation,
+  }), `fde-stage: ${FDE_STAGE_COMPLETE_VALIDATION_PATH}`)
 }
 
 /** Model-facing content is limited to one short stage section and an on-demand Skill. */

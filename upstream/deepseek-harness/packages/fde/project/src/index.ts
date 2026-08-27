@@ -11,14 +11,23 @@ import {
   createArchitectureConfirmRoute,
   createEvaluationBaselineRoute,
   createProjectSnapshotRoute,
+  createProjectRuntimeAbandonRoute,
+  createProjectRuntimeStartRoute,
+  createProjectRuntimeStopRoute,
   createRequirementArtifactFileRoute,
   createRequirementWikiAbandonRoute,
   createRequirementWikiStartRoute,
+  createValidationPlanConfirmRoute,
 } from './http.ts'
 import { registerProjectOpenApiTools, type ProjectOpenApiPolicy } from './openapi-tools.ts'
 import { approveProjectEvaluationBaseline, confirmProjectArchitecture, loadProjectSurfaceSnapshot } from './snapshot.ts'
 import { abandonRequirementWikiBuild, startRequirementWikiBuild } from './requirement-wiki.ts'
 import { registerRequirementWikiTools } from './requirement-wiki-tools.ts'
+import {
+  abandonProjectRuntimeOperation,
+  beginProjectRuntimeOperation,
+} from './project-runtime.ts'
+import { registerProjectRuntimeTools } from './project-runtime-tools.ts'
 import {
   REQUIREMENT_ARTIFACT_FILE_PATH,
   resolveRequirementArtifact,
@@ -31,15 +40,24 @@ import {
   DEVELOPMENT_ARTIFACT_FILE_PATH,
   resolveDevelopmentArtifact,
 } from './development-docs.ts'
+import {
+  confirmValidationPlan,
+  resolveValidationArtifact,
+  VALIDATION_ARTIFACT_FILE_PATH,
+} from './validation.ts'
 
 export {
   FdeProjectRequestError,
   createArchitectureConfirmRoute,
   createEvaluationBaselineRoute,
   createProjectSnapshotRoute,
+  createProjectRuntimeAbandonRoute,
+  createProjectRuntimeStartRoute,
+  createProjectRuntimeStopRoute,
   createRequirementArtifactFileRoute,
   createRequirementWikiAbandonRoute,
   createRequirementWikiStartRoute,
+  createValidationPlanConfirmRoute,
 } from './http.ts'
 export {
   approveProjectEvaluationBaseline, confirmProjectArchitecture, loadProjectSurfaceSnapshot, projectSurfacePaths,
@@ -81,7 +99,27 @@ export {
   loadDevelopmentDocs,
   resolveDevelopmentArtifact,
 } from './development-docs.ts'
+export {
+  confirmValidationPlan,
+  loadValidationStage,
+  resolveValidationArtifact,
+  VALIDATION_ARTIFACT_FILE_PATH,
+  VALIDATION_ARTIFACT_ROOT,
+  VALIDATION_ARTIFACTS,
+  VALIDATION_CONTRACT_PATH,
+  VALIDATION_PLAN_APPROVAL_PATH,
+} from './validation.ts'
 export { registerRequirementWikiTools } from './requirement-wiki-tools.ts'
+export {
+  abandonProjectRuntimeOperation,
+  beginProjectRuntimeOperation,
+  loadProjectRuntimeSnapshot,
+  PROJECT_RUNTIME_PATH,
+  projectRuntimeUrl,
+  readProjectRuntime,
+  reportProjectRuntime,
+} from './project-runtime.ts'
+export { registerProjectRuntimeTools } from './project-runtime-tools.ts'
 export { projectEvaluationDecision, registerProjectEvaluationGuard } from './evaluation-guard.ts'
 export { loadProjectOpenApiCatalog, registerProjectOpenApiTools } from './openapi-tools.ts'
 export type * from './types.ts'
@@ -94,14 +132,24 @@ export const FDE_REQUIREMENT_ARTIFACT_FILE_PATH = REQUIREMENT_ARTIFACT_FILE_PATH
 export const FDE_SOLUTION_ARTIFACT_FILE_PATH = SOLUTION_ARTIFACT_FILE_PATH
 /** Verified read-only route for one Host-indexed project-development document. */
 export const FDE_DEVELOPMENT_ARTIFACT_FILE_PATH = DEVELOPMENT_ARTIFACT_FILE_PATH
+/** Verified read-only route for one fixed validation output. */
+export const FDE_VALIDATION_ARTIFACT_FILE_PATH = VALIDATION_ARTIFACT_FILE_PATH
 /** Exact-revision project architecture confirmation route. */
 export const FDE_ARCHITECTURE_CONFIRM_PATH = '/api/fde-project/architecture/confirm'
+/** Exact-contract validation plan confirmation route. */
+export const FDE_VALIDATION_PLAN_CONFIRM_PATH = '/api/fde-project/validation/confirm-plan'
 /** Project evaluation baseline approval route. */
 export const FDE_EVALUATION_BASELINE_PATH = '/api/fde-project/evaluation/baseline'
 /** Explicit project requirement-Wiki build start route. */
 export const FDE_REQUIREMENT_WIKI_START_PATH = '/api/fde-project/requirement-wiki/start'
 /** Explicit project requirement-Wiki build abandonment route. */
 export const FDE_REQUIREMENT_WIKI_ABANDON_PATH = '/api/fde-project/requirement-wiki/abandon'
+/** Begin one Agent-driven project start operation. */
+export const FDE_PROJECT_RUNTIME_START_PATH = '/api/fde-project/runtime/start'
+/** Begin one Agent-driven project stop operation. */
+export const FDE_PROJECT_RUNTIME_STOP_PATH = '/api/fde-project/runtime/stop'
+/** Settle an operation whose visible Agent prompt could not be queued. */
+export const FDE_PROJECT_RUNTIME_ABANDON_PATH = '/api/fde-project/runtime/abandon'
 export const name = 'fde-project'
 export const inject = ['tools', 'webServer', 'workspaceRegistry']
 
@@ -135,6 +183,7 @@ export function apply(ctx: Context, config: Config): void {
   registerProjectOpenApiTools(ctx, config)
   registerProjectArchitectureTools(ctx)
   registerRequirementWikiTools(ctx)
+  registerProjectRuntimeTools(ctx)
   registerProjectEvaluationGuard(ctx)
   const reportFailure = (error: unknown): void => { ctx.logger.warn(error instanceof Error ? error : new Error(String(error))) }
   const handler = createProjectSnapshotRoute({
@@ -200,6 +249,21 @@ export function apply(ctx: Context, config: Config): void {
     path: FDE_DEVELOPMENT_ARTIFACT_FILE_PATH,
     handler: developmentArtifactFile,
   }), `fde-project: ${FDE_DEVELOPMENT_ARTIFACT_FILE_PATH}`)
+  const validationArtifactFile = createRequirementArtifactFileRoute({
+    trusted: request => isTrustedApiRequest(request, []),
+    artifact: async (workspaceId, artifactId) => {
+      const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
+      if (workspace === undefined) return undefined
+      return await resolveValidationArtifact(workspace.path, artifactId)
+    },
+    maxFileBytes: config.artifactPreviewMaxBytes,
+    reportFailure,
+  })
+  ctx.effect(() => ctx.webServer.register({
+    kind: 'exact',
+    path: FDE_VALIDATION_ARTIFACT_FILE_PATH,
+    handler: validationArtifactFile,
+  }), `fde-project: ${FDE_VALIDATION_ARTIFACT_FILE_PATH}`)
   const confirm = createArchitectureConfirmRoute({
     trusted: request => isTrustedApiRequest(request, []),
     confirm: async (workspaceId, revision) => {
@@ -215,6 +279,21 @@ export function apply(ctx: Context, config: Config): void {
     path: FDE_ARCHITECTURE_CONFIRM_PATH,
     handler: confirm,
   }), `fde-project: ${FDE_ARCHITECTURE_CONFIRM_PATH}`)
+  const confirmPlan = createValidationPlanConfirmRoute({
+    trusted: request => isTrustedApiRequest(request, []),
+    confirm: async (workspaceId, contractDigest) => {
+      const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
+      if (workspace === undefined) return undefined
+      await confirmValidationPlan(workspace.path, contractDigest)
+      return await loadProjectSurfaceSnapshot({ workspaceId, title: workspace.title, path: workspace.path })
+    },
+    reportFailure,
+  })
+  ctx.effect(() => ctx.webServer.register({
+    kind: 'exact',
+    path: FDE_VALIDATION_PLAN_CONFIRM_PATH,
+    handler: confirmPlan,
+  }), `fde-project: ${FDE_VALIDATION_PLAN_CONFIRM_PATH}`)
   const baseline = createEvaluationBaselineRoute({
     trusted: request => isTrustedApiRequest(request, []),
     approve: async (workspaceId, reportPath) => {
@@ -260,4 +339,49 @@ export function apply(ctx: Context, config: Config): void {
     path: FDE_REQUIREMENT_WIKI_ABANDON_PATH,
     handler: abandonWiki,
   }), `fde-project: ${FDE_REQUIREMENT_WIKI_ABANDON_PATH}`)
+  const startRuntime = createProjectRuntimeStartRoute({
+    trusted: request => isTrustedApiRequest(request, []),
+    act: async (workspaceId, sessionId) => {
+      const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
+      if (workspace === undefined) return undefined
+      await beginProjectRuntimeOperation(workspace.path, 'start', sessionId)
+      return await loadProjectSurfaceSnapshot({ workspaceId, title: workspace.title, path: workspace.path })
+    },
+    reportFailure,
+  })
+  ctx.effect(() => ctx.webServer.register({
+    kind: 'exact',
+    path: FDE_PROJECT_RUNTIME_START_PATH,
+    handler: startRuntime,
+  }), `fde-project: ${FDE_PROJECT_RUNTIME_START_PATH}`)
+  const stopRuntime = createProjectRuntimeStopRoute({
+    trusted: request => isTrustedApiRequest(request, []),
+    act: async (workspaceId, sessionId) => {
+      const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
+      if (workspace === undefined) return undefined
+      await beginProjectRuntimeOperation(workspace.path, 'stop', sessionId)
+      return await loadProjectSurfaceSnapshot({ workspaceId, title: workspace.title, path: workspace.path })
+    },
+    reportFailure,
+  })
+  ctx.effect(() => ctx.webServer.register({
+    kind: 'exact',
+    path: FDE_PROJECT_RUNTIME_STOP_PATH,
+    handler: stopRuntime,
+  }), `fde-project: ${FDE_PROJECT_RUNTIME_STOP_PATH}`)
+  const abandonRuntime = createProjectRuntimeAbandonRoute({
+    trusted: request => isTrustedApiRequest(request, []),
+    abandon: async (workspaceId, operationId, message) => {
+      const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
+      if (workspace === undefined) return undefined
+      await abandonProjectRuntimeOperation(workspace.path, operationId, message)
+      return await loadProjectSurfaceSnapshot({ workspaceId, title: workspace.title, path: workspace.path })
+    },
+    reportFailure,
+  })
+  ctx.effect(() => ctx.webServer.register({
+    kind: 'exact',
+    path: FDE_PROJECT_RUNTIME_ABANDON_PATH,
+    handler: abandonRuntime,
+  }), `fde-project: ${FDE_PROJECT_RUNTIME_ABANDON_PATH}`)
 }

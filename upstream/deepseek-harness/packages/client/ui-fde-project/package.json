@@ -26,7 +26,8 @@
         "@deepseek-ai/dsh-client-ui-conversation",
         "@deepseek-ai/dsh-client-ui-layout",
         "@deepseek-ai/dsh-client-ui-model-selection",
-        "@deepseek-ai/dsh-client-ui-sidebar"
+        "@deepseek-ai/dsh-client-ui-sidebar",
+        "dsh-better-sidebar"
       ],
       "platform": "web"
     }
@@ -44,7 +45,8 @@
     "@deepseek-ai/dsh-client-ui-layout": "workspace:^",
     "@deepseek-ai/dsh-client-ui-model-selection": "workspace:^",
     "@deepseek-ai/dsh-client-ui-sidebar": "workspace:^",
-    "@deepseek-ai/dsh-invariants": "workspace:^"
+    "@deepseek-ai/dsh-invariants": "workspace:^",
+    "dsh-better-sidebar": "0.16.1"
   },
   "devDependencies": {
     "@deepseek-ai/cordis": "workspace:^",
@@ -61,6 +63,7 @@
     "@testing-library/react": "^16.1.0",
     "@types/react": "~18.3.1",
     "@types/three": "~0.184.0",
+    "dsh-better-sidebar": "0.16.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

@@ -4,10 +4,11 @@ import { LocaleRuntime } from '@deepseek-ai/dsh-client-locale/client'
 import { SlotRegistry, createSnapshotStore } from '@deepseek-ai/dsh-client-runtime/client'
 import { apply, inject } from '../src/client/index.ts'
 import { ArchitectureView } from '../src/client/ArchitectureView.tsx'
-import { ApiDocsView } from '../src/client/ApiDocsView.tsx'
+import { ObservabilityView } from '../src/client/ObservabilityView.tsx'
 import { ProjectProgressLauncher } from '../src/client/ProjectProgressLauncher.tsx'
 import { ProjectProgressOverlay } from '../src/client/ProjectProgressOverlay.tsx'
-import type { ProjectPageInjected } from '../src/client/slots.ts'
+import { ProjectRuntimeHeader } from '../src/client/ProjectRuntimeHeader.tsx'
+import type { ProjectPageInjected, ProjectRuntimeHeaderInjected } from '../src/client/slots.ts'
 
 afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks() })
 
@@ -23,13 +24,32 @@ describe('ui-fde-project apply', () => {
     const locale = new LocaleRuntime(ctx)
     locale.setLocale('zh')
     ctx.provide('locale', locale)
+    const prompt = vi.fn(async (
+      _content: readonly { readonly type: string; readonly text?: string }[],
+      _mode: string,
+    ) => ({ ok: true as const, value: { accepted: true as const } }))
+    const openTab = vi.fn()
+    const selectView = vi.fn()
+    const openSession = vi.fn()
+    ctx.provide('betterSidebar', {
+      getSnapshot: () => ({
+        prefs: {
+          agentTerminalTools: true,
+          tabsEnabled: { terminal: true, browser: true },
+          browserAllowedLoopback: '',
+        },
+      }),
+      openTab,
+    } as never)
     ctx.provide('sessions', {
       list: createSnapshotStore({
         ids: ['session-1'],
         byId: { 'session-1': { id: 'session-1', displayTitle: '会话', running: false, blank: true, updatedAt: 1 } },
         current: 'session-1', phase: 'ready', subagentsByParent: {}, jobsBySession: {}, currentAddress: undefined,
       }),
-      binding: () => undefined,
+      binding: () => ({ session: { prompt } }),
+      scope: () => ({ get: () => ({ selectView }) }),
+      open: openSession,
     } as never)
     ctx.provide('workspaces', {
       list: createSnapshotStore({
@@ -46,9 +66,25 @@ describe('ui-fde-project apply', () => {
       const path = requestPath(input)
       const completedRequirements = path.endsWith('/requirements/complete')
       const completedSolution = path.endsWith('/solution/complete')
+      if (path.endsWith('/fde-project/runtime/start')) {
+        return new Response(JSON.stringify({ ok: true, value: {
+          workspaceId: 'workspace-1', title: '项目一',
+          runtime: {
+            schemaVersion: 1, revision: 1, operationId: `runtime_${'a'.repeat(32)}`,
+            action: 'start', status: 'starting', sessionId: 'session-1',
+            updatedAt: '2026-08-27T00:00:00.000Z',
+          },
+          apiDocs: { status: 'unconfigured', message: '未配置' },
+          architecture: null, evaluation: { casesCount: 0, reports: [] },
+          requirements: { root: 'fde-deliverables/01-requirement-research', requiredCount: 3, presentCount: 0, artifacts: [] },
+          solution: { root: 'fde-deliverables/02-solution-design', requiredCount: 5, presentCount: 0, artifacts: [] },
+        } }), { status: 200 })
+      }
       if (path.endsWith('/fde-project/snapshot')) {
         return new Response(JSON.stringify({ ok: true, value: {
-          workspaceId: 'workspace-1', title: '项目一', apiDocs: { status: 'unconfigured', message: '未配置' },
+          workspaceId: 'workspace-1', title: '项目一',
+          runtime: { schemaVersion: 1, revision: 0, status: 'stopped', updatedAt: '1970-01-01T00:00:00.000Z' },
+          apiDocs: { status: 'unconfigured', message: '未配置' },
           architecture: null, evaluation: { casesCount: 0, reports: [] },
           requirements: { root: 'fde-deliverables/01-requirement-research', requiredCount: 3, presentCount: 0, artifacts: [] },
           solution: { root: 'fde-deliverables/02-solution-design', requiredCount: 5, presentCount: 0, artifacts: [] },
@@ -63,8 +99,8 @@ describe('ui-fde-project apply', () => {
           createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:00:00.000Z',
         },
       }), { status: 200 })
-    }) as typeof fetch
-    vi.stubGlobal('fetch', fetchImpl)
+    })
+    vi.stubGlobal('fetch', fetchImpl as typeof fetch)
     const slots = ctx.get('slots') as SlotRegistry
     slots.register({
       name: 'root',
@@ -72,6 +108,7 @@ describe('ui-fde-project apply', () => {
         'sidebar.footer.action': { kind: 'list', scope: 'root' },
         'shell.overlay': { kind: 'list', scope: 'root' },
         'conversation.view': { kind: 'list', scope: 'session' },
+        'conversation.session.header.utilities': { kind: 'list', scope: 'session' },
       },
     } as never, () => null)
     const fiber = ctx.plugin({ inject: [...inject], apply })
@@ -80,7 +117,9 @@ describe('ui-fde-project apply', () => {
     expect(slots.entries('sidebar.footer.action')[0]?.component).toBe(ProjectProgressLauncher)
     expect(slots.entries('shell.overlay')[0]?.component).toBe(ProjectProgressOverlay)
     expect(slots.spec('fde.project.source.preview')).toEqual({ kind: 'single', scope: 'root' })
-    await vi.waitFor(() => { expect(fetchImpl).toHaveBeenCalledTimes(1) })
+    await vi.waitFor(() => {
+      expect(fetchImpl.mock.calls.filter(call => requestPath(call[0]).endsWith('/fde-project/snapshot'))).toHaveLength(1)
+    })
     expect(slots.entries('conversation.view')).toHaveLength(0)
 
     const injected = (slots.entries('shell.overlay')[0]!.inject as unknown as () => ProjectPageInjected)()
@@ -96,7 +135,23 @@ describe('ui-fde-project apply', () => {
 
     await injected.completeSolution('workspace-1', 2)
     await vi.waitFor(() => { expect(slots.entries('conversation.view')).toHaveLength(2) })
-    expect(slots.entries('conversation.view').map(view => view.component)).toEqual([ApiDocsView, ArchitectureView])
+    expect(slots.entries('conversation.view').map(view => view.component)).toEqual([ArchitectureView, ObservabilityView])
+
+    const runtimeEntry = slots.entries('conversation.session.header.utilities')[0]
+    expect(runtimeEntry?.component).toBe(ProjectRuntimeHeader)
+    const runtimeInjected = (runtimeEntry?.inject as unknown as () => ProjectRuntimeHeaderInjected)()
+    await runtimeInjected.startProject('workspace-1', 'session-1', '/project/one')
+    expect(selectView).toHaveBeenCalledWith('chat')
+    expect(openSession).toHaveBeenCalledWith('session-1')
+    expect(openTab).toHaveBeenCalledWith(
+      { type: 'explorer', title: 'Files', path: '/project/one' },
+      { sessionId: 'session-1', cwd: '/project/one' },
+    )
+    expect(prompt).toHaveBeenCalledTimes(1)
+    expect(prompt.mock.calls[0]?.[0][0]?.text).toContain('operationId=runtime_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+    expect(prompt.mock.calls[0]?.[0][0]?.text).toContain('在当前对话用简短中文正常说明结果和下一步')
+    expect(selectView.mock.invocationCallOrder[0]).toBeLessThan(prompt.mock.invocationCallOrder[0]!)
+    expect(openSession.mock.invocationCallOrder[0]).toBeLessThan(prompt.mock.invocationCallOrder[0]!)
 
     await fiber.dispose()
     expect(slots.entries('conversation.view')).toHaveLength(0)

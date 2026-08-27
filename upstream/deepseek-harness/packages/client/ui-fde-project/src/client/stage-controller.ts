@@ -12,6 +12,8 @@ export const FDE_STAGE_COMPLETE_REQUIREMENTS_PATH = '/api/fde-stage/requirements
 export const FDE_STAGE_COMPLETE_SOLUTION_PATH = '/api/fde-stage/solution/complete'
 /** Fixed FDE-only project-development completion route. */
 export const FDE_STAGE_COMPLETE_DEVELOPMENT_PATH = '/api/fde-stage/development/complete'
+/** Fixed FDE-only validation completion route. */
+export const FDE_STAGE_COMPLETE_VALIDATION_PATH = '/api/fde-stage/validation/complete'
 /** Browser-local cache invalidation emitted after one durable stage commit. */
 export const FDE_STAGE_CHANGED_EVENT = 'fde:project-stage-changed'
 
@@ -106,6 +108,23 @@ export async function completeProjectDevelopment(
   )
 }
 
+/** Submit the FDE's explicit validation completion against one exact revision. */
+export async function completeValidation(
+  workspaceId: string,
+  expectedRevision: number,
+  signal?: AbortSignal,
+  fetchImpl?: typeof fetch,
+): Promise<ProjectStageValue> {
+  return await completeStage(
+    FDE_STAGE_COMPLETE_VALIDATION_PATH,
+    workspaceId,
+    expectedRevision,
+    '验证评估阶段确认失败。',
+    signal,
+    fetchImpl,
+  )
+}
+
 async function completeStage(
   path: string,
   workspaceId: string,
@@ -178,6 +197,11 @@ export class ProjectStageController {
   /** Complete project development without hiding the currently displayed stage. */
   async completeDevelopment(workspaceId: string, expectedRevision: number): Promise<void> {
     await this.complete(workspaceId, expectedRevision, completeProjectDevelopment)
+  }
+
+  /** Complete validation without hiding the currently displayed stage. */
+  async completeValidation(workspaceId: string, expectedRevision: number): Promise<void> {
+    await this.complete(workspaceId, expectedRevision, completeValidation)
   }
 
   private async complete(

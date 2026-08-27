@@ -55,6 +55,7 @@ export interface ProjectPageInjected {
   completeRequirements: (workspaceId: string, expectedRevision: number) => Promise<void>
   completeSolution: (workspaceId: string, expectedRevision: number) => Promise<void>
   completeDevelopment: (workspaceId: string, expectedRevision: number) => Promise<void>
+  completeValidation: (workspaceId: string, expectedRevision: number) => Promise<void>
   loadProjectSources: (workspaceId: string, force?: boolean) => void
   parseProjectSource: (workspaceId: string, sourceId: string) => Promise<void>
   loadRequirementWiki: (workspaceId: string, force?: boolean) => void
@@ -80,10 +81,29 @@ export interface ProjectViewInjected {
   hooks: { projectSurfaces: FdeProjectSurfaceController }
   loadProjectSurface: (workspaceId: string) => void
   refreshProjectSurface: (workspaceId: string) => void
+  prepareValidationPlan: () => Promise<void>
+  confirmValidationPlan: (workspaceId: string, contractDigest: string) => Promise<void>
+  startValidation: () => Promise<void>
   runProjectEvaluation: (workspacePath: string) => Promise<void>
   requestArchitectureDraft: (currentRevision: number) => Promise<void>
   confirmProjectArchitecture: (workspaceId: string, revision: number) => Promise<void>
   approveEvaluationBaseline: (workspaceId: string, reportPath: string) => Promise<void>
+}
+
+/** Current-Session project runtime actions and observables injected into the header utility. */
+export interface ProjectRuntimeHeaderInjected {
+  hooks: {
+    projectSurfaces: FdeProjectSurfaceController
+    stageProgress: ProjectStageController
+  }
+  loadStage: (workspaceId: string) => void
+  loadProjectSurface: (workspaceId: string) => void
+  pollProjectSurface: (workspaceId: string) => void
+  startProject: (workspaceId: string, sessionId: string, workspacePath: string) => Promise<void>
+  stopProject: (workspaceId: string, sessionId: string, workspacePath: string) => Promise<void>
+  openProjectPreview: (workspaceId: string, sessionId: string, workspacePath: string) => Promise<void>
+  showProjectTerminal: (workspaceId: string, sessionId: string, workspacePath: string) => Promise<void>
+  continueDevelopment: (sessionId: string) => void
 }
 
 /** Props for the sidebar Project Progress launcher. */
@@ -100,3 +120,9 @@ export type ProjectProgressOverlayProps =
 /** Shared props for all project-scoped conversation views. */
 export type ProjectViewProps =
   PropsRuntime<'conversation.view'> & InjectFace<ProjectViewInjected> & PropsLocale<'fdeProject'>
+
+/** Props for the project runtime utility in the active Session header. */
+export type ProjectRuntimeHeaderProps =
+  PropsRuntime<'conversation.session.header.utilities'>
+  & InjectFace<ProjectRuntimeHeaderInjected>
+  & PropsLocale<'fdeProject'>

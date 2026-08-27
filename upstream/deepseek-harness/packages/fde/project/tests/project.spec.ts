@@ -7,6 +7,7 @@ import { projectEvaluationDecision } from '../src/evaluation-guard.ts'
 import { loadDevelopmentDocs, resolveDevelopmentArtifact } from '../src/development-docs.ts'
 import { resolveRequirementArtifact } from '../src/requirement-artifacts.ts'
 import { resolveSolutionArtifact } from '../src/solution-artifacts.ts'
+import { confirmValidationPlan, loadValidationStage, resolveValidationArtifact } from '../src/validation.ts'
 import {
   approveProjectEvaluationBaseline, confirmProjectArchitecture, loadProjectSurfaceSnapshot, replaceProjectArchitecture,
 } from '../src/snapshot.ts'
@@ -23,6 +24,7 @@ describe('FDE project surface snapshot', () => {
   it('keeps unconfigured project surfaces honest', async () => {
     const root = await mkdtemp(join(tmpdir(), 'fde-project-empty-'))
     const value = await loadProjectSurfaceSnapshot({ workspaceId: 'w1', title: '空白项目', path: root })
+    expect(value.runtime).toMatchObject({ revision: 0, status: 'stopped' })
     expect(value.apiDocs.status).toBe('unconfigured')
     expect(value.architecture).toBeNull()
     expect(value.evaluation).toMatchObject({ casesCount: 0, reports: [] })
@@ -35,6 +37,11 @@ describe('FDE project surface snapshot', () => {
       features: [],
       closure: { requiredCount: 3, presentCount: 0 },
       issues: [],
+    })
+    expect(value.validation).toMatchObject({
+      contract: { status: 'missing', metrics: [] },
+      artifacts: { requiredCount: 3, presentCount: 0 },
+      gateReady: false,
     })
   })
 
@@ -162,6 +169,127 @@ milestone: 完成数据源接入
       name: 'tasks.md', path: 'docs/specs/F001-source-ingestion/tasks.md',
     })
     await expect(resolveDevelopmentArtifact(root, '../../outside')).resolves.toBeUndefined()
+  })
+
+  it('binds validation readiness to real sources, exact FDE plan confirmation, evidence, and three outputs', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'fde-validation-'))
+    const evaluations = join(root, '.fde', 'evaluations')
+    const evidence = join(evaluations, 'reports', 'validation-r1')
+    const outputs = join(root, 'fde-deliverables', '04-validation')
+    const solution = join(root, 'fde-deliverables', '02-solution-design')
+    await mkdir(evidence, { recursive: true })
+    await mkdir(outputs, { recursive: true })
+    await mkdir(solution, { recursive: true })
+    const acceptancePlan = '# 验收方案\n\nFA-1 核心冒烟\n'
+    await writeFile(join(solution, 'acceptance-plan.md'), acceptancePlan)
+    await writeFile(join(evidence, 'smoke.md'), '# 前后端冒烟通过\n')
+    await writeFile(join(outputs, 'validation-plan.md'), '# 验证计划\n')
+    await writeFile(join(outputs, 'validation-report.md'), '# 验证报告\n')
+    await writeFile(join(outputs, 'validation-baseline.md'), '# 验证基线\n')
+    const contract = {
+      schemaVersion: 2,
+      candidate: { id: 'R1', description: '本地候选版本' },
+      environment: 'macOS 本地验证环境',
+      datasets: [{ id: 'smoke-cases', name: '核心业务冒烟用例', version: '1' }],
+      metrics: [{
+        id: 'runtime-smoke', name: '前后端冒烟', category: 'functional', method: '启动服务并访问核心页面',
+        threshold: '核心入口全部可用', sources: [{ path: 'fde-deliverables/02-solution-design/acceptance-plan.md', references: ['FA-1'] }], required: true,
+        result: { status: 'PASS', value: '通过', evidence: '.fde/evaluations/reports/validation-r1/smoke.md' },
+      }],
+      issues: [],
+    }
+    await writeFile(join(evaluations, 'validation.json'), JSON.stringify(contract))
+
+    const value = await loadValidationStage(root, 'w1')
+    expect(value).toMatchObject({
+      contract: { status: 'ready', candidateId: 'R1', metrics: [{ status: 'PASS', evidenceAvailable: true, sources: [{ available: true, references: ['FA-1'] }] }] },
+      artifacts: { requiredCount: 3, presentCount: 3 },
+      planReady: true,
+      planApproval: { status: 'pending' },
+      requiredMetricCount: 1,
+      satisfiedMetricCount: 1,
+      gateReady: false,
+    })
+    expect(value.contract.digest).toMatch(/^sha256:[a-f0-9]{64}$/u)
+    const confirmed = await confirmValidationPlan(root, value.contract.digest ?? '')
+    expect(confirmed).toMatchObject({ planApproval: { status: 'confirmed' }, gateReady: true, blockers: [] })
+    const executingContract = {
+      ...contract,
+      metrics: contract.metrics.map(metric => ({ ...metric, result: { status: 'NOT_RUN', note: '开始执行本轮验证。' } })),
+    }
+    await writeFile(join(evaluations, 'validation.json'), JSON.stringify(executingContract))
+    await expect(loadValidationStage(root)).resolves.toMatchObject({ planApproval: { status: 'confirmed' }, gateReady: false })
+    await writeFile(join(solution, 'acceptance-plan.md'), `${acceptancePlan}\nFA-2 新增边界\n`)
+    await expect(loadValidationStage(root)).resolves.toMatchObject({ planApproval: { status: 'stale' }, gateReady: false })
+    await writeFile(join(solution, 'acceptance-plan.md'), acceptancePlan)
+    await expect(loadValidationStage(root)).resolves.toMatchObject({ planApproval: { status: 'confirmed' }, gateReady: false })
+    await writeFile(join(evaluations, 'validation.json'), JSON.stringify({ ...executingContract, environment: '变更后的环境' }))
+    await expect(loadValidationStage(root)).resolves.toMatchObject({ planApproval: { status: 'stale' }, gateReady: false })
+    expect(value.artifacts.items.map(item => item.fileUrl)).toEqual([
+      '/api/fde-project/validation/artifact?workspaceId=w1&artifactId=validation-plan',
+      '/api/fde-project/validation/artifact?workspaceId=w1&artifactId=validation-report',
+      '/api/fde-project/validation/artifact?workspaceId=w1&artifactId=validation-baseline',
+    ])
+    await expect(resolveValidationArtifact(root, 'validation-report')).resolves.toMatchObject({ name: 'validation-report.md' })
+    await expect(resolveValidationArtifact(root, '../../outside')).resolves.toBeUndefined()
+  })
+
+  it('keeps validation blocked when required evidence or an accepted warning reason is missing', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'fde-validation-blocked-'))
+    const evaluations = join(root, '.fde', 'evaluations')
+    const solution = join(root, 'fde-deliverables', '02-solution-design')
+    await mkdir(evaluations, { recursive: true })
+    await mkdir(solution, { recursive: true })
+    await writeFile(join(solution, 'acceptance-plan.md'), '# 验收方案\n\nPA-1 性能\n')
+    await writeFile(join(evaluations, 'validation.json'), JSON.stringify({
+      schemaVersion: 2,
+      candidate: { id: 'R2' },
+      environment: '待验证环境',
+      metrics: [{
+        id: 'latency', name: '响应时延', category: 'performance', method: '固定请求集压测',
+        threshold: 'P95 小于 2 秒', sources: [{ path: 'fde-deliverables/02-solution-design/acceptance-plan.md', references: ['PA-1'] }], required: true,
+        result: { status: 'WARN', value: 'P95 2.1 秒', evidence: '.fde/evaluations/reports/missing.md' },
+      }],
+      issues: [{ id: 'deploy-risk', title: '部署脚本未验证', severity: 'high', status: 'open' }],
+    }))
+    const value = await loadValidationStage(root)
+    expect(value.gateReady).toBe(false)
+    expect(value.blockers).toEqual(expect.arrayContaining([
+      '必需指标“响应时延”缺少可读取证据。',
+      '必需指标“响应时延”的 WARN 尚无接受理由。',
+      '关键问题“部署脚本未验证”尚未处理。',
+      '验证计划尚未生成。',
+      '验证报告尚未生成。',
+      '验证基线尚未生成。',
+    ]))
+  })
+
+  it('does not allow FDE confirmation while a metric source is unreadable', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'fde-validation-source-'))
+    const evaluations = join(root, '.fde', 'evaluations')
+    const outputs = join(root, 'fde-deliverables', '04-validation')
+    await mkdir(evaluations, { recursive: true })
+    await mkdir(outputs, { recursive: true })
+    await writeFile(join(outputs, 'validation-plan.md'), '# 验证计划\n')
+    await writeFile(join(evaluations, 'validation.json'), JSON.stringify({
+      schemaVersion: 2,
+      candidate: { id: 'R3' },
+      environment: '本地环境',
+      metrics: [{
+        id: 'source-check', name: '来源校验', category: 'business', method: '核对来源', threshold: '来源存在',
+        sources: [{ path: 'fde-deliverables/02-solution-design/missing.md', references: ['BA-1'] }],
+        required: true, result: { status: 'NOT_RUN' },
+      }],
+      issues: [],
+    }))
+    const value = await loadValidationStage(root)
+    expect(value).toMatchObject({
+      contract: { status: 'ready', metrics: [{ sources: [{ available: false }] }] },
+      planReady: false,
+      planApproval: { status: 'unavailable' },
+    })
+    expect(value.planBlockers).toContain('指标“来源校验”的来源文件不可读取：fde-deliverables/02-solution-design/missing.md。')
+    await expect(confirmValidationPlan(root, value.contract.digest ?? '')).rejects.toThrow('来源文件不可读取')
   })
 
   it('loads project-scoped API, architecture, and evaluation facts', async () => {

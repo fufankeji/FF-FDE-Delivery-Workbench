@@ -2,11 +2,19 @@
 
 English | [中文](README.zh.md)
 
-Trusted Host support for the FDE project-delivery surfaces. It resolves one explicit Harness WorkspaceId, reads only that Workspace's `.fde/api-docs.json`, `.fde/architecture.json`, `.fde/evaluations/`, fixed requirement-research and solution-design outputs, canonical project-development docs, and requirement Wiki state, validates bounded structures, and returns one same-origin snapshot for the browser. Stage output readers report present, missing, or read-error state without creating files or treating presence as confirmation; present Markdown outputs receive bounded, read-only same-origin preview URLs selected by Host-indexed artifact ids rather than browser-supplied paths. It also adapts the locked `dsh-openapi` parser and HTTP implementation so the standard OpenAPI tools resolve configuration from the calling Agent's registered Workspace instead of a process-global API list.
+Trusted Host support for the FDE project-delivery surfaces. It resolves one explicit Harness WorkspaceId, reads only that Workspace's `.fde/project-runtime.json`, `.fde/api-docs.json`, `.fde/architecture.json`, `.fde/evaluations/`, fixed requirement/solution/validation outputs, canonical project-development docs, and requirement Wiki state, validates bounded structures, and returns one same-origin snapshot for the browser. Stage output readers report present, missing, or read-error state without creating files or treating presence as confirmation; present Markdown outputs receive bounded, read-only same-origin preview URLs selected by Host-indexed artifact ids rather than browser-supplied paths. It also adapts the locked `dsh-openapi` parser and HTTP implementation so the standard OpenAPI tools resolve configuration from the calling Agent's registered Workspace instead of a process-global API list.
 
 ## Project development docs
 
 The read-only development projection scans `docs/PRD.md`, `docs/specs/product-spec.md`, `docs/specs/feature-map.md`, and up to 100 canonical `docs/specs/FNNN-slug/{spec,plan,tasks}.md` Feature directories. Optional frontmatter supplies title, status, planned dates, milestone, and blocker; unchecked and checked Markdown tasks provide the only task counts. Missing dates stay unknown, duplicate Feature ids are reported, and the browser never receives a write-back task API. The same projection reports the three close-out files under `fde-deliverables/03-project-development/`. Every preview id is re-indexed and realpath-checked inside the registered Workspace before bytes are served.
+
+## Project runtime
+
+An explicit start or stop request creates one exact operation in `.fde/project-runtime.json`, owned by the Session that must perform it. The visible Agent reads the project's own `AGENTS.md`, uses the Better Sidebar persistent terminal tools, verifies the real loopback project URL, and settles that operation through `project_runtime_report`. A blocked start remains recoverable by the same Session and operation after missing prerequisites are supplied and a real preview URL is verified. The Host still rejects stale operation ids, reports from another Session, non-loopback or credentialed URLs, out-of-project OpenAPI paths, and every other invalid state transition. A stop keeps the terminal title and transcript reachable while clearing the preview and API runtime facts only after the Agent truthfully reports that the service exited. A blocked stop must be retried before another start can begin.
+
+## Validation contract
+
+The validation projection parses schema-v2 `.fde/evaluations/validation.json` with bounded candidates, environments, project-specific datasets, metrics, results, and issues. Every metric must cite one or more existing prior-stage project documents plus document-local references. PASS/WARN evidence must also resolve to a real file inside the registered Workspace. Once the plan exists and every source is readable, an exact-plan same-origin action atomically records the FDE's confirmation in `.fde/evaluations/validation-plan-approval.json`. Its SHA-256 digest covers the candidate, environment, datasets, and metric definitions, but excludes execution results, evidence, and issue state: changing the plan makes confirmation stale while normal result updates do not. Required NOT_RUN/FAIL results, missing evidence, unaccepted WARN, open critical/high issues, missing outputs, and absent/currently stale plan confirmation remain explicit blockers. The same snapshot indexes `fde-deliverables/04-validation/{validation-plan,validation-report,validation-baseline}.md` for bounded preview. It never runs validation or advances the delivery stage.
 
 ## Requirement Wiki
 
@@ -44,11 +52,25 @@ The two fixed schemas add input tokens to each request whose Agent can see the g
 
 The schemas remain identical across projects and builds, so Source or Wiki changes do not alter the cached tool-schema prefix. Tool calls and data-dependent results extend the ordinary conversation suffix.
 
+### Project runtime report tool
+
+#### What the model sees
+
+One stable `project_runtime_report` schema. The visible start or stop instruction supplies the exact operation id; the tool resolves the calling Session's registered Workspace and accepts only the state and verified runtime facts for that operation.
+
+#### Token effect
+
+The fixed schema adds input tokens to requests that can see the global tool registry. Operation-specific ids, URLs, terminal titles, and failure reasons enter context only through the visible user instruction and the bounded tool result.
+
+#### KV Cache effect
+
+The schema is stable across projects. Only the ordinary conversation suffix changes for each operation.
+
 ## Known Limitations and Deferred Work
 
-- The package does not start project servers, run evaluations, or create architecture artifacts.
+- The package does not execute server commands itself, run evaluations, or create architecture artifacts; the visible project Agent owns start and stop work through a persistent terminal.
 - The package does not infer dates, task completion, or Feature state from Git history, file timestamps, Agent replies, or conversation content, and it never edits project docs.
-- API documentation URLs must be explicitly project-owned; absent configuration remains unconfigured.
+- API documentation must come from an explicit project file or a verified running-project report; absent OpenAPI stays unconfigured.
 - Evaluation reports are read-only and malformed reports are excluded instead of repaired.
 - The adapter intentionally uses the locked plugin's parser and request modules because the upstream plugin's static process-wide API catalog cannot provide Workspace isolation by itself.
 - Architecture history is file-based under `.fde/architecture-history/`; the browser presents the current version only.

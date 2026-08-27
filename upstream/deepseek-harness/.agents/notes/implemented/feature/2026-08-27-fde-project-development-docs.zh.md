@@ -14,7 +14,7 @@ Host 注册一个按需加载的 `fde-project-development` Skill。它借鉴 Spe
 
 `@deepseek-ai/dsh-fde-project` 增加有界只读研发投影。它最多扫描 100 个规范 Feature 目录，只解析少量 frontmatter 白名单字段，统计 Markdown 任务，报告重复 Feature ID，并索引 `fde-deliverables/03-project-development/` 下三份收口文件。预览路由只接受 Host 已索引产物 ID，提供字节前再次检查 realpath 仍在 Workspace 内；浏览器不能提交任意路径。
 
-“项目进度”从该投影展示核心文档、Feature 状态、任务证据、计划日期、里程碑、阻塞、文档预览和收口文件，从不反写任务状态。“评估”从项目开发阶段开始可用，“观测”仍从验证评估开始。三份收口文件只使 FDE 动作可用。二次确认调用专用 `development` 到 `validation` Host 路由，并重新检查文件、当前阶段和精确 revision。Agent 与 Skill 都没有推进阶段的能力。
+“项目进度”从该投影展示核心文档、Feature 状态、任务证据、计划日期、里程碑、阻塞、文档预览和收口文件，从不反写任务状态。“观测”从项目开发阶段开始可用，供 FDE 在实施过程中查看 Agent、工具、Token、耗时和错误；“评估”保持隐藏，直到 FDE 把项目推进到验证评估。三份收口文件只使 FDE 动作可用。二次确认调用专用 `development` 到 `validation` Host 路由，并重新检查文件、当前阶段和精确 revision。Agent 与 Skill 都没有推进阶段的能力。
 
 ## 考虑过的替代方案
 

@@ -40,6 +40,13 @@ export interface ArchitectureConfirmRouteOptions {
   readonly reportFailure?: (error: unknown) => void
 }
 
+/** Dependencies of the exact-contract validation-plan confirmation route. */
+export interface ValidationPlanConfirmRouteOptions {
+  readonly trusted: (request: IncomingMessage) => boolean
+  readonly confirm: (workspaceId: string, contractDigest: string) => Promise<ProjectSurfaceSnapshot | undefined>
+  readonly reportFailure?: (error: unknown) => void
+}
+
 /** Dependencies of the project evaluation baseline route. */
 export interface EvaluationBaselineRouteOptions {
   readonly trusted: (request: IncomingMessage) => boolean
@@ -62,6 +69,20 @@ export interface RequirementWikiStartRouteOptions {
 export interface RequirementWikiAbandonRouteOptions {
   readonly trusted: (request: IncomingMessage) => boolean
   readonly abandon: (workspaceId: string, buildId: string) => Promise<ProjectSurfaceSnapshot | undefined>
+  readonly reportFailure?: (error: unknown) => void
+}
+
+/** Dependencies of a project runtime start/stop route. */
+export interface ProjectRuntimeActionRouteOptions {
+  readonly trusted: (request: IncomingMessage) => boolean
+  readonly act: (workspaceId: string, sessionId: string) => Promise<ProjectSurfaceSnapshot | undefined>
+  readonly reportFailure?: (error: unknown) => void
+}
+
+/** Dependencies of a project runtime operation abandonment route. */
+export interface ProjectRuntimeAbandonRouteOptions {
+  readonly trusted: (request: IncomingMessage) => boolean
+  readonly abandon: (workspaceId: string, operationId: string, message: string) => Promise<ProjectSurfaceSnapshot | undefined>
   readonly reportFailure?: (error: unknown) => void
 }
 
@@ -100,6 +121,15 @@ function architectureConfirmationOf(value: unknown): { readonly workspaceId: str
   return { workspaceId, revision: Number(revision) }
 }
 
+function validationPlanConfirmationOf(value: unknown): { readonly workspaceId: string; readonly contractDigest: string } {
+  const workspaceId = workspaceIdOf(value)
+  const contractDigest = (value as { contractDigest?: unknown }).contractDigest
+  if (typeof contractDigest !== 'string' || !/^sha256:[a-f0-9]{64}$/u.test(contractDigest)) {
+    throw new FdeProjectRequestError('invalid-request', 400, '评估方案确认请求缺少有效合同摘要。')
+  }
+  return { workspaceId, contractDigest }
+}
+
 function evaluationBaselineOf(value: unknown): { readonly workspaceId: string; readonly reportPath: string } {
   const workspaceId = workspaceIdOf(value)
   const reportPath = (value as { reportPath?: unknown }).reportPath
@@ -135,6 +165,32 @@ function requirementWikiAbandonOf(value: unknown): { readonly workspaceId: strin
     throw new FdeProjectRequestError('invalid-request', 400, '结束需求整理请求缺少有效 BuildId。')
   }
   return { workspaceId, buildId }
+}
+
+function runtimeActionOf(value: unknown): { readonly workspaceId: string; readonly sessionId: string } {
+  const workspaceId = workspaceIdOf(value)
+  const sessionId = (value as { sessionId?: unknown }).sessionId
+  if (typeof sessionId !== 'string' || sessionId.trim() === '' || sessionId.length > 160) {
+    throw new FdeProjectRequestError('invalid-request', 400, '项目运行请求缺少当前会话。')
+  }
+  return { workspaceId, sessionId: sessionId.trim() }
+}
+
+function runtimeAbandonOf(value: unknown): {
+  readonly workspaceId: string
+  readonly operationId: string
+  readonly message: string
+} {
+  const workspaceId = workspaceIdOf(value)
+  const operationId = (value as { operationId?: unknown }).operationId
+  const message = (value as { message?: unknown }).message
+  if (typeof operationId !== 'string' || !/^runtime_[a-f0-9]{32}$/u.test(operationId)) {
+    throw new FdeProjectRequestError('invalid-request', 400, '结束项目运行操作缺少有效 operationId。')
+  }
+  if (typeof message !== 'string' || message.trim() === '' || message.length > 1_000) {
+    throw new FdeProjectRequestError('invalid-request', 400, '结束项目运行操作缺少具体原因。')
+  }
+  return { workspaceId, operationId, message: message.trim() }
 }
 
 function writeJson(response: ServerResponse, status: number, payload: unknown): void {
@@ -266,6 +322,42 @@ export function createArchitectureConfirmRoute(
 }
 
 /**
+ * Create the trusted exact-contract validation-plan confirmation route.
+ * @param options - trust decision, confirmation operation, and failure reporter.
+ * @returns an exact-route HTTP handler.
+ */
+export function createValidationPlanConfirmRoute(
+  options: ValidationPlanConfirmRouteOptions,
+): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
+  return async (request: IncomingMessage, response: ServerResponse): Promise<void> => {
+    try {
+      if (!options.trusted(request)) throw new FdeProjectRequestError('forbidden', 403, '当前请求不能确认评估方案。')
+      if (request.method !== 'POST') {
+        request.resume()
+        throw new FdeProjectRequestError('method-not-allowed', 405, '评估方案确认接口只接受 POST。')
+      }
+      const input = validationPlanConfirmationOf(await readJson(request))
+      const snapshot = await options.confirm(input.workspaceId, input.contractDigest)
+      if (snapshot === undefined) throw new FdeProjectRequestError('workspace-not-found', 404, '当前项目不存在或已被移除。')
+      writeJson(response, 200, { ok: true, value: snapshot })
+    } catch (error) {
+      if (error instanceof FdeProjectRequestError) {
+        writeJson(response, error.status, { ok: false, error: { code: error.code, message: error.message } })
+        return
+      }
+      options.reportFailure?.(error)
+      writeJson(response, 409, {
+        ok: false,
+        error: {
+          code: 'validation-plan-confirm-failed',
+          message: error instanceof Error ? error.message : '评估方案确认失败。',
+        },
+      })
+    }
+  }
+}
+
+/**
  * Create the trusted project-report baseline approval route.
  * @param options - trust decision, approval operation, and failure reporter.
  * @returns an exact-route HTTP handler.
@@ -367,6 +459,85 @@ export function createRequirementWikiAbandonRoute(
         error: {
           code: 'requirement-wiki-abandon-failed',
           message: error instanceof Error ? error.message : '结束需求整理失败。',
+        },
+      })
+    }
+  }
+}
+
+function createProjectRuntimeActionRoute(
+  action: 'start' | 'stop',
+  options: ProjectRuntimeActionRouteOptions,
+): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
+  return async (request: IncomingMessage, response: ServerResponse): Promise<void> => {
+    try {
+      const label = action === 'start' ? '启动' : '停止'
+      if (!options.trusted(request)) throw new FdeProjectRequestError('forbidden', 403, `当前请求不能${label}项目。`)
+      if (request.method !== 'POST') {
+        request.resume()
+        throw new FdeProjectRequestError('method-not-allowed', 405, `项目${label}接口只接受 POST。`)
+      }
+      const input = runtimeActionOf(await readJson(request))
+      const snapshot = await options.act(input.workspaceId, input.sessionId)
+      if (snapshot === undefined) throw new FdeProjectRequestError('workspace-not-found', 404, '当前项目不存在或已被移除。')
+      writeJson(response, 200, { ok: true, value: snapshot })
+    } catch (error) {
+      if (error instanceof FdeProjectRequestError) {
+        writeJson(response, error.status, { ok: false, error: { code: error.code, message: error.message } })
+        return
+      }
+      options.reportFailure?.(error)
+      writeJson(response, 409, {
+        ok: false,
+        error: {
+          code: `project-runtime-${action}-failed`,
+          message: error instanceof Error ? error.message : `项目${action === 'start' ? '启动' : '停止'}失败。`,
+        },
+      })
+    }
+  }
+}
+
+/** Create the trusted project runtime start route. */
+export function createProjectRuntimeStartRoute(
+  options: ProjectRuntimeActionRouteOptions,
+): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
+  return createProjectRuntimeActionRoute('start', options)
+}
+
+/** Create the trusted project runtime stop route. */
+export function createProjectRuntimeStopRoute(
+  options: ProjectRuntimeActionRouteOptions,
+): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
+  return createProjectRuntimeActionRoute('stop', options)
+}
+
+/** Create the trusted route that settles an operation whose Agent prompt could not be queued. */
+export function createProjectRuntimeAbandonRoute(
+  options: ProjectRuntimeAbandonRouteOptions,
+): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
+  return async (request: IncomingMessage, response: ServerResponse): Promise<void> => {
+    try {
+      if (!options.trusted(request)) throw new FdeProjectRequestError('forbidden', 403, '当前请求不能结束项目运行操作。')
+      if (request.method !== 'POST') {
+        request.resume()
+        throw new FdeProjectRequestError('method-not-allowed', 405, '项目运行恢复接口只接受 POST。')
+      }
+      const input = runtimeAbandonOf(await readJson(request))
+      const snapshot = await options.abandon(input.workspaceId, input.operationId, input.message)
+      if (snapshot === undefined) throw new FdeProjectRequestError('workspace-not-found', 404, '当前项目不存在或已被移除。')
+      writeJson(response, 200, { ok: true, value: snapshot })
+    } catch (error) {
+      if (error instanceof FdeProjectRequestError) {
+        writeJson(response, error.status, { ok: false, error: { code: error.code, message: error.message } })
+        return
+      }
+      options.reportFailure?.(error)
+      writeJson(response, 409, {
+        ok: false,
+        error: {
+          code: 'project-runtime-abandon-failed',
+          message: error instanceof Error ? error.message : '项目运行操作恢复失败。',
         },
       })
     }

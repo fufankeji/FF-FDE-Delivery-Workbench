@@ -3,12 +3,17 @@ import { describe, expect, it, vi } from 'vitest'
 import type { KvTable } from '@deepseek-ai/dsh-storage-domain'
 import type { WorkspaceId } from '@deepseek-ai/dsh-workspace'
 import {
-  createCompleteDevelopmentRoute, createCompleteRequirementsRoute, createCompleteSolutionRoute, createStageRoute,
+  createCompleteDevelopmentRoute,
+  createCompleteRequirementsRoute,
+  createCompleteSolutionRoute,
+  createCompleteValidationRoute,
+  createStageRoute,
 } from '../src/http.ts'
 import {
   PROJECT_DEVELOPMENT_SKILL, projectDevelopmentPrompt,
   REQUIREMENT_RESEARCH_SKILL, requirementResearchPrompt,
   SOLUTION_DESIGN_SKILL, solutionDesignPrompt,
+  VALIDATION_SKILL, validationPrompt,
 } from '../src/index.ts'
 import type { ProjectStageRecord } from '../src/spec.ts'
 import { FdeStageState } from '../src/state.ts'
@@ -79,7 +84,7 @@ describe('FdeStageState', () => {
     const data = table()
     const times = [
       '2026-08-26T00:00:00.000Z', '2026-08-27T00:00:00.000Z',
-      '2026-08-28T00:00:00.000Z', '2026-08-29T00:00:00.000Z',
+      '2026-08-28T00:00:00.000Z', '2026-08-29T00:00:00.000Z', '2026-08-30T00:00:00.000Z',
     ]
     const state = new FdeStageState(data.value, () => times.shift() ?? '2026-08-27T00:00:00.000Z')
     await state.open(wid('w-1'))
@@ -102,6 +107,12 @@ describe('FdeStageState', () => {
       createdAt: '2026-08-26T00:00:00.000Z', updatedAt: '2026-08-29T00:00:00.000Z',
     })
     await expect(state.completeDevelopment(wid('w-1'), 3)).rejects.toThrow('已经变化')
+    const pilot = await state.completeValidation(wid('w-1'), 4)
+    expect(pilot).toEqual({
+      currentStage: 'pilot', revision: 5,
+      createdAt: '2026-08-26T00:00:00.000Z', updatedAt: '2026-08-30T00:00:00.000Z',
+    })
+    await expect(state.completeValidation(wid('w-1'), 4)).rejects.toThrow('已经变化')
   })
 })
 
@@ -134,6 +145,21 @@ describe('requirement-research model guidance', () => {
     expect(projectDevelopmentPrompt('solution')).toBe('')
     expect(projectDevelopmentPrompt('development')).toContain('先加载 Skill')
     expect(projectDevelopmentPrompt('validation')).toBe('')
+  })
+
+  it('uses one evidence-backed validation Skill and only prompts during validation', () => {
+    expect(VALIDATION_SKILL.name).toBe('fde-validation')
+    expect(VALIDATION_SKILL.content).toContain('.fde/evaluations/validation.json')
+    expect(VALIDATION_SKILL.content).toContain('schemaVersion')
+    expect(VALIDATION_SKILL.content).toContain('metrics[].sources')
+    expect(VALIDATION_SKILL.content).toContain('评估方案准备')
+    expect(VALIDATION_SKILL.content).toContain('validation-plan-approval.json')
+    expect(VALIDATION_SKILL.content).toContain('validation-report.md')
+    expect(VALIDATION_SKILL.content).toContain('不得编造指标值')
+    expect(VALIDATION_SKILL.content).toContain('不能修改项目阶段')
+    expect(validationPrompt('development')).toBe('')
+    expect(validationPrompt('validation')).toContain('先加载 Skill')
+    expect(validationPrompt('pilot')).toBe('')
   })
 })
 
@@ -311,6 +337,38 @@ describe('project-stage route', () => {
       body: { ok: true, value: { workspaceId: 'w-1', currentStage: 'validation', revision: 4 } },
     })
     expect(complete).toHaveBeenCalledWith('w-1', 3)
+  })
+
+  it('requires complete validation evidence before the FDE enters pilot deployment', async () => {
+    const complete = vi.fn(async () => ({
+      currentStage: 'pilot' as const,
+      revision: 5,
+      createdAt: '2026-08-26T00:00:00.000Z',
+      updatedAt: '2026-08-30T00:00:00.000Z',
+    }))
+    const validation = vi.fn(async () => ({ gateReady: false, blockers: ['必需指标“前端冒烟”尚未运行。'] }))
+    const handler = createCompleteValidationRoute({
+      trusted: () => true,
+      workspaceExists: id => id === 'w-1',
+      validation,
+      complete,
+    })
+    const blocked = response()
+    await handler(request({ workspaceId: 'w-1', expectedRevision: 4 }), blocked.value)
+    expect(blocked.snapshot()).toEqual({
+      status: 409,
+      body: { ok: false, error: { code: 'stage-validation-incomplete', message: '验证评估尚未达到进入部署试运行的条件：必需指标“前端冒烟”尚未运行。' } },
+    })
+    expect(complete).not.toHaveBeenCalled()
+
+    validation.mockResolvedValueOnce({ gateReady: true, blockers: [] })
+    const accepted = response()
+    await handler(request({ workspaceId: 'w-1', expectedRevision: 4 }), accepted.value)
+    expect(accepted.snapshot()).toMatchObject({
+      status: 200,
+      body: { ok: true, value: { workspaceId: 'w-1', currentStage: 'pilot', revision: 5 } },
+    })
+    expect(complete).toHaveBeenCalledWith('w-1', 4)
   })
 
   it('rejects untrusted and non-POST requests before persistence', async () => {

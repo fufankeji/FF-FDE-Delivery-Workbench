@@ -67,4 +67,26 @@ describe('ProjectStageController', () => {
     controller.dispose()
     window.removeEventListener(FDE_STAGE_CHANGED_EVENT, changed)
   })
+
+  it('submits the validation gate to the fixed pilot route', async () => {
+    const fetchImpl = vi.fn(async () => new Response(JSON.stringify({
+      ok: true,
+      value: {
+        workspaceId: 'workspace-1', currentStage: 'pilot', revision: 5,
+        createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:04:00.000Z',
+      },
+    }), { status: 200, headers: { 'content-type': 'application/json' } })) as typeof fetch
+    vi.stubGlobal('fetch', fetchImpl)
+    const controller = new ProjectStageController()
+
+    await controller.completeValidation('workspace-1', 4)
+
+    expect(fetchImpl).toHaveBeenCalledWith('/api/fde-stage/validation/complete', expect.objectContaining({
+      method: 'POST', body: JSON.stringify({ workspaceId: 'workspace-1', expectedRevision: 4 }),
+    }))
+    expect(controller.getSnapshot().byWorkspace['workspace-1']).toMatchObject({
+      status: 'ready', value: { currentStage: 'pilot', revision: 5 },
+    })
+    controller.dispose()
+  })
 })

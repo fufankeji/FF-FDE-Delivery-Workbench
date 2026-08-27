@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { CSSProperties, RefObject } from 'react'
-import type { DevelopmentArtifact, ProjectSurfaceLoadState } from './controller.ts'
+import type { DevelopmentArtifact, ProjectSurfaceLoadState, ValidationStageSnapshot } from './controller.ts'
 import { readProjectMetadata, STAGE_NAMES } from './project-data.ts'
 import { FDE_STAGES, type FdeStageId, type ProjectStageLoadState } from './stage-controller.ts'
 import type { ProjectSourceItem, ProjectSourceLoadState } from './source-controller.ts'
@@ -345,8 +345,175 @@ function DevelopmentOutputs({ workspaceId, currentStage, revision, development, 
   )
 }
 
+const VALIDATION_CATEGORY_LABELS = {
+  business: '业务', functional: '功能', data: '数据', model: '模型', performance: '性能',
+  security: '安全', recovery: '恢复', agent: 'Agent',
+} as const
+
+function validationStatusLabel(status: ValidationStageSnapshot['contract']['metrics'][number]['status']): string {
+  if (status === 'PASS') return '通过'
+  if (status === 'WARN') return '有条件通过'
+  if (status === 'FAIL') return '未通过'
+  return '待执行'
+}
+
+function ValidationOutputs({ workspaceId, currentStage, revision, validation, completeValidation, renderPreview }: {
+  readonly workspaceId: string
+  readonly currentStage: FdeStageId
+  readonly revision: number | undefined
+  readonly validation: ValidationStageSnapshot
+  readonly completeValidation: (revision: number) => Promise<void>
+  readonly renderPreview: (source: ProjectPreviewFile) => React.ReactNode
+}) {
+  const [confirming, setConfirming] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | undefined>()
+  const [selectedArtifactId, setSelectedArtifactId] = useState<string | undefined>()
+  useEffect(() => {
+    setConfirming(false); setSubmitting(false); setError(undefined); setSelectedArtifactId(undefined)
+  }, [currentStage, workspaceId])
+  const selectedArtifact = validation.artifacts.items.find((artifact): artifact is typeof artifact & { readonly fileUrl: string } => (
+    artifact.id === selectedArtifactId && artifact.status === 'present' && artifact.fileUrl !== undefined
+  ))
+  return (
+    <section className={css.outputRoot}>
+      <header className={css.outputHeader}>
+        <div><h2>评估方案、执行与产物</h2><p>从已确认文档建立评估方案，由 FDE 确认后再执行；结果只读取真实指标与项目内证据。</p></div>
+        <strong>{validation.satisfiedMetricCount}/{validation.requiredMetricCount} 个必需指标</strong>
+      </header>
+      <div className={css.developmentSummary}>
+        <div><span>候选版本</span><strong>{validation.contract.candidateId ?? '待登记'}</strong></div>
+        <div><span>验证环境</span><strong>{validation.contract.environment ?? '待登记'}</strong></div>
+        <div><span>数据/用例</span><strong>{validation.contract.datasets.length}</strong></div>
+        <div><span>方案确认</span><strong>{validation.planApproval.status === 'confirmed' ? '已确认' : validation.planApproval.status === 'stale' ? '需重新确认' : validation.planReady ? '待 FDE 确认' : '方案未就绪'}</strong></div>
+        <div><span>阶段产物</span><strong>{validation.artifacts.presentCount}/{validation.artifacts.requiredCount}</strong></div>
+      </div>
+      {validation.contract.status !== 'ready' && (
+        <div className={css.developmentIssues}><p>{validation.contract.message ?? '验证合同尚未就绪。'}</p></div>
+      )}
+      <section className={css.developmentSection}>
+        <header><div><h3>本轮输入</h3><p><code>{validation.contract.path}</code> 关联当前候选版本、环境以及项目适用的数据或用例。</p></div></header>
+        {validation.contract.datasets.length === 0
+          ? <div className={css.outputState}>当前项目没有登记独立数据集；是否需要数据集由验收方案决定。</div>
+          : <div className={css.outputList}>{validation.contract.datasets.map(dataset => (
+            <div key={dataset.id} className={css.outputItem} data-static>
+              <span className={css.outputIcon} aria-hidden="true">DATA</span>
+              <div><h3>{dataset.name}</h3><code>{dataset.id}</code><p className={css.outputMeta}>{[dataset.version, dataset.hash, dataset.source].filter(Boolean).join(' · ')}</p></div>
+              <span className={css.outputBadge}>{dataset.version ?? '版本待确认'}</span>
+            </div>
+          ))}</div>}
+      </section>
+      <section className={css.developmentSection}>
+        <header><div><h3>指标与证据</h3><p>必需指标只有在结果、阈值和项目内证据完整时才计入通过。</p></div></header>
+        {validation.contract.metrics.length === 0
+          ? <div className={css.outputState}>尚未定义本项目的验证指标。</div>
+          : <div className={css.tableScroll}><table className={css.dataTable}>
+            <thead><tr><th>指标</th><th>类别</th><th>指标来源</th><th>阈值</th><th>结果</th><th>证据</th></tr></thead>
+            <tbody>{validation.contract.metrics.map(metric => (
+              <tr key={metric.id}>
+                <td><strong>{metric.name}</strong><small>{metric.required ? '必需' : '可选'} · {metric.method}</small></td>
+                <td>{VALIDATION_CATEGORY_LABELS[metric.category]}</td>
+                <td>{metric.sources.map(source => (
+                  <small key={`${source.path}-${source.references.join('-')}`}>
+                    <code>{source.path}</code><br />{source.references.join('、')}{source.available ? '' : ' · 文件不可读取'}
+                  </small>
+                ))}</td>
+                <td>{metric.threshold}</td>
+                <td>
+                  <span className={css.reportStatus} data-status={metric.status}>{validationStatusLabel(metric.status)}</span>
+                  {metric.value === undefined ? null : <small>{metric.value}</small>}
+                </td>
+                <td>{metric.evidenceAvailable
+                  ? <code>{metric.evidence}</code>
+                  : metric.evidence === undefined ? '未登记' : `不可读取：${metric.evidence}`}</td>
+              </tr>
+            ))}</tbody>
+          </table></div>}
+      </section>
+      {validation.contract.issues.length > 0 && (
+        <section className={css.developmentSection}>
+          <header><div><h3>问题与接受决定</h3><p>未关闭的 critical/high 问题会阻止进入部署试运行。</p></div></header>
+          <div className={css.outputList}>{validation.contract.issues.map(issue => (
+            <div key={issue.id} className={css.outputItem} data-static data-status={issue.status === 'open' ? 'error' : 'present'}>
+              <span className={css.outputIcon} aria-hidden="true">ISSUE</span>
+              <div><h3>{issue.title}</h3><code>{issue.id}</code><p className={css.outputMeta}>{issue.resolution ?? issue.evidence ?? '尚未记录处理说明或证据。'}</p></div>
+              <span className={css.outputBadge}>{issue.severity} · {issue.status}</span>
+            </div>
+          ))}</div>
+        </section>
+      )}
+      <section className={css.developmentSection}>
+        <header>
+          <div><h3>验证评估阶段产物</h3><p>验证计划、验证报告和验证基线齐备只表示可以提交；进入部署试运行仍由 FDE 决定。</p></div>
+          <strong>{validation.artifacts.presentCount}/{validation.artifacts.requiredCount}</strong>
+        </header>
+        <div className={css.outputList}>{validation.artifacts.items.map((artifact) => {
+          const previewable = artifact.status === 'present' && artifact.fileUrl !== undefined
+          return <button
+            key={artifact.id}
+            type="button"
+            className={css.outputItem}
+            data-status={artifact.status}
+            data-active={selectedArtifact?.id === artifact.id || undefined}
+            disabled={!previewable}
+            onClick={() => { if (previewable) setSelectedArtifactId(artifact.id) }}
+            aria-label={previewable ? `预览${artifact.title}` : undefined}
+          >
+            <span className={css.outputIcon} aria-hidden="true">MD</span>
+            <div><h3>{artifact.title}</h3><code>{artifact.path}</code>{artifact.message !== undefined && <p>{artifact.message}</p>}</div>
+            <span className={css.outputBadge}>{artifact.status === 'present' ? '已有文件' : artifact.status === 'error' ? '读取失败' : '待生成'}</span>
+          </button>
+        })}</div>
+      </section>
+      {selectedArtifact === undefined
+        ? <div className={css.outputPreviewHint}>选择一份“已有文件”查看只读内容。</div>
+        : <section className={css.outputPreviewPanel}>
+          <header className={css.previewHeader}>
+            <div><h2>{selectedArtifact.title}</h2><span>{selectedArtifact.path}{selectedArtifact.bytes === undefined ? '' : ` · ${formatBytes(selectedArtifact.bytes)}`}</span></div>
+            <div className={css.previewActions}><a href={selectedArtifact.fileUrl} download={selectedArtifact.path.split('/').at(-1)}>下载原件</a></div>
+          </header>
+          <div className={css.previewBody}>{renderPreview({
+            fileUrl: selectedArtifact.fileUrl,
+            name: selectedArtifact.path.split('/').at(-1) ?? selectedArtifact.title,
+            ...(selectedArtifact.bytes === undefined ? {} : { bytes: selectedArtifact.bytes }),
+            previewKind: 'text',
+          })}</div>
+        </section>}
+      {validation.blockers.length > 0 && (
+        <div className={css.developmentIssues}>{validation.blockers.map(blocker => <p key={blocker}>{blocker}</p>)}</div>
+      )}
+      {currentStage === 'validation'
+        ? <div className={css.stageGate}>
+          {!confirming
+            ? <>
+              <div><strong>由 FDE 决定是否进入部署试运行</strong><p>{validation.gateReady ? '验证合同、必需指标证据和三份固定产物已经齐备，请核对候选版本、接受风险和剩余问题。' : '当前仍有验证阻塞项，请继续执行验证并更新合同和阶段产物。'}</p></div>
+              <button type="button" disabled={!validation.gateReady || revision === undefined} onClick={() => { setConfirming(true); setError(undefined) }}>完成验证评估</button>
+            </>
+            : <>
+              <div><strong>确认进入部署试运行</strong><p>我已核对候选版本、环境和数据版本、全部必需指标与证据、关键问题、接受风险、验证报告及验证基线。</p></div>
+              <div className={css.stageGateActions}>
+                <button type="button" disabled={submitting} onClick={() => { setConfirming(false); setError(undefined) }}>返回核对</button>
+                <button type="button" disabled={submitting || revision === undefined} onClick={() => {
+                  if (revision === undefined) return
+                  setSubmitting(true); setError(undefined)
+                  void completeValidation(revision).then(
+                    () => { setConfirming(false) },
+                    (reason: unknown) => { setError(reason instanceof Error ? reason.message : String(reason)) },
+                  ).finally(() => { setSubmitting(false) })
+                }}>{submitting ? '正在确认…' : '确认并进入部署试运行'}</button>
+              </div>
+            </>}
+          {error !== undefined && <p className={css.stageGateError}>{error}</p>}
+        </div>
+        : <div className={css.stageConfirmed}>验证评估已由 FDE 确认，项目当前处于“{STAGE_NAMES[currentStage]}”。</div>}
+    </section>
+  )
+}
+
 function StageOutputs({
-  workspaceId, stage, surfaceState, completeRequirements, completeSolution, completeDevelopment, reviewArchitecture, renderPreview,
+  workspaceId, stage, surfaceState,
+  completeRequirements, completeSolution, completeDevelopment, completeValidation,
+  reviewArchitecture, renderPreview,
 }: {
   readonly workspaceId: string
   readonly stage: ProjectStageLoadState | undefined
@@ -354,6 +521,7 @@ function StageOutputs({
   readonly completeRequirements: (revision: number) => Promise<void>
   readonly completeSolution: (revision: number) => Promise<void>
   readonly completeDevelopment: (revision: number) => Promise<void>
+  readonly completeValidation: (revision: number) => Promise<void>
   readonly reviewArchitecture: () => Promise<void>
   readonly renderPreview: (source: ProjectPreviewFile) => React.ReactNode
 }) {
@@ -372,7 +540,7 @@ function StageOutputs({
   if (surfaceState.status === 'error') {
     return <div className={css.outputState} data-error>{surfaceState.message}</div>
   }
-  if (currentStage !== undefined && currentStage !== 'requirements' && currentStage !== 'solution') {
+  if (currentStage === 'development') {
     if (surfaceState.value.development === undefined) {
       return <div className={css.outputState} data-error>项目开发文档暂不可用，请刷新项目页面。</div>
     }
@@ -382,6 +550,16 @@ function StageOutputs({
       revision={stage?.status === 'ready' ? stage.value.revision : undefined}
       development={surfaceState.value.development}
       completeDevelopment={completeDevelopment}
+      renderPreview={renderPreview}
+    />
+  }
+  if (currentStage !== undefined && currentStage !== 'requirements' && currentStage !== 'solution') {
+    return <ValidationOutputs
+      workspaceId={workspaceId}
+      currentStage={currentStage}
+      revision={stage?.status === 'ready' ? stage.value.revision : undefined}
+      validation={surfaceState.value.validation}
+      completeValidation={completeValidation}
       renderPreview={renderPreview}
     />
   }
@@ -423,7 +601,7 @@ function StageOutputs({
               : (artifact.id === 'requirement-baseline' && currentStage === 'requirements')
                 || (artifact.id === 'solution-baseline' && currentStage === 'solution')
                 ? '待 FDE 确认'
-                : (showSolution && currentStage !== 'solution') || (!showSolution && currentStage !== 'requirements')
+                : currentStage === undefined
                   ? '已纳入阶段确认'
                   : '已有文件'
           const previewable = artifact.status === 'present' && artifact.fileUrl !== undefined
@@ -542,16 +720,13 @@ function StageOutputs({
           {error !== undefined && <p className={css.stageGateError}>{error}</p>}
         </div>
       )}
-      {currentStage !== undefined && currentStage !== 'requirements' && currentStage !== 'solution' && (
-        <div className={css.stageConfirmed}>方案设计已由 FDE 确认，项目当前处于“{STAGE_NAMES[currentStage]}”。</div>
-      )}
     </section>
   )
 }
 
 function ProjectDetail({
   row, sourceState, surfaceState, wikiState, selectedSource, selectSource, parseSource,
-  prepareWiki, startWiki, abandonWiki, refreshWiki, completeRequirements, completeSolution, completeDevelopment,
+  prepareWiki, startWiki, abandonWiki, refreshWiki, completeRequirements, completeSolution, completeDevelopment, completeValidation,
   reviewArchitecture, enterProject, back, renderPreview,
 }: {
   readonly row: ProjectRow
@@ -572,6 +747,7 @@ function ProjectDetail({
   readonly completeRequirements: (revision: number) => Promise<void>
   readonly completeSolution: (revision: number) => Promise<void>
   readonly completeDevelopment: (revision: number) => Promise<void>
+  readonly completeValidation: (revision: number) => Promise<void>
   readonly reviewArchitecture: () => Promise<void>
   readonly enterProject: () => void
   readonly back: () => void
@@ -584,14 +760,19 @@ function ProjectDetail({
   const currentStage = row.stage?.status === 'ready' ? row.stage.value.currentStage : undefined
   const showSolution = currentStage !== undefined && currentStage !== 'requirements'
   const showDevelopment = currentStage !== undefined && currentStage !== 'requirements' && currentStage !== 'solution'
+  const showValidation = currentStage !== undefined && FDE_STAGES.findIndex(item => item.id === currentStage) >= FDE_STAGES.findIndex(item => item.id === 'validation')
   const outputCount = surfaceState?.status === 'ready'
-    ? showDevelopment
-      ? (surfaceState.value.development?.core.presentCount ?? 0)
-        + (surfaceState.value.development?.features.reduce((total, feature) => total + feature.artifacts.filter(artifact => artifact.status === 'present').length, 0) ?? 0)
-        + (surfaceState.value.development?.closure.presentCount ?? 0)
-      : showSolution
-        ? (surfaceState.value.solution?.presentCount ?? 0) + (surfaceState.value.architecture === null ? 0 : 1)
-        : surfaceState.value.requirements.presentCount
+    ? showValidation
+      ? surfaceState.value.validation.artifacts.presentCount
+      : showDevelopment
+        ? (surfaceState.value.development?.core.presentCount ?? 0)
+          + (surfaceState.value.development?.features.reduce((total, feature) => (
+            total + feature.artifacts.filter(artifact => artifact.status === 'present').length
+          ), 0) ?? 0)
+          + (surfaceState.value.development?.closure.presentCount ?? 0)
+        : showSolution
+          ? (surfaceState.value.solution?.presentCount ?? 0) + (surfaceState.value.architecture === null ? 0 : 1)
+          : surfaceState.value.requirements.presentCount
     : 0
   return (
     <main className={css.detailPage}>
@@ -633,6 +814,7 @@ function ProjectDetail({
         completeRequirements={completeRequirements}
         completeSolution={completeSolution}
         completeDevelopment={completeDevelopment}
+        completeValidation={completeValidation}
         reviewArchitecture={reviewArchitecture}
         renderPreview={renderPreview}
       />}
@@ -689,7 +871,7 @@ export function ProjectProgressOverlay({
   useProjectPage, useStageProgress, useProjectSurfaces, useProjectSources, useRequirementWiki, useWorkspaces, useSessions,
   loadStage, retryStage, refreshProjectSurface, loadProjectSources, parseProjectSource, loadRequirementWiki,
   prepareRequirementWikiRun, startRequirementWikiBuild, abandonRequirementWikiBuild, enterProject, reviewProjectArchitecture,
-  completeRequirements, completeSolution, completeDevelopment, closeProjectPage,
+  completeRequirements, completeSolution, completeDevelopment, completeValidation, closeProjectPage,
   showProjectOverview, showProjectTimeline, showProjectDetail,
   renderSlot, t,
 }: ProjectProgressOverlayProps) {
@@ -811,6 +993,14 @@ export function ProjectProgressOverlay({
           completeDevelopment={async (revision) => {
             try {
               await completeDevelopment(detailRow.workspaceId, revision)
+            } catch (error) {
+              retryStage(detailRow.workspaceId)
+              throw error
+            }
+          }}
+          completeValidation={async (revision) => {
+            try {
+              await completeValidation(detailRow.workspaceId, revision)
             } catch (error) {
               retryStage(detailRow.workspaceId)
               throw error

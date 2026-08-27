@@ -64,7 +64,9 @@ describe('ProjectProgressOverlay standalone page', () => {
         createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:00:00.000Z',
       } } } }),
       useProjectSurfaces: hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: {
-        workspaceId: 'workspace-1', title: '数据分析项目', apiDocs: { status: 'unconfigured', message: '未配置' },
+        workspaceId: 'workspace-1', title: '数据分析项目',
+        runtime: { schemaVersion: 1, revision: 0, status: 'stopped', updatedAt: '1970-01-01T00:00:00.000Z' },
+        apiDocs: { status: 'unconfigured', message: '未配置' },
         architecture: null, evaluation: { casesCount: 0, reports: [] },
         requirements: {
           root: 'fde-deliverables/01-requirement-research', requiredCount: 3, presentCount: 3,
@@ -123,7 +125,9 @@ describe('ProjectProgressOverlay standalone page', () => {
         createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:01:00.000Z',
       } } } }),
       useProjectSurfaces: hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: {
-        workspaceId: 'workspace-1', title: '数据分析项目', apiDocs: { status: 'unconfigured', message: '未配置' },
+        workspaceId: 'workspace-1', title: '数据分析项目',
+        runtime: { schemaVersion: 1, revision: 0, status: 'stopped', updatedAt: '1970-01-01T00:00:00.000Z' },
+        apiDocs: { status: 'unconfigured', message: '未配置' },
         architecture: {
           version: 1, revision: 1, title: '数据分析系统架构', status: 'confirmed',
           updatedAt: '2026-08-27T00:00:00.000Z', groups: [], nodes: [], edges: [],
@@ -184,7 +188,9 @@ describe('ProjectProgressOverlay standalone page', () => {
         createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:02:00.000Z',
       } } } }),
       useProjectSurfaces: hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: {
-        workspaceId: 'workspace-1', title: '数据分析项目', apiDocs: { status: 'unconfigured', message: '未配置' },
+        workspaceId: 'workspace-1', title: '数据分析项目',
+        runtime: { schemaVersion: 1, revision: 0, status: 'stopped', updatedAt: '1970-01-01T00:00:00.000Z' },
+        apiDocs: { status: 'unconfigured', message: '未配置' },
         architecture: null, evaluation: { casesCount: 0, reports: [] },
         requirements: { root: 'fde-deliverables/01-requirement-research', requiredCount: 3, presentCount: 3, artifacts: [] },
         solution: { root: 'fde-deliverables/02-solution-design', requiredCount: 5, presentCount: 5, artifacts: [] },
@@ -243,6 +249,72 @@ describe('ProjectProgressOverlay standalone page', () => {
     await waitFor(() => { expect(completeDevelopment).toHaveBeenCalledWith('workspace-1', 3) })
   })
 
+  it('shows validation inputs, evidence, outputs, and keeps pilot behind FDE confirmation', async () => {
+    const completeValidation = vi.fn(async () => {})
+    const renderSlot = vi.fn(() => <div>验证报告正文</div>)
+    const props = {
+      useProjectPage: hook({ open: true, view: 'project' as const, workspaceId: 'workspace-1' }),
+      useStageProgress: hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: {
+        workspaceId: 'workspace-1', currentStage: 'validation', revision: 4,
+        createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:03:00.000Z',
+      } } } }),
+      useProjectSurfaces: hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: {
+        workspaceId: 'workspace-1', title: '数据分析项目',
+        runtime: { schemaVersion: 1, revision: 0, status: 'stopped', updatedAt: '1970-01-01T00:00:00.000Z' },
+        apiDocs: { status: 'unconfigured', message: '未配置' }, architecture: null,
+        evaluation: { casesCount: 1, reports: [] },
+        validation: {
+          contract: {
+            status: 'ready', path: '.fde/evaluations/validation.json', digest: `sha256:${'1'.repeat(64)}`, candidateId: 'R1', environment: '本地验收环境',
+            datasets: [{ id: 'core-cases', name: '核心业务用例', version: '1.0' }],
+            metrics: [{
+              id: 'runtime-smoke', name: '核心流程冒烟', category: 'functional', method: '启动并访问核心页面', threshold: '全部通过',
+              sources: [{ path: 'fde-deliverables/02-solution-design/acceptance-plan.md', references: ['BA-1'], available: true }],
+              required: true, status: 'PASS', value: '通过', evidence: '.fde/evaluations/reports/r1/smoke.md', evidenceAvailable: true,
+            }],
+            issues: [],
+          },
+          artifacts: { root: 'fde-deliverables/04-validation', requiredCount: 3, presentCount: 3, items: [
+            { id: 'validation-plan', title: '验证计划', path: 'fde-deliverables/04-validation/validation-plan.md', status: 'present', fileUrl: '/api/fde-project/validation/artifact?workspaceId=workspace-1&artifactId=validation-plan' },
+            { id: 'validation-report', title: '验证报告', path: 'fde-deliverables/04-validation/validation-report.md', status: 'present', bytes: 220, fileUrl: '/api/fde-project/validation/artifact?workspaceId=workspace-1&artifactId=validation-report' },
+            { id: 'validation-baseline', title: '验证基线', path: 'fde-deliverables/04-validation/validation-baseline.md', status: 'present', fileUrl: '/api/fde-project/validation/artifact?workspaceId=workspace-1&artifactId=validation-baseline' },
+          ] },
+          planReady: true, planBlockers: [], planApproval: { status: 'confirmed', contractDigest: `sha256:${'1'.repeat(64)}` },
+          requiredMetricCount: 1, satisfiedMetricCount: 1, gateReady: true, blockers: [],
+        },
+        requirements: { root: 'fde-deliverables/01-requirement-research', requiredCount: 3, presentCount: 3, artifacts: [] },
+      } } } }),
+      useProjectSources: hook({ byWorkspace: { 'workspace-1': { status: 'ready', files: [] } } }),
+      useRequirementWiki: hook({ byWorkspace: {} }),
+      useWorkspaces: hook({ items: [{
+        workspaceId: 'workspace-1', title: '数据分析项目', path: '/project/one', sessionIds: ['session-1'],
+        createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:00:00.000Z',
+      }] }),
+      useSessions: hook({ byId: { 'session-1': { id: 'session-1', displayTitle: '会话', running: false, blank: false, updatedAt: 1 } } }),
+      loadStage: vi.fn(), retryStage: vi.fn(), loadProjectSurface: vi.fn(), refreshProjectSurface: vi.fn(),
+      completeRequirements: vi.fn(), completeSolution: vi.fn(), completeDevelopment: vi.fn(), completeValidation,
+      loadProjectSources: vi.fn(), parseProjectSource: vi.fn(), loadRequirementWiki: vi.fn(),
+      prepareRequirementWikiRun: vi.fn(), startRequirementWikiBuild: vi.fn(), abandonRequirementWikiBuild: vi.fn(),
+      enterProject: vi.fn(), reviewProjectArchitecture: vi.fn(), closeProjectPage: vi.fn(), showProjectOverview: vi.fn(),
+      showProjectTimeline: vi.fn(), showProjectDetail: vi.fn(), renderSlot,
+      t: makeTranslate(zh),
+    } as unknown as ProjectProgressOverlayProps
+
+    render(<ProjectProgressOverlay {...props} />)
+    fireEvent.click(screen.getByRole('button', { name: /阶段产出/ }))
+    expect(screen.getByText('评估方案、执行与产物')).toBeTruthy()
+    expect(screen.getByText('R1')).toBeTruthy()
+    expect(screen.getByText('核心业务用例')).toBeTruthy()
+    expect(screen.getByText('核心流程冒烟')).toBeTruthy()
+    expect(screen.getByText('BA-1')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '预览验证报告' }))
+    expect(screen.getByText('验证报告正文')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '完成验证评估' }))
+    expect(screen.getByText(/我已核对候选版本、环境和数据版本/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '确认并进入部署试运行' }))
+    await waitFor(() => { expect(completeValidation).toHaveBeenCalledWith('workspace-1', 4) })
+  })
+
   it('refreshes the project snapshot and guides a candidate architecture to the full review view', async () => {
     const refreshProjectSurface = vi.fn()
     const reviewProjectArchitecture = vi.fn(async () => {})
@@ -253,7 +325,9 @@ describe('ProjectProgressOverlay standalone page', () => {
         createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:01:00.000Z',
       } } } }),
       useProjectSurfaces: hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: {
-        workspaceId: 'workspace-1', title: '数据分析项目', apiDocs: { status: 'unconfigured', message: '未配置' },
+        workspaceId: 'workspace-1', title: '数据分析项目',
+        runtime: { schemaVersion: 1, revision: 0, status: 'stopped', updatedAt: '1970-01-01T00:00:00.000Z' },
+        apiDocs: { status: 'unconfigured', message: '未配置' },
         architecture: {
           version: 1, revision: 2, title: '数据分析系统架构', status: 'candidate',
           updatedAt: '2026-08-27T00:02:00.000Z', groups: [], nodes: [], edges: [],

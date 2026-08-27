@@ -4,8 +4,16 @@
 export const FDE_PROJECT_SNAPSHOT_PATH = '/api/fde-project/snapshot'
 /** Exact Host route for confirming one architecture revision. */
 export const FDE_ARCHITECTURE_CONFIRM_PATH = '/api/fde-project/architecture/confirm'
+/** Exact Host route for confirming one validation contract. */
+export const FDE_VALIDATION_PLAN_CONFIRM_PATH = '/api/fde-project/validation/confirm-plan'
 /** Exact Host route for approving one indexed evaluation report. */
 export const FDE_EVALUATION_BASELINE_PATH = '/api/fde-project/evaluation/baseline'
+/** Exact Host route for beginning one Agent-driven project start. */
+export const FDE_PROJECT_RUNTIME_START_PATH = '/api/fde-project/runtime/start'
+/** Exact Host route for beginning one Agent-driven project stop. */
+export const FDE_PROJECT_RUNTIME_STOP_PATH = '/api/fde-project/runtime/stop'
+/** Exact Host route for settling an operation whose Agent prompt was not queued. */
+export const FDE_PROJECT_RUNTIME_ABANDON_PATH = '/api/fde-project/runtime/abandon'
 
 /** Architecture node styles accepted from the project artifact. */
 export type ArchitectureNodeKind = 'default' | 'entry' | 'core' | 'store' | 'external' | 'output'
@@ -47,6 +55,23 @@ export type ApiDocsSnapshot =
     readonly allowPrivateNetwork: boolean
   }
 
+/** Browser wire value for one Workspace-scoped project runtime fact. */
+export interface ProjectRuntimeSnapshot {
+  readonly schemaVersion: 1
+  readonly revision: number
+  readonly status: 'stopped' | 'starting' | 'running' | 'stopping' | 'blocked'
+  readonly updatedAt: string
+  readonly action?: 'start' | 'stop'
+  readonly operationId?: string
+  readonly sessionId?: string
+  readonly message?: string
+  readonly previewUrl?: string
+  readonly docsUrl?: string
+  readonly openapiSource?: string
+  readonly baseUrl?: string
+  readonly terminalTitle?: string
+}
+
 /** Bounded browser summary of one persisted evaluation report. */
 export interface EvaluationReportSummary {
   readonly id: string
@@ -65,10 +90,93 @@ export interface EvaluationReportSummary {
   }[]
 }
 
+/** Project-specific validation metric categories accepted by the Host contract. */
+export type ValidationMetricCategory = 'business' | 'functional' | 'data' | 'model' | 'performance' | 'security' | 'recovery' | 'agent'
+/** Evidence-backed validation result. */
+export type ValidationMetricStatus = 'PASS' | 'WARN' | 'FAIL' | 'NOT_RUN'
+
+/** Browser wire value for the validation contract, evidence, and fixed outputs. */
+export interface ValidationStageSnapshot {
+  readonly contract: {
+    readonly status: 'missing' | 'invalid' | 'ready'
+    readonly path: string
+    readonly digest?: string
+    readonly candidateId?: string
+    readonly candidateDescription?: string
+    readonly candidateSource?: string
+    readonly environment?: string
+    readonly datasets: readonly {
+      readonly id: string
+      readonly name: string
+      readonly version?: string
+      readonly source?: string
+      readonly hash?: string
+    }[]
+    readonly metrics: readonly {
+      readonly id: string
+      readonly name: string
+      readonly category: ValidationMetricCategory
+      readonly method: string
+      readonly threshold: string
+      readonly sources: readonly {
+        readonly path: string
+        readonly references: readonly string[]
+        readonly available: boolean
+        readonly digest?: string
+      }[]
+      readonly required: boolean
+      readonly status: ValidationMetricStatus
+      readonly value?: string
+      readonly evidence?: string
+      readonly evidenceAvailable: boolean
+      readonly waiverReason?: string
+      readonly note?: string
+    }[]
+    readonly issues: readonly {
+      readonly id: string
+      readonly title: string
+      readonly severity: 'critical' | 'high' | 'medium' | 'low'
+      readonly status: 'open' | 'resolved' | 'waived'
+      readonly evidence?: string
+      readonly evidenceAvailable: boolean
+      readonly resolution?: string
+    }[]
+    readonly message?: string
+  }
+  readonly artifacts: {
+    readonly root: string
+    readonly requiredCount: number
+    readonly presentCount: number
+    readonly items: readonly {
+      readonly id: 'validation-plan' | 'validation-report' | 'validation-baseline'
+      readonly title: string
+      readonly path: string
+      readonly status: 'missing' | 'present' | 'error'
+      readonly bytes?: number
+      readonly updatedAt?: string
+      readonly fileUrl?: string
+      readonly message?: string
+    }[]
+  }
+  readonly planReady: boolean
+  readonly planBlockers: readonly string[]
+  readonly planApproval: {
+    readonly status: 'unavailable' | 'pending' | 'confirmed' | 'stale'
+    readonly contractDigest?: string
+    readonly confirmedAt?: string
+    readonly message?: string
+  }
+  readonly requiredMetricCount: number
+  readonly satisfiedMetricCount: number
+  readonly gateReady: boolean
+  readonly blockers: readonly string[]
+}
+
 /** One project-level read model returned by the trusted Host route. */
 export interface ProjectSurfaceSnapshot {
   readonly workspaceId: string
   readonly title: string
+  readonly runtime: ProjectRuntimeSnapshot
   readonly apiDocs: ApiDocsSnapshot
   readonly architecture: ProjectArchitecture | null
   readonly architectureError?: string
@@ -78,6 +186,7 @@ export interface ProjectSurfaceSnapshot {
     readonly baseline?: EvaluationReportSummary
     readonly message?: string
   }
+  readonly validation: ValidationStageSnapshot
   readonly requirements: {
     readonly root: string
     readonly requiredCount: number
@@ -229,6 +338,28 @@ export async function confirmProjectArchitecture(
   return parseSnapshot(payload, workspaceId)
 }
 
+/** Confirm the exact validation contract currently displayed to the FDE. */
+export async function confirmValidationPlan(
+  workspaceId: string,
+  contractDigest: string,
+  fetchImpl: typeof fetch = fetch,
+  signal?: AbortSignal,
+): Promise<ProjectSurfaceSnapshot> {
+  const response = await fetchImpl(FDE_VALIDATION_PLAN_CONFIRM_PATH, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ workspaceId, contractDigest }),
+    ...(signal === undefined ? {} : { signal }),
+  })
+  let payload: unknown
+  try { payload = await response.json() } catch { throw new Error('评估方案确认响应无效。') }
+  if (!response.ok) {
+    const failure = payload as SnapshotFailure
+    throw new Error(failure.error?.message ?? `评估方案确认失败（HTTP ${String(response.status)}）。`)
+  }
+  return parseSnapshot(payload, workspaceId)
+}
+
 /**
  * Approve one project report as the explicit evaluation baseline.
  * @param workspaceId - exact registered project identity.
@@ -256,6 +387,66 @@ export async function approveProjectEvaluationBaseline(
     throw new Error(failure.error?.message ?? `评估基线设置失败（HTTP ${String(response.status)}）。`)
   }
   return parseSnapshot(payload, workspaceId)
+}
+
+async function changeProjectRuntime(
+  path: string,
+  workspaceId: string,
+  body: Readonly<Record<string, unknown>>,
+  failureMessage: string,
+  fetchImpl: typeof fetch = fetch,
+  signal?: AbortSignal,
+): Promise<ProjectSurfaceSnapshot> {
+  const response = await fetchImpl(path, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ workspaceId, ...body }),
+    ...(signal === undefined ? {} : { signal }),
+  })
+  let payload: unknown
+  try { payload = await response.json() } catch { throw new Error('项目运行响应无效。') }
+  if (!response.ok) {
+    const failure = payload as SnapshotFailure
+    throw new Error(failure.error?.message ?? `${failureMessage}（HTTP ${String(response.status)}）。`)
+  }
+  return parseSnapshot(payload, workspaceId)
+}
+
+/** Begin one exact project start operation. */
+export async function startProjectRuntime(
+  workspaceId: string,
+  sessionId: string,
+  fetchImpl: typeof fetch = fetch,
+  signal?: AbortSignal,
+): Promise<ProjectSurfaceSnapshot> {
+  return await changeProjectRuntime(
+    FDE_PROJECT_RUNTIME_START_PATH, workspaceId, { sessionId }, '项目启动请求失败', fetchImpl, signal,
+  )
+}
+
+/** Begin one exact project stop operation. */
+export async function stopProjectRuntime(
+  workspaceId: string,
+  sessionId: string,
+  fetchImpl: typeof fetch = fetch,
+  signal?: AbortSignal,
+): Promise<ProjectSurfaceSnapshot> {
+  return await changeProjectRuntime(
+    FDE_PROJECT_RUNTIME_STOP_PATH, workspaceId, { sessionId }, '项目停止请求失败', fetchImpl, signal,
+  )
+}
+
+/** Settle an operation when its visible Agent prompt could not be queued. */
+export async function abandonProjectRuntime(
+  workspaceId: string,
+  operationId: string,
+  message: string,
+  fetchImpl: typeof fetch = fetch,
+  signal?: AbortSignal,
+): Promise<ProjectSurfaceSnapshot> {
+  return await changeProjectRuntime(
+    FDE_PROJECT_RUNTIME_ABANDON_PATH, workspaceId, { operationId, message }, '项目运行恢复失败', fetchImpl, signal,
+  )
 }
 
 /** Apply-scoped project snapshot object layer. */
@@ -295,6 +486,30 @@ export class FdeProjectSurfaceController {
     this.start(workspaceId)
   }
 
+  /** Refresh one running operation without replacing the visible snapshot with a loading card. */
+  poll(workspaceId: string): void {
+    if (this.disposed || this.requests.has(workspaceId)) return
+    this.start(workspaceId, true)
+  }
+
+  /** Begin a project start and publish the returned starting record. */
+  async startRuntime(workspaceId: string, sessionId: string): Promise<ProjectRuntimeSnapshot> {
+    return await this.runtimeOperation(workspaceId, signal => startProjectRuntime(workspaceId, sessionId, fetch, signal))
+  }
+
+  /** Begin a project stop and publish the returned stopping record. */
+  async stopRuntime(workspaceId: string, sessionId: string): Promise<ProjectRuntimeSnapshot> {
+    return await this.runtimeOperation(workspaceId, signal => stopProjectRuntime(workspaceId, sessionId, fetch, signal))
+  }
+
+  /** Settle a runtime operation whose visible Agent prompt was not accepted. */
+  async abandonRuntime(workspaceId: string, operationId: string, message: string): Promise<ProjectRuntimeSnapshot> {
+    return await this.runtimeOperation(
+      workspaceId,
+      signal => abandonProjectRuntime(workspaceId, operationId, message, fetch, signal),
+    )
+  }
+
   /**
    * Confirm one exact architecture revision without hiding the current graph.
    * @param workspaceId - exact project identity.
@@ -307,6 +522,22 @@ export class FdeProjectSurfaceController {
     this.requests.set(workspaceId, controller)
     try {
       const value = await confirmProjectArchitecture(workspaceId, revision, fetch, controller.signal)
+      if (this.canPublish(workspaceId, controller)) {
+        this.publish(workspaceId, { status: 'ready', value })
+      }
+    } finally {
+      if (this.requests.get(workspaceId) === controller) this.requests.delete(workspaceId)
+    }
+  }
+
+  /** Confirm one exact validation contract without hiding the current plan. */
+  async confirmValidationPlan(workspaceId: string, contractDigest: string): Promise<void> {
+    if (this.disposed) throw new Error('项目页面已关闭。')
+    this.requests.get(workspaceId)?.abort()
+    const controller = new AbortController()
+    this.requests.set(workspaceId, controller)
+    try {
+      const value = await confirmValidationPlan(workspaceId, contractDigest, fetch, controller.signal)
       if (this.canPublish(workspaceId, controller)) {
         this.publish(workspaceId, { status: 'ready', value })
       }
@@ -344,11 +575,29 @@ export class FdeProjectSurfaceController {
     this.listeners.clear()
   }
 
-  private start(workspaceId: string): void {
+  private async runtimeOperation(
+    workspaceId: string,
+    operation: (signal: AbortSignal) => Promise<ProjectSurfaceSnapshot>,
+  ): Promise<ProjectRuntimeSnapshot> {
+    if (this.disposed) throw new Error('项目页面已关闭。')
     this.requests.get(workspaceId)?.abort()
     const controller = new AbortController()
     this.requests.set(workspaceId, controller)
-    this.publish(workspaceId, { status: 'loading' })
+    try {
+      const value = await operation(controller.signal)
+      if (!this.canPublish(workspaceId, controller)) throw new Error('项目运行操作已被新的请求替代。')
+      this.publish(workspaceId, { status: 'ready', value })
+      return value.runtime
+    } finally {
+      if (this.requests.get(workspaceId) === controller) this.requests.delete(workspaceId)
+    }
+  }
+
+  private start(workspaceId: string, preserve = false): void {
+    this.requests.get(workspaceId)?.abort()
+    const controller = new AbortController()
+    this.requests.set(workspaceId, controller)
+    if (!preserve) this.publish(workspaceId, { status: 'loading' })
     void fetchProjectSurface(workspaceId, fetch, controller.signal).then(
       (value) => {
         if (this.canPublish(workspaceId, controller)) this.publish(workspaceId, { status: 'ready', value })

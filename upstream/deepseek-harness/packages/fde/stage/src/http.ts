@@ -62,6 +62,18 @@ export interface CompleteDevelopmentRouteOptions {
   reportFailure?: (error: unknown) => void
 }
 
+/** Dependencies for the fixed FDE-only validation completion route. */
+export interface CompleteValidationRouteOptions {
+  trusted: (request: IncomingMessage) => boolean
+  workspaceExists: (workspaceId: string) => boolean
+  validation: (workspaceId: string) => Promise<{
+    readonly gateReady: boolean
+    readonly blockers: readonly string[]
+  }>
+  complete: (workspaceId: WorkspaceId, expectedRevision: number) => Promise<ProjectStageRecord>
+  reportFailure?: (error: unknown) => void
+}
+
 async function readJson(request: IncomingMessage): Promise<unknown> {
   const declaredRaw = request.headers['content-length']
   const declared = typeof declaredRaw === 'string' ? Number(declaredRaw) : undefined
@@ -286,6 +298,52 @@ export function createCompleteDevelopmentRoute(
       }
       options.reportFailure?.(error)
       writeJson(response, 500, { ok: false, error: { code: 'internal-error', message: '项目开发阶段确认失败。' } })
+    }
+  }
+}
+
+/** Create the POST-only, fixed validation-to-pilot manual gate. */
+export function createCompleteValidationRoute(
+  options: CompleteValidationRouteOptions,
+): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
+  return async (request: IncomingMessage, response: ServerResponse): Promise<void> => {
+    let requestedWorkspaceId: string | undefined
+    try {
+      if (!options.trusted(request)) throw new FdeStageRequestError('forbidden', 403, '当前请求不能确认项目阶段。')
+      if (request.method !== 'POST') {
+        request.resume()
+        throw new FdeStageRequestError('method-not-allowed', 405, '阶段确认接口只接受 POST。')
+      }
+      const { workspaceId, expectedRevision } = completionRequestOf(await readJson(request))
+      requestedWorkspaceId = workspaceId
+      if (!options.workspaceExists(workspaceId)) {
+        throw new FdeStageRequestError('workspace-not-found', 404, '当前项目不存在或已被移除。')
+      }
+      const validation = await options.validation(workspaceId)
+      if (!validation.gateReady) {
+        throw new FdeStageRequestError(
+          'stage-validation-incomplete',
+          409,
+          `验证评估尚未达到进入部署试运行的条件：${validation.blockers.join('；')}`,
+        )
+      }
+      const record = await options.complete(workspaceId as WorkspaceId, expectedRevision)
+      writeJson(response, 200, { ok: true, value: { workspaceId, ...record } })
+    } catch (error) {
+      if (error instanceof FdeStageRequestError) {
+        writeJson(response, error.status, { ok: false, error: { code: error.code, message: error.message } })
+        return
+      }
+      if (error instanceof FdeStageConflictError || error instanceof FdeStageTransitionError) {
+        writeJson(response, 409, {
+          ok: false,
+          error: { code: error instanceof FdeStageConflictError ? 'stage-revision-conflict' : 'stage-invalid-transition', message: error.message },
+          ...(requestedWorkspaceId === undefined ? {} : { value: { workspaceId: requestedWorkspaceId, ...error.current } }),
+        })
+        return
+      }
+      options.reportFailure?.(error)
+      writeJson(response, 500, { ok: false, error: { code: 'internal-error', message: '验证评估阶段确认失败。' } })
     }
   }
 }

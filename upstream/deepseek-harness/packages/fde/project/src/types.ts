@@ -73,6 +73,26 @@ export type ApiDocsSnapshot =
   }
   | { readonly status: 'invalid'; readonly message: string }
 
+/** Durable project runtime states shown in every project-delivery view. */
+export type ProjectRuntimeStatus = 'stopped' | 'starting' | 'running' | 'stopping' | 'blocked'
+
+/** Browser-safe, Workspace-scoped project runtime fact. */
+export interface ProjectRuntimeSnapshot {
+  readonly schemaVersion: 1
+  readonly revision: number
+  readonly status: ProjectRuntimeStatus
+  readonly updatedAt: string
+  readonly action?: 'start' | 'stop'
+  readonly operationId?: string
+  readonly sessionId?: string
+  readonly message?: string
+  readonly previewUrl?: string
+  readonly docsUrl?: string
+  readonly openapiSource?: string
+  readonly baseUrl?: string
+  readonly terminalTitle?: string
+}
+
 /** One bounded case result projected from an evaluation report. */
 export interface EvaluationCaseSummary {
   readonly name: string
@@ -100,6 +120,121 @@ export interface EvaluationSnapshot {
   readonly reports: readonly EvaluationReportSummary[]
   readonly baseline?: EvaluationReportSummary
   readonly message?: string
+}
+
+/** Validation dimensions selected per project rather than required globally. */
+export const VALIDATION_METRIC_CATEGORIES = [
+  'business',
+  'functional',
+  'data',
+  'model',
+  'performance',
+  'security',
+  'recovery',
+  'agent',
+] as const
+
+/** One project-specific validation dimension. */
+export type ValidationMetricCategory = typeof VALIDATION_METRIC_CATEGORIES[number]
+/** Current evidence-backed result of one validation metric. */
+export type ValidationMetricStatus = 'PASS' | 'WARN' | 'FAIL' | 'NOT_RUN'
+
+/** One project-specific dataset or case collection admitted to validation. */
+export interface ValidationDatasetSnapshot {
+  readonly id: string
+  readonly name: string
+  readonly version?: string
+  readonly source?: string
+  readonly hash?: string
+}
+
+/** One prior-stage document reference that justifies a validation metric. */
+export interface ValidationMetricSourceSnapshot {
+  readonly path: string
+  readonly references: readonly string[]
+  readonly available: boolean
+  readonly digest?: string
+}
+
+/** One bounded metric and its current evidence-backed result. */
+export interface ValidationMetricSnapshot {
+  readonly id: string
+  readonly name: string
+  readonly category: ValidationMetricCategory
+  readonly method: string
+  readonly threshold: string
+  readonly sources: readonly ValidationMetricSourceSnapshot[]
+  readonly required: boolean
+  readonly status: ValidationMetricStatus
+  readonly value?: string
+  readonly evidence?: string
+  readonly evidenceAvailable: boolean
+  readonly waiverReason?: string
+  readonly note?: string
+}
+
+/** One validation issue that can block or qualify the current candidate. */
+export interface ValidationIssueSnapshot {
+  readonly id: string
+  readonly title: string
+  readonly severity: 'critical' | 'high' | 'medium' | 'low'
+  readonly status: 'open' | 'resolved' | 'waived'
+  readonly evidence?: string
+  readonly evidenceAvailable: boolean
+  readonly resolution?: string
+}
+
+/** Parsed project validation contract or its explicit absence/failure. */
+export interface ValidationContractSnapshot {
+  readonly status: 'missing' | 'invalid' | 'ready'
+  readonly path: string
+  readonly digest?: string
+  readonly candidateId?: string
+  readonly candidateDescription?: string
+  readonly candidateSource?: string
+  readonly environment?: string
+  readonly datasets: readonly ValidationDatasetSnapshot[]
+  readonly metrics: readonly ValidationMetricSnapshot[]
+  readonly issues: readonly ValidationIssueSnapshot[]
+  readonly message?: string
+}
+
+/** FDE approval bound to one exact validation contract digest. */
+export interface ValidationPlanApprovalSnapshot {
+  readonly status: 'unavailable' | 'pending' | 'confirmed' | 'stale'
+  readonly contractDigest?: string
+  readonly confirmedAt?: string
+  readonly message?: string
+}
+
+/** One fixed Markdown output of the validation stage. */
+export interface ValidationArtifactSnapshot {
+  readonly id: 'validation-plan' | 'validation-report' | 'validation-baseline'
+  readonly title: string
+  readonly path: string
+  readonly status: 'missing' | 'present' | 'error'
+  readonly bytes?: number
+  readonly updatedAt?: string
+  readonly fileUrl?: string
+  readonly message?: string
+}
+
+/** Host-derived validation readiness, evidence, and fixed outputs. */
+export interface ValidationStageSnapshot {
+  readonly contract: ValidationContractSnapshot
+  readonly artifacts: {
+    readonly root: string
+    readonly requiredCount: number
+    readonly presentCount: number
+    readonly items: readonly ValidationArtifactSnapshot[]
+  }
+  readonly planReady: boolean
+  readonly planBlockers: readonly string[]
+  readonly planApproval: ValidationPlanApprovalSnapshot
+  readonly requiredMetricCount: number
+  readonly satisfiedMetricCount: number
+  readonly gateReady: boolean
+  readonly blockers: readonly string[]
 }
 
 /** Controlled requirement-Wiki topics shared by Agent validation and Galaxy View. */
@@ -303,10 +438,12 @@ export interface DevelopmentDocsSnapshot {
 export interface ProjectSurfaceSnapshot {
   readonly workspaceId: string
   readonly title: string
+  readonly runtime: ProjectRuntimeSnapshot
   readonly apiDocs: ApiDocsSnapshot
   readonly architecture: ProjectArchitecture | null
   readonly architectureError?: string
   readonly evaluation: EvaluationSnapshot
+  readonly validation: ValidationStageSnapshot
   readonly requirementWiki: RequirementWikiSnapshot
   readonly requirements: RequirementArtifactsSnapshot
   readonly solution: SolutionArtifactsSnapshot

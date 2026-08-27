@@ -13,6 +13,7 @@ import type {
   EvaluationSnapshot,
   ProjectArchitecture,
   ProjectOpenApiConfig,
+  ProjectRuntimeSnapshot,
   ProjectSurfaceSnapshot,
 } from './types.ts'
 import { ARCHITECTURE_NODE_KINDS, ARCHITECTURE_STATUSES } from './types.ts'
@@ -20,6 +21,8 @@ import { loadRequirementArtifacts, REQUIREMENT_ARTIFACT_ROOT } from './requireme
 import { loadSolutionArtifacts, SOLUTION_ARTIFACT_ROOT } from './solution-artifacts.ts'
 import { DEVELOPMENT_DOCS_ROOT, loadDevelopmentDocs } from './development-docs.ts'
 import { loadRequirementWikiSnapshot, requirementWikiPaths } from './requirement-wiki.ts'
+import { loadProjectRuntimeSnapshot, PROJECT_RUNTIME_PATH } from './project-runtime.ts'
+import { loadValidationStage, VALIDATION_CONTRACT_PATH } from './validation.ts'
 
 const FDE_DIRECTORY = '.fde'
 const API_DOCS_FILE = 'api-docs.json'
@@ -112,11 +115,22 @@ function parseApiDocs(value: unknown, root: string): ApiDocsSnapshot {
   }
 }
 
-async function loadApiDocs(root: string): Promise<ApiDocsSnapshot> {
+async function loadApiDocs(root: string, runtime: ProjectRuntimeSnapshot): Promise<ApiDocsSnapshot> {
   try {
     return parseApiDocs(await readJson(join(root, FDE_DIRECTORY, API_DOCS_FILE)), root)
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      return { status: 'invalid', message: error instanceof Error ? error.message : String(error) }
+    }
+  }
+  if (runtime.status === 'running' && runtime.openapiSource !== undefined) {
+    try {
+      return parseApiDocs({
+        openapiSource: runtime.openapiSource,
+        ...(runtime.docsUrl === undefined ? {} : { docsUrl: runtime.docsUrl }),
+        ...(runtime.baseUrl === undefined ? {} : { baseUrl: runtime.baseUrl }),
+      }, root)
+    } catch (error) {
       return { status: 'invalid', message: error instanceof Error ? error.message : String(error) }
     }
   }
@@ -190,6 +204,13 @@ export async function loadProjectOpenApiConfig(root: string): Promise<ProjectOpe
     return openApiConfigOf(await readJson(join(root, FDE_DIRECTORY, API_DOCS_FILE)), root)
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error
+  }
+  const runtime = await loadProjectRuntimeSnapshot(root)
+  if (runtime.status === 'running' && runtime.openapiSource !== undefined) {
+    return openApiConfigOf({
+      openapiSource: runtime.openapiSource,
+      ...(runtime.baseUrl === undefined ? {} : { baseUrl: runtime.baseUrl }),
+    }, root)
   }
   for (const candidate of [
     'openapi.json', 'openapi.yaml', 'openapi.yml',
@@ -506,10 +527,12 @@ export async function loadProjectSurfaceSnapshot(input: {
   readonly title: string
   readonly path: string
 }): Promise<ProjectSurfaceSnapshot> {
-  const [apiDocs, architecture, evaluation, requirementWiki, requirements, solution, development] = await Promise.all([
-    loadApiDocs(input.path),
+  const runtime = await loadProjectRuntimeSnapshot(input.path)
+  const [apiDocs, architecture, evaluation, validation, requirementWiki, requirements, solution, development] = await Promise.all([
+    loadApiDocs(input.path, runtime),
     loadArchitecture(input.path),
     loadEvaluation(input.path),
+    loadValidationStage(input.path, input.workspaceId),
     loadRequirementWikiSnapshot(input.path),
     loadRequirementArtifacts(input.path, input.workspaceId),
     loadSolutionArtifacts(input.path, input.workspaceId),
@@ -518,10 +541,12 @@ export async function loadProjectSurfaceSnapshot(input: {
   return {
     workspaceId: input.workspaceId,
     title: input.title,
+    runtime,
     apiDocs,
     architecture: architecture.value,
     ...(architecture.error === undefined ? {} : { architectureError: architecture.error }),
     evaluation,
+    validation,
     requirementWiki,
     requirements,
     solution,
@@ -531,9 +556,11 @@ export async function loadProjectSurfaceSnapshot(input: {
 
 /** Stable project-relative paths consumed by delivery surfaces. */
 export const projectSurfacePaths = {
+  runtime: PROJECT_RUNTIME_PATH,
   apiDocs: `${FDE_DIRECTORY}/${API_DOCS_FILE}`,
   architecture: `${FDE_DIRECTORY}/${ARCHITECTURE_FILE}`,
   evaluation: `${FDE_DIRECTORY}/${EVALUATION_DIRECTORY}`,
+  validation: VALIDATION_CONTRACT_PATH,
   requirementWiki: requirementWikiPaths.root,
   requirements: REQUIREMENT_ARTIFACT_ROOT,
   solution: SOLUTION_ARTIFACT_ROOT,

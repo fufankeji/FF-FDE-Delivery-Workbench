@@ -24,7 +24,9 @@ export class FdeStageTransitionError extends Error {
         ? '方案设计'
         : expected === 'development'
           ? '项目开发'
-          : expected
+          : expected === 'validation'
+            ? '验证评估'
+            : expected
     super(`当前项目已经不在${label}阶段。`)
     this.name = 'FdeStageTransitionError'
   }
@@ -82,6 +84,11 @@ export class FdeStageState {
   /** Atomically complete project development for one exact browser revision. */
   completeDevelopment(workspaceId: WorkspaceId, expectedRevision: number): Promise<ProjectStageRecord> {
     return this.transition(workspaceId, expectedRevision, 'development', 'validation')
+  }
+
+  /** Atomically complete validation for one exact browser revision. */
+  completeValidation(workspaceId: WorkspaceId, expectedRevision: number): Promise<ProjectStageRecord> {
+    return this.transition(workspaceId, expectedRevision, 'validation', 'pilot')
   }
 
   private transition(
