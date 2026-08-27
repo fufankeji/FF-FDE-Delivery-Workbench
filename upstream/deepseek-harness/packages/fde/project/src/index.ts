@@ -17,6 +17,7 @@ import {
   createRequirementArtifactFileRoute,
   createRequirementWikiAbandonRoute,
   createRequirementWikiStartRoute,
+  createValidationIssueWaiveRoute,
   createValidationPlanConfirmRoute,
 } from './http.ts'
 import { registerProjectOpenApiTools, type ProjectOpenApiPolicy } from './openapi-tools.ts'
@@ -44,6 +45,7 @@ import {
   confirmValidationPlan,
   resolveValidationArtifact,
   VALIDATION_ARTIFACT_FILE_PATH,
+  waiveValidationIssue,
 } from './validation.ts'
 
 export {
@@ -57,6 +59,7 @@ export {
   createRequirementArtifactFileRoute,
   createRequirementWikiAbandonRoute,
   createRequirementWikiStartRoute,
+  createValidationIssueWaiveRoute,
   createValidationPlanConfirmRoute,
 } from './http.ts'
 export {
@@ -108,6 +111,7 @@ export {
   VALIDATION_ARTIFACTS,
   VALIDATION_CONTRACT_PATH,
   VALIDATION_PLAN_APPROVAL_PATH,
+  waiveValidationIssue,
 } from './validation.ts'
 export { registerRequirementWikiTools } from './requirement-wiki-tools.ts'
 export {
@@ -138,6 +142,8 @@ export const FDE_VALIDATION_ARTIFACT_FILE_PATH = VALIDATION_ARTIFACT_FILE_PATH
 export const FDE_ARCHITECTURE_CONFIRM_PATH = '/api/fde-project/architecture/confirm'
 /** Exact-contract validation plan confirmation route. */
 export const FDE_VALIDATION_PLAN_CONFIRM_PATH = '/api/fde-project/validation/confirm-plan'
+/** Exact-contract validation issue manual-acceptance route. */
+export const FDE_VALIDATION_ISSUE_WAIVE_PATH = '/api/fde-project/validation/waive-issue'
 /** Project evaluation baseline approval route. */
 export const FDE_EVALUATION_BASELINE_PATH = '/api/fde-project/evaluation/baseline'
 /** Explicit project requirement-Wiki build start route. */
@@ -294,6 +300,21 @@ export function apply(ctx: Context, config: Config): void {
     path: FDE_VALIDATION_PLAN_CONFIRM_PATH,
     handler: confirmPlan,
   }), `fde-project: ${FDE_VALIDATION_PLAN_CONFIRM_PATH}`)
+  const waiveIssue = createValidationIssueWaiveRoute({
+    trusted: request => isTrustedApiRequest(request, []),
+    waive: async (workspaceId, contractDigest, issueId, reason) => {
+      const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
+      if (workspace === undefined) return undefined
+      await waiveValidationIssue(workspace.path, contractDigest, issueId, reason)
+      return await loadProjectSurfaceSnapshot({ workspaceId, title: workspace.title, path: workspace.path })
+    },
+    reportFailure,
+  })
+  ctx.effect(() => ctx.webServer.register({
+    kind: 'exact',
+    path: FDE_VALIDATION_ISSUE_WAIVE_PATH,
+    handler: waiveIssue,
+  }), `fde-project: ${FDE_VALIDATION_ISSUE_WAIVE_PATH}`)
   const baseline = createEvaluationBaselineRoute({
     trusted: request => isTrustedApiRequest(request, []),
     approve: async (workspaceId, reportPath) => {

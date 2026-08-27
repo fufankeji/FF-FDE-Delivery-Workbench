@@ -933,20 +933,33 @@ function validationStatusLabel(status: ValidationStageSnapshot['contract']['metr
   return '待执行'
 }
 
-function ValidationOutputs({ workspaceId, currentStage, revision, validation, completeValidation, renderPreview }: {
+function validationIssueStatusLabel(status: ValidationStageSnapshot['contract']['issues'][number]['status']): string {
+  if (status === 'resolved') return '已解决'
+  if (status === 'waived') return '已人工接受'
+  return '待处理'
+}
+
+function ValidationOutputs({
+  workspaceId, currentStage, revision, validation, completeValidation, waiveValidationIssue, renderPreview,
+}: {
   readonly workspaceId: string
   readonly currentStage: FdeStageId
   readonly revision: number | undefined
   readonly validation: ValidationStageSnapshot
   readonly completeValidation: (revision: number) => Promise<void>
+  readonly waiveValidationIssue: (contractDigest: string, issueId: string, reason: string) => Promise<void>
   readonly renderPreview: (source: ProjectPreviewFile) => React.ReactNode
 }) {
   const [confirming, setConfirming] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | undefined>()
   const [selectedArtifactId, setSelectedArtifactId] = useState<string | undefined>()
+  const [issueDecision, setIssueDecision] = useState<{ readonly issueId: string; readonly reason: string } | undefined>()
+  const [issueSubmitting, setIssueSubmitting] = useState(false)
+  const [issueError, setIssueError] = useState<string | undefined>()
   useEffect(() => {
     setConfirming(false); setSubmitting(false); setError(undefined); setSelectedArtifactId(undefined)
+    setIssueDecision(undefined); setIssueSubmitting(false); setIssueError(undefined)
   }, [currentStage, workspaceId])
   const selectedArtifact = validation.artifacts.items.find((artifact): artifact is typeof artifact & { readonly fileUrl: string } => (
     artifact.id === selectedArtifactId && artifact.status === 'present' && artifact.fileUrl !== undefined
@@ -1010,10 +1023,64 @@ function ValidationOutputs({ workspaceId, currentStage, revision, validation, co
         <section className={css.developmentSection}>
           <header><div><h3>问题与接受决定</h3><p>未关闭的 critical/high 问题会阻止进入部署试运行。</p></div></header>
           <div className={css.outputList}>{validation.contract.issues.map(issue => (
-            <div key={issue.id} className={css.outputItem} data-static data-status={issue.status === 'open' ? 'error' : 'present'}>
+            <div key={issue.id} className={`${css.outputItem} ${css.validationIssueItem}`} data-static data-status={issue.status === 'open' ? 'error' : 'present'}>
               <span className={css.outputIcon} aria-hidden="true">ISSUE</span>
-              <div><h3>{issue.title}</h3><code>{issue.id}</code><p className={css.outputMeta}>{issue.resolution ?? issue.evidence ?? '尚未记录处理说明或证据。'}</p></div>
-              <span className={css.outputBadge}>{issue.severity} · {issue.status}</span>
+              <div>
+                <h3>{issue.title}</h3>
+                <code>{issue.id}</code>
+                <p className={css.outputMeta}>{issue.resolution ?? issue.evidence ?? '尚未记录处理说明或证据。'}</p>
+                {issue.waiverReason === undefined ? null : <p className={css.issueWaiverSummary}>人工接受理由：{issue.waiverReason}</p>}
+              </div>
+              <div className={css.validationIssueActions}>
+                <span className={css.outputBadge}>{issue.severity} · {validationIssueStatusLabel(issue.status)}</span>
+                {issue.status === 'open' && (
+                  <button type="button" disabled={issueSubmitting} onClick={() => {
+                    setIssueDecision({ issueId: issue.id, reason: '' })
+                    setIssueError(undefined)
+                  }}>人工确认关闭</button>
+                )}
+              </div>
+              {issueDecision?.issueId === issue.id && (
+                <form className={css.validationIssueForm} onSubmit={(event) => {
+                  event.preventDefault()
+                  const reason = issueDecision.reason.trim()
+                  const contractDigest = validation.contract.digest
+                  if (reason === '') {
+                    setIssueError('请填写本次人工接受的原因、范围或后续处理约定。')
+                    return
+                  }
+                  if (contractDigest === undefined) {
+                    setIssueError('当前评估方案缺少有效摘要，请刷新后重试。')
+                    return
+                  }
+                  setIssueSubmitting(true); setIssueError(undefined)
+                  void waiveValidationIssue(contractDigest, issue.id, reason).then(
+                    () => { setIssueDecision(undefined) },
+                    (cause: unknown) => { setIssueError(cause instanceof Error ? cause.message : String(cause)) },
+                  ).finally(() => { setIssueSubmitting(false) })
+                }}>
+                  <div>
+                    <strong>确认由 FDE 接受该问题风险</strong>
+                    <p>此操作只关闭这一条问题，不会把未通过、未执行或缺少证据的指标改成通过。</p>
+                  </div>
+                  <label>
+                    <span>接受理由</span>
+                    <textarea
+                      rows={3}
+                      maxLength={1_000}
+                      value={issueDecision.reason}
+                      disabled={issueSubmitting}
+                      placeholder="说明接受原因、适用范围和后续处理约定"
+                      onChange={(event) => { setIssueDecision({ issueId: issue.id, reason: event.currentTarget.value }) }}
+                    />
+                  </label>
+                  {issueError === undefined ? null : <p className={css.validationIssueError}>{issueError}</p>}
+                  <div className={css.validationIssueFormActions}>
+                    <button type="button" disabled={issueSubmitting} onClick={() => { setIssueDecision(undefined); setIssueError(undefined) }}>取消</button>
+                    <button type="submit" disabled={issueSubmitting}>{issueSubmitting ? '正在确认…' : '确认接受并关闭'}</button>
+                  </div>
+                </form>
+              )}
             </div>
           ))}</div>
         </section>
@@ -1088,7 +1155,7 @@ function ValidationOutputs({ workspaceId, currentStage, revision, validation, co
 
 function StageOutputs({
   workspaceId, stage, viewedStage, surfaceState, completeRequirements, completeSolution,
-  completeDevelopment, completeValidation, reviewArchitecture, renderPreview,
+  completeDevelopment, completeValidation, waiveValidationIssue, reviewArchitecture, renderPreview,
 }: {
   readonly workspaceId: string
   readonly stage: ProjectStageLoadState | undefined
@@ -1098,6 +1165,7 @@ function StageOutputs({
   readonly completeSolution: (revision: number) => Promise<void>
   readonly completeDevelopment: (revision: number) => Promise<void>
   readonly completeValidation: (revision: number) => Promise<void>
+  readonly waiveValidationIssue: (contractDigest: string, issueId: string, reason: string) => Promise<void>
   readonly reviewArchitecture: () => Promise<void>
   readonly renderPreview: (source: ProjectPreviewFile) => React.ReactNode
 }) {
@@ -1140,6 +1208,7 @@ function StageOutputs({
       revision={stage?.status === 'ready' ? stage.value.revision : undefined}
       validation={surfaceState.value.validation}
       completeValidation={completeValidation}
+      waiveValidationIssue={waiveValidationIssue}
       renderPreview={renderPreview}
     />
   }
@@ -1301,6 +1370,7 @@ function StageOutputs({
 function ProjectDetail({
   row, sourceState, surfaceState, wikiState, selectedSource, selectSource, parseSource,
   prepareWiki, startWiki, abandonWiki, refreshWiki, completeRequirements, completeSolution, completeDevelopment, completeValidation,
+  waiveValidationIssue,
   reviewArchitecture, enterProject, back, renderPreview,
 }: {
   readonly row: ProjectRow
@@ -1322,6 +1392,7 @@ function ProjectDetail({
   readonly completeSolution: (revision: number) => Promise<void>
   readonly completeDevelopment: (revision: number) => Promise<void>
   readonly completeValidation: (revision: number) => Promise<void>
+  readonly waiveValidationIssue: (contractDigest: string, issueId: string, reason: string) => Promise<void>
   readonly reviewArchitecture: () => Promise<void>
   readonly enterProject: () => void
   readonly back: () => void
@@ -1435,6 +1506,7 @@ function ProjectDetail({
             completeSolution={completeSolution}
             completeDevelopment={completeDevelopment}
             completeValidation={completeValidation}
+            waiveValidationIssue={waiveValidationIssue}
             reviewArchitecture={reviewArchitecture}
             renderPreview={renderPreview}
           />}
@@ -1496,7 +1568,7 @@ export function ProjectProgressOverlay({
   useProjectPage, useStageProgress, useProjectSurfaces, useProjectSources, useRequirementWiki, useWorkspaces, useSessions,
   loadStage, retryStage, refreshProjectSurface, loadProjectSources, parseProjectSource, loadRequirementWiki,
   prepareRequirementWikiRun, startRequirementWikiBuild, abandonRequirementWikiBuild, enterProject, reviewProjectArchitecture,
-  completeRequirements, completeSolution, completeDevelopment, completeValidation, closeProjectPage,
+  completeRequirements, completeSolution, completeDevelopment, completeValidation, waiveValidationIssue, closeProjectPage,
   showProjectOverview, showProjectTimeline, showProjectDetail,
   renderSlot, t,
 }: ProjectProgressOverlayProps) {
@@ -1648,6 +1720,9 @@ export function ProjectProgressOverlay({
               retryStage(detailRow.workspaceId)
               throw error
             }
+          }}
+          waiveValidationIssue={async (contractDigest, issueId, reason) => {
+            await waiveValidationIssue(detailRow.workspaceId, contractDigest, issueId, reason)
           }}
           reviewArchitecture={async () => { await reviewProjectArchitecture(detailRow.workspaceId) }}
           enterProject={() => { void enterProject(detailRow.workspaceId) }}

@@ -182,6 +182,8 @@ export interface ValidationIssueSnapshot {
   readonly evidence?: string
   readonly evidenceAvailable: boolean
   readonly resolution?: string
+  readonly waiverReason?: string
+  readonly waivedAt?: string
 }
 
 /** Parsed project validation contract or its explicit absence/failure. */

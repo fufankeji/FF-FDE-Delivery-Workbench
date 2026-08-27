@@ -201,6 +201,11 @@ async function issueOf(projectRoot: string, raw: unknown, index: number): Promis
   if (!ISSUE_STATUSES.has(status)) throw new Error(`issues[${String(index)}].status 不受支持。`)
   const evidence = await evidenceOf(projectRoot, item.evidence, `issues[${String(index)}].evidence`)
   const resolution = optionalText(item.resolution, `issues[${String(index)}].resolution`, 1_000)
+  const waiverReason = optionalText(item.waiverReason, `issues[${String(index)}].waiverReason`, 1_000)
+  const waivedAt = optionalText(item.waivedAt, `issues[${String(index)}].waivedAt`, 80)
+  if (waivedAt !== undefined && Number.isNaN(Date.parse(waivedAt))) {
+    throw new Error(`issues[${String(index)}].waivedAt 必须是有效时间。`)
+  }
   return {
     id: idOf(item.id, `issues[${String(index)}].id`),
     title: textOf(item.title, `issues[${String(index)}].title`, 240),
@@ -209,6 +214,8 @@ async function issueOf(projectRoot: string, raw: unknown, index: number): Promis
     ...(evidence.path === undefined ? {} : { evidence: evidence.path }),
     evidenceAvailable: evidence.available,
     ...(resolution === undefined ? {} : { resolution }),
+    ...(waiverReason === undefined ? {} : { waiverReason }),
+    ...(waivedAt === undefined ? {} : { waivedAt }),
   }
 }
 
@@ -216,8 +223,10 @@ async function parseValidationContract(projectRoot: string, value: unknown): Pro
   const contract = recordOf(value, '验证合同')
   if (contract.schemaVersion !== 2) throw new Error('验证合同 schemaVersion 必须是 2。')
   const candidate = recordOf(contract.candidate, 'candidate')
+  const candidateId = textOf(candidate.id, 'candidate.id', 240)
   const candidateDescription = optionalText(candidate.description, 'candidate.description', 1_000)
   const candidateSource = optionalText(candidate.source, 'candidate.source', 1_000)
+  const environment = textOf(contract.environment, 'environment', 1_000)
   const rawDatasets = contract.datasets ?? []
   const rawMetrics = contract.metrics
   const rawIssues = contract.issues ?? []
@@ -225,22 +234,39 @@ async function parseValidationContract(projectRoot: string, value: unknown): Pro
   if (!Array.isArray(rawMetrics) || rawMetrics.length === 0 || rawMetrics.length > MAX_METRICS) throw new Error(`metrics 必须是 1 到 ${String(MAX_METRICS)} 项的数组。`)
   if (!Array.isArray(rawIssues) || rawIssues.length > MAX_ISSUES) throw new Error(`issues 必须是最多 ${String(MAX_ISSUES)} 项的数组。`)
   const datasets = rawDatasets.map(datasetOf)
-  const metrics = await Promise.all(rawMetrics.map(async (metric, index) => await metricOf(projectRoot, metric, index)))
+  const metricResults = await Promise.all(rawMetrics.map(async (metric, index) => {
+    try {
+      return { metric: await metricOf(projectRoot, metric, index) }
+    } catch (error) {
+      return { error: error instanceof Error ? error.message : String(error) }
+    }
+  }))
+  const metrics = metricResults.flatMap(result => result.metric === undefined ? [] : [result.metric])
+  const metricErrors = metricResults.flatMap(result => result.error === undefined ? [] : [result.error])
   const issues = await Promise.all(rawIssues.map(async (issue, index) => await issueOf(projectRoot, issue, index)))
   for (const [label, ids] of [['datasets', datasets.map(item => item.id)], ['metrics', metrics.map(item => item.id)], ['issues', issues.map(item => item.id)]] as const) {
     if (new Set(ids).size !== ids.length) throw new Error(`${label} 包含重复 id。`)
   }
-  return {
-    status: 'ready',
+  const parsed = {
     path: VALIDATION_CONTRACT_PATH,
-    candidateId: textOf(candidate.id, 'candidate.id', 240),
+    candidateId,
     ...(candidateDescription === undefined ? {} : { candidateDescription }),
     ...(candidateSource === undefined ? {} : { candidateSource }),
-    environment: textOf(contract.environment, 'environment', 1_000),
+    environment,
     datasets,
     metrics,
     issues,
   }
+  if (metricErrors.length > 0) {
+    const visibleErrors = metricErrors.slice(0, 3).join('；')
+    const remaining = metricErrors.length > 3 ? `；另有 ${String(metricErrors.length - 3)} 项错误` : ''
+    return {
+      status: 'invalid',
+      ...parsed,
+      message: `验证合同包含 ${String(metricErrors.length)} 个无效指标：${visibleErrors}${remaining}。其余 ${String(metrics.length)} 项仍可查看，但不能确认方案或推进阶段。`,
+    }
+  }
+  return { status: 'ready', ...parsed }
 }
 
 function planDigest(contract: ValidationContractSnapshot): string {
@@ -300,7 +326,7 @@ async function loadContract(projectRoot: string): Promise<ValidationContractSnap
     const value = await stat(path)
     if (!value.isFile() || value.size > MAX_CONTRACT_BYTES) throw new Error('验证合同不是普通 JSON 文件或超过 512 KiB。')
     const contract = await parseValidationContract(projectRoot, JSON.parse(await readFile(path, 'utf8')) as unknown)
-    return { ...contract, digest: planDigest(contract) }
+    return contract.status === 'ready' ? { ...contract, digest: planDigest(contract) } : contract
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
       return { status: 'missing', path: VALIDATION_CONTRACT_PATH, datasets: [], metrics: [], issues: [], message: '尚未建立验证合同。' }
@@ -382,7 +408,8 @@ export async function loadValidationStage(projectRoot: string, workspaceId?: str
     if ((issue.severity === 'critical' || issue.severity === 'high') && issue.status === 'open') {
       blockers.push(`关键问题“${issue.title}”尚未处理。`)
     }
-    if (issue.status === 'waived' && issue.resolution === undefined) blockers.push(`问题“${issue.title}”的接受决定缺少理由。`)
+    if (issue.status === 'waived' && issue.waiverReason === undefined) blockers.push(`问题“${issue.title}”的人工接受决定缺少理由。`)
+    if (issue.status === 'waived' && issue.waivedAt === undefined) blockers.push(`问题“${issue.title}”的人工接受决定缺少时间。`)
   }
   for (const artifact of artifacts.filter(item => item.status !== 'present' && item.id !== 'validation-plan')) blockers.push(`${artifact.title}尚未生成。`)
   const requiredMetrics = contract.metrics.filter(item => item.required)
@@ -421,6 +448,44 @@ export async function confirmValidationPlan(projectRoot: string, expectedDigest:
       contractDigest: expectedDigest,
       confirmedAt: new Date().toISOString(),
     }, null, 2)}\n`, { mode: 0o600, dirMode: 0o700 })
+    return await loadValidationStage(projectRoot)
+  })
+}
+
+/** Accept one still-open validation issue without changing any metric result. */
+export async function waiveValidationIssue(
+  projectRoot: string,
+  expectedDigest: string,
+  issueId: string,
+  reason: string,
+): Promise<ValidationStageSnapshot> {
+  if (!SHA256_DIGEST.test(expectedDigest)) throw new Error('人工关闭问题请求缺少有效合同摘要。')
+  const expectedIssueId = idOf(issueId, '人工关闭问题 issueId')
+  const waiverReason = textOf(reason, '人工关闭问题 reason', 1_000)
+  const contractPath = join(projectRoot, VALIDATION_CONTRACT_PATH)
+  return await withFileLock(contractPath, async () => {
+    const value = await stat(contractPath)
+    if (!value.isFile() || value.size > MAX_CONTRACT_BYTES) throw new Error('验证合同不是普通 JSON 文件或超过 512 KiB。')
+    const contract = recordOf(JSON.parse(await readFile(contractPath, 'utf8')) as unknown, '验证合同')
+    const current = await parseValidationContract(projectRoot, contract)
+    if (current.status !== 'ready') throw new Error(current.message ?? '验证合同尚未就绪。')
+    if (planDigest(current) !== expectedDigest) throw new Error('评估方案已经变化，请刷新后重新核对。')
+    if (!Array.isArray(contract.issues)) throw new Error('验证合同 issues 必须是数组。')
+    const issueIndex = contract.issues.findIndex((candidate) => {
+      if (candidate === null || typeof candidate !== 'object' || Array.isArray(candidate)) return false
+      return (candidate as { id?: unknown }).id === expectedIssueId
+    })
+    if (issueIndex < 0) throw new Error('要人工关闭的问题已经不存在，请刷新后重新核对。')
+    const issue = recordOf(contract.issues[issueIndex], `issues[${String(issueIndex)}]`)
+    const currentIssue = await issueOf(projectRoot, issue, issueIndex)
+    if (currentIssue.status !== 'open') throw new Error('该问题已经处理，请刷新后查看最新状态。')
+    contract.issues[issueIndex] = {
+      ...issue,
+      status: 'waived',
+      waiverReason,
+      waivedAt: new Date().toISOString(),
+    }
+    await writeFileAtomic(contractPath, `${JSON.stringify(contract, null, 2)}\n`, { mode: 0o600, dirMode: 0o700 })
     return await loadValidationStage(projectRoot)
   })
 }

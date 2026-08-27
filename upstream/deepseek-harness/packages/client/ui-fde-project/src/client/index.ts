@@ -21,6 +21,7 @@ import { latestProjectSessionId } from './project-data.ts'
 import {
   ensureProjectRuntimeSidebar,
   openProjectPreview,
+  projectRuntimeTerminalRecoveryPrompt,
   projectPreviewAuthority,
   revealProjectSidebar,
   showProjectRuntimeTerminal,
@@ -106,6 +107,9 @@ export function apply(ctx: ClientContext): void {
     completeValidation: async (workspaceId, expectedRevision) => {
       await stages.completeValidation(workspaceId, expectedRevision)
       surfaces.refresh(workspaceId)
+    },
+    waiveValidationIssue: async (workspaceId, contractDigest, issueId, reason) => {
+      await surfaces.waiveValidationIssue(workspaceId, contractDigest, issueId, reason)
     },
     loadProjectSources: (workspaceId, force) => { sources.load(workspaceId, force) },
     parseProjectSource: async (workspaceId, sourceId) => { await sources.parse(workspaceId, sourceId) },
@@ -316,16 +320,21 @@ export function apply(ctx: ClientContext): void {
         throw new Error('项目运行会话已经不可用。')
       }
       await ensureProjectRuntimeSidebar(betterSidebar)
-      if (targetSessionId !== sessionId) {
-        ctx.sessions.open(targetSessionId as SessionId)
-        await waitForProjectSidebarSession(betterSidebar, targetSessionId)
-      }
-      showProjectRuntimeTerminal(
+      ctx.sessions.open(targetSessionId as SessionId)
+      await waitForProjectSidebarSession(betterSidebar, targetSessionId)
+      const shown = await showProjectRuntimeTerminal(
         betterSidebar,
         targetSessionId,
         workspacePath,
         state?.status === 'ready' ? state.value.runtime.terminalTitle : undefined,
       )
+      if (shown) return
+      showProjectConversation(targetSessionId)
+      const runtime = state?.status === 'ready' ? state.value.runtime : undefined
+      await queueRuntimePrompt(targetSessionId, projectRuntimeTerminalRecoveryPrompt(
+        runtime?.previewUrl,
+        runtime?.terminalTitle,
+      ))
     },
     continueDevelopment: (sessionId) => {
       showProjectConversation(sessionId)

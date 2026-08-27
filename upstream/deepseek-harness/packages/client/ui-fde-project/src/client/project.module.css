@@ -1654,6 +1654,7 @@
 .outputRoot[data-stage='requirements'] .outputBadge,
 .outputRoot[data-stage='solution'] .outputBadge { grid-column: 2; justify-self: start; }
 .outputItem { display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; align-items: center; gap: 13px; width: 100%; min-width: 0; padding: 14px; border: 1px solid var(--dsw-alias-border-l1); border-radius: 12px; color: var(--dsw-alias-label-primary); background: var(--dsw-alias-bg-layer-1); text-align: left; }
+.outputItem > div { min-width: 0; }
 .outputItem:not(:disabled) { cursor: pointer; }
 .outputItem:not(:disabled):hover,
 .outputItem[data-active] { border-color: color-mix(in srgb, var(--dsw-alias-state-business-primary) 54%, var(--dsw-alias-border-l2)); background: color-mix(in srgb, var(--dsw-alias-state-business-primary) 6%, var(--dsw-alias-bg-layer-1)); }
@@ -1668,11 +1669,28 @@
 .outputItem h3 { margin: 0; font-size: 13px; font-weight: 620; }
 .outputItem code { display: block; overflow: hidden; margin-top: 5px; color: var(--dsw-alias-label-caption); font: 10px/1.5 var(--ds-font-family-code); text-overflow: ellipsis; white-space: nowrap; }
 .outputItem p { margin: 5px 0 0; color: var(--dsw-alias-state-error-primary); font: var(--dsw-font-xxxs-11); }
-.outputList .outputMeta { color: var(--dsw-alias-label-secondary); }
+.outputList .outputMeta { overflow-wrap: anywhere; color: var(--dsw-alias-label-secondary); word-break: break-word; }
 .outputBadge { flex: none; padding: 5px 8px; border-radius: 999px; color: var(--dsw-alias-label-secondary); background: var(--dsw-alias-interactive-bg-hover); font: var(--dsw-font-xxxs-11); white-space: nowrap; }
 .outputItem[data-status='present'] .outputBadge { color: var(--dsw-alias-state-success-primary); background: var(--dsw-alias-state-success-tertiary); }
 .outputItem[data-status='pending'] .outputBadge { color: var(--dsw-alias-state-business-primary); background: color-mix(in srgb, var(--dsw-alias-state-business-primary) 10%, var(--dsw-alias-bg-layer-2)); }
 .outputItem[data-status='error'] .outputBadge { color: var(--dsw-alias-state-error-primary); background: var(--dsw-alias-state-error-tertiary); }
+.validationIssueItem { align-items: start; }
+.validationIssueActions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; max-width: 280px; }
+.validationIssueActions button,
+.validationIssueFormActions button { min-height: 30px; padding: 0 10px; border: 1px solid var(--dsw-alias-border-l2); border-radius: 8px; color: var(--dsw-alias-label-primary); background: var(--dsw-alias-bg-layer-1); font: var(--dsw-font-xxxs-11); cursor: pointer; }
+.validationIssueActions button { border-color: color-mix(in srgb, var(--dsw-alias-state-error-primary) 42%, var(--dsw-alias-border-l2)); color: var(--dsw-alias-state-error-primary); }
+.validationIssueActions button:disabled,
+.validationIssueFormActions button:disabled { opacity: 0.46; cursor: not-allowed; }
+.outputItem .issueWaiverSummary { overflow-wrap: anywhere; color: var(--dsw-alias-state-success-primary); line-height: 1.55; word-break: break-word; }
+.validationIssueForm { grid-column: 2 / -1; display: grid; gap: 12px; width: 100%; min-width: 0; padding: 14px; border: 1px solid color-mix(in srgb, var(--dsw-alias-state-warn-primary) 42%, var(--dsw-alias-border-l2)); border-radius: 10px; background: color-mix(in srgb, var(--dsw-alias-state-warn-tertiary) 48%, var(--dsw-alias-bg-layer-1)); }
+.validationIssueForm > div:first-child strong { font: var(--dsw-font-xs-strong-13); }
+.validationIssueForm > div:first-child p { margin-top: 4px; color: var(--dsw-alias-label-secondary); line-height: 1.55; }
+.validationIssueForm label { display: grid; gap: 6px; min-width: 0; color: var(--dsw-alias-label-secondary); font: var(--dsw-font-xxxs-11); }
+.validationIssueForm textarea { box-sizing: border-box; width: 100%; min-width: 0; resize: vertical; padding: 10px 11px; border: 1px solid var(--dsw-alias-border-l2); border-radius: 8px; color: var(--dsw-alias-label-primary); background: var(--dsw-alias-bg-layer-1); font: var(--dsw-font-xxs-12); line-height: 1.55; }
+.validationIssueForm textarea:focus-visible { outline: 2px solid var(--dsw-alias-state-business-primary); outline-offset: 1px; }
+.outputItem .validationIssueError { overflow-wrap: anywhere; margin: 0; color: var(--dsw-alias-state-error-primary); word-break: break-word; }
+.validationIssueFormActions { display: flex; justify-content: flex-end; gap: 8px; }
+.validationIssueFormActions button:last-child { border-color: var(--dsw-alias-label-primary); color: var(--dsw-alias-label-primary-inverted); background: var(--dsw-alias-label-primary); }
 .outputPreviewHint { display: grid; min-height: 76px; place-items: center; margin-top: 12px; border: 1px dashed var(--dsw-alias-border-l2); border-radius: 12px; color: var(--dsw-alias-label-secondary); background: var(--dsw-alias-bg-layer-1); font: var(--dsw-font-xxs-12); }
 .artifactPreviewLayer { position: fixed; inset: 0; z-index: 20; display: flex; justify-content: flex-end; min-width: 0; overflow: hidden; }
 .artifactPreviewScrim { position: absolute; inset: 0; width: 100%; border: 0; background: color-mix(in srgb, var(--dsw-alias-label-primary) 18%, transparent); backdrop-filter: blur(3px); cursor: pointer; }
@@ -2097,6 +2115,8 @@
   .outputHeader { flex-direction: column; }
   .outputItem { grid-template-columns: 42px minmax(0, 1fr); }
   .outputBadge { grid-column: 2; justify-self: start; }
+  .validationIssueActions { grid-column: 2; justify-content: flex-start; max-width: none; }
+  .validationIssueForm { grid-column: 1 / -1; }
   .developmentPulse { grid-template-columns: 1fr; }
   .developmentPulse dl { grid-column: auto; }
   .evidenceList { grid-template-columns: 1fr; }

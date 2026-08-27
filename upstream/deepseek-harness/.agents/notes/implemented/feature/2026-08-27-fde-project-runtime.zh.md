@@ -20,7 +20,9 @@ Status: implemented
 
 页头注册会捕获 `ctx.inject(['betterSidebar'], ...)` 提供的作用域 Context 中的 Better Sidebar 实例。运行回调不会再从插件外层 Context 延迟读取该服务；后者虽然能成功注册界面，但会在用户点击“启动项目”时才失败。
 
-Agent 创建或复用名为“项目运行”的持久终端。启动中、运行中、停止中、阻塞和曾经停止等状态会在有意义时提供该保留终端。停止操作发给原运行 Session，使用 `terminal_signal(SIGINT)` 加终端观察，并明确禁止无范围 `pkill`、`killall` 和 `terminal_close`。确认停止后会清除预览与 API 运行事实，但保留终端标题和输出。停止结果不明确时保持阻塞，只能重试停止，不能重复启动服务。
+Agent 创建或复用名为“项目运行”的持久终端。启动中、运行中、停止中、阻塞和曾经停止等状态会在有意义时提供该保留终端。停止操作发给原运行 Session，使用 `terminal_signal(SIGINT)` 加终端观察，并明确禁止无范围 `pkill`、`killall` 和 `terminal_close`。确认停止后会清除预览与 API 运行事实，但在当前 Host 生命周期内保留终端标题和输出。停止结果不明确时保持阻塞，只能重试停止，不能重复启动服务。
+
+“查看终端”始终先打开运行记录绑定的 Session，并等待 Better Sidebar 采用该 Session 后再读取其布局。查找顺序依次为同名 Agent 终端、该 Session 中已经可见的同名普通终端、最近的 Agent 终端。Harness Host 重启会真实销毁内存 Agent PTY 及其输出，即使最后一份运行记录仍为 `running`。短暂等待后仍无终端时，动作会返回原项目对话并排队一次可见恢复指令：先列举终端，必要时只创建一个空的替代观察终端，再按照项目说明核验已记录预览；明确禁止重复启动或停止服务、在没有当前 operationId 时报告，或声称恢复了旧日志。
 
 “打开项目”使用 Better Sidebar 公共 `openTab` Browser 表层。打开前，客户端只把已验证预览的精确 loopback `host:port` authority 加入 `browserAllowedLoopback`，绝不启动操作系统浏览器。“API 文档”仍以项目开发阶段为最低门槛，但只有当前快照为 `running`、API 文档已配置且存在 OpenAPI 来源时才注册。显式 `.fde/api-docs.json` 继续有效；运行 Agent 报告也可以提供已验证 OpenAPI URL 或项目相对来源。
 
@@ -28,7 +30,7 @@ Agent 创建或复用名为“项目运行”的持久终端。启动中、运�
 
 [`project-runtime.spec.ts`](../../../../packages/fde/project/tests/project-runtime.spec.ts)覆盖精确操作归属、loopback 限制、OpenAPI 投影、终端身份保留、启动阻塞恢复、停止阻塞重试、防止重复启动和指令排队失败恢复。[`project-runtime-header.client.spec.tsx`](../../../../packages/client/ui-fde-project/tests/project-runtime-header.client.spec.tsx)覆盖可见启动动作、启动阻塞刷新、一次性自动打开 Browser 与停止未决控制。Apply 集成测试通过已注册页头注入对象直接执行“启动项目”，并证明作用域 Better Sidebar 实例会在 Agent 指令排队前打开项目文件树。Controller 与 View 可见性套件固定同源 route 请求体，以及“运行中且有 OpenAPI”这一 API 文档门槛。
 
-Apply 集成测试还固定了阻塞路径的展示合同：“启动项目”会在排队可见指令前选择“对话”并打开当前 Session，且提示明确要求 Agent 在运行报告后正常使用中文回复。限定范围的 Host 与 Client TypeScript 项目均通过 `--noEmit` 编译，客户端包可以 bundle，直接受影响的测试均通过。本切片按协同开发约定不做浏览器自动化；手工使用仍需验证目标项目自己的 `AGENTS.md`、原生 PTY 可用性、真实命令、就绪 URL 和渲染后的应用。
+Apply 集成测试还固定了阻塞路径的展示合同：“启动项目”会在排队可见指令前选择“对话”并打开当前 Session，且提示明确要求 Agent 在运行报告后正常使用中文回复。[`project-runtime-sidebar.client.spec.ts`](../../../../packages/client/ui-fde-project/tests/project-runtime-sidebar.client.spec.ts)覆盖同名普通终端兼容、延迟到达的 Agent 终端、可恢复的终端缺失结果，以及不得重复启动的恢复指令。限定范围的 Host 与 Client TypeScript 项目均通过 `--noEmit` 编译，客户端包可以 bundle，直接受影响的测试均通过。本切片按协同开发约定不做浏览器自动化；手工使用仍需验证目标项目自己的 `AGENTS.md`、原生 PTY 可用性、真实命令、就绪 URL 和渲染后的应用。
 
 ## Alternatives considered
 

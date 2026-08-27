@@ -6,6 +6,8 @@ export const FDE_PROJECT_SNAPSHOT_PATH = '/api/fde-project/snapshot'
 export const FDE_ARCHITECTURE_CONFIRM_PATH = '/api/fde-project/architecture/confirm'
 /** Exact Host route for confirming one validation contract. */
 export const FDE_VALIDATION_PLAN_CONFIRM_PATH = '/api/fde-project/validation/confirm-plan'
+/** Exact Host route for manually accepting one validation issue. */
+export const FDE_VALIDATION_ISSUE_WAIVE_PATH = '/api/fde-project/validation/waive-issue'
 /** Exact Host route for approving one indexed evaluation report. */
 export const FDE_EVALUATION_BASELINE_PATH = '/api/fde-project/evaluation/baseline'
 /** Exact Host route for beginning one Agent-driven project start. */
@@ -140,6 +142,8 @@ export interface ValidationStageSnapshot {
       readonly evidence?: string
       readonly evidenceAvailable: boolean
       readonly resolution?: string
+      readonly waiverReason?: string
+      readonly waivedAt?: string
     }[]
     readonly message?: string
   }
@@ -360,6 +364,30 @@ export async function confirmValidationPlan(
   return parseSnapshot(payload, workspaceId)
 }
 
+/** Manually accept one open validation issue for the exact displayed contract. */
+export async function waiveValidationIssue(
+  workspaceId: string,
+  contractDigest: string,
+  issueId: string,
+  reason: string,
+  fetchImpl: typeof fetch = fetch,
+  signal?: AbortSignal,
+): Promise<ProjectSurfaceSnapshot> {
+  const response = await fetchImpl(FDE_VALIDATION_ISSUE_WAIVE_PATH, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ workspaceId, contractDigest, issueId, reason }),
+    ...(signal === undefined ? {} : { signal }),
+  })
+  let payload: unknown
+  try { payload = await response.json() } catch { throw new Error('人工关闭验证问题响应无效。') }
+  if (!response.ok) {
+    const failure = payload as SnapshotFailure
+    throw new Error(failure.error?.message ?? `人工关闭验证问题失败（HTTP ${String(response.status)}）。`)
+  }
+  return parseSnapshot(payload, workspaceId)
+}
+
 /**
  * Approve one project report as the explicit evaluation baseline.
  * @param workspaceId - exact registered project identity.
@@ -538,6 +566,27 @@ export class FdeProjectSurfaceController {
     this.requests.set(workspaceId, controller)
     try {
       const value = await confirmValidationPlan(workspaceId, contractDigest, fetch, controller.signal)
+      if (this.canPublish(workspaceId, controller)) {
+        this.publish(workspaceId, { status: 'ready', value })
+      }
+    } finally {
+      if (this.requests.get(workspaceId) === controller) this.requests.delete(workspaceId)
+    }
+  }
+
+  /** Accept one still-open validation issue and publish the refreshed project snapshot. */
+  async waiveValidationIssue(
+    workspaceId: string,
+    contractDigest: string,
+    issueId: string,
+    reason: string,
+  ): Promise<void> {
+    if (this.disposed) throw new Error('项目页面已关闭。')
+    this.requests.get(workspaceId)?.abort()
+    const controller = new AbortController()
+    this.requests.set(workspaceId, controller)
+    try {
+      const value = await waiveValidationIssue(workspaceId, contractDigest, issueId, reason, fetch, controller.signal)
       if (this.canPublish(workspaceId, controller)) {
         this.publish(workspaceId, { status: 'ready', value })
       }

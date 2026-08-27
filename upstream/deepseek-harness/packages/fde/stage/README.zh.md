@@ -4,7 +4,7 @@
 
 FDE 项目当前阶段的 Host 端状态。该包打开一张以 Harness WorkspaceId 为键的 `storage-domain` 表，并提供仅限可信同源访问的 POST 路由：读取或初始化记录，以及执行四个固定转换——`requirements` 到 `solution`、`solution` 到 `development`、`development` 到 `validation`、`validation` 到 `pilot`。同一 Workspace 的并发首次读取共享一次写入；阶段转换按项目串行并要求页面提交精确 revision。四个交付门依次重新检查三份需求调研文件、包括项目 PRD 在内的五份方案设计文档与已确认架构、三份项目开发收口文件，以及当前已由 FDE 确认的验证方案、验证合同、证据、阻塞项和三份验证产物；所有路由都不接受任意目标阶段。
 
-该包同时注册内置 `fde-requirement-research`、`fde-solution-design`、`fde-project-development`、`fde-validation` Skills 和一段简短的阶段感知系统提示。项目开发 Skill 直接约束项目唯一标准 `docs/` 与有证据的任务；验证 Skill 区分方案准备和执行，要求每项指标引用此前阶段的真实文档，也不能创建 Host 所有的 FDE 方案确认。只有 FDE 在浏览器中的明确确认能够授权当前方案，并在验证完成后推进阶段。其余两个阶段门仍延期实现。
+该包同时注册内置 `fde-requirement-research`、`fde-solution-design`、`fde-project-development`、`fde-validation` Skills 和一段简短的阶段感知系统提示。项目开发 Skill 直接约束项目唯一标准 `docs/` 与有证据的任务；验证 Skill 区分方案准备和执行，要求每项指标引用此前阶段的真实文档，并给出精确结果模板：`evidence` 是一条非空的项目相对路径文字，WARN 的接受理由使用 `waiverReason`。它不能创建 Host 所有的 FDE 方案确认，也不能写入问题的 `waived` 决定；只有 FDE 在浏览器中填写理由后才能接受一条 open 问题。只有 FDE 在浏览器中的明确确认能够授权当前方案，并在验证完成后推进阶段。其余两个阶段门仍延期实现。
 
 ## 模型体验
 

@@ -14,7 +14,7 @@ FDE 项目交付页面使用的可信 Host 支持。它只解析显式 Harness W
 
 ## 验证合同
 
-验证投影会有界解析 schema v2 的 `.fde/evaluations/validation.json`，包括候选版本、环境、项目适用数据、指标、结果和问题。每个指标都必须引用一份或多份此前阶段的真实项目文档，并给出文档内编号；PASS／WARN 证据也必须解析到已登记 Workspace 内真实文件。验证计划存在且所有来源可读取后，同源精确方案操作会把 FDE 确认原子写入 `.fde/evaluations/validation-plan-approval.json`。其 SHA-256 摘要覆盖候选、环境、数据和指标定义，但不包含执行结果、证据和问题状态：修改方案会使旧确认失效，正常写回结果则不会。必需指标 NOT_RUN／FAIL、证据缺失、未接受 WARN、未关闭 critical／high 问题、固定产物缺失，以及方案尚未确认或确认已失效，都会保持为明确阻塞项。同一快照还索引 `fde-deliverables/04-validation/{validation-plan,validation-report,validation-baseline}.md`，供页面有界预览；它不会运行验证或推进交付阶段。
+验证投影会有界解析 schema v2 的 `.fde/evaluations/validation.json`，包括候选版本、环境、项目适用数据、指标、结果和问题。每个指标都必须引用一份或多份此前阶段的真实项目文档，并给出文档内编号。PASS 或 WARN 结果的 `evidence` 必须是一条非空的项目相对路径文字，不能使用数组；WARN 的接受理由必须使用 camelCase 字段 `waiverReason`。证据还必须解析到已登记 Workspace 内真实文件。单个指标格式错误时，投影会保留有效的候选版本、环境、数据集、其他指标、问题和独立索引的阶段产物，便于诊断；但整份合同仍保持无效，不生成摘要，也不能确认方案或推进阶段。验证计划存在且所有来源可读取后，同源精确方案操作会把 FDE 确认原子写入 `.fde/evaluations/validation-plan-approval.json`。其 SHA-256 摘要覆盖候选、环境、数据和指标定义，但不包含执行结果、证据和问题状态：修改方案会使旧确认失效，正常写回结果则不会。FDE 也可以人工接受一条仍为 open 的问题，但必须填写非空理由。同源精确合同操作会在合同文件锁内重新核对方案摘要和问题仍为 open，保留原问题，并写入 `status=waived`、`waiverReason` 与 `waivedAt`；它不会改变任何指标结果，也不会清除其他阻塞。必需指标 NOT_RUN／FAIL、证据缺失、未接受 WARN、未关闭 critical／high 问题、不完整的人工接受记录、固定产物缺失，以及方案尚未确认或确认已失效，都会保持为明确阻塞项。同一快照还索引 `fde-deliverables/04-validation/{validation-plan,validation-report,validation-baseline}.md`，供页面有界预览；它不会运行验证或推进交付阶段。
 
 ## 需求 Wiki
 
@@ -71,7 +71,7 @@ Schema 在不同项目之间保持稳定；每次操作只改变普通对话后�
 - 本包不会自行执行服务命令、运行评估或创建系统架构产物；启动和停止工作由可见项目 Agent 通过持久终端完成。
 - 本包不会根据 Git 历史、文件时间、Agent 回复或对话内容推断日期、任务完成和 Feature 状态，也不会编辑项目 docs。
 - API 文档必须来自项目显式文件或已验证的运行中项目报告；没有 OpenAPI 时保持未配置状态。
-- 评估报告当前只读；损坏报告会被排除，不会自动修复。
+- 评估报告当前只读。单个指标格式错误时，其他有效合同事实仍可用于诊断，但 Host 不会修复错误，也不会把部分投影视为可确认合同。
 - 适配层刻意复用锁定插件的解析和请求模块，因为上游插件的进程级静态 API 清单本身无法提供 Workspace 隔离。
 - 系统架构历史以文件形式保存在 `.fde/architecture-history/`；浏览器当前只展示最新版本。
 - 需求 Wiki 历史以文件形式保存在 `.fde/requirement-wiki/versions/`；Host 快照只展示完整的当前 revision 和最近构建。

@@ -47,6 +47,18 @@ export interface ValidationPlanConfirmRouteOptions {
   readonly reportFailure?: (error: unknown) => void
 }
 
+/** Dependencies of the exact-contract validation-issue waiver route. */
+export interface ValidationIssueWaiveRouteOptions {
+  readonly trusted: (request: IncomingMessage) => boolean
+  readonly waive: (
+    workspaceId: string,
+    contractDigest: string,
+    issueId: string,
+    reason: string,
+  ) => Promise<ProjectSurfaceSnapshot | undefined>
+  readonly reportFailure?: (error: unknown) => void
+}
+
 /** Dependencies of the project evaluation baseline route. */
 export interface EvaluationBaselineRouteOptions {
   readonly trusted: (request: IncomingMessage) => boolean
@@ -128,6 +140,31 @@ function validationPlanConfirmationOf(value: unknown): { readonly workspaceId: s
     throw new FdeProjectRequestError('invalid-request', 400, '评估方案确认请求缺少有效合同摘要。')
   }
   return { workspaceId, contractDigest }
+}
+
+function validationIssueWaiverOf(value: unknown): {
+  readonly workspaceId: string
+  readonly contractDigest: string
+  readonly issueId: string
+  readonly reason: string
+} {
+  const workspaceId = workspaceIdOf(value)
+  const input = value as { contractDigest?: unknown; issueId?: unknown; reason?: unknown }
+  if (typeof input.contractDigest !== 'string' || !/^sha256:[a-f0-9]{64}$/u.test(input.contractDigest)) {
+    throw new FdeProjectRequestError('invalid-request', 400, '人工关闭问题请求缺少有效合同摘要。')
+  }
+  if (typeof input.issueId !== 'string' || !/^[a-z0-9][a-z0-9._-]{0,119}$/iu.test(input.issueId)) {
+    throw new FdeProjectRequestError('invalid-request', 400, '人工关闭问题请求缺少有效问题标识。')
+  }
+  if (typeof input.reason !== 'string' || input.reason.trim() === '' || input.reason.trim().length > 1_000) {
+    throw new FdeProjectRequestError('invalid-request', 400, '请填写 1 到 1000 个字符的人工接受理由。')
+  }
+  return {
+    workspaceId,
+    contractDigest: input.contractDigest,
+    issueId: input.issueId,
+    reason: input.reason.trim(),
+  }
 }
 
 function evaluationBaselineOf(value: unknown): { readonly workspaceId: string; readonly reportPath: string } {
@@ -351,6 +388,42 @@ export function createValidationPlanConfirmRoute(
         error: {
           code: 'validation-plan-confirm-failed',
           message: error instanceof Error ? error.message : '评估方案确认失败。',
+        },
+      })
+    }
+  }
+}
+
+/**
+ * Create the trusted exact-contract validation-issue waiver route.
+ * @param options - trust decision, issue waiver operation, and failure reporter.
+ * @returns an exact-route HTTP handler.
+ */
+export function createValidationIssueWaiveRoute(
+  options: ValidationIssueWaiveRouteOptions,
+): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
+  return async (request: IncomingMessage, response: ServerResponse): Promise<void> => {
+    try {
+      if (!options.trusted(request)) throw new FdeProjectRequestError('forbidden', 403, '当前请求不能人工关闭验证问题。')
+      if (request.method !== 'POST') {
+        request.resume()
+        throw new FdeProjectRequestError('method-not-allowed', 405, '人工关闭问题接口只接受 POST。')
+      }
+      const input = validationIssueWaiverOf(await readJson(request))
+      const snapshot = await options.waive(input.workspaceId, input.contractDigest, input.issueId, input.reason)
+      if (snapshot === undefined) throw new FdeProjectRequestError('workspace-not-found', 404, '当前项目不存在或已被移除。')
+      writeJson(response, 200, { ok: true, value: snapshot })
+    } catch (error) {
+      if (error instanceof FdeProjectRequestError) {
+        writeJson(response, error.status, { ok: false, error: { code: error.code, message: error.message } })
+        return
+      }
+      options.reportFailure?.(error)
+      writeJson(response, 409, {
+        ok: false,
+        error: {
+          code: 'validation-issue-waive-failed',
+          message: error instanceof Error ? error.message : '人工关闭验证问题失败。',
         },
       })
     }

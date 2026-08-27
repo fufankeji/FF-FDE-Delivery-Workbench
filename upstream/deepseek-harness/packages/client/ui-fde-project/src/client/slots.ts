@@ -56,6 +56,12 @@ export interface ProjectPageInjected {
   completeSolution: (workspaceId: string, expectedRevision: number) => Promise<void>
   completeDevelopment: (workspaceId: string, expectedRevision: number) => Promise<void>
   completeValidation: (workspaceId: string, expectedRevision: number) => Promise<void>
+  waiveValidationIssue: (
+    workspaceId: string,
+    contractDigest: string,
+    issueId: string,
+    reason: string,
+  ) => Promise<void>
   loadProjectSources: (workspaceId: string, force?: boolean) => void
   parseProjectSource: (workspaceId: string, sourceId: string) => Promise<void>
   loadRequirementWiki: (workspaceId: string, force?: boolean) => void

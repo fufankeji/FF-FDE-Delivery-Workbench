@@ -7,7 +7,7 @@ import { projectEvaluationDecision } from '../src/evaluation-guard.ts'
 import { loadDevelopmentDocs, resolveDevelopmentArtifact } from '../src/development-docs.ts'
 import { resolveRequirementArtifact } from '../src/requirement-artifacts.ts'
 import { resolveSolutionArtifact } from '../src/solution-artifacts.ts'
-import { confirmValidationPlan, loadValidationStage, resolveValidationArtifact } from '../src/validation.ts'
+import { confirmValidationPlan, loadValidationStage, resolveValidationArtifact, waiveValidationIssue } from '../src/validation.ts'
 import {
   approveProjectEvaluationBaseline, confirmProjectArchitecture, loadProjectSurfaceSnapshot, replaceProjectArchitecture,
 } from '../src/snapshot.ts'
@@ -262,6 +262,115 @@ milestone: 完成数据源接入
       '验证报告尚未生成。',
       '验证基线尚未生成。',
     ]))
+  })
+
+  it('lets an FDE accept one current open issue without changing metric results', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'fde-validation-waive-'))
+    const evaluations = join(root, '.fde', 'evaluations')
+    const evidence = join(evaluations, 'reports', 'validation-r1')
+    const outputs = join(root, 'fde-deliverables', '04-validation')
+    const solution = join(root, 'fde-deliverables', '02-solution-design')
+    await mkdir(evidence, { recursive: true })
+    await mkdir(outputs, { recursive: true })
+    await mkdir(solution, { recursive: true })
+    await writeFile(join(solution, 'acceptance-plan.md'), '# 验收方案\n\nFA-1 核心流程\n')
+    await writeFile(join(evidence, 'smoke.md'), '# 核心流程通过\n')
+    for (const name of ['validation-plan.md', 'validation-report.md', 'validation-baseline.md']) {
+      await writeFile(join(outputs, name), `# ${name}\n`)
+    }
+    const contractPath = join(evaluations, 'validation.json')
+    await writeFile(contractPath, JSON.stringify({
+      schemaVersion: 2,
+      candidate: { id: 'R1' },
+      environment: 'macOS 本地验证环境',
+      metrics: [{
+        id: 'runtime-smoke', name: '核心流程', category: 'functional', method: '执行核心流程',
+        threshold: '全部通过', sources: [{ path: 'fde-deliverables/02-solution-design/acceptance-plan.md', references: ['FA-1'] }],
+        required: true, result: { status: 'PASS', evidence: '.fde/evaluations/reports/validation-r1/smoke.md' },
+      }],
+      issues: [{
+        id: 'customer-reconciliation', title: '客户对账结果待补充', severity: 'high', status: 'open',
+        resolution: '需要客户提供真实对账结果。',
+      }],
+    }))
+
+    const before = await loadValidationStage(root)
+    const digest = before.contract.digest ?? ''
+    await confirmValidationPlan(root, digest)
+    expect((await loadValidationStage(root)).gateReady).toBe(false)
+    const after = await waiveValidationIssue(root, digest, 'customer-reconciliation', '客户确认本轮先按现有样例验收，真实对账延后补充。')
+    expect(after).toMatchObject({
+      contract: {
+        metrics: [{ id: 'runtime-smoke', status: 'PASS' }],
+        issues: [{
+          id: 'customer-reconciliation', status: 'waived',
+          resolution: '需要客户提供真实对账结果。',
+          waiverReason: '客户确认本轮先按现有样例验收，真实对账延后补充。',
+        }],
+      },
+      planApproval: { status: 'confirmed' },
+      gateReady: true,
+      blockers: [],
+    })
+    expect(Date.parse(after.contract.issues[0]?.waivedAt ?? '')).not.toBeNaN()
+    await expect(waiveValidationIssue(root, digest, 'customer-reconciliation', '重复接受')).rejects.toThrow('已经处理')
+
+    const changed = JSON.parse(await readFile(contractPath, 'utf8')) as { environment: string; issues: Record<string, unknown>[] }
+    changed.environment = '已经变化的验证环境'
+    const changedIssue = changed.issues[0]
+    if (changedIssue === undefined) throw new Error('expected validation issue')
+    delete changedIssue.waiverReason
+    delete changedIssue.waivedAt
+    changed.issues[0] = { ...changedIssue, status: 'open' }
+    await writeFile(contractPath, JSON.stringify(changed))
+    await expect(waiveValidationIssue(root, digest, 'customer-reconciliation', '使用过期方案接受')).rejects.toThrow('评估方案已经变化')
+  })
+
+  it('keeps valid project and metric facts visible when one metric result is malformed', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'fde-validation-partial-'))
+    const evaluations = join(root, '.fde', 'evaluations')
+    const evidence = join(evaluations, 'reports', 'validation-r3')
+    const outputs = join(root, 'fde-deliverables', '04-validation')
+    const solution = join(root, 'fde-deliverables', '02-solution-design')
+    await mkdir(evidence, { recursive: true })
+    await mkdir(outputs, { recursive: true })
+    await mkdir(solution, { recursive: true })
+    await writeFile(join(solution, 'acceptance-plan.md'), '# 验收方案\n\nFA-1 核心验证\nFA-2 恢复验证\n')
+    await writeFile(join(evidence, 'smoke.md'), '# 核心验证通过\n')
+    for (const name of ['validation-plan.md', 'validation-report.md', 'validation-baseline.md']) {
+      await writeFile(join(outputs, name), `# ${name}\n`)
+    }
+    await writeFile(join(evaluations, 'validation.json'), JSON.stringify({
+      schemaVersion: 2,
+      candidate: { id: 'R3', description: '部分字段损坏的候选版本' },
+      environment: 'macOS 本地验证环境',
+      datasets: [{ id: 'smoke-data', name: '冒烟数据' }],
+      metrics: [{
+        id: 'runtime-smoke', name: '核心验证', category: 'functional', method: '执行核心路径',
+        threshold: '核心路径可用', sources: [{ path: 'fde-deliverables/02-solution-design/acceptance-plan.md', references: ['FA-1'] }],
+        required: true, result: { status: 'PASS', evidence: '.fde/evaluations/reports/validation-r3/smoke.md' },
+      }, {
+        id: 'restore', name: '恢复验证', category: 'recovery', method: '执行恢复路径',
+        threshold: '可以恢复', sources: [{ path: 'fde-deliverables/02-solution-design/acceptance-plan.md', references: ['FA-2'] }],
+        required: true, result: { status: 'PASS', evidence: ['first.md', 'second.md'] },
+      }],
+      issues: [],
+    }))
+
+    const value = await loadValidationStage(root, 'w1')
+    expect(value).toMatchObject({
+      contract: {
+        status: 'invalid', candidateId: 'R3', environment: 'macOS 本地验证环境',
+        datasets: [{ id: 'smoke-data' }], metrics: [{ id: 'runtime-smoke', status: 'PASS' }],
+      },
+      artifacts: { requiredCount: 3, presentCount: 3 },
+      planReady: false,
+      planApproval: { status: 'unavailable' },
+      gateReady: false,
+    })
+    expect(value.contract.message).toContain('metrics[1].result.evidence 必须是非空文字')
+    expect(value.contract).not.toHaveProperty('digest')
+    expect(value.blockers[0]).toContain('验证合同包含 1 个无效指标')
   })
 
   it('does not allow FDE confirmation while a metric source is unreadable', async () => {

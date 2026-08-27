@@ -333,6 +333,7 @@ describe('ProjectProgressOverlay standalone page', () => {
 
   it('shows validation inputs, evidence, outputs, and keeps pilot behind FDE confirmation', async () => {
     const completeValidation = vi.fn(async () => {})
+    const waiveValidationIssue = vi.fn(async () => {})
     const renderSlot = vi.fn(() => <div>验证报告正文</div>)
     const props = {
       useProjectPage: hook({ open: true, view: 'project' as const, workspaceId: 'workspace-1' }),
@@ -354,7 +355,10 @@ describe('ProjectProgressOverlay standalone page', () => {
               sources: [{ path: 'fde-deliverables/02-solution-design/acceptance-plan.md', references: ['BA-1'], available: true }],
               required: true, status: 'PASS', value: '通过', evidence: '.fde/evaluations/reports/r1/smoke.md', evidenceAvailable: true,
             }],
-            issues: [],
+            issues: [{
+              id: 'model-window', title: '复购模型测试窗口尚未确定', severity: 'medium', status: 'open',
+              evidenceAvailable: false, resolution: '增长团队确认时间窗口、正负样本定义和泄漏边界后再执行模型验收。',
+            }],
           },
           artifacts: { root: 'fde-deliverables/04-validation', requiredCount: 3, presentCount: 3, items: [
             { id: 'validation-plan', title: '验证计划', path: 'fde-deliverables/04-validation/validation-plan.md', status: 'present', fileUrl: '/api/fde-project/validation/artifact?workspaceId=workspace-1&artifactId=validation-plan' },
@@ -374,7 +378,7 @@ describe('ProjectProgressOverlay standalone page', () => {
       }] }),
       useSessions: hook({ byId: { 'session-1': { id: 'session-1', displayTitle: '会话', running: false, blank: false, updatedAt: 1 } } }),
       loadStage: vi.fn(), retryStage: vi.fn(), loadProjectSurface: vi.fn(), refreshProjectSurface: vi.fn(),
-      completeRequirements: vi.fn(), completeSolution: vi.fn(), completeDevelopment: vi.fn(), completeValidation,
+      completeRequirements: vi.fn(), completeSolution: vi.fn(), completeDevelopment: vi.fn(), completeValidation, waiveValidationIssue,
       loadProjectSources: vi.fn(), parseProjectSource: vi.fn(), loadRequirementWiki: vi.fn(),
       prepareRequirementWikiRun: vi.fn(), startRequirementWikiBuild: vi.fn(), abandonRequirementWikiBuild: vi.fn(),
       enterProject: vi.fn(), reviewProjectArchitecture: vi.fn(), closeProjectPage: vi.fn(), showProjectOverview: vi.fn(),
@@ -389,6 +393,20 @@ describe('ProjectProgressOverlay standalone page', () => {
     expect(screen.getByText('核心业务用例')).toBeTruthy()
     expect(screen.getByText('核心流程冒烟')).toBeTruthy()
     expect(screen.getByText('BA-1')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '人工确认关闭' }))
+    expect(screen.getByText(/不会把未通过、未执行或缺少证据的指标改成通过/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '确认接受并关闭' }))
+    expect(screen.getByText('请填写本次人工接受的原因、范围或后续处理约定。')).toBeTruthy()
+    fireEvent.change(screen.getByRole('textbox', { name: '接受理由' }), {
+      target: { value: '客户确认当前模型窗口不阻塞本轮交付，下一轮补充专项验证。' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: '确认接受并关闭' }))
+    await waitFor(() => {
+      expect(waiveValidationIssue).toHaveBeenCalledWith(
+        'workspace-1', `sha256:${'1'.repeat(64)}`, 'model-window',
+        '客户确认当前模型窗口不阻塞本轮交付，下一轮补充专项验证。',
+      )
+    })
     fireEvent.click(screen.getByRole('button', { name: '预览验证报告' }))
     expect(screen.getByText('验证报告正文')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: '完成验证评估' }))

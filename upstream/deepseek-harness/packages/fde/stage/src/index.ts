@@ -185,9 +185,14 @@ export const VALIDATION_SKILL = {
 - 每个指标都写清名称、类别、方法、阈值和是否必需；类别只使用 business、functional、data、model、performance、security、recovery、agent。
 - 每个指标必须包含非空 \`metrics[].sources\`。每项来源写项目相对 \`path\` 和文档内 \`references\` 编号，例如验收条件、需求 ID 或方案决策 ID；来源文件必须真实存在于当前项目。不要从 Agent 自己新写的验证计划反向证明指标来源。
 - 指标结果只使用 PASS、WARN、FAIL、NOT_RUN。PASS/WARN 必须引用当前项目中的真实证据文件；WARN 还必须写明接受理由。
+- \`result.evidence\` 必须是一个非空的项目相对路径字符串，不能是数组。需要引用多份底层记录时，先生成一份当前指标的主证据 Markdown，由它索引其他记录，再把主证据路径写入 \`evidence\`。
+- 结果字段只使用以下 camelCase 名称，不能使用 \`accept_reason\`、\`waiver_reason\` 或自创字段：
+  - NOT_RUN：\`{ "status": "NOT_RUN", "note": "尚未执行的真实原因" }\`
+  - PASS/FAIL：\`{ "status": "PASS", "value": "实际结果", "evidence": ".fde/evaluations/reports/<run-id>/<metric>.md", "note": "结果说明" }\`
+  - WARN：\`{ "status": "WARN", "value": "实际结果", "evidence": ".fde/evaluations/reports/<run-id>/<metric>.md", "waiverReason": "接受者、理由和适用范围" }\`
 - 修改候选版本、验证环境、数据/用例、指标来源、方法或阈值时，先把受影响指标重置为 NOT_RUN；平台会让旧的 FDE 确认失效。停止执行并请 FDE 重新确认后才能继续。
 - 数据集只在项目确实需要时登记版本、来源或哈希，不为凑格式虚构数据集。
-- critical/high 问题在 open 状态时阻止进入部署试运行；waived 问题必须记录接受理由。
+- critical/high 问题在 open 状态时阻止进入部署试运行。Agent 只记录或更新 open/resolved 问题，不得代替 FDE 写入 waived、waiverReason 或 waivedAt；人工接受必须由 FDE 在项目进度页填写理由并确认。
 - 不得编造指标值、阈值、执行时间、数据集版本或验证证据。信息不足时保留 NOT_RUN，并明确下一步需要执行什么。
 
 ## 固定产物

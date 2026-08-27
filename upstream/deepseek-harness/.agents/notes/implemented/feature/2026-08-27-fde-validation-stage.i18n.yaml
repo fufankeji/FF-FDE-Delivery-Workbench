@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write .agents/notes/implemented/feature/2026-08-27-fde-validation-stage.md
-2026-08-27-fde-validation-stage.md: 5ed25be55638a8f1a37b563d63eb431e5ffe99ef
-2026-08-27-fde-validation-stage.zh.md: a17965940d4ffc7c11c0e8e9ae979039115facca
+2026-08-27-fde-validation-stage.md: be30a4ef4f7cb3047fee1da8b43fe4ffed884cfd
+2026-08-27-fde-validation-stage.zh.md: f7dab1bf7405db8635f5e19972b2b3f308f515db

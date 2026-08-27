@@ -1,5 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
-import { confirmValidationPlan, FdeProjectSurfaceController, fetchProjectSurface, startProjectRuntime } from '../src/client/controller.ts'
+import {
+  confirmValidationPlan,
+  FdeProjectSurfaceController,
+  fetchProjectSurface,
+  startProjectRuntime,
+  waiveValidationIssue,
+} from '../src/client/controller.ts'
 
 const value = {
   workspaceId: 'w-1',
@@ -58,6 +64,21 @@ describe('FDE project surface controller', () => {
     await expect(confirmValidationPlan('w-1', digest, fetchImpl)).resolves.toEqual(value)
     expect(fetchImpl).toHaveBeenCalledWith('/api/fde-project/validation/confirm-plan', expect.objectContaining({
       method: 'POST', body: JSON.stringify({ workspaceId: 'w-1', contractDigest: digest }),
+    }))
+  })
+
+  it('submits one explained validation issue waiver through the same-origin route', async () => {
+    const digest = `sha256:${'1'.repeat(64)}`
+    const fetchImpl = vi.fn(async () => new Response(JSON.stringify({ ok: true, value }), { status: 200 }))
+    await expect(waiveValidationIssue(
+      'w-1', digest, 'customer-reconciliation', '客户确认本轮接受，后续补充真实对账数据。', fetchImpl,
+    )).resolves.toEqual(value)
+    expect(fetchImpl).toHaveBeenCalledWith('/api/fde-project/validation/waive-issue', expect.objectContaining({
+      method: 'POST',
+      body: JSON.stringify({
+        workspaceId: 'w-1', contractDigest: digest, issueId: 'customer-reconciliation',
+        reason: '客户确认本轮接受，后续补充真实对账数据。',
+      }),
     }))
   })
 
