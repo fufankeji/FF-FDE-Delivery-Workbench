@@ -2,8 +2,14 @@ import type { IncomingMessage, ServerResponse } from 'node:http'
 import { describe, expect, it, vi } from 'vitest'
 import type { KvTable } from '@deepseek-ai/dsh-storage-domain'
 import type { WorkspaceId } from '@deepseek-ai/dsh-workspace'
-import { createCompleteRequirementsRoute, createCompleteSolutionRoute, createStageRoute } from '../src/http.ts'
-import { REQUIREMENT_RESEARCH_SKILL, requirementResearchPrompt, SOLUTION_DESIGN_SKILL, solutionDesignPrompt } from '../src/index.ts'
+import {
+  createCompleteDevelopmentRoute, createCompleteRequirementsRoute, createCompleteSolutionRoute, createStageRoute,
+} from '../src/http.ts'
+import {
+  PROJECT_DEVELOPMENT_SKILL, projectDevelopmentPrompt,
+  REQUIREMENT_RESEARCH_SKILL, requirementResearchPrompt,
+  SOLUTION_DESIGN_SKILL, solutionDesignPrompt,
+} from '../src/index.ts'
 import type { ProjectStageRecord } from '../src/spec.ts'
 import { FdeStageState } from '../src/state.ts'
 
@@ -71,7 +77,10 @@ describe('FdeStageState', () => {
 
   it('completes requirements once for the exact revision', async () => {
     const data = table()
-    const times = ['2026-08-26T00:00:00.000Z', '2026-08-27T00:00:00.000Z', '2026-08-28T00:00:00.000Z']
+    const times = [
+      '2026-08-26T00:00:00.000Z', '2026-08-27T00:00:00.000Z',
+      '2026-08-28T00:00:00.000Z', '2026-08-29T00:00:00.000Z',
+    ]
     const state = new FdeStageState(data.value, () => times.shift() ?? '2026-08-27T00:00:00.000Z')
     await state.open(wid('w-1'))
     const next = await state.completeRequirements(wid('w-1'), 1)
@@ -87,6 +96,12 @@ describe('FdeStageState', () => {
       createdAt: '2026-08-26T00:00:00.000Z', updatedAt: '2026-08-28T00:00:00.000Z',
     })
     await expect(state.completeSolution(wid('w-1'), 2)).rejects.toThrow('已经变化')
+    const validation = await state.completeDevelopment(wid('w-1'), 3)
+    expect(validation).toEqual({
+      currentStage: 'validation', revision: 4,
+      createdAt: '2026-08-26T00:00:00.000Z', updatedAt: '2026-08-29T00:00:00.000Z',
+    })
+    await expect(state.completeDevelopment(wid('w-1'), 3)).rejects.toThrow('已经变化')
   })
 })
 
@@ -101,12 +116,24 @@ describe('requirement-research model guidance', () => {
 
   it('keeps the solution contract in one on-demand Skill and only prompts during solution design', () => {
     expect(SOLUTION_DESIGN_SKILL.name).toBe('fde-solution-design')
+    expect(SOLUTION_DESIGN_SKILL.content).toContain('project-prd.md')
     expect(SOLUTION_DESIGN_SKILL.content).toContain('solution-baseline.md')
     expect(SOLUTION_DESIGN_SKILL.content).toContain('architecture_get')
     expect(SOLUTION_DESIGN_SKILL.content).toContain('不得改变项目阶段')
     expect(solutionDesignPrompt('requirements')).toBe('')
     expect(solutionDesignPrompt('solution')).toContain('先加载 Skill')
     expect(solutionDesignPrompt('development')).toBe('')
+  })
+
+  it('uses one lightweight project-development Skill and only prompts during development', () => {
+    expect(PROJECT_DEVELOPMENT_SKILL.name).toBe('fde-project-development')
+    expect(PROJECT_DEVELOPMENT_SKILL.content).toContain('docs/specs/feature-map.md')
+    expect(PROJECT_DEVELOPMENT_SKILL.content).toContain('FNNN-slug')
+    expect(PROJECT_DEVELOPMENT_SKILL.content).toContain('implementation-report.md')
+    expect(PROJECT_DEVELOPMENT_SKILL.content).toContain('不得改变项目阶段')
+    expect(projectDevelopmentPrompt('solution')).toBe('')
+    expect(projectDevelopmentPrompt('development')).toContain('先加载 Skill')
+    expect(projectDevelopmentPrompt('validation')).toBe('')
   })
 })
 
@@ -179,7 +206,7 @@ describe('project-stage route', () => {
     expect(complete).toHaveBeenCalledWith('w-1', 1)
   })
 
-  it('requires four solution documents and a confirmed architecture before project development', async () => {
+  it('requires five solution documents and a confirmed architecture before project development', async () => {
     const complete = vi.fn(async () => ({
       currentStage: 'development' as const,
       revision: 3,
@@ -188,8 +215,9 @@ describe('project-stage route', () => {
     }))
     const solution = vi.fn(async () => ({
       artifacts: [
+        { title: '项目 PRD', status: 'missing' as const },
         { title: '方案设计', status: 'present' as const },
-        { title: '研发计划', status: 'missing' as const },
+        { title: '研发计划', status: 'present' as const },
         { title: '验收方案', status: 'present' as const },
         { title: '方案基线', status: 'present' as const },
       ],
@@ -205,12 +233,13 @@ describe('project-stage route', () => {
     await handler(request({ workspaceId: 'w-1', expectedRevision: 2 }), missing.value)
     expect(missing.snapshot()).toEqual({
       status: 409,
-      body: { ok: false, error: { code: 'stage-solution-incomplete', message: '方案设计产物尚未齐备：研发计划。' } },
+      body: { ok: false, error: { code: 'stage-solution-incomplete', message: '方案设计产物尚未齐备：项目 PRD。' } },
     })
     expect(complete).not.toHaveBeenCalled()
 
     solution.mockResolvedValueOnce({
       artifacts: [
+        { title: '项目 PRD', status: 'present' },
         { title: '方案设计', status: 'present' },
         { title: '研发计划', status: 'present' },
         { title: '验收方案', status: 'present' },
@@ -227,6 +256,7 @@ describe('project-stage route', () => {
 
     solution.mockResolvedValueOnce({
       artifacts: [
+        { title: '项目 PRD', status: 'present' },
         { title: '方案设计', status: 'present' },
         { title: '研发计划', status: 'present' },
         { title: '验收方案', status: 'present' },
@@ -241,6 +271,46 @@ describe('project-stage route', () => {
       body: { ok: true, value: { workspaceId: 'w-1', currentStage: 'development', revision: 3 } },
     })
     expect(complete).toHaveBeenCalledWith('w-1', 2)
+  })
+
+  it('requires the three project-development close-out files before validation', async () => {
+    const complete = vi.fn(async () => ({
+      currentStage: 'validation' as const,
+      revision: 4,
+      createdAt: '2026-08-26T00:00:00.000Z',
+      updatedAt: '2026-08-29T00:00:00.000Z',
+    }))
+    const development = vi.fn(async () => ({ artifacts: [
+      { title: '实施报告', status: 'present' as const },
+      { title: '运行手册', status: 'missing' as const },
+      { title: '研发基线', status: 'present' as const },
+    ] }))
+    const handler = createCompleteDevelopmentRoute({
+      trusted: () => true,
+      workspaceExists: id => id === 'w-1',
+      development,
+      complete,
+    })
+    const blocked = response()
+    await handler(request({ workspaceId: 'w-1', expectedRevision: 3 }), blocked.value)
+    expect(blocked.snapshot()).toEqual({
+      status: 409,
+      body: { ok: false, error: { code: 'stage-development-incomplete', message: '项目开发收口产物尚未齐备：运行手册。' } },
+    })
+    expect(complete).not.toHaveBeenCalled()
+
+    development.mockResolvedValueOnce({ artifacts: [
+      { title: '实施报告', status: 'present' },
+      { title: '运行手册', status: 'present' },
+      { title: '研发基线', status: 'present' },
+    ] })
+    const accepted = response()
+    await handler(request({ workspaceId: 'w-1', expectedRevision: 3 }), accepted.value)
+    expect(accepted.snapshot()).toMatchObject({
+      status: 200,
+      body: { ok: true, value: { workspaceId: 'w-1', currentStage: 'validation', revision: 4 } },
+    })
+    expect(complete).toHaveBeenCalledWith('w-1', 3)
   })
 
   it('rejects untrusted and non-POST requests before persistence', async () => {

@@ -9,8 +9,9 @@ export const SOLUTION_ARTIFACT_ROOT = 'fde-deliverables/02-solution-design'
 /** Same-origin route serving one verified fixed solution artifact. */
 export const SOLUTION_ARTIFACT_FILE_PATH = '/api/fde-project/solution/artifact'
 
-/** The four documents required before an FDE may complete solution design. */
+/** The five documents required before an FDE may complete solution design. */
 export const SOLUTION_ARTIFACTS = [
+  { id: 'project-prd', title: '项目 PRD', fileName: 'project-prd.md' },
   { id: 'solution-design', title: '方案设计', fileName: 'solution-design.md' },
   { id: 'development-plan', title: '研发计划', fileName: 'development-plan.md' },
   { id: 'acceptance-plan', title: '验收方案', fileName: 'acceptance-plan.md' },
@@ -98,7 +99,7 @@ async function inspectArtifact(
   }
 }
 
-/** Inspect the four fixed solution documents without changing project files. */
+/** Inspect the five fixed solution documents without changing project files. */
 export async function loadSolutionArtifacts(projectRoot: string, workspaceId?: string): Promise<SolutionArtifactsSnapshot> {
   const artifacts = await Promise.all(SOLUTION_ARTIFACTS.map(
     async definition => await inspectArtifact(projectRoot, definition, workspaceId),

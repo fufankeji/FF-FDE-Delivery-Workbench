@@ -129,6 +129,20 @@ async function bench() {
 }
 
 describe('conversation slot inject API', () => {
+  it('applies scope-addressed view selection before and after the Session store mounts', async () => {
+    const b = await bench()
+    const scoped = b.runtime.sessions.scope(ROOT)?.get('conversation')
+    if (scoped === undefined) throw new Error('scoped conversation missing')
+
+    scoped.selectView('fde-architecture')
+    const { instance } = b.conversationApi(ROOT)
+    expect(instance.store.getSnapshot().view).toBe('fde-architecture')
+
+    scoped.selectView('trajectory')
+    expect(instance.store.getSnapshot().view).toBe('trajectory')
+    await b.runtime.dispose()
+  })
+
   it('assembles the thin API side-effect-free', async () => {
     const b = await bench()
     const { injected } = b.conversationApi(ROOT)

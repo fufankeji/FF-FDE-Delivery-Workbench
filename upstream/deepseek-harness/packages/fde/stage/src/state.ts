@@ -18,7 +18,13 @@ export class FdeStageConflictError extends Error {
 /** A fixed stage action was attempted from the wrong current stage. */
 export class FdeStageTransitionError extends Error {
   constructor(readonly current: ProjectStageRecord, expected: FdeStageId) {
-    const label = expected === 'requirements' ? '需求调研' : expected === 'solution' ? '方案设计' : expected
+    const label = expected === 'requirements'
+      ? '需求调研'
+      : expected === 'solution'
+        ? '方案设计'
+        : expected === 'development'
+          ? '项目开发'
+          : expected
     super(`当前项目已经不在${label}阶段。`)
     this.name = 'FdeStageTransitionError'
   }
@@ -71,6 +77,11 @@ export class FdeStageState {
   /** Atomically complete solution design for one exact browser revision. */
   completeSolution(workspaceId: WorkspaceId, expectedRevision: number): Promise<ProjectStageRecord> {
     return this.transition(workspaceId, expectedRevision, 'solution', 'development')
+  }
+
+  /** Atomically complete project development for one exact browser revision. */
+  completeDevelopment(workspaceId: WorkspaceId, expectedRevision: number): Promise<ProjectStageRecord> {
+    return this.transition(workspaceId, expectedRevision, 'development', 'validation')
   }
 
   private transition(

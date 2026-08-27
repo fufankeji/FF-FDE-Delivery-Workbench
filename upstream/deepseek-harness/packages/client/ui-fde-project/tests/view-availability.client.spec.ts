@@ -10,7 +10,7 @@ describe('project delivery view availability', () => {
     expect(visible(undefined)).toEqual([])
     expect(visible('requirements')).toEqual([])
     expect(visible('solution')).toEqual(['fde-architecture'])
-    expect(visible('development')).toEqual(['fde-api-docs', 'fde-architecture'])
+    expect(visible('development')).toEqual(['fde-api-docs', 'fde-architecture', 'fde-evaluation'])
     expect(visible('validation')).toEqual(['fde-api-docs', 'fde-architecture', 'fde-observability', 'fde-evaluation'])
     expect(visible('handoff')).toEqual(['fde-api-docs', 'fde-architecture', 'fde-observability', 'fde-evaluation'])
   })

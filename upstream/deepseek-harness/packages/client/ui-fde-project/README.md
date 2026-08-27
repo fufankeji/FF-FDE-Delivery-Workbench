@@ -2,12 +2,12 @@
 
 English | [中文](README.zh.md)
 
-Browser presentation for the FDE project delivery workspace. It adds a root-level Project Progress page beside the persistent sidebar, a project requirement Wiki with Galaxy View, and four stage-aware delivery views: System Architecture appears from solution design, API Docs from development, and Observability plus Evaluation from validation.
+Browser presentation for the FDE project delivery workspace. It adds a root-level Project Progress page beside the persistent sidebar, a project requirement Wiki with Galaxy View, and four stage-aware delivery views: System Architecture appears from solution design, API Docs and Evaluation from development, and Observability from validation.
 
 ## Behavior
 
 - Project Progress replaces the center/right work surfaces while open, so the underlying conversation, composer, and Better Sidebar cannot show through or receive input.
-- It reads the existing Workspace list, creation metadata, Session summaries, and Workspace-scoped six-stage projection. Project Details shows the current stage's real outputs: three requirement-research files, or four solution-design documents plus the project architecture. Present Markdown can be selected and read in place through the shared preview; architecture title, revision, and confirmation state remain visible. An FDE uses a two-step confirmation to enter solution design or development only after the corresponding Host checks pass; the Agent cannot perform either action. A successful Host commit invalidates the matching Project Delivery stage prompt so it re-reads the same durable revision.
+- It reads the existing Workspace list, creation metadata, Session summaries, and Workspace-scoped six-stage projection. Project Details shows real stage outputs: three requirement files; five solution documents plus architecture; or the canonical development core docs, Feature/task evidence, and three close-out files. Present Markdown can be read in place. An FDE uses a two-step confirmation to enter solution, development, or validation only after the corresponding Host checks pass; the Agent cannot perform these actions. A successful Host commit invalidates the matching Project Delivery stage prompt so it re-reads the same durable revision.
 - Enter Project Delivery opens that Workspace's most recently updated non-archived ordinary Session. Subagent, archived, and other-project Sessions are excluded; only a project with no recoverable Session uses the official first-blank-session flow.
 - Conversation keeps Chat and Trajectory available throughout delivery. Project-specific result views are registered only after their corresponding stage starts; loading or failure never reveals later-stage views early.
 - API Docs, System Architecture, and Evaluation read the trusted `/api/fde-project/snapshot` route.
@@ -27,10 +27,20 @@ Browser presentation for the FDE project delivery workspace. It adds a root-leve
 fde-deliverables/01-requirement-research/requirement-research-report.md
 fde-deliverables/01-requirement-research/confirmation-checklist.md
 fde-deliverables/01-requirement-research/requirement-baseline.md
+fde-deliverables/02-solution-design/project-prd.md
 fde-deliverables/02-solution-design/solution-design.md
 fde-deliverables/02-solution-design/development-plan.md
 fde-deliverables/02-solution-design/acceptance-plan.md
 fde-deliverables/02-solution-design/solution-baseline.md
+docs/PRD.md
+docs/specs/product-spec.md
+docs/specs/feature-map.md
+docs/specs/FNNN-slug/spec.md
+docs/specs/FNNN-slug/plan.md
+docs/specs/FNNN-slug/tasks.md
+fde-deliverables/03-project-development/implementation-report.md
+fde-deliverables/03-project-development/runbook.md
+fde-deliverables/03-project-development/development-baseline.md
 .fde/requirement-wiki/build.json
 .fde/requirement-wiki/current.json
 .fde/requirement-wiki/versions/RNNNNNN/manifest.json

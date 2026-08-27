@@ -54,6 +54,7 @@ export interface ProjectPageInjected {
   refreshProjectSurface: (workspaceId: string) => void
   completeRequirements: (workspaceId: string, expectedRevision: number) => Promise<void>
   completeSolution: (workspaceId: string, expectedRevision: number) => Promise<void>
+  completeDevelopment: (workspaceId: string, expectedRevision: number) => Promise<void>
   loadProjectSources: (workspaceId: string, force?: boolean) => void
   parseProjectSource: (workspaceId: string, sourceId: string) => Promise<void>
   loadRequirementWiki: (workspaceId: string, force?: boolean) => void
@@ -66,6 +67,7 @@ export interface ProjectPageInjected {
   ) => Promise<void>
   abandonRequirementWikiBuild: (workspaceId: string, buildId: string) => Promise<void>
   enterProject: (workspaceId: string) => Promise<void>
+  reviewProjectArchitecture: (workspaceId: string) => Promise<void>
   closeProjectPage: () => void
   openProjectPage: () => void
   showProjectOverview: () => void

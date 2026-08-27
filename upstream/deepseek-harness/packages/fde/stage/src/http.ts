@@ -51,6 +51,17 @@ export interface CompleteSolutionRouteOptions {
   reportFailure?: (error: unknown) => void
 }
 
+/** Dependencies for the fixed FDE-only project-development completion route. */
+export interface CompleteDevelopmentRouteOptions {
+  trusted: (request: IncomingMessage) => boolean
+  workspaceExists: (workspaceId: string) => boolean
+  development: (workspaceId: string) => Promise<{
+    readonly artifacts: readonly { readonly title: string; readonly status: 'missing' | 'present' | 'error' }[]
+  }>
+  complete: (workspaceId: WorkspaceId, expectedRevision: number) => Promise<ProjectStageRecord>
+  reportFailure?: (error: unknown) => void
+}
+
 async function readJson(request: IncomingMessage): Promise<unknown> {
   const declaredRaw = request.headers['content-length']
   const declared = typeof declaredRaw === 'string' ? Number(declaredRaw) : undefined
@@ -228,6 +239,53 @@ export function createCompleteSolutionRoute(
       }
       options.reportFailure?.(error)
       writeJson(response, 500, { ok: false, error: { code: 'internal-error', message: '方案设计阶段确认失败。' } })
+    }
+  }
+}
+
+/** Create the POST-only, fixed development-to-validation manual gate. */
+export function createCompleteDevelopmentRoute(
+  options: CompleteDevelopmentRouteOptions,
+): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
+  return async (request: IncomingMessage, response: ServerResponse): Promise<void> => {
+    let requestedWorkspaceId: string | undefined
+    try {
+      if (!options.trusted(request)) throw new FdeStageRequestError('forbidden', 403, '当前请求不能确认项目阶段。')
+      if (request.method !== 'POST') {
+        request.resume()
+        throw new FdeStageRequestError('method-not-allowed', 405, '阶段确认接口只接受 POST。')
+      }
+      const { workspaceId, expectedRevision } = completionRequestOf(await readJson(request))
+      requestedWorkspaceId = workspaceId
+      if (!options.workspaceExists(workspaceId)) {
+        throw new FdeStageRequestError('workspace-not-found', 404, '当前项目不存在或已被移除。')
+      }
+      const development = await options.development(workspaceId)
+      const incomplete = development.artifacts.filter(artifact => artifact.status !== 'present')
+      if (incomplete.length > 0) {
+        throw new FdeStageRequestError(
+          'stage-development-incomplete',
+          409,
+          `项目开发收口产物尚未齐备：${incomplete.map(artifact => artifact.title).join('、')}。`,
+        )
+      }
+      const record = await options.complete(workspaceId as WorkspaceId, expectedRevision)
+      writeJson(response, 200, { ok: true, value: { workspaceId, ...record } })
+    } catch (error) {
+      if (error instanceof FdeStageRequestError) {
+        writeJson(response, error.status, { ok: false, error: { code: error.code, message: error.message } })
+        return
+      }
+      if (error instanceof FdeStageConflictError || error instanceof FdeStageTransitionError) {
+        writeJson(response, 409, {
+          ok: false,
+          error: { code: error instanceof FdeStageConflictError ? 'stage-revision-conflict' : 'stage-invalid-transition', message: error.message },
+          ...(requestedWorkspaceId === undefined ? {} : { value: { workspaceId: requestedWorkspaceId, ...error.current } }),
+        })
+        return
+      }
+      options.reportFailure?.(error)
+      writeJson(response, 500, { ok: false, error: { code: 'internal-error', message: '项目开发阶段确认失败。' } })
     }
   }
 }

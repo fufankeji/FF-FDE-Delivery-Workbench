@@ -130,6 +130,20 @@ export function apply(ctx: Context): void {
 
   // Apply-time construction keeps store identity bound to this fiber.
   const chatStore = createChatStore()
+  const viewActionsBySession = new Map<SessionId, BoundActions<typeof chatStore>>()
+  const pendingViewBySession = new Map<SessionId, string>()
+  const selectSessionView = (sessionId: SessionId, viewId: string): void => {
+    const actions = viewActionsBySession.get(sessionId)
+    if (actions === undefined) {
+      pendingViewBySession.set(sessionId, viewId)
+      return
+    }
+    actions.setView(viewId)
+  }
+  ctx.effect(() => () => {
+    viewActionsBySession.clear()
+    pendingViewBySession.clear()
+  }, 'ui-conversation: scoped view navigation')
   const submissionPolicy = new ComposerSubmissionPolicy(
     ctx.settingsScope.bind<ConversationSettings>({ namespace: CONVERSATION_SETTINGS_NAMESPACE }),
   )
@@ -243,7 +257,13 @@ export function apply(ctx: Context): void {
       'conversation.view': { kind: 'list', scope: 'session' },
     },
     store: chatStore,
-    inject: (sessionId: SessionId, _actions: BoundActions<typeof chatStore>): ConversationSessionInjected => {
+    inject: (sessionId: SessionId, actions: BoundActions<typeof chatStore>): ConversationSessionInjected => {
+      viewActionsBySession.set(sessionId, actions)
+      const pendingView = pendingViewBySession.get(sessionId)
+      if (pendingView !== undefined) {
+        pendingViewBySession.delete(sessionId)
+        actions.setView(pendingView)
+      }
       const conversation = concreteConversation(ctx)
       return {
         views,
@@ -434,7 +454,7 @@ export function apply(ctx: Context): void {
   // registers itself as `conversation` and lives on its own child fiber.
   // Presentation registrants depend directly on their slot declarations;
   // this service remains only where conversation actions are required.
-  ctx.plugin(ConversationController, { input: inputHub, blocks: composerBlocks })
+  ctx.plugin(ConversationController, { input: inputHub, blocks: composerBlocks, selectView: selectSessionView })
 
   // The plan strip rides the input dock above the queue rows (same posture).
   ctx.plugin(todoDockEntry)

@@ -18,6 +18,7 @@ import type {
 import { ARCHITECTURE_NODE_KINDS, ARCHITECTURE_STATUSES } from './types.ts'
 import { loadRequirementArtifacts, REQUIREMENT_ARTIFACT_ROOT } from './requirement-artifacts.ts'
 import { loadSolutionArtifacts, SOLUTION_ARTIFACT_ROOT } from './solution-artifacts.ts'
+import { DEVELOPMENT_DOCS_ROOT, loadDevelopmentDocs } from './development-docs.ts'
 import { loadRequirementWikiSnapshot, requirementWikiPaths } from './requirement-wiki.ts'
 
 const FDE_DIRECTORY = '.fde'
@@ -505,13 +506,14 @@ export async function loadProjectSurfaceSnapshot(input: {
   readonly title: string
   readonly path: string
 }): Promise<ProjectSurfaceSnapshot> {
-  const [apiDocs, architecture, evaluation, requirementWiki, requirements, solution] = await Promise.all([
+  const [apiDocs, architecture, evaluation, requirementWiki, requirements, solution, development] = await Promise.all([
     loadApiDocs(input.path),
     loadArchitecture(input.path),
     loadEvaluation(input.path),
     loadRequirementWikiSnapshot(input.path),
     loadRequirementArtifacts(input.path, input.workspaceId),
     loadSolutionArtifacts(input.path, input.workspaceId),
+    loadDevelopmentDocs(input.path, input.workspaceId),
   ])
   return {
     workspaceId: input.workspaceId,
@@ -523,6 +525,7 @@ export async function loadProjectSurfaceSnapshot(input: {
     requirementWiki,
     requirements,
     solution,
+    development,
   }
 }
 
@@ -534,4 +537,5 @@ export const projectSurfacePaths = {
   requirementWiki: requirementWikiPaths.root,
   requirements: REQUIREMENT_ARTIFACT_ROOT,
   solution: SOLUTION_ARTIFACT_ROOT,
+  development: DEVELOPMENT_DOCS_ROOT,
 } as const

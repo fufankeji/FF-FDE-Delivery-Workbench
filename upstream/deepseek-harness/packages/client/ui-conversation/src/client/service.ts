@@ -35,6 +35,12 @@ export interface IConversation {
    */
   readonly blocks: ComposerBlocks
   /**
+   * Select one registered Conversation view for the caller scope's Session.
+   * The request may be queued until that Session's shared view store mounts.
+   * @param viewId - registered `conversation.view` entry id.
+   */
+  selectView(viewId: string): void
+  /**
    * Send a prompt into the caller scope's session (queued turn).
    * @param text - prompt text, sent verbatim as one text block.
    * @returns completion; business failures reject (and land in promptError).
@@ -98,6 +104,7 @@ export class ConversationController extends Service implements IConversation {
   private readonly imageUrls = new Map<string, ImageUrlEntry>()
   private readonly imageGenerations = new Map<SessionId, number>()
   private readonly createdImageUrls = new Set<string>()
+  private readonly selectSessionView: (sessionId: SessionId, viewId: string) => void
   private disposed = false
 
   /**
@@ -107,10 +114,15 @@ export class ConversationController extends Service implements IConversation {
    * constructed by the plugin apply (the same instances the slot inject
    * factories close over).
    */
-  constructor(ctx: Context, config: { input: SessionInputResolver; blocks: ComposerBlocks }) {
+  constructor(ctx: Context, config: {
+    input: SessionInputResolver
+    blocks: ComposerBlocks
+    selectView: (sessionId: SessionId, viewId: string) => void
+  }) {
     super(ctx, 'conversation')
     this.input = config.input
     this.blocks = config.blocks
+    this.selectSessionView = config.selectView
     ctx.effect(() => () => {
       this.disposed = true
       for (const url of this.createdImageUrls) revokePreview(url)
@@ -119,6 +131,12 @@ export class ConversationController extends Service implements IConversation {
       this.imageUrls.clear()
       this.imageGenerations.clear()
     }, 'conversation attachment URL cache')
+  }
+
+  /** Select one Conversation view in the caller scope's Session. */
+  selectView(viewId: string): void {
+    if (viewId.trim() === '') throw new Error('conversation.selectView requires a non-empty view id')
+    this.selectSessionView(this.scopeId('selectView'), viewId)
   }
 
   /**

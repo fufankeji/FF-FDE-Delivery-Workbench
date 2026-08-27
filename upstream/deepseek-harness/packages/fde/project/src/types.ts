@@ -235,7 +235,7 @@ export interface RequirementArtifactsSnapshot {
 
 /** One required Markdown output of the FDE solution-design stage. */
 export interface SolutionArtifactSnapshot {
-  readonly id: 'solution-design' | 'development-plan' | 'acceptance-plan' | 'solution-baseline'
+  readonly id: 'project-prd' | 'solution-design' | 'development-plan' | 'acceptance-plan' | 'solution-baseline'
   readonly title: string
   readonly path: string
   readonly status: 'missing' | 'present' | 'error'
@@ -253,6 +253,52 @@ export interface SolutionArtifactsSnapshot {
   readonly artifacts: readonly SolutionArtifactSnapshot[]
 }
 
+/** One Host-indexed Markdown document used by project-development progress. */
+export interface DevelopmentArtifactSnapshot {
+  readonly id: string
+  readonly title: string
+  readonly path: string
+  readonly kind: 'core' | 'feature' | 'closure'
+  readonly status: 'missing' | 'present' | 'error'
+  readonly bytes?: number
+  readonly updatedAt?: string
+  readonly fileUrl?: string
+  readonly message?: string
+}
+
+/** One Feature directory and its deterministic Markdown task progress. */
+export interface DevelopmentFeatureSnapshot {
+  readonly id: string
+  readonly title: string
+  readonly directory: string
+  readonly status: string
+  readonly plannedStart?: string
+  readonly plannedEnd?: string
+  readonly milestone?: string
+  readonly blocker?: string
+  readonly taskTotal: number
+  readonly taskCompleted: number
+  readonly artifacts: readonly DevelopmentArtifactSnapshot[]
+}
+
+/** Read-only project-development docs and fixed close-out outputs. */
+export interface DevelopmentDocsSnapshot {
+  readonly root: string
+  readonly core: {
+    readonly requiredCount: number
+    readonly presentCount: number
+    readonly artifacts: readonly DevelopmentArtifactSnapshot[]
+  }
+  readonly features: readonly DevelopmentFeatureSnapshot[]
+  readonly closure: {
+    readonly root: string
+    readonly requiredCount: number
+    readonly presentCount: number
+    readonly artifacts: readonly DevelopmentArtifactSnapshot[]
+  }
+  readonly issues: readonly string[]
+}
+
 /** Combined read model for project delivery views and Project Detail. */
 export interface ProjectSurfaceSnapshot {
   readonly workspaceId: string
@@ -264,6 +310,7 @@ export interface ProjectSurfaceSnapshot {
   readonly requirementWiki: RequirementWikiSnapshot
   readonly requirements: RequirementArtifactsSnapshot
   readonly solution: SolutionArtifactsSnapshot
+  readonly development: DevelopmentDocsSnapshot
 }
 
 /** Host-only API configuration consumed by the project-scoped OpenAPI adapter. */

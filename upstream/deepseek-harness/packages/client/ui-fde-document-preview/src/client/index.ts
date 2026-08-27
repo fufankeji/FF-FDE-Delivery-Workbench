@@ -14,7 +14,7 @@ function ProjectSourcePreview({ source }: ProjectSourcePreviewProps) {
   return createElement(DocumentPreview, {
     url: source.fileUrl,
     name: source.name,
-    size: source.bytes,
+    ...(source.bytes === undefined ? {} : { size: source.bytes }),
     kind: source.previewKind,
   })
 }

@@ -38,7 +38,7 @@ describe('ProjectProgressOverlay standalone page', () => {
       completeRequirements: vi.fn(), completeSolution: vi.fn(),
       loadProjectSources: vi.fn(), parseProjectSource: vi.fn(), loadRequirementWiki: vi.fn(),
       prepareRequirementWikiRun: vi.fn(), startRequirementWikiBuild: vi.fn(), abandonRequirementWikiBuild: vi.fn(),
-      enterProject: vi.fn(), closeProjectPage: vi.fn(), showProjectOverview: vi.fn(),
+      enterProject: vi.fn(), reviewProjectArchitecture: vi.fn(), closeProjectPage: vi.fn(), showProjectOverview: vi.fn(),
       showProjectTimeline: vi.fn(), showProjectDetail: vi.fn(), renderSlot: vi.fn(() => null),
       t: makeTranslate(zh),
     } as unknown as ProjectProgressOverlayProps
@@ -86,7 +86,7 @@ describe('ProjectProgressOverlay standalone page', () => {
       completeRequirements, completeSolution: vi.fn(),
       loadProjectSources: vi.fn(), parseProjectSource: vi.fn(), loadRequirementWiki: vi.fn(),
       prepareRequirementWikiRun: vi.fn(), startRequirementWikiBuild: vi.fn(), abandonRequirementWikiBuild: vi.fn(),
-      enterProject: vi.fn(), closeProjectPage: vi.fn(), showProjectOverview: vi.fn(),
+      enterProject: vi.fn(), reviewProjectArchitecture: vi.fn(), closeProjectPage: vi.fn(), showProjectOverview: vi.fn(),
       showProjectTimeline: vi.fn(), showProjectDetail: vi.fn(), renderSlot,
       t: makeTranslate(zh),
     } as unknown as ProjectProgressOverlayProps
@@ -113,7 +113,7 @@ describe('ProjectProgressOverlay standalone page', () => {
     await waitFor(() => { expect(completeRequirements).toHaveBeenCalledWith('workspace-1', 1) })
   })
 
-  it('shows four solution documents and the confirmed architecture before the FDE enters development', async () => {
+  it('shows five solution documents and the confirmed architecture before the FDE enters development', async () => {
     const completeSolution = vi.fn(async () => {})
     const renderSlot = vi.fn(() => <div>方案设计正文</div>)
     const props = {
@@ -131,8 +131,9 @@ describe('ProjectProgressOverlay standalone page', () => {
         evaluation: { casesCount: 0, reports: [] },
         requirements: { root: 'fde-deliverables/01-requirement-research', requiredCount: 3, presentCount: 3, artifacts: [] },
         solution: {
-          root: 'fde-deliverables/02-solution-design', requiredCount: 4, presentCount: 4,
+          root: 'fde-deliverables/02-solution-design', requiredCount: 5, presentCount: 5,
           artifacts: [
+            { id: 'project-prd', title: '项目 PRD', path: 'fde-deliverables/02-solution-design/project-prd.md', status: 'present', bytes: 320, fileUrl: '/api/fde-project/solution/artifact?workspaceId=workspace-1&artifactId=project-prd' },
             { id: 'solution-design', title: '方案设计', path: 'fde-deliverables/02-solution-design/solution-design.md', status: 'present', bytes: 240, fileUrl: '/api/fde-project/solution/artifact?workspaceId=workspace-1&artifactId=solution-design' },
             { id: 'development-plan', title: '研发计划', path: 'fde-deliverables/02-solution-design/development-plan.md', status: 'present', fileUrl: '/api/fde-project/solution/artifact?workspaceId=workspace-1&artifactId=development-plan' },
             { id: 'acceptance-plan', title: '验收方案', path: 'fde-deliverables/02-solution-design/acceptance-plan.md', status: 'present', fileUrl: '/api/fde-project/solution/artifact?workspaceId=workspace-1&artifactId=acceptance-plan' },
@@ -151,7 +152,7 @@ describe('ProjectProgressOverlay standalone page', () => {
       completeRequirements: vi.fn(), completeSolution,
       loadProjectSources: vi.fn(), parseProjectSource: vi.fn(), loadRequirementWiki: vi.fn(),
       prepareRequirementWikiRun: vi.fn(), startRequirementWikiBuild: vi.fn(), abandonRequirementWikiBuild: vi.fn(),
-      enterProject: vi.fn(), closeProjectPage: vi.fn(), showProjectOverview: vi.fn(),
+      enterProject: vi.fn(), reviewProjectArchitecture: vi.fn(), closeProjectPage: vi.fn(), showProjectOverview: vi.fn(),
       showProjectTimeline: vi.fn(), showProjectDetail: vi.fn(), renderSlot,
       t: makeTranslate(zh),
     } as unknown as ProjectProgressOverlayProps
@@ -159,16 +160,129 @@ describe('ProjectProgressOverlay standalone page', () => {
     render(<ProjectProgressOverlay {...props} />)
     fireEvent.click(screen.getByRole('button', { name: /阶段产出/ }))
     expect(screen.getByText('方案设计阶段产出')).toBeTruthy()
+    expect(screen.getByText('项目 PRD')).toBeTruthy()
     expect(screen.getByText('研发计划')).toBeTruthy()
     expect(screen.getByText('验收方案')).toBeTruthy()
     expect(screen.getByText('方案基线')).toBeTruthy()
     expect(screen.getByText('系统架构')).toBeTruthy()
     expect(screen.getByText('已确认 R1')).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: '预览方案设计' }))
+    fireEvent.click(screen.getByRole('button', { name: '预览项目 PRD' }))
     expect(screen.getByText('方案设计正文')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: '完成方案设计' }))
-    expect(screen.getByText(/我已核对四份方案文档/)).toBeTruthy()
+    expect(screen.getByText(/我已核对项目 PRD 等五份方案文档/)).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: '确认并进入项目开发' }))
     await waitFor(() => { expect(completeSolution).toHaveBeenCalledWith('workspace-1', 2) })
+  })
+
+  it('shows docs-based development progress and keeps validation behind FDE confirmation', async () => {
+    const completeDevelopment = vi.fn(async () => {})
+    const renderSlot = vi.fn(() => <div>研发文档正文</div>)
+    const props = {
+      useProjectPage: hook({ open: true, view: 'project' as const, workspaceId: 'workspace-1' }),
+      useStageProgress: hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: {
+        workspaceId: 'workspace-1', currentStage: 'development', revision: 3,
+        createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:02:00.000Z',
+      } } } }),
+      useProjectSurfaces: hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: {
+        workspaceId: 'workspace-1', title: '数据分析项目', apiDocs: { status: 'unconfigured', message: '未配置' },
+        architecture: null, evaluation: { casesCount: 0, reports: [] },
+        requirements: { root: 'fde-deliverables/01-requirement-research', requiredCount: 3, presentCount: 3, artifacts: [] },
+        solution: { root: 'fde-deliverables/02-solution-design', requiredCount: 5, presentCount: 5, artifacts: [] },
+        development: {
+          root: 'docs', issues: [],
+          core: { requiredCount: 3, presentCount: 3, artifacts: [
+            { id: 'core-prd', title: '项目 PRD', path: 'docs/PRD.md', kind: 'core', status: 'present', bytes: 120, fileUrl: '/api/fde-project/development/artifact?workspaceId=workspace-1&artifactId=core-prd' },
+            { id: 'core-product-spec', title: '产品总规格', path: 'docs/specs/product-spec.md', kind: 'core', status: 'present' },
+            { id: 'core-feature-map', title: 'Feature Map', path: 'docs/specs/feature-map.md', kind: 'core', status: 'present' },
+          ] },
+          features: [{
+            id: 'F001', title: '数据接入', directory: 'docs/specs/F001-source-ingestion', status: 'in-progress',
+            plannedStart: '2026-08-27', plannedEnd: '待确认', milestone: '完成数据源接入',
+            taskTotal: 3, taskCompleted: 2,
+            artifacts: [
+              { id: 'feature-F001-spec', title: 'Feature Spec', path: 'docs/specs/F001-source-ingestion/spec.md', kind: 'feature', status: 'present' },
+              { id: 'feature-F001-plan', title: '实施计划', path: 'docs/specs/F001-source-ingestion/plan.md', kind: 'feature', status: 'present' },
+              { id: 'feature-F001-tasks', title: '任务清单', path: 'docs/specs/F001-source-ingestion/tasks.md', kind: 'feature', status: 'present' },
+            ],
+          }],
+          closure: { root: 'fde-deliverables/03-project-development', requiredCount: 3, presentCount: 3, artifacts: [
+            { id: 'closure-implementation-report', title: '实施报告', path: 'fde-deliverables/03-project-development/implementation-report.md', kind: 'closure', status: 'present' },
+            { id: 'closure-runbook', title: '运行手册', path: 'fde-deliverables/03-project-development/runbook.md', kind: 'closure', status: 'present' },
+            { id: 'closure-development-baseline', title: '研发基线', path: 'fde-deliverables/03-project-development/development-baseline.md', kind: 'closure', status: 'present' },
+          ] },
+        },
+      } } } }),
+      useProjectSources: hook({ byWorkspace: { 'workspace-1': { status: 'ready', files: [] } } }),
+      useRequirementWiki: hook({ byWorkspace: {} }),
+      useWorkspaces: hook({ items: [{
+        workspaceId: 'workspace-1', title: '数据分析项目', path: '/project/one', sessionIds: ['session-1'],
+        createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:00:00.000Z',
+      }] }),
+      useSessions: hook({ byId: { 'session-1': { id: 'session-1', displayTitle: '会话', running: false, blank: false, updatedAt: 1 } } }),
+      loadStage: vi.fn(), retryStage: vi.fn(), loadProjectSurface: vi.fn(), refreshProjectSurface: vi.fn(),
+      completeRequirements: vi.fn(), completeSolution: vi.fn(), completeDevelopment,
+      loadProjectSources: vi.fn(), parseProjectSource: vi.fn(), loadRequirementWiki: vi.fn(),
+      prepareRequirementWikiRun: vi.fn(), startRequirementWikiBuild: vi.fn(), abandonRequirementWikiBuild: vi.fn(),
+      enterProject: vi.fn(), reviewProjectArchitecture: vi.fn(), closeProjectPage: vi.fn(), showProjectOverview: vi.fn(),
+      showProjectTimeline: vi.fn(), showProjectDetail: vi.fn(), renderSlot,
+      t: makeTranslate(zh),
+    } as unknown as ProjectProgressOverlayProps
+
+    render(<ProjectProgressOverlay {...props} />)
+    fireEvent.click(screen.getByRole('button', { name: /阶段产出/ }))
+    expect(screen.getByText('项目开发文档与进度')).toBeTruthy()
+    expect(screen.getByText('F001')).toBeTruthy()
+    expect(screen.getByText('数据接入')).toBeTruthy()
+    expect(screen.getByText('任务 2/3')).toBeTruthy()
+    expect(screen.getByText('项目开发收口产物')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '预览项目 PRD' }))
+    expect(screen.getByText('研发文档正文')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '完成项目开发' }))
+    expect(screen.getByText(/我已核对实施报告、运行手册、研发基线/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '确认并进入验证评估' }))
+    await waitFor(() => { expect(completeDevelopment).toHaveBeenCalledWith('workspace-1', 3) })
+  })
+
+  it('refreshes the project snapshot and guides a candidate architecture to the full review view', async () => {
+    const refreshProjectSurface = vi.fn()
+    const reviewProjectArchitecture = vi.fn(async () => {})
+    const props = {
+      useProjectPage: hook({ open: true, view: 'project' as const, workspaceId: 'workspace-1' }),
+      useStageProgress: hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: {
+        workspaceId: 'workspace-1', currentStage: 'solution', revision: 2,
+        createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:01:00.000Z',
+      } } } }),
+      useProjectSurfaces: hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: {
+        workspaceId: 'workspace-1', title: '数据分析项目', apiDocs: { status: 'unconfigured', message: '未配置' },
+        architecture: {
+          version: 1, revision: 2, title: '数据分析系统架构', status: 'candidate',
+          updatedAt: '2026-08-27T00:02:00.000Z', groups: [], nodes: [], edges: [],
+        },
+        evaluation: { casesCount: 0, reports: [] },
+        requirements: { root: 'fde-deliverables/01-requirement-research', requiredCount: 3, presentCount: 3, artifacts: [] },
+        solution: { root: 'fde-deliverables/02-solution-design', requiredCount: 5, presentCount: 0, artifacts: [] },
+      } } } }),
+      useProjectSources: hook({ byWorkspace: { 'workspace-1': { status: 'ready', files: [] } } }),
+      useRequirementWiki: hook({ byWorkspace: {} }),
+      useWorkspaces: hook({ items: [{
+        workspaceId: 'workspace-1', title: '数据分析项目', path: '/project/one', sessionIds: ['session-1'],
+        createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:00:00.000Z',
+      }] }),
+      useSessions: hook({ byId: { 'session-1': { id: 'session-1', displayTitle: '会话', running: false, blank: false, updatedAt: 1 } } }),
+      loadStage: vi.fn(), retryStage: vi.fn(), loadProjectSurface: vi.fn(), refreshProjectSurface,
+      completeRequirements: vi.fn(), completeSolution: vi.fn(),
+      loadProjectSources: vi.fn(), parseProjectSource: vi.fn(), loadRequirementWiki: vi.fn(),
+      prepareRequirementWikiRun: vi.fn(), startRequirementWikiBuild: vi.fn(), abandonRequirementWikiBuild: vi.fn(),
+      enterProject: vi.fn(), reviewProjectArchitecture, closeProjectPage: vi.fn(), showProjectOverview: vi.fn(),
+      showProjectTimeline: vi.fn(), showProjectDetail: vi.fn(), renderSlot: vi.fn(() => null),
+      t: makeTranslate(zh),
+    } as unknown as ProjectProgressOverlayProps
+
+    render(<ProjectProgressOverlay {...props} />)
+    await waitFor(() => { expect(refreshProjectSurface).toHaveBeenCalledWith('workspace-1') })
+    fireEvent.click(screen.getByRole('button', { name: /阶段产出/ }))
+    fireEvent.click(screen.getByRole('button', { name: '去确认架构：数据分析系统架构 R2' }))
+    await waitFor(() => { expect(reviewProjectArchitecture).toHaveBeenCalledWith('workspace-1') })
+    expect(screen.queryByText('待 FDE 确认 R2')).toBeNull()
   })
 })

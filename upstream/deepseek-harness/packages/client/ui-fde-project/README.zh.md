@@ -2,12 +2,12 @@
 
 [English](README.md) | 中文
 
-FDE 项目交付工作台的浏览器界面。它在保留左侧栏的前提下增加全局“项目进度”页面、带 Galaxy View 的项目需求 Wiki，并按阶段开放 4 个交付页签：方案设计开始显示“系统架构”，项目开发开始显示“API 文档”，验证评估开始显示“观测”和“评估”。
+FDE 项目交付工作台的浏览器界面。它在保留左侧栏的前提下增加全局“项目进度”页面、带 Galaxy View 的项目需求 Wiki，并按阶段开放 4 个交付页签：方案设计开始显示“系统架构”，项目开发开始显示“API 文档”和“评估”，验证评估开始显示“观测”。
 
 ## 行为
 
 - “项目进度”打开时会替换中央与右侧工作区，底层对话、输入框和 Better Sidebar 不会透出，也不能接收操作。
-- 页面读取现有 Workspace 列表、新建项目元数据、Session 摘要和 Workspace 级六阶段记录，不虚构完成百分比。“项目详情”按当前阶段展示真实输出：需求调研展示三份固定文件，方案设计展示四份固定文档和项目系统架构；已有 Markdown 可通过共用只读预览就地阅读，架构显示真实标题、revision 和确认状态。FDE 只有在对应 Host 检查通过后，才能经过二次确认进入方案设计或项目开发；Agent 没有这两个动作。Host 提交成功后会让同项目的项目交付阶段提示失效并重新读取同一持久 revision。
+- 页面读取现有 Workspace 列表、新建项目元数据、Session 摘要和 Workspace 级六阶段记录。“项目详情”展示真实阶段输出：需求调研三份文件；方案设计五份文档与架构；项目开发标准核心 docs、Feature/任务证据和三份收口文件。已有 Markdown 可就地只读。FDE 只有在对应 Host 检查通过后，才能经过二次确认进入方案设计、项目开发或验证评估；Agent 没有这些动作。Host 提交成功后会让同项目的阶段提示失效并重新读取同一持久 revision。
 - “进入项目交付”默认打开该 Workspace 中按更新时间最新的非归档普通 Session；子 Agent、归档和其他项目 Session 不参与。只有项目不存在可恢复 Session 时才使用官方首个空白会话流程。
 - “对话”和“轨迹”贯穿整个交付过程；项目结果页签只有对应阶段开始后才注册，加载中或读取失败不会提前显示后续能力。
 - “API 文档”“系统架构”“评估”读取可信的 `/api/fde-project/snapshot` 接口。
@@ -27,10 +27,20 @@ FDE 项目交付工作台的浏览器界面。它在保留左侧栏的前提下�
 fde-deliverables/01-requirement-research/requirement-research-report.md
 fde-deliverables/01-requirement-research/confirmation-checklist.md
 fde-deliverables/01-requirement-research/requirement-baseline.md
+fde-deliverables/02-solution-design/project-prd.md
 fde-deliverables/02-solution-design/solution-design.md
 fde-deliverables/02-solution-design/development-plan.md
 fde-deliverables/02-solution-design/acceptance-plan.md
 fde-deliverables/02-solution-design/solution-baseline.md
+docs/PRD.md
+docs/specs/product-spec.md
+docs/specs/feature-map.md
+docs/specs/FNNN-slug/spec.md
+docs/specs/FNNN-slug/plan.md
+docs/specs/FNNN-slug/tasks.md
+fde-deliverables/03-project-development/implementation-report.md
+fde-deliverables/03-project-development/runbook.md
+fde-deliverables/03-project-development/development-baseline.md
 .fde/requirement-wiki/build.json
 .fde/requirement-wiki/current.json
 .fde/requirement-wiki/versions/RNNNNNN/manifest.json

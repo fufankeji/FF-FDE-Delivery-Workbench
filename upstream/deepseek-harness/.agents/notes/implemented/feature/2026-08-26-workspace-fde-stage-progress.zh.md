@@ -12,7 +12,7 @@ Status: implemented
 
 `@deepseek-ai/dsh-fde-stage` 打开一个 `fde_stage` storage domain，其中 `projects` 表以 WorkspaceId 为键。仅限可信同源访问的 POST 路由只接受已注册 WorkspaceId：记录存在时读取，不存在时先提交初始 `requirements` 记录再返回。两个独立的固定完成路由只实现 `requirements` 到 `solution` 和 `solution` 到 `development`，都不接受浏览器提交的目标阶段。两者都要求精确匹配当前 revision，并按 Workspace 串行执行阶段变更。
 
-需求门读取 `fde-deliverables/01-requirement-research/` 下三份固定 Markdown 产物。方案门读取 `fde-deliverables/02-solution-design/` 下四份固定 Markdown 产物，并读取 `.fde/architecture.json` 中的当前项目架构；四份文件必须存在，当前架构 revision 的状态必须为 `confirmed`。文件存在只会让操作可执行。每个路由真正提交下一阶段前，FDE 仍须在项目进度中再次确认，Host 会在提交时重新检查全部条件。
+需求门读取 `fde-deliverables/01-requirement-research/` 下三份固定 Markdown 产物。方案门读取 `fde-deliverables/02-solution-design/` 下五份固定 Markdown 产物——`project-prd.md`、`solution-design.md`、`development-plan.md`、`acceptance-plan.md` 和 `solution-baseline.md`——并读取 `.fde/architecture.json` 中的当前项目架构。项目 PRD 定义要建设什么及其可观察验收行为，方案设计定义如何实现。五份文件必须存在，当前架构 revision 的状态必须为 `confirmed`。文件存在只会让操作可执行。每个路由真正提交下一阶段前，FDE 仍须在项目进度中再次确认，Host 会在提交时重新检查全部条件。
 
 Host 注册按需加载的 `fde-requirement-research`、`fde-solution-design` Skills 和一个简短的阶段感知系统提示段。Skills 将 Agent 产物限制在固定项目路径，要求区分候选、事实与未知项，并禁止 Agent 确认客户事实、确认架构或推进阶段。架构更新只能使用 `architecture_get` 与 `architecture_set`，不能直接写入 `.fde/architecture.json`。
 

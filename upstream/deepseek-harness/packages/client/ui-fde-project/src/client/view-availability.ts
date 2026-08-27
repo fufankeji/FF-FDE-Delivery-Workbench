@@ -9,7 +9,7 @@ const MINIMUM_STAGE: Readonly<Record<FdeProjectViewId, FdeStageId>> = {
   'fde-architecture': 'solution',
   'fde-api-docs': 'development',
   'fde-observability': 'validation',
-  'fde-evaluation': 'validation',
+  'fde-evaluation': 'development',
 }
 
 /** Whether the project's current stage has reached the view's first useful stage. */

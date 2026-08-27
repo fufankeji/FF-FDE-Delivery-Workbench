@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write .agents/notes/implemented/feature/2026-08-26-workspace-fde-stage-progress.md
-2026-08-26-workspace-fde-stage-progress.md: 8c5424905bb41cedc1f01ae859f8c96c26c5caa3
-2026-08-26-workspace-fde-stage-progress.zh.md: f751da5b50c48732299e6def236b09ab03d5e011
+2026-08-26-workspace-fde-stage-progress.md: b9f0ee6c49bb10cd44c471299742ee6f7339f7e4
+2026-08-26-workspace-fde-stage-progress.zh.md: cc99bc5e8899f0650077ad7c6f6ef41f02556b08

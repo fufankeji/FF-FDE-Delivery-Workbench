@@ -27,6 +27,10 @@ import {
   SOLUTION_ARTIFACT_FILE_PATH,
   resolveSolutionArtifact,
 } from './solution-artifacts.ts'
+import {
+  DEVELOPMENT_ARTIFACT_FILE_PATH,
+  resolveDevelopmentArtifact,
+} from './development-docs.ts'
 
 export {
   FdeProjectRequestError,
@@ -69,6 +73,14 @@ export {
   SOLUTION_ARTIFACTS,
   resolveSolutionArtifact,
 } from './solution-artifacts.ts'
+export {
+  DEVELOPMENT_ARTIFACT_FILE_PATH,
+  DEVELOPMENT_CLOSURE_ARTIFACTS,
+  DEVELOPMENT_CLOSURE_ROOT,
+  DEVELOPMENT_DOCS_ROOT,
+  loadDevelopmentDocs,
+  resolveDevelopmentArtifact,
+} from './development-docs.ts'
 export { registerRequirementWikiTools } from './requirement-wiki-tools.ts'
 export { projectEvaluationDecision, registerProjectEvaluationGuard } from './evaluation-guard.ts'
 export { loadProjectOpenApiCatalog, registerProjectOpenApiTools } from './openapi-tools.ts'
@@ -80,6 +92,8 @@ export const FDE_PROJECT_SNAPSHOT_PATH = '/api/fde-project/snapshot'
 export const FDE_REQUIREMENT_ARTIFACT_FILE_PATH = REQUIREMENT_ARTIFACT_FILE_PATH
 /** Verified read-only route for one fixed solution-design output. */
 export const FDE_SOLUTION_ARTIFACT_FILE_PATH = SOLUTION_ARTIFACT_FILE_PATH
+/** Verified read-only route for one Host-indexed project-development document. */
+export const FDE_DEVELOPMENT_ARTIFACT_FILE_PATH = DEVELOPMENT_ARTIFACT_FILE_PATH
 /** Exact-revision project architecture confirmation route. */
 export const FDE_ARCHITECTURE_CONFIRM_PATH = '/api/fde-project/architecture/confirm'
 /** Project evaluation baseline approval route. */
@@ -171,6 +185,21 @@ export function apply(ctx: Context, config: Config): void {
     path: FDE_SOLUTION_ARTIFACT_FILE_PATH,
     handler: solutionArtifactFile,
   }), `fde-project: ${FDE_SOLUTION_ARTIFACT_FILE_PATH}`)
+  const developmentArtifactFile = createRequirementArtifactFileRoute({
+    trusted: request => isTrustedApiRequest(request, []),
+    artifact: async (workspaceId, artifactId) => {
+      const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
+      if (workspace === undefined) return undefined
+      return await resolveDevelopmentArtifact(workspace.path, artifactId)
+    },
+    maxFileBytes: config.artifactPreviewMaxBytes,
+    reportFailure,
+  })
+  ctx.effect(() => ctx.webServer.register({
+    kind: 'exact',
+    path: FDE_DEVELOPMENT_ARTIFACT_FILE_PATH,
+    handler: developmentArtifactFile,
+  }), `fde-project: ${FDE_DEVELOPMENT_ARTIFACT_FILE_PATH}`)
   const confirm = createArchitectureConfirmRoute({
     trusted: request => isTrustedApiRequest(request, []),
     confirm: async (workspaceId, revision) => {

@@ -41,6 +41,7 @@ describe('ui-fde-project apply', () => {
       }),
     } as never)
     ctx.provide('modelDirectories', {} as never)
+    ctx.provide('conversation', {} as never)
     const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
       const path = requestPath(input)
       const completedRequirements = path.endsWith('/requirements/complete')
@@ -50,7 +51,7 @@ describe('ui-fde-project apply', () => {
           workspaceId: 'workspace-1', title: '项目一', apiDocs: { status: 'unconfigured', message: '未配置' },
           architecture: null, evaluation: { casesCount: 0, reports: [] },
           requirements: { root: 'fde-deliverables/01-requirement-research', requiredCount: 3, presentCount: 0, artifacts: [] },
-          solution: { root: 'fde-deliverables/02-solution-design', requiredCount: 4, presentCount: 0, artifacts: [] },
+          solution: { root: 'fde-deliverables/02-solution-design', requiredCount: 5, presentCount: 0, artifacts: [] },
         } }), { status: 200 })
       }
       return new Response(JSON.stringify({
@@ -137,6 +138,7 @@ describe('ui-fde-project apply', () => {
     }
     const loadModels = vi.fn(async () => models)
     ctx.provide('modelDirectories', { directoryFor: () => ({ load: loadModels }) } as never)
+    ctx.provide('conversation', {} as never)
     const fetchImpl = vi.fn(async () => new Response(JSON.stringify({
       ok: true,
       value: {
@@ -200,6 +202,7 @@ describe('ui-fde-project apply', () => {
     locale.setLocale('zh')
     ctx.provide('locale', locale)
     const open = vi.fn()
+    const selectView = vi.fn()
     ctx.provide('sessions', {
       list: createSnapshotStore({
         ids: ['older', 'latest', 'child', 'archived'],
@@ -212,6 +215,7 @@ describe('ui-fde-project apply', () => {
         current: undefined, phase: 'ready', subagentsByParent: {}, jobsBySession: {}, currentAddress: undefined,
       }),
       binding: () => undefined,
+      scope: () => ({ get: () => ({ selectView }) }),
       open,
     } as never)
     const connectWorkspace = vi.fn(async () => 'new-session')
@@ -231,6 +235,7 @@ describe('ui-fde-project apply', () => {
       connectWorkspace,
     } as never)
     ctx.provide('modelDirectories', {} as never)
+    ctx.provide('conversation', {} as never)
     const slots = ctx.get('slots') as SlotRegistry
     slots.register({
       name: 'root',
@@ -247,6 +252,11 @@ describe('ui-fde-project apply', () => {
     await injected.enterProject('workspace-1')
     expect(open).toHaveBeenLastCalledWith('latest')
     expect(connectWorkspace).not.toHaveBeenCalled()
+
+    await injected.reviewProjectArchitecture('workspace-1')
+    expect(selectView).toHaveBeenLastCalledWith('fde-architecture')
+    expect(open).toHaveBeenLastCalledWith('latest')
+    expect(selectView.mock.invocationCallOrder[0]).toBeLessThan(open.mock.invocationCallOrder.at(-1) ?? 0)
 
     await injected.enterProject('workspace-2')
     expect(connectWorkspace).toHaveBeenCalledWith('workspace-2')

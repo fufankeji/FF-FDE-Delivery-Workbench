@@ -33,7 +33,7 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
 }
 
 /** Required browser services and the Slot owners that declare our targets. */
-export const inject = ['slots', 'locale', 'modelDirectories', 'sessions', 'workspaces']
+export const inject = ['slots', 'locale', 'modelDirectories', 'sessions', 'workspaces', 'conversation']
 
 /** Register the global project page and the four project delivery views. */
 export function apply(ctx: ClientContext): void {
@@ -45,6 +45,30 @@ export function apply(ctx: ClientContext): void {
   ctx.effect(() => () => { page.dispose(); stages.dispose(); sources.dispose(); requirementWiki.dispose(); surfaces.dispose() }, 'ui-fde-project: controllers')
   ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'ui-fde-project: dictionaries')
   const t = ctx.locale.bind(NS)
+
+  const resolveProjectSession = async (workspaceId: string): Promise<SessionId> => {
+    const workspaceState = ctx.workspaces.list.getSnapshot()
+    const workspace = workspaceState.items.find(item => String(item.workspaceId) === workspaceId)
+    if (workspace === undefined) throw new Error('当前项目不存在或已被移除。')
+    const sessions = ctx.sessions.list.getSnapshot()
+    return latestProjectSessionId(
+      workspace.sessionIds,
+      sessions.byId,
+      workspaceState.archivedSessionIds,
+    ) ?? await ctx.workspaces.connectWorkspace(workspaceId as WorkspaceId)
+  }
+
+  const enterProject = async (workspaceId: string, viewId?: string): Promise<void> => {
+    const sessionId = await resolveProjectSession(workspaceId)
+    if (viewId !== undefined) {
+      const scoped = ctx.sessions.scope(sessionId)
+      const conversation = scoped?.get('conversation')
+      if (conversation === undefined) throw new Error('当前项目会话暂时无法打开系统架构。')
+      conversation.selectView(viewId)
+    }
+    ctx.sessions.open(sessionId)
+    page.close()
+  }
 
   const pageInjected = (): ProjectPageInjected => ({
     hooks: { projectPage: page, stageProgress: stages, projectSurfaces: surfaces, projectSources: sources, requirementWiki },
@@ -58,6 +82,10 @@ export function apply(ctx: ClientContext): void {
     },
     completeSolution: async (workspaceId, expectedRevision) => {
       await stages.completeSolution(workspaceId, expectedRevision)
+      surfaces.refresh(workspaceId)
+    },
+    completeDevelopment: async (workspaceId, expectedRevision) => {
+      await stages.completeDevelopment(workspaceId, expectedRevision)
       surfaces.refresh(workspaceId)
     },
     loadProjectSources: (workspaceId, force) => { sources.load(workspaceId, force) },
@@ -113,19 +141,8 @@ export function apply(ctx: ClientContext): void {
     abandonRequirementWikiBuild: async (workspaceId, buildId) => {
       await requirementWiki.abandonBuild(workspaceId, buildId)
     },
-    enterProject: async (workspaceId) => {
-      const workspaceState = ctx.workspaces.list.getSnapshot()
-      const workspace = workspaceState.items.find(item => String(item.workspaceId) === workspaceId)
-      if (workspace === undefined) throw new Error('当前项目不存在或已被移除。')
-      const sessions = ctx.sessions.list.getSnapshot()
-      const sessionId = latestProjectSessionId(
-        workspace.sessionIds,
-        sessions.byId,
-        workspaceState.archivedSessionIds,
-      ) ?? await ctx.workspaces.connectWorkspace(workspaceId as WorkspaceId)
-      ctx.sessions.open(sessionId)
-      page.close()
-    },
+    enterProject: async (workspaceId) => { await enterProject(workspaceId) },
+    reviewProjectArchitecture: async (workspaceId) => { await enterProject(workspaceId, 'fde-architecture') },
     closeProjectPage: page.close,
     openProjectPage: page.open,
     showProjectOverview: page.showOverview,

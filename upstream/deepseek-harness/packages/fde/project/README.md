@@ -2,7 +2,11 @@
 
 English | [中文](README.zh.md)
 
-Trusted Host support for the FDE project-delivery surfaces. It resolves one explicit Harness WorkspaceId, reads only that Workspace's `.fde/api-docs.json`, `.fde/architecture.json`, `.fde/evaluations/`, fixed requirement-research and solution-design outputs, and requirement Wiki state, validates bounded structures, and returns one same-origin snapshot for the browser. The two output readers report present, missing, or read-error state without creating files or treating presence as confirmation; present Markdown outputs receive bounded, read-only same-origin preview URLs selected by stage-specific fixed artifact ids rather than browser-supplied paths. It also adapts the locked `dsh-openapi` parser and HTTP implementation so the standard OpenAPI tools resolve configuration from the calling Agent's registered Workspace instead of a process-global API list.
+Trusted Host support for the FDE project-delivery surfaces. It resolves one explicit Harness WorkspaceId, reads only that Workspace's `.fde/api-docs.json`, `.fde/architecture.json`, `.fde/evaluations/`, fixed requirement-research and solution-design outputs, canonical project-development docs, and requirement Wiki state, validates bounded structures, and returns one same-origin snapshot for the browser. Stage output readers report present, missing, or read-error state without creating files or treating presence as confirmation; present Markdown outputs receive bounded, read-only same-origin preview URLs selected by Host-indexed artifact ids rather than browser-supplied paths. It also adapts the locked `dsh-openapi` parser and HTTP implementation so the standard OpenAPI tools resolve configuration from the calling Agent's registered Workspace instead of a process-global API list.
+
+## Project development docs
+
+The read-only development projection scans `docs/PRD.md`, `docs/specs/product-spec.md`, `docs/specs/feature-map.md`, and up to 100 canonical `docs/specs/FNNN-slug/{spec,plan,tasks}.md` Feature directories. Optional frontmatter supplies title, status, planned dates, milestone, and blocker; unchecked and checked Markdown tasks provide the only task counts. Missing dates stay unknown, duplicate Feature ids are reported, and the browser never receives a write-back task API. The same projection reports the three close-out files under `fde-deliverables/03-project-development/`. Every preview id is re-indexed and realpath-checked inside the registered Workspace before bytes are served.
 
 ## Requirement Wiki
 
@@ -43,6 +47,7 @@ The schemas remain identical across projects and builds, so Source or Wiki chang
 ## Known Limitations and Deferred Work
 
 - The package does not start project servers, run evaluations, or create architecture artifacts.
+- The package does not infer dates, task completion, or Feature state from Git history, file timestamps, Agent replies, or conversation content, and it never edits project docs.
 - API documentation URLs must be explicitly project-owned; absent configuration remains unconfigured.
 - Evaluation reports are read-only and malformed reports are excluded instead of repaired.
 - The adapter intentionally uses the locked plugin's parser and request modules because the upstream plugin's static process-wide API catalog cannot provide Workspace isolation by itself.

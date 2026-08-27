@@ -2,9 +2,9 @@
 
 English | [中文](README.zh.md)
 
-Host-side current-stage state for FDE projects. The package opens one `storage-domain` table keyed by Harness WorkspaceId and exposes trusted same-origin POST routes that read or initialize the record and perform two fixed transitions: `requirements` to `solution`, then `solution` to `development`. Concurrent first reads share one write; transition requests are serialized per Workspace and require the exact browser revision. The first gate rechecks three fixed requirement-research files; the second rechecks four fixed solution-design documents and a confirmed project architecture. No route accepts an arbitrary target stage.
+Host-side current-stage state for FDE projects. The package opens one `storage-domain` table keyed by Harness WorkspaceId and exposes trusted same-origin POST routes that read or initialize the record and perform three fixed transitions: `requirements` to `solution`, `solution` to `development`, then `development` to `validation`. Concurrent first reads share one write; transition requests are serialized per Workspace and require the exact browser revision. The first gate rechecks three fixed requirement-research files; the second rechecks five fixed solution-design documents and a confirmed project architecture; the third rechecks three fixed project-development close-out files. No route accepts an arbitrary target stage.
 
-The package also registers bundled `fde-requirement-research` and `fde-solution-design` Skills plus one short stage-aware system section. The first Skill standardizes three requirement outputs; the second standardizes four solution documents and requires architecture changes to use `architecture_get`/`architecture_set`. Only an FDE's explicit browser confirmation can advance the stage. The remaining four gates stay deferred.
+The package also registers bundled `fde-requirement-research`, `fde-solution-design`, and `fde-project-development` Skills plus one short stage-aware system section. The development Skill applies a lightweight spec-first contract directly to the project's canonical `docs/` tree and evidence-backed tasks, without adding a second CLI or task database. Only an FDE's explicit browser confirmation can advance the stage. The remaining three gates stay deferred.
 
 ## Model Experience
 

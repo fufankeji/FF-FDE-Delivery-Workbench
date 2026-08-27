@@ -2,7 +2,11 @@
 
 [English](README.md) | 中文
 
-FDE 项目交付页面使用的可信 Host 支持。它只解析显式 Harness WorkspaceId，只读取该项目的 `.fde/api-docs.json`、`.fde/architecture.json`、`.fde/evaluations/`、固定的需求调研与方案设计产物和需求 Wiki 状态，校验有界结构后，通过同源接口返回一个浏览器快照。两个阶段产物读取器只报告已有、缺失或读取失败，不创建文件，也不把文件存在当成确认；已有的 Markdown 产物会获得有大小限制的同源只读预览地址，Host 按各阶段固定产物标识选择文件，不接受浏览器传入路径。它还适配锁定版本 `dsh-openapi` 的解析和 HTTP 实现，使标准 OpenAPI 工具按调用 Agent 所属的已注册 Workspace 解析配置，而不是使用进程级共享 API 清单。
+FDE 项目交付页面使用的可信 Host 支持。它只解析显式 Harness WorkspaceId，只读取该项目的 `.fde/api-docs.json`、`.fde/architecture.json`、`.fde/evaluations/`、固定的需求调研与方案设计产物、标准项目开发文档和需求 Wiki 状态，校验有界结构后，通过同源接口返回一个浏览器快照。阶段产物读取器只报告已有、缺失或读取失败，不创建文件，也不把文件存在当成确认；已有的 Markdown 产物会获得有大小限制的同源只读预览地址，Host 按已索引产物标识选择文件，不接受浏览器传入路径。它还适配锁定版本 `dsh-openapi` 的解析和 HTTP 实现，使标准 OpenAPI 工具按调用 Agent 所属的已注册 Workspace 解析配置，而不是使用进程级共享 API 清单。
+
+## 项目开发文档
+
+只读研发投影扫描 `docs/PRD.md`、`docs/specs/product-spec.md`、`docs/specs/feature-map.md`，以及最多 100 个规范 `docs/specs/FNNN-slug/{spec,plan,tasks}.md` Feature 目录。可选 frontmatter 提供标题、状态、计划日期、里程碑和阻塞；Markdown 未勾选/已勾选任务是唯一任务数量来源。缺少日期时保持未知，重复 Feature ID 会被报告，浏览器没有反写任务 API。同一投影还报告 `fde-deliverables/03-project-development/` 下三份收口文件。Host 提供字节前会重新索引每个预览 ID，并用 realpath 检查文件仍位于已登记 Workspace 内。
 
 ## 需求 Wiki
 
@@ -43,6 +47,7 @@ Schema 在不同项目和构建之间保持一致，因此 Source 或 Wiki 变�
 ## 已知限制与延期工作
 
 - 本包不会启动项目服务、运行评估或创建系统架构产物。
+- 本包不会根据 Git 历史、文件时间、Agent 回复或对话内容推断日期、任务完成和 Feature 状态，也不会编辑项目 docs。
 - API 文档地址必须明确归属于项目；没有配置时保持未配置状态。
 - 评估报告当前只读；损坏报告会被排除，不会自动修复。
 - 适配层刻意复用锁定插件的解析和请求模块，因为上游插件的进程级静态 API 清单本身无法提供 Workspace 隔离。

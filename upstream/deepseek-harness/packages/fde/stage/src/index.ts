@@ -3,17 +3,17 @@
 import type { Context } from '@deepseek-ai/cordis'
 import type {} from '@deepseek-ai/dsh-agent'
 import { isTrustedApiRequest } from '@deepseek-ai/dsh-client-connection'
-import { loadRequirementArtifacts, loadSolutionArtifacts, readProjectArchitecture } from '@deepseek-ai/dsh-fde-project'
+import { loadDevelopmentDocs, loadRequirementArtifacts, loadSolutionArtifacts, readProjectArchitecture } from '@deepseek-ai/dsh-fde-project'
 import type {} from '@deepseek-ai/dsh-host-webserver'
 import type {} from '@deepseek-ai/dsh-skill'
 import type {} from '@deepseek-ai/dsh-storage-domain'
 import type {} from '@deepseek-ai/dsh-system-prompt'
 import { WorkspaceId } from '@deepseek-ai/dsh-workspace'
-import { createCompleteRequirementsRoute, createCompleteSolutionRoute, createStageRoute } from './http.ts'
+import { createCompleteDevelopmentRoute, createCompleteRequirementsRoute, createCompleteSolutionRoute, createStageRoute } from './http.ts'
 import { fdeStageDomainSpec, type FdeStageId } from './spec.ts'
 import { FdeStageState } from './state.ts'
 
-export { FdeStageRequestError, createCompleteRequirementsRoute, createCompleteSolutionRoute, createStageRoute } from './http.ts'
+export { FdeStageRequestError, createCompleteDevelopmentRoute, createCompleteRequirementsRoute, createCompleteSolutionRoute, createStageRoute } from './http.ts'
 export { FDE_STAGE_IDS, fdeStageDomainSpec, fdeStageId, projectStageRecord } from './spec.ts'
 export type { FdeStageId, ProjectStageRecord } from './spec.ts'
 export { FdeStageConflictError, FdeStageState, FdeStageTransitionError } from './state.ts'
@@ -24,6 +24,8 @@ export const FDE_STAGE_OPEN_PATH = '/api/fde-stage/open'
 export const FDE_STAGE_COMPLETE_REQUIREMENTS_PATH = '/api/fde-stage/requirements/complete'
 /** Fixed manual gate from solution design to project development. */
 export const FDE_STAGE_COMPLETE_SOLUTION_PATH = '/api/fde-stage/solution/complete'
+/** Fixed manual gate from project development to validation. */
+export const FDE_STAGE_COMPLETE_DEVELOPMENT_PATH = '/api/fde-stage/development/complete'
 /** Cordis plugin name. */
 export const name = 'fde-stage'
 /** Required durable Workspace, model guidance, and same-origin Web services. */
@@ -60,7 +62,7 @@ export const REQUIREMENT_RESEARCH_SKILL = {
 /** Runtime Skill loaded on demand while an FDE is consolidating the solution. */
 export const SOLUTION_DESIGN_SKILL = {
   name: 'fde-solution-design',
-  description: '把已确认需求收敛为方案设计、研发计划、验收方案、候选方案基线和项目级系统架构。',
+  description: '把已确认需求收敛为项目 PRD、方案设计、研发计划、验收方案、候选方案基线和项目级系统架构。',
   whenToUse: '当前项目处于方案设计，用户要求设计、收敛或更新项目方案时使用。',
   source: 'bundled',
   content: `# FDE 方案设计产物
@@ -69,13 +71,15 @@ export const SOLUTION_DESIGN_SKILL = {
 
 ## 固定文档
 
-1. \`fde-deliverables/02-solution-design/solution-design.md\`
-   - 目标流程与产品形态、范围与角色、系统边界、关键方案决策、非目标，以及需求事实与方案选择的对应关系。
-2. \`fde-deliverables/02-solution-design/development-plan.md\`
+1. \`fde-deliverables/02-solution-design/project-prd.md\`
+   - 定义“要做什么”：用户与角色、业务目标、用户/业务流程、功能需求、业务规则、输入输出与数据、AI 行为与失败回退、约束、需求到验收的映射，以及仍待确认的产品问题。
+2. \`fde-deliverables/02-solution-design/solution-design.md\`
+   - 定义“怎么做”：系统边界、技术组件、集成关系、数据与 AI 实现策略、关键技术决策、非目标，以及项目 PRD 条目与实现方案的对应关系；不要重复项目 PRD 中的产品范围和角色定义。
+3. \`fde-deliverables/02-solution-design/development-plan.md\`
    - 工作包、里程碑、实施顺序、数据与环境准备、外部依赖、风险和候选时间安排。
-3. \`fde-deliverables/02-solution-design/acceptance-plan.md\`
+4. \`fde-deliverables/02-solution-design/acceptance-plan.md\`
    - 可检查的业务、功能、AI、性能、安全、部署和试运行验收条件，以及验证证据要求。
-4. \`fde-deliverables/02-solution-design/solution-baseline.md\`
+5. \`fde-deliverables/02-solution-design/solution-baseline.md\`
    - 候选方案版本、需求基线引用、关键决策、未决项、已接受风险，以及原型、API 契约、数据映射和 POC 是否适用及其证据位置。
 
 ## 系统架构
@@ -89,7 +93,47 @@ export const SOLUTION_DESIGN_SKILL = {
 - 明确区分“已确认需求”“方案选择”“合理推断”“未知/待确认”，并尽可能引用需求基线、文件或对话依据。
 - 有新事实或新决定时更新同一文件，不创建 final、v2、new 等平行最终稿。
 - 原型、API 契约、数据映射和 POC 按项目实际情况决定，不机械补造；在方案基线记录适用性、证据或不适用理由。
-- 四份文档和系统架构都是候选阶段产物。不得声称客户或 FDE 已经确认，不得改变项目阶段；是否进入项目开发只能由 FDE 在项目进度页决定。`,
+- 五份文档和系统架构都是候选阶段产物。不得声称客户或 FDE 已经确认，不得改变项目阶段；是否进入项目开发只能由 FDE 在项目进度页决定。`,
+} as const
+
+/** Runtime Skill loaded on demand while an FDE is planning and executing development. */
+export const PROJECT_DEVELOPMENT_SKILL = {
+  name: 'fde-project-development',
+  description: '按统一 docs 规范拆分、实施和追踪 FDE 项目研发，并在开发完成时形成固定收口产物。',
+  whenToUse: '当前项目处于项目开发，用户要求规划、拆分、实施、检查研发进度或收口开发时使用。',
+  source: 'bundled',
+  content: `# FDE 项目开发规范
+
+只在当前项目的项目开发阶段使用本 Skill。先读取已确认的项目 PRD、方案、架构、现有源码和已有 docs，再决定本次需要补文档还是实施功能。不要用模板内容覆盖真实项目事实。
+
+## 标准 docs
+
+1. \`docs/PRD.md\`：产品目标、范围、需求和验收。
+2. \`docs/specs/product-spec.md\`：跨 Feature 的对象、状态、不变量和共享行为。
+3. \`docs/specs/feature-map.md\`：Feature、依赖、优先级和真实状态。
+4. \`docs/specs/FNNN-slug/spec.md\`：一个 Feature 的可观察行为、边界和验收。
+5. \`docs/specs/FNNN-slug/plan.md\`：影响范围、实施顺序、风险、回退和验证。
+6. \`docs/specs/FNNN-slug/tasks.md\`：可执行任务、依赖和完成证据。
+
+Feature 文档 frontmatter 使用 \`document\`、\`feature\`、\`status\`、\`title\`、\`planned_start\`、\`planned_end\`、\`milestone\`、\`updated\`；日期没有事实依据时写“待确认”。同一 Feature 持续更新同一路径，不创建 final、v2、new 等平行最终稿。
+
+## 开发规则
+
+- 先收敛 PRD 与总规格，再冻结 Feature Map；只为本次明确实施的 Feature 创建或更新 spec/plan/tasks。
+- 实施前读对应 spec、plan 和 tasks；变更必须能回到需求、验收和任务。
+- \`- [x]\` 只在源码、测试、构建或运行证据真实存在后使用，并在任务下记录最窄证据；文档存在本身不等于完成。
+- 新事实影响上游时，先更新受影响的 PRD/总规格/Feature，再继续开发；不要另建任务数据库或让页面状态反写 docs。
+- 评估可以从项目开发阶段使用，但评估结果不能自动勾选任务、更新基线或推进阶段。
+
+## 开发收口
+
+开发完成时更新以下固定候选产物：
+
+1. \`fde-deliverables/03-project-development/implementation-report.md\`
+2. \`fde-deliverables/03-project-development/runbook.md\`
+3. \`fde-deliverables/03-project-development/development-baseline.md\`
+
+三份文件分别记录实现范围与剩余项、安装运行和故障恢复、候选版本与测试/评估证据及已知风险。它们仍是候选阶段产物；你不能声称 FDE 已确认，不得改变项目阶段。是否进入验证评估只能由 FDE 在项目进度页决定。`,
 } as const
 
 /** Short stage-aware prompt; the complete Skill body remains on-demand. */
@@ -101,7 +145,13 @@ export function requirementResearchPrompt(stage: FdeStageId): string {
 /** Short solution-aware prompt; the complete Skill body remains on-demand. */
 export function solutionDesignPrompt(stage: FdeStageId): string {
   if (stage !== 'solution') return ''
-  return '当前 FDE 项目处于“方案设计”。当用户要求设计、收敛或更新项目方案时，先加载 Skill `fde-solution-design`，更新 `fde-deliverables/02-solution-design/` 的四个固定文件，并通过 architecture_get/architecture_set 维护项目级候选架构。所有产物均为候选；你不能确认架构、客户结论或推进项目阶段。'
+  return '当前 FDE 项目处于“方案设计”。当用户要求设计、收敛或更新项目方案时，先加载 Skill `fde-solution-design`，更新 `fde-deliverables/02-solution-design/` 的五个固定文件（包含项目 PRD），并通过 architecture_get/architecture_set 维护项目级候选架构。所有产物均为候选；你不能确认架构、客户结论或推进项目阶段。'
+}
+
+/** Short development-aware prompt; the complete Skill body remains on-demand. */
+export function projectDevelopmentPrompt(stage: FdeStageId): string {
+  if (stage !== 'development') return ''
+  return '当前 FDE 项目处于“项目开发”。当用户要求规划、拆分、实施或检查研发进度时，先加载 Skill `fde-project-development`，按项目 `docs/` 的 PRD、产品总规格、Feature Map 和逐 Feature spec/plan/tasks 原位维护，并用真实工程证据更新任务。开发收口产物固定在 `fde-deliverables/03-project-development/`。你不能虚构日期或证据，也不能推进项目阶段。'
 }
 
 /**
@@ -114,6 +164,7 @@ export async function apply(ctx: Context): Promise<void> {
   ctx.effect(() => async () => { await domain.close() }, 'fde-stage: domain')
   ctx.skills.register(REQUIREMENT_RESEARCH_SKILL)
   ctx.skills.register(SOLUTION_DESIGN_SKILL)
+  ctx.skills.register(PROJECT_DEVELOPMENT_SKILL)
   ctx.systemPrompt.section({
     name: 'fde:requirement-research',
     order: 90,
@@ -123,7 +174,7 @@ export async function apply(ctx: Context): Promise<void> {
       const workspace = ctx.workspaceRegistry.list().find(item => item.path === cwd)
       if (workspace === undefined) return ''
       const stage = state.current(workspace.id)?.currentStage ?? 'requirements'
-      return requirementResearchPrompt(stage) || solutionDesignPrompt(stage)
+      return requirementResearchPrompt(stage) || solutionDesignPrompt(stage) || projectDevelopmentPrompt(stage)
     },
   })
   const handler = createStageRoute({
@@ -173,6 +224,23 @@ export async function apply(ctx: Context): Promise<void> {
     path: FDE_STAGE_COMPLETE_SOLUTION_PATH,
     handler: completeSolution,
   }), `fde-stage: ${FDE_STAGE_COMPLETE_SOLUTION_PATH}`)
+  const completeDevelopment = createCompleteDevelopmentRoute({
+    trusted: request => isTrustedApiRequest(request, []),
+    workspaceExists: id => ctx.workspaceRegistry.get(WorkspaceId(id)) !== undefined,
+    development: async (workspaceId) => {
+      const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
+      if (workspace === undefined) throw new Error('当前项目不存在或已被移除。')
+      const snapshot = await loadDevelopmentDocs(workspace.path)
+      return { artifacts: snapshot.closure.artifacts }
+    },
+    complete: async (workspaceId, expectedRevision) => await state.completeDevelopment(workspaceId, expectedRevision),
+    reportFailure: (error) => { ctx.logger.warn(error instanceof Error ? error : new Error(String(error))) },
+  })
+  ctx.effect(() => ctx.webServer.register({
+    kind: 'exact',
+    path: FDE_STAGE_COMPLETE_DEVELOPMENT_PATH,
+    handler: completeDevelopment,
+  }), `fde-stage: ${FDE_STAGE_COMPLETE_DEVELOPMENT_PATH}`)
 }
 
 /** Model-facing content is limited to one short stage section and an on-demand Skill. */
