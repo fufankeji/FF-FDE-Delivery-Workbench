@@ -2,10 +2,12 @@
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { CSSProperties, RefObject } from 'react'
+import type { ProjectSurfaceLoadState } from './controller.ts'
 import { readProjectMetadata, STAGE_NAMES } from './project-data.ts'
 import { FDE_STAGES, type ProjectStageLoadState } from './stage-controller.ts'
 import type { ProjectSourceItem, ProjectSourceLoadState } from './source-controller.ts'
 import type { ProjectProgressOverlayProps, RequirementWikiRunTarget } from './slots.ts'
+import type { ProjectPreviewFile } from './slots.ts'
 import { RequirementIssuePanel, RequirementWikiPanel } from './RequirementWikiPanel.tsx'
 import type { RequirementWikiLoadState } from './wiki-controller.ts'
 import css from './project.module.css'
@@ -204,12 +206,190 @@ function sourceStateLabel(source: ProjectSourceItem): string {
   return `${preview} · ${parseLabel(source)}`
 }
 
+function StageOutputs({ workspaceId, stage, surfaceState, completeRequirements, completeSolution, renderPreview }: {
+  readonly workspaceId: string
+  readonly stage: ProjectStageLoadState | undefined
+  readonly surfaceState: ProjectSurfaceLoadState | undefined
+  readonly completeRequirements: (revision: number) => Promise<void>
+  readonly completeSolution: (revision: number) => Promise<void>
+  readonly renderPreview: (source: ProjectPreviewFile) => React.ReactNode
+}) {
+  const [confirming, setConfirming] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | undefined>()
+  const [selectedArtifactId, setSelectedArtifactId] = useState<string | undefined>()
+  const currentStage = stage?.status === 'ready' ? stage.value.currentStage : undefined
+  useEffect(() => {
+    setConfirming(false); setSubmitting(false); setError(undefined); setSelectedArtifactId(undefined)
+  }, [currentStage, workspaceId])
+
+  if (surfaceState === undefined || surfaceState.status === 'loading') {
+    return <div className={css.outputState}>正在读取阶段产出…</div>
+  }
+  if (surfaceState.status === 'error') {
+    return <div className={css.outputState} data-error>{surfaceState.message}</div>
+  }
+  const showSolution = currentStage !== undefined && currentStage !== 'requirements'
+  if (showSolution && surfaceState.value.solution === undefined) {
+    return <div className={css.outputState} data-error>方案设计阶段产出暂不可用，请刷新项目页面。</div>
+  }
+  const outputs = showSolution
+    ? surfaceState.value.solution as NonNullable<typeof surfaceState.value.solution>
+    : surfaceState.value.requirements
+  const architecture = showSolution ? surfaceState.value.architecture : null
+  const documentsReady = outputs.presentCount === outputs.requiredCount
+  const architectureReady = architecture?.status === 'confirmed'
+  const ready = showSolution ? documentsReady && architectureReady : documentsReady
+  const revision = stage?.status === 'ready' ? stage.value.revision : undefined
+  const selectedArtifact = outputs.artifacts.find((artifact): artifact is typeof artifact & { readonly fileUrl: string } => (
+    artifact.id === selectedArtifactId && artifact.status === 'present' && artifact.fileUrl !== undefined
+  ))
+  const outputCount = outputs.presentCount + (showSolution && architecture !== null ? 1 : 0)
+  const outputTotal = outputs.requiredCount + (showSolution ? 1 : 0)
+  const title = showSolution ? '方案设计阶段产出' : '需求调研阶段产出'
+  const description = showSolution
+    ? '四份文档与系统架构由 Agent 和 FDE 持续更新；文件存在和候选架构都不等于阶段已经完成。'
+    : '这些文件由 Agent 与 FDE 在多轮沟通中持续更新；文件存在仍不等于客户已经确认。'
+  return (
+    <section className={css.outputRoot}>
+      <header className={css.outputHeader}>
+        <div><h2>{title}</h2><p>{description}</p></div>
+        <strong>{outputCount}/{outputTotal}</strong>
+      </header>
+      <div className={css.outputList}>
+        {outputs.artifacts.map((artifact) => {
+          const label = artifact.status === 'missing'
+            ? '待生成'
+            : artifact.status === 'error'
+              ? '读取失败'
+              : (artifact.id === 'requirement-baseline' && currentStage === 'requirements')
+                || (artifact.id === 'solution-baseline' && currentStage === 'solution')
+                ? '待 FDE 确认'
+                : (showSolution && currentStage !== 'solution') || (!showSolution && currentStage !== 'requirements')
+                  ? '已纳入阶段确认'
+                  : '已有文件'
+          const previewable = artifact.status === 'present' && artifact.fileUrl !== undefined
+          return (
+            <button
+              key={artifact.id}
+              type="button"
+              className={css.outputItem}
+              data-status={artifact.status}
+              data-active={selectedArtifact?.id === artifact.id || undefined}
+              disabled={!previewable}
+              onClick={() => { if (previewable) setSelectedArtifactId(artifact.id) }}
+              aria-label={previewable ? `预览${artifact.title}` : undefined}
+            >
+              <span className={css.outputIcon} aria-hidden="true">MD</span>
+              <div><h3>{artifact.title}</h3><code>{artifact.path}</code>{artifact.message !== undefined && <p>{artifact.message}</p>}</div>
+              <span className={css.outputBadge}>{label}</span>
+            </button>
+          )
+        })}
+        {showSolution && (
+          <button
+            type="button"
+            className={css.outputItem}
+            data-status={surfaceState.value.architectureError !== undefined ? 'error' : architecture?.status === 'confirmed' ? 'present' : 'missing'}
+            disabled
+          >
+            <span className={css.outputIcon} aria-hidden="true">ARCH</span>
+            <div>
+              <h3>系统架构</h3>
+              <code>.fde/architecture.json</code>
+              {architecture !== null && <p>{architecture.title} · R{architecture.revision}</p>}
+              {surfaceState.value.architectureError !== undefined && <p>{surfaceState.value.architectureError}</p>}
+            </div>
+            <span className={css.outputBadge}>{surfaceState.value.architectureError !== undefined
+              ? '读取失败'
+              : architecture === null
+                ? '待生成'
+                : architecture.status === 'confirmed'
+                  ? currentStage === 'solution' ? `已确认 R${String(architecture.revision)}` : `已纳入阶段确认 R${String(architecture.revision)}`
+                  : `待 FDE 确认 R${String(architecture.revision)}`}</span>
+          </button>
+        )}
+      </div>
+      {selectedArtifact === undefined
+        ? <div className={css.outputPreviewHint}>选择一份“已有文件”查看只读内容。</div>
+        : <section className={css.outputPreviewPanel}>
+          <header className={css.previewHeader}>
+            <div><h2>{selectedArtifact.title}</h2><span>{selectedArtifact.path}{selectedArtifact.bytes === undefined ? '' : ` · ${formatBytes(selectedArtifact.bytes)}`}</span></div>
+            <div className={css.previewActions}>
+              <a href={selectedArtifact.fileUrl} download={selectedArtifact.path.split('/').at(-1)}>下载原件</a>
+            </div>
+          </header>
+          <div className={css.previewBody}>{renderPreview({
+            fileUrl: selectedArtifact.fileUrl,
+            name: selectedArtifact.path.split('/').at(-1) ?? selectedArtifact.title,
+            ...(selectedArtifact.bytes === undefined ? {} : { bytes: selectedArtifact.bytes }),
+            previewKind: 'text',
+          })}</div>
+        </section>}
+      {currentStage === 'requirements' && (
+        <div className={css.stageGate}>
+          {!confirming
+            ? <>
+              <div><strong>由 FDE 决定是否进入下一阶段</strong><p>{ready ? '三份标准产物已经齐备，请先核对内容和未决事项。' : '产物尚未齐备，请回到项目交付继续对话和更新文件。'}</p></div>
+              <button type="button" disabled={!ready || revision === undefined} onClick={() => { setConfirming(true); setError(undefined) }}>完成需求调研</button>
+            </>
+            : <>
+              <div><strong>确认进入方案设计</strong><p>我已核对客户原始资料、需求调研报告、确认清单、需求基线和仍保留的未决事项。</p></div>
+              <div className={css.stageGateActions}>
+                <button type="button" disabled={submitting} onClick={() => { setConfirming(false); setError(undefined) }}>返回核对</button>
+                <button type="button" disabled={submitting || revision === undefined} onClick={() => {
+                  if (revision === undefined) return
+                  setSubmitting(true)
+                  setError(undefined)
+                  void completeRequirements(revision).then(
+                    () => { setConfirming(false) },
+                    (reason: unknown) => { setError(reason instanceof Error ? reason.message : String(reason)) },
+                  ).finally(() => { setSubmitting(false) })
+                }}>{submitting ? '正在确认…' : '确认并进入方案设计'}</button>
+              </div>
+            </>}
+          {error !== undefined && <p className={css.stageGateError}>{error}</p>}
+        </div>
+      )}
+      {currentStage === 'solution' && (
+        <div className={css.stageGate}>
+          {!confirming
+            ? <>
+              <div><strong>由 FDE 决定是否进入项目开发</strong><p>{ready ? '四份标准文档已经齐备，系统架构也已确认，请继续核对补充证据和剩余风险。' : !documentsReady ? '方案文档尚未齐备，请回到项目交付继续对话和更新文件。' : '系统架构尚未确认，请先在项目交付的“系统架构”中审阅并确认当前版本。'}</p></div>
+              <button type="button" disabled={!ready || revision === undefined} onClick={() => { setConfirming(true); setError(undefined) }}>完成方案设计</button>
+            </>
+            : <>
+              <div><strong>确认进入项目开发</strong><p>我已核对四份方案文档、已确认系统架构，以及本项目适用的原型、API 契约、数据映射、POC 证据或不适用理由和剩余风险。</p></div>
+              <div className={css.stageGateActions}>
+                <button type="button" disabled={submitting} onClick={() => { setConfirming(false); setError(undefined) }}>返回核对</button>
+                <button type="button" disabled={submitting || revision === undefined} onClick={() => {
+                  if (revision === undefined) return
+                  setSubmitting(true)
+                  setError(undefined)
+                  void completeSolution(revision).then(
+                    () => { setConfirming(false) },
+                    (reason: unknown) => { setError(reason instanceof Error ? reason.message : String(reason)) },
+                  ).finally(() => { setSubmitting(false) })
+                }}>{submitting ? '正在确认…' : '确认并进入项目开发'}</button>
+              </div>
+            </>}
+          {error !== undefined && <p className={css.stageGateError}>{error}</p>}
+        </div>
+      )}
+      {currentStage !== undefined && currentStage !== 'requirements' && currentStage !== 'solution' && (
+        <div className={css.stageConfirmed}>方案设计已由 FDE 确认，项目当前处于“{STAGE_NAMES[currentStage]}”。</div>
+      )}
+    </section>
+  )
+}
+
 function ProjectDetail({
-  row, sourceState, wikiState, selectedSource, selectSource, parseSource,
-  prepareWiki, startWiki, abandonWiki, refreshWiki, enterProject, back, renderPreview,
+  row, sourceState, surfaceState, wikiState, selectedSource, selectSource, parseSource,
+  prepareWiki, startWiki, abandonWiki, refreshWiki, completeRequirements, completeSolution, enterProject, back, renderPreview,
 }: {
   readonly row: ProjectRow
   readonly sourceState: ProjectSourceLoadState | undefined
+  readonly surfaceState: ProjectSurfaceLoadState | undefined
   readonly wikiState: RequirementWikiLoadState | undefined
   readonly selectedSource: ProjectSourceItem | undefined
   readonly selectSource: (sourceId: string) => void
@@ -222,14 +402,23 @@ function ProjectDetail({
   ) => Promise<void>
   readonly abandonWiki: (buildId: string) => Promise<void>
   readonly refreshWiki: () => void
+  readonly completeRequirements: (revision: number) => Promise<void>
+  readonly completeSolution: (revision: number) => Promise<void>
   readonly enterProject: () => void
   readonly back: () => void
-  readonly renderPreview: (source: ProjectSourceItem) => React.ReactNode
+  readonly renderPreview: (source: ProjectPreviewFile) => React.ReactNode
 }) {
-  const [section, setSection] = useState<'inputs' | 'wiki' | 'conflicts' | 'unknowns'>('inputs')
+  const [section, setSection] = useState<'inputs' | 'outputs' | 'wiki' | 'conflicts' | 'unknowns'>('inputs')
   useEffect(() => { setSection('inputs') }, [row.workspaceId])
   const canParse = selectedSource !== undefined && ['pending', 'error', 'stale'].includes(selectedSource.parse.status)
   const openSource = (sourceId: string): void => { selectSource(sourceId); setSection('inputs') }
+  const currentStage = row.stage?.status === 'ready' ? row.stage.value.currentStage : undefined
+  const showSolution = currentStage !== undefined && currentStage !== 'requirements'
+  const outputCount = surfaceState?.status === 'ready'
+    ? showSolution
+      ? (surfaceState.value.solution?.presentCount ?? 0) + (surfaceState.value.architecture === null ? 0 : 1)
+      : surfaceState.value.requirements.presentCount
+    : 0
   return (
     <main className={css.detailPage}>
       <div className={css.detailBreadcrumb}><button type="button" onClick={back}>← 返回全部项目</button></div>
@@ -242,18 +431,11 @@ function ProjectDetail({
       </section>
       <StageBar stage={row.stage} />
       <nav className={css.detailSections} aria-label="项目详情">
-        <button type="button" data-active={section === 'inputs' || undefined} onClick={() => { setSection('inputs') }}>
-          原始资料 <span>{sourceState?.files.length ?? 0}</span>
-        </button>
-        <button type="button" data-active={section === 'wiki' || undefined} onClick={() => { setSection('wiki') }}>
-          需求知识图谱
-        </button>
-        <button type="button" data-active={section === 'conflicts' || undefined} onClick={() => { setSection('conflicts') }}>
-          冲突与缺口 <span>{wikiState?.value?.current?.conflicts.length ?? 0}</span>
-        </button>
-        <button type="button" data-active={section === 'unknowns' || undefined} onClick={() => { setSection('unknowns') }}>
-          待确认事项 <span>{wikiState?.value?.current?.unknowns.length ?? 0}</span>
-        </button>
+        <button type="button" data-active={section === 'inputs' || undefined} onClick={() => { setSection('inputs') }}>阶段输入 <span>{sourceState?.files.length ?? 0}</span></button>
+        <button type="button" data-active={section === 'outputs' || undefined} onClick={() => { setSection('outputs') }}>阶段产出 <span>{outputCount}</span></button>
+        <button type="button" data-active={section === 'wiki' || undefined} onClick={() => { setSection('wiki') }}>需求知识图谱</button>
+        <button type="button" data-active={section === 'conflicts' || undefined} onClick={() => { setSection('conflicts') }}>冲突与缺口 <span>{wikiState?.value?.current?.conflicts.length ?? 0}</span></button>
+        <button type="button" data-active={section === 'unknowns' || undefined} onClick={() => { setSection('unknowns') }}>待确认事项 <span>{wikiState?.value?.current?.unknowns.length ?? 0}</span></button>
       </nav>
       {section === 'wiki' && (
         <RequirementWikiPanel
@@ -268,12 +450,16 @@ function ProjectDetail({
           onOpenSource={openSource}
         />
       )}
-      {section === 'conflicts' && (
-        <RequirementIssuePanel kind="conflicts" wikiState={wikiState} onOpenSource={openSource} />
-      )}
-      {section === 'unknowns' && (
-        <RequirementIssuePanel kind="unknowns" wikiState={wikiState} onOpenSource={openSource} />
-      )}
+      {section === 'conflicts' && <RequirementIssuePanel kind="conflicts" wikiState={wikiState} onOpenSource={openSource} />}
+      {section === 'unknowns' && <RequirementIssuePanel kind="unknowns" wikiState={wikiState} onOpenSource={openSource} />}
+      {section === 'outputs' && <StageOutputs
+        workspaceId={row.workspaceId}
+        stage={row.stage}
+        surfaceState={surfaceState}
+        completeRequirements={completeRequirements}
+        completeSolution={completeSolution}
+        renderPreview={renderPreview}
+      />}
       {section === 'inputs' && <div className={css.detailLayout}>
         <aside className={css.sourcePanel}>
           <div className={css.sourcePanelHeader}>
@@ -309,7 +495,12 @@ function ProjectDetail({
                 </div>
               </header>
               {selectedSource.parse.message !== undefined && <div className={css.sourceNotice}>{selectedSource.parse.message}</div>}
-              <div className={css.previewBody}>{renderPreview(selectedSource)}</div>
+              <div className={css.previewBody}>{renderPreview({
+                fileUrl: selectedSource.fileUrl,
+                name: selectedSource.storedName,
+                bytes: selectedSource.bytes,
+                previewKind: selectedSource.previewKind,
+              })}</div>
             </>}
         </section>
       </div>}
@@ -319,16 +510,17 @@ function ProjectDetail({
 
 /** Render the global full page while retaining the ordinary project/session sidebar. */
 export function ProjectProgressOverlay({
-  useProjectPage, useStageProgress, useProjectSources, useRequirementWiki, useWorkspaces, useSessions,
-  loadStage, retryStage, loadProjectSources, parseProjectSource, loadRequirementWiki,
+  useProjectPage, useStageProgress, useProjectSurfaces, useProjectSources, useRequirementWiki, useWorkspaces, useSessions,
+  loadStage, retryStage, loadProjectSurface, loadProjectSources, parseProjectSource, loadRequirementWiki,
   prepareRequirementWikiRun, startRequirementWikiBuild, abandonRequirementWikiBuild, enterProject,
-  closeProjectPage, showProjectOverview, showProjectTimeline, showProjectDetail,
+  completeRequirements, completeSolution, closeProjectPage, showProjectOverview, showProjectTimeline, showProjectDetail,
   renderSlot, t,
 }: ProjectProgressOverlayProps) {
   const page = useProjectPage(state => state)
   const workspaces = useWorkspaces(state => state.items)
   const sessions = useSessions(state => state)
   const stages = useStageProgress(state => state.byWorkspace)
+  const surfaces = useProjectSurfaces(state => state.byWorkspace)
   const sources = useProjectSources(state => state.byWorkspace)
   const requirementWikis = useRequirementWiki(state => state.byWorkspace)
   const [selectedSourceId, setSelectedSourceId] = useState<string | undefined>()
@@ -343,16 +535,16 @@ export function ProjectProgressOverlay({
   useEffect(() => {
     if (page.view !== 'project' || page.workspaceId === undefined) return
     setSelectedSourceId(undefined)
+    loadProjectSurface(page.workspaceId)
     loadProjectSources(page.workspaceId)
     loadRequirementWiki(page.workspaceId)
-  }, [loadProjectSources, loadRequirementWiki, page.view, page.workspaceId])
+  }, [loadProjectSources, loadProjectSurface, loadRequirementWiki, page.view, page.workspaceId])
 
   useEffect(() => {
     if (page.view !== 'project' || page.workspaceId === undefined) return
     const build = requirementWikis[page.workspaceId]?.value?.build
     if (build === null || build === undefined || (build.status !== 'queued' && build.status !== 'running')) return
-    const workspaceId = page.workspaceId
-    const timer = window.setInterval(() => { loadRequirementWiki(workspaceId, true) }, 2_500)
+    const timer = window.setInterval(() => { loadRequirementWiki(page.workspaceId as string, true) }, 2_500)
     return () => { window.clearInterval(timer) }
   }, [loadRequirementWiki, page.view, page.workspaceId, requirementWikis])
 
@@ -386,6 +578,7 @@ export function ProjectProgressOverlay({
   if (!page.open) return null
   const detailRow = page.workspaceId === undefined ? undefined : rows.find(row => row.workspaceId === page.workspaceId)
   const sourceState = page.workspaceId === undefined ? undefined : sources[page.workspaceId]
+  const surfaceState = page.workspaceId === undefined ? undefined : surfaces[page.workspaceId]
   const wikiState = page.workspaceId === undefined ? undefined : requirementWikis[page.workspaceId]
   const selectedSource = sourceState?.files.find(source => source.sourceId === selectedSourceId)
   const pendingSchedules = rows.filter(row => row.schedule.status === 'pending-confirmation').length
@@ -403,6 +596,7 @@ export function ProjectProgressOverlay({
         ? <ProjectDetail
           row={detailRow}
           sourceState={sourceState}
+          surfaceState={surfaceState}
           wikiState={wikiState}
           selectedSource={selectedSource}
           selectSource={setSelectedSourceId}
@@ -421,6 +615,22 @@ export function ProjectProgressOverlay({
             await abandonRequirementWikiBuild(detailRow.workspaceId, buildId)
           }}
           refreshWiki={() => { loadRequirementWiki(detailRow.workspaceId, true) }}
+          completeRequirements={async (revision) => {
+            try {
+              await completeRequirements(detailRow.workspaceId, revision)
+            } catch (error) {
+              retryStage(detailRow.workspaceId)
+              throw error
+            }
+          }}
+          completeSolution={async (revision) => {
+            try {
+              await completeSolution(detailRow.workspaceId, revision)
+            } catch (error) {
+              retryStage(detailRow.workspaceId)
+              throw error
+            }
+          }}
           enterProject={() => { void enterProject(detailRow.workspaceId) }}
           back={showProjectOverview}
           renderPreview={source => renderSlot('fde.project.source.preview', { source })}

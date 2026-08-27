@@ -4,6 +4,8 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { loadProjectOpenApiCatalog } from '../src/openapi-tools.ts'
 import { projectEvaluationDecision } from '../src/evaluation-guard.ts'
+import { resolveRequirementArtifact } from '../src/requirement-artifacts.ts'
+import { resolveSolutionArtifact } from '../src/solution-artifacts.ts'
 import {
   approveProjectEvaluationBaseline, confirmProjectArchitecture, loadProjectSurfaceSnapshot, replaceProjectArchitecture,
 } from '../src/snapshot.ts'
@@ -23,6 +25,80 @@ describe('FDE project surface snapshot', () => {
     expect(value.apiDocs.status).toBe('unconfigured')
     expect(value.architecture).toBeNull()
     expect(value.evaluation).toMatchObject({ casesCount: 0, reports: [] })
+    expect(value.requirements).toMatchObject({ requiredCount: 3, presentCount: 0 })
+    expect(value.requirements.artifacts.map(item => item.status)).toEqual(['missing', 'missing', 'missing'])
+    expect(value.solution).toMatchObject({ requiredCount: 4, presentCount: 0 })
+    expect(value.solution.artifacts.map(item => item.status)).toEqual(['missing', 'missing', 'missing', 'missing'])
+  })
+
+  it('reports only real requirement-research files as present', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'fde-requirements-'))
+    const output = join(root, 'fde-deliverables', '01-requirement-research')
+    await mkdir(output, { recursive: true })
+    await writeFile(join(output, 'requirement-research-report.md'), '# 需求调研报告\n')
+    await writeFile(join(output, 'confirmation-checklist.md'), '# 需求确认清单\n')
+
+    const value = await loadProjectSurfaceSnapshot({ workspaceId: 'w1', title: '需求项目', path: root })
+    expect(value.requirements).toMatchObject({
+      root: 'fde-deliverables/01-requirement-research',
+      requiredCount: 3,
+      presentCount: 2,
+    })
+    expect(value.requirements.artifacts).toEqual([
+      expect.objectContaining({
+        id: 'research-report', status: 'present', path: 'fde-deliverables/01-requirement-research/requirement-research-report.md',
+        fileUrl: '/api/fde-project/requirements/artifact?workspaceId=w1&artifactId=research-report',
+      }),
+      expect.objectContaining({
+        id: 'confirmation-checklist', status: 'present', path: 'fde-deliverables/01-requirement-research/confirmation-checklist.md',
+        fileUrl: '/api/fde-project/requirements/artifact?workspaceId=w1&artifactId=confirmation-checklist',
+      }),
+      expect.objectContaining({ id: 'requirement-baseline', status: 'missing', path: 'fde-deliverables/01-requirement-research/requirement-baseline.md' }),
+    ])
+    expect(value.requirements.artifacts[2]).not.toHaveProperty('fileUrl')
+  })
+
+  it('resolves only fixed requirement outputs inside the registered project', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'fde-requirements-safe-'))
+    const outside = await mkdtemp(join(tmpdir(), 'fde-requirements-outside-'))
+    const output = join(root, 'fde-deliverables', '01-requirement-research')
+    await mkdir(output, { recursive: true })
+    await writeFile(join(output, 'requirement-research-report.md'), '# 项目内产物\n')
+    await writeFile(join(outside, 'requirement-baseline.md'), '# 项目外文件\n')
+    await symlink(join(outside, 'requirement-baseline.md'), join(output, 'requirement-baseline.md'))
+
+    await expect(resolveRequirementArtifact(root, 'research-report')).resolves.toMatchObject({
+      id: 'research-report', name: 'requirement-research-report.md',
+    })
+    await expect(resolveRequirementArtifact(root, '../../outside')).resolves.toBeUndefined()
+    await expect(resolveRequirementArtifact(root, 'requirement-baseline')).rejects.toThrow('越过项目目录')
+  })
+
+  it('reports and resolves only the four fixed solution-design documents', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'fde-solution-'))
+    const output = join(root, 'fde-deliverables', '02-solution-design')
+    await mkdir(output, { recursive: true })
+    await writeFile(join(output, 'solution-design.md'), '# 方案设计\n')
+    await writeFile(join(output, 'development-plan.md'), '# 研发计划\n')
+    await writeFile(join(output, 'acceptance-plan.md'), '# 验收方案\n')
+    await writeFile(join(output, 'solution-baseline.md'), '# 方案基线\n')
+
+    const value = await loadProjectSurfaceSnapshot({ workspaceId: 'w1', title: '方案项目', path: root })
+    expect(value.solution).toMatchObject({
+      root: 'fde-deliverables/02-solution-design',
+      requiredCount: 4,
+      presentCount: 4,
+    })
+    expect(value.solution.artifacts.map(item => item.fileUrl)).toEqual([
+      '/api/fde-project/solution/artifact?workspaceId=w1&artifactId=solution-design',
+      '/api/fde-project/solution/artifact?workspaceId=w1&artifactId=development-plan',
+      '/api/fde-project/solution/artifact?workspaceId=w1&artifactId=acceptance-plan',
+      '/api/fde-project/solution/artifact?workspaceId=w1&artifactId=solution-baseline',
+    ])
+    await expect(resolveSolutionArtifact(root, 'solution-design')).resolves.toMatchObject({
+      id: 'solution-design', name: 'solution-design.md',
+    })
+    await expect(resolveSolutionArtifact(root, '../../outside')).resolves.toBeUndefined()
   })
 
   it('loads project-scoped API, architecture, and evaluation facts', async () => {

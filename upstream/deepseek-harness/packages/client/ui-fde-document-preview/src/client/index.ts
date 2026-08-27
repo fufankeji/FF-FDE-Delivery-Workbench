@@ -13,8 +13,7 @@ type ProjectSourcePreviewProps = PropsRuntime<'fde.project.source.preview'> & Pr
 function ProjectSourcePreview({ source }: ProjectSourcePreviewProps) {
   return createElement(DocumentPreview, {
     url: source.fileUrl,
-    name: source.storedName,
-    mimeType: source.mimeType,
+    name: source.name,
     size: source.bytes,
     kind: source.previewKind,
   })

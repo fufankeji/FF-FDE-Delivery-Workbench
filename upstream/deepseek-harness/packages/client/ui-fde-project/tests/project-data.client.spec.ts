@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it } from 'vitest'
 import type { SessionId, SessionSummary } from '@deepseek-ai/dsh-client-runtime/client'
-import { projectRuntimeTotals, readProjectMetadata } from '../src/client/project-data.ts'
+import { latestProjectSessionId, projectRuntimeTotals, readProjectMetadata } from '../src/client/project-data.ts'
 
 afterEach(() => { localStorage.clear() })
 
@@ -34,5 +34,33 @@ describe('FDE project browser data', () => {
       sessions: 1, running: 1, turns: 3, steps: 7,
       inputTokens: 150, outputTokens: 20, toolMs: 800, llmMs: 1200,
     })
+  })
+
+  it('selects the latest visible ordinary project Session', () => {
+    const summary = (id: string, updatedAt: number, origin?: 'subagent'): SessionSummary => ({
+      id: id as SessionId,
+      displayTitle: id,
+      running: false,
+      blank: false,
+      updatedAt,
+      ...(origin === undefined ? {} : { origin }),
+    })
+    const byId = {
+      older: summary('older', 1),
+      latest: summary('latest', 4),
+      child: summary('child', 9, 'subagent'),
+      archived: summary('archived', 10),
+    }
+
+    expect(latestProjectSessionId(
+      ['older', 'latest', 'child', 'archived'] as SessionId[],
+      byId,
+      ['archived'] as SessionId[],
+    )).toBe('latest')
+    expect(latestProjectSessionId(
+      ['child', 'archived'] as SessionId[],
+      byId,
+      ['archived'] as SessionId[],
+    )).toBeUndefined()
   })
 })

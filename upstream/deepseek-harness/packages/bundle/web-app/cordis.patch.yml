@@ -93,6 +93,7 @@
         maxResponseBytes: 262144
         maxRedirects: 3
         maxOperations: 1000
+        artifactPreviewMaxBytes: 2097152
 
     # DSH-native evaluation tools. The UI never calls these automatically;
     # an explicit user action asks the current Agent to run project cases.

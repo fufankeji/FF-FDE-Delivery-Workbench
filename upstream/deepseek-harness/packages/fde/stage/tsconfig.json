@@ -8,9 +8,13 @@
   "include": ["src"],
   "references": [
     { "path": "../../../vendor/cordis" },
+    { "path": "../../core/agent" },
+    { "path": "../../core/system-prompt" },
     { "path": "../../client/connection/tsconfig.host.json" },
+    { "path": "../project" },
     { "path": "../../host/webserver" },
     { "path": "../../runtime-diagnostics/invariants" },
+    { "path": "../../skill/skill" },
     { "path": "../../storage/storage-domain" },
     { "path": "../../workspace/workspace" }
   ]

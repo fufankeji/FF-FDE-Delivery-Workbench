@@ -1,3 +1,6 @@
+import { copyFile, mkdir } from 'node:fs/promises'
+import { createRequire } from 'node:module'
+import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 import type { Plugin } from 'vite'
@@ -5,6 +8,9 @@ import react from '@vitejs/plugin-react'
 import { clientBuildEnvironmentDefines } from '../../scripts/client-build-environment.ts'
 
 const src = (rel: string): string => fileURLToPath(new URL(rel, import.meta.url))
+const require = createRequire(import.meta.url)
+const PPTX_WORKER_SOURCE = require.resolve('@file-viewer/pptx/worker/pptx.worker.js')
+const PPTX_WORKER_TARGET = 'vendor/pptx/pptx.worker.js'
 const STANDALONE_ERROR = 'apps/web is not a standalone application: bare Vite cannot inject window.__DSH_BOOT__. '
   + 'From a repository checkout, run `pnpm dsh web`; an installed package uses `dsh web`. '
   + 'For client-plugin HMR, run `pnpm dsh web` together with `pnpm run dev:web`.'
@@ -22,6 +28,20 @@ function clientDocumentTitle(): Plugin {
     name: 'dsh-client-document-title',
     transformIndexHtml(html) {
       return html.replace('<title>DSH Local Build</title>', `<title>${title}</title>`)
+    },
+  }
+}
+
+/** Publish the self-hosted worker required by the File Viewer PPTX renderer. */
+function fileViewerPptxWorker(): Plugin {
+  return {
+    name: 'dsh-file-viewer-pptx-worker',
+    apply: 'build',
+    async writeBundle(options) {
+      if (options.dir === undefined) throw new Error('PPTX worker build requires a directory output')
+      const target = resolve(src('.'), options.dir, PPTX_WORKER_TARGET)
+      await mkdir(dirname(target), { recursive: true })
+      await copyFile(PPTX_WORKER_SOURCE, target)
     },
   }
 }
@@ -108,7 +128,7 @@ function npmPackageOf(id: string): string | undefined {
 }
 
 export default defineConfig({
-  plugins: [rejectStandaloneServe(), clientDocumentTitle(), react()],
+  plugins: [rejectStandaloneServe(), clientDocumentTitle(), fileViewerPptxWorker(), react()],
   build: {
     sourcemap: true,
     rollupOptions: {

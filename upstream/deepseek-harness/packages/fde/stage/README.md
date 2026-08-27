@@ -2,20 +2,21 @@
 
 English | [中文](README.zh.md)
 
-Host-side current-stage state for FDE projects. The package opens one `storage-domain` table keyed by Harness WorkspaceId and exposes a trusted same-origin POST route that reads the record or durably initializes it to `requirements`. Concurrent first reads for one Workspace share a single write. The current slice accepts no target stage, completion claim, or transition operation.
+Host-side current-stage state for FDE projects. The package opens one `storage-domain` table keyed by Harness WorkspaceId and exposes trusted same-origin POST routes that read or initialize the record and perform two fixed transitions: `requirements` to `solution`, then `solution` to `development`. Concurrent first reads share one write; transition requests are serialized per Workspace and require the exact browser revision. The first gate rechecks three fixed requirement-research files; the second rechecks four fixed solution-design documents and a confirmed project architecture. No route accepts an arbitrary target stage.
 
-The six product stages are requirements research, solution design, project development, validation and evaluation, deployment and pilot, and acceptance and handoff. Their detailed inputs, artifacts, confirmations, and completion rules belong to later stage-gate slices.
+The package also registers bundled `fde-requirement-research` and `fde-solution-design` Skills plus one short stage-aware system section. The first Skill standardizes three requirement outputs; the second standardizes four solution documents and requires architecture changes to use `architecture_get`/`architecture_set`. Only an FDE's explicit browser confirmation can advance the stage. The remaining four gates stay deferred.
 
 ## Model Experience
 
-None, as reading or initializing project progress creates no Session event, prompt, tool, message, or model request.
+While an Agent belongs to a registered project in requirement research or solution design, the model sees one short section naming the current stage, fixed output directory, on-demand Skill, and prohibition on confirming or advancing the project. The complete matching Skill body is loaded only when the existing skill tool is invoked. No stage-transition tool is registered.
 
 #### KV Cache effect
 
-None; no provider request is assembled or changed.
+The short stage section is stable within each supported stage and changes only when the committed project stage changes. It becomes empty from development onward. A longer Skill body affects only the ordinary conversation suffix after an explicit Skill load.
 
 ## Known Limitations and Deferred Work
 
 - The route is loopback/same-origin only and requires an existing WorkspaceId.
-- The record contains only the current stage, revision, and timestamps; transition history, affected-stage state, delivery-gate evidence, and browser push updates are deferred to F005.
-- The current stage is not model-visible until the later `fde-context` consumer records a reconstructable project snapshot in each addressed Session.
+- The record contains only the current stage, revision, and timestamps; transition history, affected-stage state, later delivery-gate evidence, and browser push updates remain deferred.
+- Only the requirements-to-solution and solution-to-development gates exist. Later stages cannot be advanced through this package yet.
+- Fixed files are checked for presence and readability; their business quality remains the FDE's responsibility.

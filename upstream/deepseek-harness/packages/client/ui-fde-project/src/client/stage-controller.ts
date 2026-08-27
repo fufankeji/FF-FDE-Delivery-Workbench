@@ -6,6 +6,12 @@ export const FDE_STAGE_IDS = ['requirements', 'solution', 'development', 'valida
 export type FdeStageId = typeof FDE_STAGE_IDS[number]
 /** Ordered stage metadata for the global progress segments. */
 export const FDE_STAGES = FDE_STAGE_IDS.map((id, index) => ({ id, number: index + 1 }))
+/** Fixed manual gate owned by the Host stage plugin. */
+export const FDE_STAGE_COMPLETE_REQUIREMENTS_PATH = '/api/fde-stage/requirements/complete'
+/** Fixed FDE-only solution-design completion route. */
+export const FDE_STAGE_COMPLETE_SOLUTION_PATH = '/api/fde-stage/solution/complete'
+/** Browser-local cache invalidation emitted after one durable stage commit. */
+export const FDE_STAGE_CHANGED_EVENT = 'fde:project-stage-changed'
 
 /** One Workspace stage value returned by the Host route. */
 export interface ProjectStageValue {
@@ -47,6 +53,69 @@ async function fetchStage(workspaceId: string, signal: AbortSignal): Promise<Pro
   return value as ProjectStageValue
 }
 
+/** Submit the FDE's explicit requirements completion against one exact revision. */
+export async function completeRequirementResearch(
+  workspaceId: string,
+  expectedRevision: number,
+  signal?: AbortSignal,
+  fetchImpl?: typeof fetch,
+): Promise<ProjectStageValue> {
+  return await completeStage(
+    FDE_STAGE_COMPLETE_REQUIREMENTS_PATH,
+    workspaceId,
+    expectedRevision,
+    '需求调研阶段确认失败。',
+    signal,
+    fetchImpl,
+  )
+}
+
+/** Submit the FDE's explicit solution completion against one exact revision. */
+export async function completeSolutionDesign(
+  workspaceId: string,
+  expectedRevision: number,
+  signal?: AbortSignal,
+  fetchImpl?: typeof fetch,
+): Promise<ProjectStageValue> {
+  return await completeStage(
+    FDE_STAGE_COMPLETE_SOLUTION_PATH,
+    workspaceId,
+    expectedRevision,
+    '方案设计阶段确认失败。',
+    signal,
+    fetchImpl,
+  )
+}
+
+async function completeStage(
+  path: string,
+  workspaceId: string,
+  expectedRevision: number,
+  failureMessage: string,
+  signal?: AbortSignal,
+  fetchImpl?: typeof fetch,
+): Promise<ProjectStageValue> {
+  const request = fetchImpl ?? ((input: RequestInfo | URL, init?: RequestInit) => globalThis.fetch(input, init))
+  const response = await request(path, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ workspaceId, expectedRevision }),
+    ...(signal === undefined ? {} : { signal }),
+  })
+  let payload: unknown
+  try { payload = await response.json() } catch { throw new Error('阶段确认响应无效。') }
+  const result = payload as {
+    readonly ok?: unknown
+    readonly value?: Partial<ProjectStageValue>
+    readonly error?: { readonly message?: string }
+  }
+  if (!response.ok || result.ok !== true) throw new Error(result.error?.message ?? failureMessage)
+  const value = result.value
+  if (value?.workspaceId !== workspaceId || !isStage(value.currentStage) || !Number.isSafeInteger(value.revision)
+    || typeof value.createdAt !== 'string' || typeof value.updatedAt !== 'string') throw new Error('阶段确认响应无效。')
+  return value as ProjectStageValue
+}
+
 /** Apply-scoped Workspace-keyed stage reader for the global project page. */
 export class ProjectStageController {
   private snapshot: StageControllerSnapshot = { byWorkspace: {} }
@@ -77,6 +146,38 @@ export class ProjectStageController {
     this.start(workspaceId)
   }
 
+  /** Complete requirement research without hiding the currently displayed stage. */
+  async completeRequirements(workspaceId: string, expectedRevision: number): Promise<void> {
+    await this.complete(workspaceId, expectedRevision, completeRequirementResearch)
+  }
+
+  /** Complete solution design without hiding the currently displayed stage. */
+  async completeSolution(workspaceId: string, expectedRevision: number): Promise<void> {
+    await this.complete(workspaceId, expectedRevision, completeSolutionDesign)
+  }
+
+  private async complete(
+    workspaceId: string,
+    expectedRevision: number,
+    operation: (workspaceId: string, expectedRevision: number, signal?: AbortSignal) => Promise<ProjectStageValue>,
+  ): Promise<void> {
+    if (this.disposed) throw new Error('项目进度已关闭。')
+    this.requests.get(workspaceId)?.abort()
+    const controller = new AbortController()
+    this.requests.set(workspaceId, controller)
+    try {
+      const value = await operation(workspaceId, expectedRevision, controller.signal)
+      if (!this.disposed && this.requests.get(workspaceId) === controller) {
+        this.publish(workspaceId, { status: 'ready', value })
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent(FDE_STAGE_CHANGED_EVENT, { detail: { workspaceId } }))
+        }
+      }
+    } finally {
+      if (this.requests.get(workspaceId) === controller) this.requests.delete(workspaceId)
+    }
+  }
+
   /** Cancel pending reads and release subscribers. */
   dispose(): void {
     this.disposed = true
@@ -94,7 +195,9 @@ export class ProjectStageController {
       (error: unknown) => {
         if (!this.disposed && !controller.signal.aborted) this.publish(workspaceId, { status: 'error', message: error instanceof Error ? error.message : String(error) })
       },
-    ).finally(() => { this.requests.delete(workspaceId) })
+    ).finally(() => {
+      if (this.requests.get(workspaceId) === controller) this.requests.delete(workspaceId)
+    })
   }
 
   private publish(workspaceId: string, state: ProjectStageLoadState): void {

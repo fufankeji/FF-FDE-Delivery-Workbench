@@ -2,14 +2,32 @@
 
 import type { KvTable } from '@deepseek-ai/dsh-storage-domain'
 import type { WorkspaceId } from '@deepseek-ai/dsh-workspace'
-import type { ProjectStageRecord } from './spec.ts'
+import type { FdeStageId, ProjectStageRecord } from './spec.ts'
 
 /** Clock dependency used to stamp the one initial record. */
 export type StageClock = () => string
 
+/** A browser submitted an older project-stage revision. */
+export class FdeStageConflictError extends Error {
+  constructor(readonly current: ProjectStageRecord) {
+    super('项目阶段已经变化，请刷新后重试。')
+    this.name = 'FdeStageConflictError'
+  }
+}
+
+/** A fixed stage action was attempted from the wrong current stage. */
+export class FdeStageTransitionError extends Error {
+  constructor(readonly current: ProjectStageRecord, expected: FdeStageId) {
+    const label = expected === 'requirements' ? '需求调研' : expected === 'solution' ? '方案设计' : expected
+    super(`当前项目已经不在${label}阶段。`)
+    this.name = 'FdeStageTransitionError'
+  }
+}
+
 /** Owns current-stage reads and coalesces one Workspace's first durable write. */
 export class FdeStageState {
   private readonly pending = new Map<WorkspaceId, Promise<ProjectStageRecord>>()
+  private readonly transitions = new Map<WorkspaceId, Promise<ProjectStageRecord>>()
 
   /**
    * @param table - authoritative Workspace-keyed records.
@@ -35,6 +53,50 @@ export class FdeStageState {
       .finally(() => { this.pending.delete(workspaceId) })
     this.pending.set(workspaceId, attempt)
     return attempt
+  }
+
+  /** Return the committed record without creating one. */
+  current(workspaceId: WorkspaceId): ProjectStageRecord | undefined {
+    return this.table.get(workspaceId)
+  }
+
+  /**
+   * Atomically complete requirement research for one exact browser revision.
+   * Calls for one Workspace are serialized; no arbitrary target stage is accepted.
+   */
+  completeRequirements(workspaceId: WorkspaceId, expectedRevision: number): Promise<ProjectStageRecord> {
+    return this.transition(workspaceId, expectedRevision, 'requirements', 'solution')
+  }
+
+  /** Atomically complete solution design for one exact browser revision. */
+  completeSolution(workspaceId: WorkspaceId, expectedRevision: number): Promise<ProjectStageRecord> {
+    return this.transition(workspaceId, expectedRevision, 'solution', 'development')
+  }
+
+  private transition(
+    workspaceId: WorkspaceId,
+    expectedRevision: number,
+    from: FdeStageId,
+    to: FdeStageId,
+  ): Promise<ProjectStageRecord> {
+    const before = this.transitions.get(workspaceId) ?? Promise.resolve(undefined)
+    const attempt = before.catch(() => undefined).then(async () => {
+      const current = await this.open(workspaceId)
+      if (current.revision !== expectedRevision) throw new FdeStageConflictError(current)
+      if (current.currentStage !== from) throw new FdeStageTransitionError(current, from)
+      const next: ProjectStageRecord = {
+        ...current,
+        currentStage: to,
+        revision: current.revision + 1,
+        updatedAt: this.clock(),
+      }
+      await this.table.put(workspaceId, next)
+      return next
+    })
+    this.transitions.set(workspaceId, attempt)
+    return attempt.finally(() => {
+      if (this.transitions.get(workspaceId) === attempt) this.transitions.delete(workspaceId)
+    })
   }
 
   private async initialize(workspaceId: WorkspaceId): Promise<ProjectStageRecord> {

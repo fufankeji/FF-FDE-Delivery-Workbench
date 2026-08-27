@@ -2,12 +2,14 @@
 
 English | [中文](README.zh.md)
 
-Browser presentation for the FDE project delivery workspace. It adds a root-level Project Progress page beside the persistent sidebar, a project requirement Wiki with Galaxy View, and four project-scoped conversation views: API Docs, System Architecture, Observability, and Evaluation.
+Browser presentation for the FDE project delivery workspace. It adds a root-level Project Progress page beside the persistent sidebar, a project requirement Wiki with Galaxy View, and four stage-aware delivery views: System Architecture appears from solution design, API Docs from development, and Observability plus Evaluation from validation.
 
 ## Behavior
 
 - Project Progress replaces the center/right work surfaces while open, so the underlying conversation, composer, and Better Sidebar cannot show through or receive input.
-- It reads the existing Workspace list, creation metadata, Session summaries, and Workspace-scoped six-stage projection. A project card opens a read-only Project Details page with the project's Source list, processing status, shared preview seat, and an explicit “Enter project delivery” action.
+- It reads the existing Workspace list, creation metadata, Session summaries, and Workspace-scoped six-stage projection. Project Details shows the current stage's real outputs: three requirement-research files, or four solution-design documents plus the project architecture. Present Markdown can be selected and read in place through the shared preview; architecture title, revision, and confirmation state remain visible. An FDE uses a two-step confirmation to enter solution design or development only after the corresponding Host checks pass; the Agent cannot perform either action. A successful Host commit invalidates the matching Project Delivery stage prompt so it re-reads the same durable revision.
+- Enter Project Delivery opens that Workspace's most recently updated non-archived ordinary Session. Subagent, archived, and other-project Sessions are excluded; only a project with no recoverable Session uses the official first-blank-session flow.
+- Conversation keeps Chat and Trajectory available throughout delivery. Project-specific result views are registered only after their corresponding stage starts; loading or failure never reveals later-stage views early.
 - API Docs, System Architecture, and Evaluation read the trusted `/api/fde-project/snapshot` route.
 - Observability aggregates the current project's existing `sessionStats` and `tokenUsage` projections. External export remains disabled until deployment configuration opts in.
 - Running an evaluation is an explicit user action. It queues a prompt asking the current Agent to invoke `eval_run`; mounting or viewing the page never starts a model call.
@@ -22,6 +24,13 @@ Browser presentation for the FDE project delivery workspace. It adds a root-leve
 .fde/evaluations/cases/*.yml
 .fde/evaluations/reports/*/report.json
 .fde/evaluations/baseline/report.json
+fde-deliverables/01-requirement-research/requirement-research-report.md
+fde-deliverables/01-requirement-research/confirmation-checklist.md
+fde-deliverables/01-requirement-research/requirement-baseline.md
+fde-deliverables/02-solution-design/solution-design.md
+fde-deliverables/02-solution-design/development-plan.md
+fde-deliverables/02-solution-design/acceptance-plan.md
+fde-deliverables/02-solution-design/solution-baseline.md
 .fde/requirement-wiki/build.json
 .fde/requirement-wiki/current.json
 .fde/requirement-wiki/versions/RNNNNNN/manifest.json
@@ -61,6 +70,6 @@ The confirmed instruction appends to the ordinary Session suffix and does not re
 - API documentation embedded in an iframe depends on the target server's frame policy; the page always keeps an external-open fallback.
 - The v1 architecture diagram uses a deterministic grouped layout rather than an interactive editor.
 - External Langfuse/OTLP status is not shown while the exporter is disabled by deployment configuration.
-- Project Details is intentionally read-only; editing, moving, deleting, and Agent use remain in Project Delivery or later confirmed features.
+- Project Details keeps files read-only. Its only mutation is explicit FDE stage confirmation after Host-side document, architecture, and revision checks; editing, moving, deleting, and Agent use remain in Project Delivery.
 - Requirement knowledge cannot be built until the project has a Session with a routable model and at least one current `ready` Source. A changed target requires another confirmation.
 - The browser presents the current Wiki revision only and has no general Wiki editor or revision diff. A viewport below 520 px, unavailable WebGL, context loss, or reduced-motion preference keeps the same knowledge available through the semantic list.

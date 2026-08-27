@@ -78,6 +78,36 @@ export interface ProjectSurfaceSnapshot {
     readonly baseline?: EvaluationReportSummary
     readonly message?: string
   }
+  readonly requirements: {
+    readonly root: string
+    readonly requiredCount: number
+    readonly presentCount: number
+    readonly artifacts: readonly {
+      readonly id: 'research-report' | 'confirmation-checklist' | 'requirement-baseline'
+      readonly title: string
+      readonly path: string
+      readonly status: 'missing' | 'present' | 'error'
+      readonly bytes?: number
+      readonly updatedAt?: string
+      readonly fileUrl?: string
+      readonly message?: string
+    }[]
+  }
+  readonly solution?: {
+    readonly root: string
+    readonly requiredCount: number
+    readonly presentCount: number
+    readonly artifacts: readonly {
+      readonly id: 'solution-design' | 'development-plan' | 'acceptance-plan' | 'solution-baseline'
+      readonly title: string
+      readonly path: string
+      readonly status: 'missing' | 'present' | 'error'
+      readonly bytes?: number
+      readonly updatedAt?: string
+      readonly fileUrl?: string
+      readonly message?: string
+    }[]
+  }
 }
 
 /** Client loading state for one project snapshot. */

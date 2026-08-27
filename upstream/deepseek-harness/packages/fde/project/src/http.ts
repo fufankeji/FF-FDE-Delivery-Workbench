@@ -1,5 +1,6 @@
 /** Trusted same-origin route for project delivery read models. */
 
+import { readFile } from 'node:fs/promises'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import type { ProjectSurfaceSnapshot } from './types.ts'
 
@@ -17,6 +18,18 @@ export class FdeProjectRequestError extends Error {
 export interface ProjectRouteOptions {
   readonly trusted: (request: IncomingMessage) => boolean
   readonly snapshot: (workspaceId: string) => Promise<ProjectSurfaceSnapshot | undefined>
+  readonly reportFailure?: (error: unknown) => void
+}
+
+/** Dependencies of the verified fixed-artifact file route. */
+export interface RequirementArtifactFileRouteOptions {
+  readonly trusted: (request: IncomingMessage) => boolean
+  readonly artifact: (workspaceId: string, artifactId: string) => Promise<{
+    readonly name: string
+    readonly filePath: string
+    readonly bytes: number
+  } | undefined>
+  readonly maxFileBytes: number
   readonly reportFailure?: (error: unknown) => void
 }
 
@@ -158,6 +171,60 @@ export function createProjectSnapshotRoute(
       }
       options.reportFailure?.(error)
       writeJson(response, 500, { ok: false, error: { code: 'internal-error', message: '项目页面读取失败。' } })
+    }
+  }
+}
+
+/**
+ * Create the verified fixed-artifact file handler used by read-only previews.
+ * @param options - trust decision, fixed-artifact resolver, byte bound, and failure reporter.
+ * @returns an exact-route HTTP handler.
+ */
+export function createRequirementArtifactFileRoute(
+  options: RequirementArtifactFileRouteOptions,
+): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
+  return async (request: IncomingMessage, response: ServerResponse): Promise<void> => {
+    try {
+      if (!options.trusted(request)) throw new FdeProjectRequestError('forbidden', 403, '当前请求不能读取阶段产出。')
+      if (request.method !== 'GET' && request.method !== 'HEAD') {
+        request.resume()
+        response.setHeader('allow', 'GET, HEAD')
+        throw new FdeProjectRequestError('method-not-allowed', 405, '阶段产出只接受 GET/HEAD。')
+      }
+      const url = new URL(request.url ?? '/', 'http://localhost')
+      const workspaceId = url.searchParams.get('workspaceId') ?? ''
+      const artifactId = url.searchParams.get('artifactId') ?? ''
+      if (workspaceId === '' || artifactId === '') {
+        throw new FdeProjectRequestError('invalid-request', 400, '阶段产出请求缺少项目或产物标识。')
+      }
+      const artifact = await options.artifact(workspaceId, artifactId)
+      if (artifact === undefined) throw new FdeProjectRequestError('artifact-not-found', 404, '阶段产出不存在或不可用。')
+      if (artifact.bytes > options.maxFileBytes) {
+        throw new FdeProjectRequestError('artifact-too-large', 413, '阶段产出超过在线预览限制，请在项目交付中打开。')
+      }
+      const body = request.method === 'HEAD' ? undefined : await readFile(artifact.filePath)
+      if (body !== undefined && body.byteLength > options.maxFileBytes) {
+        throw new FdeProjectRequestError('artifact-too-large', 413, '阶段产出超过在线预览限制，请在项目交付中打开。')
+      }
+      response.writeHead(200, {
+        'content-type': 'text/markdown; charset=utf-8',
+        'content-length': String(body?.byteLength ?? artifact.bytes),
+        'content-disposition': `inline; filename*=UTF-8''${encodeURIComponent(artifact.name)}`,
+        'cache-control': 'no-store',
+        'x-content-type-options': 'nosniff',
+      })
+      response.end(body)
+    } catch (error) {
+      if (error instanceof FdeProjectRequestError) {
+        writeJson(response, error.status, { ok: false, error: { code: error.code, message: error.message } })
+        return
+      }
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+        writeJson(response, 404, { ok: false, error: { code: 'artifact-not-found', message: '阶段产出不存在或不可用。' } })
+        return
+      }
+      options.reportFailure?.(error)
+      writeJson(response, 500, { ok: false, error: { code: 'internal-error', message: '阶段产出读取失败。' } })
     }
   }
 }

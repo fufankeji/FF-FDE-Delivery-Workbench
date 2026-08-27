@@ -12,6 +12,7 @@ import css from './DocumentPreview.module.css'
 const browserGlobals = globalThis as unknown as { process?: typeof browserProcess; Buffer?: typeof BrowserBuffer }
 browserGlobals.process ??= browserProcess
 browserGlobals.Buffer ??= BrowserBuffer
+const PPTX_WORKER_URL = '/vendor/pptx/pptx.worker.js'
 
 const wordOpenXmlDefinition = wordRendererDefinitions.find(definition => definition.id === 'office-word-openxml')
 if (wordOpenXmlDefinition === undefined) throw new Error('FDE document preview: Word OpenXML renderer definition is unavailable')
@@ -35,7 +36,6 @@ export type DocumentPreviewKind = 'office' | 'pdf' | 'image' | 'text' | 'unsuppo
 export interface DocumentPreviewProps {
   readonly url: string
   readonly name: string
-  readonly mimeType?: string
   readonly size?: number
   readonly kind: DocumentPreviewKind
 }
@@ -59,7 +59,7 @@ function TextPreview({ url, name }: Pick<DocumentPreviewProps, 'url' | 'name'>) 
 }
 
 /** Render one same-origin original without exposing edit actions. */
-export function DocumentPreview({ url, name, mimeType, size, kind }: DocumentPreviewProps) {
+export function DocumentPreview({ url, name, size, kind }: DocumentPreviewProps) {
   if (kind === 'office') {
     return (
       <div className={css.office} data-testid="fde-office-preview">
@@ -68,7 +68,6 @@ export function DocumentPreview({ url, name, mimeType, size, kind }: DocumentPre
           url={url}
           name={name}
           filename={name}
-          {...(mimeType === undefined ? {} : { type: mimeType })}
           {...(size === undefined ? {} : { size })}
           options={{
             renderers: officeRenderers,
@@ -76,8 +75,9 @@ export function DocumentPreview({ url, name, mimeType, size, kind }: DocumentPre
             builtinRenderers: 'none',
             autoRenderers: false,
             styleIsolation: 'shadow',
-            theme: 'system',
+            theme: 'light',
             locale: 'zh-CN',
+            presentation: { workerUrl: PPTX_WORKER_URL, workerType: 'module' },
             toolbar: { download: true, print: true, exportHtml: false, theme: false },
           }}
         />
@@ -89,5 +89,11 @@ export function DocumentPreview({ url, name, mimeType, size, kind }: DocumentPre
   }
   if (kind === 'image') return <div className={css.imageWrap}><img src={url} alt={name} /></div>
   if (kind === 'text') return <TextPreview url={url} name={name} />
-  return <div className={css.state}><strong>当前格式暂不支持预览</strong><span>原件已经保存，可以下载或进入项目交付后使用其他工程工具打开。</span><a href={url} download={name}>下载原件</a></div>
+  return (
+    <div className={css.state}>
+      <strong>当前格式暂不支持预览</strong>
+      <span>原件已经保存，可以下载或进入项目交付后使用其他工程工具打开。</span>
+      <a href={url} download={name}>下载原件</a>
+    </div>
+  )
 }

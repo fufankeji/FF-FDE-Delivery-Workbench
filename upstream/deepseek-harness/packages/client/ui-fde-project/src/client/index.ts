@@ -15,10 +15,12 @@ import { ObservabilityView } from './ObservabilityView.tsx'
 import { ProjectPageController } from './page-controller.ts'
 import { ProjectProgressLauncher } from './ProjectProgressLauncher.tsx'
 import { ProjectProgressOverlay } from './ProjectProgressOverlay.tsx'
+import { latestProjectSessionId } from './project-data.ts'
 import type { ProjectPageInjected, ProjectViewInjected, RequirementWikiRunTarget } from './slots.ts'
 import { ProjectStageController } from './stage-controller.ts'
 import { ProjectSourceController } from './source-controller.ts'
 import { RequirementWikiController } from './wiki-controller.ts'
+import { projectViewVisible, type FdeProjectViewId } from './view-availability.ts'
 
 export type { ProjectSourcePreviewOwnerProps } from './slots.ts'
 export type { ProjectSourceItem, ProjectSourcePreviewKind } from './source-controller.ts'
@@ -40,20 +42,24 @@ export function apply(ctx: ClientContext): void {
   const sources = new ProjectSourceController()
   const requirementWiki = new RequirementWikiController()
   const surfaces = new FdeProjectSurfaceController()
-  ctx.effect(() => () => {
-    page.dispose()
-    stages.dispose()
-    sources.dispose()
-    requirementWiki.dispose()
-    surfaces.dispose()
-  }, 'ui-fde-project: controllers')
+  ctx.effect(() => () => { page.dispose(); stages.dispose(); sources.dispose(); requirementWiki.dispose(); surfaces.dispose() }, 'ui-fde-project: controllers')
   ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'ui-fde-project: dictionaries')
   const t = ctx.locale.bind(NS)
 
   const pageInjected = (): ProjectPageInjected => ({
-    hooks: { projectPage: page, stageProgress: stages, projectSources: sources, requirementWiki },
+    hooks: { projectPage: page, stageProgress: stages, projectSurfaces: surfaces, projectSources: sources, requirementWiki },
     loadStage: (workspaceId) => { stages.load(workspaceId) },
     retryStage: (workspaceId) => { stages.retry(workspaceId) },
+    loadProjectSurface: (workspaceId) => { surfaces.load(workspaceId) },
+    refreshProjectSurface: (workspaceId) => { surfaces.refresh(workspaceId) },
+    completeRequirements: async (workspaceId, expectedRevision) => {
+      await stages.completeRequirements(workspaceId, expectedRevision)
+      surfaces.refresh(workspaceId)
+    },
+    completeSolution: async (workspaceId, expectedRevision) => {
+      await stages.completeSolution(workspaceId, expectedRevision)
+      surfaces.refresh(workspaceId)
+    },
     loadProjectSources: (workspaceId, force) => { sources.load(workspaceId, force) },
     parseProjectSource: async (workspaceId, sourceId) => { await sources.parse(workspaceId, sourceId) },
     loadRequirementWiki: (workspaceId, force) => { requirementWiki.load(workspaceId, force) },
@@ -93,9 +99,7 @@ export function apply(ctx: ClientContext): void {
       try {
         const session = ctx.sessions.binding(target.sessionId as SessionId)?.session
         if (session === undefined) throw new Error('当前项目会话不可用。')
-        const sourceList = build.sources
-          .map(source => `- ${source.sourceId}: ${source.derivedPath}（${source.storedName}）`)
-          .join('\n')
+        const sourceList = build.sources.map(source => `- ${source.sourceId}: ${source.derivedPath}（${source.storedName}）`).join('\n')
         const result = await session.prompt([{
           type: 'text',
           text: `请执行当前 FDE 项目的需求知识整理。BuildId=${build.id}，页面基于 revision R${String(build.expectedRevision)}。\n\n先调用 requirement_wiki_get，并传入 BuildId；随后只读取它返回的以下固定派生文本，不要读取其他项目或自行扩展来源：\n${sourceList}\n\n把资料整体梳理为业务目标、角色、流程/SOP、系统与数据、业务规则、约束、验收方向、风险、冲突和未知项。每个知识页、关系、冲突和未知项都必须引用一个或多个本次 SourceId。完成后调用 requirement_wiki_publish 一次提交完整候选，expectedRevision 必须使用 requirement_wiki_get 返回的值。不要把候选理解写成客户已确认事实，不要推进项目阶段或项目基线。`,
@@ -110,7 +114,15 @@ export function apply(ctx: ClientContext): void {
       await requirementWiki.abandonBuild(workspaceId, buildId)
     },
     enterProject: async (workspaceId) => {
-      const sessionId = await ctx.workspaces.connectWorkspace(workspaceId as WorkspaceId)
+      const workspaceState = ctx.workspaces.list.getSnapshot()
+      const workspace = workspaceState.items.find(item => String(item.workspaceId) === workspaceId)
+      if (workspace === undefined) throw new Error('当前项目不存在或已被移除。')
+      const sessions = ctx.sessions.list.getSnapshot()
+      const sessionId = latestProjectSessionId(
+        workspace.sessionIds,
+        sessions.byId,
+        workspaceState.archivedSessionIds,
+      ) ?? await ctx.workspaces.connectWorkspace(workspaceId as WorkspaceId)
       ctx.sessions.open(sessionId)
       page.close()
     },
@@ -166,16 +178,58 @@ export function apply(ctx: ClientContext): void {
     children: { 'fde.project.source.preview': { kind: 'single', scope: 'root' } },
   }, ProjectProgressOverlay))
 
-  const views = [
+  const views: readonly {
+    readonly id: FdeProjectViewId
+    readonly order: number
+    readonly label: 'view.api' | 'view.architecture' | 'view.observe' | 'view.evaluate'
+    readonly component: typeof ApiDocsView
+  }[] = [
     { id: 'fde-api-docs', order: 20, label: 'view.api', component: ApiDocsView },
     { id: 'fde-architecture', order: 21, label: 'view.architecture', component: ArchitectureView },
     { id: 'fde-observability', order: 22, label: 'view.observe', component: ObservabilityView },
     { id: 'fde-evaluation', order: 23, label: 'view.evaluate', component: EvaluationView },
-  ] as const
-  for (const view of views) {
-    ctx.slots.inject('conversation.view', () => ctx.slots.register({
-      name: 'conversation.view', id: view.id, order: view.order, locale: NS,
-      label: () => t(view.label), inject: projectViewInjected,
-    }, view.component))
-  }
+  ]
+  ctx.effect(() => {
+    const mounted = new Map<FdeProjectViewId, () => void>()
+    const unmount = (id: FdeProjectViewId): void => {
+      mounted.get(id)?.()
+      mounted.delete(id)
+    }
+    const reconcile = (): void => {
+      const current = ctx.sessions.list.getSnapshot().current
+      const workspace = current === undefined
+        ? undefined
+        : ctx.workspaces.list.getSnapshot().items.find(item => item.sessionIds.includes(current))
+      if (workspace === undefined) {
+        for (const id of [...mounted.keys()]) unmount(id)
+        return
+      }
+      const workspaceId = String(workspace.workspaceId)
+      stages.load(workspaceId)
+      const stageState = stages.getSnapshot().byWorkspace[workspaceId]
+      const currentStage = stageState?.status === 'ready' ? stageState.value.currentStage : undefined
+      for (const view of views) {
+        const visible = projectViewVisible(view.id, currentStage)
+        if (!visible) {
+          unmount(view.id)
+          continue
+        }
+        if (mounted.has(view.id)) continue
+        mounted.set(view.id, ctx.slots.inject('conversation.view', () => ctx.slots.register({
+          name: 'conversation.view', id: view.id, order: view.order, locale: NS,
+          label: () => t(view.label), inject: projectViewInjected,
+        }, view.component)))
+      }
+    }
+    const unsubscribers = [
+      ctx.sessions.list.subscribe(reconcile),
+      ctx.workspaces.list.subscribe(reconcile),
+      stages.subscribe(reconcile),
+    ]
+    reconcile()
+    return () => {
+      for (const unsubscribe of unsubscribers) unsubscribe()
+      for (const id of [...mounted.keys()]) unmount(id)
+    }
+  }, 'ui-fde-project: stage-aware views')
 }

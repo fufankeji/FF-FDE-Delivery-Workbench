@@ -2,7 +2,7 @@
 
 English | [中文](README.zh.md)
 
-Trusted Host support for the FDE project-delivery surfaces. It resolves one explicit Harness WorkspaceId, reads only that Workspace's `.fde/api-docs.json`, `.fde/architecture.json`, `.fde/evaluations/`, and requirement Wiki state, validates bounded structures, and returns one same-origin snapshot for the browser. It also adapts the locked `dsh-openapi` parser and HTTP implementation so the standard OpenAPI tools resolve configuration from the calling Agent's registered Workspace instead of a process-global API list. A pre-execution guard confines `dsh-eval-harness` cases and results to the same project, rejects symlink traversal and model-selected executables or profiles, and disables unapproved Judge calibration.
+Trusted Host support for the FDE project-delivery surfaces. It resolves one explicit Harness WorkspaceId, reads only that Workspace's `.fde/api-docs.json`, `.fde/architecture.json`, `.fde/evaluations/`, fixed requirement-research and solution-design outputs, and requirement Wiki state, validates bounded structures, and returns one same-origin snapshot for the browser. The two output readers report present, missing, or read-error state without creating files or treating presence as confirmation; present Markdown outputs receive bounded, read-only same-origin preview URLs selected by stage-specific fixed artifact ids rather than browser-supplied paths. It also adapts the locked `dsh-openapi` parser and HTTP implementation so the standard OpenAPI tools resolve configuration from the calling Agent's registered Workspace instead of a process-global API list.
 
 ## Requirement Wiki
 

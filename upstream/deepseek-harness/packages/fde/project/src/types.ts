@@ -213,7 +213,47 @@ export interface RequirementWikiSnapshot {
   readonly message?: string
 }
 
-/** Combined read model for project delivery views and the requirement Wiki. */
+/** One required output of the FDE requirement-research stage. */
+export interface RequirementArtifactSnapshot {
+  readonly id: 'research-report' | 'confirmation-checklist' | 'requirement-baseline'
+  readonly title: string
+  readonly path: string
+  readonly status: 'missing' | 'present' | 'error'
+  readonly bytes?: number
+  readonly updatedAt?: string
+  readonly fileUrl?: string
+  readonly message?: string
+}
+
+/** Read-only status of the fixed requirement-research outputs. */
+export interface RequirementArtifactsSnapshot {
+  readonly root: string
+  readonly requiredCount: number
+  readonly presentCount: number
+  readonly artifacts: readonly RequirementArtifactSnapshot[]
+}
+
+/** One required Markdown output of the FDE solution-design stage. */
+export interface SolutionArtifactSnapshot {
+  readonly id: 'solution-design' | 'development-plan' | 'acceptance-plan' | 'solution-baseline'
+  readonly title: string
+  readonly path: string
+  readonly status: 'missing' | 'present' | 'error'
+  readonly bytes?: number
+  readonly updatedAt?: string
+  readonly fileUrl?: string
+  readonly message?: string
+}
+
+/** Read-only status of the fixed solution-design Markdown outputs. */
+export interface SolutionArtifactsSnapshot {
+  readonly root: string
+  readonly requiredCount: number
+  readonly presentCount: number
+  readonly artifacts: readonly SolutionArtifactSnapshot[]
+}
+
+/** Combined read model for project delivery views and Project Detail. */
 export interface ProjectSurfaceSnapshot {
   readonly workspaceId: string
   readonly title: string
@@ -222,6 +262,8 @@ export interface ProjectSurfaceSnapshot {
   readonly architectureError?: string
   readonly evaluation: EvaluationSnapshot
   readonly requirementWiki: RequirementWikiSnapshot
+  readonly requirements: RequirementArtifactsSnapshot
+  readonly solution: SolutionArtifactsSnapshot
 }
 
 /** Host-only API configuration consumed by the project-scoped OpenAPI adapter. */

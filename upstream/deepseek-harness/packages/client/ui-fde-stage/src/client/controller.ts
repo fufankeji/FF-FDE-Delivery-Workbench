@@ -4,6 +4,8 @@ import { isFdeStageId, type FdeStageId } from './stages.ts'
 
 /** Exact Host route owned by `@deepseek-ai/dsh-fde-stage`. */
 export const FDE_STAGE_OPEN_PATH = '/api/fde-stage/open'
+/** Browser-local cache invalidation emitted after one durable stage commit. */
+export const FDE_STAGE_CHANGED_EVENT = 'fde:project-stage-changed'
 
 /** One committed project-stage projection. */
 export interface ProjectStageValue {
@@ -87,6 +89,14 @@ export class FdeStageProgressController {
   private readonly listeners = new Set<() => void>()
   private readonly requests = new Map<string, StageRequest>()
   private disposed = false
+  private readonly onChanged = (event: Event): void => {
+    const detail = (event as CustomEvent<{ workspaceId?: unknown }>).detail
+    if (typeof detail?.workspaceId === 'string') this.refresh(detail.workspaceId)
+  }
+
+  constructor() {
+    if (typeof window !== 'undefined') window.addEventListener(FDE_STAGE_CHANGED_EVENT, this.onChanged)
+  }
 
   /** Current immutable snapshot; stable until a state changes. */
   getSnapshot = (): FdeStageProgressSnapshot => this.snapshot
@@ -115,6 +125,13 @@ export class FdeStageProgressController {
     this.start(workspaceId)
   }
 
+  /** Invalidate one Workspace cache and read its durable stage again. */
+  refresh(workspaceId: string): void {
+    if (this.disposed) return
+    this.requests.get(workspaceId)?.controller.abort()
+    this.start(workspaceId)
+  }
+
   /** Cancel pending reads and suppress all later publication. */
   dispose(): void {
     if (this.disposed) return
@@ -122,6 +139,7 @@ export class FdeStageProgressController {
     for (const request of this.requests.values()) request.controller.abort()
     this.requests.clear()
     this.listeners.clear()
+    if (typeof window !== 'undefined') window.removeEventListener(FDE_STAGE_CHANGED_EVENT, this.onChanged)
   }
 
   private start(workspaceId: string): void {
@@ -137,7 +155,9 @@ export class FdeStageProgressController {
           })
         }
       },
-    ).finally(() => { this.requests.delete(workspaceId) })
+    ).finally(() => {
+      if (this.requests.get(workspaceId)?.controller === controller) this.requests.delete(workspaceId)
+    })
     this.requests.set(workspaceId, { controller, promise })
   }
 

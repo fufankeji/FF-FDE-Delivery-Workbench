@@ -1181,14 +1181,14 @@ export const CLIENT_SLOT_API: readonly ClientSlotEntry[] = [
     key: 'fde.project.source.preview',
     kind: 'single',
     scope: 'root',
-    summary: 'One shared read-only renderer for the selected project source.',
-    doc: 'One shared read-only renderer for the selected project source.',
+    summary: 'One shared read-only renderer for a selected project source or fixed deliverable.',
+    doc: 'One shared read-only renderer for a selected project source or fixed deliverable.',
     registerOptions: [],
     ownerProps: [
-      '/** Read-only source currency passed from Project Detail to one preview occupant. */\nexport interface ProjectSourcePreviewOwnerProps {\n  readonly source: ProjectSourceItem\n}',
+      '/** Read-only project file passed from Project Detail to one preview occupant. */\nexport interface ProjectSourcePreviewOwnerProps {\n  readonly source: ProjectPreviewFile\n}',
     ],
     ownerPropsReferences: [
-      'ProjectSourceItem',
+      'ProjectPreviewFile',
     ],
     standardProps: [
       'useSessions: SnapshotSelectorHook<SessionListState>',
@@ -1203,7 +1203,7 @@ export const CLIENT_SLOT_API: readonly ClientSlotEntry[] = [
     ],
     replaceRisk: 'shadows-shipped-ui',
     example: 'return {\n  inject: [\'slots\'],\n  apply(ctx) {\n    ctx.slots.inject(\'fde.project.source.preview\', () => ctx.slots.register(\n      { name: \'fde.project.source.preview\' },\n      () => React.createElement(\'div\', null, \'hello\'),\n    ))\n  },\n}',
-    source: 'packages/client/ui-fde-project/src/client/slots.ts:20',
+    source: 'packages/client/ui-fde-project/src/client/slots.ts:38',
   },
   {
     key: 'root',

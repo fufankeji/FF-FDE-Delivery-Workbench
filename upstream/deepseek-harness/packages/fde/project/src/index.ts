@@ -11,6 +11,7 @@ import {
   createArchitectureConfirmRoute,
   createEvaluationBaselineRoute,
   createProjectSnapshotRoute,
+  createRequirementArtifactFileRoute,
   createRequirementWikiAbandonRoute,
   createRequirementWikiStartRoute,
 } from './http.ts'
@@ -18,12 +19,21 @@ import { registerProjectOpenApiTools, type ProjectOpenApiPolicy } from './openap
 import { approveProjectEvaluationBaseline, confirmProjectArchitecture, loadProjectSurfaceSnapshot } from './snapshot.ts'
 import { abandonRequirementWikiBuild, startRequirementWikiBuild } from './requirement-wiki.ts'
 import { registerRequirementWikiTools } from './requirement-wiki-tools.ts'
+import {
+  REQUIREMENT_ARTIFACT_FILE_PATH,
+  resolveRequirementArtifact,
+} from './requirement-artifacts.ts'
+import {
+  SOLUTION_ARTIFACT_FILE_PATH,
+  resolveSolutionArtifact,
+} from './solution-artifacts.ts'
 
 export {
   FdeProjectRequestError,
   createArchitectureConfirmRoute,
   createEvaluationBaselineRoute,
   createProjectSnapshotRoute,
+  createRequirementArtifactFileRoute,
   createRequirementWikiAbandonRoute,
   createRequirementWikiStartRoute,
 } from './http.ts'
@@ -43,6 +53,22 @@ export {
   startRequirementWikiBuild,
 } from './requirement-wiki.ts'
 export { registerProjectArchitectureTools } from './architecture-tools.ts'
+export {
+  loadRequirementArtifacts,
+  requirementArtifactFileUrl,
+  REQUIREMENT_ARTIFACT_FILE_PATH,
+  REQUIREMENT_ARTIFACT_ROOT,
+  REQUIREMENT_ARTIFACTS,
+  resolveRequirementArtifact,
+} from './requirement-artifacts.ts'
+export {
+  loadSolutionArtifacts,
+  solutionArtifactFileUrl,
+  SOLUTION_ARTIFACT_FILE_PATH,
+  SOLUTION_ARTIFACT_ROOT,
+  SOLUTION_ARTIFACTS,
+  resolveSolutionArtifact,
+} from './solution-artifacts.ts'
 export { registerRequirementWikiTools } from './requirement-wiki-tools.ts'
 export { projectEvaluationDecision, registerProjectEvaluationGuard } from './evaluation-guard.ts'
 export { loadProjectOpenApiCatalog, registerProjectOpenApiTools } from './openapi-tools.ts'
@@ -50,6 +76,10 @@ export type * from './types.ts'
 
 /** Trusted project snapshot route. */
 export const FDE_PROJECT_SNAPSHOT_PATH = '/api/fde-project/snapshot'
+/** Verified read-only route for one fixed requirement-research output. */
+export const FDE_REQUIREMENT_ARTIFACT_FILE_PATH = REQUIREMENT_ARTIFACT_FILE_PATH
+/** Verified read-only route for one fixed solution-design output. */
+export const FDE_SOLUTION_ARTIFACT_FILE_PATH = SOLUTION_ARTIFACT_FILE_PATH
 /** Exact-revision project architecture confirmation route. */
 export const FDE_ARCHITECTURE_CONFIRM_PATH = '/api/fde-project/architecture/confirm'
 /** Project evaluation baseline approval route. */
@@ -62,7 +92,9 @@ export const name = 'fde-project'
 export const inject = ['tools', 'webServer', 'workspaceRegistry']
 
 /** Bounded OpenAPI parsing and request limits enforced by dsh-openapi. */
-export interface Config extends ProjectOpenApiPolicy {}
+export interface Config extends ProjectOpenApiPolicy {
+  readonly artifactPreviewMaxBytes: number
+}
 
 /** Project OpenAPI limits; deployments may tighten them without changing tools. */
 export const Config: z<Config> = z.object({
@@ -71,6 +103,7 @@ export const Config: z<Config> = z.object({
   maxResponseBytes: z.number().default(262_144),
   maxRedirects: z.number().default(3),
   maxOperations: z.number().default(1_000),
+  artifactPreviewMaxBytes: z.number().default(2_097_152),
 })
 
 function positiveInteger(label: string, value: number, minimum: number): void {
@@ -84,6 +117,7 @@ export function apply(ctx: Context, config: Config): void {
   positiveInteger('maxResponseBytes', config.maxResponseBytes, 1_024)
   positiveInteger('maxRedirects', config.maxRedirects, 0)
   positiveInteger('maxOperations', config.maxOperations, 1)
+  positiveInteger('artifactPreviewMaxBytes', config.artifactPreviewMaxBytes, 1_024)
   registerProjectOpenApiTools(ctx, config)
   registerProjectArchitectureTools(ctx)
   registerRequirementWikiTools(ctx)
@@ -107,6 +141,36 @@ export function apply(ctx: Context, config: Config): void {
     path: FDE_PROJECT_SNAPSHOT_PATH,
     handler,
   }), `fde-project: ${FDE_PROJECT_SNAPSHOT_PATH}`)
+  const artifactFile = createRequirementArtifactFileRoute({
+    trusted: request => isTrustedApiRequest(request, []),
+    artifact: async (workspaceId, artifactId) => {
+      const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
+      if (workspace === undefined) return undefined
+      return await resolveRequirementArtifact(workspace.path, artifactId)
+    },
+    maxFileBytes: config.artifactPreviewMaxBytes,
+    reportFailure,
+  })
+  ctx.effect(() => ctx.webServer.register({
+    kind: 'exact',
+    path: FDE_REQUIREMENT_ARTIFACT_FILE_PATH,
+    handler: artifactFile,
+  }), `fde-project: ${FDE_REQUIREMENT_ARTIFACT_FILE_PATH}`)
+  const solutionArtifactFile = createRequirementArtifactFileRoute({
+    trusted: request => isTrustedApiRequest(request, []),
+    artifact: async (workspaceId, artifactId) => {
+      const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
+      if (workspace === undefined) return undefined
+      return await resolveSolutionArtifact(workspace.path, artifactId)
+    },
+    maxFileBytes: config.artifactPreviewMaxBytes,
+    reportFailure,
+  })
+  ctx.effect(() => ctx.webServer.register({
+    kind: 'exact',
+    path: FDE_SOLUTION_ARTIFACT_FILE_PATH,
+    handler: solutionArtifactFile,
+  }), `fde-project: ${FDE_SOLUTION_ARTIFACT_FILE_PATH}`)
   const confirm = createArchitectureConfirmRoute({
     trusted: request => isTrustedApiRequest(request, []),
     confirm: async (workspaceId, revision) => {

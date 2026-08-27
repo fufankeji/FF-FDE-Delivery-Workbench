@@ -1,15 +1,16 @@
+// @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { FdeStageProgressController } from '../src/client/controller.ts'
+import { FDE_STAGE_CHANGED_EVENT, FdeStageProgressController } from '../src/client/controller.ts'
 
 afterEach(() => { vi.unstubAllGlobals() })
 
-function success(workspaceId: string) {
+function success(workspaceId: string, currentStage = 'requirements', revision = 1) {
   return new Response(JSON.stringify({
     ok: true,
     value: {
       workspaceId,
-      currentStage: 'requirements',
-      revision: 1,
+      currentStage,
+      revision,
       createdAt: '2026-08-26T00:00:00.000Z',
       updatedAt: '2026-08-26T00:00:00.000Z',
     },
@@ -39,6 +40,7 @@ describe('FdeStageProgressController', () => {
     expect(controller.getSnapshot().byWorkspace['w-1']).toMatchObject({
       status: 'ready', value: { workspaceId: 'w-1', currentStage: 'requirements', revision: 1 },
     })
+    controller.dispose()
   })
 
   it('keeps failures project-scoped and retries explicitly', async () => {
@@ -57,5 +59,34 @@ describe('FdeStageProgressController', () => {
     controller.retry('w-1')
     await waitForState(controller, 'w-1', 'ready')
     expect(fetchImpl).toHaveBeenCalledTimes(2)
+    controller.dispose()
+  })
+
+  it('re-reads the committed stage when the addressed project changes', async () => {
+    const calls = new Map<string, number>()
+    const fetchImpl = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
+      const workspaceId = JSON.parse(String(init?.body))?.workspaceId as string
+      const count = (calls.get(workspaceId) ?? 0) + 1
+      calls.set(workspaceId, count)
+      return workspaceId === 'w-1' && count === 2
+        ? success('w-1', 'solution', 2)
+        : success(workspaceId)
+    }) as typeof fetch
+    vi.stubGlobal('fetch', fetchImpl)
+    const controller = new FdeStageProgressController()
+    controller.load('w-1')
+    controller.load('w-2')
+    await waitForState(controller, 'w-1', 'ready')
+    await waitForState(controller, 'w-2', 'ready')
+
+    window.dispatchEvent(new CustomEvent(FDE_STAGE_CHANGED_EVENT, { detail: { workspaceId: 'w-1' } }))
+
+    await vi.waitFor(() => {
+      expect(controller.getSnapshot().byWorkspace['w-1']).toMatchObject({
+        status: 'ready', value: { currentStage: 'solution', revision: 2 },
+      })
+    })
+    expect(calls).toEqual(new Map([['w-1', 2], ['w-2', 1]]))
+    controller.dispose()
   })
 })

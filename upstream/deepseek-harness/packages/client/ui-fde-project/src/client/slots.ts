@@ -7,7 +7,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
 import type { FdeProjectSurfaceController } from './controller.ts'
 import type { ProjectPageController } from './page-controller.ts'
 import type { ProjectStageController } from './stage-controller.ts'
-import type { ProjectSourceController, ProjectSourceItem } from './source-controller.ts'
+import type { ProjectSourceController, ProjectSourcePreviewKind } from './source-controller.ts'
 import type { RequirementWikiController } from './wiki-controller.ts'
 
 /** Exact project Session and model selection confirmed for one Wiki run. */
@@ -19,14 +19,22 @@ export interface RequirementWikiRunTarget {
   readonly modelName: string
 }
 
-/** Read-only source currency passed from Project Detail to one preview occupant. */
+/** Browser-safe read-only file currency passed from Project Detail to one preview occupant. */
+export interface ProjectPreviewFile {
+  readonly fileUrl: string
+  readonly name: string
+  readonly bytes?: number
+  readonly previewKind: ProjectSourcePreviewKind
+}
+
+/** Read-only project file passed from Project Detail to one preview occupant. */
 export interface ProjectSourcePreviewOwnerProps {
-  readonly source: ProjectSourceItem
+  readonly source: ProjectPreviewFile
 }
 
 declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface SlotMap {
-    /** One shared read-only renderer for the selected project source. */
+    /** One shared read-only renderer for a selected project source or fixed deliverable. */
     'fde.project.source.preview': { kind: 'single'; scope: 'root'; owner: ProjectSourcePreviewOwnerProps }
   }
 }
@@ -36,11 +44,16 @@ export interface ProjectPageInjected {
   hooks: {
     projectPage: ProjectPageController
     stageProgress: ProjectStageController
+    projectSurfaces: FdeProjectSurfaceController
     projectSources: ProjectSourceController
     requirementWiki: RequirementWikiController
   }
   loadStage: (workspaceId: string) => void
   retryStage: (workspaceId: string) => void
+  loadProjectSurface: (workspaceId: string) => void
+  refreshProjectSurface: (workspaceId: string) => void
+  completeRequirements: (workspaceId: string, expectedRevision: number) => Promise<void>
+  completeSolution: (workspaceId: string, expectedRevision: number) => Promise<void>
   loadProjectSources: (workspaceId: string, force?: boolean) => void
   parseProjectSource: (workspaceId: string, sourceId: string) => Promise<void>
   loadRequirementWiki: (workspaceId: string, force?: boolean) => void

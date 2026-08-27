@@ -1,6 +1,6 @@
 /** Browser-local project metadata and aggregate helpers. */
 
-import type { SessionSummary } from '@deepseek-ai/dsh-client-runtime/client'
+import type { SessionId, SessionSummary } from '@deepseek-ai/dsh-client-runtime/client'
 import type { FdeStageId } from './stage-controller.ts'
 
 const WORKSPACE_VIEW_STORAGE_KEY = 'dsh.workspace.view.v6'
@@ -104,4 +104,23 @@ export const STAGE_NAMES: Readonly<Record<FdeStageId, string>> = {
   validation: '验证评估',
   pilot: '部署试运行',
   handoff: '验收移交',
+}
+
+/** Select the most recently updated visible ordinary Session in one project. */
+export function latestProjectSessionId(
+  sessionIds: readonly SessionId[],
+  byId: Readonly<Record<string, SessionSummary | undefined>>,
+  archivedSessionIds: readonly SessionId[],
+): SessionId | undefined {
+  const archived = new Set(archivedSessionIds)
+  let selected: SessionId | undefined
+  let selectedUpdatedAt = Number.NEGATIVE_INFINITY
+  for (const id of sessionIds) {
+    const session = byId[id]
+    if (session === undefined || session.origin === 'subagent' || archived.has(id)) continue
+    if (session.updatedAt <= selectedUpdatedAt) continue
+    selected = session.id
+    selectedUpdatedAt = session.updatedAt
+  }
+  return selected
 }
