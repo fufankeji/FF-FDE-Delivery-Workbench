@@ -8,6 +8,16 @@ import type { FdeProjectSurfaceController } from './controller.ts'
 import type { ProjectPageController } from './page-controller.ts'
 import type { ProjectStageController } from './stage-controller.ts'
 import type { ProjectSourceController, ProjectSourceItem } from './source-controller.ts'
+import type { RequirementWikiController } from './wiki-controller.ts'
+
+/** Exact project Session and model selection confirmed for one Wiki run. */
+export interface RequirementWikiRunTarget {
+  readonly sessionId: string
+  readonly provider: string
+  readonly providerName: string
+  readonly model: string
+  readonly modelName: string
+}
 
 /** Read-only source currency passed from Project Detail to one preview occupant. */
 export interface ProjectSourcePreviewOwnerProps {
@@ -27,11 +37,21 @@ export interface ProjectPageInjected {
     projectPage: ProjectPageController
     stageProgress: ProjectStageController
     projectSources: ProjectSourceController
+    requirementWiki: RequirementWikiController
   }
   loadStage: (workspaceId: string) => void
   retryStage: (workspaceId: string) => void
   loadProjectSources: (workspaceId: string, force?: boolean) => void
   parseProjectSource: (workspaceId: string, sourceId: string) => Promise<void>
+  loadRequirementWiki: (workspaceId: string, force?: boolean) => void
+  prepareRequirementWikiRun: (workspaceId: string, sessionId: string) => Promise<RequirementWikiRunTarget>
+  startRequirementWikiBuild: (
+    workspaceId: string,
+    sourceIds: readonly string[],
+    expectedRevision: number,
+    target: RequirementWikiRunTarget,
+  ) => Promise<void>
+  abandonRequirementWikiBuild: (workspaceId: string, buildId: string) => Promise<void>
   enterProject: (workspaceId: string) => Promise<void>
   closeProjectPage: () => void
   openProjectPage: () => void

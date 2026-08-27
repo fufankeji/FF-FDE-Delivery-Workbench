@@ -5,7 +5,9 @@ import type { CSSProperties, RefObject } from 'react'
 import { readProjectMetadata, STAGE_NAMES } from './project-data.ts'
 import { FDE_STAGES, type ProjectStageLoadState } from './stage-controller.ts'
 import type { ProjectSourceItem, ProjectSourceLoadState } from './source-controller.ts'
-import type { ProjectProgressOverlayProps } from './slots.ts'
+import type { ProjectProgressOverlayProps, RequirementWikiRunTarget } from './slots.ts'
+import { RequirementIssuePanel, RequirementWikiPanel } from './RequirementWikiPanel.tsx'
+import type { RequirementWikiLoadState } from './wiki-controller.ts'
 import css from './project.module.css'
 
 interface ProjectRow {
@@ -15,6 +17,7 @@ interface ProjectRow {
   readonly createdAt: string
   readonly sessions: number
   readonly runningSessions: number
+  readonly wikiSessionId?: string
   readonly companyName: string
   readonly schedule: ReturnType<typeof readProjectMetadata>['schedule']
   readonly stage: ProjectStageLoadState | undefined
@@ -160,7 +163,10 @@ function Timeline({ rows, showProject, todayLabel }: {
   const now = Date.now()
   return (
     <div className={css.timelinePanel}>
-      <div className={css.timelineScale}><span>{formatDate(new Date(start).toISOString())}</span><span>{formatDate(new Date(end).toISOString())}</span></div>
+      <div className={css.timelineScale}>
+        <span>{formatDate(new Date(start).toISOString())}</span>
+        <span>{formatDate(new Date(end).toISOString())}</span>
+      </div>
       <div className={css.timelineRows}>
         {now >= start && now <= end && (
           <div className={css.todayLine} style={{ '--timeline-today': String(position(now) / 100) } as CSSProperties}><span>{todayLabel}</span></div>
@@ -198,17 +204,32 @@ function sourceStateLabel(source: ProjectSourceItem): string {
   return `${preview} · ${parseLabel(source)}`
 }
 
-function ProjectDetail({ row, sourceState, selectedSource, selectSource, parseSource, enterProject, back, renderPreview }: {
+function ProjectDetail({
+  row, sourceState, wikiState, selectedSource, selectSource, parseSource,
+  prepareWiki, startWiki, abandonWiki, refreshWiki, enterProject, back, renderPreview,
+}: {
   readonly row: ProjectRow
   readonly sourceState: ProjectSourceLoadState | undefined
+  readonly wikiState: RequirementWikiLoadState | undefined
   readonly selectedSource: ProjectSourceItem | undefined
   readonly selectSource: (sourceId: string) => void
   readonly parseSource: (sourceId: string) => void
+  readonly prepareWiki: (sessionId: string) => Promise<RequirementWikiRunTarget>
+  readonly startWiki: (
+    sourceIds: readonly string[],
+    expectedRevision: number,
+    target: RequirementWikiRunTarget,
+  ) => Promise<void>
+  readonly abandonWiki: (buildId: string) => Promise<void>
+  readonly refreshWiki: () => void
   readonly enterProject: () => void
   readonly back: () => void
   readonly renderPreview: (source: ProjectSourceItem) => React.ReactNode
 }) {
+  const [section, setSection] = useState<'inputs' | 'wiki' | 'conflicts' | 'unknowns'>('inputs')
+  useEffect(() => { setSection('inputs') }, [row.workspaceId])
   const canParse = selectedSource !== undefined && ['pending', 'error', 'stale'].includes(selectedSource.parse.status)
+  const openSource = (sourceId: string): void => { selectSource(sourceId); setSection('inputs') }
   return (
     <main className={css.detailPage}>
       <div className={css.detailBreadcrumb}><button type="button" onClick={back}>← 返回全部项目</button></div>
@@ -220,9 +241,45 @@ function ProjectDetail({ row, sourceState, selectedSource, selectSource, parseSo
         <button type="button" className={css.enterDeliveryButton} onClick={enterProject}>进入项目交付 <span aria-hidden="true">→</span></button>
       </section>
       <StageBar stage={row.stage} />
-      <div className={css.detailLayout}>
+      <nav className={css.detailSections} aria-label="项目详情">
+        <button type="button" data-active={section === 'inputs' || undefined} onClick={() => { setSection('inputs') }}>
+          原始资料 <span>{sourceState?.files.length ?? 0}</span>
+        </button>
+        <button type="button" data-active={section === 'wiki' || undefined} onClick={() => { setSection('wiki') }}>
+          需求知识图谱
+        </button>
+        <button type="button" data-active={section === 'conflicts' || undefined} onClick={() => { setSection('conflicts') }}>
+          冲突与缺口 <span>{wikiState?.value?.current?.conflicts.length ?? 0}</span>
+        </button>
+        <button type="button" data-active={section === 'unknowns' || undefined} onClick={() => { setSection('unknowns') }}>
+          待确认事项 <span>{wikiState?.value?.current?.unknowns.length ?? 0}</span>
+        </button>
+      </nav>
+      {section === 'wiki' && (
+        <RequirementWikiPanel
+          workspaceId={row.workspaceId}
+          runSessionId={row.wikiSessionId}
+          wikiState={wikiState}
+          sourceState={sourceState}
+          onPrepare={prepareWiki}
+          onStart={startWiki}
+          onAbandon={abandonWiki}
+          onRefresh={refreshWiki}
+          onOpenSource={openSource}
+        />
+      )}
+      {section === 'conflicts' && (
+        <RequirementIssuePanel kind="conflicts" wikiState={wikiState} onOpenSource={openSource} />
+      )}
+      {section === 'unknowns' && (
+        <RequirementIssuePanel kind="unknowns" wikiState={wikiState} onOpenSource={openSource} />
+      )}
+      {section === 'inputs' && <div className={css.detailLayout}>
         <aside className={css.sourcePanel}>
-          <div className={css.sourcePanelHeader}><div><h2>项目资料</h2><span>客户原始文件与本地识别状态</span></div><strong>{sourceState?.files.length ?? 0}</strong></div>
+          <div className={css.sourcePanelHeader}>
+            <div><h2>项目资料</h2><span>客户原始文件与本地识别状态</span></div>
+            <strong>{sourceState?.files.length ?? 0}</strong>
+          </div>
           {sourceState === undefined || sourceState.status === 'loading'
             ? <div className={css.sourceState}>正在读取项目资料…</div>
             : sourceState.status === 'error'
@@ -232,7 +289,10 @@ function ProjectDetail({ row, sourceState, selectedSource, selectSource, parseSo
                 : <div className={css.sourceList}>{sourceState.files.map(source => (
                   <button key={source.sourceId} type="button" data-active={selectedSource?.sourceId === source.sourceId || undefined} onClick={() => { selectSource(source.sourceId) }}>
                     <span className={css.sourceExtension}>{source.extension || 'FILE'}</span>
-                    <span className={css.sourceText}><strong>{source.storedName}</strong><small>{formatBytes(source.bytes)} · {sourceStateLabel(source)}</small></span>
+                    <span className={css.sourceText}>
+                      <strong>{source.storedName}</strong>
+                      <small>{formatBytes(source.bytes)} · {sourceStateLabel(source)}</small>
+                    </span>
                   </button>
                 ))}</div>}
         </aside>
@@ -252,15 +312,16 @@ function ProjectDetail({ row, sourceState, selectedSource, selectSource, parseSo
               <div className={css.previewBody}>{renderPreview(selectedSource)}</div>
             </>}
         </section>
-      </div>
+      </div>}
     </main>
   )
 }
 
 /** Render the global full page while retaining the ordinary project/session sidebar. */
 export function ProjectProgressOverlay({
-  useProjectPage, useStageProgress, useProjectSources, useWorkspaces, useSessions,
-  loadStage, retryStage, loadProjectSources, parseProjectSource, enterProject,
+  useProjectPage, useStageProgress, useProjectSources, useRequirementWiki, useWorkspaces, useSessions,
+  loadStage, retryStage, loadProjectSources, parseProjectSource, loadRequirementWiki,
+  prepareRequirementWikiRun, startRequirementWikiBuild, abandonRequirementWikiBuild, enterProject,
   closeProjectPage, showProjectOverview, showProjectTimeline, showProjectDetail,
   renderSlot, t,
 }: ProjectProgressOverlayProps) {
@@ -269,6 +330,7 @@ export function ProjectProgressOverlay({
   const sessions = useSessions(state => state)
   const stages = useStageProgress(state => state.byWorkspace)
   const sources = useProjectSources(state => state.byWorkspace)
+  const requirementWikis = useRequirementWiki(state => state.byWorkspace)
   const [selectedSourceId, setSelectedSourceId] = useState<string | undefined>()
   const [rootRef, sidebarOffset] = useSidebarOffset(page.open)
   useStandalonePage(page.open, rootRef)
@@ -282,7 +344,17 @@ export function ProjectProgressOverlay({
     if (page.view !== 'project' || page.workspaceId === undefined) return
     setSelectedSourceId(undefined)
     loadProjectSources(page.workspaceId)
-  }, [loadProjectSources, page.view, page.workspaceId])
+    loadRequirementWiki(page.workspaceId)
+  }, [loadProjectSources, loadRequirementWiki, page.view, page.workspaceId])
+
+  useEffect(() => {
+    if (page.view !== 'project' || page.workspaceId === undefined) return
+    const build = requirementWikis[page.workspaceId]?.value?.build
+    if (build === null || build === undefined || (build.status !== 'queued' && build.status !== 'running')) return
+    const workspaceId = page.workspaceId
+    const timer = window.setInterval(() => { loadRequirementWiki(workspaceId, true) }, 2_500)
+    return () => { window.clearInterval(timer) }
+  }, [loadRequirementWiki, page.view, page.workspaceId, requirementWikis])
 
   useEffect(() => {
     if (page.view !== 'project' || page.workspaceId === undefined || selectedSourceId !== undefined) return
@@ -299,11 +371,13 @@ export function ProjectProgressOverlay({
 
   const rows = useMemo<readonly ProjectRow[]>(() => workspaces.map((workspace) => {
     const workspaceSessions = workspace.sessionIds.map(id => sessions.byId[id]).filter(item => item !== undefined)
+    const wikiSessionId = workspaceSessions.find(item => item.origin !== 'subagent')?.id
     const metadata = readProjectMetadata(workspace.path)
     return {
       workspaceId: String(workspace.workspaceId), title: workspace.title, path: workspace.path,
       createdAt: workspace.createdAt, sessions: workspaceSessions.length,
       runningSessions: workspaceSessions.filter(item => item.running).length,
+      ...(wikiSessionId === undefined ? {} : { wikiSessionId: String(wikiSessionId) }),
       companyName: metadata.companyName, schedule: metadata.schedule,
       stage: stages[String(workspace.workspaceId)],
     }
@@ -312,6 +386,7 @@ export function ProjectProgressOverlay({
   if (!page.open) return null
   const detailRow = page.workspaceId === undefined ? undefined : rows.find(row => row.workspaceId === page.workspaceId)
   const sourceState = page.workspaceId === undefined ? undefined : sources[page.workspaceId]
+  const wikiState = page.workspaceId === undefined ? undefined : requirementWikis[page.workspaceId]
   const selectedSource = sourceState?.files.find(source => source.sourceId === selectedSourceId)
   const pendingSchedules = rows.filter(row => row.schedule.status === 'pending-confirmation').length
   const activeSessions = rows.reduce((total, row) => total + row.runningSessions, 0)
@@ -328,9 +403,24 @@ export function ProjectProgressOverlay({
         ? <ProjectDetail
           row={detailRow}
           sourceState={sourceState}
+          wikiState={wikiState}
           selectedSource={selectedSource}
           selectSource={setSelectedSourceId}
-          parseSource={(sourceId) => { void parseProjectSource(detailRow.workspaceId, sourceId).catch(() => undefined) }}
+          parseSource={(sourceId) => {
+            void parseProjectSource(detailRow.workspaceId, sourceId)
+              .then(() => { loadRequirementWiki(detailRow.workspaceId, true) })
+              .catch(() => undefined)
+          }}
+          prepareWiki={async (sessionId) => {
+            return await prepareRequirementWikiRun(detailRow.workspaceId, sessionId)
+          }}
+          startWiki={async (sourceIds, expectedRevision, target) => {
+            await startRequirementWikiBuild(detailRow.workspaceId, sourceIds, expectedRevision, target)
+          }}
+          abandonWiki={async (buildId) => {
+            await abandonRequirementWikiBuild(detailRow.workspaceId, buildId)
+          }}
+          refreshWiki={() => { loadRequirementWiki(detailRow.workspaceId, true) }}
           enterProject={() => { void enterProject(detailRow.workspaceId) }}
           back={showProjectOverview}
           renderPreview={source => renderSlot('fde.project.source.preview', { source })}

@@ -91,7 +91,6 @@ const SENTENCE_MODEL_EXPERIENCE: Readonly<Record<string, SentenceContract>> = {
   'packages/client/ui-fde-appearance': { kind: 'none', reason: 'Browser-local appearance projection; registers nothing model-facing.' },
   'packages/client/ui-fde-document-preview': { kind: 'none', reason: 'Browser-side same-origin document rendering; registers nothing model-facing.' },
   'packages/client/ui-fde-stage': { kind: 'none', reason: 'Browser-side project stage projection; registers nothing model-facing.' },
-  'packages/client/ui-fde-project': { kind: 'none', reason: 'Browser-side project delivery surfaces; registers nothing model-facing.' },
   'packages/client/ui-fde-sources': { kind: 'none', reason: 'Browser-side project persistence action; registers nothing model-facing.' },
   'packages/client/ui-directory-picker-browse': { kind: 'none', reason: 'Browser-side directory-browsing surface; registers nothing model-facing.' },
   'packages/client/ui-directory-picker-native': { kind: 'none', reason: 'Browser-side surface driving the host OS chooser; registers nothing model-facing.' },

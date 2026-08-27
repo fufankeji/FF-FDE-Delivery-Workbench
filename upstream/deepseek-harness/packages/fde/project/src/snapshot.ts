@@ -16,6 +16,7 @@ import type {
   ProjectSurfaceSnapshot,
 } from './types.ts'
 import { ARCHITECTURE_NODE_KINDS, ARCHITECTURE_STATUSES } from './types.ts'
+import { loadRequirementWikiSnapshot, requirementWikiPaths } from './requirement-wiki.ts'
 
 const FDE_DIRECTORY = '.fde'
 const API_DOCS_FILE = 'api-docs.json'
@@ -502,10 +503,11 @@ export async function loadProjectSurfaceSnapshot(input: {
   readonly title: string
   readonly path: string
 }): Promise<ProjectSurfaceSnapshot> {
-  const [apiDocs, architecture, evaluation] = await Promise.all([
+  const [apiDocs, architecture, evaluation, requirementWiki] = await Promise.all([
     loadApiDocs(input.path),
     loadArchitecture(input.path),
     loadEvaluation(input.path),
+    loadRequirementWikiSnapshot(input.path),
   ])
   return {
     workspaceId: input.workspaceId,
@@ -514,6 +516,7 @@ export async function loadProjectSurfaceSnapshot(input: {
     architecture: architecture.value,
     ...(architecture.error === undefined ? {} : { architectureError: architecture.error }),
     evaluation,
+    requirementWiki,
   }
 }
 
@@ -522,4 +525,5 @@ export const projectSurfacePaths = {
   apiDocs: `${FDE_DIRECTORY}/${API_DOCS_FILE}`,
   architecture: `${FDE_DIRECTORY}/${ARCHITECTURE_FILE}`,
   evaluation: `${FDE_DIRECTORY}/${EVALUATION_DIRECTORY}`,
+  requirementWiki: requirementWikiPaths.root,
 } as const

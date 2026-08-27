@@ -10,6 +10,7 @@
     { "path": "../../../vendor/cordis" },
     { "path": "../../../vendor/schemastery" },
     { "path": "../../util/atomic-write" },
+    { "path": "../source" },
     { "path": "../../client/connection/tsconfig.host.json" },
     { "path": "../../core/tools" },
     { "path": "../../host/webserver" },

@@ -1,6 +1,6 @@
 {
   "name": "@deepseek-ai/dsh-fde-project",
-  "description": "Workspace-scoped FDE project artifacts, OpenAPI tools, and architecture tools",
+  "description": "Workspace-scoped FDE project artifacts, requirement Wiki, OpenAPI, architecture, and evaluation tools",
   "version": "0.1.1-rc.2",
   "publishConfig": { "access": "public" },
   "repository": {
@@ -21,6 +21,7 @@
   "license": "MIT",
   "dependencies": {
     "@deepseek-ai/dsh-atomic-write": "workspace:^",
+    "@deepseek-ai/dsh-fde-source": "workspace:^",
     "@deepseek-ai/schemastery": "workspace:^"
   },
   "peerDependencies": {
@@ -35,10 +36,13 @@
   },
   "devDependencies": {
     "@deepseek-ai/cordis": "workspace:^",
+    "@deepseek-ai/cordis-plugin-include": "workspace:^",
+    "@deepseek-ai/cordis-plugin-loader": "workspace:^",
     "@deepseek-ai/dsh-client-connection": "workspace:^",
     "@deepseek-ai/dsh-host-webserver": "workspace:^",
     "@deepseek-ai/dsh-invariants": "workspace:^",
     "@deepseek-ai/dsh-llm": "workspace:^",
+    "@deepseek-ai/dsh-system-prompt": "workspace:^",
     "@deepseek-ai/dsh-tools": "workspace:^",
     "@deepseek-ai/dsh-workspace": "workspace:^",
     "dsh-openapi": "git+https://github.com/Degurechaff57/dsh-openapi.git#fb854355b89e495ded090b9e2eb94c33430d2366"
