@@ -74,3 +74,52 @@
 .chevronOpen {
   transform: rotate(180deg);
 }
+
+/* Permission choices carry their consequence beside the same compact trigger.
+   The shared Menu still owns dismissal, selection, keyboard, and focus
+   behavior; this owner only widens and composes its row content. */
+.menuRoot > [role='menu'] {
+  width: min(394px, calc(100vw - 32px));
+  max-width: min(394px, calc(100vw - 32px));
+}
+
+.menuRoot [role='menuitem'] {
+  min-height: 58px;
+}
+
+.menuRoot [role='menuitem'] > span:nth-child(2) {
+  overflow: visible;
+  white-space: normal;
+}
+
+.optionCopy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.optionTitle {
+  color: var(--dsw-alias-label-primary);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+}
+
+.optionDescription {
+  overflow: hidden;
+  color: var(--dsw-alias-label-tertiary);
+  font-size: 12px;
+  line-height: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.optionIcon {
+  display: inline-flex;
+}
+
+.warningCopy .optionTitle,
+.warningCopy .optionDescription,
+.warningIcon {
+  color: var(--dsw-alias-state-warn-label);
+}

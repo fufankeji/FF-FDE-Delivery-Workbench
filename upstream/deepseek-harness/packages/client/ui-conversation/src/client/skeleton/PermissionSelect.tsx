@@ -8,6 +8,8 @@ import type { ComposerBarProps } from '../contract/slots.ts'
 import css from './PermissionSelect.module.css'
 
 const FULL_ACCESS = 'danger-full-access'
+const READ_ONLY = 'read-only'
+const WORKSPACE_WRITE = 'workspace-write'
 
 /* Shield glyphs (design set 1556): check = read-only, pencil = workspace
    write, exclamation = full access. currentColor so the trigger and menu
@@ -46,19 +48,36 @@ function permissionGlyph(value: string): ReactNode | undefined {
 }
 
 /**
- * Display transform: kebab-case machine names render as title-case labels
- * (`workspace-write` → `Workspace Write`); non-kebab host-configured names
- * pass through. Full access intentionally overrides the machine-name
- * transform so both permission surfaces use the product label `Full access`;
- * the warning body remains locale-aware.
+ * Display transform for host-configured names outside the built-in product
+ * vocabulary. Built-in permission presets use locale-owned product labels.
  */
 function displayName(name: string): string {
   if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(name)) return name
   return name.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
 }
 
-function optionLabel(option: PermissionSelectValue['options'][number]): string {
-  return option.value === FULL_ACCESS ? 'Full access' : displayName(option.name)
+function permissionLabel(value: string, name: string, t: ComposerBarProps['t']): string {
+  const displayed = displayName(name)
+  const usesBuiltInName = name === value
+    || value === READ_ONLY && displayed === 'Read Only'
+    || value === WORKSPACE_WRITE && displayed === 'Workspace Write'
+    || value === FULL_ACCESS && (displayed === 'Full Access' || displayed === 'Full access')
+  if (!usesBuiltInName) return displayed
+  if (value === READ_ONLY) return t('access.preset.readOnly')
+  if (value === WORKSPACE_WRITE) return t('access.preset.workspaceWrite')
+  if (value === FULL_ACCESS) return t('access.preset.fullAccess')
+  return displayed
+}
+
+function optionLabel(option: PermissionSelectValue['options'][number], t: ComposerBarProps['t']): string {
+  return permissionLabel(option.value, option.name, t)
+}
+
+function optionDescription(option: PermissionSelectValue['options'][number], t: ComposerBarProps['t']): string | undefined {
+  if (option.value === READ_ONLY) return t('access.menu.readOnlyDescription')
+  if (option.value === WORKSPACE_WRITE) return t('access.menu.workspaceWriteDescription')
+  if (option.value === FULL_ACCESS) return t('access.menu.fullAccessDescription')
+  return option.description
 }
 
 export interface PermissionSelectProps {
@@ -88,12 +107,30 @@ export function PermissionSelect({ value, locked, command, t }: PermissionSelect
   const current = value.options.find(option => option.value === currentValue)
   const busy = pick !== null || confirmation !== null
 
-  const items: MenuEntry[] = value.options
-    .filter(o => o.value !== 'custom')
-    .map((option) => {
-      const icon = permissionGlyph(option.value)
-      return { id: option.value, label: optionLabel(option), ...icon === undefined ? {} : { icon } }
-    })
+  const items: MenuEntry[] = [
+    { type: 'label', id: 'permission-menu-title', text: t('access.menu.title') },
+    ...value.options
+      .filter(o => o.value !== 'custom')
+      .map((option) => {
+        const glyph = permissionGlyph(option.value)
+        const description = optionDescription(option, t)
+        const warning = option.value === FULL_ACCESS
+        return {
+          id: option.value,
+          label: (
+            <span className={clsx(css.optionCopy, warning && css.warningCopy)}>
+              <span className={css.optionTitle}>{optionLabel(option, t)}</span>
+              {description !== undefined && (
+                <span className={css.optionDescription}>{description}</span>
+              )}
+            </span>
+          ),
+          ...glyph === undefined
+            ? {}
+            : { icon: <span className={clsx(css.optionIcon, warning && css.warningIcon)}>{glyph}</span> },
+        }
+      }),
+  ]
 
   const submit = (id: string): void => {
     setPick(id)
@@ -134,19 +171,28 @@ export function PermissionSelect({ value, locked, command, t }: PermissionSelect
         onSelect={choose}
         onClose={() => { setOpen(false) }}
         side="top"
+        className={css.menuRoot ?? ''}
         anchor={
           <button
             type="button"
             className={css.trigger}
-            aria-label={t('input.accessMode', { name: current === undefined ? displayName(currentValue) : optionLabel(current) })}
-            title={current?.description}
+            aria-label={t('input.accessMode', {
+              name: current === undefined
+                ? permissionLabel(currentValue, currentValue, t)
+                : optionLabel(current, t),
+            })}
+            title={current === undefined ? undefined : optionDescription(current, t)}
             disabled={locked || busy}
             onClick={() => { setOpen(!open) }}
           >
             {permissionGlyph(currentValue) !== undefined && (
               <span className={css.triggerIcon} aria-hidden>{permissionGlyph(currentValue)}</span>
             )}
-            <span className={css.triggerLabel}>{current === undefined ? displayName(currentValue) : optionLabel(current)}</span>
+            <span className={css.triggerLabel}>
+              {current === undefined
+                ? permissionLabel(currentValue, currentValue, t)
+                : optionLabel(current, t)}
+            </span>
             {/* Same glyph + open rotation as the sibling ModelSelect trigger. */}
             <span className={clsx(css.chevron, open && css.chevronOpen)} aria-hidden>
               <IconChevronDownOutline14 />
