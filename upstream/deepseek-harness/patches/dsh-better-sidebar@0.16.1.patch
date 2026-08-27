@@ -1,5 +1,5 @@
 diff --git a/lib/client.js b/lib/client.js
-index 6cf688cbba1345a61e6db0738638ae215ad1d2e0..667f515712fff3a82220939341a3faa8c8991846 100644
+index 6cf688cbba1345a61e6db0738638ae215ad1d2e0..9aa44dee99d3796bf9813e4c766eb68cf4aabdb7 100644
 --- a/lib/client.js	
 +++ b/lib/client.js
 @@ -41,13 +41,13 @@ window.__ModuleLoader__.load({
@@ -39,7 +39,13 @@ index 6cf688cbba1345a61e6db0738638ae215ad1d2e0..667f515712fff3a82220939341a3faa8
  			viewersEnabled: {},
  			pluginSettings: {}
  		};
-@@ -12263,8 +12268,29 @@ window.__ModuleLoader__.load({
+@@ -9729 +9734,4 @@ window.__ModuleLoader__.load({
+-			tag.textContent = css$4;
++			tag.textContent = css$4.replace(
++				"[data-dsh-panel-host]{z-index:25;pointer-events:none;position:fixed;inset:0;overflow:hidden}",
++				"[data-dsh-panel-host]{z-index:25;pointer-events:none;position:fixed;inset:0;overflow:clip}"
++			);
+@@ -12263,8 +12271,29 @@ window.__ModuleLoader__.load({
  		* drop over the file window uploads here and never reaches DSH's chat
  		* intake.
  		*/
@@ -70,7 +76,7 @@ index 6cf688cbba1345a61e6db0738638ae215ad1d2e0..667f515712fff3a82220939341a3faa8
  			const [query, setQuery] = (0, react.useState)("");
  			const [results, setResults] = (0, react.useState)(null);
  			const [error, setError] = (0, react.useState)(null);
-@@ -12282,6 +12308,41 @@ window.__ModuleLoader__.load({
+@@ -12282,6 +12311,41 @@ window.__ModuleLoader__.load({
  			const cancelledRef = (0, react.useRef)(false);
  			const fileInputRef = (0, react.useRef)(null);
  			const folderInputRef = (0, react.useRef)(null);
@@ -112,7 +118,7 @@ index 6cf688cbba1345a61e6db0738638ae215ad1d2e0..667f515712fff3a82220939341a3faa8
  			/** Start one upload session into `dir` (absolute, inside the workspace). */
  			const startUpload = (dir, items) => {
  				if (items.length === 0 || cwd === void 0 || upload !== null) return;
-@@ -12360,7 +12421,8 @@ window.__ModuleLoader__.load({
+@@ -12360,7 +12424,8 @@ window.__ModuleLoader__.load({
  			}, [
  				sessionId,
  				cwd,
@@ -122,7 +128,7 @@ index 6cf688cbba1345a61e6db0738638ae215ad1d2e0..667f515712fff3a82220939341a3faa8
  			]);
  			const busy = upload !== null;
  			return /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
-@@ -12783,6 +12845,7 @@ window.__ModuleLoader__.load({
+@@ -12783,6 +12848,7 @@ window.__ModuleLoader__.load({
  			if (treeOnly || folderRoot !== void 0) return /* @__PURE__ */ (0, react_jsx_runtime.jsx)("div", {
  				className: sidebar_module_css_default.editor,
  				children: /* @__PURE__ */ (0, react_jsx_runtime.jsx)(TreePanel, {
@@ -130,7 +136,7 @@ index 6cf688cbba1345a61e6db0738638ae215ad1d2e0..667f515712fff3a82220939341a3faa8
  					full: true,
  					sessionId: scope.sessionId,
  					cwd: folderRoot ?? scope.cwd,
-@@ -12915,6 +12978,7 @@ window.__ModuleLoader__.load({
+@@ -12915,6 +12981,7 @@ window.__ModuleLoader__.load({
  							onPointerUp: onResizeEnd,
  							onPointerCancel: onResizeEnd
  						}), /* @__PURE__ */ (0, react_jsx_runtime.jsx)(TreePanel, {
@@ -138,7 +144,7 @@ index 6cf688cbba1345a61e6db0738638ae215ad1d2e0..667f515712fff3a82220939341a3faa8
  							sessionId: scope.sessionId,
  							cwd: scope.cwd,
  							expanded,
-@@ -19580,7 +19644,7 @@ Mode: this is a continuable side conversation. Your answers stay in this side th
+@@ -19580,7 +19647,7 @@ Mode: this is a continuable side conversation. Your answers stay in this side th
  				children: /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
  					className: sidebar_module_css_default.toggleCluster,
  					"data-dsh-toggle-cluster": true,
@@ -147,7 +153,7 @@ index 6cf688cbba1345a61e6db0738638ae215ad1d2e0..667f515712fff3a82220939341a3faa8
  						label: t("noSession"),
  						side: "bottom",
  						delayMs: 500,
-@@ -19701,7 +19765,7 @@ Mode: this is a continuable side conversation. Your answers stay in this side th
+@@ -19701,7 +19768,7 @@ Mode: this is a continuable side conversation. Your answers stay in this side th
  					/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
  						className: sidebar_module_css_default.toggleCluster,
  						"data-dsh-toggle-cluster": true,
@@ -401,6 +407,22 @@ index e304328eb8060966700e7911f6f046b8f8f46897..f05170d31af8dc1f04d0f5c543fa7b44
  
    const busy = upload !== null
  
+diff --git a/src/client/sidebar.module.css b/src/client/sidebar.module.css
+index 26e1862d3dc43d7b009676656dd639303cfe43ee..ff84d995e6f2ef57164f93d086e40276464f6841 100644
+--- a/src/client/sidebar.module.css
++++ b/src/client/sidebar.module.css
+@@ -43,6 +43,8 @@
+      hidden panels extended the document's scrollable area, making the whole
+      page draggable left-right and up-down while any panel was collapsed.
+      The host is exactly viewport-sized (inset: 0), so the clip is invisible
+-     until a panel slides in from the edge; internal scroll containers and
+-     the app's fixed overlay stack are unaffected. */
+-  overflow: hidden;
++     until a panel slides in from the edge. `clip` deliberately avoids making
++     the host a programmatic scroll container: a nested review surface may
++     call scrollIntoView() without moving the whole dock. Internal scroll
++     containers and the app's fixed overlay stack are unaffected. */
++  overflow: clip;
 diff --git a/src/config.ts b/src/config.ts
 index b28b2a7868faebd510ece59c93636a9de6b03c67..d930de53ec346b6fdd777c9b87af91bdee0cc607 100644
 --- a/src/config.ts	

@@ -442,10 +442,11 @@
 }
 
 /* Rail variant (own .rail class from the wide owner prop — the region never
-   reads the shell's class names): the two icon controls stack as 36x36
-   circles matching the shell's rail rhythm. Both use the rail's shared base
-   left anchor so the outer shell can translate the whole region uniformly. */
+   reads the shell's class names): hide the wide-only section header so it
+   cannot separate the two 36x36 icon controls. The controls keep the rail's
+   shared base left anchor and the new-project button supplies their gap. */
 .rail .sectionHeader {
+  display: none;
   gap: 0;
   padding-left: 0;
   margin-bottom: 12px;

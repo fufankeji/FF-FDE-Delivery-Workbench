@@ -14,7 +14,7 @@ dsh 浏览器表层组合包。[`cordis.patch.yml`](cordis.patch.yml) 叠加在 
 
 `fde-project` 与 `ui-fde-project` 增加独立的全局“项目进度”页面，以及项目级“API 文档”“系统架构”“观测”“评估”View。项目 OpenAPI 工具复用锁定版本 `dsh-openapi` 的解析与请求实现，同时按调用 Agent 所属的已注册 Workspace 解析配置。系统架构候选使用精确 revision 和原子替换，确认架构不会推进交付阶段。`dsh-observe@0.2.0` 以无后端、disabled 状态挂载，因此本地汇总不需要采集或外发。固定版本 `dsh-eval-harness@2f59376` 的工具只会在用户从页面明确提交评估后运行，Host 执行前守卫把其路径以及可执行文件/Profile 选择限制在当前项目策略内。
 
-FDE profile 还固定组合 `dsh-better-sidebar@0.16.1` 与 `dsh-file-review-tab@0.2.0`。项目/会话浏览器保持在左侧，官方 Conversation 保持在中央；唯一的可收起右侧 Dock 提供文件/编辑、Git diff，以及按当前会话/轮次组织的 Agent 文件审查。FDE patch 默认禁用底部工作台和无关的浏览器、侧边对话、子代理与终端页面，并保持 Git diff 与 Agent 归因审查的语义区别。
+FDE profile 还固定组合 `dsh-better-sidebar@0.16.1` 与 `dsh-file-review-tab@0.2.0`。项目/会话浏览器保持在左侧，官方 Conversation 保持在中央；唯一的可收起右侧 Dock 提供文件/编辑、Git diff，以及按当前会话/轮次组织的 Agent 文件审查。FDE patch 默认禁用底部工作台和无关的浏览器、侧边对话、子代理与终端页面，保持 Git diff 与 Agent 归因审查的语义区别，并让 Dock 宿主只裁剪越界内容而不成为滚动容器，避免直接定位文件审查内容时把整个 Dock 推出视口。
 
 ## 模型重试默认值
 

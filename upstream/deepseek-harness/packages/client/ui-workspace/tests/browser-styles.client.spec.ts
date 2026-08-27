@@ -108,9 +108,11 @@ describe('WorkspaceBrowser.module.css list', () => {
       .toBe('var(--dsw-alias-interactive-bg-hover)')
   })
 
-  it('pins both rail controls to the shared left anchor during the column slide', () => {
-    expect(declarations('.rail .sectionHeader')?.get('justify-content')).toBe('flex-start')
+  it('keeps the two rail controls aligned with a compact 12px gap', () => {
+    expect(declarations('.rail .sectionHeader')?.get('display')).toBe('none')
+    expect(declarations('.rail .newProject')?.get('margin')).toBe('0 0 12px')
     expect(declarations('.rail .iconButton')?.get('width')).toBe('36px')
     expect(declarations('.rail .search')?.get('width')).toBe('36px')
+    expect(declarations('.rail .search')?.get('margin')).toBe('0 0 12px')
   })
 })
