@@ -54,6 +54,65 @@ describe('ProjectProgressOverlay standalone page', () => {
     frame.remove()
   })
 
+  it('compares projects by their real six-stage position before entering a project', () => {
+    const showProjectDetail = vi.fn()
+    const props = {
+      useProjectPage: hook({ open: true, view: 'overview' as const }),
+      useStageProgress: hook({ byWorkspace: {
+        'workspace-1': { status: 'ready', value: {
+          workspaceId: 'workspace-1', currentStage: 'requirements', revision: 1,
+          createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:00:00.000Z',
+        } },
+        'workspace-2': { status: 'ready', value: {
+          workspaceId: 'workspace-2', currentStage: 'development', revision: 3,
+          createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:02:00.000Z',
+        } },
+      } }),
+      useProjectSurfaces: hook({ byWorkspace: {} }),
+      useProjectSources: hook({ byWorkspace: {} }),
+      useRequirementWiki: hook({ byWorkspace: {} }),
+      useWorkspaces: hook({ items: [
+        {
+          workspaceId: 'workspace-1', title: '客户需求梳理', path: '/project/one', sessionIds: ['session-1'],
+          createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:00:00.000Z',
+        },
+        {
+          workspaceId: 'workspace-2', title: '数据分析项目', path: '/project/two', sessionIds: ['session-2'],
+          createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:00:00.000Z',
+        },
+      ] }),
+      useSessions: hook({ byId: {
+        'session-1': { id: 'session-1', displayTitle: '需求会话', running: false, blank: false, updatedAt: 1 },
+        'session-2': { id: 'session-2', displayTitle: '研发会话', running: true, blank: false, updatedAt: 2 },
+      } }),
+      loadStage: vi.fn(), retryStage: vi.fn(), loadProjectSurface: vi.fn(), refreshProjectSurface: vi.fn(),
+      completeRequirements: vi.fn(), completeSolution: vi.fn(), completeDevelopment: vi.fn(),
+      loadProjectSources: vi.fn(), parseProjectSource: vi.fn(), loadRequirementWiki: vi.fn(),
+      prepareRequirementWikiRun: vi.fn(), startRequirementWikiBuild: vi.fn(), abandonRequirementWikiBuild: vi.fn(),
+      enterProject: vi.fn(), reviewProjectArchitecture: vi.fn(), closeProjectPage: vi.fn(), showProjectOverview: vi.fn(),
+      showProjectTimeline: vi.fn(), showProjectDetail, renderSlot: vi.fn(() => null),
+      t: makeTranslate(zh),
+    } as unknown as ProjectProgressOverlayProps
+
+    render(<ProjectProgressOverlay {...props} />)
+    expect(screen.getByText('工作台焦点')).toBeTruthy()
+    expect(screen.getByText('需要关注')).toBeTruthy()
+    expect(screen.getByText('交付节点')).toBeTruthy()
+    expect(screen.getByText('最近会话')).toBeTruthy()
+    expect(screen.getByText('研发会话')).toBeTruthy()
+    expect(screen.getByText('六阶段项目分布')).toBeTruthy()
+    expect(screen.getByText('阶段 1/6 · 需求调研')).toBeTruthy()
+    expect(screen.getByText('阶段 3/6 · 项目开发')).toBeTruthy()
+    expect(screen.getAllByRole('list', { name: '项目六阶段位置' })).toHaveLength(2)
+    fireEvent.click(screen.getByRole('button', { name: '筛选阶段 3：项目开发，1 个项目' }))
+    expect(screen.queryByRole('heading', { name: '客户需求梳理' })).toBeNull()
+    expect(screen.getByRole('heading', { name: '数据分析项目' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: /全部项目/ }))
+    const projectButtons = screen.getAllByRole('button', { name: /查看项目/ })
+    fireEvent.click(projectButtons[1] as HTMLElement)
+    expect(showProjectDetail).toHaveBeenCalledWith('workspace-2')
+  })
+
   it('separates stage inputs and outputs and requires the FDE second confirmation', async () => {
     const completeRequirements = vi.fn(async () => {})
     const renderSlot = vi.fn(() => <div>阶段产出正文</div>)
@@ -195,16 +254,22 @@ describe('ProjectProgressOverlay standalone page', () => {
             { id: 'core-product-spec', title: '产品总规格', path: 'docs/specs/product-spec.md', kind: 'core', status: 'present' },
             { id: 'core-feature-map', title: 'Feature Map', path: 'docs/specs/feature-map.md', kind: 'core', status: 'present' },
           ] },
-          features: [{
-            id: 'F001', title: '数据接入', directory: 'docs/specs/F001-source-ingestion', status: 'in-progress',
-            plannedStart: '2026-08-27', plannedEnd: '待确认', milestone: '完成数据源接入',
-            taskTotal: 3, taskCompleted: 2,
-            artifacts: [
-              { id: 'feature-F001-spec', title: 'Feature Spec', path: 'docs/specs/F001-source-ingestion/spec.md', kind: 'feature', status: 'present' },
-              { id: 'feature-F001-plan', title: '实施计划', path: 'docs/specs/F001-source-ingestion/plan.md', kind: 'feature', status: 'present' },
-              { id: 'feature-F001-tasks', title: '任务清单', path: 'docs/specs/F001-source-ingestion/tasks.md', kind: 'feature', status: 'present' },
-            ],
-          }],
+          features: [
+            {
+              id: 'F001', title: '数据接入', directory: 'docs/specs/F001-source-ingestion', status: 'in-progress',
+              plannedStart: '2026-08-27', plannedEnd: '待确认', milestone: '完成数据源接入',
+              taskTotal: 3, taskCompleted: 2,
+              artifacts: [
+                { id: 'feature-F001-spec', title: 'Feature Spec', path: 'docs/specs/F001-source-ingestion/spec.md', kind: 'feature', status: 'present' },
+                { id: 'feature-F001-plan', title: '实施计划', path: 'docs/specs/F001-source-ingestion/plan.md', kind: 'feature', status: 'present' },
+                { id: 'feature-F001-tasks', title: '任务清单', path: 'docs/specs/F001-source-ingestion/tasks.md', kind: 'feature', status: 'present' },
+              ],
+            },
+            {
+              id: 'F002', title: '模型评估', directory: 'docs/specs/F002-evaluation', status: 'unknown',
+              taskTotal: 0, taskCompleted: 0, artifacts: [],
+            },
+          ],
           closure: { root: 'fde-deliverables/03-project-development', requiredCount: 3, presentCount: 3, artifacts: [
             { id: 'closure-implementation-report', title: '实施报告', path: 'fde-deliverables/03-project-development/implementation-report.md', kind: 'closure', status: 'present' },
             { id: 'closure-runbook', title: '运行手册', path: 'fde-deliverables/03-project-development/runbook.md', kind: 'closure', status: 'present' },
@@ -229,14 +294,31 @@ describe('ProjectProgressOverlay standalone page', () => {
     } as unknown as ProjectProgressOverlayProps
 
     render(<ProjectProgressOverlay {...props} />)
+    expect(screen.getByRole('region', { name: '项目交付数据总览' })).toBeTruthy()
+    expect(screen.getByRole('region', { name: '研发证据图谱' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: '查看阶段 3：项目开发' }).getAttribute('aria-current')).toBe('step')
+    expect(screen.getByRole('button', { name: '查看阶段 1：需求调研' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: '查看阶段 6：验收移交' })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: /阶段产出/ }))
-    expect(screen.getByText('项目开发文档与进度')).toBeTruthy()
+    expect(screen.getByText('Feature 研发进度')).toBeTruthy()
     expect(screen.getByText('F001')).toBeTruthy()
     expect(screen.getByText('数据接入')).toBeTruthy()
-    expect(screen.getByText('任务 2/3')).toBeTruthy()
+    expect(screen.getByLabelText('任务证据 2/3')).toBeTruthy()
+    expect(screen.getByText('暂无任务证据')).toBeTruthy()
+    expect(screen.getByText('状态待确认')).toBeTruthy()
     expect(screen.getByText('项目开发收口产物')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: '预览项目 PRD' }))
+    expect(screen.getByRole('dialog', { name: '预览项目 PRD' })).toBeTruthy()
     expect(screen.getByText('研发文档正文')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '关闭' }))
+    expect(screen.queryByRole('dialog', { name: '预览项目 PRD' })).toBeNull()
+    expect(screen.getByRole('button', { name: '查看阶段 3：项目开发' }).getAttribute('aria-current')).toBe('step')
+    fireEvent.click(screen.getByRole('button', { name: '查看阶段 4：验证评估' }))
+    expect(screen.getByRole('region', { name: '验证证据矩阵' })).toBeTruthy()
+    expect(screen.getAllByText('尚未开始').length).toBeGreaterThan(0)
+    expect(screen.getByText('项目当前处于 项目开发')).toBeTruthy()
+    expect(completeDevelopment).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: '查看阶段 3：项目开发' }))
     fireEvent.click(screen.getByRole('button', { name: '完成项目开发' }))
     expect(screen.getByText(/我已核对实施报告、运行手册、研发基线/)).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: '确认并进入验证评估' }))

@@ -66,7 +66,7 @@
 
 ### `architecture_set`
 
-为当前 FDE 项目发布一份完整候选架构。必须先调用 architecture_get，并传入其精确 expectedRevision。
+为当前 FDE 项目发布一份基于证据的完整候选架构。保留稳定 ID，按入口到输出的顺序排列职责分组，只包含关键关系，并传入 architecture_get 返回的精确 expectedRevision。
 
 ```json
 {
@@ -78,24 +78,26 @@
     },
     "title": {
       "type": "string",
-      "description": "Architecture title."
+      "description": "Concise title naming the actual system or candidate architecture."
     },
     "summary": {
       "type": "string",
-      "description": "Business and technical objective summary."
+      "description": "Scope, current-versus-candidate status, key evidence, constraints, and unresolved differences."
     },
     "groups": {
       "type": "array",
-      "description": "System layers or responsibility groups.",
+      "description": "Stable responsibility groups ordered from entry to delivery output; use kebab-case ids.",
       "items": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "Stable kebab-case group id."
           },
           "label": {
-            "type": "string"
+            "type": "string",
+            "description": "Short responsibility label."
           }
         },
         "required": [
@@ -106,19 +108,22 @@
     },
     "nodes": {
       "type": "array",
-      "description": "System components.",
+      "description": "Major runtime components, capabilities, stores, external boundaries, or delivery outputs.",
       "items": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "Stable kebab-case component id; preserve it while the concept remains the same."
           },
           "label": {
-            "type": "string"
+            "type": "string",
+            "description": "Short component or capability name."
           },
           "kind": {
             "type": "string",
+            "description": "entry=user/system entry; core=orchestration/domain/AI core; store=durable data/evidence; external=outside boundary; output=deliverable; default=other.",
             "enum": [
               "default",
               "entry",
@@ -129,10 +134,12 @@
             ]
           },
           "note": {
-            "type": "string"
+            "type": "string",
+            "description": "Real responsibility, source evidence, constraint, candidate status, or unresolved fact."
           },
           "group": {
-            "type": "string"
+            "type": "string",
+            "description": "Id of the declared responsibility group that owns this node."
           }
         },
         "required": [
@@ -144,22 +151,26 @@
     },
     "edges": {
       "type": "array",
-      "description": "Directed relationships between existing node ids.",
+      "description": "Material runtime, data-flow, control-flow, or dependency relationships between existing node ids.",
       "items": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "from": {
-            "type": "string"
+            "type": "string",
+            "description": "Id of the component initiating the relationship."
           },
           "to": {
-            "type": "string"
+            "type": "string",
+            "description": "Id of the component receiving the relationship."
           },
           "label": {
-            "type": "string"
+            "type": "string",
+            "description": "Short action, data, or dependency label."
           },
           "dashed": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "True only for optional, asynchronous, or not-yet-implemented candidate relationships."
           }
         },
         "required": [

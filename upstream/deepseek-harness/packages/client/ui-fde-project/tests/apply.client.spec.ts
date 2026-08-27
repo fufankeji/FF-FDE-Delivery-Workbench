@@ -5,9 +5,10 @@ import { SlotRegistry, createSnapshotStore } from '@deepseek-ai/dsh-client-runti
 import { apply, inject } from '../src/client/index.ts'
 import { ArchitectureView } from '../src/client/ArchitectureView.tsx'
 import { ApiDocsView } from '../src/client/ApiDocsView.tsx'
+import { EvaluationView } from '../src/client/EvaluationView.tsx'
 import { ProjectProgressLauncher } from '../src/client/ProjectProgressLauncher.tsx'
 import { ProjectProgressOverlay } from '../src/client/ProjectProgressOverlay.tsx'
-import type { ProjectPageInjected } from '../src/client/slots.ts'
+import type { ProjectPageInjected, ProjectViewInjected } from '../src/client/slots.ts'
 
 afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks() })
 
@@ -19,6 +20,10 @@ function requestPath(input: RequestInfo | URL): string {
 describe('ui-fde-project apply', () => {
   it('registers the global page and reveals project views only after their stage', async () => {
     const ctx = new Context()
+    const architecturePrompt = vi.fn(async (
+      _content: readonly { readonly type: string; readonly text?: string }[],
+      _mode: string,
+    ) => ({ ok: true as const, value: { accepted: true as const } }))
     await ctx.plugin(SlotRegistry).await()
     const locale = new LocaleRuntime(ctx)
     locale.setLocale('zh')
@@ -29,7 +34,7 @@ describe('ui-fde-project apply', () => {
         byId: { 'session-1': { id: 'session-1', displayTitle: '会话', running: false, blank: true, updatedAt: 1 } },
         current: 'session-1', phase: 'ready', subagentsByParent: {}, jobsBySession: {}, currentAddress: undefined,
       }),
-      binding: () => undefined,
+      binding: () => ({ session: { prompt: architecturePrompt } }),
     } as never)
     ctx.provide('workspaces', {
       list: createSnapshotStore({
@@ -93,10 +98,18 @@ describe('ui-fde-project apply', () => {
       const label = view.options.label
       return typeof label === 'function' ? label() : label
     })).toEqual(['系统架构'])
+    const architectureInjected = (views[0]!.inject as unknown as (sessionId: string) => ProjectViewInjected)('session-1')
+    await architectureInjected.requestArchitectureDraft(4)
+    const architectureInstruction = architecturePrompt.mock.calls[0]?.[0][0]?.text
+    expect(architectureInstruction).toContain('architecture_get')
+    expect(architectureInstruction).toContain('2–7 个职责分组')
+    expect(architectureInstruction).toContain('保留仍代表同一概念的现有 ID')
+    expect(architectureInstruction).toContain('关键运行时、数据流、控制流或依赖关系')
+    expect(architectureInstruction).toContain('页面当前显示的 revision 是 4')
 
     await injected.completeSolution('workspace-1', 2)
-    await vi.waitFor(() => { expect(slots.entries('conversation.view')).toHaveLength(2) })
-    expect(slots.entries('conversation.view').map(view => view.component)).toEqual([ApiDocsView, ArchitectureView])
+    await vi.waitFor(() => { expect(slots.entries('conversation.view')).toHaveLength(3) })
+    expect(slots.entries('conversation.view').map(view => view.component)).toEqual([ApiDocsView, ArchitectureView, EvaluationView])
 
     await fiber.dispose()
     expect(slots.entries('conversation.view')).toHaveLength(0)
