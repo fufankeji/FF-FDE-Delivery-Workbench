@@ -21,6 +21,7 @@ export interface FdeStageDefinition {
   readonly number: number
   readonly nameKey: `stage.${FdeStageId}.name`
   readonly goalKey: `stage.${FdeStageId}.goal`
+  readonly focusKey: `stage.${FdeStageId}.focus`
   readonly questionKey: `stage.${FdeStageId}.question`
 }
 
@@ -30,6 +31,7 @@ export const FDE_STAGES: readonly FdeStageDefinition[] = FDE_STAGE_IDS.map((id, 
   number: index + 1,
   nameKey: `stage.${id}.name`,
   goalKey: `stage.${id}.goal`,
+  focusKey: `stage.${id}.focus`,
   questionKey: `stage.${id}.question`,
 }))
 

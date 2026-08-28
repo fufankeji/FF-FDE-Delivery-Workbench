@@ -534,7 +534,18 @@ export async function loadProjectSurfaceSnapshot(input: {
   readonly path: string
 }): Promise<ProjectSurfaceSnapshot> {
   const runtime = await loadProjectRuntimeSnapshot(input.path)
-  const [apiDocs, architecture, evaluation, validation, requirementWiki, requirements, solution, development, deploymentTrial, acceptanceHandover] = await Promise.all([
+  const [
+    apiDocs,
+    architecture,
+    evaluation,
+    validation,
+    requirementWiki,
+    requirements,
+    solution,
+    development,
+    deploymentTrial,
+    acceptanceHandover,
+  ] = await Promise.all([
     loadApiDocs(input.path, runtime),
     loadArchitecture(input.path),
     loadEvaluation(input.path),

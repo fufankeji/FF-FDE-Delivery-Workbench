@@ -210,7 +210,8 @@ export interface DeploymentTrialStageSnapshot {
     readonly environment?: { readonly name: string; readonly summary: string; readonly authorized: boolean }
     readonly deploymentStatus?: 'preparing' | 'deploying' | 'running' | 'blocked' | 'ready'
     readonly evidence: Readonly<Record<'validationBaseline' | 'deployment' | 'health' | 'rollback' | 'trial', {
-      readonly path?: string; readonly available: boolean
+      readonly path?: string
+      readonly available: boolean
     }>>
     readonly issues: readonly {
       readonly id: string

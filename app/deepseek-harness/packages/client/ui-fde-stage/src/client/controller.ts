@@ -6,6 +6,8 @@ import { isFdeProjectState, type FdeProjectState } from './stages.ts'
 export const FDE_STAGE_OPEN_PATH = '/api/fde-stage/open'
 /** Browser-local cache invalidation emitted after one durable stage commit. */
 export const FDE_STAGE_CHANGED_EVENT = 'fde:project-stage-changed'
+/** Browser-local request to open one Workspace's Project Progress detail. */
+export const FDE_PROJECT_PROGRESS_OPEN_EVENT = 'fde:project-progress-open'
 
 /** One committed project-stage projection. */
 export interface ProjectStageValue {
@@ -90,7 +92,7 @@ export class FdeStageProgressController {
   private readonly requests = new Map<string, StageRequest>()
   private disposed = false
   private readonly onChanged = (event: Event): void => {
-    const detail = (event as CustomEvent<{ workspaceId?: unknown }>).detail
+    const detail = (event as CustomEvent<{ workspaceId?: unknown } | undefined>).detail
     if (typeof detail?.workspaceId === 'string') this.refresh(detail.workspaceId)
   }
 

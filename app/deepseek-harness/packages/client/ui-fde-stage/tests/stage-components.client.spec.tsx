@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import type { SessionId, WorkspaceId } from '@deepseek-ai/dsh-client-runtime/client'
 import { makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
 import { StageBlankStatus } from '../src/client/StageBlankStatus.tsx'
@@ -44,6 +44,7 @@ function runtime() {
     useStageProgress: hook(ready),
     loadStage: vi.fn(),
     retryStage: vi.fn(),
+    openProjectProgress: vi.fn(),
     t,
   }
 }
@@ -61,7 +62,11 @@ describe('FDE stage components', () => {
       session={{ composerPhase: 'blank' } as never}
       input={{} as never}
     />)
-    expect(screen.getByText('阶段 1/6')).toBeTruthy()
-    expect(screen.getByText('从客户需求和真实业务现场开始')).toBeTruthy()
+    expect(screen.getByRole('region', { name: '阶段 1/6' })).toBeTruthy()
+    expect(screen.getByText('整理客户资料，形成可确认的需求基线')).toBeTruthy()
+    expect(screen.queryByText('筛选正确场景，理解真实业务、岗位、SOP、问题边界和验收方向。')).toBeNull()
+    expect(screen.queryByRole('list')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: '查看项目进度' }))
+    expect(props.openProjectProgress).toHaveBeenCalledWith('w-1')
   })
 })

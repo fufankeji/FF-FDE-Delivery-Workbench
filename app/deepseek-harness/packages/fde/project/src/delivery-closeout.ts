@@ -466,12 +466,18 @@ async function inspectArtifacts(
 }
 
 /** Resolve one enumerated deployment-trial output. */
-export async function resolveDeploymentTrialArtifact(projectRoot: string, artifactId: string): Promise<DeliveryCloseoutArtifactFile | undefined> {
+export async function resolveDeploymentTrialArtifact(
+  projectRoot: string,
+  artifactId: string,
+): Promise<DeliveryCloseoutArtifactFile | undefined> {
   return await resolveArtifact(projectRoot, DEPLOYMENT_TRIAL_ARTIFACT_ROOT, DEPLOYMENT_TRIAL_ARTIFACTS, artifactId)
 }
 
 /** Resolve one enumerated acceptance-handover output. */
-export async function resolveAcceptanceHandoverArtifact(projectRoot: string, artifactId: string): Promise<DeliveryCloseoutArtifactFile | undefined> {
+export async function resolveAcceptanceHandoverArtifact(
+  projectRoot: string,
+  artifactId: string,
+): Promise<DeliveryCloseoutArtifactFile | undefined> {
   return await resolveArtifact(projectRoot, ACCEPTANCE_HANDOVER_ARTIFACT_ROOT, ACCEPTANCE_HANDOVER_ARTIFACTS, artifactId)
 }
 
@@ -617,7 +623,11 @@ export async function loadAcceptanceHandoverStage(projectRoot: string, workspace
         ? '项目已退回或终止，不能完成项目。'
         : '企业验收结论尚未达到通过或带条件通过。')
     }
-    if (contract.acceptance === undefined || contract.acceptance.evidence.length === 0 || contract.acceptance.evidence.some(item => !item.available)) {
+    if (
+      contract.acceptance === undefined
+      || contract.acceptance.evidence.length === 0
+      || contract.acceptance.evidence.some(item => !item.available)
+    ) {
       blockers.push('企业验收证据尚未齐备。')
     }
     if (contract.deliverables.length === 0) blockers.push('交付物清单尚未登记任何条目。')
@@ -634,7 +644,11 @@ export async function loadAcceptanceHandoverStage(projectRoot: string, workspace
     if (contract.handover?.trainingCompleted !== true) blockers.push('培训尚未完成移交。')
     if (contract.handover?.accessResponsibilityTransferred !== true) blockers.push('权限责任尚未完成移交。')
     if (contract.handover?.operationsResponsibilityTransferred !== true) blockers.push('运维责任尚未完成移交。')
-    if (contract.handover === undefined || contract.handover.evidence.length === 0 || contract.handover.evidence.some(item => !item.available)) {
+    if (
+      contract.handover === undefined
+      || contract.handover.evidence.length === 0
+      || contract.handover.evidence.some(item => !item.available)
+    ) {
       blockers.push('移交证据尚未齐备。')
     }
   }

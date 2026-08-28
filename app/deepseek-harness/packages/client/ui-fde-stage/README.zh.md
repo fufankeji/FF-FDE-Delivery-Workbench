@@ -2,7 +2,7 @@
 
 [English](README.md) | 中文
 
-一个 Workspace 项目的 FDE 六阶段进度浏览器界面。一个 apply 作用域内的 Host-backed observable 由两个 Conversation contribution 共享：空白输入框上方的紧凑提示和已开始会话头部的当前阶段。空白提示读取 Conversation 共享的卡片宽度与两侧 clearance 变量，因此其外边界与输入卡保持对齐，而不是跟随更宽的 Slot 容器。Session 归属只通过 Workspace 列表的 `sessionIds` 解析，禁止使用 cwd 或最近项目回退。全局项目进度页面属于 `ui-fde-project`。
+一个 Workspace 项目的 FDE 六阶段进度浏览器界面。一个 apply 作用域内的 Host-backed observable 由两个 Conversation contribution 共享：空白输入框上方的一行式阶段行动提示和已开始会话头部的当前阶段。空白阶段栏读取 Conversation 共享的卡片宽度与两侧 clearance 变量，因此其外边界与输入卡保持对齐，而不是跟随更宽的 Slot 容器。明确的“查看项目进度”动作携带当前 WorkspaceId，由 `ui-fde-project` 直接打开该项目详情；完整阶段流程、输入、输出和交付门不进入工作入口。Session 归属只通过 Workspace 列表的 `sessionIds` 解析，禁止使用 cwd 或最近项目回退。
 
 该包不提供完成或推进阶段的动作。其他已授权 FDE 页面成功提交阶段门后，会通过 Workspace 级浏览器失效通知让两处提示重新读取 Host 持久值；通知本身不携带或虚构新阶段。Host 读取失败时保留可见重试状态，不使用其他项目缓存兜底。
 

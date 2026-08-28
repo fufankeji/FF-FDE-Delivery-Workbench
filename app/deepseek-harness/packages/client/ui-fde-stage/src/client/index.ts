@@ -3,7 +3,7 @@
 import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
 import type {} from '@deepseek-ai/dsh-client-locale/client'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
-import { FdeStageProgressController } from './controller.ts'
+import { FDE_PROJECT_PROGRESS_OPEN_EVENT, FdeStageProgressController } from './controller.ts'
 import { StageBlankStatus } from './StageBlankStatus.tsx'
 import { StageHeaderStatus } from './StageHeaderStatus.tsx'
 import { en, NS, zh, type FdeStageKey } from './locales.ts'
@@ -29,6 +29,11 @@ export function apply(ctx: ClientContext): void {
     hooks: { stageProgress: controller },
     loadStage: (workspaceId) => { controller.load(workspaceId) },
     retryStage: (workspaceId) => { controller.retry(workspaceId) },
+    openProjectProgress: (workspaceId) => {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent(FDE_PROJECT_PROGRESS_OPEN_EVENT, { detail: { workspaceId } }))
+      }
+    },
   })
   ctx.effect(() => () => { controller.dispose() }, 'ui-fde-stage: controller')
   ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'ui-fde-stage: dictionaries')

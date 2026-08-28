@@ -51,6 +51,8 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
 /** Required browser services and the Slot owners that declare our targets. */
 export const inject = ['slots', 'locale', 'modelDirectories', 'sessions', 'workspaces', 'conversation']
 
+const FDE_PROJECT_PROGRESS_OPEN_EVENT = 'fde:project-progress-open'
+
 /** Register the global project page and the four project delivery views. */
 export function apply(ctx: ClientContext): void {
   const page = new ProjectPageController()
@@ -60,6 +62,17 @@ export function apply(ctx: ClientContext): void {
   const surfaces = new FdeProjectSurfaceController()
   ctx.effect(() => () => { page.dispose(); stages.dispose(); sources.dispose(); requirementWiki.dispose(); surfaces.dispose() }, 'ui-fde-project: controllers')
   ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'ui-fde-project: dictionaries')
+  ctx.effect(() => {
+    if (typeof window === 'undefined') return () => undefined
+    const openProjectProgress = (event: Event): void => {
+      const detail = (event as CustomEvent<{ workspaceId?: unknown } | undefined>).detail
+      if (typeof detail?.workspaceId === 'string' && detail.workspaceId.length > 0) {
+        page.showProject(detail.workspaceId)
+      }
+    }
+    window.addEventListener(FDE_PROJECT_PROGRESS_OPEN_EVENT, openProjectProgress)
+    return () => { window.removeEventListener(FDE_PROJECT_PROGRESS_OPEN_EVENT, openProjectProgress) }
+  }, 'ui-fde-project: blank-stage progress entry')
   const t = ctx.locale.bind(NS)
 
   const resolveProjectSession = async (workspaceId: string): Promise<SessionId> => {

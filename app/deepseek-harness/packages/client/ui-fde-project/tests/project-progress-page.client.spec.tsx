@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
 import { ProjectProgressOverlay } from '../src/client/ProjectProgressOverlay.tsx'
 import { zh } from '../src/client/locales.ts'
@@ -95,22 +95,41 @@ describe('ProjectProgressOverlay standalone page', () => {
     } as unknown as ProjectProgressOverlayProps
 
     render(<ProjectProgressOverlay {...props} />)
-    expect(screen.getByText('工作台焦点')).toBeTruthy()
-    expect(screen.getByText('需要关注')).toBeTruthy()
+    expect(screen.getByText('项目关注')).toBeTruthy()
+    expect(screen.getByText('需要 FDE 介入')).toBeTruthy()
     expect(screen.getByText('交付节点')).toBeTruthy()
     expect(screen.getByText('最近会话')).toBeTruthy()
     expect(screen.getByText('研发会话')).toBeTruthy()
-    expect(screen.getByText('六阶段项目分布')).toBeTruthy()
-    expect(screen.getByText('阶段 1/6 · 需求调研')).toBeTruthy()
-    expect(screen.getByText('阶段 3/6 · 项目开发')).toBeTruthy()
-    expect(screen.getAllByRole('list', { name: '项目六阶段位置' })).toHaveLength(2)
-    fireEvent.click(screen.getByRole('button', { name: '筛选阶段 3：项目开发，1 个项目' }))
-    expect(screen.queryByRole('heading', { name: '客户需求梳理' })).toBeNull()
-    expect(screen.getByRole('heading', { name: '数据分析项目' })).toBeTruthy()
+    expect(screen.getByText('六阶段从需求到验收')).toBeTruthy()
+    expect(screen.getByRole('region', { name: '标准 FDE 六阶段交付流程' })).toBeTruthy()
+    expect(screen.getByRole('article', { name: '项目阶段分布' })).toBeTruthy()
+    expect(screen.getByRole('article', { name: '项目交付健康分布' })).toBeTruthy()
+    expect(screen.getByRole('article', { name: '近六周项目动态' })).toBeTruthy()
+    expect(screen.getAllByText('阶段 1/6 · 需求调研')).toHaveLength(3)
+    expect(screen.getAllByText('阶段 3/6 · 项目开发')).toHaveLength(3)
+    expect(screen.getAllByRole('list', { name: '项目六阶段位置' })).toHaveLength(10)
+    expect(screen.getAllByText('演示项目')).toHaveLength(8)
+    expect(screen.getAllByRole('button', { name: '演示数据' })).toHaveLength(8)
+    for (const button of screen.getAllByRole('button', { name: '演示数据' })) expect((button as HTMLButtonElement).disabled).toBe(true)
+    const cardView = screen.getByRole('button', { name: '卡片' })
+    const listView = screen.getByRole('button', { name: '列表' })
+    expect(cardView.getAttribute('aria-pressed')).toBe('true')
+    expect(listView.getAttribute('aria-pressed')).toBe('false')
+    fireEvent.click(listView)
+    const projectTable = screen.getByRole('table', { name: '项目列表' })
+    expect(listView.getAttribute('aria-pressed')).toBe('true')
+    expect(within(projectTable).getByText('客户需求梳理')).toBeTruthy()
+    expect(within(projectTable).getAllByText('演示项目')).toHaveLength(8)
+    fireEvent.click(screen.getByRole('button', { name: '筛选阶段 3：项目开发，3 个项目' }))
+    expect(within(projectTable).queryByText('客户需求梳理')).toBeNull()
+    expect(within(projectTable).getByText('数据分析项目')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: /全部项目/ }))
-    const projectButtons = screen.getAllByRole('button', { name: /查看项目/ })
+    const projectButtons = within(projectTable).getAllByRole('button', { name: /查看项目/ })
     fireEvent.click(projectButtons[1] as HTMLElement)
     expect(showProjectDetail).toHaveBeenCalledWith('workspace-2')
+    fireEvent.click(cardView)
+    expect(screen.queryByRole('table', { name: '项目列表' })).toBeNull()
+    expect(screen.getAllByRole('list', { name: '项目六阶段位置' })).toHaveLength(10)
   })
 
   it('separates stage inputs and outputs and requires the FDE second confirmation', async () => {

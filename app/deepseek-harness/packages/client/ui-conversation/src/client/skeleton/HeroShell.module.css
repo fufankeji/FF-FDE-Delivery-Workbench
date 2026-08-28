@@ -23,24 +23,46 @@
   overflow: visible;
 }
 
-/* figma 34:10411: fish + title, gap 10, centered; 26/32 wt500. The preview
-   badge is a product addition outside that source: a mono superscript pill
-   riding the title's top-right. */
+/* FDE brand lockup: the original mark stays unchanged while the title gains
+   an editorial, project-delivery hierarchy. */
 .headline {
   display: grid;
-  grid-template-columns: 34px auto auto;
-  column-gap: 10px;
+  grid-template-rows: auto auto;
+  grid-template-columns: 42px auto auto;
+  column-gap: 14px;
+  row-gap: 5px;
   align-items: center;
   justify-content: center;
-  font-size: 26px;
-  line-height: 32px;
-  font-weight: 500;
   color: var(--dsw-alias-label-primary);
 }
 
 .headlineText {
   grid-row: 1;
   grid-column: 2;
+  background: linear-gradient(
+    110deg,
+    var(--dsw-alias-label-primary) 8%,
+    var(--dsw-alias-label-primary-bluish) 58%,
+    var(--dsw-alias-state-business-primary) 100%
+  );
+  background-clip: text;
+  color: transparent;
+  font-family: "Songti SC", STSong, "Noto Serif CJK SC", serif;
+  font-size: clamp(36px, 3vw, 44px);
+  line-height: 1.14;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-shadow: 0 10px 28px color-mix(in srgb, var(--dsw-alias-state-business-primary) 12%, transparent);
+}
+
+.headlineSubtitle {
+  grid-row: 2;
+  grid-column: 2;
+  color: var(--dsw-alias-label-secondary);
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
 }
 
 .previewBadge {
@@ -63,7 +85,7 @@
 
 /* Keep hover detection on a stationary box while the mark moves within it. */
 .fishHitbox {
-  grid-row: 1;
+  grid-row: 1 / span 2;
   grid-column: 1;
   display: inline-flex;
   align-items: center;
@@ -204,4 +226,21 @@
   font-size: 12px;
   line-height: 18px;
   color: var(--dsw-alias-state-error-primary);
+}
+
+@media (max-width: 760px) {
+  .headline {
+    grid-template-columns: 38px minmax(0, auto) auto;
+    column-gap: 11px;
+  }
+
+  .headlineText {
+    font-size: 31px;
+    letter-spacing: 0.06em;
+  }
+
+  .headlineSubtitle {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+  }
 }
