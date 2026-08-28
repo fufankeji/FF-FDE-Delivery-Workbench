@@ -16,13 +16,15 @@
 .headerRetry,
 .inlineRetry,
 .primaryButton,
-.stageCard {
+.stageCard,
+.blankProgressLink {
   font-family: inherit;
   cursor: pointer;
 }
 
 .headerRetry:hover,
-.inlineRetry:hover {
+.inlineRetry:hover,
+.blankProgressLink:hover {
   background: var(--dsw-alias-interactive-bg-hover);
 }
 
@@ -51,41 +53,110 @@
   max-width: var(--dsh-composer-card-max-width);
   margin: 0 auto;
   box-sizing: border-box;
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 12px;
-  min-height: 50px;
-  padding: 9px 12px;
+  align-items: center;
+  min-height: 54px;
+  padding: 8px 10px;
   border: 1px solid var(--dsw-alias-border-l2);
   border-radius: 12px;
-  background: var(--dsw-alias-bg-layer-1);
+  background: color-mix(in srgb, var(--dsw-alias-bg-overlay) 84%, transparent);
+  box-shadow: 0 7px 22px color-mix(in srgb, var(--dsw-alias-label-primary) 4%, transparent);
   color: var(--dsw-alias-label-secondary);
   font: var(--dsw-font-xs-13);
+}
+
+.blankStatus[data-compact='true'] {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  min-height: 50px;
+  padding: 9px 12px;
+  background: var(--dsw-alias-bg-layer-1);
+  box-shadow: none;
 }
 
 .blankStatus[data-state='error'] {
   border-color: var(--dsw-alias-state-error-secondary);
 }
 
-.blankStageNumber {
-  padding: 5px 8px;
+.blankStageCopy {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  min-width: 0;
+}
+
+.blankStageBadge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 9px;
   border-radius: 8px;
   background: var(--dsw-alias-state-business-tertiary);
   color: var(--dsw-alias-brand-text);
-  font-weight: 600;
+  font: var(--dsw-font-xxs-strong-12);
   white-space: nowrap;
-}
-
-.blankStageCopy {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  min-width: 0;
 }
 
 .blankStageCopy strong {
   color: var(--dsw-alias-label-primary);
   font: var(--dsw-font-s-strong-14);
+  white-space: nowrap;
+}
+
+.blankStageCopy > span {
+  overflow: hidden;
+  color: var(--dsw-alias-label-secondary);
+  font: var(--dsw-font-xxs-12);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.blankProgressLink {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 9px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--dsw-alias-brand-text);
+  font: var(--dsw-font-xxs-strong-12);
+  white-space: nowrap;
+}
+
+.blankProgressLink:focus-visible {
+  outline: 2px solid var(--dsw-alias-brand-primary);
+  outline-offset: 1px;
+}
+
+.blankCompletedMark {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--dsw-alias-state-success-secondary);
+  color: var(--dsw-alias-state-success-primary);
+  font-weight: 700;
+}
+
+.blankCompletedCopy {
+  display: grid;
+  gap: 2px;
+}
+
+.blankCompletedCopy strong {
+  color: var(--dsw-alias-label-primary);
+  font: var(--dsw-font-s-strong-14);
+}
+
+.blankCompletedCopy span {
+  color: var(--dsw-alias-label-secondary);
+  font: var(--dsw-font-xs-13);
 }
 
 .inlineRetry {
@@ -326,7 +397,20 @@
     grid-template-columns: 1fr;
   }
 
-  .blankStageCopy span {
-    display: none;
+  .blankStatus {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 7px 9px;
+  }
+
+  .blankStageCopy {
+    display: grid;
+    gap: 2px;
+  }
+
+  .blankProgressLink {
+    grid-column: 2;
+    justify-self: start;
+    min-height: 26px;
+    padding: 0 4px;
   }
 }

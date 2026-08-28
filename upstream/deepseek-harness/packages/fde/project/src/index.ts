@@ -9,6 +9,9 @@ import { registerProjectArchitectureTools } from './architecture-tools.ts'
 import { registerProjectEvaluationGuard } from './evaluation-guard.ts'
 import {
   createArchitectureConfirmRoute,
+  createAcceptanceHandoverDecisionRoute,
+  createDeploymentTrialIssueAcceptRoute,
+  createDeploymentTrialReadinessConfirmRoute,
   createEvaluationBaselineRoute,
   createProjectSnapshotRoute,
   createProjectRuntimeAbandonRoute,
@@ -17,6 +20,7 @@ import {
   createRequirementArtifactFileRoute,
   createRequirementWikiAbandonRoute,
   createRequirementWikiStartRoute,
+  createValidationMetricAcceptRoute,
   createValidationIssueWaiveRoute,
   createValidationPlanConfirmRoute,
 } from './http.ts'
@@ -42,15 +46,28 @@ import {
   resolveDevelopmentArtifact,
 } from './development-docs.ts'
 import {
+  acceptValidationMetric,
   confirmValidationPlan,
   resolveValidationArtifact,
   VALIDATION_ARTIFACT_FILE_PATH,
   waiveValidationIssue,
 } from './validation.ts'
+import {
+  ACCEPTANCE_HANDOVER_ARTIFACT_FILE_PATH,
+  acceptDeploymentTrialIssue,
+  confirmDeploymentTrialReadiness,
+  DEPLOYMENT_TRIAL_ARTIFACT_FILE_PATH,
+  recordAcceptanceHandoverDecision,
+  resolveAcceptanceHandoverArtifact,
+  resolveDeploymentTrialArtifact,
+} from './delivery-closeout.ts'
 
 export {
   FdeProjectRequestError,
   createArchitectureConfirmRoute,
+  createAcceptanceHandoverDecisionRoute,
+  createDeploymentTrialIssueAcceptRoute,
+  createDeploymentTrialReadinessConfirmRoute,
   createEvaluationBaselineRoute,
   createProjectSnapshotRoute,
   createProjectRuntimeAbandonRoute,
@@ -59,6 +76,7 @@ export {
   createRequirementArtifactFileRoute,
   createRequirementWikiAbandonRoute,
   createRequirementWikiStartRoute,
+  createValidationMetricAcceptRoute,
   createValidationIssueWaiveRoute,
   createValidationPlanConfirmRoute,
 } from './http.ts'
@@ -103,6 +121,7 @@ export {
   resolveDevelopmentArtifact,
 } from './development-docs.ts'
 export {
+  acceptValidationMetric,
   confirmValidationPlan,
   loadValidationStage,
   resolveValidationArtifact,
@@ -113,6 +132,23 @@ export {
   VALIDATION_PLAN_APPROVAL_PATH,
   waiveValidationIssue,
 } from './validation.ts'
+export {
+  ACCEPTANCE_HANDOVER_ARTIFACT_FILE_PATH,
+  ACCEPTANCE_HANDOVER_ARTIFACT_ROOT,
+  ACCEPTANCE_HANDOVER_ARTIFACTS,
+  ACCEPTANCE_HANDOVER_CONTRACT_PATH,
+  DEPLOYMENT_TRIAL_ARTIFACT_FILE_PATH,
+  DEPLOYMENT_TRIAL_ARTIFACT_ROOT,
+  DEPLOYMENT_TRIAL_ARTIFACTS,
+  DEPLOYMENT_TRIAL_CONTRACT_PATH,
+  acceptDeploymentTrialIssue,
+  confirmDeploymentTrialReadiness,
+  loadAcceptanceHandoverStage,
+  loadDeploymentTrialStage,
+  recordAcceptanceHandoverDecision,
+  resolveAcceptanceHandoverArtifact,
+  resolveDeploymentTrialArtifact,
+} from './delivery-closeout.ts'
 export { registerRequirementWikiTools } from './requirement-wiki-tools.ts'
 export {
   abandonProjectRuntimeOperation,
@@ -138,12 +174,24 @@ export const FDE_SOLUTION_ARTIFACT_FILE_PATH = SOLUTION_ARTIFACT_FILE_PATH
 export const FDE_DEVELOPMENT_ARTIFACT_FILE_PATH = DEVELOPMENT_ARTIFACT_FILE_PATH
 /** Verified read-only route for one fixed validation output. */
 export const FDE_VALIDATION_ARTIFACT_FILE_PATH = VALIDATION_ARTIFACT_FILE_PATH
+/** Verified read-only route for one fixed deployment-trial output. */
+export const FDE_DEPLOYMENT_TRIAL_ARTIFACT_FILE_PATH = DEPLOYMENT_TRIAL_ARTIFACT_FILE_PATH
+/** Verified read-only route for one fixed acceptance-handover output. */
+export const FDE_ACCEPTANCE_HANDOVER_ARTIFACT_FILE_PATH = ACCEPTANCE_HANDOVER_ARTIFACT_FILE_PATH
 /** Exact-revision project architecture confirmation route. */
 export const FDE_ARCHITECTURE_CONFIRM_PATH = '/api/fde-project/architecture/confirm'
 /** Exact-contract validation plan confirmation route. */
 export const FDE_VALIDATION_PLAN_CONFIRM_PATH = '/api/fde-project/validation/confirm-plan'
+/** Exact-contract validation metric manual-acceptance route. */
+export const FDE_VALIDATION_METRIC_ACCEPT_PATH = '/api/fde-project/validation/accept-metric'
 /** Exact-contract validation issue manual-acceptance route. */
 export const FDE_VALIDATION_ISSUE_WAIVE_PATH = '/api/fde-project/validation/waive-issue'
+/** Exact-contract deployment-trial issue manual-acceptance route. */
+export const FDE_DEPLOYMENT_TRIAL_ISSUE_ACCEPT_PATH = '/api/fde-project/pilot/accept-issue'
+/** Exact-contract deployment-trial target-environment and readiness confirmation route. */
+export const FDE_DEPLOYMENT_TRIAL_READINESS_CONFIRM_PATH = '/api/fde-project/pilot/confirm-readiness'
+/** Exact-contract acceptance-handover decision route. */
+export const FDE_ACCEPTANCE_HANDOVER_DECISION_PATH = '/api/fde-project/handoff/record-decision'
 /** Project evaluation baseline approval route. */
 export const FDE_EVALUATION_BASELINE_PATH = '/api/fde-project/evaluation/baseline'
 /** Explicit project requirement-Wiki build start route. */
@@ -270,6 +318,36 @@ export function apply(ctx: Context, config: Config): void {
     path: FDE_VALIDATION_ARTIFACT_FILE_PATH,
     handler: validationArtifactFile,
   }), `fde-project: ${FDE_VALIDATION_ARTIFACT_FILE_PATH}`)
+  const deploymentTrialArtifactFile = createRequirementArtifactFileRoute({
+    trusted: request => isTrustedApiRequest(request, []),
+    artifact: async (workspaceId, artifactId) => {
+      const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
+      if (workspace === undefined) return undefined
+      return await resolveDeploymentTrialArtifact(workspace.path, artifactId)
+    },
+    maxFileBytes: config.artifactPreviewMaxBytes,
+    reportFailure,
+  })
+  ctx.effect(() => ctx.webServer.register({
+    kind: 'exact',
+    path: FDE_DEPLOYMENT_TRIAL_ARTIFACT_FILE_PATH,
+    handler: deploymentTrialArtifactFile,
+  }), `fde-project: ${FDE_DEPLOYMENT_TRIAL_ARTIFACT_FILE_PATH}`)
+  const acceptanceHandoverArtifactFile = createRequirementArtifactFileRoute({
+    trusted: request => isTrustedApiRequest(request, []),
+    artifact: async (workspaceId, artifactId) => {
+      const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
+      if (workspace === undefined) return undefined
+      return await resolveAcceptanceHandoverArtifact(workspace.path, artifactId)
+    },
+    maxFileBytes: config.artifactPreviewMaxBytes,
+    reportFailure,
+  })
+  ctx.effect(() => ctx.webServer.register({
+    kind: 'exact',
+    path: FDE_ACCEPTANCE_HANDOVER_ARTIFACT_FILE_PATH,
+    handler: acceptanceHandoverArtifactFile,
+  }), `fde-project: ${FDE_ACCEPTANCE_HANDOVER_ARTIFACT_FILE_PATH}`)
   const confirm = createArchitectureConfirmRoute({
     trusted: request => isTrustedApiRequest(request, []),
     confirm: async (workspaceId, revision) => {
@@ -300,6 +378,21 @@ export function apply(ctx: Context, config: Config): void {
     path: FDE_VALIDATION_PLAN_CONFIRM_PATH,
     handler: confirmPlan,
   }), `fde-project: ${FDE_VALIDATION_PLAN_CONFIRM_PATH}`)
+  const acceptMetric = createValidationMetricAcceptRoute({
+    trusted: request => isTrustedApiRequest(request, []),
+    accept: async (workspaceId, contractDigest, metricId, reason) => {
+      const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
+      if (workspace === undefined) return undefined
+      await acceptValidationMetric(workspace.path, contractDigest, metricId, reason)
+      return await loadProjectSurfaceSnapshot({ workspaceId, title: workspace.title, path: workspace.path })
+    },
+    reportFailure,
+  })
+  ctx.effect(() => ctx.webServer.register({
+    kind: 'exact',
+    path: FDE_VALIDATION_METRIC_ACCEPT_PATH,
+    handler: acceptMetric,
+  }), `fde-project: ${FDE_VALIDATION_METRIC_ACCEPT_PATH}`)
   const waiveIssue = createValidationIssueWaiveRoute({
     trusted: request => isTrustedApiRequest(request, []),
     waive: async (workspaceId, contractDigest, issueId, reason) => {
@@ -315,6 +408,51 @@ export function apply(ctx: Context, config: Config): void {
     path: FDE_VALIDATION_ISSUE_WAIVE_PATH,
     handler: waiveIssue,
   }), `fde-project: ${FDE_VALIDATION_ISSUE_WAIVE_PATH}`)
+  const acceptPilotIssue = createDeploymentTrialIssueAcceptRoute({
+    trusted: request => isTrustedApiRequest(request, []),
+    accept: async (workspaceId, contractDigest, issueId, reason) => {
+      const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
+      if (workspace === undefined) return undefined
+      await acceptDeploymentTrialIssue(workspace.path, contractDigest, issueId, reason)
+      return await loadProjectSurfaceSnapshot({ workspaceId, title: workspace.title, path: workspace.path })
+    },
+    reportFailure,
+  })
+  ctx.effect(() => ctx.webServer.register({
+    kind: 'exact',
+    path: FDE_DEPLOYMENT_TRIAL_ISSUE_ACCEPT_PATH,
+    handler: acceptPilotIssue,
+  }), `fde-project: ${FDE_DEPLOYMENT_TRIAL_ISSUE_ACCEPT_PATH}`)
+  const confirmPilotReadiness = createDeploymentTrialReadinessConfirmRoute({
+    trusted: request => isTrustedApiRequest(request, []),
+    confirm: async (workspaceId, contractDigest) => {
+      const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
+      if (workspace === undefined) return undefined
+      await confirmDeploymentTrialReadiness(workspace.path, contractDigest)
+      return await loadProjectSurfaceSnapshot({ workspaceId, title: workspace.title, path: workspace.path })
+    },
+    reportFailure,
+  })
+  ctx.effect(() => ctx.webServer.register({
+    kind: 'exact',
+    path: FDE_DEPLOYMENT_TRIAL_READINESS_CONFIRM_PATH,
+    handler: confirmPilotReadiness,
+  }), `fde-project: ${FDE_DEPLOYMENT_TRIAL_READINESS_CONFIRM_PATH}`)
+  const recordHandoffDecision = createAcceptanceHandoverDecisionRoute({
+    trusted: request => isTrustedApiRequest(request, []),
+    record: async (workspaceId, contractDigest, decision) => {
+      const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
+      if (workspace === undefined) return undefined
+      await recordAcceptanceHandoverDecision(workspace.path, contractDigest, decision)
+      return await loadProjectSurfaceSnapshot({ workspaceId, title: workspace.title, path: workspace.path })
+    },
+    reportFailure,
+  })
+  ctx.effect(() => ctx.webServer.register({
+    kind: 'exact',
+    path: FDE_ACCEPTANCE_HANDOVER_DECISION_PATH,
+    handler: recordHandoffDecision,
+  }), `fde-project: ${FDE_ACCEPTANCE_HANDOVER_DECISION_PATH}`)
   const baseline = createEvaluationBaselineRoute({
     trusted: request => isTrustedApiRequest(request, []),
     approve: async (workspaceId, reportPath) => {

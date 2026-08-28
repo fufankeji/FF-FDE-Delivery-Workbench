@@ -4,6 +4,8 @@
 export const FDE_STAGE_IDS = ['requirements', 'solution', 'development', 'validation', 'pilot', 'handoff'] as const
 /** One supported FDE project stage id. */
 export type FdeStageId = typeof FDE_STAGE_IDS[number]
+/** Six active stages plus the terminal completion state. */
+export type FdeProjectState = FdeStageId | 'completed'
 /** Ordered stage metadata for the global progress segments. */
 export const FDE_STAGES = FDE_STAGE_IDS.map((id, index) => ({ id, number: index + 1 }))
 /** Fixed manual gate owned by the Host stage plugin. */
@@ -14,16 +16,33 @@ export const FDE_STAGE_COMPLETE_SOLUTION_PATH = '/api/fde-stage/solution/complet
 export const FDE_STAGE_COMPLETE_DEVELOPMENT_PATH = '/api/fde-stage/development/complete'
 /** Fixed FDE-only validation completion route. */
 export const FDE_STAGE_COMPLETE_VALIDATION_PATH = '/api/fde-stage/validation/complete'
+/** Fixed FDE-only deployment-trial completion route. */
+export const FDE_STAGE_COMPLETE_PILOT_PATH = '/api/fde-stage/pilot/complete'
+/** Fixed FDE-only acceptance-handover completion route. */
+export const FDE_STAGE_COMPLETE_HANDOFF_PATH = '/api/fde-stage/handoff/complete'
+/** FDE-only one-stage return route, including completed-project reopening. */
+export const FDE_STAGE_RETURN_PATH = '/api/fde-stage/return'
 /** Browser-local cache invalidation emitted after one durable stage commit. */
 export const FDE_STAGE_CHANGED_EVENT = 'fde:project-stage-changed'
 
 /** One Workspace stage value returned by the Host route. */
 export interface ProjectStageValue {
   readonly workspaceId: string
-  readonly currentStage: FdeStageId
+  readonly currentStage: FdeProjectState
   readonly revision: number
   readonly createdAt: string
   readonly updatedAt: string
+  readonly reconfirmThrough?: FdeProjectState
+  readonly returns?: readonly ProjectStageReturnRecord[]
+}
+
+/** One durable FDE stage-return audit entry. */
+export interface ProjectStageReturnRecord {
+  readonly from: FdeProjectState
+  readonly to: FdeStageId
+  readonly reason: string
+  readonly returnedAt: string
+  readonly revision: number
 }
 
 /** Client loading state for one Workspace stage. */
@@ -35,8 +54,23 @@ export type ProjectStageLoadState =
 /** Immutable Workspace-keyed stage controller state. */
 export interface StageControllerSnapshot { readonly byWorkspace: Readonly<Record<string, ProjectStageLoadState>> }
 
-function isStage(value: unknown): value is FdeStageId {
-  return typeof value === 'string' && (FDE_STAGE_IDS as readonly string[]).includes(value)
+function isProjectState(value: unknown): value is FdeProjectState {
+  return value === 'completed' || (typeof value === 'string' && (FDE_STAGE_IDS as readonly string[]).includes(value))
+}
+
+function isProjectStageValue(value: Partial<ProjectStageValue> | undefined, workspaceId: string): value is ProjectStageValue {
+  if (value?.workspaceId !== workspaceId || !isProjectState(value.currentStage) || !Number.isSafeInteger(value.revision)
+    || typeof value.createdAt !== 'string' || typeof value.updatedAt !== 'string') return false
+  if (value.reconfirmThrough !== undefined && !isProjectState(value.reconfirmThrough)) return false
+  if (value.returns !== undefined && (!Array.isArray(value.returns) || value.returns.some(entry => (
+    !isProjectState(entry.from)
+    || !(FDE_STAGE_IDS as readonly string[]).includes(entry.to)
+    || typeof entry.reason !== 'string'
+    || entry.reason.trim() === ''
+    || typeof entry.returnedAt !== 'string'
+    || !Number.isSafeInteger(entry.revision)
+  )))) return false
+  return true
 }
 
 async function fetchStage(workspaceId: string, signal: AbortSignal): Promise<ProjectStageValue> {
@@ -52,9 +86,8 @@ async function fetchStage(workspaceId: string, signal: AbortSignal): Promise<Pro
   }
   if (!response.ok || result.ok !== true) throw new Error(result.error?.message ?? '项目阶段读取失败。')
   const value = result.value
-  if (value?.workspaceId !== workspaceId || !isStage(value.currentStage) || !Number.isSafeInteger(value.revision)
-    || typeof value.createdAt !== 'string' || typeof value.updatedAt !== 'string') throw new Error('项目阶段响应无效。')
-  return value as ProjectStageValue
+  if (!isProjectStageValue(value, workspaceId)) throw new Error('项目阶段响应无效。')
+  return value
 }
 
 /** Submit the FDE's explicit requirements completion against one exact revision. */
@@ -125,6 +158,59 @@ export async function completeValidation(
   )
 }
 
+/** Submit the FDE's explicit deployment-trial completion against one exact revision. */
+export async function completeDeploymentTrial(
+  workspaceId: string,
+  expectedRevision: number,
+  signal?: AbortSignal,
+  fetchImpl?: typeof fetch,
+): Promise<ProjectStageValue> {
+  return await completeStage(
+    FDE_STAGE_COMPLETE_PILOT_PATH,
+    workspaceId,
+    expectedRevision,
+    '部署试运行阶段确认失败。',
+    signal,
+    fetchImpl,
+  )
+}
+
+/** Submit the FDE's explicit project completion against one exact revision. */
+export async function completeAcceptanceHandover(
+  workspaceId: string,
+  expectedRevision: number,
+  signal?: AbortSignal,
+  fetchImpl?: typeof fetch,
+): Promise<ProjectStageValue> {
+  return await completeStage(
+    FDE_STAGE_COMPLETE_HANDOFF_PATH,
+    workspaceId,
+    expectedRevision,
+    '验收移交阶段确认失败。',
+    signal,
+    fetchImpl,
+  )
+}
+
+/** Return the project by exactly one stage after the FDE supplies a reason. */
+export async function returnProjectStage(
+  workspaceId: string,
+  expectedRevision: number,
+  reason: string,
+  signal?: AbortSignal,
+  fetchImpl?: typeof fetch,
+): Promise<ProjectStageValue> {
+  return await submitStage(
+    FDE_STAGE_RETURN_PATH,
+    workspaceId,
+    { expectedRevision, reason },
+    '项目阶段返回失败。',
+    '阶段返回响应无效。',
+    signal,
+    fetchImpl,
+  )
+}
+
 async function completeStage(
   path: string,
   workspaceId: string,
@@ -133,15 +219,35 @@ async function completeStage(
   signal?: AbortSignal,
   fetchImpl?: typeof fetch,
 ): Promise<ProjectStageValue> {
+  return await submitStage(
+    path,
+    workspaceId,
+    { expectedRevision },
+    failureMessage,
+    '阶段确认响应无效。',
+    signal,
+    fetchImpl,
+  )
+}
+
+async function submitStage(
+  path: string,
+  workspaceId: string,
+  body: Readonly<Record<string, unknown>>,
+  failureMessage: string,
+  invalidResponseMessage: string,
+  signal?: AbortSignal,
+  fetchImpl?: typeof fetch,
+): Promise<ProjectStageValue> {
   const request = fetchImpl ?? ((input: RequestInfo | URL, init?: RequestInit) => globalThis.fetch(input, init))
   const response = await request(path, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ workspaceId, expectedRevision }),
+    body: JSON.stringify({ workspaceId, ...body }),
     ...(signal === undefined ? {} : { signal }),
   })
   let payload: unknown
-  try { payload = await response.json() } catch { throw new Error('阶段确认响应无效。') }
+  try { payload = await response.json() } catch { throw new Error(invalidResponseMessage) }
   const result = payload as {
     readonly ok?: unknown
     readonly value?: Partial<ProjectStageValue>
@@ -149,9 +255,8 @@ async function completeStage(
   }
   if (!response.ok || result.ok !== true) throw new Error(result.error?.message ?? failureMessage)
   const value = result.value
-  if (value?.workspaceId !== workspaceId || !isStage(value.currentStage) || !Number.isSafeInteger(value.revision)
-    || typeof value.createdAt !== 'string' || typeof value.updatedAt !== 'string') throw new Error('阶段确认响应无效。')
-  return value as ProjectStageValue
+  if (!isProjectStageValue(value, workspaceId)) throw new Error(invalidResponseMessage)
+  return value
 }
 
 /** Apply-scoped Workspace-keyed stage reader for the global project page. */
@@ -202,6 +307,25 @@ export class ProjectStageController {
   /** Complete validation without hiding the currently displayed stage. */
   async completeValidation(workspaceId: string, expectedRevision: number): Promise<void> {
     await this.complete(workspaceId, expectedRevision, completeValidation)
+  }
+
+  /** Complete deployment trial without hiding the currently displayed stage. */
+  async completePilot(workspaceId: string, expectedRevision: number): Promise<void> {
+    await this.complete(workspaceId, expectedRevision, completeDeploymentTrial)
+  }
+
+  /** Complete acceptance handover and publish the terminal project state. */
+  async completeHandoff(workspaceId: string, expectedRevision: number): Promise<void> {
+    await this.complete(workspaceId, expectedRevision, completeAcceptanceHandover)
+  }
+
+  /** Return exactly one stage and publish the durable audit-bearing record. */
+  async returnToPrevious(workspaceId: string, expectedRevision: number, reason: string): Promise<void> {
+    await this.complete(
+      workspaceId,
+      expectedRevision,
+      async (id, revision, signal) => await returnProjectStage(id, revision, reason, signal),
+    )
   }
 
   private async complete(

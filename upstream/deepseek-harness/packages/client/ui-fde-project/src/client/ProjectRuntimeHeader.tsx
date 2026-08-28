@@ -69,7 +69,8 @@ export function ProjectRuntimeHeader({
   }, [openProjectPreview, runtime, sessionId, workspace, workspaceId])
 
   if (workspace === undefined || workspaceId === undefined || stage?.status !== 'ready') return null
-  if (FDE_STAGE_IDS.indexOf(stage.value.currentStage) < FDE_STAGE_IDS.indexOf('development')) return null
+  if (stage.value.currentStage !== 'completed'
+    && FDE_STAGE_IDS.indexOf(stage.value.currentStage) < FDE_STAGE_IDS.indexOf('development')) return null
 
   const run = async (action: () => Promise<void>): Promise<void> => {
     if (busy) return

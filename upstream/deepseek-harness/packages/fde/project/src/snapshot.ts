@@ -23,6 +23,12 @@ import { DEVELOPMENT_DOCS_ROOT, loadDevelopmentDocs } from './development-docs.t
 import { loadRequirementWikiSnapshot, requirementWikiPaths } from './requirement-wiki.ts'
 import { loadProjectRuntimeSnapshot, PROJECT_RUNTIME_PATH } from './project-runtime.ts'
 import { loadValidationStage, VALIDATION_CONTRACT_PATH } from './validation.ts'
+import {
+  ACCEPTANCE_HANDOVER_CONTRACT_PATH,
+  DEPLOYMENT_TRIAL_CONTRACT_PATH,
+  loadAcceptanceHandoverStage,
+  loadDeploymentTrialStage,
+} from './delivery-closeout.ts'
 
 const FDE_DIRECTORY = '.fde'
 const API_DOCS_FILE = 'api-docs.json'
@@ -528,7 +534,18 @@ export async function loadProjectSurfaceSnapshot(input: {
   readonly path: string
 }): Promise<ProjectSurfaceSnapshot> {
   const runtime = await loadProjectRuntimeSnapshot(input.path)
-  const [apiDocs, architecture, evaluation, validation, requirementWiki, requirements, solution, development] = await Promise.all([
+  const [
+    apiDocs,
+    architecture,
+    evaluation,
+    validation,
+    requirementWiki,
+    requirements,
+    solution,
+    development,
+    deploymentTrial,
+    acceptanceHandover,
+  ] = await Promise.all([
     loadApiDocs(input.path, runtime),
     loadArchitecture(input.path),
     loadEvaluation(input.path),
@@ -537,6 +554,8 @@ export async function loadProjectSurfaceSnapshot(input: {
     loadRequirementArtifacts(input.path, input.workspaceId),
     loadSolutionArtifacts(input.path, input.workspaceId),
     loadDevelopmentDocs(input.path, input.workspaceId),
+    loadDeploymentTrialStage(input.path, input.workspaceId),
+    loadAcceptanceHandoverStage(input.path, input.workspaceId),
   ])
   return {
     workspaceId: input.workspaceId,
@@ -551,6 +570,8 @@ export async function loadProjectSurfaceSnapshot(input: {
     requirements,
     solution,
     development,
+    deploymentTrial,
+    acceptanceHandover,
   }
 }
 
@@ -565,4 +586,6 @@ export const projectSurfacePaths = {
   requirements: REQUIREMENT_ARTIFACT_ROOT,
   solution: SOLUTION_ARTIFACT_ROOT,
   development: DEVELOPMENT_DOCS_ROOT,
+  deploymentTrial: DEPLOYMENT_TRIAL_CONTRACT_PATH,
+  acceptanceHandover: ACCEPTANCE_HANDOVER_CONTRACT_PATH,
 } as const

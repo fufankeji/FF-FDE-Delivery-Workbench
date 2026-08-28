@@ -1,16 +1,18 @@
 /** Host-backed observable for Workspace-keyed FDE stage loading. */
 
-import { isFdeStageId, type FdeStageId } from './stages.ts'
+import { isFdeProjectState, type FdeProjectState } from './stages.ts'
 
 /** Exact Host route owned by `@deepseek-ai/dsh-fde-stage`. */
 export const FDE_STAGE_OPEN_PATH = '/api/fde-stage/open'
 /** Browser-local cache invalidation emitted after one durable stage commit. */
 export const FDE_STAGE_CHANGED_EVENT = 'fde:project-stage-changed'
+/** Browser-local request to open one Workspace's Project Progress detail. */
+export const FDE_PROJECT_PROGRESS_OPEN_EVENT = 'fde:project-progress-open'
 
 /** One committed project-stage projection. */
 export interface ProjectStageValue {
   readonly workspaceId: string
-  readonly currentStage: FdeStageId
+  readonly currentStage: FdeProjectState
   readonly revision: number
   readonly createdAt: string
   readonly updatedAt: string
@@ -38,7 +40,7 @@ function parseValue(payload: unknown, workspaceId: string): ProjectStageValue {
   if (!result.ok) throw new Error(result.error?.message ?? '项目阶段读取失败。')
   const value = result.value
   if (value.workspaceId !== workspaceId
-    || !isFdeStageId(value.currentStage)
+    || !isFdeProjectState(value.currentStage)
     || !Number.isSafeInteger(value.revision) || value.revision < 1
     || typeof value.createdAt !== 'string' || typeof value.updatedAt !== 'string') {
     throw new Error('阶段状态响应无效。')
@@ -90,7 +92,7 @@ export class FdeStageProgressController {
   private readonly requests = new Map<string, StageRequest>()
   private disposed = false
   private readonly onChanged = (event: Event): void => {
-    const detail = (event as CustomEvent<{ workspaceId?: unknown }>).detail
+    const detail = (event as CustomEvent<{ workspaceId?: unknown } | undefined>).detail
     if (typeof detail?.workspaceId === 'string') this.refresh(detail.workspaceId)
   }
 

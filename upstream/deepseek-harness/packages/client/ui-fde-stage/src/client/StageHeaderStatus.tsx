@@ -30,6 +30,14 @@ export function StageHeaderStatus({
       </button>
     )
   }
+  if (stage.value.currentStage === 'completed') {
+    return (
+      <span className={css.headerStatus} data-state="ready">
+        <span className={css.statusDot} />
+        <span>{t('header.completed')}</span>
+      </span>
+    )
+  }
   const index = FDE_STAGES.findIndex(item => item.id === stage.value.currentStage)
   const definition = FDE_STAGES[index]
   if (definition === undefined) return null

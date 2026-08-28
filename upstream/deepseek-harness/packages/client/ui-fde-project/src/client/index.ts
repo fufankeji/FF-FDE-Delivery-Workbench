@@ -51,6 +51,8 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
 /** Required browser services and the Slot owners that declare our targets. */
 export const inject = ['slots', 'locale', 'modelDirectories', 'sessions', 'workspaces', 'conversation']
 
+const FDE_PROJECT_PROGRESS_OPEN_EVENT = 'fde:project-progress-open'
+
 /** Register the global project page and the four project delivery views. */
 export function apply(ctx: ClientContext): void {
   const page = new ProjectPageController()
@@ -60,6 +62,17 @@ export function apply(ctx: ClientContext): void {
   const surfaces = new FdeProjectSurfaceController()
   ctx.effect(() => () => { page.dispose(); stages.dispose(); sources.dispose(); requirementWiki.dispose(); surfaces.dispose() }, 'ui-fde-project: controllers')
   ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'ui-fde-project: dictionaries')
+  ctx.effect(() => {
+    if (typeof window === 'undefined') return () => undefined
+    const openProjectProgress = (event: Event): void => {
+      const detail = (event as CustomEvent<{ workspaceId?: unknown } | undefined>).detail
+      if (typeof detail?.workspaceId === 'string' && detail.workspaceId.length > 0) {
+        page.showProject(detail.workspaceId)
+      }
+    }
+    window.addEventListener(FDE_PROJECT_PROGRESS_OPEN_EVENT, openProjectProgress)
+    return () => { window.removeEventListener(FDE_PROJECT_PROGRESS_OPEN_EVENT, openProjectProgress) }
+  }, 'ui-fde-project: blank-stage progress entry')
   const t = ctx.locale.bind(NS)
 
   const resolveProjectSession = async (workspaceId: string): Promise<SessionId> => {
@@ -108,8 +121,32 @@ export function apply(ctx: ClientContext): void {
       await stages.completeValidation(workspaceId, expectedRevision)
       surfaces.refresh(workspaceId)
     },
+    completePilot: async (workspaceId, expectedRevision) => {
+      await stages.completePilot(workspaceId, expectedRevision)
+      surfaces.refresh(workspaceId)
+    },
+    completeHandoff: async (workspaceId, expectedRevision) => {
+      await stages.completeHandoff(workspaceId, expectedRevision)
+      surfaces.refresh(workspaceId)
+    },
+    returnToPrevious: async (workspaceId, expectedRevision, reason) => {
+      await stages.returnToPrevious(workspaceId, expectedRevision, reason)
+      surfaces.refresh(workspaceId)
+    },
+    acceptValidationMetric: async (workspaceId, contractDigest, metricId, reason) => {
+      await surfaces.acceptValidationMetric(workspaceId, contractDigest, metricId, reason)
+    },
     waiveValidationIssue: async (workspaceId, contractDigest, issueId, reason) => {
       await surfaces.waiveValidationIssue(workspaceId, contractDigest, issueId, reason)
+    },
+    acceptDeploymentTrialIssue: async (workspaceId, contractDigest, issueId, reason) => {
+      await surfaces.acceptDeploymentTrialIssue(workspaceId, contractDigest, issueId, reason)
+    },
+    confirmDeploymentTrialReadiness: async (workspaceId, contractDigest) => {
+      await surfaces.confirmDeploymentTrialReadiness(workspaceId, contractDigest)
+    },
+    recordAcceptanceHandoverDecision: async (workspaceId, contractDigest, decision) => {
+      await surfaces.recordAcceptanceHandoverDecision(workspaceId, contractDigest, decision)
     },
     loadProjectSources: (workspaceId, force) => { sources.load(workspaceId, force) },
     parseProjectSource: async (workspaceId, sourceId) => { await sources.parse(workspaceId, sourceId) },

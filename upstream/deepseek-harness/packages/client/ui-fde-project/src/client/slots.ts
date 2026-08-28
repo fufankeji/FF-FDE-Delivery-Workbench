@@ -4,7 +4,7 @@ import type { InjectFace, PropsLocale, PropsRenderSlots, PropsRuntime } from '@d
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type {} from '@deepseek-ai/dsh-client-ui-layout/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
-import type { FdeProjectSurfaceController } from './controller.ts'
+import type { AcceptanceHandoverDecision, FdeProjectSurfaceController } from './controller.ts'
 import type { ProjectPageController } from './page-controller.ts'
 import type { ProjectStageController } from './stage-controller.ts'
 import type { ProjectSourceController, ProjectSourcePreviewKind } from './source-controller.ts'
@@ -56,11 +56,32 @@ export interface ProjectPageInjected {
   completeSolution: (workspaceId: string, expectedRevision: number) => Promise<void>
   completeDevelopment: (workspaceId: string, expectedRevision: number) => Promise<void>
   completeValidation: (workspaceId: string, expectedRevision: number) => Promise<void>
+  completePilot: (workspaceId: string, expectedRevision: number) => Promise<void>
+  completeHandoff: (workspaceId: string, expectedRevision: number) => Promise<void>
+  returnToPrevious: (workspaceId: string, expectedRevision: number, reason: string) => Promise<void>
+  acceptValidationMetric: (
+    workspaceId: string,
+    contractDigest: string,
+    metricId: string,
+    reason: string,
+  ) => Promise<void>
   waiveValidationIssue: (
     workspaceId: string,
     contractDigest: string,
     issueId: string,
     reason: string,
+  ) => Promise<void>
+  acceptDeploymentTrialIssue: (
+    workspaceId: string,
+    contractDigest: string,
+    issueId: string,
+    reason: string,
+  ) => Promise<void>
+  confirmDeploymentTrialReadiness: (workspaceId: string, contractDigest: string) => Promise<void>
+  recordAcceptanceHandoverDecision: (
+    workspaceId: string,
+    contractDigest: string,
+    decision: AcceptanceHandoverDecision,
   ) => Promise<void>
   loadProjectSources: (workspaceId: string, force?: boolean) => void
   parseProjectSource: (workspaceId: string, sourceId: string) => Promise<void>

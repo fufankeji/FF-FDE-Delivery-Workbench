@@ -1,7 +1,7 @@
 /** Browser-local project metadata and aggregate helpers. */
 
 import type { SessionId, SessionSummary } from '@deepseek-ai/dsh-client-runtime/client'
-import type { FdeStageId } from './stage-controller.ts'
+import type { FdeProjectState } from './stage-controller.ts'
 
 const WORKSPACE_VIEW_STORAGE_KEY = 'dsh.workspace.view.v6'
 
@@ -208,13 +208,14 @@ export function projectActivityBuckets(
 }
 
 /** Stable Chinese stage names shared by the progress surface. */
-export const STAGE_NAMES: Readonly<Record<FdeStageId, string>> = {
+export const STAGE_NAMES: Readonly<Record<FdeProjectState, string>> = {
   requirements: '需求调研',
   solution: '方案设计',
   development: '项目开发',
   validation: '验证评估',
   pilot: '部署试运行',
   handoff: '验收移交',
+  completed: '项目已完成',
 }
 
 /** Select the most recently updated visible ordinary Session in one project. */

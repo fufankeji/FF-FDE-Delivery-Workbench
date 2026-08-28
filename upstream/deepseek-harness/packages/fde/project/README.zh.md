@@ -2,7 +2,7 @@
 
 [English](README.md) | 中文
 
-FDE 项目交付页面使用的可信 Host 支持。它只解析显式 Harness WorkspaceId，只读取该项目的 `.fde/project-runtime.json`、`.fde/api-docs.json`、`.fde/architecture.json`、`.fde/evaluations/`、固定的需求／方案／验证产物、标准项目开发文档和需求 Wiki 状态，校验有界结构后，通过同源接口返回一个浏览器快照。阶段产物读取器只报告已有、缺失或读取失败，不创建文件，也不把文件存在当成确认；已有的 Markdown 产物会获得有大小限制的同源只读预览地址，Host 按已索引产物标识选择文件，不接受浏览器传入路径。它还适配锁定版本 `dsh-openapi` 的解析和 HTTP 实现，使标准 OpenAPI 工具按调用 Agent 所属的已注册 Workspace 解析配置，而不是使用进程级共享 API 清单。
+FDE 项目交付页面使用的可信 Host 支持。它只解析显式 Harness WorkspaceId，只读取该项目的 `.fde/project-runtime.json`、`.fde/api-docs.json`、`.fde/architecture.json`、`.fde/evaluations/`、`.fde/deployment-trial.json`、`.fde/acceptance-handover.json`、六阶段固定产物、标准项目开发文档和需求 Wiki 状态，校验有界结构后，通过同源接口返回一个浏览器快照。阶段产物读取器只报告已有、缺失或读取失败，不创建文件，也不把文件存在当成确认；已有的 Markdown 产物会获得有大小限制的同源只读预览地址，Host 按已索引产物标识选择文件，不接受浏览器传入路径。它还适配锁定版本 `dsh-openapi` 的解析和 HTTP 实现，使标准 OpenAPI 工具按调用 Agent 所属的已注册 Workspace 解析配置，而不是使用进程级共享 API 清单。
 
 ## 项目开发文档
 
@@ -14,7 +14,13 @@ FDE 项目交付页面使用的可信 Host 支持。它只解析显式 Harness W
 
 ## 验证合同
 
-验证投影会有界解析 schema v2 的 `.fde/evaluations/validation.json`，包括候选版本、环境、项目适用数据、指标、结果和问题。每个指标都必须引用一份或多份此前阶段的真实项目文档，并给出文档内编号。PASS 或 WARN 结果的 `evidence` 必须是一条非空的项目相对路径文字，不能使用数组；WARN 的接受理由必须使用 camelCase 字段 `waiverReason`。证据还必须解析到已登记 Workspace 内真实文件。单个指标格式错误时，投影会保留有效的候选版本、环境、数据集、其他指标、问题和独立索引的阶段产物，便于诊断；但整份合同仍保持无效，不生成摘要，也不能确认方案或推进阶段。验证计划存在且所有来源可读取后，同源精确方案操作会把 FDE 确认原子写入 `.fde/evaluations/validation-plan-approval.json`。其 SHA-256 摘要覆盖候选、环境、数据和指标定义，但不包含执行结果、证据和问题状态：修改方案会使旧确认失效，正常写回结果则不会。FDE 也可以人工接受一条仍为 open 的问题，但必须填写非空理由。同源精确合同操作会在合同文件锁内重新核对方案摘要和问题仍为 open，保留原问题，并写入 `status=waived`、`waiverReason` 与 `waivedAt`；它不会改变任何指标结果，也不会清除其他阻塞。必需指标 NOT_RUN／FAIL、证据缺失、未接受 WARN、未关闭 critical／high 问题、不完整的人工接受记录、固定产物缺失，以及方案尚未确认或确认已失效，都会保持为明确阻塞项。同一快照还索引 `fde-deliverables/04-validation/{validation-plan,validation-report,validation-baseline}.md`，供页面有界预览；它不会运行验证或推进交付阶段。
+验证投影会有界解析 schema v2 的 `.fde/evaluations/validation.json`，包括候选版本、环境、项目适用数据、指标、结果和问题。每个指标都必须引用一份或多份此前阶段的真实项目文档，并给出文档内编号。PASS 或 WARN 结果的 `evidence` 必须是一条非空的项目相对路径文字，不能使用数组；WARN 的接受理由必须使用 camelCase 字段 `waiverReason`。证据还必须解析到已登记 Workspace 内真实文件。单个指标格式错误时，投影会保留有效的候选版本、环境、数据集、其他指标、问题和独立索引的阶段产物，便于诊断；但整份合同仍保持无效，不生成摘要，也不能确认方案或推进阶段。验证计划存在且所有来源可读取后，同源精确方案操作会把 FDE 确认原子写入 `.fde/evaluations/validation-plan-approval.json`。其 SHA-256 摘要覆盖候选、环境、数据和指标定义，但不包含执行结果、证据、问题状态和 FDE 指标决定：修改方案会使旧确认失效，正常写回结果或决定则不会。FDE 可以对一条仍为 open 的问题填写非空理由；带锁的精确合同操作保留原问题，并写入 `status=waived`、`waiverReason` 与 `waivedAt`。FDE 也可以单独接受一个尚未满足的必需指标；带锁操作写入 `result.manualAcceptance.reason` 与 `acceptedAt`，同时保留真实 NOT_RUN／FAIL、证据缺口、数值和说明。两种操作都只解除自身阻塞，并拒绝过期方案摘要。没有合格证据或完整指标接受记录的必需指标、未接受 WARN、未关闭 critical／high 问题、不完整的问题接受记录、固定产物缺失，以及方案尚未确认或确认已失效，都会保持为明确阻塞项。同一快照还索引 `fde-deliverables/04-validation/{validation-plan,validation-report,validation-baseline}.md`，供页面有界预览；它不会运行验证或推进交付阶段。
+
+## 交付收口合同
+
+部署试运行投影有界解析 schema v1 的 `.fde/deployment-trial.json`，验证其中的验证、部署、健康检查、回滚、试运行和问题证据路径仍位于已登记 Workspace 内，并索引 `fde-deliverables/05-deployment-trial/` 下四份固定 Markdown。只有目标环境已明确授权、候选版本存在、`status=ready`、五类证据与四份产物齐备，而且 critical/high 问题均已解决或人工接受时，快照才标记可提交；解决、接受和延期决定仍保留说明与责任。一个精确合同的同源动作允许 FDE 在填写非空理由后接受一条 open 或 deferred 问题，并且只改变该问题。另一项独立的精确合同动作只在证据、问题决定和产物已经齐备时可用，用于原子记录 FDE 的目标环境授权与 `status=ready`，但不执行部署、停止或回滚。文件锁和 SHA-256 摘要会拒绝过期决定。
+
+验收移交投影有界解析 schema v1 的 `.fde/acceptance-handover.json`，支持最多四十份项目相对的企业验收证据，验证项目相对证据与交付物文件，只记录外部 HTTP(S) 交付物而不主动获取，并索引 `fde-deliverables/06-acceptance-handover/` 下四份固定 Markdown。一项带文件锁的精确合同 FDE 操作只能更新验收结论与证据、各登记交付物的可取得状态、条件决定，以及三项责任移交事实和证据；它拒绝过期摘要和已变化的条目集合，并保留交付物标识、位置、版本与校验值。项目完成条件包括：验收通过或带条件通过且有证据、部署试运行基线可读取、至少一项交付物可取得、无开放条件、接受条件包含理由/责任/后续安排、培训/权限/运维责任与项目内证据均已移交，以及四份产物齐备。记录这些事实不会完成项目，固定 Host 阶段路由仍要求一次独立的最终确认。两个投影都不执行部署、不上传或下载制品、不认证客户、不完成签章，也不自行推进项目。
 
 ## 需求 Wiki
 
@@ -72,6 +78,7 @@ Schema 在不同项目之间保持稳定；每次操作只改变普通对话后�
 - 本包不会根据 Git 历史、文件时间、Agent 回复或对话内容推断日期、任务完成和 Feature 状态，也不会编辑项目 docs。
 - API 文档必须来自项目显式文件或已验证的运行中项目报告；没有 OpenAPI 时保持未配置状态。
 - 评估报告当前只读。单个指标格式错误时，其他有效合同事实仍可用于诊断，但 Host 不会修复错误，也不会把部分投影视为可确认合同。
+- 部署试运行与验收移交记录仍是项目文件。Agent 维护候选说明与固定文档，保留的 FDE 决定字段归属项目进度中的精确合同操作。Host 不执行部署、不探测外部交付物地址、不收集客户签章，也不管理凭据。
 - 适配层刻意复用锁定插件的解析和请求模块，因为上游插件的进程级静态 API 清单本身无法提供 Workspace 隔离。
 - 系统架构历史以文件形式保存在 `.fde/architecture-history/`；浏览器当前只展示最新版本。
 - 需求 Wiki 历史以文件形式保存在 `.fde/requirement-wiki/versions/`；Host 快照只展示完整的当前 revision 和最近构建。

@@ -113,8 +113,8 @@ export function ObservabilityView(props: ProjectViewProps) {
     <section className={css.surfaceRoot}>
       <ProjectViewHeader
         eyebrow={workspace.title}
-        title="项目观测"
-        description="从项目会话投影中汇总用量趋势、活动峰值、模型效率与运行结构。"
+        title="项目用量分析"
+        description="汇总项目的 Token 消耗、模型调用、会话活动与运行耗时，帮助 FDE 看清实际使用情况。"
       />
 
       <div className={css.observeToolbar}>
@@ -122,7 +122,7 @@ export function ObservabilityView(props: ProjectViewProps) {
           <strong>运行脉搏</strong>
           <span>按会话最后活动时间归集累计投影</span>
         </div>
-        <div className={css.observeRange} aria-label="观测时间范围">
+        <div className={css.observeRange} aria-label="用量分析时间范围">
           {RANGE_OPTIONS.map(option => (
             <button
               key={option.id}

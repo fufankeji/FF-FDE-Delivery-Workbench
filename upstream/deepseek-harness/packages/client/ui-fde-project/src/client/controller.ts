@@ -6,8 +6,16 @@ export const FDE_PROJECT_SNAPSHOT_PATH = '/api/fde-project/snapshot'
 export const FDE_ARCHITECTURE_CONFIRM_PATH = '/api/fde-project/architecture/confirm'
 /** Exact Host route for confirming one validation contract. */
 export const FDE_VALIDATION_PLAN_CONFIRM_PATH = '/api/fde-project/validation/confirm-plan'
+/** Exact Host route for manually accepting one required validation metric. */
+export const FDE_VALIDATION_METRIC_ACCEPT_PATH = '/api/fde-project/validation/accept-metric'
 /** Exact Host route for manually accepting one validation issue. */
 export const FDE_VALIDATION_ISSUE_WAIVE_PATH = '/api/fde-project/validation/waive-issue'
+/** Exact Host route for manually accepting one deployment-trial issue. */
+export const FDE_DEPLOYMENT_TRIAL_ISSUE_ACCEPT_PATH = '/api/fde-project/pilot/accept-issue'
+/** Exact Host route for confirming the current deployment-trial target and readiness. */
+export const FDE_DEPLOYMENT_TRIAL_READINESS_CONFIRM_PATH = '/api/fde-project/pilot/confirm-readiness'
+/** Exact Host route for recording the current acceptance and responsibility-transfer facts. */
+export const FDE_ACCEPTANCE_HANDOVER_DECISION_PATH = '/api/fde-project/handoff/record-decision'
 /** Exact Host route for approving one indexed evaluation report. */
 export const FDE_EVALUATION_BASELINE_PATH = '/api/fde-project/evaluation/baseline'
 /** Exact Host route for beginning one Agent-driven project start. */
@@ -132,6 +140,10 @@ export interface ValidationStageSnapshot {
       readonly evidence?: string
       readonly evidenceAvailable: boolean
       readonly waiverReason?: string
+      readonly manualAcceptance?: {
+        readonly reason: string
+        readonly acceptedAt: string
+      }
       readonly note?: string
     }[]
     readonly issues: readonly {
@@ -176,6 +188,127 @@ export interface ValidationStageSnapshot {
   readonly blockers: readonly string[]
 }
 
+/** One fixed Markdown output from deployment trial or acceptance handover. */
+export interface DeliveryCloseoutArtifact {
+  readonly id: string
+  readonly title: string
+  readonly path: string
+  readonly status: 'missing' | 'present' | 'error'
+  readonly bytes?: number
+  readonly updatedAt?: string
+  readonly fileUrl?: string
+  readonly message?: string
+}
+
+/** Browser wire value for deployment-trial facts and completion readiness. */
+export interface DeploymentTrialStageSnapshot {
+  readonly contract: {
+    readonly status: 'missing' | 'invalid' | 'ready'
+    readonly path: string
+    readonly digest?: string
+    readonly candidateVersion?: string
+    readonly environment?: { readonly name: string; readonly summary: string; readonly authorized: boolean }
+    readonly deploymentStatus?: 'preparing' | 'deploying' | 'running' | 'blocked' | 'ready'
+    readonly evidence: Readonly<Record<'validationBaseline' | 'deployment' | 'health' | 'rollback' | 'trial', {
+      readonly path?: string
+      readonly available: boolean
+    }>>
+    readonly issues: readonly {
+      readonly id: string
+      readonly title: string
+      readonly severity: 'critical' | 'high' | 'medium' | 'low'
+      readonly status: 'open' | 'resolved' | 'accepted' | 'deferred'
+      readonly evidence?: string
+      readonly evidenceAvailable: boolean
+      readonly resolution?: string
+      readonly decisionReason?: string
+      readonly owner?: string
+    }[]
+    readonly message?: string
+  }
+  readonly artifacts: {
+    readonly root: string
+    readonly requiredCount: number
+    readonly presentCount: number
+    readonly items: readonly DeliveryCloseoutArtifact[]
+  }
+  readonly confirmationReady: boolean
+  readonly confirmationBlockers: readonly string[]
+  readonly gateReady: boolean
+  readonly blockers: readonly string[]
+}
+
+/** Browser wire value for final acceptance, handover, and project-completion readiness. */
+export interface AcceptanceHandoverStageSnapshot {
+  readonly contract: {
+    readonly status: 'missing' | 'invalid' | 'ready'
+    readonly path: string
+    readonly digest?: string
+    readonly finalVersion?: string
+    readonly deploymentTrialBaseline: { readonly path?: string; readonly available: boolean }
+    readonly acceptance?: {
+      readonly status: 'pending' | 'accepted' | 'conditionally-accepted' | 'returned' | 'terminated'
+      readonly summary: string
+      readonly evidence: readonly { readonly path?: string; readonly available: boolean }[]
+    }
+    readonly deliverables: readonly {
+      readonly id: string
+      readonly name: string
+      readonly location: string
+      readonly version?: string
+      readonly checksum?: string
+      readonly available: boolean
+      readonly locationType: 'project-file' | 'external'
+    }[]
+    readonly conditions: readonly {
+      readonly id: string
+      readonly title: string
+      readonly status: 'open' | 'resolved' | 'accepted'
+      readonly reason?: string
+      readonly owner?: string
+      readonly followUp?: string
+    }[]
+    readonly handover?: {
+      readonly trainingCompleted: boolean
+      readonly accessResponsibilityTransferred: boolean
+      readonly operationsResponsibilityTransferred: boolean
+      readonly evidence: readonly { readonly path?: string; readonly available: boolean }[]
+    }
+    readonly message?: string
+  }
+  readonly artifacts: {
+    readonly root: string
+    readonly requiredCount: number
+    readonly presentCount: number
+    readonly items: readonly DeliveryCloseoutArtifact[]
+  }
+  readonly gateReady: boolean
+  readonly blockers: readonly string[]
+}
+
+/** Editable FDE decision fields for one exact acceptance-handover contract. */
+export interface AcceptanceHandoverDecision {
+  readonly acceptance: {
+    readonly status: 'pending' | 'accepted' | 'conditionally-accepted' | 'returned' | 'terminated'
+    readonly summary: string
+    readonly evidence: readonly string[]
+  }
+  readonly deliverables: readonly { readonly id: string; readonly available: boolean }[]
+  readonly conditions: readonly {
+    readonly id: string
+    readonly status: 'open' | 'resolved' | 'accepted'
+    readonly reason?: string
+    readonly owner?: string
+    readonly followUp?: string
+  }[]
+  readonly handover: {
+    readonly trainingCompleted: boolean
+    readonly accessResponsibilityTransferred: boolean
+    readonly operationsResponsibilityTransferred: boolean
+    readonly evidence: readonly string[]
+  }
+}
+
 /** One project-level read model returned by the trusted Host route. */
 export interface ProjectSurfaceSnapshot {
   readonly workspaceId: string
@@ -191,6 +324,8 @@ export interface ProjectSurfaceSnapshot {
     readonly message?: string
   }
   readonly validation: ValidationStageSnapshot
+  readonly deploymentTrial: DeploymentTrialStageSnapshot
+  readonly acceptanceHandover: AcceptanceHandoverStageSnapshot
   readonly requirements: {
     readonly root: string
     readonly requiredCount: number
@@ -364,6 +499,30 @@ export async function confirmValidationPlan(
   return parseSnapshot(payload, workspaceId)
 }
 
+/** Manually accept one unmet required metric for the exact displayed contract. */
+export async function acceptValidationMetric(
+  workspaceId: string,
+  contractDigest: string,
+  metricId: string,
+  reason: string,
+  fetchImpl: typeof fetch = fetch,
+  signal?: AbortSignal,
+): Promise<ProjectSurfaceSnapshot> {
+  const response = await fetchImpl(FDE_VALIDATION_METRIC_ACCEPT_PATH, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ workspaceId, contractDigest, metricId, reason }),
+    ...(signal === undefined ? {} : { signal }),
+  })
+  let payload: unknown
+  try { payload = await response.json() } catch { throw new Error('人工接受验证指标响应无效。') }
+  if (!response.ok) {
+    const failure = payload as SnapshotFailure
+    throw new Error(failure.error?.message ?? `人工接受验证指标失败（HTTP ${String(response.status)}）。`)
+  }
+  return parseSnapshot(payload, workspaceId)
+}
+
 /** Manually accept one open validation issue for the exact displayed contract. */
 export async function waiveValidationIssue(
   workspaceId: string,
@@ -384,6 +543,75 @@ export async function waiveValidationIssue(
   if (!response.ok) {
     const failure = payload as SnapshotFailure
     throw new Error(failure.error?.message ?? `人工关闭验证问题失败（HTTP ${String(response.status)}）。`)
+  }
+  return parseSnapshot(payload, workspaceId)
+}
+
+/** Manually accept one unresolved deployment-trial issue for the exact displayed contract. */
+export async function acceptDeploymentTrialIssue(
+  workspaceId: string,
+  contractDigest: string,
+  issueId: string,
+  reason: string,
+  fetchImpl: typeof fetch = fetch,
+  signal?: AbortSignal,
+): Promise<ProjectSurfaceSnapshot> {
+  const response = await fetchImpl(FDE_DEPLOYMENT_TRIAL_ISSUE_ACCEPT_PATH, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ workspaceId, contractDigest, issueId, reason }),
+    ...(signal === undefined ? {} : { signal }),
+  })
+  let payload: unknown
+  try { payload = await response.json() } catch { throw new Error('人工接受试运行问题响应无效。') }
+  if (!response.ok) {
+    const failure = payload as SnapshotFailure
+    throw new Error(failure.error?.message ?? `人工接受试运行问题失败（HTTP ${String(response.status)}）。`)
+  }
+  return parseSnapshot(payload, workspaceId)
+}
+
+/** Confirm the exact displayed deployment-trial target environment and readiness conclusion. */
+export async function confirmDeploymentTrialReadiness(
+  workspaceId: string,
+  contractDigest: string,
+  fetchImpl: typeof fetch = fetch,
+  signal?: AbortSignal,
+): Promise<ProjectSurfaceSnapshot> {
+  const response = await fetchImpl(FDE_DEPLOYMENT_TRIAL_READINESS_CONFIRM_PATH, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ workspaceId, contractDigest }),
+    ...(signal === undefined ? {} : { signal }),
+  })
+  let payload: unknown
+  try { payload = await response.json() } catch { throw new Error('确认部署试运行结论响应无效。') }
+  if (!response.ok) {
+    const failure = payload as SnapshotFailure
+    throw new Error(failure.error?.message ?? `确认部署试运行结论失败（HTTP ${String(response.status)}）。`)
+  }
+  return parseSnapshot(payload, workspaceId)
+}
+
+/** Record evidence-backed acceptance and handover facts for the exact displayed contract. */
+export async function recordAcceptanceHandoverDecision(
+  workspaceId: string,
+  contractDigest: string,
+  decision: AcceptanceHandoverDecision,
+  fetchImpl: typeof fetch = fetch,
+  signal?: AbortSignal,
+): Promise<ProjectSurfaceSnapshot> {
+  const response = await fetchImpl(FDE_ACCEPTANCE_HANDOVER_DECISION_PATH, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ workspaceId, contractDigest, decision }),
+    ...(signal === undefined ? {} : { signal }),
+  })
+  let payload: unknown
+  try { payload = await response.json() } catch { throw new Error('记录验收移交事实响应无效。') }
+  if (!response.ok) {
+    const failure = payload as SnapshotFailure
+    throw new Error(failure.error?.message ?? `记录验收移交事实失败（HTTP ${String(response.status)}）。`)
   }
   return parseSnapshot(payload, workspaceId)
 }
@@ -574,6 +802,27 @@ export class FdeProjectSurfaceController {
     }
   }
 
+  /** Accept one unmet required metric and publish the refreshed project snapshot. */
+  async acceptValidationMetric(
+    workspaceId: string,
+    contractDigest: string,
+    metricId: string,
+    reason: string,
+  ): Promise<void> {
+    if (this.disposed) throw new Error('项目页面已关闭。')
+    this.requests.get(workspaceId)?.abort()
+    const controller = new AbortController()
+    this.requests.set(workspaceId, controller)
+    try {
+      const value = await acceptValidationMetric(workspaceId, contractDigest, metricId, reason, fetch, controller.signal)
+      if (this.canPublish(workspaceId, controller)) {
+        this.publish(workspaceId, { status: 'ready', value })
+      }
+    } finally {
+      if (this.requests.get(workspaceId) === controller) this.requests.delete(workspaceId)
+    }
+  }
+
   /** Accept one still-open validation issue and publish the refreshed project snapshot. */
   async waiveValidationIssue(
     workspaceId: string,
@@ -587,6 +836,63 @@ export class FdeProjectSurfaceController {
     this.requests.set(workspaceId, controller)
     try {
       const value = await waiveValidationIssue(workspaceId, contractDigest, issueId, reason, fetch, controller.signal)
+      if (this.canPublish(workspaceId, controller)) {
+        this.publish(workspaceId, { status: 'ready', value })
+      }
+    } finally {
+      if (this.requests.get(workspaceId) === controller) this.requests.delete(workspaceId)
+    }
+  }
+
+  /** Accept one unresolved deployment-trial issue and publish the refreshed project snapshot. */
+  async acceptDeploymentTrialIssue(
+    workspaceId: string,
+    contractDigest: string,
+    issueId: string,
+    reason: string,
+  ): Promise<void> {
+    if (this.disposed) throw new Error('项目页面已关闭。')
+    this.requests.get(workspaceId)?.abort()
+    const controller = new AbortController()
+    this.requests.set(workspaceId, controller)
+    try {
+      const value = await acceptDeploymentTrialIssue(workspaceId, contractDigest, issueId, reason, fetch, controller.signal)
+      if (this.canPublish(workspaceId, controller)) {
+        this.publish(workspaceId, { status: 'ready', value })
+      }
+    } finally {
+      if (this.requests.get(workspaceId) === controller) this.requests.delete(workspaceId)
+    }
+  }
+
+  /** Confirm the displayed deployment-trial target and readiness, then publish the refreshed snapshot. */
+  async confirmDeploymentTrialReadiness(workspaceId: string, contractDigest: string): Promise<void> {
+    if (this.disposed) throw new Error('项目页面已关闭。')
+    this.requests.get(workspaceId)?.abort()
+    const controller = new AbortController()
+    this.requests.set(workspaceId, controller)
+    try {
+      const value = await confirmDeploymentTrialReadiness(workspaceId, contractDigest, fetch, controller.signal)
+      if (this.canPublish(workspaceId, controller)) {
+        this.publish(workspaceId, { status: 'ready', value })
+      }
+    } finally {
+      if (this.requests.get(workspaceId) === controller) this.requests.delete(workspaceId)
+    }
+  }
+
+  /** Record acceptance and responsibility-transfer facts, then publish the refreshed snapshot. */
+  async recordAcceptanceHandoverDecision(
+    workspaceId: string,
+    contractDigest: string,
+    decision: AcceptanceHandoverDecision,
+  ): Promise<void> {
+    if (this.disposed) throw new Error('项目页面已关闭。')
+    this.requests.get(workspaceId)?.abort()
+    const controller = new AbortController()
+    this.requests.set(workspaceId, controller)
+    try {
+      const value = await recordAcceptanceHandoverDecision(workspaceId, contractDigest, decision, fetch, controller.signal)
       if (this.canPublish(workspaceId, controller)) {
         this.publish(workspaceId, { status: 'ready', value })
       }

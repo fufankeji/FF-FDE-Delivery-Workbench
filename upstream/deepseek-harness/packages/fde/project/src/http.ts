@@ -47,6 +47,18 @@ export interface ValidationPlanConfirmRouteOptions {
   readonly reportFailure?: (error: unknown) => void
 }
 
+/** Dependencies of the exact-contract validation-metric acceptance route. */
+export interface ValidationMetricAcceptRouteOptions {
+  readonly trusted: (request: IncomingMessage) => boolean
+  readonly accept: (
+    workspaceId: string,
+    contractDigest: string,
+    metricId: string,
+    reason: string,
+  ) => Promise<ProjectSurfaceSnapshot | undefined>
+  readonly reportFailure?: (error: unknown) => void
+}
+
 /** Dependencies of the exact-contract validation-issue waiver route. */
 export interface ValidationIssueWaiveRouteOptions {
   readonly trusted: (request: IncomingMessage) => boolean
@@ -55,6 +67,39 @@ export interface ValidationIssueWaiveRouteOptions {
     contractDigest: string,
     issueId: string,
     reason: string,
+  ) => Promise<ProjectSurfaceSnapshot | undefined>
+  readonly reportFailure?: (error: unknown) => void
+}
+
+/** Dependencies of the exact-contract deployment-trial issue acceptance route. */
+export interface DeploymentTrialIssueAcceptRouteOptions {
+  readonly trusted: (request: IncomingMessage) => boolean
+  readonly accept: (
+    workspaceId: string,
+    contractDigest: string,
+    issueId: string,
+    reason: string,
+  ) => Promise<ProjectSurfaceSnapshot | undefined>
+  readonly reportFailure?: (error: unknown) => void
+}
+
+/** Dependencies of the exact-contract deployment-trial readiness confirmation route. */
+export interface DeploymentTrialReadinessConfirmRouteOptions {
+  readonly trusted: (request: IncomingMessage) => boolean
+  readonly confirm: (
+    workspaceId: string,
+    contractDigest: string,
+  ) => Promise<ProjectSurfaceSnapshot | undefined>
+  readonly reportFailure?: (error: unknown) => void
+}
+
+/** Dependencies of the exact-contract acceptance-handover decision route. */
+export interface AcceptanceHandoverDecisionRouteOptions {
+  readonly trusted: (request: IncomingMessage) => boolean
+  readonly record: (
+    workspaceId: string,
+    contractDigest: string,
+    decision: unknown,
   ) => Promise<ProjectSurfaceSnapshot | undefined>
   readonly reportFailure?: (error: unknown) => void
 }
@@ -142,6 +187,31 @@ function validationPlanConfirmationOf(value: unknown): { readonly workspaceId: s
   return { workspaceId, contractDigest }
 }
 
+function validationMetricAcceptanceOf(value: unknown): {
+  readonly workspaceId: string
+  readonly contractDigest: string
+  readonly metricId: string
+  readonly reason: string
+} {
+  const workspaceId = workspaceIdOf(value)
+  const input = value as { contractDigest?: unknown; metricId?: unknown; reason?: unknown }
+  if (typeof input.contractDigest !== 'string' || !/^sha256:[a-f0-9]{64}$/u.test(input.contractDigest)) {
+    throw new FdeProjectRequestError('invalid-request', 400, '人工接受指标请求缺少有效合同摘要。')
+  }
+  if (typeof input.metricId !== 'string' || !/^[a-z0-9][a-z0-9._-]{0,119}$/iu.test(input.metricId)) {
+    throw new FdeProjectRequestError('invalid-request', 400, '人工接受指标请求缺少有效指标标识。')
+  }
+  if (typeof input.reason !== 'string' || input.reason.trim() === '' || input.reason.trim().length > 1_000) {
+    throw new FdeProjectRequestError('invalid-request', 400, '请填写 1 到 1000 个字符的人工接受理由。')
+  }
+  return {
+    workspaceId,
+    contractDigest: input.contractDigest,
+    metricId: input.metricId,
+    reason: input.reason.trim(),
+  }
+}
+
 function validationIssueWaiverOf(value: unknown): {
   readonly workspaceId: string
   readonly contractDigest: string
@@ -165,6 +235,59 @@ function validationIssueWaiverOf(value: unknown): {
     issueId: input.issueId,
     reason: input.reason.trim(),
   }
+}
+
+function deploymentTrialIssueAcceptanceOf(value: unknown): {
+  readonly workspaceId: string
+  readonly contractDigest: string
+  readonly issueId: string
+  readonly reason: string
+} {
+  const workspaceId = workspaceIdOf(value)
+  const input = value as { contractDigest?: unknown; issueId?: unknown; reason?: unknown }
+  if (typeof input.contractDigest !== 'string' || !/^sha256:[a-f0-9]{64}$/u.test(input.contractDigest)) {
+    throw new FdeProjectRequestError('invalid-request', 400, '人工接受试运行问题请求缺少有效合同摘要。')
+  }
+  if (typeof input.issueId !== 'string' || !/^[a-z0-9][a-z0-9._-]{0,119}$/iu.test(input.issueId)) {
+    throw new FdeProjectRequestError('invalid-request', 400, '人工接受试运行问题请求缺少有效问题标识。')
+  }
+  if (typeof input.reason !== 'string' || input.reason.trim() === '' || input.reason.trim().length > 1_000) {
+    throw new FdeProjectRequestError('invalid-request', 400, '请填写 1 到 1000 个字符的人工接受理由。')
+  }
+  return {
+    workspaceId,
+    contractDigest: input.contractDigest,
+    issueId: input.issueId,
+    reason: input.reason.trim(),
+  }
+}
+
+function deploymentTrialReadinessConfirmationOf(value: unknown): {
+  readonly workspaceId: string
+  readonly contractDigest: string
+} {
+  const workspaceId = workspaceIdOf(value)
+  const contractDigest = (value as { contractDigest?: unknown }).contractDigest
+  if (typeof contractDigest !== 'string' || !/^sha256:[a-f0-9]{64}$/u.test(contractDigest)) {
+    throw new FdeProjectRequestError('invalid-request', 400, '确认部署试运行结论请求缺少有效合同摘要。')
+  }
+  return { workspaceId, contractDigest }
+}
+
+function acceptanceHandoverDecisionOf(value: unknown): {
+  readonly workspaceId: string
+  readonly contractDigest: string
+  readonly decision: unknown
+} {
+  const workspaceId = workspaceIdOf(value)
+  const input = value as { contractDigest?: unknown; decision?: unknown }
+  if (typeof input.contractDigest !== 'string' || !/^sha256:[a-f0-9]{64}$/u.test(input.contractDigest)) {
+    throw new FdeProjectRequestError('invalid-request', 400, '验收移交人工记录请求缺少有效合同摘要。')
+  }
+  if (input.decision === null || typeof input.decision !== 'object' || Array.isArray(input.decision)) {
+    throw new FdeProjectRequestError('invalid-request', 400, '验收移交人工记录请求缺少结构化决定。')
+  }
+  return { workspaceId, contractDigest: input.contractDigest, decision: input.decision }
 }
 
 function evaluationBaselineOf(value: unknown): { readonly workspaceId: string; readonly reportPath: string } {
@@ -395,6 +518,42 @@ export function createValidationPlanConfirmRoute(
 }
 
 /**
+ * Create the trusted exact-contract validation-metric acceptance route.
+ * @param options - trust decision, metric acceptance operation, and failure reporter.
+ * @returns an exact-route HTTP handler.
+ */
+export function createValidationMetricAcceptRoute(
+  options: ValidationMetricAcceptRouteOptions,
+): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
+  return async (request: IncomingMessage, response: ServerResponse): Promise<void> => {
+    try {
+      if (!options.trusted(request)) throw new FdeProjectRequestError('forbidden', 403, '当前请求不能人工接受验证指标。')
+      if (request.method !== 'POST') {
+        request.resume()
+        throw new FdeProjectRequestError('method-not-allowed', 405, '人工接受指标接口只接受 POST。')
+      }
+      const input = validationMetricAcceptanceOf(await readJson(request))
+      const snapshot = await options.accept(input.workspaceId, input.contractDigest, input.metricId, input.reason)
+      if (snapshot === undefined) throw new FdeProjectRequestError('workspace-not-found', 404, '当前项目不存在或已被移除。')
+      writeJson(response, 200, { ok: true, value: snapshot })
+    } catch (error) {
+      if (error instanceof FdeProjectRequestError) {
+        writeJson(response, error.status, { ok: false, error: { code: error.code, message: error.message } })
+        return
+      }
+      options.reportFailure?.(error)
+      writeJson(response, 409, {
+        ok: false,
+        error: {
+          code: 'validation-metric-accept-failed',
+          message: error instanceof Error ? error.message : '人工接受验证指标失败。',
+        },
+      })
+    }
+  }
+}
+
+/**
  * Create the trusted exact-contract validation-issue waiver route.
  * @param options - trust decision, issue waiver operation, and failure reporter.
  * @returns an exact-route HTTP handler.
@@ -424,6 +583,114 @@ export function createValidationIssueWaiveRoute(
         error: {
           code: 'validation-issue-waive-failed',
           message: error instanceof Error ? error.message : '人工关闭验证问题失败。',
+        },
+      })
+    }
+  }
+}
+
+/**
+ * Create the trusted exact-contract deployment-trial issue acceptance route.
+ * @param options - trust decision, issue acceptance operation, and failure reporter.
+ * @returns an exact-route HTTP handler.
+ */
+export function createDeploymentTrialIssueAcceptRoute(
+  options: DeploymentTrialIssueAcceptRouteOptions,
+): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
+  return async (request: IncomingMessage, response: ServerResponse): Promise<void> => {
+    try {
+      if (!options.trusted(request)) throw new FdeProjectRequestError('forbidden', 403, '当前请求不能人工接受试运行问题。')
+      if (request.method !== 'POST') {
+        request.resume()
+        throw new FdeProjectRequestError('method-not-allowed', 405, '人工接受试运行问题接口只接受 POST。')
+      }
+      const input = deploymentTrialIssueAcceptanceOf(await readJson(request))
+      const snapshot = await options.accept(input.workspaceId, input.contractDigest, input.issueId, input.reason)
+      if (snapshot === undefined) throw new FdeProjectRequestError('workspace-not-found', 404, '当前项目不存在或已被移除。')
+      writeJson(response, 200, { ok: true, value: snapshot })
+    } catch (error) {
+      if (error instanceof FdeProjectRequestError) {
+        writeJson(response, error.status, { ok: false, error: { code: error.code, message: error.message } })
+        return
+      }
+      options.reportFailure?.(error)
+      writeJson(response, 409, {
+        ok: false,
+        error: {
+          code: 'deployment-trial-issue-accept-failed',
+          message: error instanceof Error ? error.message : '人工接受试运行问题失败。',
+        },
+      })
+    }
+  }
+}
+
+/**
+ * Create the trusted exact-contract deployment-trial readiness confirmation route.
+ * @param options - trust decision, readiness confirmation operation, and failure reporter.
+ * @returns an exact-route HTTP handler.
+ */
+export function createDeploymentTrialReadinessConfirmRoute(
+  options: DeploymentTrialReadinessConfirmRouteOptions,
+): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
+  return async (request: IncomingMessage, response: ServerResponse): Promise<void> => {
+    try {
+      if (!options.trusted(request)) throw new FdeProjectRequestError('forbidden', 403, '当前请求不能确认部署试运行结论。')
+      if (request.method !== 'POST') {
+        request.resume()
+        throw new FdeProjectRequestError('method-not-allowed', 405, '确认部署试运行结论接口只接受 POST。')
+      }
+      const input = deploymentTrialReadinessConfirmationOf(await readJson(request))
+      const snapshot = await options.confirm(input.workspaceId, input.contractDigest)
+      if (snapshot === undefined) throw new FdeProjectRequestError('workspace-not-found', 404, '当前项目不存在或已被移除。')
+      writeJson(response, 200, { ok: true, value: snapshot })
+    } catch (error) {
+      if (error instanceof FdeProjectRequestError) {
+        writeJson(response, error.status, { ok: false, error: { code: error.code, message: error.message } })
+        return
+      }
+      options.reportFailure?.(error)
+      writeJson(response, 409, {
+        ok: false,
+        error: {
+          code: 'deployment-trial-readiness-confirm-failed',
+          message: error instanceof Error ? error.message : '确认部署试运行结论失败。',
+        },
+      })
+    }
+  }
+}
+
+/**
+ * Create the trusted exact-contract acceptance-handover decision route.
+ * @param options - trust decision, decision recorder, and failure reporter.
+ * @returns an exact-route HTTP handler.
+ */
+export function createAcceptanceHandoverDecisionRoute(
+  options: AcceptanceHandoverDecisionRouteOptions,
+): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
+  return async (request: IncomingMessage, response: ServerResponse): Promise<void> => {
+    try {
+      if (!options.trusted(request)) throw new FdeProjectRequestError('forbidden', 403, '当前请求不能记录验收移交决定。')
+      if (request.method !== 'POST') {
+        request.resume()
+        throw new FdeProjectRequestError('method-not-allowed', 405, '验收移交人工记录接口只接受 POST。')
+      }
+      const input = acceptanceHandoverDecisionOf(await readJson(request))
+      const snapshot = await options.record(input.workspaceId, input.contractDigest, input.decision)
+      if (snapshot === undefined) throw new FdeProjectRequestError('workspace-not-found', 404, '当前项目不存在或已被移除。')
+      writeJson(response, 200, { ok: true, value: snapshot })
+    } catch (error) {
+      if (error instanceof FdeProjectRequestError) {
+        writeJson(response, error.status, { ok: false, error: { code: error.code, message: error.message } })
+        return
+      }
+      options.reportFailure?.(error)
+      writeJson(response, 409, {
+        ok: false,
+        error: {
+          code: 'acceptance-handover-decision-failed',
+          message: error instanceof Error ? error.message : '记录验收移交决定失败。',
         },
       })
     }

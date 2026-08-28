@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
 import { ProjectProgressOverlay } from '../src/client/ProjectProgressOverlay.tsx'
 import { zh } from '../src/client/locales.ts'
@@ -95,22 +95,41 @@ describe('ProjectProgressOverlay standalone page', () => {
     } as unknown as ProjectProgressOverlayProps
 
     render(<ProjectProgressOverlay {...props} />)
-    expect(screen.getByText('工作台焦点')).toBeTruthy()
-    expect(screen.getByText('需要关注')).toBeTruthy()
+    expect(screen.getByText('项目关注')).toBeTruthy()
+    expect(screen.getByText('需要 FDE 介入')).toBeTruthy()
     expect(screen.getByText('交付节点')).toBeTruthy()
     expect(screen.getByText('最近会话')).toBeTruthy()
     expect(screen.getByText('研发会话')).toBeTruthy()
-    expect(screen.getByText('六阶段项目分布')).toBeTruthy()
-    expect(screen.getByText('阶段 1/6 · 需求调研')).toBeTruthy()
-    expect(screen.getByText('阶段 3/6 · 项目开发')).toBeTruthy()
-    expect(screen.getAllByRole('list', { name: '项目六阶段位置' })).toHaveLength(2)
-    fireEvent.click(screen.getByRole('button', { name: '筛选阶段 3：项目开发，1 个项目' }))
-    expect(screen.queryByRole('heading', { name: '客户需求梳理' })).toBeNull()
-    expect(screen.getByRole('heading', { name: '数据分析项目' })).toBeTruthy()
+    expect(screen.getByText('六阶段从需求到验收')).toBeTruthy()
+    expect(screen.getByRole('region', { name: '标准 FDE 六阶段交付流程' })).toBeTruthy()
+    expect(screen.getByRole('article', { name: '项目阶段分布' })).toBeTruthy()
+    expect(screen.getByRole('article', { name: '项目交付健康分布' })).toBeTruthy()
+    expect(screen.getByRole('article', { name: '近六周项目动态' })).toBeTruthy()
+    expect(screen.getAllByText('阶段 1/6 · 需求调研')).toHaveLength(3)
+    expect(screen.getAllByText('阶段 3/6 · 项目开发')).toHaveLength(3)
+    expect(screen.getAllByRole('list', { name: '项目六阶段位置' })).toHaveLength(10)
+    expect(screen.getAllByText('演示项目')).toHaveLength(8)
+    expect(screen.getAllByRole('button', { name: '演示数据' })).toHaveLength(8)
+    for (const button of screen.getAllByRole('button', { name: '演示数据' })) expect((button as HTMLButtonElement).disabled).toBe(true)
+    const cardView = screen.getByRole('button', { name: '卡片' })
+    const listView = screen.getByRole('button', { name: '列表' })
+    expect(cardView.getAttribute('aria-pressed')).toBe('true')
+    expect(listView.getAttribute('aria-pressed')).toBe('false')
+    fireEvent.click(listView)
+    const projectTable = screen.getByRole('table', { name: '项目列表' })
+    expect(listView.getAttribute('aria-pressed')).toBe('true')
+    expect(within(projectTable).getByText('客户需求梳理')).toBeTruthy()
+    expect(within(projectTable).getAllByText('演示项目')).toHaveLength(8)
+    fireEvent.click(screen.getByRole('button', { name: '筛选阶段 3：项目开发，3 个项目' }))
+    expect(within(projectTable).queryByText('客户需求梳理')).toBeNull()
+    expect(within(projectTable).getByText('数据分析项目')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: /全部项目/ }))
-    const projectButtons = screen.getAllByRole('button', { name: /查看项目/ })
+    const projectButtons = within(projectTable).getAllByRole('button', { name: /查看项目/ })
     fireEvent.click(projectButtons[1] as HTMLElement)
     expect(showProjectDetail).toHaveBeenCalledWith('workspace-2')
+    fireEvent.click(cardView)
+    expect(screen.queryByRole('table', { name: '项目列表' })).toBeNull()
+    expect(screen.getAllByRole('list', { name: '项目六阶段位置' })).toHaveLength(10)
   })
 
   it('separates stage inputs and outputs and requires the FDE second confirmation', async () => {
@@ -333,6 +352,7 @@ describe('ProjectProgressOverlay standalone page', () => {
 
   it('shows validation inputs, evidence, outputs, and keeps pilot behind FDE confirmation', async () => {
     const completeValidation = vi.fn(async () => {})
+    const acceptValidationMetric = vi.fn(async () => {})
     const waiveValidationIssue = vi.fn(async () => {})
     const renderSlot = vi.fn(() => <div>验证报告正文</div>)
     const props = {
@@ -354,6 +374,11 @@ describe('ProjectProgressOverlay standalone page', () => {
               id: 'runtime-smoke', name: '核心流程冒烟', category: 'functional', method: '启动并访问核心页面', threshold: '全部通过',
               sources: [{ path: 'fde-deliverables/02-solution-design/acceptance-plan.md', references: ['BA-1'], available: true }],
               required: true, status: 'PASS', value: '通过', evidence: '.fde/evaluations/reports/r1/smoke.md', evidenceAvailable: true,
+            }, {
+              id: 'million-row-performance', name: '百万行查询性能', category: 'performance',
+              method: '正式设备压测', threshold: 'P95 小于 2 秒',
+              sources: [{ path: 'fde-deliverables/02-solution-design/acceptance-plan.md', references: ['PA-1'], available: true }],
+              required: true, status: 'NOT_RUN', evidenceAvailable: false, note: '正式性能设备尚未到位。',
             }],
             issues: [{
               id: 'model-window', title: '复购模型测试窗口尚未确定', severity: 'medium', status: 'open',
@@ -366,7 +391,7 @@ describe('ProjectProgressOverlay standalone page', () => {
             { id: 'validation-baseline', title: '验证基线', path: 'fde-deliverables/04-validation/validation-baseline.md', status: 'present', fileUrl: '/api/fde-project/validation/artifact?workspaceId=workspace-1&artifactId=validation-baseline' },
           ] },
           planReady: true, planBlockers: [], planApproval: { status: 'confirmed', contractDigest: `sha256:${'1'.repeat(64)}` },
-          requiredMetricCount: 1, satisfiedMetricCount: 1, gateReady: true, blockers: [],
+          requiredMetricCount: 2, satisfiedMetricCount: 2, gateReady: true, blockers: [],
         },
         requirements: { root: 'fde-deliverables/01-requirement-research', requiredCount: 3, presentCount: 3, artifacts: [] },
       } } } }),
@@ -378,7 +403,8 @@ describe('ProjectProgressOverlay standalone page', () => {
       }] }),
       useSessions: hook({ byId: { 'session-1': { id: 'session-1', displayTitle: '会话', running: false, blank: false, updatedAt: 1 } } }),
       loadStage: vi.fn(), retryStage: vi.fn(), loadProjectSurface: vi.fn(), refreshProjectSurface: vi.fn(),
-      completeRequirements: vi.fn(), completeSolution: vi.fn(), completeDevelopment: vi.fn(), completeValidation, waiveValidationIssue,
+      completeRequirements: vi.fn(), completeSolution: vi.fn(), completeDevelopment: vi.fn(), completeValidation,
+      acceptValidationMetric, waiveValidationIssue,
       loadProjectSources: vi.fn(), parseProjectSource: vi.fn(), loadRequirementWiki: vi.fn(),
       prepareRequirementWikiRun: vi.fn(), startRequirementWikiBuild: vi.fn(), abandonRequirementWikiBuild: vi.fn(),
       enterProject: vi.fn(), reviewProjectArchitecture: vi.fn(), closeProjectPage: vi.fn(), showProjectOverview: vi.fn(),
@@ -393,6 +419,20 @@ describe('ProjectProgressOverlay standalone page', () => {
     expect(screen.getByText('核心业务用例')).toBeTruthy()
     expect(screen.getByText('核心流程冒烟')).toBeTruthy()
     expect(screen.getByText('BA-1')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '人工接受指标' }))
+    expect(screen.getByText(/不会把“待执行”或缺少证据改成通过/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '确认人工接受' }))
+    expect(screen.getByText('请填写本次人工接受的原因、适用范围或后续处理约定。')).toBeTruthy()
+    fireEvent.change(screen.getByRole('textbox', { name: '接受理由' }), {
+      target: { value: '客户确认本轮不具备正式性能设备，试运行阶段补测并回填证据。' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: '确认人工接受' }))
+    await waitFor(() => {
+      expect(acceptValidationMetric).toHaveBeenCalledWith(
+        'workspace-1', `sha256:${'1'.repeat(64)}`, 'million-row-performance',
+        '客户确认本轮不具备正式性能设备，试运行阶段补测并回填证据。',
+      )
+    })
     fireEvent.click(screen.getByRole('button', { name: '人工确认关闭' }))
     expect(screen.getByText(/不会把未通过、未执行或缺少证据的指标改成通过/)).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: '确认接受并关闭' }))

@@ -3,20 +3,37 @@
 import type { Context } from '@deepseek-ai/cordis'
 import type {} from '@deepseek-ai/dsh-agent'
 import { isTrustedApiRequest } from '@deepseek-ai/dsh-client-connection'
-import { loadDevelopmentDocs, loadRequirementArtifacts, loadSolutionArtifacts, loadValidationStage, readProjectArchitecture } from '@deepseek-ai/dsh-fde-project'
+import {
+  loadAcceptanceHandoverStage,
+  loadDeploymentTrialStage,
+  loadDevelopmentDocs,
+  loadRequirementArtifacts,
+  loadSolutionArtifacts,
+  loadValidationStage,
+  readProjectArchitecture,
+} from '@deepseek-ai/dsh-fde-project'
 import type {} from '@deepseek-ai/dsh-host-webserver'
 import type {} from '@deepseek-ai/dsh-skill'
 import type {} from '@deepseek-ai/dsh-storage-domain'
 import type {} from '@deepseek-ai/dsh-system-prompt'
 import { WorkspaceId } from '@deepseek-ai/dsh-workspace'
-import { createCompleteDevelopmentRoute, createCompleteRequirementsRoute, createCompleteSolutionRoute, createCompleteValidationRoute, createStageRoute } from './http.ts'
-import { fdeStageDomainSpec, type FdeStageId } from './spec.ts'
+import {
+  createCompleteDevelopmentRoute,
+  createCompleteHandoffRoute,
+  createCompletePilotRoute,
+  createCompleteRequirementsRoute,
+  createCompleteSolutionRoute,
+  createCompleteValidationRoute,
+  createReturnStageRoute,
+  createStageRoute,
+} from './http.ts'
+import { fdeStageDomainSpec, type FdeProjectState } from './spec.ts'
 import { FdeStageState } from './state.ts'
 
-export { FdeStageRequestError, createCompleteDevelopmentRoute, createCompleteRequirementsRoute, createCompleteSolutionRoute, createCompleteValidationRoute, createStageRoute } from './http.ts'
-export { FDE_STAGE_IDS, fdeStageDomainSpec, fdeStageId, projectStageRecord } from './spec.ts'
-export type { FdeStageId, ProjectStageRecord } from './spec.ts'
-export { FdeStageConflictError, FdeStageState, FdeStageTransitionError } from './state.ts'
+export { FdeStageRequestError, createCompleteDevelopmentRoute, createCompleteHandoffRoute, createCompletePilotRoute, createCompleteRequirementsRoute, createCompleteSolutionRoute, createCompleteValidationRoute, createReturnStageRoute, createStageRoute } from './http.ts'
+export { FDE_PROJECT_STATE_IDS, FDE_STAGE_IDS, fdeProjectState, fdeStageDomainSpec, fdeStageId, projectStageRecord, stageReturnRecord } from './spec.ts'
+export type { FdeProjectState, FdeStageId, ProjectStageRecord } from './spec.ts'
+export { FdeStageConflictError, FdeStageReturnError, FdeStageState, FdeStageTransitionError } from './state.ts'
 
 /** Stable Host route used by the FDE Stage browser plugin. */
 export const FDE_STAGE_OPEN_PATH = '/api/fde-stage/open'
@@ -28,6 +45,12 @@ export const FDE_STAGE_COMPLETE_SOLUTION_PATH = '/api/fde-stage/solution/complet
 export const FDE_STAGE_COMPLETE_DEVELOPMENT_PATH = '/api/fde-stage/development/complete'
 /** Fixed manual gate from validation to pilot deployment. */
 export const FDE_STAGE_COMPLETE_VALIDATION_PATH = '/api/fde-stage/validation/complete'
+/** Fixed manual gate from deployment trial to acceptance handover. */
+export const FDE_STAGE_COMPLETE_PILOT_PATH = '/api/fde-stage/pilot/complete'
+/** Fixed manual gate from acceptance handover to project completion. */
+export const FDE_STAGE_COMPLETE_HANDOFF_PATH = '/api/fde-stage/handoff/complete'
+/** FDE-only one-step return route, including terminal project reopening. */
+export const FDE_STAGE_RETURN_PATH = '/api/fde-stage/return'
 /** Cordis plugin name. */
 export const name = 'fde-stage'
 /** Required durable Workspace, model guidance, and same-origin Web services. */
@@ -210,28 +233,102 @@ export const VALIDATION_SKILL = {
 - 你不能修改项目阶段。是否进入部署试运行只能由 FDE 在项目进度页核对全部阻塞项后决定。`,
 } as const
 
+/** Runtime Skill loaded on demand while an FDE deploys and observes one candidate. */
+export const DEPLOYMENT_TRIAL_SKILL = {
+  name: 'fde-deployment-trial',
+  description: '把已验证候选版本部署到明确目标环境，记录授权、运行与回滚证据、试运行问题和四份固定部署产物。',
+  whenToUse: '当前项目处于部署试运行，用户要求部署、试运行、记录反馈、关闭问题或收口部署阶段时使用。',
+  source: 'bundled',
+  content: `# FDE 部署试运行规范
+
+只在当前项目的部署试运行阶段使用本 Skill。先读取已确认的验证基线、候选版本、目标环境说明、项目 AGENTS.md 和已有部署文件。任何真实部署、停止、回滚或外部写入都必须得到 FDE 对当前目标和动作的明确授权；不得读取、复制或写入明文凭据。
+
+## 结构化状态
+
+在 \`.fde/deployment-trial.json\` 维护唯一状态，\`schemaVersion\` 固定为 1：
+
+- \`candidateVersion\`：与验证基线一致的候选版本。
+- \`environment\`：\`name\`、\`summary\`、\`authorized\`；Agent 保持 false，只有 FDE 在项目进度确认当前目标环境与试运行结论后，Host 才写 true。
+- \`status\`：Agent 只维护 preparing、deploying、running 或 blocked；ready 由同一个 FDE 项目进度确认动作写入。
+- \`evidence\`：validationBaseline、deployment、health、rollback、trial，均为当前项目相对文件路径。
+- \`issues\`：id、title、severity、status、evidence，以及按状态需要的 resolution、decisionReason、owner。Agent 只能写 open、resolved 或 deferred；不得代替 FDE 把问题标为 accepted。
+
+## 固定产物
+
+1. \`fde-deliverables/05-deployment-trial/deployment-runbook.md\`
+2. \`fde-deliverables/05-deployment-trial/deployment-baseline.md\`
+3. \`fde-deliverables/05-deployment-trial/trial-operation-report.md\`
+4. \`fde-deliverables/05-deployment-trial/issue-closure-list.md\`
+
+文档必须绑定候选版本、目标环境和真实证据。一次启动、端口可访问或 HTTP 200 只能作为单项证据，不能冒充试运行完成。所有产物仍是候选；是否进入验收移交只能由 FDE 在项目进度页决定。`,
+} as const
+
+/** Runtime Skill loaded on demand while an FDE completes acceptance and handover. */
+export const ACCEPTANCE_HANDOVER_SKILL = {
+  name: 'fde-acceptance-handover',
+  description: '统一最终交付物、企业验收结论、条件项、培训与权限/运维责任移交，并形成四份固定移交产物。',
+  whenToUse: '当前项目处于验收移交，用户要求整理交付清单、记录验收、处理条件项、准备运维培训或收口项目时使用。',
+  source: 'bundled',
+  content: `# FDE 验收移交规范
+
+只在当前项目的验收移交阶段使用本 Skill。先读取 \`.fde/deployment-trial.json\`、全部前阶段基线、最终版本、企业反馈和已有移交文件。部署试运行的授权与状态以该 JSON 为唯一事实源；若固定 Markdown 与它冲突，先按 JSON 的当前事实刷新相关文档，不得用旧文档覆盖结构化状态。不得虚构客户签字、电子签章、培训完成或制品可取得状态。
+
+## 结构化状态
+
+在 \`.fde/acceptance-handover.json\` 维护唯一状态，\`schemaVersion\` 固定为 1：
+
+- \`finalVersion\` 和项目相对路径 \`deploymentTrialBaseline\`。
+- \`acceptance\`：status 只使用 pending、accepted、conditionally-accepted、returned、terminated，并记录 summary 与最多 40 项项目相对 evidence 数组。
+- \`deliverables\`：id、name、location、version、checksum、available。外部制品只引用受控位置，平台不会替你上传或探测。
+- \`conditions\`：id、title、status；人工接受项写清 reason、owner、followUp。
+- \`handover\`：trainingCompleted、accessResponsibilityTransferred、operationsResponsibilityTransferred，以及项目相对 evidence 数组。
+
+首次生成结构化状态时，Agent 必须把企业验收保持为 pending、交付物 available 保持 false、条件项保持 open、三个移交完成字段保持 false。已有状态存在时，Agent 必须保留项目进度页已经写入的这些人工决定字段，不得重置或代替 FDE 修改。FDE 只能在项目进度页通过带当前合同摘要的“记录验收与移交事实”动作，关联项目内证据后更新这些字段；该动作不会代替签字、上传制品、完成培训、变更权限或移交运维责任。
+
+## 固定产物
+
+1. \`fde-deliverables/06-acceptance-handover/delivery-inventory.md\`
+2. \`fde-deliverables/06-acceptance-handover/acceptance-report.md\`
+3. \`fde-deliverables/06-acceptance-handover/operations-and-maintenance-guide.md\`
+4. \`fde-deliverables/06-acceptance-handover/handover-record.md\`
+
+验收退回或终止时如实保留状态，不能完成项目。文件齐备或人工事实记录齐备都只表示可以提交；“记录验收与移交事实”和“完成项目”是两个独立动作，是否完成项目只能由 FDE 在项目进度页二次确认。`,
+} as const
+
 /** Short stage-aware prompt; the complete Skill body remains on-demand. */
-export function requirementResearchPrompt(stage: FdeStageId): string {
+export function requirementResearchPrompt(stage: FdeProjectState): string {
   if (stage !== 'requirements') return ''
   return '当前 FDE 项目处于“需求调研”。当用户要求梳理、收敛或更新需求材料时，先加载 Skill `fde-requirement-research`，并把产物更新到 `fde-deliverables/01-requirement-research/` 的三个固定文件。产物均为候选；你不能确认客户结论，也不能推进项目阶段。'
 }
 
 /** Short solution-aware prompt; the complete Skill body remains on-demand. */
-export function solutionDesignPrompt(stage: FdeStageId): string {
+export function solutionDesignPrompt(stage: FdeProjectState): string {
   if (stage !== 'solution') return ''
   return '当前 FDE 项目处于“方案设计”。当用户要求设计、收敛或更新项目方案时，先加载 Skill `fde-solution-design`，更新 `fde-deliverables/02-solution-design/` 的五个固定文件（包含项目 PRD），并先取证、后建模，通过 architecture_get/architecture_set 维护有序、可追溯的项目级候选架构。所有产物均为候选；你不能确认架构、客户结论或推进项目阶段。'
 }
 
 /** Short development-aware prompt; the complete Skill body remains on-demand. */
-export function projectDevelopmentPrompt(stage: FdeStageId): string {
+export function projectDevelopmentPrompt(stage: FdeProjectState): string {
   if (stage !== 'development') return ''
   return '当前 FDE 项目处于“项目开发”。当用户要求规划、拆分、实施、检查研发进度，或要求生成或更新系统架构时，先加载 Skill `fde-project-development`，按项目 `docs/` 的 PRD、产品总规格、Feature Map 和逐 Feature spec/plan/tasks 原位维护，并用真实工程证据更新任务。出现主要服务、入口、存储、外部集成或关键数据路径等结构性变更时，同步更新系统架构候选。开发收口产物固定在 `fde-deliverables/03-project-development/`。你不能虚构日期或证据，也不能推进项目阶段。'
 }
 
 /** Short validation-aware prompt; the complete Skill body remains on-demand. */
-export function validationPrompt(stage: FdeStageId): string {
+export function validationPrompt(stage: FdeProjectState): string {
   if (stage !== 'validation') return ''
   return '当前 FDE 项目处于“验证评估”。当用户要求准备方案或执行验证时，先加载 Skill `fde-validation`，严格区分“评估方案准备”和“开始验证”。指标必须追溯到此前已确认文档；只有 FDE 确认当前方案后才能执行。只记录真实结果和项目内证据；你不能确认方案或推进项目阶段。'
+}
+
+/** Short deployment-trial-aware prompt; the complete Skill body remains on-demand. */
+export function deploymentTrialPrompt(stage: FdeProjectState): string {
+  if (stage !== 'pilot') return ''
+  return '当前 FDE 项目处于“部署试运行”。当用户要求部署、试运行、记录反馈或收口时，先加载 Skill `fde-deployment-trial`。真实外部动作必须得到 FDE 明确授权；状态记录在 `.fde/deployment-trial.json`，四份固定产物位于 `fde-deliverables/05-deployment-trial/`。你不能接受严重问题或推进项目阶段。'
+}
+
+/** Short acceptance-handover-aware prompt; the complete Skill body remains on-demand. */
+export function acceptanceHandoverPrompt(stage: FdeProjectState): string {
+  if (stage !== 'handoff') return ''
+  return '当前 FDE 项目处于“验收移交”。当用户要求整理交付清单、记录企业验收、处理条件项或准备移交时，先加载 Skill `fde-acceptance-handover`。先以 `.fde/deployment-trial.json` 为已确认部署试运行事实源；验收状态记录在 `.fde/acceptance-handover.json`，其中 acceptance.evidence 是项目相对路径数组，四份固定产物位于 `fde-deliverables/06-acceptance-handover/`。企业验收、交付物可取得、条件决定和责任移交只能由 FDE 在项目进度页记录；你不得重置这些人工字段，也不能完成项目。'
 }
 
 /**
@@ -246,6 +343,8 @@ export async function apply(ctx: Context): Promise<void> {
   ctx.skills.register(SOLUTION_DESIGN_SKILL)
   ctx.skills.register(PROJECT_DEVELOPMENT_SKILL)
   ctx.skills.register(VALIDATION_SKILL)
+  ctx.skills.register(DEPLOYMENT_TRIAL_SKILL)
+  ctx.skills.register(ACCEPTANCE_HANDOVER_SKILL)
   ctx.systemPrompt.section({
     name: 'fde:requirement-research',
     order: 90,
@@ -255,7 +354,12 @@ export async function apply(ctx: Context): Promise<void> {
       const workspace = ctx.workspaceRegistry.list().find(item => item.path === cwd)
       if (workspace === undefined) return ''
       const stage = state.current(workspace.id)?.currentStage ?? 'requirements'
-      return requirementResearchPrompt(stage) || solutionDesignPrompt(stage) || projectDevelopmentPrompt(stage) || validationPrompt(stage)
+      return requirementResearchPrompt(stage)
+        || solutionDesignPrompt(stage)
+        || projectDevelopmentPrompt(stage)
+        || validationPrompt(stage)
+        || deploymentTrialPrompt(stage)
+        || acceptanceHandoverPrompt(stage)
     },
   })
   const handler = createStageRoute({
@@ -339,6 +443,51 @@ export async function apply(ctx: Context): Promise<void> {
     path: FDE_STAGE_COMPLETE_VALIDATION_PATH,
     handler: completeValidation,
   }), `fde-stage: ${FDE_STAGE_COMPLETE_VALIDATION_PATH}`)
+  const completePilot = createCompletePilotRoute({
+    trusted: request => isTrustedApiRequest(request, []),
+    workspaceExists: id => ctx.workspaceRegistry.get(WorkspaceId(id)) !== undefined,
+    deploymentTrial: async (workspaceId) => {
+      const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
+      if (workspace === undefined) throw new Error('当前项目不存在或已被移除。')
+      const snapshot = await loadDeploymentTrialStage(workspace.path)
+      return { gateReady: snapshot.gateReady, blockers: snapshot.blockers }
+    },
+    complete: async (workspaceId, expectedRevision) => await state.completePilot(workspaceId, expectedRevision),
+    reportFailure: (error) => { ctx.logger.warn(error instanceof Error ? error : new Error(String(error))) },
+  })
+  ctx.effect(() => ctx.webServer.register({
+    kind: 'exact',
+    path: FDE_STAGE_COMPLETE_PILOT_PATH,
+    handler: completePilot,
+  }), `fde-stage: ${FDE_STAGE_COMPLETE_PILOT_PATH}`)
+  const completeHandoff = createCompleteHandoffRoute({
+    trusted: request => isTrustedApiRequest(request, []),
+    workspaceExists: id => ctx.workspaceRegistry.get(WorkspaceId(id)) !== undefined,
+    acceptanceHandover: async (workspaceId) => {
+      const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
+      if (workspace === undefined) throw new Error('当前项目不存在或已被移除。')
+      const snapshot = await loadAcceptanceHandoverStage(workspace.path)
+      return { gateReady: snapshot.gateReady, blockers: snapshot.blockers }
+    },
+    complete: async (workspaceId, expectedRevision) => await state.completeHandoff(workspaceId, expectedRevision),
+    reportFailure: (error) => { ctx.logger.warn(error instanceof Error ? error : new Error(String(error))) },
+  })
+  ctx.effect(() => ctx.webServer.register({
+    kind: 'exact',
+    path: FDE_STAGE_COMPLETE_HANDOFF_PATH,
+    handler: completeHandoff,
+  }), `fde-stage: ${FDE_STAGE_COMPLETE_HANDOFF_PATH}`)
+  const returnStage = createReturnStageRoute({
+    trusted: request => isTrustedApiRequest(request, []),
+    workspaceExists: id => ctx.workspaceRegistry.get(WorkspaceId(id)) !== undefined,
+    returnToPrevious: async (workspaceId, expectedRevision, reason) => await state.returnToPrevious(workspaceId, expectedRevision, reason),
+    reportFailure: (error) => { ctx.logger.warn(error instanceof Error ? error : new Error(String(error))) },
+  })
+  ctx.effect(() => ctx.webServer.register({
+    kind: 'exact',
+    path: FDE_STAGE_RETURN_PATH,
+    handler: returnStage,
+  }), `fde-stage: ${FDE_STAGE_RETURN_PATH}`)
 }
 
 /** Model-facing content is limited to one short stage section and an on-demand Skill. */

@@ -2,21 +2,21 @@
 
 [English](README.md) | 中文
 
-FDE 项目当前阶段的 Host 端状态。该包打开一张以 Harness WorkspaceId 为键的 `storage-domain` 表，并提供仅限可信同源访问的 POST 路由：读取或初始化记录，以及执行四个固定转换——`requirements` 到 `solution`、`solution` 到 `development`、`development` 到 `validation`、`validation` 到 `pilot`。同一 Workspace 的并发首次读取共享一次写入；阶段转换按项目串行并要求页面提交精确 revision。四个交付门依次重新检查三份需求调研文件、包括项目 PRD 在内的五份方案设计文档与已确认架构、三份项目开发收口文件，以及当前已由 FDE 确认的验证方案、验证合同、证据、阻塞项和三份验证产物；所有路由都不接受任意目标阶段。
+FDE 项目当前阶段的 Host 端状态。该包打开一张以 Harness WorkspaceId 为键的 `storage-domain` 表，并提供仅限可信同源访问的 POST 路由：读取或初始化记录，以及执行六个固定转换——`requirements` 到 `solution`、`solution` 到 `development`、`development` 到 `validation`、`validation` 到 `pilot`、`pilot` 到 `handoff`，最后由 `handoff` 进入终态 `completed`。同一 Workspace 的并发首次读取共享一次写入；阶段转换按项目串行并要求页面提交精确 revision。六个交付门依次重新检查三份需求调研文件、包括项目 PRD 在内的五份方案设计文档与已确认架构、三份项目开发收口文件、当前已由 FDE 确认的验证方案/合同/证据/阻塞项和三份验证产物、部署试运行合同/环境授权/五类证据/问题和四份产物，以及最终验收移交合同/交付物/条件项/责任移交/证据和四份产物。另一条仅限 FDE 的路由每次只返回一个阶段，也可把 `completed` 重新打开到 `handoff`；它必须填写原因，保留全部文件和证据，记录有界审计，并把返回范围标记为待重新确认。所有路由都不接受任意目标阶段。
 
-该包同时注册内置 `fde-requirement-research`、`fde-solution-design`、`fde-project-development`、`fde-validation` Skills 和一段简短的阶段感知系统提示。项目开发 Skill 直接约束项目唯一标准 `docs/` 与有证据的任务；验证 Skill 区分方案准备和执行，要求每项指标引用此前阶段的真实文档，并给出精确结果模板：`evidence` 是一条非空的项目相对路径文字，WARN 的接受理由使用 `waiverReason`。它不能创建 Host 所有的 FDE 方案确认，也不能写入问题的 `waived` 决定；只有 FDE 在浏览器中填写理由后才能接受一条 open 问题。只有 FDE 在浏览器中的明确确认能够授权当前方案，并在验证完成后推进阶段。其余两个阶段门仍延期实现。
+该包同时注册内置 `fde-requirement-research`、`fde-solution-design`、`fde-project-development`、`fde-validation`、`fde-deployment-trial`、`fde-acceptance-handover` Skills 和一段简短的阶段感知系统提示。项目开发 Skill 直接约束项目唯一标准 `docs/` 与有证据的任务；验证 Skill 区分方案准备和执行，并要求每项指标引用此前阶段的真实文档。部署 Skill 记录目标环境、当前候选版本、项目内运行/回滚证据、问题和四份固定产物，不获得凭据，也不把本地启动当成部署完成；Agent 保持授权为 false 且不写 `status=ready`，这项 FDE 决定归属项目进度中的精确合同操作。移交 Skill 在 Markdown 过期时以 `.fde/deployment-trial.json` 为部署事实源，把企业验收证据写成有界数组，并把企业验收、制品可取得、条件决定与责任移交完成状态保留给项目进度中有证据的 FDE 操作。Skill 只能维护候选文件，不能调用阶段转换；记录移交事实与完成项目仍是两个独立的 FDE 动作。
 
 ## 模型体验
 
-当 Agent 属于需求调研、方案设计、项目开发或验证评估中的已登记项目时，模型会看到一段短提示：当前阶段、固定产物目录、按需加载的 Skill，以及不得确认客户结论或推进项目。对应完整 Skill 正文只在既有 skill 工具被调用后加载；本包不注册阶段推进工具。
+当 Agent 属于已登记项目的任一活动交付阶段时，模型会看到一段短提示：当前阶段、固定产物目录、按需加载的 Skill，以及不得确认客户结论或推进项目。对应完整 Skill 正文只在既有 skill 工具被调用后加载；终态 `completed` 不再贡献阶段提示。本包不注册阶段推进工具。
 
 #### KV Cache 影响
 
-短提示在每个受支持阶段内保持稳定，只在已提交项目阶段变化时改变，并从部署试运行开始变为空。较长的 Skill 正文只在明确加载后影响普通对话后缀。
+短提示在每个活动阶段内保持稳定，只在已提交项目状态变化时改变，并在最终完成后变为空。较长的 Skill 正文只在明确加载后影响普通对话后缀。
 
 ## 已知限制与暂缓事项
 
 - 路由只允许本机同源访问，并要求 WorkspaceId 已存在。
-- 当前记录只有当前阶段、revision 和时间；阶段历史、受影响状态、试运行／移交证据和浏览器推送仍延期实现。
-- 部署试运行到验收移交及最终移交完成的阶段门尚未实现。
+- 当前记录保留有界的返回审计和待重新确认边界；完整的前进转换历史与浏览器推送仍延期实现。
+- 部署与验收合同仍是项目文件；本包不执行部署、不保管凭据、不认证客户，也不完成签章。
 - 固定文件只校验存在和可读取；业务质量仍由 FDE 负责判断。

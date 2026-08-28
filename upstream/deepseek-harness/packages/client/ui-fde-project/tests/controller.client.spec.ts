@@ -1,8 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
+  acceptValidationMetric,
+  confirmDeploymentTrialReadiness,
   confirmValidationPlan,
   FdeProjectSurfaceController,
   fetchProjectSurface,
+  recordAcceptanceHandoverDecision,
   startProjectRuntime,
   waiveValidationIssue,
 } from '../src/client/controller.ts'
@@ -79,6 +82,50 @@ describe('FDE project surface controller', () => {
         workspaceId: 'w-1', contractDigest: digest, issueId: 'customer-reconciliation',
         reason: '客户确认本轮接受，后续补充真实对账数据。',
       }),
+    }))
+  })
+
+  it('submits one explained required-metric acceptance through the same-origin route', async () => {
+    const digest = `sha256:${'1'.repeat(64)}`
+    const fetchImpl = vi.fn(async () => new Response(JSON.stringify({ ok: true, value }), { status: 200 }))
+    await expect(acceptValidationMetric(
+      'w-1', digest, 'million-row-performance', '客户确认本轮不具备正式性能设备，试运行阶段补测。', fetchImpl,
+    )).resolves.toEqual(value)
+    expect(fetchImpl).toHaveBeenCalledWith('/api/fde-project/validation/accept-metric', expect.objectContaining({
+      method: 'POST',
+      body: JSON.stringify({
+        workspaceId: 'w-1', contractDigest: digest, metricId: 'million-row-performance',
+        reason: '客户确认本轮不具备正式性能设备，试运行阶段补测。',
+      }),
+    }))
+  })
+
+  it('confirms the exact deployment-trial readiness contract through the same-origin route', async () => {
+    const digest = `sha256:${'2'.repeat(64)}`
+    const fetchImpl = vi.fn(async () => new Response(JSON.stringify({ ok: true, value }), { status: 200 }))
+    await expect(confirmDeploymentTrialReadiness('w-1', digest, fetchImpl)).resolves.toEqual(value)
+    expect(fetchImpl).toHaveBeenCalledWith('/api/fde-project/pilot/confirm-readiness', expect.objectContaining({
+      method: 'POST', body: JSON.stringify({ workspaceId: 'w-1', contractDigest: digest }),
+    }))
+  })
+
+  it('records one exact evidence-backed acceptance and handover decision', async () => {
+    const digest = `sha256:${'3'.repeat(64)}`
+    const decision = {
+      acceptance: { status: 'accepted' as const, summary: '客户已经签署验收记录。', evidence: ['records/acceptance.md'] },
+      deliverables: [{ id: 'source', available: true }],
+      conditions: [{ id: 'C-1', status: 'resolved' as const }],
+      handover: {
+        trainingCompleted: true,
+        accessResponsibilityTransferred: true,
+        operationsResponsibilityTransferred: true,
+        evidence: ['records/handover.md'],
+      },
+    }
+    const fetchImpl = vi.fn(async () => new Response(JSON.stringify({ ok: true, value }), { status: 200 }))
+    await expect(recordAcceptanceHandoverDecision('w-1', digest, decision, fetchImpl)).resolves.toEqual(value)
+    expect(fetchImpl).toHaveBeenCalledWith('/api/fde-project/handoff/record-decision', expect.objectContaining({
+      method: 'POST', body: JSON.stringify({ workspaceId: 'w-1', contractDigest: digest, decision }),
     }))
   })
 

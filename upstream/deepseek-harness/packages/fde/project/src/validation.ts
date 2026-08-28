@@ -175,6 +175,18 @@ async function metricOf(projectRoot: string, raw: unknown, index: number): Promi
   const evidence = await evidenceOf(projectRoot, result.evidence, `metrics[${String(index)}].result.evidence`)
   const value = optionalText(result.value, `metrics[${String(index)}].result.value`, 500)
   const waiverReason = optionalText(result.waiverReason, `metrics[${String(index)}].result.waiverReason`, 1_000)
+  const manualAcceptance = result.manualAcceptance === undefined
+    ? undefined
+    : recordOf(result.manualAcceptance, `metrics[${String(index)}].result.manualAcceptance`)
+  const manualAcceptanceReason = manualAcceptance === undefined
+    ? undefined
+    : textOf(manualAcceptance.reason, `metrics[${String(index)}].result.manualAcceptance.reason`, 1_000)
+  const manualAcceptanceAt = manualAcceptance === undefined
+    ? undefined
+    : textOf(manualAcceptance.acceptedAt, `metrics[${String(index)}].result.manualAcceptance.acceptedAt`, 80)
+  if (manualAcceptanceAt !== undefined && Number.isNaN(Date.parse(manualAcceptanceAt))) {
+    throw new Error(`metrics[${String(index)}].result.manualAcceptance.acceptedAt 必须是有效时间。`)
+  }
   const note = optionalText(result.note, `metrics[${String(index)}].result.note`, 1_000)
   return {
     id: idOf(item.id, `metrics[${String(index)}].id`),
@@ -189,6 +201,9 @@ async function metricOf(projectRoot: string, raw: unknown, index: number): Promi
     ...(evidence.path === undefined ? {} : { evidence: evidence.path }),
     evidenceAvailable: evidence.available,
     ...(waiverReason === undefined ? {} : { waiverReason }),
+    ...(manualAcceptanceReason === undefined || manualAcceptanceAt === undefined
+      ? {}
+      : { manualAcceptance: { reason: manualAcceptanceReason, acceptedAt: manualAcceptanceAt } }),
     ...(note === undefined ? {} : { note }),
   }
 }
@@ -290,6 +305,15 @@ function planDigest(contract: ValidationContractSnapshot): string {
     })),
   }
   return `sha256:${createHash('sha256').update(JSON.stringify(value)).digest('hex')}`
+}
+
+function metricNormallySatisfied(metric: ValidationMetricSnapshot): boolean {
+  return metric.evidenceAvailable
+    && (metric.status === 'PASS' || (metric.status === 'WARN' && metric.waiverReason !== undefined))
+}
+
+function metricSatisfied(metric: ValidationMetricSnapshot): boolean {
+  return metricNormallySatisfied(metric) || metric.manualAcceptance !== undefined
 }
 
 function artifactFileUrl(workspaceId: string, artifactId: string): string {
@@ -397,11 +421,13 @@ export async function loadValidationStage(projectRoot: string, workspaceId?: str
   if (planApproval.status === 'pending') blockers.push('评估方案尚未由 FDE 确认。')
   if (planApproval.status === 'stale') blockers.push(planApproval.message ?? '评估方案需要 FDE 重新确认。')
   for (const metric of contract.metrics.filter(item => item.required)) {
-    if (metric.status === 'NOT_RUN') blockers.push(`必需指标“${metric.name}”尚未运行。`)
-    else {
-      if (metric.status === 'FAIL') blockers.push(`必需指标“${metric.name}”未通过。`)
-      if (!metric.evidenceAvailable) blockers.push(`必需指标“${metric.name}”缺少可读取证据。`)
-      if (metric.status === 'WARN' && metric.waiverReason === undefined) blockers.push(`必需指标“${metric.name}”的 WARN 尚无接受理由。`)
+    if (metric.manualAcceptance === undefined) {
+      if (metric.status === 'NOT_RUN') blockers.push(`必需指标“${metric.name}”尚未运行。`)
+      else {
+        if (metric.status === 'FAIL') blockers.push(`必需指标“${metric.name}”未通过。`)
+        if (!metric.evidenceAvailable) blockers.push(`必需指标“${metric.name}”缺少可读取证据。`)
+        if (metric.status === 'WARN' && metric.waiverReason === undefined) blockers.push(`必需指标“${metric.name}”的 WARN 尚无接受理由。`)
+      }
     }
   }
   for (const issue of contract.issues) {
@@ -413,8 +439,7 @@ export async function loadValidationStage(projectRoot: string, workspaceId?: str
   }
   for (const artifact of artifacts.filter(item => item.status !== 'present' && item.id !== 'validation-plan')) blockers.push(`${artifact.title}尚未生成。`)
   const requiredMetrics = contract.metrics.filter(item => item.required)
-  const satisfiedMetrics = requiredMetrics.filter(item =>
-    item.evidenceAvailable && (item.status === 'PASS' || (item.status === 'WARN' && item.waiverReason !== undefined)))
+  const satisfiedMetrics = requiredMetrics.filter(metricSatisfied)
   return {
     contract,
     artifacts: {
@@ -431,6 +456,51 @@ export async function loadValidationStage(projectRoot: string, workspaceId?: str
     gateReady: blockers.length === 0 && planApproval.status === 'confirmed',
     blockers: [...new Set(blockers)],
   }
+}
+
+/** Accept one unmet required validation metric while preserving its real result and evidence state. */
+export async function acceptValidationMetric(
+  projectRoot: string,
+  expectedDigest: string,
+  metricId: string,
+  reason: string,
+): Promise<ValidationStageSnapshot> {
+  if (!SHA256_DIGEST.test(expectedDigest)) throw new Error('人工接受指标请求缺少有效合同摘要。')
+  const expectedMetricId = idOf(metricId, '人工接受指标 metricId')
+  const acceptanceReason = textOf(reason, '人工接受指标 reason', 1_000)
+  const contractPath = join(projectRoot, VALIDATION_CONTRACT_PATH)
+  return await withFileLock(contractPath, async () => {
+    const value = await stat(contractPath)
+    if (!value.isFile() || value.size > MAX_CONTRACT_BYTES) throw new Error('验证合同不是普通 JSON 文件或超过 512 KiB。')
+    const contract = recordOf(JSON.parse(await readFile(contractPath, 'utf8')) as unknown, '验证合同')
+    const current = await parseValidationContract(projectRoot, contract)
+    if (current.status !== 'ready') throw new Error(current.message ?? '验证合同尚未就绪。')
+    if (planDigest(current) !== expectedDigest) throw new Error('评估方案已经变化，请刷新后重新核对。')
+    if (!Array.isArray(contract.metrics)) throw new Error('验证合同 metrics 必须是数组。')
+    const metricIndex = contract.metrics.findIndex((candidate) => {
+      if (candidate === null || typeof candidate !== 'object' || Array.isArray(candidate)) return false
+      return (candidate as { id?: unknown }).id === expectedMetricId
+    })
+    if (metricIndex < 0) throw new Error('要人工接受的指标已经不存在，请刷新后重新核对。')
+    const metric = recordOf(contract.metrics[metricIndex], `metrics[${String(metricIndex)}]`)
+    const currentMetric = await metricOf(projectRoot, metric, metricIndex)
+    if (!currentMetric.required) throw new Error('只有必需指标可以由 FDE 人工接受。')
+    if (metricNormallySatisfied(currentMetric)) throw new Error('该指标已经通过正常结果和证据满足门槛，无需人工接受。')
+    if (currentMetric.manualAcceptance !== undefined) throw new Error('该指标已经由 FDE 人工接受，请刷新后查看最新状态。')
+    const result = metric.result === undefined ? {} : recordOf(metric.result, `metrics[${String(metricIndex)}].result`)
+    contract.metrics[metricIndex] = {
+      ...metric,
+      result: {
+        ...result,
+        manualAcceptance: {
+          reason: acceptanceReason,
+          acceptedAt: new Date().toISOString(),
+        },
+      },
+    }
+    await writeFileAtomic(contractPath, `${JSON.stringify(contract, null, 2)}\n`, { mode: 0o600, dirMode: 0o700 })
+    return await loadValidationStage(projectRoot)
+  })
 }
 
 /** Confirm the exact validation plan currently displayed to the FDE. */

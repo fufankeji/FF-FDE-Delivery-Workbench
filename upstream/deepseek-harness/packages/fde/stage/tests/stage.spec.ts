@@ -4,12 +4,17 @@ import type { KvTable } from '@deepseek-ai/dsh-storage-domain'
 import type { WorkspaceId } from '@deepseek-ai/dsh-workspace'
 import {
   createCompleteDevelopmentRoute,
+  createCompleteHandoffRoute,
+  createCompletePilotRoute,
   createCompleteRequirementsRoute,
   createCompleteSolutionRoute,
   createCompleteValidationRoute,
+  createReturnStageRoute,
   createStageRoute,
 } from '../src/http.ts'
 import {
+  ACCEPTANCE_HANDOVER_SKILL, acceptanceHandoverPrompt,
+  DEPLOYMENT_TRIAL_SKILL, deploymentTrialPrompt,
   PROJECT_DEVELOPMENT_SKILL, projectDevelopmentPrompt,
   REQUIREMENT_RESEARCH_SKILL, requirementResearchPrompt,
   SOLUTION_DESIGN_SKILL, solutionDesignPrompt,
@@ -85,6 +90,7 @@ describe('FdeStageState', () => {
     const times = [
       '2026-08-26T00:00:00.000Z', '2026-08-27T00:00:00.000Z',
       '2026-08-28T00:00:00.000Z', '2026-08-29T00:00:00.000Z', '2026-08-30T00:00:00.000Z',
+      '2026-08-31T00:00:00.000Z', '2026-09-01T00:00:00.000Z',
     ]
     const state = new FdeStageState(data.value, () => times.shift() ?? '2026-08-27T00:00:00.000Z')
     await state.open(wid('w-1'))
@@ -113,6 +119,61 @@ describe('FdeStageState', () => {
       createdAt: '2026-08-26T00:00:00.000Z', updatedAt: '2026-08-30T00:00:00.000Z',
     })
     await expect(state.completeValidation(wid('w-1'), 4)).rejects.toThrow('已经变化')
+    const handoff = await state.completePilot(wid('w-1'), 5)
+    expect(handoff).toMatchObject({ currentStage: 'handoff', revision: 6 })
+    const completed = await state.completeHandoff(wid('w-1'), 6)
+    expect(completed).toMatchObject({ currentStage: 'completed', revision: 7 })
+  })
+
+  it('returns exactly one stage, preserves an audit, and requires the returned range to be reconfirmed', async () => {
+    const data = table()
+    const times = [
+      '2026-08-26T00:00:00.000Z', '2026-08-27T00:00:00.000Z',
+      '2026-08-28T00:00:00.000Z', '2026-08-29T00:00:00.000Z',
+      '2026-08-30T00:00:00.000Z', '2026-08-31T00:00:00.000Z',
+      '2026-09-01T00:00:00.000Z', '2026-09-02T00:00:00.000Z',
+    ]
+    const state = new FdeStageState(data.value, () => times.shift() ?? '2026-09-03T00:00:00.000Z')
+    await state.open(wid('w-1'))
+    await state.completeRequirements(wid('w-1'), 1)
+    await state.completeSolution(wid('w-1'), 2)
+    await state.completeDevelopment(wid('w-1'), 3)
+
+    const returned = await state.returnToPrevious(wid('w-1'), 4, '客户补充了开发范围')
+    expect(returned).toMatchObject({
+      currentStage: 'development',
+      revision: 5,
+      reconfirmThrough: 'validation',
+      returns: [{
+        from: 'validation',
+        to: 'development',
+        reason: '客户补充了开发范围',
+        returnedAt: '2026-08-30T00:00:00.000Z',
+        revision: 5,
+      }],
+    })
+    await expect(state.returnToPrevious(wid('w-1'), 4, '旧页面')).rejects.toThrow('已经变化')
+
+    const validation = await state.completeDevelopment(wid('w-1'), 5)
+    expect(validation).toMatchObject({ currentStage: 'validation', revision: 6, reconfirmThrough: 'validation' })
+    const pilot = await state.completeValidation(wid('w-1'), 6)
+    expect(pilot).toMatchObject({ currentStage: 'pilot', revision: 7, returns: returned.returns })
+    expect(pilot).not.toHaveProperty('reconfirmThrough')
+  })
+
+  it('reopens a completed project to handoff and refuses to return before requirements', async () => {
+    const data = table()
+    const state = new FdeStageState(data.value, () => '2026-08-27T00:00:00.000Z')
+    data.records.set(wid('completed'), {
+      currentStage: 'completed', revision: 7,
+      createdAt: '2026-08-20T00:00:00.000Z', updatedAt: '2026-08-26T00:00:00.000Z',
+    })
+    await expect(state.returnToPrevious(wid('completed'), 7, '补充移交记录')).resolves.toMatchObject({
+      currentStage: 'handoff', revision: 8, reconfirmThrough: 'completed',
+    })
+    await state.open(wid('new'))
+    await expect(state.returnToPrevious(wid('new'), 1, '返回')).rejects.toThrow('第一个阶段')
+    await expect(state.returnToPrevious(wid('new'), 1, '   ')).rejects.toThrow('返回原因必须填写')
   })
 })
 
@@ -173,6 +234,27 @@ describe('requirement-research model guidance', () => {
     expect(validationPrompt('validation')).toContain('先加载 Skill')
     expect(validationPrompt('pilot')).toBe('')
   })
+
+  it('keeps deployment trial and acceptance handover as stage-scoped Skills', () => {
+    expect(DEPLOYMENT_TRIAL_SKILL.name).toBe('fde-deployment-trial')
+    expect(DEPLOYMENT_TRIAL_SKILL.content).toContain('.fde/deployment-trial.json')
+    expect(DEPLOYMENT_TRIAL_SKILL.content).toContain('不得代替 FDE 把问题标为 accepted')
+    expect(DEPLOYMENT_TRIAL_SKILL.content).toContain('Agent 保持 false')
+    expect(DEPLOYMENT_TRIAL_SKILL.content).toContain('ready 由同一个 FDE 项目进度确认动作写入')
+    expect(deploymentTrialPrompt('pilot')).toContain('先加载 Skill')
+    expect(deploymentTrialPrompt('handoff')).toBe('')
+    expect(ACCEPTANCE_HANDOVER_SKILL.name).toBe('fde-acceptance-handover')
+    expect(ACCEPTANCE_HANDOVER_SKILL.content).toContain('.fde/acceptance-handover.json')
+    expect(ACCEPTANCE_HANDOVER_SKILL.content).toContain('.fde/deployment-trial.json')
+    expect(ACCEPTANCE_HANDOVER_SKILL.content).toContain('唯一事实源')
+    expect(ACCEPTANCE_HANDOVER_SKILL.content).toContain('最多 40 项项目相对 evidence 数组')
+    expect(ACCEPTANCE_HANDOVER_SKILL.content).toContain('交付物 available 保持 false')
+    expect(ACCEPTANCE_HANDOVER_SKILL.content).toContain('“记录验收与移交事实”和“完成项目”是两个独立动作')
+    expect(ACCEPTANCE_HANDOVER_SKILL.content).toContain('不得虚构客户签字')
+    expect(acceptanceHandoverPrompt('handoff')).toContain('先加载 Skill')
+    expect(acceptanceHandoverPrompt('handoff')).toContain('只能由 FDE 在项目进度页记录')
+    expect(acceptanceHandoverPrompt('completed')).toBe('')
+  })
 })
 
 describe('project-stage route', () => {
@@ -202,6 +284,37 @@ describe('project-stage route', () => {
       status: 404,
       body: { ok: false, error: { code: 'workspace-not-found', message: '当前项目不存在或已被移除。' } },
     })
+  })
+
+  it('accepts an explicit return reason and rejects unavailable or empty returns', async () => {
+    const returnToPrevious = vi.fn(async () => ({
+      currentStage: 'development' as const,
+      revision: 5,
+      createdAt: '2026-08-26T00:00:00.000Z',
+      updatedAt: '2026-08-30T00:00:00.000Z',
+      reconfirmThrough: 'validation' as const,
+      returns: [{
+        from: 'validation' as const, to: 'development' as const, reason: '范围变化',
+        returnedAt: '2026-08-30T00:00:00.000Z', revision: 5,
+      }],
+    }))
+    const handler = createReturnStageRoute({
+      trusted: () => true,
+      workspaceExists: id => id === 'w-1',
+      returnToPrevious,
+    })
+    const invalid = response()
+    await handler(request({ workspaceId: 'w-1', expectedRevision: 4, reason: '  ' }), invalid.value)
+    expect(invalid.snapshot()).toMatchObject({ status: 400, body: { error: { code: 'invalid-request' } } })
+    expect(returnToPrevious).not.toHaveBeenCalled()
+
+    const accepted = response()
+    await handler(request({ workspaceId: 'w-1', expectedRevision: 4, reason: ' 范围变化 ' }), accepted.value)
+    expect(accepted.snapshot()).toMatchObject({
+      status: 200,
+      body: { value: { currentStage: 'development', revision: 5, reconfirmThrough: 'validation' } },
+    })
+    expect(returnToPrevious).toHaveBeenCalledWith('w-1', 4, '范围变化')
   })
 
   it('requires all fixed outputs before the FDE-only completion action', async () => {
@@ -381,6 +494,36 @@ describe('project-stage route', () => {
       body: { ok: true, value: { workspaceId: 'w-1', currentStage: 'pilot', revision: 5 } },
     })
     expect(complete).toHaveBeenCalledWith('w-1', 4)
+  })
+
+  it('requires Host-ready deployment and handover facts for the final two manual gates', async () => {
+    const completePilot = vi.fn(async () => ({
+      currentStage: 'handoff' as const, revision: 6,
+      createdAt: '2026-08-26T00:00:00.000Z', updatedAt: '2026-08-31T00:00:00.000Z',
+    }))
+    const deploymentTrial = vi.fn(async () => ({ gateReady: false, blockers: ['回滚演练证据尚不可用。'] }))
+    const pilotHandler = createCompletePilotRoute({
+      trusted: () => true, workspaceExists: id => id === 'w-1', deploymentTrial, complete: completePilot,
+    })
+    const blockedPilot = response()
+    await pilotHandler(request({ workspaceId: 'w-1', expectedRevision: 5 }), blockedPilot.value)
+    expect(blockedPilot.snapshot()).toMatchObject({ status: 409, body: { error: { code: 'stage-pilot-incomplete' } } })
+    deploymentTrial.mockResolvedValueOnce({ gateReady: true, blockers: [] })
+    const acceptedPilot = response()
+    await pilotHandler(request({ workspaceId: 'w-1', expectedRevision: 5 }), acceptedPilot.value)
+    expect(acceptedPilot.snapshot()).toMatchObject({ status: 200, body: { value: { currentStage: 'handoff', revision: 6 } } })
+
+    const completeHandoff = vi.fn(async () => ({
+      currentStage: 'completed' as const, revision: 7,
+      createdAt: '2026-08-26T00:00:00.000Z', updatedAt: '2026-09-01T00:00:00.000Z',
+    }))
+    const acceptanceHandover = vi.fn(async () => ({ gateReady: true, blockers: [] }))
+    const handoffHandler = createCompleteHandoffRoute({
+      trusted: () => true, workspaceExists: id => id === 'w-1', acceptanceHandover, complete: completeHandoff,
+    })
+    const acceptedHandoff = response()
+    await handoffHandler(request({ workspaceId: 'w-1', expectedRevision: 6 }), acceptedHandoff.value)
+    expect(acceptedHandoff.snapshot()).toMatchObject({ status: 200, body: { value: { currentStage: 'completed', revision: 7 } } })
   })
 
   it('rejects untrusted and non-POST requests before persistence', async () => {

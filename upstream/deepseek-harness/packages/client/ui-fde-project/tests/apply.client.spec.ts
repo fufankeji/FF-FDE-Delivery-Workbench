@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { Context } from '@deepseek-ai/cordis'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { LocaleRuntime } from '@deepseek-ai/dsh-client-locale/client'
@@ -123,6 +124,10 @@ describe('ui-fde-project apply', () => {
     expect(slots.entries('conversation.view')).toHaveLength(0)
 
     const injected = (slots.entries('shell.overlay')[0]!.inject as unknown as () => ProjectPageInjected)()
+    window.dispatchEvent(new CustomEvent('fde:project-progress-open', { detail: { workspaceId: 'workspace-1' } }))
+    expect(injected.hooks.projectPage.getSnapshot()).toEqual({
+      open: true, view: 'project', workspaceId: 'workspace-1',
+    })
     await injected.completeRequirements('workspace-1', 1)
     await vi.waitFor(() => { expect(slots.entries('conversation.view')).toHaveLength(1) })
     const views = slots.entries('conversation.view')
@@ -164,6 +169,8 @@ describe('ui-fde-project apply', () => {
 
     await fiber.dispose()
     expect(slots.entries('conversation.view')).toHaveLength(0)
+    window.dispatchEvent(new CustomEvent('fde:project-progress-open', { detail: { workspaceId: 'workspace-2' } }))
+    expect(injected.hooks.projectPage.getSnapshot().workspaceId).toBe('workspace-1')
   })
 
   it('confirms and rechecks the exact project Session model before queuing one visible Wiki instruction', async () => {

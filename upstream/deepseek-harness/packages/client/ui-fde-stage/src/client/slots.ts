@@ -9,6 +9,7 @@ export interface FdeStageInjected {
   hooks: { stageProgress: FdeStageProgressController }
   loadStage: (workspaceId: string) => void
   retryStage: (workspaceId: string) => void
+  openProjectProgress: (workspaceId: string) => void
 }
 
 /** Session-header current-stage props. */

@@ -170,6 +170,10 @@ export interface ValidationMetricSnapshot {
   readonly evidence?: string
   readonly evidenceAvailable: boolean
   readonly waiverReason?: string
+  readonly manualAcceptance?: {
+    readonly reason: string
+    readonly acceptedAt: string
+  }
   readonly note?: string
 }
 
@@ -436,6 +440,158 @@ export interface DevelopmentDocsSnapshot {
   readonly issues: readonly string[]
 }
 
+/** One fixed Markdown output of the final two delivery stages. */
+export interface DeliveryCloseoutArtifactSnapshot {
+  readonly id: string
+  readonly title: string
+  readonly path: string
+  readonly status: 'missing' | 'present' | 'error'
+  readonly bytes?: number
+  readonly updatedAt?: string
+  readonly fileUrl?: string
+  readonly message?: string
+}
+
+/** One project-relative evidence reference and its current filesystem status. */
+export interface DeliveryEvidenceSnapshot {
+  readonly path?: string
+  readonly available: boolean
+}
+
+/** One issue found while the candidate is running in the target environment. */
+export interface DeploymentTrialIssueSnapshot {
+  readonly id: string
+  readonly title: string
+  readonly severity: 'critical' | 'high' | 'medium' | 'low'
+  readonly status: 'open' | 'resolved' | 'accepted' | 'deferred'
+  readonly evidence?: string
+  readonly evidenceAvailable: boolean
+  readonly resolution?: string
+  readonly decisionReason?: string
+  readonly owner?: string
+}
+
+/** Parsed deployment-trial contract or its explicit absence/failure. */
+export interface DeploymentTrialContractSnapshot {
+  readonly status: 'missing' | 'invalid' | 'ready'
+  readonly path: string
+  readonly digest?: string
+  readonly candidateVersion?: string
+  readonly environment?: {
+    readonly name: string
+    readonly summary: string
+    readonly authorized: boolean
+  }
+  readonly deploymentStatus?: 'preparing' | 'deploying' | 'running' | 'blocked' | 'ready'
+  readonly evidence: {
+    readonly validationBaseline: DeliveryEvidenceSnapshot
+    readonly deployment: DeliveryEvidenceSnapshot
+    readonly health: DeliveryEvidenceSnapshot
+    readonly rollback: DeliveryEvidenceSnapshot
+    readonly trial: DeliveryEvidenceSnapshot
+  }
+  readonly issues: readonly DeploymentTrialIssueSnapshot[]
+  readonly message?: string
+}
+
+/** Host-derived deployment-trial readiness and fixed outputs. */
+export interface DeploymentTrialStageSnapshot {
+  readonly contract: DeploymentTrialContractSnapshot
+  readonly artifacts: {
+    readonly root: string
+    readonly requiredCount: number
+    readonly presentCount: number
+    readonly items: readonly DeliveryCloseoutArtifactSnapshot[]
+  }
+  readonly confirmationReady: boolean
+  readonly confirmationBlockers: readonly string[]
+  readonly gateReady: boolean
+  readonly blockers: readonly string[]
+}
+
+/** One final deliverable indexed without uploading or probing external storage. */
+export interface AcceptanceDeliverableSnapshot {
+  readonly id: string
+  readonly name: string
+  readonly location: string
+  readonly version?: string
+  readonly checksum?: string
+  readonly available: boolean
+  readonly locationType: 'project-file' | 'external'
+}
+
+/** One unresolved, resolved, or explicitly accepted acceptance condition. */
+export interface AcceptanceConditionSnapshot {
+  readonly id: string
+  readonly title: string
+  readonly status: 'open' | 'resolved' | 'accepted'
+  readonly reason?: string
+  readonly owner?: string
+  readonly followUp?: string
+}
+
+/** Parsed acceptance-handover contract or its explicit absence/failure. */
+export interface AcceptanceHandoverContractSnapshot {
+  readonly status: 'missing' | 'invalid' | 'ready'
+  readonly path: string
+  readonly digest?: string
+  readonly finalVersion?: string
+  readonly deploymentTrialBaseline: DeliveryEvidenceSnapshot
+  readonly acceptance?: {
+    readonly status: 'pending' | 'accepted' | 'conditionally-accepted' | 'returned' | 'terminated'
+    readonly summary: string
+    readonly evidence: readonly DeliveryEvidenceSnapshot[]
+  }
+  readonly deliverables: readonly AcceptanceDeliverableSnapshot[]
+  readonly conditions: readonly AcceptanceConditionSnapshot[]
+  readonly handover?: {
+    readonly trainingCompleted: boolean
+    readonly accessResponsibilityTransferred: boolean
+    readonly operationsResponsibilityTransferred: boolean
+    readonly evidence: readonly DeliveryEvidenceSnapshot[]
+  }
+  readonly message?: string
+}
+
+/** FDE-authored mutable decisions for one exact acceptance-handover contract. */
+export interface AcceptanceHandoverDecision {
+  readonly acceptance: {
+    readonly status: 'pending' | 'accepted' | 'conditionally-accepted' | 'returned' | 'terminated'
+    readonly summary: string
+    readonly evidence: readonly string[]
+  }
+  readonly deliverables: readonly {
+    readonly id: string
+    readonly available: boolean
+  }[]
+  readonly conditions: readonly {
+    readonly id: string
+    readonly status: 'open' | 'resolved' | 'accepted'
+    readonly reason?: string
+    readonly owner?: string
+    readonly followUp?: string
+  }[]
+  readonly handover: {
+    readonly trainingCompleted: boolean
+    readonly accessResponsibilityTransferred: boolean
+    readonly operationsResponsibilityTransferred: boolean
+    readonly evidence: readonly string[]
+  }
+}
+
+/** Host-derived final acceptance/handover readiness and fixed outputs. */
+export interface AcceptanceHandoverStageSnapshot {
+  readonly contract: AcceptanceHandoverContractSnapshot
+  readonly artifacts: {
+    readonly root: string
+    readonly requiredCount: number
+    readonly presentCount: number
+    readonly items: readonly DeliveryCloseoutArtifactSnapshot[]
+  }
+  readonly gateReady: boolean
+  readonly blockers: readonly string[]
+}
+
 /** Combined read model for project delivery views and Project Detail. */
 export interface ProjectSurfaceSnapshot {
   readonly workspaceId: string
@@ -450,6 +606,8 @@ export interface ProjectSurfaceSnapshot {
   readonly requirements: RequirementArtifactsSnapshot
   readonly solution: SolutionArtifactsSnapshot
   readonly development: DevelopmentDocsSnapshot
+  readonly deploymentTrial: DeploymentTrialStageSnapshot
+  readonly acceptanceHandover: AcceptanceHandoverStageSnapshot
 }
 
 /** Host-only API configuration consumed by the project-scoped OpenAPI adapter. */

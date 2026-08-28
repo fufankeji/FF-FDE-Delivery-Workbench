@@ -7,7 +7,9 @@ import { projectEvaluationDecision } from '../src/evaluation-guard.ts'
 import { loadDevelopmentDocs, resolveDevelopmentArtifact } from '../src/development-docs.ts'
 import { resolveRequirementArtifact } from '../src/requirement-artifacts.ts'
 import { resolveSolutionArtifact } from '../src/solution-artifacts.ts'
-import { confirmValidationPlan, loadValidationStage, resolveValidationArtifact, waiveValidationIssue } from '../src/validation.ts'
+import {
+  acceptValidationMetric, confirmValidationPlan, loadValidationStage, resolveValidationArtifact, waiveValidationIssue,
+} from '../src/validation.ts'
 import {
   approveProjectEvaluationBaseline, confirmProjectArchitecture, loadProjectSurfaceSnapshot, replaceProjectArchitecture,
 } from '../src/snapshot.ts'
@@ -324,6 +326,76 @@ milestone: 完成数据源接入
     changed.issues[0] = { ...changedIssue, status: 'open' }
     await writeFile(contractPath, JSON.stringify(changed))
     await expect(waiveValidationIssue(root, digest, 'customer-reconciliation', '使用过期方案接受')).rejects.toThrow('评估方案已经变化')
+  })
+
+  it('lets an FDE accept one unmet required metric without rewriting its real result', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'fde-validation-accept-metric-'))
+    const evaluations = join(root, '.fde', 'evaluations')
+    const evidence = join(evaluations, 'reports', 'validation-r1')
+    const outputs = join(root, 'fde-deliverables', '04-validation')
+    const solution = join(root, 'fde-deliverables', '02-solution-design')
+    await mkdir(evidence, { recursive: true })
+    await mkdir(outputs, { recursive: true })
+    await mkdir(solution, { recursive: true })
+    await writeFile(join(solution, 'acceptance-plan.md'), '# 验收方案\n\nFA-1 核心流程\nPA-1 性能基线\n')
+    await writeFile(join(evidence, 'smoke.md'), '# 核心流程通过\n')
+    for (const name of ['validation-plan.md', 'validation-report.md', 'validation-baseline.md']) {
+      await writeFile(join(outputs, name), `# ${name}\n`)
+    }
+    const contractPath = join(evaluations, 'validation.json')
+    const contract = {
+      schemaVersion: 2,
+      candidate: { id: 'R1' },
+      environment: 'macOS 本地验证环境',
+      metrics: [{
+        id: 'runtime-smoke', name: '核心流程', category: 'functional', method: '执行核心流程',
+        threshold: '全部通过', sources: [{ path: 'fde-deliverables/02-solution-design/acceptance-plan.md', references: ['FA-1'] }],
+        required: true, result: { status: 'PASS', evidence: '.fde/evaluations/reports/validation-r1/smoke.md' },
+      }, {
+        id: 'million-row-performance', name: '百万行查询性能', category: 'performance', method: '正式设备压测',
+        threshold: 'P95 小于 2 秒', sources: [{ path: 'fde-deliverables/02-solution-design/acceptance-plan.md', references: ['PA-1'] }],
+        required: true, result: { status: 'NOT_RUN', note: '正式性能设备尚未到位。' },
+      }, {
+        id: 'optional-export', name: '可选导出检查', category: 'functional', method: '手工导出',
+        threshold: '文件可下载', sources: [{ path: 'fde-deliverables/02-solution-design/acceptance-plan.md', references: ['FA-1'] }],
+        required: false, result: { status: 'NOT_RUN' },
+      }],
+      issues: [],
+    }
+    await writeFile(contractPath, JSON.stringify(contract))
+
+    const before = await loadValidationStage(root)
+    const digest = before.contract.digest ?? ''
+    await confirmValidationPlan(root, digest)
+    expect((await loadValidationStage(root))).toMatchObject({ satisfiedMetricCount: 1, gateReady: false })
+    const accepted = await acceptValidationMetric(
+      root, digest, 'million-row-performance', '客户确认本轮不提供正式性能设备，部署试运行阶段补测并回填证据。',
+    )
+    expect(accepted).toMatchObject({
+      contract: { metrics: [
+        { id: 'runtime-smoke', status: 'PASS', evidenceAvailable: true },
+        {
+          id: 'million-row-performance', status: 'NOT_RUN', evidenceAvailable: false,
+          note: '正式性能设备尚未到位。',
+          manualAcceptance: { reason: '客户确认本轮不提供正式性能设备，部署试运行阶段补测并回填证据。' },
+        },
+        { id: 'optional-export', status: 'NOT_RUN' },
+      ] },
+      planApproval: { status: 'confirmed' },
+      requiredMetricCount: 2,
+      satisfiedMetricCount: 2,
+      gateReady: true,
+      blockers: [],
+    })
+    expect(Date.parse(accepted.contract.metrics[1]?.manualAcceptance?.acceptedAt ?? '')).not.toBeNaN()
+    await expect(acceptValidationMetric(root, digest, 'million-row-performance', '重复接受')).rejects.toThrow('已经由 FDE 人工接受')
+    await expect(acceptValidationMetric(root, digest, 'optional-export', '接受可选项')).rejects.toThrow('只有必需指标')
+    await expect(acceptValidationMetric(root, digest, 'runtime-smoke', '接受已通过项')).rejects.toThrow('已经通过正常结果和证据')
+
+    const changed = JSON.parse(await readFile(contractPath, 'utf8')) as typeof contract
+    changed.environment = '已经变化的验证环境'
+    await writeFile(contractPath, JSON.stringify(changed))
+    await expect(acceptValidationMetric(root, digest, 'million-row-performance', '使用过期方案接受')).rejects.toThrow('评估方案已经变化')
   })
 
   it('keeps valid project and metric facts visible when one metric result is malformed', async () => {

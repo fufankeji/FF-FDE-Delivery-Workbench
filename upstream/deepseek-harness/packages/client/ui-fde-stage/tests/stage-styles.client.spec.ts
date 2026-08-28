@@ -9,5 +9,7 @@ describe('FDE blank-stage geometry', () => {
     expect(block).toContain('var(--dsh-composer-side-clearance)')
     expect(block).toContain('max-width: var(--dsh-composer-card-max-width)')
     expect(block).toContain('margin: 0 auto')
+    expect(block).toContain('min-height: 54px')
+    expect(styles).not.toContain('.blankStageRail')
   })
 })

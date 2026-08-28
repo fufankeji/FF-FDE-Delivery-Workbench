@@ -2,7 +2,8 @@
 
 import type { KvTable } from '@deepseek-ai/dsh-storage-domain'
 import type { WorkspaceId } from '@deepseek-ai/dsh-workspace'
-import type { FdeStageId, ProjectStageRecord } from './spec.ts'
+import { FDE_PROJECT_STATE_IDS } from './spec.ts'
+import type { FdeProjectState, FdeStageId, ProjectStageRecord } from './spec.ts'
 
 /** Clock dependency used to stamp the one initial record. */
 export type StageClock = () => string
@@ -26,10 +27,33 @@ export class FdeStageTransitionError extends Error {
           ? '项目开发'
           : expected === 'validation'
             ? '验证评估'
-            : expected
+            : expected === 'pilot'
+              ? '部署试运行'
+              : '验收移交'
     super(`当前项目已经不在${label}阶段。`)
     this.name = 'FdeStageTransitionError'
   }
+}
+
+/** The current stage cannot be returned any further. */
+export class FdeStageReturnError extends Error {
+  constructor(readonly current: ProjectStageRecord, message = '需求调研已经是第一个阶段，不能继续返回。') {
+    super(message)
+    this.name = 'FdeStageReturnError'
+  }
+}
+
+const PREVIOUS_STAGE: Readonly<Record<Exclude<FdeProjectState, 'requirements'>, FdeStageId>> = {
+  solution: 'requirements',
+  development: 'solution',
+  validation: 'development',
+  pilot: 'validation',
+  handoff: 'pilot',
+  completed: 'handoff',
+}
+
+function stateIndex(state: FdeProjectState): number {
+  return FDE_PROJECT_STATE_IDS.indexOf(state)
 }
 
 /** Owns current-stage reads and coalesces one Workspace's first durable write. */
@@ -91,19 +115,79 @@ export class FdeStageState {
     return this.transition(workspaceId, expectedRevision, 'validation', 'pilot')
   }
 
+  /** Atomically complete deployment trial for one exact browser revision. */
+  completePilot(workspaceId: WorkspaceId, expectedRevision: number): Promise<ProjectStageRecord> {
+    return this.transition(workspaceId, expectedRevision, 'pilot', 'handoff')
+  }
+
+  /** Atomically complete acceptance handover and enter the terminal state. */
+  completeHandoff(workspaceId: WorkspaceId, expectedRevision: number): Promise<ProjectStageRecord> {
+    return this.transition(workspaceId, expectedRevision, 'handoff', 'completed')
+  }
+
+  /**
+   * Return exactly one stage after a second-confirmed FDE decision. Existing
+   * project files and evidence are retained; the returned range must be
+   * confirmed again before it can advance beyond its former position.
+   */
+  returnToPrevious(workspaceId: WorkspaceId, expectedRevision: number, reason: string): Promise<ProjectStageRecord> {
+    const normalizedReason = reason.trim()
+    if (normalizedReason === '' || normalizedReason.length > 1000) {
+      return Promise.reject(new Error('返回原因必须填写，且不能超过 1000 个字符。'))
+    }
+    const before = this.transitions.get(workspaceId) ?? Promise.resolve(undefined)
+    const attempt = before.catch(() => undefined).then(async () => {
+      const current = await this.open(workspaceId)
+      if (current.revision !== expectedRevision) throw new FdeStageConflictError(current)
+      if (current.currentStage === 'requirements') throw new FdeStageReturnError(current)
+      const to = PREVIOUS_STAGE[current.currentStage]
+      const returnedAt = this.clock()
+      const revision = current.revision + 1
+      const existingBoundary = current.reconfirmThrough
+      const reconfirmThrough = existingBoundary === undefined || stateIndex(current.currentStage) > stateIndex(existingBoundary)
+        ? current.currentStage
+        : existingBoundary
+      const next: ProjectStageRecord = {
+        ...current,
+        currentStage: to,
+        revision,
+        updatedAt: returnedAt,
+        reconfirmThrough,
+        returns: [...(current.returns ?? []), {
+          from: current.currentStage,
+          to,
+          reason: normalizedReason,
+          returnedAt,
+          revision,
+        }].slice(-50),
+      }
+      await this.table.put(workspaceId, next)
+      return next
+    })
+    this.transitions.set(workspaceId, attempt)
+    return attempt.finally(() => {
+      if (this.transitions.get(workspaceId) === attempt) this.transitions.delete(workspaceId)
+    })
+  }
+
   private transition(
     workspaceId: WorkspaceId,
     expectedRevision: number,
     from: FdeStageId,
-    to: FdeStageId,
+    to: FdeProjectState,
   ): Promise<ProjectStageRecord> {
     const before = this.transitions.get(workspaceId) ?? Promise.resolve(undefined)
     const attempt = before.catch(() => undefined).then(async () => {
       const current = await this.open(workspaceId)
       if (current.revision !== expectedRevision) throw new FdeStageConflictError(current)
       if (current.currentStage !== from) throw new FdeStageTransitionError(current, from)
+      const clearReconfirmation = current.reconfirmThrough !== undefined
+        && (stateIndex(to) > stateIndex(current.reconfirmThrough)
+          || (to === 'completed' && current.reconfirmThrough === 'completed'))
+      const recordForNext = { ...current }
+      if (clearReconfirmation) delete recordForNext.reconfirmThrough
       const next: ProjectStageRecord = {
-        ...current,
+        ...recordForNext,
         currentStage: to,
         revision: current.revision + 1,
         updatedAt: this.clock(),

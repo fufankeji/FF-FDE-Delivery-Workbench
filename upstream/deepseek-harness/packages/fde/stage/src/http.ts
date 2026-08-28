@@ -3,7 +3,7 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import type { WorkspaceId } from '@deepseek-ai/dsh-workspace'
 import type { ProjectStageRecord } from './spec.ts'
-import { FdeStageConflictError, FdeStageTransitionError } from './state.ts'
+import { FdeStageConflictError, FdeStageReturnError, FdeStageTransitionError } from './state.ts'
 
 const MAX_BODY_BYTES = 16 * 1024
 
@@ -74,6 +74,38 @@ export interface CompleteValidationRouteOptions {
   reportFailure?: (error: unknown) => void
 }
 
+/** Dependencies for the fixed FDE-only deployment-trial completion route. */
+export interface CompletePilotRouteOptions {
+  trusted: (request: IncomingMessage) => boolean
+  workspaceExists: (workspaceId: string) => boolean
+  deploymentTrial: (workspaceId: string) => Promise<{
+    readonly gateReady: boolean
+    readonly blockers: readonly string[]
+  }>
+  complete: (workspaceId: WorkspaceId, expectedRevision: number) => Promise<ProjectStageRecord>
+  reportFailure?: (error: unknown) => void
+}
+
+/** Dependencies for the fixed FDE-only acceptance-handover completion route. */
+export interface CompleteHandoffRouteOptions {
+  trusted: (request: IncomingMessage) => boolean
+  workspaceExists: (workspaceId: string) => boolean
+  acceptanceHandover: (workspaceId: string) => Promise<{
+    readonly gateReady: boolean
+    readonly blockers: readonly string[]
+  }>
+  complete: (workspaceId: WorkspaceId, expectedRevision: number) => Promise<ProjectStageRecord>
+  reportFailure?: (error: unknown) => void
+}
+
+/** Dependencies for the FDE-only, one-step stage-return action. */
+export interface ReturnStageRouteOptions {
+  trusted: (request: IncomingMessage) => boolean
+  workspaceExists: (workspaceId: string) => boolean
+  returnToPrevious: (workspaceId: WorkspaceId, expectedRevision: number, reason: string) => Promise<ProjectStageRecord>
+  reportFailure?: (error: unknown) => void
+}
+
 async function readJson(request: IncomingMessage): Promise<unknown> {
   const declaredRaw = request.headers['content-length']
   const declared = typeof declaredRaw === 'string' ? Number(declaredRaw) : undefined
@@ -119,6 +151,15 @@ function completionRequestOf(value: unknown): { workspaceId: string; expectedRev
   return { workspaceId, expectedRevision: expectedRevision as number }
 }
 
+function returnRequestOf(value: unknown): { workspaceId: string; expectedRevision: number; reason: string } {
+  const completion = completionRequestOf(value)
+  const reason = (value as { reason?: unknown }).reason
+  if (typeof reason !== 'string' || reason.trim() === '' || reason.trim().length > 1000) {
+    throw new FdeStageRequestError('invalid-request', 400, '返回原因必须填写，且不能超过 1000 个字符。')
+  }
+  return { ...completion, reason: reason.trim() }
+}
+
 function writeJson(response: ServerResponse, status: number, payload: unknown): void {
   response.writeHead(status, { 'content-type': 'application/json; charset=utf-8' })
   response.end(JSON.stringify(payload))
@@ -150,6 +191,47 @@ export function createStageRoute(options: StageRouteOptions): (request: Incoming
       }
       options.reportFailure?.(error)
       writeJson(response, 500, { ok: false, error: { code: 'internal-error', message: '项目阶段读取失败。' } })
+    }
+  }
+}
+
+/** Create the POST-only, one-stage FDE return action. */
+export function createReturnStageRoute(
+  options: ReturnStageRouteOptions,
+): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
+  return async (request: IncomingMessage, response: ServerResponse): Promise<void> => {
+    let requestedWorkspaceId: string | undefined
+    try {
+      if (!options.trusted(request)) throw new FdeStageRequestError('forbidden', 403, '当前请求不能返回项目阶段。')
+      if (request.method !== 'POST') {
+        request.resume()
+        throw new FdeStageRequestError('method-not-allowed', 405, '阶段返回接口只接受 POST。')
+      }
+      const { workspaceId, expectedRevision, reason } = returnRequestOf(await readJson(request))
+      requestedWorkspaceId = workspaceId
+      if (!options.workspaceExists(workspaceId)) {
+        throw new FdeStageRequestError('workspace-not-found', 404, '当前项目不存在或已被移除。')
+      }
+      const record = await options.returnToPrevious(workspaceId as WorkspaceId, expectedRevision, reason)
+      writeJson(response, 200, { ok: true, value: { workspaceId, ...record } })
+    } catch (error) {
+      if (error instanceof FdeStageRequestError) {
+        writeJson(response, error.status, { ok: false, error: { code: error.code, message: error.message } })
+        return
+      }
+      if (error instanceof FdeStageConflictError || error instanceof FdeStageReturnError) {
+        writeJson(response, 409, {
+          ok: false,
+          error: {
+            code: error instanceof FdeStageConflictError ? 'stage-revision-conflict' : 'stage-return-unavailable',
+            message: error.message,
+          },
+          ...(requestedWorkspaceId === undefined ? {} : { value: { workspaceId: requestedWorkspaceId, ...error.current } }),
+        })
+        return
+      }
+      options.reportFailure?.(error)
+      writeJson(response, 500, { ok: false, error: { code: 'internal-error', message: '项目阶段返回失败。' } })
     }
   }
 }
@@ -344,6 +426,98 @@ export function createCompleteValidationRoute(
       }
       options.reportFailure?.(error)
       writeJson(response, 500, { ok: false, error: { code: 'internal-error', message: '验证评估阶段确认失败。' } })
+    }
+  }
+}
+
+/** Create the POST-only, fixed pilot-to-handoff manual gate. */
+export function createCompletePilotRoute(
+  options: CompletePilotRouteOptions,
+): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
+  return async (request: IncomingMessage, response: ServerResponse): Promise<void> => {
+    let requestedWorkspaceId: string | undefined
+    try {
+      if (!options.trusted(request)) throw new FdeStageRequestError('forbidden', 403, '当前请求不能确认项目阶段。')
+      if (request.method !== 'POST') {
+        request.resume()
+        throw new FdeStageRequestError('method-not-allowed', 405, '阶段确认接口只接受 POST。')
+      }
+      const { workspaceId, expectedRevision } = completionRequestOf(await readJson(request))
+      requestedWorkspaceId = workspaceId
+      if (!options.workspaceExists(workspaceId)) {
+        throw new FdeStageRequestError('workspace-not-found', 404, '当前项目不存在或已被移除。')
+      }
+      const deploymentTrial = await options.deploymentTrial(workspaceId)
+      if (!deploymentTrial.gateReady) {
+        throw new FdeStageRequestError(
+          'stage-pilot-incomplete',
+          409,
+          `部署试运行尚未达到进入验收移交的条件：${deploymentTrial.blockers.join('；')}`,
+        )
+      }
+      const record = await options.complete(workspaceId as WorkspaceId, expectedRevision)
+      writeJson(response, 200, { ok: true, value: { workspaceId, ...record } })
+    } catch (error) {
+      if (error instanceof FdeStageRequestError) {
+        writeJson(response, error.status, { ok: false, error: { code: error.code, message: error.message } })
+        return
+      }
+      if (error instanceof FdeStageConflictError || error instanceof FdeStageTransitionError) {
+        writeJson(response, 409, {
+          ok: false,
+          error: { code: error instanceof FdeStageConflictError ? 'stage-revision-conflict' : 'stage-invalid-transition', message: error.message },
+          ...(requestedWorkspaceId === undefined ? {} : { value: { workspaceId: requestedWorkspaceId, ...error.current } }),
+        })
+        return
+      }
+      options.reportFailure?.(error)
+      writeJson(response, 500, { ok: false, error: { code: 'internal-error', message: '部署试运行阶段确认失败。' } })
+    }
+  }
+}
+
+/** Create the POST-only, fixed handoff-to-completed manual gate. */
+export function createCompleteHandoffRoute(
+  options: CompleteHandoffRouteOptions,
+): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
+  return async (request: IncomingMessage, response: ServerResponse): Promise<void> => {
+    let requestedWorkspaceId: string | undefined
+    try {
+      if (!options.trusted(request)) throw new FdeStageRequestError('forbidden', 403, '当前请求不能确认项目阶段。')
+      if (request.method !== 'POST') {
+        request.resume()
+        throw new FdeStageRequestError('method-not-allowed', 405, '阶段确认接口只接受 POST。')
+      }
+      const { workspaceId, expectedRevision } = completionRequestOf(await readJson(request))
+      requestedWorkspaceId = workspaceId
+      if (!options.workspaceExists(workspaceId)) {
+        throw new FdeStageRequestError('workspace-not-found', 404, '当前项目不存在或已被移除。')
+      }
+      const acceptanceHandover = await options.acceptanceHandover(workspaceId)
+      if (!acceptanceHandover.gateReady) {
+        throw new FdeStageRequestError(
+          'stage-handoff-incomplete',
+          409,
+          `验收移交尚未达到项目完成条件：${acceptanceHandover.blockers.join('；')}`,
+        )
+      }
+      const record = await options.complete(workspaceId as WorkspaceId, expectedRevision)
+      writeJson(response, 200, { ok: true, value: { workspaceId, ...record } })
+    } catch (error) {
+      if (error instanceof FdeStageRequestError) {
+        writeJson(response, error.status, { ok: false, error: { code: error.code, message: error.message } })
+        return
+      }
+      if (error instanceof FdeStageConflictError || error instanceof FdeStageTransitionError) {
+        writeJson(response, 409, {
+          ok: false,
+          error: { code: error instanceof FdeStageConflictError ? 'stage-revision-conflict' : 'stage-invalid-transition', message: error.message },
+          ...(requestedWorkspaceId === undefined ? {} : { value: { workspaceId: requestedWorkspaceId, ...error.current } }),
+        })
+        return
+      }
+      options.reportFailure?.(error)
+      writeJson(response, 500, { ok: false, error: { code: 'internal-error', message: '验收移交阶段确认失败。' } })
     }
   }
 }

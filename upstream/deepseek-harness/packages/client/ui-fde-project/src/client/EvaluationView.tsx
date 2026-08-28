@@ -138,7 +138,7 @@ export function EvaluationView(props: ProjectViewProps) {
         <section className={css.surfaceRoot}>
           <ProjectViewHeader
             eyebrow={workspace.title}
-            title="验证评估"
+            title="项目评估优化"
             description="围绕当前候选版本组织指标、真实运行、证据与问题，形成进入部署试运行前可审阅的验证结论。"
             onRefresh={() => { props.refreshProjectSurface(workspace.workspaceId) }}
             refreshLabel="刷新报告"
