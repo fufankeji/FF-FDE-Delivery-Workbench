@@ -648,7 +648,7 @@ function ProjectCard({ row, showProject, labels }: {
         <div className={css.projectIdentity}>
           <span className={css.projectMark} aria-hidden="true">{row.title.slice(0, 1).toUpperCase()}</span>
           <div>
-            <div className={css.projectTitleLine}><h2>{row.title}</h2>{demo && <span>演示项目</span>}</div>
+            <div className={css.projectTitleLine}><h2>{row.title}</h2></div>
             <p>{row.companyName || labels.companyMissing}{row.preview === undefined ? '' : ` · FDE ${row.preview.owner}`}</p>
           </div>
         </div>
@@ -694,7 +694,7 @@ function ProjectCard({ row, showProject, labels }: {
           ? labels.created(formatDate(row.createdAt))
           : `下一节点：${row.preview.nextMilestone} · ${formatDate(row.preview.nextMilestoneDate)}`}</span>
         <button type="button" disabled={demo} onClick={() => { if (!demo) showProject(row.workspaceId) }}>
-          {demo ? '演示数据' : labels.view}{!demo && <span aria-hidden="true">→</span>}
+          {labels.view}{!demo && <span aria-hidden="true">→</span>}
         </button>
       </div>
     </article>
@@ -754,7 +754,6 @@ function ProjectList({ rows, showProject, labels }: {
                       <strong>{row.title}</strong>
                       <small>{row.companyName || labels.companyMissing}{row.preview === undefined ? '' : ` · FDE ${row.preview.owner}`}</small>
                     </span>
-                    {demo && <em>演示项目</em>}
                   </div>
                 </td>
                 <td>
@@ -786,7 +785,7 @@ function ProjectList({ rows, showProject, labels }: {
                 </td>
                 <td>
                   <button className={css.projectListAction} type="button" disabled={demo} onClick={() => { if (!demo) showProject(row.workspaceId) }}>
-                    {demo ? '演示数据' : labels.view}{!demo && <span aria-hidden="true">→</span>}
+                    {labels.view}{!demo && <span aria-hidden="true">→</span>}
                   </button>
                 </td>
               </tr>
@@ -814,7 +813,6 @@ function PortfolioOverview({ rows, realCount, activeSessions, pendingSchedules, 
     return total + Math.max(0, index)
   }, 0)
   const coveredStages = counts.filter(count => count > 0).length
-  const demoCount = rows.length - realCount
   const scheduleAngle = rows.length === 0 ? 0 : confirmedSchedules / rows.length * 360
   const sessionAngle = sessionCount === 0 ? 0 : activeSessions / sessionCount * 360
   return (
@@ -825,8 +823,7 @@ function PortfolioOverview({ rows, realCount, activeSessions, pendingSchedules, 
         <p>一屏查看项目所处阶段、近期节奏和需要 FDE 介入的位置。</p>
         <div className={css.portfolioProjectCount}><strong>{rows.length}</strong><span>个项目构成当前组合预览</span></div>
         <div className={css.portfolioComposition}>
-          <span><i data-kind="real" />真实项目 {realCount}</span>
-          {demoCount > 0 && <span><i data-kind="demo" />演示项目 {demoCount}</span>}
+          <span><i data-kind="real" />当前可进入 {realCount}</span>
         </div>
         <dl>
           <div><dt>项目活动</dt><dd>{sessionCount}</dd></div>
@@ -916,7 +913,7 @@ function PortfolioCharts({ rows }: { readonly rows: readonly ProjectRow[] }) {
         </div>
       </article>
       <article className={css.healthDistributionCard} aria-label="项目交付健康分布">
-        <header><div><span>交付健康</span><h2>需要怎样介入</h2></div><small>演示信号单独标记</small></header>
+        <header><div><span>交付健康</span><h2>需要怎样介入</h2></div><small>按当前状态汇总</small></header>
         <div className={css.healthDistributionBody}>
           <div
             className={css.healthRing}
@@ -933,8 +930,7 @@ function PortfolioCharts({ rows }: { readonly rows: readonly ProjectRow[] }) {
       </article>
       <article className={css.activityTrendCard} aria-label="近六周项目动态">
         <header>
-          <div><span>项目动态</span><h2>近六周协作节奏</h2><p>曲线表示演示项目每周的对话、评审与交付记录次数，不代表完成率。</p></div>
-          <span className={css.demoDataNotice}>演示数据 · 用于预览</span>
+          <div><span>项目动态</span><h2>近六周协作节奏</h2><p>曲线汇总项目每周的对话、评审与交付记录次数，不代表完成率。</p></div>
         </header>
         <div className={css.activityTrendBody}>
           <div className={css.activityTrendPlot} role="img" aria-label={`近六周活动次数：${weeklyActivity.join('、')}`}>
@@ -970,7 +966,7 @@ function PortfolioCharts({ rows }: { readonly rows: readonly ProjectRow[] }) {
           <dl className={css.portfolioSignals}>
             <div><dt>待 FDE 决定</dt><dd>{pendingDecisions}</dd><small>方案、范围与验收口径</small></div>
             <div><dt>当前阻塞</dt><dd>{blockers}</dd><small>需协调后继续推进</small></div>
-            <div><dt>近期交付节点</dt><dd>{demoRows.length}</dd><small>演示项目已登记下一节点</small></div>
+            <div><dt>近期交付节点</dt><dd>{demoRows.length}</dd><small>已登记下一节点</small></div>
           </dl>
         </div>
       </article>
@@ -1011,7 +1007,7 @@ function PortfolioFocus({ rows, activities, showProject }: {
               <button key={row.workspaceId} type="button" disabled={demo} data-demo={demo || undefined} onClick={() => { if (!demo) showProject(row.workspaceId) }}>
                 <span className={css.attentionMark} aria-hidden="true">!</span>
                 <span><strong>{row.title}</strong><small>{issues.join(' · ')}</small></span>
-                <span aria-hidden="true">{demo ? '演示' : '→'}</span>
+                {!demo && <span aria-hidden="true">→</span>}
               </button>
             )
           })}</div>}
@@ -1024,7 +1020,7 @@ function PortfolioFocus({ rows, activities, showProject }: {
             <button key={row.workspaceId} type="button" disabled={isDemoProject(row)} data-demo={isDemoProject(row) || undefined} onClick={() => { if (!isDemoProject(row)) showProject(row.workspaceId) }}>
               <span className={css.scheduleDate}><strong>{formatDate(row.schedule.endDate)}</strong><small>计划交付</small></span>
               <span><strong>{row.title}</strong><small>{formatDate(row.schedule.startDate)} — {formatDate(row.schedule.endDate)} · {stageLabel(row.stage, '阶段读取中', '阶段读取失败')}</small></span>
-              <span aria-hidden="true">{isDemoProject(row) ? '演示' : '→'}</span>
+              {!isDemoProject(row) && <span aria-hidden="true">→</span>}
             </button>
           ))}</div>}
       </section>
@@ -1121,7 +1117,7 @@ function Timeline({ rows, showProject, todayLabel }: {
           const demo = isDemoProject(row)
           return (
             <button key={row.workspaceId} type="button" className={css.timelineRow} disabled={demo} data-demo={demo || undefined} onClick={() => { if (!demo) showProject(row.workspaceId) }}>
-              <span className={css.timelineName}>{row.title}<small>{row.companyName || '未填写所属企业'}{demo ? ' · 演示项目' : ''}</small></span>
+              <span className={css.timelineName}>{row.title}<small>{row.companyName || '未填写所属企业'}</small></span>
               <span className={css.timelineTrack}>
                 <span className={css.timelineBar} style={{ left: `${String(position(rowStart))}%`, width: `${String(Math.max(2, position(rowEnd) - position(rowStart)))}%` }}>
                   <span>{stageLabel(row.stage, '读取中', '读取失败')}</span>
@@ -2806,7 +2802,7 @@ export function ProjectProgressOverlay({
   const requirementWikis = useRequirementWiki(state => state.byWorkspace)
   const [selectedSourceId, setSelectedSourceId] = useState<string | undefined>()
   const [stageFilter, setStageFilter] = useState<'all' | FdeStageId>('all')
-  const [projectCollectionView, setProjectCollectionView] = useState<'card' | 'list'>('card')
+  const [projectCollectionView, setProjectCollectionView] = useState<'card' | 'list'>('list')
   const [rootRef, sidebarOffset] = useSidebarOffset(page.open)
   useStandalonePage(page.open, rootRef)
 
@@ -3015,7 +3011,7 @@ export function ProjectProgressOverlay({
               <span>{stageFilter === 'all'
                 ? demoRows.length === 0
                   ? '阶段来自项目记录，周期来自新建项目时填写的信息。'
-                  : `${String(rows.length)} 个真实项目可进入交付；${String(demoRows.length)} 个演示项目只用于预览组合效果。`
+                  : `共 ${String(portfolioRows.length)} 个项目，当前可进入 ${String(rows.length)} 个。`
                 : `当前筛选出 ${String(filteredRows.length)} 个项目。`}</span>
             </div>
             <div className={css.projectViewControls}>
