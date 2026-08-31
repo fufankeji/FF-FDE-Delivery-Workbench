@@ -1,5 +1,5 @@
-# Root product documents are intentionally kept out of the handoff repository.
-/docs/
+# V2 product requirements, total contracts, and approved Feature specs are
+# versioned with the source so implementation and acceptance stay traceable.
 
 # Restored local DeepSeek Harness state. The sanitized template is versioned
 # under handoff/dsh-home-template instead.
