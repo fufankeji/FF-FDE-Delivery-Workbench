@@ -437,7 +437,7 @@ export function apply(ctx: ClientContext): void {
   }, ProjectProgressOverlay))
 
   ctx.slots.inject('conversation.hero.content', () => ctx.slots.register({
-    name: 'conversation.hero.content', id: 'fde-project-stage-home', order: -20, locale: NS,
+    name: 'conversation.hero.content', priority: -20, locale: NS,
     inject: stageWorkbenchInjected,
   }, ProjectStageWorkbenchHero))
 
@@ -447,7 +447,7 @@ export function apply(ctx: ClientContext): void {
   }, ProjectStageWorkbenchView))
 
   ctx.slots.inject('sidebar.workspaces.projectContext', () => ctx.slots.register({
-    name: 'sidebar.workspaces.projectContext', id: 'fde-project-context', order: -20, locale: NS,
+    name: 'sidebar.workspaces.projectContext', priority: -20, locale: NS,
     inject: stageWorkbenchInjected,
   }, ProjectContextSidebar))
 
