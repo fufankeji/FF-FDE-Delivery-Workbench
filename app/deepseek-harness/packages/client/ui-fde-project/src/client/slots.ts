@@ -4,6 +4,7 @@ import type { InjectFace, PropsLocale, PropsRenderSlots, PropsRuntime } from '@d
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type {} from '@deepseek-ai/dsh-client-ui-layout/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
+import type {} from '@deepseek-ai/dsh-client-ui-workspace/client'
 import type { AcceptanceHandoverDecision, FdeProjectSurfaceController } from './controller.ts'
 import type { ProjectPageController } from './page-controller.ts'
 import type { ProjectStageController } from './stage-controller.ts'
@@ -94,6 +95,7 @@ export interface ProjectPageInjected {
     target: RequirementWikiRunTarget,
   ) => Promise<void>
   abandonRequirementWikiBuild: (workspaceId: string, buildId: string) => Promise<void>
+  openProjectCreation: () => void
   enterProject: (workspaceId: string) => Promise<void>
   reviewProjectArchitecture: (workspaceId: string) => Promise<void>
   closeProjectPage: () => void
@@ -133,6 +135,24 @@ export interface ProjectRuntimeHeaderInjected {
   continueDevelopment: (sessionId: string) => void
 }
 
+/** Stage-one business actions exposed without leaking Skill names into product copy. */
+export type DiscoveryAction = 'qualify-workflow' | 'prepare-interview' | 'reframe-engagement'
+
+/** Shared project-stage workbench data and actions. */
+export interface ProjectStageWorkbenchInjected {
+  hooks: {
+    stageProgress: ProjectStageController
+    projectSurfaces: FdeProjectSurfaceController
+    projectSources: ProjectSourceController
+  }
+  loadStage: (workspaceId: string) => void
+  loadProjectSurface: (workspaceId: string) => void
+  loadProjectSources: (workspaceId: string, force?: boolean) => void
+  runDiscoveryAction: (sessionId: string, action: DiscoveryAction) => Promise<void>
+  openProjectConversation: (sessionId: string) => void
+  openProjectPage: () => void
+}
+
 /** Props for the sidebar Project Progress launcher. */
 export type ProjectProgressLauncherProps =
   PropsRuntime<'sidebar.footer.action'> & InjectFace<ProjectPageInjected> & PropsLocale<'fdeProject'>
@@ -152,4 +172,22 @@ export type ProjectViewProps =
 export type ProjectRuntimeHeaderProps =
   PropsRuntime<'conversation.session.header.utilities'>
   & InjectFace<ProjectRuntimeHeaderInjected>
+  & PropsLocale<'fdeProject'>
+
+/** Product-specific blank-session home for one FDE project. */
+export type ProjectStageWorkbenchHeroProps =
+  PropsRuntime<'conversation.hero.content'>
+  & InjectFace<ProjectStageWorkbenchInjected>
+  & PropsLocale<'fdeProject'>
+
+/** Current-stage workbench rendered as a normal tab after a Session has turns. */
+export type ProjectStageWorkbenchViewProps =
+  PropsRuntime<'conversation.view'>
+  & InjectFace<ProjectStageWorkbenchInjected>
+  & PropsLocale<'fdeProject'>
+
+/** Project-local sidebar replacing the global project/session tree. */
+export type ProjectContextSidebarProps =
+  PropsRuntime<'sidebar.workspaces.projectContext'>
+  & InjectFace<ProjectStageWorkbenchInjected>
   & PropsLocale<'fdeProject'>

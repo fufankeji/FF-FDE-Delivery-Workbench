@@ -23,14 +23,15 @@
 等价的手动工作台命令为：
 
 ```bash
-corepack pnpm --dir app/deepseek-harness install --frozen-lockfile
-corepack pnpm --dir app/deepseek-harness run build
+./scripts/pnpm.sh install --frozen-lockfile
+./scripts/pnpm.sh run build
 node scripts/restore-handoff-state.mjs
-cd app/deepseek-harness
-DSH_HOME=../../.runtime/dsh-home corepack pnpm dsh web --no-open --host 127.0.0.1 --port 3080
+DSH_HOME=.runtime/dsh-home ./scripts/pnpm.sh dsh web --no-open --host 127.0.0.1 --port 3080
 ```
 
 不得省略 `DSH_HOME`，否则会加载用户全局或其他项目的工作区。
+不得绕过 `scripts/pnpm.sh` 直接使用电脑当前激活的 pnpm；该脚本以源码
+`package.json` 声明的版本为准，避免不同 pnpm 版本阻断安装或启动。
 
 ## 会话与数据保护
 

@@ -6,6 +6,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type {} from '@deepseek-ai/dsh-client-ui-layout/client'
 import type {} from '@deepseek-ai/dsh-client-ui-model-selection/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
+import type {} from '@deepseek-ai/dsh-client-ui-workspace/client'
 import type { BetterSidebarService } from 'dsh-better-sidebar'
 import { ApiDocsView } from './ApiDocsView.tsx'
 import { ArchitectureView } from './ArchitectureView.tsx'
@@ -17,6 +18,8 @@ import { ProjectPageController } from './page-controller.ts'
 import { ProjectProgressLauncher } from './ProjectProgressLauncher.tsx'
 import { ProjectProgressOverlay } from './ProjectProgressOverlay.tsx'
 import { ProjectRuntimeHeader } from './ProjectRuntimeHeader.tsx'
+import { ProjectContextSidebar } from './ProjectContextSidebar.tsx'
+import { ProjectStageWorkbenchHero, ProjectStageWorkbenchView } from './StageWorkbench.tsx'
 import { latestProjectSessionId } from './project-data.ts'
 import {
   ensureProjectRuntimeSidebar,
@@ -29,8 +32,10 @@ import {
 } from './project-runtime-sidebar.ts'
 import type {
   ProjectPageInjected,
+  ProjectStageWorkbenchInjected,
   ProjectRuntimeHeaderInjected,
   ProjectViewInjected,
+  DiscoveryAction,
   RequirementWikiRunTarget,
 } from './slots.ts'
 import { ProjectStageController } from './stage-controller.ts'
@@ -52,6 +57,7 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
 export const inject = ['slots', 'locale', 'modelDirectories', 'sessions', 'workspaces', 'conversation']
 
 const FDE_PROJECT_PROGRESS_OPEN_EVENT = 'fde:project-progress-open'
+const FDE_PROJECT_CREATE_OPEN_EVENT = 'fde:project-create-open'
 
 /** Register the global project page and the four project delivery views. */
 export function apply(ctx: ClientContext): void {
@@ -67,6 +73,7 @@ export function apply(ctx: ClientContext): void {
     const openProjectProgress = (event: Event): void => {
       const detail = (event as CustomEvent<{ workspaceId?: unknown } | undefined>).detail
       if (typeof detail?.workspaceId === 'string' && detail.workspaceId.length > 0) {
+        event.preventDefault()
         page.showProject(detail.workspaceId)
       }
     }
@@ -74,6 +81,7 @@ export function apply(ctx: ClientContext): void {
     return () => { window.removeEventListener(FDE_PROJECT_PROGRESS_OPEN_EVENT, openProjectProgress) }
   }, 'ui-fde-project: blank-stage progress entry')
   const t = ctx.locale.bind(NS)
+  let projectSidebar: BetterSidebarService | undefined
 
   const resolveProjectSession = async (workspaceId: string): Promise<SessionId> => {
     const workspaceState = ctx.workspaces.list.getSnapshot()
@@ -89,14 +97,22 @@ export function apply(ctx: ClientContext): void {
 
   const enterProject = async (workspaceId: string, viewId?: string): Promise<void> => {
     const sessionId = await resolveProjectSession(workspaceId)
-    if (viewId !== undefined) {
+    const targetView = viewId ?? 'fde-stage-workbench'
+    if (targetView !== undefined) {
       const scoped = ctx.sessions.scope(sessionId)
       const conversation = scoped?.get('conversation')
-      if (conversation === undefined) throw new Error('当前项目会话暂时无法打开系统架构。')
-      conversation.selectView(viewId)
+      if (conversation === undefined) throw new Error('当前项目会话暂时无法打开。')
+      conversation.selectView(targetView)
     }
     ctx.sessions.open(sessionId)
     page.close()
+    const workspace = ctx.workspaces.list.getSnapshot().items.find(item => String(item.workspaceId) === workspaceId)
+    if (projectSidebar !== undefined && workspace !== undefined) {
+      const sidebar = projectSidebar
+      void waitForProjectSidebarSession(sidebar, String(sessionId))
+        .then(() => { revealProjectSidebar(sidebar, String(sessionId), workspace.path) })
+        .catch(() => undefined)
+    }
   }
 
   const pageInjected = (): ProjectPageInjected => ({
@@ -201,6 +217,9 @@ export function apply(ctx: ClientContext): void {
     abandonRequirementWikiBuild: async (workspaceId, buildId) => {
       await requirementWiki.abandonBuild(workspaceId, buildId)
     },
+    openProjectCreation: () => {
+      window.dispatchEvent(new Event(FDE_PROJECT_CREATE_OPEN_EVENT, { cancelable: true }))
+    },
     enterProject: async (workspaceId) => { await enterProject(workspaceId) },
     reviewProjectArchitecture: async (workspaceId) => { await enterProject(workspaceId, 'fde-architecture') },
     closeProjectPage: page.close,
@@ -277,6 +296,36 @@ export function apply(ctx: ClientContext): void {
       }], 'queue')
       if (!result.ok) throw new Error(result.error.message)
     },
+  })
+
+  const discoveryPrompt = (action: DiscoveryAction): string => {
+    if (action === 'prepare-interview') {
+      return '请围绕 FDE 阶段 1“发现高价值问题”，基于当前项目已经归档的客户资料，生成下一轮现场访谈提纲。重点确认真实流程知情者、正常案例、重要异常案例、结果验证者、人工回退、访问边界和风险上限。必须区分资料中的原始说法、可验证事实、推断和未知项；没有证据的内容明确写待确认。只提出问题和需要取得的证据，不设计技术方案，不推进项目阶段。'
+    }
+    if (action === 'reframe-engagement') {
+      return '请围绕 FDE 阶段 1“发现高价值问题”，对照当前项目的原始诉求与已有现场证据，判断是否存在会改变项目边界、成功标准或停止条件的事实冲突。保留原始说法及来源，列出冲突、影响、安全回退和有权决定的人；证据不足时只列待核实项。不要自行改写客户事实，不设计技术方案，不推进项目阶段。'
+    }
+    return '请围绕 FDE 阶段 1“发现高价值问题”，读取当前项目已经归档的客户资料，判断哪个真实工作流问题值得继续。请明确当前工作流、流程知情者、代表案例、结果验证者、业务结果、现状基线、人工回退、访问边界、风险上限和证据缺口；每项结论区分已确认、推断和未验证。形成候选的现场观察记录与工作流章程初稿，但不要把文件存在当成客户确认，不设计技术方案，也不要推进项目阶段。'
+  }
+
+  const stageWorkbenchInjected = (): ProjectStageWorkbenchInjected => ({
+    hooks: { stageProgress: stages, projectSurfaces: surfaces, projectSources: sources },
+    loadStage: workspaceId => { stages.load(workspaceId) },
+    loadProjectSurface: workspaceId => { surfaces.load(workspaceId) },
+    loadProjectSources: (workspaceId, force) => { sources.load(workspaceId, force) },
+    runDiscoveryAction: async (sessionId, action) => {
+      const session = ctx.sessions.binding(sessionId as SessionId)?.session
+      if (session === undefined) throw new Error('当前项目会话不可用。')
+      ctx.sessions.scope(sessionId as SessionId)?.get('conversation')?.selectView('chat')
+      ctx.sessions.open(sessionId as SessionId)
+      const result = await session.prompt([{ type: 'text', text: discoveryPrompt(action) }], 'queue')
+      if (!result.ok) throw new Error(result.error.message)
+    },
+    openProjectConversation: sessionId => {
+      ctx.sessions.scope(sessionId as SessionId)?.get('conversation')?.selectView('chat')
+      ctx.sessions.open(sessionId as SessionId)
+    },
+    openProjectPage: page.open,
   })
 
   const promptFailure = (error: unknown): string => error instanceof Error ? error.message : String(error)
@@ -387,13 +436,32 @@ export function apply(ctx: ClientContext): void {
     children: { 'fde.project.source.preview': { kind: 'single', scope: 'root' } },
   }, ProjectProgressOverlay))
 
-  ctx.inject(['betterSidebar'], (scope: ClientContext) => scope.slots.inject(
-    'conversation.session.header.utilities',
-    () => scope.slots.register({
+  ctx.slots.inject('conversation.hero.content', () => ctx.slots.register({
+    name: 'conversation.hero.content', id: 'fde-project-stage-home', order: -20, locale: NS,
+    inject: stageWorkbenchInjected,
+  }, ProjectStageWorkbenchHero))
+
+  ctx.slots.inject('conversation.view', () => ctx.slots.register({
+    name: 'conversation.view', id: 'fde-stage-workbench', order: 10, locale: NS,
+    label: () => t('view.stage'), inject: stageWorkbenchInjected,
+  }, ProjectStageWorkbenchView))
+
+  ctx.slots.inject('sidebar.workspaces.projectContext', () => ctx.slots.register({
+    name: 'sidebar.workspaces.projectContext', id: 'fde-project-context', order: -20, locale: NS,
+    inject: stageWorkbenchInjected,
+  }, ProjectContextSidebar))
+
+  ctx.inject(['betterSidebar'], (scope: ClientContext) => {
+    projectSidebar = scope.betterSidebar
+    const dispose = scope.slots.inject('conversation.session.header.utilities', () => scope.slots.register({
       name: 'conversation.session.header.utilities', id: 'fde-project-runtime', order: -10, locale: NS,
       inject: () => runtimeHeaderInjected(scope.betterSidebar),
-    }, ProjectRuntimeHeader),
-  ))
+    }, ProjectRuntimeHeader))
+    return () => {
+      if (projectSidebar === scope.betterSidebar) projectSidebar = undefined
+      dispose()
+    }
+  })
 
   const views: readonly {
     readonly id: FdeProjectViewId

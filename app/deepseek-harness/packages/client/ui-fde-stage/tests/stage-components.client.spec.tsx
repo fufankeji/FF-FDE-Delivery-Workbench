@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
 import type { SessionId, WorkspaceId } from '@deepseek-ai/dsh-client-runtime/client'
 import { makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
 import { StageBlankStatus } from '../src/client/StageBlankStatus.tsx'
@@ -50,7 +50,7 @@ function runtime() {
 }
 
 describe('FDE stage components', () => {
-  it('shows the same current stage in the active header and blank composer', () => {
+  it('keeps the detailed stage in the header and demotes the blank composer to an Agent entry', () => {
     const props = runtime()
     const header = render(<StageHeaderStatus {...props} />)
     expect(screen.getByText('阶段 1/6')).toBeTruthy()
@@ -62,11 +62,10 @@ describe('FDE stage components', () => {
       session={{ composerPhase: 'blank' } as never}
       input={{} as never}
     />)
-    expect(screen.getByRole('region', { name: '阶段 1/6' })).toBeTruthy()
-    expect(screen.getByText('整理客户资料，形成可确认的需求基线')).toBeTruthy()
-    expect(screen.queryByText('筛选正确场景，理解真实业务、岗位、SOP、问题边界和验收方向。')).toBeNull()
+    expect(screen.getByRole('region', { name: 'Agent 执行入口' })).toBeTruthy()
+    expect(screen.getByText('在这里补充任务；阶段目的、证据和产物请以上方工作台为准')).toBeTruthy()
+    expect(screen.queryByText('整理客户资料，形成可确认的需求基线')).toBeNull()
     expect(screen.queryByRole('list')).toBeNull()
-    fireEvent.click(screen.getByRole('button', { name: '查看项目进度' }))
-    expect(props.openProjectProgress).toHaveBeenCalledWith('w-1')
+    expect(screen.queryByRole('button', { name: '查看项目进度' })).toBeNull()
   })
 })

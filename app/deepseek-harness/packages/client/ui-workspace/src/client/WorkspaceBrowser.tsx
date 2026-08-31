@@ -9,7 +9,7 @@
  * menu in between; the flow and its error dialog live in WorkspacePicker
  * (same package — direct composition, no slot between them).
  */
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
 import clsx from 'clsx'
 import {
   Button, IconCloseFill14, IconPersonalizationOutline16,
@@ -37,6 +37,18 @@ const SEARCH_DEBOUNCE_MS = 250
 const SEARCH_QUERY_MAX_CODE_UNITS = 500
 /** Session rows visible per Workspace before the local overflow control. */
 const COLLAPSED_SESSION_LIMIT = 5
+const FDE_PROJECT_CREATE_OPEN_EVENT = 'fde:project-create-open'
+const FDE_PROJECT_PROGRESS_OPEN_EVENT = 'fde:project-progress-open'
+
+/** Open project management after creation when the FDE page plugin is mounted. */
+function openProjectManagement(workspaceId: WorkspaceId): boolean {
+  const event = new CustomEvent(FDE_PROJECT_PROGRESS_OPEN_EVENT, {
+    cancelable: true,
+    detail: { workspaceId: String(workspaceId) },
+  })
+  window.dispatchEvent(event)
+  return event.defaultPrevented
+}
 
 /** Keep controlled input and RPC payload inside the session.search wire contract. */
 function sanitizeSearchQuery(value: string): string {
@@ -826,6 +838,7 @@ export function WorkspaceBrowser({
   searchSessions,
   searchResultLimit,
   useDirectoryFlow,
+  useProjectContext,
   useHostDescription,
   renderSlot,
   t,
@@ -837,6 +850,12 @@ export function WorkspaceBrowser({
   // Live occupancy of this surface's directory-flow hole (the same source the
   // flow reads): a composition without a picking affordance can add nothing.
   const directoryFlowAvailable = useDirectoryFlow(occupied => occupied)
+  const projectContextAvailable = useProjectContext(occupied => occupied)
+  const currentSessionId = useSessions(state => state.current)
+  const currentWorkspace = currentSessionId === undefined
+    ? undefined
+    : workspaces.find(workspace => workspace.sessionIds.includes(currentSessionId))
+  const projectContextMode = wide && projectContextAvailable && currentSessionId !== undefined && currentWorkspace !== undefined
   const groupBy = useStore(s => s.groupBy)
   const orderBy = useStore(s => s.orderBy)
   const groupExpansion = useStore(s => s.groupExpansion)
@@ -1006,7 +1025,7 @@ export function WorkspaceBrowser({
     if (storageParent.trim() === '') return t('projectForm.error.location')
     return null
   }
-  const resetProjectForm = (): void => {
+  const resetProjectForm = useCallback((): void => {
     setProjectName('')
     setCompanyName('')
     setScheduleMode('pending-confirmation')
@@ -1017,11 +1036,20 @@ export function WorkspaceBrowser({
     setRememberProjectRoot(true)
     setProjectFormAttempted(false)
     setProjectFormError(null)
-  }
-  const openProjectForm = (): void => {
+  }, [defaultProjectRoot])
+  const openProjectForm = useCallback((): void => {
     resetProjectForm()
     setProjectFormOpen(true)
-  }
+  }, [resetProjectForm])
+  useEffect(() => {
+    if (!directoryFlowAvailable) return
+    const openFromProjectCenter = (event: Event): void => {
+      event.preventDefault()
+      openProjectForm()
+    }
+    window.addEventListener(FDE_PROJECT_CREATE_OPEN_EVENT, openFromProjectCenter)
+    return () => { window.removeEventListener(FDE_PROJECT_CREATE_OPEN_EVENT, openFromProjectCenter) }
+  }, [directoryFlowAvailable, openProjectForm])
   const chooseScheduleMode = (mode: 'pending-confirmation' | 'estimated'): void => {
     setScheduleMode(mode)
     setProjectFormError(null)
@@ -1059,7 +1087,7 @@ export function WorkspaceBrowser({
       setDirectoryMode(null)
       setProjectFormOpen(false)
       actions.setGroupExpanded(workspace.workspaceId as string, true)
-      startSession(workspace.workspaceId)
+      if (!openProjectManagement(workspace.workspaceId)) startSession(workspace.workspaceId)
     }).catch((reason: unknown) => {
       setDirectoryBusy(false)
       setDirectoryMode(null)
@@ -1106,7 +1134,7 @@ export function WorkspaceBrowser({
         actions.setGroupExpanded(workspace.workspaceId as string, true)
         setCreatingProject(false)
         setProjectFormOpen(false)
-        startSession(workspace.workspaceId)
+        if (!openProjectManagement(workspace.workspaceId)) startSession(workspace.workspaceId)
       })
       .catch((reason: unknown) => {
         setCreatingProject(false)
@@ -1222,7 +1250,7 @@ export function WorkspaceBrowser({
 
   return (
     <div className={clsx(css.root, !wide && css.rail)}>
-      {directoryFlowAvailable && (
+      {!projectContextMode && directoryFlowAvailable && (
         <Tooltip label={t('workspace.add')} delayMs={500} disabled={wide}>
           <button
             type="button"
@@ -1235,7 +1263,7 @@ export function WorkspaceBrowser({
           </button>
         </Tooltip>
       )}
-      <div className={css.sectionHeader}>
+      {!projectContextMode && <div className={css.sectionHeader}>
         {wide && (
           <span className={clsx(css.sectionLabel, css.wide, searchExpanded && css.sectionLabelHidden)}>
             {groupBy === 'flat' ? t('section.sessions') : t('section.workspaces')}
@@ -1307,7 +1335,7 @@ export function WorkspaceBrowser({
             />
           )}
         </div>
-      </div>
+      </div>}
 
       {renderSlot('sidebar.workspaces.directoryFlow', {
         open: directoryMode !== null,
@@ -1322,7 +1350,7 @@ export function WorkspaceBrowser({
       })}
 
       {/* The collapsed rail keeps search as its own 36px control. */}
-      {!wide && <div className={css.search}>
+      {!projectContextMode && !wide && <div className={css.search}>
         <Tooltip label={t('search')}>
           <button
             type="button"
@@ -1342,7 +1370,20 @@ export function WorkspaceBrowser({
       {/* Always-mounted seat keeps the region's flex slot while the list
           itself is wide-only. */}
       <div className={css.listArea}>
-        {wide && (normalizedQuery !== ''
+        {projectContextMode && currentWorkspace !== undefined && currentSessionId !== undefined
+          ? renderSlot('sidebar.workspaces.projectContext', {
+            workspaceId: currentWorkspace.workspaceId,
+            title: currentWorkspace.title,
+            path: currentWorkspace.path,
+            sessionId: currentSessionId,
+            sessionCount: currentWorkspace.sessionIds.length,
+            projectActions: renderSlot('sidebar.workspaces.projectActions', {
+              workspaceId: currentWorkspace.workspaceId,
+              title: currentWorkspace.title,
+              path: currentWorkspace.path,
+            }),
+          })
+          : wide && (normalizedQuery !== ''
           ? (
             <SearchResults
               useSessions={useSessions}

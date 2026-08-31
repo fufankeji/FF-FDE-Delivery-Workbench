@@ -6,9 +6,11 @@ import { SlotRegistry, createSnapshotStore } from '@deepseek-ai/dsh-client-runti
 import { apply, inject } from '../src/client/index.ts'
 import { ArchitectureView } from '../src/client/ArchitectureView.tsx'
 import { ObservabilityView } from '../src/client/ObservabilityView.tsx'
+import { ProjectContextSidebar } from '../src/client/ProjectContextSidebar.tsx'
 import { ProjectProgressLauncher } from '../src/client/ProjectProgressLauncher.tsx'
 import { ProjectProgressOverlay } from '../src/client/ProjectProgressOverlay.tsx'
 import { ProjectRuntimeHeader } from '../src/client/ProjectRuntimeHeader.tsx'
+import { ProjectStageWorkbenchHero, ProjectStageWorkbenchView } from '../src/client/StageWorkbench.tsx'
 import type { ProjectPageInjected, ProjectRuntimeHeaderInjected, ProjectViewInjected } from '../src/client/slots.ts'
 
 afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks() })
@@ -109,7 +111,9 @@ describe('ui-fde-project apply', () => {
         'sidebar.footer.action': { kind: 'list', scope: 'root' },
         'shell.overlay': { kind: 'list', scope: 'root' },
         'conversation.view': { kind: 'list', scope: 'session' },
+        'conversation.hero.content': { kind: 'single', scope: 'root' },
         'conversation.session.header.utilities': { kind: 'list', scope: 'session' },
+        'sidebar.workspaces.projectContext': { kind: 'single', scope: 'root' },
       },
     } as never, () => null)
     const fiber = ctx.plugin({ inject: [...inject], apply })
@@ -121,23 +125,35 @@ describe('ui-fde-project apply', () => {
     await vi.waitFor(() => {
       expect(fetchImpl.mock.calls.filter(call => requestPath(call[0]).endsWith('/fde-project/snapshot'))).toHaveLength(1)
     })
-    expect(slots.entries('conversation.view')).toHaveLength(0)
+    expect(slots.entries('conversation.hero.content')[0]?.component).toBe(ProjectStageWorkbenchHero)
+    expect(slots.entries('sidebar.workspaces.projectContext')[0]?.component).toBe(ProjectContextSidebar)
+    expect(slots.entries('conversation.view').map(view => view.component)).toEqual([ProjectStageWorkbenchView])
 
     const injected = (slots.entries('shell.overlay')[0]!.inject as unknown as () => ProjectPageInjected)()
-    window.dispatchEvent(new CustomEvent('fde:project-progress-open', { detail: { workspaceId: 'workspace-1' } }))
+    const progressEvent = new CustomEvent('fde:project-progress-open', {
+      cancelable: true,
+      detail: { workspaceId: 'workspace-1' },
+    })
+    window.dispatchEvent(progressEvent)
+    expect(progressEvent.defaultPrevented).toBe(true)
     expect(injected.hooks.projectPage.getSnapshot()).toEqual({
       open: true, view: 'project', workspaceId: 'workspace-1',
     })
+    const openProjectCreation = vi.fn((event: Event) => { event.preventDefault() })
+    window.addEventListener('fde:project-create-open', openProjectCreation)
+    injected.openProjectCreation()
+    expect(openProjectCreation).toHaveBeenCalledTimes(1)
+    window.removeEventListener('fde:project-create-open', openProjectCreation)
     await injected.completeRequirements('workspace-1', 1)
-    await vi.waitFor(() => { expect(slots.entries('conversation.view')).toHaveLength(1) })
+    await vi.waitFor(() => { expect(slots.entries('conversation.view')).toHaveLength(2) })
     const views = slots.entries('conversation.view')
-    expect(views[0]?.component).toBe(ArchitectureView)
-    expect(views.map(view => view.options.id)).toEqual(['fde-architecture'])
+    expect(views.map(view => view.component)).toEqual([ProjectStageWorkbenchView, ArchitectureView])
+    expect(views.map(view => view.options.id)).toEqual(['fde-stage-workbench', 'fde-architecture'])
     expect(views.map((view) => {
       const label = view.options.label
       return typeof label === 'function' ? label() : label
-    })).toEqual(['系统架构'])
-    const architectureInjected = (views[0]!.inject as unknown as (sessionId: string) => ProjectViewInjected)('session-1')
+    })).toEqual(['阶段工作台', '系统架构'])
+    const architectureInjected = (views[1]!.inject as unknown as (sessionId: string) => ProjectViewInjected)('session-1')
     await architectureInjected.requestArchitectureDraft(4)
     const architectureInstruction = prompt.mock.calls[0]?.[0][0]?.text
     expect(architectureInstruction).toContain('architecture_get')
@@ -148,8 +164,10 @@ describe('ui-fde-project apply', () => {
     prompt.mockClear()
 
     await injected.completeSolution('workspace-1', 2)
-    await vi.waitFor(() => { expect(slots.entries('conversation.view')).toHaveLength(2) })
-    expect(slots.entries('conversation.view').map(view => view.component)).toEqual([ArchitectureView, ObservabilityView])
+    await vi.waitFor(() => { expect(slots.entries('conversation.view')).toHaveLength(3) })
+    expect(slots.entries('conversation.view').map(view => view.component)).toEqual([
+      ProjectStageWorkbenchView, ArchitectureView, ObservabilityView,
+    ])
 
     const runtimeEntry = slots.entries('conversation.session.header.utilities')[0]
     expect(runtimeEntry?.component).toBe(ProjectRuntimeHeader)
@@ -321,6 +339,7 @@ describe('ui-fde-project apply', () => {
     const injected = (slots.entries('shell.overlay')[0]!.inject as unknown as () => ProjectPageInjected)()
 
     await injected.enterProject('workspace-1')
+    expect(selectView).toHaveBeenLastCalledWith('fde-stage-workbench')
     expect(open).toHaveBeenLastCalledWith('latest')
     expect(connectWorkspace).not.toHaveBeenCalled()
 
@@ -330,6 +349,7 @@ describe('ui-fde-project apply', () => {
     expect(selectView.mock.invocationCallOrder[0]).toBeLessThan(open.mock.invocationCallOrder.at(-1) ?? 0)
 
     await injected.enterProject('workspace-2')
+    expect(selectView).toHaveBeenLastCalledWith('fde-stage-workbench')
     expect(connectWorkspace).toHaveBeenCalledWith('workspace-2')
     expect(open).toHaveBeenLastCalledWith('new-session')
     await fiber.dispose()

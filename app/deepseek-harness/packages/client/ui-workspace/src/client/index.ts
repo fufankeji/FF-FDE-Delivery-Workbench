@@ -21,7 +21,7 @@ import { en, zh, type WorkspaceKey } from './locales.ts'
 
 export type {
   DirectoryFlowOwnerProps, DirectoryFlowSlotName, DirectoryPickingHooks, DirectoryPickingInjected,
-  ProjectActionOwnerProps, WorkspaceBrowserInjected, WorkspaceBrowserProps, WorkspacePickerInjected, WorkspacePickerProps,
+  ProjectActionOwnerProps, ProjectContextOwnerProps, WorkspaceBrowserInjected, WorkspaceBrowserProps, WorkspacePickerInjected, WorkspacePickerProps,
 } from './contract/slots.ts'
 export type { WorkspaceKey } from './locales.ts'
 
@@ -64,12 +64,13 @@ export function apply(ctx: ClientContext): void {
 
   // Stable per-surface occupancy sources (the renderer's hook cache keys by
   // source identity): true while the surface's directory-flow hole is filled.
-  const flowSource = (hole: 'sidebar.workspaces.directoryFlow' | 'conversation.hero.workspace.directoryFlow'): HostObservable<boolean> => ({
+  const flowSource = (hole: 'sidebar.workspaces.directoryFlow' | 'conversation.hero.workspace.directoryFlow' | 'sidebar.workspaces.projectContext'): HostObservable<boolean> => ({
     getSnapshot: () => ctx.slots.entries(hole).length > 0,
     subscribe: listener => ctx.slots.subscribe(hole, listener),
   })
   const browserFlowSource = flowSource('sidebar.workspaces.directoryFlow')
   const pickerFlowSource = flowSource('conversation.hero.workspace.directoryFlow')
+  const projectContextSource = flowSource('sidebar.workspaces.projectContext')
   const browserInjected = (): WorkspaceBrowserInjected => ({
     // Explicit group actions keep their target; unscoped New Session inherits
     // the current Session Workspace before the recent-Workspace fallback.
@@ -103,7 +104,7 @@ export function apply(ctx: ClientContext): void {
     },
     createWorkspace: input => ctx.workspaces.create(input),
     createDirectory: (path, name) => ctx.workspaces.createDirectory(path, name),
-    hooks: { directoryFlow: browserFlowSource, hostDescription },
+    hooks: { directoryFlow: browserFlowSource, hostDescription, projectContext: projectContextSource },
   })
   const pickerInjected = (): WorkspacePickerInjected => ({
     createWorkspace: input => ctx.workspaces.create(input),
@@ -117,6 +118,7 @@ export function apply(ctx: ClientContext): void {
       children: {
         'sidebar.workspaces.directoryFlow': { kind: 'single', scope: 'root' },
         'sidebar.workspaces.projectActions': { kind: 'list', scope: 'root' },
+        'sidebar.workspaces.projectContext': { kind: 'single', scope: 'root' },
       },
       store: createWorkspaceViewStore(),
       inject: browserInjected,

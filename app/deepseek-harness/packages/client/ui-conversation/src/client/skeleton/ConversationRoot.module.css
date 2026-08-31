@@ -329,6 +329,16 @@
   z-index: 1;
 }
 
+/* A project-specific blank-session home may use the full delivery column;
+   the Agent composer remains the same narrow execution surface below it. */
+.composerHero:has([data-conversation-hero-project]) {
+  align-self: stretch;
+  width: 100%;
+  padding: 24px 28px 32px;
+  box-sizing: border-box;
+  gap: 14px;
+}
+
 /* Blue backdrop ellipse (figma 313:14109), centered on the input card: the
    card's resting center sits ~92px above the stack bottom (32 foot pad +
    half of the ~120px two-row card); width tracks the card (glow asset 1051
@@ -361,6 +371,10 @@
 .root[data-phase='hero'] .scrollBody {
   justify-content: center;
   overflow-y: auto;
+}
+
+.root[data-phase='hero'] .scrollBody:has([data-conversation-hero-project]) {
+  justify-content: flex-start;
 }
 
 /* Settling (session replaying, hero/docked unknown): keep the composer seat

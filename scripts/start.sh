@@ -20,4 +20,4 @@ echo "[start] 数据分析项目：$repository_root/workspaces/ai-analysis"
 echo "[start] 访问地址：http://$fde_host:$fde_port"
 
 cd "$app_dir"
-DSH_HOME="$runtime_dir" corepack pnpm dsh web --no-open --host "$fde_host" --port "$fde_port"
+DSH_HOME="$runtime_dir" "$script_dir/pnpm.sh" dsh web --no-open --host "$fde_host" --port "$fde_port"

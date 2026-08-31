@@ -4,9 +4,9 @@ export const NS = 'fdeProject'
 
 /** Canonical Simplified Chinese product copy. */
 export const zh = {
-  'launcher.label': '项目管理',
-  'progress.title': '项目管理',
-  'progress.subtitle': '查看全部项目的交付阶段、时间安排和当前工作。',
+  'launcher.label': '项目中心',
+  'progress.title': '项目中心',
+  'progress.subtitle': '先处理需要人工决定的项目，再进入真实交付工作。',
   'progress.close': '关闭项目管理',
   'progress.overview': '项目概览',
   'progress.timeline': '交付时间轴',
@@ -14,7 +14,8 @@ export const zh = {
   'progress.active': '进行中',
   'progress.schedulePending': '待确认周期',
   'progress.sessions': '项目会话',
-  'progress.empty': '还没有项目。请先从左侧新建项目。',
+  'progress.empty': '还没有项目。创建项目后会先进入项目管理，再由你决定何时进入交付环境。',
+  'progress.createProject': '新建项目',
   'progress.companyMissing': '未填写所属企业',
   'progress.scheduleMissing': '交付周期待确认',
   'progress.enter': '进入项目交付',
@@ -23,6 +24,7 @@ export const zh = {
   'progress.stageLoading': '读取阶段中',
   'progress.stageError': '阶段读取失败',
   'progress.today': '今天',
+  'view.stage': '阶段工作台',
   'view.api': 'API 文档',
   'view.architecture': '系统架构',
   'view.observe': '用量分析',
@@ -51,9 +53,9 @@ export type FdeProjectKey = keyof typeof zh
 
 /** English counterpart of the FDE project copy. */
 export const en: Record<FdeProjectKey, string> = {
-  'launcher.label': 'Project management',
-  'progress.title': 'Project management',
-  'progress.subtitle': 'See every project stage, schedule, and current activity.',
+  'launcher.label': 'Project center',
+  'progress.title': 'Project center',
+  'progress.subtitle': 'Handle projects that need a human decision before entering delivery work.',
   'progress.close': 'Close project management',
   'progress.overview': 'Overview',
   'progress.timeline': 'Timeline',
@@ -61,7 +63,8 @@ export const en: Record<FdeProjectKey, string> = {
   'progress.active': 'In progress',
   'progress.schedulePending': 'Schedule pending',
   'progress.sessions': 'Sessions',
-  'progress.empty': 'No projects yet. Create one from the sidebar.',
+  'progress.empty': 'No projects yet. Create one to manage it before entering the delivery environment.',
+  'progress.createProject': 'New project',
   'progress.companyMissing': 'Company not provided',
   'progress.scheduleMissing': 'Delivery schedule pending',
   'progress.enter': 'Enter project delivery',
@@ -70,6 +73,7 @@ export const en: Record<FdeProjectKey, string> = {
   'progress.stageLoading': 'Loading stage',
   'progress.stageError': 'Stage unavailable',
   'progress.today': 'Today',
+  'view.stage': 'Stage workbench',
   'view.api': 'API docs',
   'view.architecture': 'Architecture',
   'view.observe': 'Usage analysis',

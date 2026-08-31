@@ -25,7 +25,7 @@ cd FF-FDE-Delivery-Workbench
 
 - macOS；
 - Node.js `22.19.0+` 或 Node.js `24+`；
-- Corepack；
+- Node.js 自带的 npm/npx；
 - 安装依赖时可访问 npm registry。
 
 执行：
@@ -40,6 +40,9 @@ cd FF-FDE-Delivery-Workbench
 2. 构建 DeepSeek Harness 与本项目的 FDE 插件；
 3. 从 `handoff/dsh-home-template/` 恢复仓库专用的 `.runtime/dsh-home/`；
 4. 自动把原机器路径改写为当前克隆目录，不会读写用户全局的 DSH 工作区。
+
+脚本会读取 DeepSeek Harness `package.json` 中锁定的 pnpm 版本并通过
+`scripts/pnpm.sh` 执行，不依赖电脑上 Corepack 当前激活的 pnpm 版本。
 
 ### 3. 启动工作台
 
@@ -93,6 +96,7 @@ node ./scripts/restore-handoff-state.mjs
 ├── handoff/dsh-home-template/     # 已脱敏的会话、附件、项目与阶段状态模板
 ├── scripts/install.sh             # 安装、构建并恢复交接状态
 ├── scripts/start.sh               # 使用隔离 DSH_HOME 启动 Web UI
+├── scripts/pnpm.sh                # 使用源码锁定的 pnpm 版本执行命令
 ├── scripts/restore-handoff-state.mjs
 ├── PRODUCT_GUIDE.md               # 产品设计思路与六阶段使用手册
 └── AGENTS.md                       # 协同开发与数据保护约束
