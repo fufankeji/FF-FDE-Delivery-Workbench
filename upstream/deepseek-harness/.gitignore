@@ -9,6 +9,7 @@ pnpm-debug.log
 examples/*/*.jsonl
 .storages/
 .sessions/
+.runtime/
 examples/*/.sessions/
 coverage/
 .doc-typecheck-*/

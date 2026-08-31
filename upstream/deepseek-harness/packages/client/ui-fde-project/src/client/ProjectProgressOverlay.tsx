@@ -16,6 +16,7 @@ import { FDE_STAGES, type FdeProjectState, type FdeStageId, type ProjectStageLoa
 import type { ProjectSourceItem, ProjectSourceLoadState } from './source-controller.ts'
 import type { ProjectProgressOverlayProps, RequirementWikiRunTarget } from './slots.ts'
 import type { ProjectPreviewFile } from './slots.ts'
+import { DeliveryHomepage } from './DeliveryHomepage.tsx'
 import { RequirementIssuePanel, RequirementWikiPanel } from './RequirementWikiPanel.tsx'
 import type { RequirementWikiLoadState } from './wiki-controller.ts'
 import css from './project.module.css'
@@ -2807,9 +2808,9 @@ export function ProjectProgressOverlay({
   useStandalonePage(page.open, rootRef)
 
   useEffect(() => {
-    if (!page.open) return
+    if (!page.open || page.view === 'home') return
     for (const workspace of workspaces) loadStage(String(workspace.workspaceId))
-  }, [loadStage, page.open, workspaces])
+  }, [loadStage, page.open, page.view, workspaces])
 
   useEffect(() => {
     if (page.view !== 'project' || page.workspaceId === undefined) return
@@ -2834,11 +2835,11 @@ export function ProjectProgressOverlay({
   }, [page.view, page.workspaceId, selectedSourceId, sources])
 
   useEffect(() => {
-    if (!page.open) return
+    if (!page.open || page.view === 'home') return
     const onKey = (event: KeyboardEvent): void => { if (event.key === 'Escape') closeProjectPage() }
     window.addEventListener('keydown', onKey)
     return () => { window.removeEventListener('keydown', onKey) }
-  }, [closeProjectPage, page.open])
+  }, [closeProjectPage, page.open, page.view])
 
   const rows = useMemo<readonly ProjectRow[]>(() => workspaces.map((workspace) => {
     const workspaceSessions = workspace.sessionIds.map(id => sessions.byId[id]).filter(item => item !== undefined)
@@ -2889,161 +2890,165 @@ export function ProjectProgressOverlay({
   }
 
   return (
-    <div ref={rootRef} className={css.pageOverlay} style={{ left: sidebarOffset, width: `calc(100% - ${String(sidebarOffset)}px)` }} data-testid="fde-project-progress">
-      <header className={css.pageHeader}>
+    <div ref={rootRef} className={css.pageOverlay} style={{ left: sidebarOffset, width: `calc(100% - ${String(sidebarOffset)}px)` }} data-testid={page.view === 'home' ? 'fde-delivery-home' : 'fde-project-progress'}>
+      {page.view !== 'home' && <header className={css.pageHeader}>
         <div><span className={css.pageEyebrow}>FF - FDE 交付工作台</span><h1>{t('progress.title')}</h1><p>{t('progress.subtitle')}</p></div>
         <button type="button" className={css.closeButton} aria-label={t('progress.close')} onClick={closeProjectPage}>×</button>
-      </header>
+      </header>}
 
-      {page.view === 'project' && detailRow !== undefined
-        ? <ProjectDetail
-          row={detailRow}
-          sourceState={sourceState}
-          surfaceState={surfaceState}
-          wikiState={wikiState}
-          selectedSource={selectedSource}
-          selectSource={setSelectedSourceId}
-          parseSource={(sourceId) => {
-            void parseProjectSource(detailRow.workspaceId, sourceId)
-              .then(() => { loadRequirementWiki(detailRow.workspaceId, true) })
-              .catch(() => undefined)
-          }}
-          prepareWiki={async (sessionId) => {
-            return await prepareRequirementWikiRun(detailRow.workspaceId, sessionId)
-          }}
-          startWiki={async (sourceIds, expectedRevision, target) => {
-            await startRequirementWikiBuild(detailRow.workspaceId, sourceIds, expectedRevision, target)
-          }}
-          abandonWiki={async (buildId) => {
-            await abandonRequirementWikiBuild(detailRow.workspaceId, buildId)
-          }}
-          refreshWiki={() => { loadRequirementWiki(detailRow.workspaceId, true) }}
-          completeRequirements={async (revision) => {
-            try {
-              await completeRequirements(detailRow.workspaceId, revision)
-            } catch (error) {
-              retryStage(detailRow.workspaceId)
-              throw error
-            }
-          }}
-          completeSolution={async (revision) => {
-            try {
-              await completeSolution(detailRow.workspaceId, revision)
-            } catch (error) {
-              retryStage(detailRow.workspaceId)
-              throw error
-            }
-          }}
-          completeDevelopment={async (revision) => {
-            try {
-              await completeDevelopment(detailRow.workspaceId, revision)
-            } catch (error) {
-              retryStage(detailRow.workspaceId)
-              throw error
-            }
-          }}
-          completeValidation={async (revision) => {
-            try {
-              await completeValidation(detailRow.workspaceId, revision)
-            } catch (error) {
-              retryStage(detailRow.workspaceId)
-              throw error
-            }
-          }}
-          completePilot={async (revision) => {
-            try {
-              await completePilot(detailRow.workspaceId, revision)
-            } catch (error) {
-              retryStage(detailRow.workspaceId)
-              throw error
-            }
-          }}
-          completeHandoff={async (revision) => {
-            try {
-              await completeHandoff(detailRow.workspaceId, revision)
-            } catch (error) {
-              retryStage(detailRow.workspaceId)
-              throw error
-            }
-          }}
-          returnToPrevious={async (revision, reason) => {
-            try {
-              await returnToPrevious(detailRow.workspaceId, revision, reason)
-            } catch (error) {
-              retryStage(detailRow.workspaceId)
-              throw error
-            }
-          }}
-          acceptValidationMetric={async (contractDigest, metricId, reason) => {
-            await acceptValidationMetric(detailRow.workspaceId, contractDigest, metricId, reason)
-          }}
-          waiveValidationIssue={async (contractDigest, issueId, reason) => {
-            await waiveValidationIssue(detailRow.workspaceId, contractDigest, issueId, reason)
-          }}
-          acceptDeploymentTrialIssue={async (contractDigest, issueId, reason) => {
-            await acceptDeploymentTrialIssue(detailRow.workspaceId, contractDigest, issueId, reason)
-          }}
-          confirmDeploymentTrialReadiness={async (contractDigest) => {
-            await confirmDeploymentTrialReadiness(detailRow.workspaceId, contractDigest)
-          }}
-          recordAcceptanceHandoverDecision={async (contractDigest, decision) => {
-            await recordAcceptanceHandoverDecision(detailRow.workspaceId, contractDigest, decision)
-          }}
-          reviewArchitecture={async () => { await reviewProjectArchitecture(detailRow.workspaceId) }}
-          enterProject={() => { void enterProject(detailRow.workspaceId) }}
-          back={showProjectOverview}
-          renderPreview={source => renderSlot('fde.project.source.preview', { source })}
-        />
-        : <main className={css.pageBody}>
-          <PortfolioOverview
-            rows={portfolioRows}
-            realCount={rows.length}
-            activeSessions={activeSessions}
-            pendingSchedules={pendingSchedules}
-            sessionCount={sessionCount}
+      {page.view === 'home'
+        ? <main className={`${css.pageBody} ${css.homeBody}`}>
+          <DeliveryHomepage projectCount={rows.length} openProjects={showProjectOverview} />
+        </main>
+        : page.view === 'project' && detailRow !== undefined
+          ? <ProjectDetail
+            row={detailRow}
+            sourceState={sourceState}
+            surfaceState={surfaceState}
+            wikiState={wikiState}
+            selectedSource={selectedSource}
+            selectSource={setSelectedSourceId}
+            parseSource={(sourceId) => {
+              void parseProjectSource(detailRow.workspaceId, sourceId)
+                .then(() => { loadRequirementWiki(detailRow.workspaceId, true) })
+                .catch(() => undefined)
+            }}
+            prepareWiki={async (sessionId) => {
+              return await prepareRequirementWikiRun(detailRow.workspaceId, sessionId)
+            }}
+            startWiki={async (sourceIds, expectedRevision, target) => {
+              await startRequirementWikiBuild(detailRow.workspaceId, sourceIds, expectedRevision, target)
+            }}
+            abandonWiki={async (buildId) => {
+              await abandonRequirementWikiBuild(detailRow.workspaceId, buildId)
+            }}
+            refreshWiki={() => { loadRequirementWiki(detailRow.workspaceId, true) }}
+            completeRequirements={async (revision) => {
+              try {
+                await completeRequirements(detailRow.workspaceId, revision)
+              } catch (error) {
+                retryStage(detailRow.workspaceId)
+                throw error
+              }
+            }}
+            completeSolution={async (revision) => {
+              try {
+                await completeSolution(detailRow.workspaceId, revision)
+              } catch (error) {
+                retryStage(detailRow.workspaceId)
+                throw error
+              }
+            }}
+            completeDevelopment={async (revision) => {
+              try {
+                await completeDevelopment(detailRow.workspaceId, revision)
+              } catch (error) {
+                retryStage(detailRow.workspaceId)
+                throw error
+              }
+            }}
+            completeValidation={async (revision) => {
+              try {
+                await completeValidation(detailRow.workspaceId, revision)
+              } catch (error) {
+                retryStage(detailRow.workspaceId)
+                throw error
+              }
+            }}
+            completePilot={async (revision) => {
+              try {
+                await completePilot(detailRow.workspaceId, revision)
+              } catch (error) {
+                retryStage(detailRow.workspaceId)
+                throw error
+              }
+            }}
+            completeHandoff={async (revision) => {
+              try {
+                await completeHandoff(detailRow.workspaceId, revision)
+              } catch (error) {
+                retryStage(detailRow.workspaceId)
+                throw error
+              }
+            }}
+            returnToPrevious={async (revision, reason) => {
+              try {
+                await returnToPrevious(detailRow.workspaceId, revision, reason)
+              } catch (error) {
+                retryStage(detailRow.workspaceId)
+                throw error
+              }
+            }}
+            acceptValidationMetric={async (contractDigest, metricId, reason) => {
+              await acceptValidationMetric(detailRow.workspaceId, contractDigest, metricId, reason)
+            }}
+            waiveValidationIssue={async (contractDigest, issueId, reason) => {
+              await waiveValidationIssue(detailRow.workspaceId, contractDigest, issueId, reason)
+            }}
+            acceptDeploymentTrialIssue={async (contractDigest, issueId, reason) => {
+              await acceptDeploymentTrialIssue(detailRow.workspaceId, contractDigest, issueId, reason)
+            }}
+            confirmDeploymentTrialReadiness={async (contractDigest) => {
+              await confirmDeploymentTrialReadiness(detailRow.workspaceId, contractDigest)
+            }}
+            recordAcceptanceHandoverDecision={async (contractDigest, decision) => {
+              await recordAcceptanceHandoverDecision(detailRow.workspaceId, contractDigest, decision)
+            }}
+            reviewArchitecture={async () => { await reviewProjectArchitecture(detailRow.workspaceId) }}
+            enterProject={() => { void enterProject(detailRow.workspaceId) }}
+            back={showProjectOverview}
+            renderPreview={source => renderSlot('fde.project.source.preview', { source })}
           />
-          {portfolioRows.length > 0 && <PortfolioCharts rows={portfolioRows} />}
-          <PortfolioFocus rows={portfolioRows} activities={recentActivities} showProject={showProjectDetail} />
-          <PortfolioStageFilter rows={portfolioRows} selectedStage={stageFilter} selectStage={setStageFilter} />
-          <div className={css.pageToolbar}>
-            <div>
-              <h2>{stageFilter === 'all' ? '全部项目' : `${STAGE_NAMES[stageFilter]}项目`}</h2>
-              <span>{stageFilter === 'all'
-                ? demoRows.length === 0
-                  ? '阶段来自项目记录，周期来自新建项目时填写的信息。'
-                  : `共 ${String(portfolioRows.length)} 个项目，当前可进入 ${String(rows.length)} 个。`
-                : `当前筛选出 ${String(filteredRows.length)} 个项目。`}</span>
-            </div>
-            <div className={css.projectViewControls}>
-              {page.view === 'overview' && <div className={css.collectionViewSwitch} role="group" aria-label="项目展示方式">
-                <button type="button" aria-pressed={projectCollectionView === 'card'} data-active={projectCollectionView === 'card' || undefined} onClick={() => { setProjectCollectionView('card') }}>
-                  <svg aria-hidden="true" viewBox="0 0 14 14"><rect x="1.5" y="1.5" width="4" height="4" rx="0.8" /><rect x="8.5" y="1.5" width="4" height="4" rx="0.8" /><rect x="1.5" y="8.5" width="4" height="4" rx="0.8" /><rect x="8.5" y="8.5" width="4" height="4" rx="0.8" /></svg>卡片
-                </button>
-                <button type="button" aria-pressed={projectCollectionView === 'list'} data-active={projectCollectionView === 'list' || undefined} onClick={() => { setProjectCollectionView('list') }}>
-                  <svg aria-hidden="true" viewBox="0 0 14 14"><circle cx="2.2" cy="3" r="0.9" /><circle cx="2.2" cy="7" r="0.9" /><circle cx="2.2" cy="11" r="0.9" /><path d="M5 3h7M5 7h7M5 11h7" /></svg>列表
-                </button>
-              </div>}
-              <div className={css.segmented} role="group" aria-label="项目页面模式">
-                <button type="button" data-active={page.view === 'overview' || undefined} onClick={showProjectOverview}>{t('progress.overview')}</button>
-                <button type="button" data-active={page.view === 'timeline' || undefined} onClick={showProjectTimeline}>{t('progress.timeline')}</button>
+          : <main className={css.pageBody}>
+            <PortfolioOverview
+              rows={portfolioRows}
+              realCount={rows.length}
+              activeSessions={activeSessions}
+              pendingSchedules={pendingSchedules}
+              sessionCount={sessionCount}
+            />
+            {portfolioRows.length > 0 && <PortfolioCharts rows={portfolioRows} />}
+            <PortfolioFocus rows={portfolioRows} activities={recentActivities} showProject={showProjectDetail} />
+            <PortfolioStageFilter rows={portfolioRows} selectedStage={stageFilter} selectStage={setStageFilter} />
+            <div id="fde-project-list" className={css.pageToolbar}>
+              <div>
+                <h2>{stageFilter === 'all' ? '全部项目' : `${STAGE_NAMES[stageFilter]}项目`}</h2>
+                <span>{stageFilter === 'all'
+                  ? demoRows.length === 0
+                    ? '阶段来自项目记录，周期来自新建项目时填写的信息。'
+                    : `共 ${String(portfolioRows.length)} 个项目，当前可进入 ${String(rows.length)} 个。`
+                  : `当前筛选出 ${String(filteredRows.length)} 个项目。`}</span>
+              </div>
+              <div className={css.projectViewControls}>
+                {page.view === 'overview' && <div className={css.collectionViewSwitch} role="group" aria-label="项目展示方式">
+                  <button type="button" aria-pressed={projectCollectionView === 'card'} data-active={projectCollectionView === 'card' || undefined} onClick={() => { setProjectCollectionView('card') }}>
+                    <svg aria-hidden="true" viewBox="0 0 14 14"><rect x="1.5" y="1.5" width="4" height="4" rx="0.8" /><rect x="8.5" y="1.5" width="4" height="4" rx="0.8" /><rect x="1.5" y="8.5" width="4" height="4" rx="0.8" /><rect x="8.5" y="8.5" width="4" height="4" rx="0.8" /></svg>卡片
+                  </button>
+                  <button type="button" aria-pressed={projectCollectionView === 'list'} data-active={projectCollectionView === 'list' || undefined} onClick={() => { setProjectCollectionView('list') }}>
+                    <svg aria-hidden="true" viewBox="0 0 14 14"><circle cx="2.2" cy="3" r="0.9" /><circle cx="2.2" cy="7" r="0.9" /><circle cx="2.2" cy="11" r="0.9" /><path d="M5 3h7M5 7h7M5 11h7" /></svg>列表
+                  </button>
+                </div>}
+                <div className={css.segmented} role="group" aria-label="项目页面模式">
+                  <button type="button" data-active={page.view === 'overview' || undefined} onClick={showProjectOverview}>{t('progress.overview')}</button>
+                  <button type="button" data-active={page.view === 'timeline' || undefined} onClick={showProjectTimeline}>{t('progress.timeline')}</button>
+                </div>
               </div>
             </div>
-          </div>
-          {rows.length === 0
-            ? <div className={css.pageEmpty}>{t('progress.empty')}</div>
-            : filteredRows.length === 0
-              ? <div className={css.pageEmpty}>当前阶段没有项目。</div>
-              : page.view === 'timeline'
-                ? <Timeline rows={filteredRows} showProject={showProjectDetail} todayLabel={t('progress.today')} />
-                : projectCollectionView === 'list'
-                  ? <ProjectList rows={filteredRows} showProject={showProjectDetail} labels={projectRowLabels} />
-                  : <div className={css.projectGrid}>{filteredRows.map(row => (
-                    <ProjectCard key={row.workspaceId} row={row} showProject={showProjectDetail} labels={projectRowLabels} />
-                  ))}</div>}
-          {Object.values(stages).some(stage => stage.status === 'error') && (
-            <button type="button" className={css.retryAll} onClick={() => { for (const row of rows) if (row.stage?.status === 'error') retryStage(row.workspaceId) }}>重新读取失败的项目阶段</button>
-          )}
-        </main>}
+            {rows.length === 0
+              ? <div className={css.pageEmpty}>{t('progress.empty')}</div>
+              : filteredRows.length === 0
+                ? <div className={css.pageEmpty}>当前阶段没有项目。</div>
+                : page.view === 'timeline'
+                  ? <Timeline rows={filteredRows} showProject={showProjectDetail} todayLabel={t('progress.today')} />
+                  : projectCollectionView === 'list'
+                    ? <ProjectList rows={filteredRows} showProject={showProjectDetail} labels={projectRowLabels} />
+                    : <div className={css.projectGrid}>{filteredRows.map(row => (
+                      <ProjectCard key={row.workspaceId} row={row} showProject={showProjectDetail} labels={projectRowLabels} />
+                    ))}</div>}
+            {Object.values(stages).some(stage => stage.status === 'error') && (
+              <button type="button" className={css.retryAll} onClick={() => { for (const row of rows) if (row.stage?.status === 'error') retryStage(row.workspaceId) }}>重新读取失败的项目阶段</button>
+            )}
+          </main>}
     </div>
   )
 }

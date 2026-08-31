@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "FF-FDE 九阶段交付生命周期",
+    "locale": "zh-CN",
+    "animation": "trace",
+    "visual_preset": "signal-flow",
+    "quality_profile": "showcase",
+    "viewBox": [980, 566],
+    "views": [
+      {
+        "id": "full-loop",
+        "label": "完整交付闭环",
+        "focus": ["discover", "define", "mechanism", "deliver", "operate"],
+        "note": "从模糊需求开始，沿真实证据走向客户接管与持续运营。"
+      },
+      {
+        "id": "decision-core",
+        "label": "关键决策链",
+        "focus": ["define", "mechanism", "deliver"],
+        "note": "先确认价值与验收口径，再准备数据、选择机制并用真实结果验证。"
+      },
+      {
+        "id": "recovery-loop",
+        "label": "验证与调整",
+        "focus": ["mechanism", "deliver", "adjust"],
+        "note": "验证未通过时回到机制选择，而不是带着风险直接上线。"
+      }
+    ]
+  },
+  "lanes": [
+    { "id": "main", "label": "九阶段主路径" },
+    { "id": "recovery", "label": "验证与调整" },
+    { "id": "terminal", "label": "客户结果" }
+  ],
+  "states": [
+    { "id": "discover", "type": "start", "label": "需求与现场", "sublabel": "接收需求 · 观察现场", "lane": "main", "col": 0, "step": "01—02", "tag": "发现与纠偏" },
+    { "id": "define", "type": "decision", "label": "价值与数据", "sublabel": "确认价值 · 准备数据", "lane": "main", "col": 1, "step": "03—04", "tag": "决策与设计" },
+    { "id": "mechanism", "type": "decision", "label": "机制选择", "sublabel": "选择最小可行机制", "lane": "main", "col": 2, "step": "05", "tag": "技术决策" },
+    { "id": "deliver", "type": "active", "label": "构建与验证", "sublabel": "受控开发 · 真实验证", "lane": "main", "col": 3, "step": "06—07", "tag": "受控交付" },
+    { "id": "operate", "type": "success", "label": "移交与运营", "sublabel": "上线移交 · 持续运营", "lane": "main", "col": 4, "step": "08—09", "tag": "上线与经营" },
+    { "id": "adjust", "type": "failure", "label": "调整方案", "sublabel": "结果未达验收口径", "lane": "recovery", "col": 1, "tag": "可恢复" }
+  ],
+  "transitions": [
+    { "id": "discover-define", "from": "discover", "to": "define", "route": "straight" },
+    { "id": "define-mechanism", "from": "define", "to": "mechanism" },
+    { "id": "mechanism-deliver", "from": "mechanism", "to": "deliver", "route": "straight" },
+    { "id": "deliver-operate", "from": "deliver", "to": "operate", "variant": "emphasis", "route": "straight" },
+    { "id": "deliver-adjust", "from": "deliver", "to": "adjust", "label": "未达验收口径", "variant": "security", "labelAt": [556, 202] },
+    { "id": "adjust-mechanism", "from": "adjust", "to": "mechanism", "label": "重新选择机制", "variant": "emphasis" },
+    { "id": "operate-discover", "from": "operate", "to": "discover", "label": "新证据进入下一轮", "variant": "dashed", "route": "top-channel" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "发现、决策与设计",
+      "items": [
+        "01 接收需求；02 观察现场：先把诉求还原成现场事实",
+        "03 确认价值；04 准备数据；05 选择能安全完成工作的最小机制"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "受控构建与真实验收",
+      "items": [
+        "06 受控开发：先打通一个边界清楚的端到端切片",
+        "07 真实验证：未达口径就调整机制，不带着风险直接上线"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "移交、经营与下一轮",
+      "items": [
+        "08 上线移交：交付权限、手册、责任人与恢复路径",
+        "09 持续运营：新证据进入下一轮，必要时安全退役"
+      ]
+    }
+  ]
+}

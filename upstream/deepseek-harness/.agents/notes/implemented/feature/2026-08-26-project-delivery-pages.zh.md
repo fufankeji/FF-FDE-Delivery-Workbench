@@ -14,6 +14,8 @@ FDE 工作台把一个 Harness Workspace 作为一个交付项目，并允许该
 
 `@deepseek-ai/dsh-client-ui-fde-project` 在 `sidebar.footer.action` 注册“项目进度”，并通过 `shell.overlay` 渲染页面，页面左侧偏移跟随实时侧边栏宽度。页面读取 Workspace 与 Session 对象层、浏览器本地的新建项目元数据和按 Workspace 保存的阶段路由。它展示阶段分段和已确认日期，不虚构完成百分比。进入项目时，页面优先选择该 Workspace 最新的可见普通 Session；只有没有可恢复会话时才建立或复用首个空白 Session，打开后关闭全局页面。进入项目详情会强制刷新一次项目产物快照，避免 Agent 已写入文件或架构已确认却仍被 Controller 首次加载缓存遮蔽。当前阶段可以在 FDE 打开警示面板、填写原因并再次确认后返回一级；页面保留全部产物、展示最近一次审计，把受影响范围标为“待重新确认”，并把终态操作命名为“重新打开项目”。
 
+系统启动后会先打开产品首页，此时没有选中任何侧栏操作。首页解释以接受成果为中心的交付方法，并提供一个进入保持原样的“项目进度”页的明确操作。明确标记的动态示例把模糊 Brief 依次转为现场证据、最小安全机制和客户接受结果；相邻的三个原则与标准九步方法解释项目为什么推进。九步只作为映射到六个持久项目阶段的展示与学习层，不增加第二套生命周期状态，也不推断项目完成；用户偏好减少动态效果时，环境和顺序动效都会停止。
+
 同一个客户端包在 `conversation.view` 注册四个项目 View：API 文档、系统架构、用量分析和评估优化。每个 View 都通过当前 Session membership 推导 Workspace 归属。`@deepseek-ai/dsh-fde-project` 提供一个可信快照路由，读取 `.fde/api-docs.json`、`.fde/architecture.json` 或 `.fde/evaluations/` 前，先解析显式且已注册的 WorkspaceId；调用方提供的目录不能选择项目。
 
 OpenAPI 工具复用 MIT 许可 `dsh-openapi` 提交 `fb854355b89e495ded090b9e2eb94c33430d2366` 的解析、目录、校验、重定向、私网限制、凭据 Header、超时和有界响应实现。系统不直接挂载上游插件的静态目录。`openapi_list`、`openapi_describe` 和 `openapi_call` 在每次执行时通过 `workspaceRegistry` 解析调用 Agent 的 cwd，并且只加载该 Workspace 的显式配置。工具 Schema 在项目之间保持稳定，执行路径负责项目隔离，默认只允许 `GET` 和 `HEAD`。
@@ -44,6 +46,6 @@ OpenAPI 工具复用 MIT 许可 `dsh-openapi` 提交 `fb854355b89e495ded090b9e2e
 
 ## Consequences
 
-左侧栏保持项目管理与交付工作之间的稳定入口，中间保持官方 Conversation，右侧 Dock 保持 Files、Editor 和 Git。API、架构、用量分析和评估优化状态跨 Session 持续可见，因为项目文件与 Host 记录持有事实，而不是组件内存。跨插件深链使用按 Session 寻址的 Conversation View 动作，不使用 DOM 点击或直接改写持久化状态。缺失文件、关闭的导出器、无效报告和不可用 API 页面保持明确，不会被替换为演示数据。
+左侧栏保持项目管理与交付工作之间的稳定入口，中间保持官方 Conversation，右侧 Dock 保持 Files、Editor 和 Git。产品首页为首次使用者提供概念路径，长期使用者可以通过首页明确操作或既有侧栏入口进入同一个项目组合。API、架构、用量分析和评估优化状态跨 Session 持续可见，因为项目文件与 Host 记录持有事实，而不是组件内存。跨插件深链使用按 Session 寻址的 Conversation View 动作，不使用 DOM 点击或直接改写持久化状态。缺失文件、关闭的导出器、无效报告和不可用 API 页面保持明确，不会被替换为演示数据。
 
 五个项目工具向 Agent 请求增加稳定 Schema：三个 OpenAPI 工具和两个系统架构工具。只有调用后的结果会进入上下文。架构质量取决于 Agent 能读取的证据，因此缺失源码或尚未解决的文档差异会保留为带标记的候选事实，不会被伪装成确定结论。稳定 ID 使跨 revision 的聚焦与变更审阅保持连贯；限制分组和关系数量则以不生成穷举调用图为代价，换取可读的项目级系统模型。外部观测导出在部署配置明确启用前保持不存在，评估只在直接点击后才可能产生费用。企业与周期元数据仍属于当前浏览器的 Workspace 视图存储；iframe 拒绝嵌入时提供外部打开，而不绕过跨域策略；评估页面把长时间进程控制交给当前 Agent 及其现有取消路径。

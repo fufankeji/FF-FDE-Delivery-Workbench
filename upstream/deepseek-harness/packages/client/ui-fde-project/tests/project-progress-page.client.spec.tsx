@@ -2,9 +2,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
+import { ProjectProgressLauncher } from '../src/client/ProjectProgressLauncher.tsx'
 import { ProjectProgressOverlay } from '../src/client/ProjectProgressOverlay.tsx'
 import { zh } from '../src/client/locales.ts'
-import type { ProjectProgressOverlayProps } from '../src/client/slots.ts'
+import type { ProjectProgressLauncherProps, ProjectProgressOverlayProps } from '../src/client/slots.ts'
 
 beforeEach(() => {
   vi.stubGlobal('ResizeObserver', class {
@@ -18,7 +19,18 @@ afterEach(() => { cleanup(); vi.unstubAllGlobals(); delete document.body.dataset
 const hook = <T,>(value: T) => <S,>(selector: (state: T) => S) => selector(value)
 
 describe('ProjectProgressOverlay standalone page', () => {
-  it('hides the center/details work surfaces while open and restores them on close', () => {
+  it('does not present the system home as an active Project Progress sidebar operation', () => {
+    const props = {
+      wide: true,
+      useProjectPage: hook({ open: true, view: 'home' as const }),
+      openProjectPage: vi.fn(),
+      t: makeTranslate(zh),
+    } as unknown as ProjectProgressLauncherProps
+    render(<ProjectProgressLauncher {...props} />)
+    expect(screen.getByRole('button', { name: '项目管理' }).getAttribute('aria-pressed')).toBe('false')
+  })
+
+  it('opens as the system home before project operations and restores hidden work surfaces on unmount', () => {
     const frame = document.createElement('div')
     const sidebar = document.createElement('div')
     const center = document.createElement('div')
@@ -26,8 +38,9 @@ describe('ProjectProgressOverlay standalone page', () => {
     const overlay = document.createElement('div')
     frame.append(sidebar, center, details, overlay)
     document.body.append(frame)
+    const showProjectOverview = vi.fn()
     const props = {
-      useProjectPage: hook({ open: true, view: 'overview' as const }),
+      useProjectPage: hook({ open: true, view: 'home' as const }),
       useStageProgress: hook({ byWorkspace: {} }),
       useProjectSurfaces: hook({ byWorkspace: {} }),
       useProjectSources: hook({ byWorkspace: {} }),
@@ -38,7 +51,7 @@ describe('ProjectProgressOverlay standalone page', () => {
       completeRequirements: vi.fn(), completeSolution: vi.fn(),
       loadProjectSources: vi.fn(), parseProjectSource: vi.fn(), loadRequirementWiki: vi.fn(),
       prepareRequirementWikiRun: vi.fn(), startRequirementWikiBuild: vi.fn(), abandonRequirementWikiBuild: vi.fn(),
-      enterProject: vi.fn(), reviewProjectArchitecture: vi.fn(), closeProjectPage: vi.fn(), showProjectOverview: vi.fn(),
+      enterProject: vi.fn(), reviewProjectArchitecture: vi.fn(), closeProjectPage: vi.fn(), showProjectOverview,
       showProjectTimeline: vi.fn(), showProjectDetail: vi.fn(), renderSlot: vi.fn(() => null),
       t: makeTranslate(zh),
     } as unknown as ProjectProgressOverlayProps
@@ -47,6 +60,19 @@ describe('ProjectProgressOverlay standalone page', () => {
     expect(center.style.visibility).toBe('hidden')
     expect(details.style.visibility).toBe('hidden')
     expect(center.getAttribute('aria-hidden')).toBe('true')
+    expect(screen.getByRole('region', { name: 'FF-FDE工作台产品首页' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: /把模糊需求，交付成\s*客户真正接管的业务结果/ })).toBeTruthy()
+    expect(screen.getByRole('link', { name: 'FF-FDE工作台首页' }).textContent).toBe('FF-FDE工作台')
+    expect(document.querySelector('img[src="/ff-brand/ff-logo.png"]')).toBeTruthy()
+    expect(screen.getByRole('region', { name: '示例项目动态交付窗口' })).toBeTruthy()
+    expect(screen.getByText('需求是待验证的假设')).toBeTruthy()
+    expect(screen.getByText('人工智能是可选机制')).toBeTruthy()
+    expect(screen.getByText('客户接管才算完成')).toBeTruthy()
+    expect(within(screen.getByRole('list', { name: '九步交付闭环' })).getAllByRole('listitem')).toHaveLength(9)
+    expect(screen.getByTitle('FF-FDE 九阶段交付生命周期交互图').getAttribute('src')).toBe('/ff-fde-lifecycle-embed.html?home=1&theme=light')
+    expect(screen.queryByRole('heading', { name: '项目进度' })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: /进入交付工作台/ }))
+    expect(showProjectOverview).toHaveBeenCalledTimes(1)
     view.unmount()
     expect(document.body.dataset.fdePage).toBeUndefined()
     expect(center.style.visibility).toBe('')
@@ -95,6 +121,8 @@ describe('ProjectProgressOverlay standalone page', () => {
     } as unknown as ProjectProgressOverlayProps
 
     render(<ProjectProgressOverlay {...props} />)
+    expect(screen.queryByRole('region', { name: 'FDE 交付方法首页' })).toBeNull()
+    expect(screen.getByRole('heading', { name: '项目管理' })).toBeTruthy()
     expect(screen.getByText('项目关注')).toBeTruthy()
     expect(screen.getByText('需要 FDE 介入')).toBeTruthy()
     expect(screen.getByText('交付节点')).toBeTruthy()

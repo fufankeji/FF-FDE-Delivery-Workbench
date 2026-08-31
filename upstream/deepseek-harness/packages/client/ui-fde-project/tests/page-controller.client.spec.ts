@@ -4,6 +4,7 @@ import { ProjectPageController } from '../src/client/page-controller.ts'
 describe('ProjectPageController', () => {
   it('navigates overview, timeline, project detail, and closed states explicitly', () => {
     const controller = new ProjectPageController()
+    expect(controller.getSnapshot()).toEqual({ open: true, view: 'home' })
     const changed = vi.fn()
     controller.subscribe(changed)
     controller.open()
