@@ -29,7 +29,7 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
 
 /** Simplified Chinese dictionary (the key-set source of truth). */
 export const zh: Record<TrajectoryKey, string> = {
-  'view.trajectory': '轨迹',
+  'view.trajectory': '运行轨迹',
   'toolbar.aria': '轨迹工具栏',
   'toolbar.duration': 'Duration',
   'toolbar.useActualDuration': 'Use actual duration',
@@ -47,7 +47,7 @@ export const zh: Record<TrajectoryKey, string> = {
 
 /** English dictionary. */
 export const en: Record<TrajectoryKey, string> = {
-  'view.trajectory': 'Trajectory',
+  'view.trajectory': 'Run trace',
   'toolbar.aria': 'Trajectory toolbar',
   'toolbar.duration': 'Duration',
   'toolbar.useActualDuration': 'Use actual duration',

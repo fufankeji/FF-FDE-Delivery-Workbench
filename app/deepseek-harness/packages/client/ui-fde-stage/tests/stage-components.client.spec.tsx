@@ -3,7 +3,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, render, screen } from '@testing-library/react'
 import type { SessionId, WorkspaceId } from '@deepseek-ai/dsh-client-runtime/client'
 import { makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
-import { StageBlankStatus } from '../src/client/StageBlankStatus.tsx'
 import { StageHeaderStatus } from '../src/client/StageHeaderStatus.tsx'
 import { zh } from '../src/client/locales.ts'
 import type { FdeStageProgressSnapshot } from '../src/client/controller.ts'
@@ -32,7 +31,7 @@ const useWorkspaces = hook({
   recentWorkspaceId: workspaceId,
 }) as never
 
-function runtime() {
+function runtime(stageSnapshot: FdeStageProgressSnapshot = ready) {
   return {
     sessionId,
     useSession: (() => undefined) as never,
@@ -41,7 +40,7 @@ function runtime() {
     useProjection: (() => undefined) as never,
     useInput: (() => undefined) as never,
     inputActions: {} as never,
-    useStageProgress: hook(ready),
+    useStageProgress: hook(stageSnapshot),
     loadStage: vi.fn(),
     retryStage: vi.fn(),
     openProjectProgress: vi.fn(),
@@ -50,22 +49,29 @@ function runtime() {
 }
 
 describe('FDE stage components', () => {
-  it('keeps the detailed stage in the header and demotes the blank composer to an Agent entry', () => {
+  it('keeps the detailed stage in the header', () => {
     const props = runtime()
     const header = render(<StageHeaderStatus {...props} />)
-    expect(screen.getByText('阶段 1/6')).toBeTruthy()
-    expect(screen.getByText('需求调研')).toBeTruthy()
+    expect(screen.getByText('阶段 1/8')).toBeTruthy()
+    expect(screen.getByText('发现高价值问题')).toBeTruthy()
     header.unmount()
+  })
 
-    render(<StageBlankStatus
-      {...props}
-      session={{ composerPhase: 'blank' } as never}
-      input={{} as never}
-    />)
-    expect(screen.getByRole('region', { name: 'Agent 执行入口' })).toBeTruthy()
-    expect(screen.getByText('在这里补充任务；阶段目的、证据和产物请以上方工作台为准')).toBeTruthy()
-    expect(screen.queryByText('整理客户资料，形成可确认的需求基线')).toBeNull()
-    expect(screen.queryByRole('list')).toBeNull()
-    expect(screen.queryByRole('button', { name: '查看项目进度' })).toBeNull()
+  it('uses the authoritative V2 stage when the legacy projection spans multiple V2 stages', () => {
+    const props = runtime({
+      byWorkspace: {
+        'w-1': {
+          status: 'ready',
+          value: {
+            workspaceId: 'w-1', currentStage: 'solution', lifecycleVersion: 2,
+            v2Stage: 'investigation', revision: 3,
+            createdAt: '2026-08-26T00:00:00.000Z', updatedAt: '2026-08-26T00:00:00.000Z',
+          },
+        },
+      },
+    })
+    render(<StageHeaderStatus {...props} />)
+    expect(screen.getByText('阶段 3/8')).toBeTruthy()
+    expect(screen.getByText('调查数据、系统、接口、安全与组织')).toBeTruthy()
   })
 })

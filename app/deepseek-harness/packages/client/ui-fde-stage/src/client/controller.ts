@@ -1,6 +1,6 @@
 /** Host-backed observable for Workspace-keyed FDE stage loading. */
 
-import { isFdeProjectState, type FdeProjectState } from './stages.ts'
+import { isFdeProjectState, isFdeV2StageId, type FdeProjectState, type FdeV2StageId } from './stages.ts'
 
 /** Exact Host route owned by `@deepseek-ai/dsh-fde-stage`. */
 export const FDE_STAGE_OPEN_PATH = '/api/fde-stage/open'
@@ -16,6 +16,8 @@ export interface ProjectStageValue {
   readonly revision: number
   readonly createdAt: string
   readonly updatedAt: string
+  readonly lifecycleVersion?: 2
+  readonly v2Stage?: FdeV2StageId
 }
 
 /** Client loading state for one Workspace. */
@@ -41,6 +43,8 @@ function parseValue(payload: unknown, workspaceId: string): ProjectStageValue {
   const value = result.value
   if (value.workspaceId !== workspaceId
     || !isFdeProjectState(value.currentStage)
+    || (value.lifecycleVersion !== undefined && value.lifecycleVersion !== 2)
+    || (value.v2Stage !== undefined && !isFdeV2StageId(value.v2Stage))
     || !Number.isSafeInteger(value.revision) || value.revision < 1
     || typeof value.createdAt !== 'string' || typeof value.updatedAt !== 'string') {
     throw new Error('阶段状态响应无效。')

@@ -311,6 +311,26 @@
   left: 0;
 }
 
+/* A stage workbench uses the composer as the execution tool for its left
+   column, while the right column remains a stable artifact review surface.
+   Keep ConversationRoot as the sole composer owner and narrow only its seat;
+   the stage view reserves the matching vertical space inside the left column. */
+.scrollBody:has([data-conversation-composer-layout='stage-execution'][data-conversation-composer-overlay]) > .composerSeat {
+  right: calc(25% + 18px);
+  left: 22px;
+}
+
+.scrollBody:has([data-conversation-composer-layout='stage-execution'][data-conversation-composer-overlay][data-artifacts-collapsed='true']) > .composerSeat {
+  right: 104px;
+}
+
+@media (max-width: 980px) {
+  .scrollBody:has([data-conversation-composer-layout='stage-execution'][data-conversation-composer-overlay]) > .composerSeat {
+    right: var(--dsh-scrollbar-width);
+    left: 0;
+  }
+}
+
 /* Hero phase: the composer stack (hero chrome + workspace row + card) is
    flex-centered in the column; composer phase docks it at the bottom. Flex,
    NOT absolute+transform: a transform would make this box the containing

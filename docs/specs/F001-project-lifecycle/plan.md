@@ -18,10 +18,10 @@ updated: "2026-08-31"
 
 | 路径/模块 | 当前职责 | 计划变化 | 对应 AC |
 |---|---|---|---|
-| `app/deepseek-harness/packages/fde/project` | 项目解析与持久化 | 增加显式生命周期版本和隔离校验 | AC-F001-001 |
-| `app/deepseek-harness/packages/fde/stage` | 六阶段状态与门禁 | 增加 V2 八阶段状态、决定记录和返回语义 | AC-F001-002 |
+| `app/deepseek-harness/packages/fde/project` | 项目解析与持久化 | 增加显式生命周期版本、隔离校验和权威阶段投影 | AC-F001-001, AC-F001-003 |
+| `app/deepseek-harness/packages/fde/stage` | 六阶段状态与门禁 | 增加 V2 八阶段状态、决定记录、返回语义和兼容投影 | AC-F001-002, AC-F001-003 |
 | `app/deepseek-harness/packages/client/ui-fde-project` | 项目入口与切换 | 只投影已解析的当前项目身份 | AC-F001-001 |
-| `app/deepseek-harness/packages/client/ui-fde-stage` | 阶段入口 | 消费 V1/V2 对应生命周期而不自行推断 | AC-F001-001, AC-F001-002 |
+| `app/deepseek-harness/packages/client/ui-fde-stage` | 阶段入口 | 消费 V1/V2 对应生命周期而不自行推断 | AC-F001-001, AC-F001-002, AC-F001-003 |
 
 ## 实现方案
 
@@ -53,3 +53,4 @@ V2 入口使用显式版本分支；若切片失败，停止创建 V2 项目并�
 |---|---|---|---|
 | AC-F001-001 | 项目隔离且 V1/V2 明确分流 | 运行 project 与 stage 定向测试 | 两类夹具保持各自生命周期，跨目录读取被拒绝 |
 | AC-F001-002 | 只有 FDE 决定能迁移，返回保留事实 | 运行 V2 状态机迁移测试 | 自动事件不迁移；决定、历史与重评范围可读取 |
+| AC-F001-003 | V2 权威状态与旧入口兼容投影一致 | 运行项目、阶段和 UI 投影测试 | 阶段 3 独立存在且所有入口读取同一权威状态 |

@@ -7,6 +7,7 @@ import { projectEvaluationDecision } from '../src/evaluation-guard.ts'
 import { loadDevelopmentDocs, resolveDevelopmentArtifact } from '../src/development-docs.ts'
 import { resolveRequirementArtifact } from '../src/requirement-artifacts.ts'
 import { resolveSolutionArtifact } from '../src/solution-artifacts.ts'
+import { loadV2StageSurface } from '../src/v2-stage-surface.ts'
 import {
   acceptValidationMetric, confirmValidationPlan, loadValidationStage, resolveValidationArtifact, waiveValidationIssue,
 } from '../src/validation.ts'
@@ -22,7 +23,72 @@ const openApiPolicy = {
   maxOperations: 1_000,
 } as const
 
+const discoveryEvidence = (id: string, state: 'confirmed' | 'inferred' | 'unverified' = 'unverified') => ({
+  id,
+  state,
+  kind: 'conversation',
+  ref: 'session:test#turn-1',
+  summary: '用户在当前对话中描述了候选工作流，仍需现场核对。',
+})
+
+const guideSource = (artifact: string) => ({
+  id: 'davidahmann/fde-guide',
+  version: '060ef0f3',
+  commit: '060ef0f3b67743b2e1fc3705763d423eae980236',
+  license: 'Apache-2.0',
+  artifact,
+})
+
+const localSource = {
+  id: 'ff-fde-workbench/discovery-contract',
+  version: 'F005-v2',
+  commit: 'product-spec/F005',
+  license: 'project',
+  artifact: 'fact-confirmation-list',
+}
+
 describe('FDE project surface snapshot', () => {
+  it('derives one V2 stage from real files and blocks review on unresolved high-risk facts', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'fde-v2-definition-'))
+    const outputs = join(root, 'fde-deliverables', '02-outcome-scope')
+    const states = join(root, '.fde', 'stages')
+    await mkdir(outputs, { recursive: true })
+    await mkdir(states, { recursive: true })
+    for (const name of ['outcome-contract.md', 'value-case.md', 'delivery-plan.md']) {
+      await writeFile(join(outputs, name), `# ${name}\n`)
+    }
+    await writeFile(join(states, 'definition.json'), JSON.stringify({
+      schemaVersion: 1,
+      stage: 'definition',
+      status: 'review-ready',
+      workItems: [
+        { id: 'baseline', status: 'complete' }, { id: 'outcome', status: 'complete' },
+        { id: 'scope', status: 'complete' }, { id: 'ownership', status: 'complete' },
+      ],
+      blockers: [{ id: 'owner', title: '客户尚未确认最终验证人', severity: 'high', status: 'open' }],
+      recommendation: 'go',
+    }))
+
+    const blocked = await loadV2StageSurface(root, 'definition')
+    expect(blocked).toMatchObject({
+      stateStatus: 'ready', status: 'blocked', presentCount: 3, requiredCount: 3, reviewReady: false,
+      reviewBlockers: ['客户尚未确认最终验证人'], recommendation: 'go',
+    })
+    expect(blocked.workItems.every(item => item.status === 'complete')).toBe(true)
+
+    await writeFile(join(states, 'definition.json'), JSON.stringify({
+      schemaVersion: 1,
+      stage: 'definition',
+      status: 'review-ready',
+      workItems: blocked.workItems,
+      blockers: [{ id: 'owner', title: '客户尚未确认最终验证人', severity: 'high', status: 'resolved' }],
+      recommendation: 'go',
+    }))
+    await expect(loadV2StageSurface(root, 'definition')).resolves.toMatchObject({
+      status: 'review-ready', presentCount: 3, reviewReady: true, reviewBlockers: [],
+    })
+  })
+
   it('keeps unconfigured project surfaces honest', async () => {
     const root = await mkdtemp(join(tmpdir(), 'fde-project-empty-'))
     const value = await loadProjectSurfaceSnapshot({ workspaceId: 'w1', title: '空白项目', path: root })
@@ -32,6 +98,12 @@ describe('FDE project surface snapshot', () => {
     expect(value.evaluation).toMatchObject({ casesCount: 0, reports: [] })
     expect(value.requirements).toMatchObject({ requiredCount: 3, presentCount: 0 })
     expect(value.requirements.artifacts.map(item => item.status)).toEqual(['missing', 'missing', 'missing'])
+    expect(value.discovery).toMatchObject({
+      status: 'collecting', currentWorkId: 'collect-originals', presentCount: 0, requiredCount: 3,
+      reviewReady: false,
+      workflows: { status: 'missing', path: '.fde/discovery/workflows.json', items: [] },
+    })
+    expect(value.discovery.workItems.map(item => item.status)).toEqual(['current', 'waiting', 'waiting', 'waiting'])
     expect(value.solution).toMatchObject({ requiredCount: 5, presentCount: 0 })
     expect(value.solution.artifacts.map(item => item.status)).toEqual(['missing', 'missing', 'missing', 'missing', 'missing'])
     expect(value.development).toMatchObject({
@@ -72,6 +144,122 @@ describe('FDE project surface snapshot', () => {
       expect.objectContaining({ id: 'requirement-baseline', status: 'missing', path: 'fde-deliverables/01-requirement-research/requirement-baseline.md' }),
     ])
     expect(value.requirements.artifacts[2]).not.toHaveProperty('fileUrl')
+    expect(value.discovery).toMatchObject({
+      status: 'collecting', currentWorkId: 'collect-originals', presentCount: 0, reviewReady: false,
+    })
+    expect(value.discovery.artifacts.map(item => [item.title, item.status, item.required, item.structureState])).toEqual([
+      ['现场观察记录', 'present', true, 'invalid'],
+      ['事实确认清单', 'present', true, 'invalid'],
+      ['工作流章程', 'missing', true, 'missing'],
+      ['项目重新界定记录', 'missing', false, 'not_applicable'],
+    ])
+    expect(value.discovery.blockers).toContain('文件已存在，但尚未登记 Artifact 来源、版本、结构与证据。')
+  })
+
+  it('projects persisted candidate workflows without inventing missing evidence', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'fde-discovery-workflows-'))
+    const state = join(root, '.fde', 'discovery')
+    await mkdir(state, { recursive: true })
+    await writeFile(join(state, 'workflows.json'), JSON.stringify({
+      schemaVersion: 2,
+      selectedWorkflowId: 'refund-review',
+      workflows: [{
+        id: 'refund-review', title: '退款申请复核', actor: '售后专员', trigger: '客户发起退款申请',
+        problem: '需要跨三个系统核对订单与履约状态，处理时间长且容易漏项。', disposition: 'selected',
+        evidenceRefs: [
+          discoveryEvidence('ev-1', 'confirmed'),
+          discoveryEvidence('ev-2', 'confirmed'),
+          discoveryEvidence('ev-3', 'inferred'),
+          discoveryEvidence('ev-4', 'unverified'),
+        ],
+      }],
+    }))
+
+    const value = await loadProjectSurfaceSnapshot({ workspaceId: 'w1', title: '发现项目', path: root })
+    expect(value.discovery.workflows).toEqual({
+      path: '.fde/discovery/workflows.json', status: 'ready', selectedWorkflowId: 'refund-review',
+      items: [{
+        id: 'refund-review', title: '退款申请复核', actor: '售后专员', trigger: '客户发起退款申请',
+        problem: '需要跨三个系统核对订单与履约状态，处理时间长且容易漏项。', disposition: 'selected',
+        evidence: { confirmed: 2, inferred: 1, unverified: 1 },
+        evidenceRefs: [
+          discoveryEvidence('ev-1', 'confirmed'),
+          discoveryEvidence('ev-2', 'confirmed'),
+          discoveryEvidence('ev-3', 'inferred'),
+          discoveryEvidence('ev-4', 'unverified'),
+        ],
+      }],
+    })
+  })
+
+  it('reports an invalid workflow catalog instead of presenting an empty success state', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'fde-discovery-invalid-'))
+    const state = join(root, '.fde', 'discovery')
+    await mkdir(state, { recursive: true })
+    await writeFile(join(state, 'workflows.json'), JSON.stringify({ schemaVersion: 2, workflows: [{ id: 'missing-fields' }] }))
+
+    const value = await loadProjectSurfaceSnapshot({ workspaceId: 'w1', title: '发现项目', path: root })
+    expect(value.discovery.workflows).toMatchObject({ status: 'invalid', items: [] })
+    expect(value.discovery.workflows.message).toContain('disposition 无效')
+  })
+
+  it('requires pinned Artifact metadata, real Markdown structure, and claim-level evidence before review', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'fde-discovery-artifacts-'))
+    const output = join(root, 'fde-deliverables', '01-requirement-research')
+    const state = join(root, '.fde', 'discovery')
+    await mkdir(output, { recursive: true })
+    await mkdir(state, { recursive: true })
+    await writeFile(join(output, 'requirement-research-report.md'), '# 现场观察记录\n\n## 来源事实\n- 待核对\n\n## 代表案例\n- 退款复核\n\n## 现场观察\n- 尚未现场观察\n\n## 未验证事项\n- 系统行为\n')
+    await writeFile(join(output, 'confirmation-checklist.md'), '# 事实确认清单\n\n## 待确认事项\n- 系统行为\n\n## 已确认事项\n- 客户诉求\n\n## 决策权\n- 业务负责人\n')
+    await writeFile(join(output, 'requirement-baseline.md'), '# 工作流章程\n\n## 候选工作流\n退款复核\n\n## 业务结果\n缩短处理时间\n\n## 现状基线\n尚未测量\n\n## 范围与非目标\n仅退款复核\n\n## 人工回退\n人工处理\n\n## 停止条件\n错误率超限\n')
+    await writeFile(join(state, 'workflows.json'), JSON.stringify({
+      schemaVersion: 2,
+      selectedWorkflowId: 'refund-review',
+      workflows: [{
+        id: 'refund-review', title: '退款申请复核', actor: '售后专员', trigger: '客户发起退款申请',
+        problem: '跨系统核对耗时且容易漏项。', disposition: 'selected', evidenceRefs: [discoveryEvidence('workflow-1')],
+      }],
+    }))
+    const records = [
+      { id: 'research-report', version: 1, contentPath: 'fde-deliverables/01-requirement-research/requirement-research-report.md', sourceAdapter: guideSource('field-observation-log') },
+      { id: 'confirmation-checklist', version: 1, contentPath: 'fde-deliverables/01-requirement-research/confirmation-checklist.md', sourceAdapter: localSource },
+      { id: 'requirement-baseline', version: 1, contentPath: 'fde-deliverables/01-requirement-research/requirement-baseline.md', sourceAdapter: guideSource('workflow-charter') },
+    ].map((item, index) => ({
+      ...item,
+      structureState: 'starter_valid',
+      evidenceState: 'unverified',
+      evidenceRefs: [discoveryEvidence(`artifact-${String(index + 1)}`)],
+      inputRefs: ['session:test#turn-1'],
+      decisionRefs: [],
+      supersedes: [],
+    }))
+    await writeFile(join(state, 'artifacts.json'), JSON.stringify({ schemaVersion: 1, artifacts: records }))
+
+    const ready = await loadProjectSurfaceSnapshot({ workspaceId: 'w1', title: '发现项目', path: root })
+    expect(ready.discovery).toMatchObject({ status: 'ready-for-review', presentCount: 3, reviewReady: true, blockers: [] })
+    expect(ready.discovery.artifacts.slice(0, 3).map(item => [item.structureState, item.version, item.evidenceRefs.length])).toEqual([
+      ['starter_valid', 1, 1], ['starter_valid', 1, 1], ['starter_valid', 1, 1],
+    ])
+    expect(ready.discovery.route.primaryMethod).toMatchObject({ skill: 'qualify-ai-workflow', layer: 'method' })
+    expect(ready.discovery.route.engineering.map(item => item.skill)).toEqual(['fde-orient', 'knowledge-interview', 'ownership-map', 'repo-recon', 'stakeholder-brief'])
+
+    const compatibleRecords = records.map((item, index) => ({
+      ...item,
+      ...(index === 0 ? { id: 'requirement-research-report' } : {}),
+      evidenceRefs: ['workflow-1'],
+      supersedes: null,
+    }))
+    await writeFile(join(state, 'artifacts.json'), JSON.stringify({ schemaVersion: 1, artifacts: compatibleRecords }))
+    const compatible = await loadProjectSurfaceSnapshot({ workspaceId: 'w1', title: '发现项目', path: root })
+    expect(compatible.discovery).toMatchObject({ status: 'ready-for-review', presentCount: 3, reviewReady: true, blockers: [] })
+    expect(compatible.discovery.artifacts[0]).toMatchObject({ id: 'research-report', status: 'present', structureState: 'starter_valid' })
+
+    records[2] = { ...records[2]!, sourceAdapter: { ...guideSource('workflow-charter'), commit: 'unreviewed' } }
+    await writeFile(join(state, 'artifacts.json'), JSON.stringify({ schemaVersion: 1, artifacts: records }))
+    const invalid = await loadProjectSurfaceSnapshot({ workspaceId: 'w1', title: '发现项目', path: root })
+    expect(invalid.discovery).toMatchObject({ presentCount: 0, reviewReady: false })
+    expect(invalid.discovery.artifacts.slice(0, 3).map(item => item.structureState)).toEqual(['invalid', 'invalid', 'invalid'])
+    expect(invalid.discovery.blockers[0]).toContain('Artifact Catalog 无效')
   })
 
   it('resolves only fixed requirement outputs inside the registered project', async () => {

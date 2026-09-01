@@ -65,6 +65,7 @@
     "@deepseek-ai/dsh-invariants": "workspace:^",
     "@testing-library/react": "^16.1.0",
     "@types/react": "~18.3.1",
+    "@types/react-dom": "~18.3.0",
     "@types/three": "~0.184.0",
     "dsh-better-sidebar": "0.16.1",
     "react": "^18.2.0",

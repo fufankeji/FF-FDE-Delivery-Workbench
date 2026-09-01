@@ -129,7 +129,7 @@ describe('ProjectProgressOverlay standalone page', () => {
     expect(showProjectDetail).toHaveBeenCalledWith('workspace-2')
     fireEvent.click(cardView)
     expect(screen.queryByRole('table', { name: '项目列表' })).toBeNull()
-    expect(screen.getAllByRole('list', { name: '项目六阶段位置' })).toHaveLength(2)
+    expect(screen.getAllByRole('list', { name: '项目八阶段位置' })).toHaveLength(2)
   })
 
   it('separates stage inputs and outputs and requires the FDE second confirmation', async () => {

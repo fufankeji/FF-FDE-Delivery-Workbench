@@ -54,10 +54,11 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
 }
 
 /** Required browser services and the Slot owners that declare our targets. */
-export const inject = ['slots', 'locale', 'modelDirectories', 'sessions', 'workspaces', 'conversation']
+export const inject = ['slots', 'locale', 'modelDirectories', 'sessions', 'workspaces', 'conversation', 'layout']
 
 const FDE_PROJECT_PROGRESS_OPEN_EVENT = 'fde:project-progress-open'
 const FDE_PROJECT_CREATE_OPEN_EVENT = 'fde:project-create-open'
+const FDE_PROJECT_SOURCE_UPLOAD_OPEN_EVENT = 'fde:project-source-upload-open'
 
 /** Register the global project page and the four project delivery views. */
 export function apply(ctx: ClientContext): void {
@@ -106,13 +107,6 @@ export function apply(ctx: ClientContext): void {
     }
     ctx.sessions.open(sessionId)
     page.close()
-    const workspace = ctx.workspaces.list.getSnapshot().items.find(item => String(item.workspaceId) === workspaceId)
-    if (projectSidebar !== undefined && workspace !== undefined) {
-      const sidebar = projectSidebar
-      void waitForProjectSidebarSession(sidebar, String(sessionId))
-        .then(() => { revealProjectSidebar(sidebar, String(sessionId), workspace.path) })
-        .catch(() => undefined)
-    }
   }
 
   const pageInjected = (): ProjectPageInjected => ({
@@ -123,6 +117,14 @@ export function apply(ctx: ClientContext): void {
     refreshProjectSurface: (workspaceId) => { surfaces.refresh(workspaceId) },
     completeRequirements: async (workspaceId, expectedRevision) => {
       await stages.completeRequirements(workspaceId, expectedRevision)
+      surfaces.refresh(workspaceId)
+    },
+    completeV2Stage: async (workspaceId, expectedRevision, stage) => {
+      await stages.completeV2(workspaceId, expectedRevision, stage)
+      surfaces.refresh(workspaceId)
+    },
+    returnV2Stage: async (workspaceId, expectedRevision, reason) => {
+      await stages.returnV2(workspaceId, expectedRevision, reason)
       surfaces.refresh(workspaceId)
     },
     completeSolution: async (workspaceId, expectedRevision) => {
@@ -298,32 +300,100 @@ export function apply(ctx: ClientContext): void {
     },
   })
 
-  const discoveryPrompt = (action: DiscoveryAction): string => {
+  const discoveryDraft = (
+    action: DiscoveryAction,
+    sourcePaths: readonly string[],
+  ): string => {
     if (action === 'prepare-interview') {
-      return '请围绕 FDE 阶段 1“发现高价值问题”，基于当前项目已经归档的客户资料，生成下一轮现场访谈提纲。重点确认真实流程知情者、正常案例、重要异常案例、结果验证者、人工回退、访问边界和风险上限。必须区分资料中的原始说法、可验证事实、推断和未知项；没有证据的内容明确写待确认。只提出问题和需要取得的证据，不设计技术方案，不推进项目阶段。'
+      return '客户最近遇到的问题是：____。请先帮我还原他们现在怎么做、问题发生在哪一步，以及还需要向哪些业务人员确认。暂时不要讨论解决方案。'
     }
     if (action === 'reframe-engagement') {
-      return '请围绕 FDE 阶段 1“发现高价值问题”，对照当前项目的原始诉求与已有现场证据，判断是否存在会改变项目边界、成功标准或停止条件的事实冲突。保留原始说法及来源，列出冲突、影响、安全回退和有权决定的人；证据不足时只列待核实项。不要自行改写客户事实，不设计技术方案，不推进项目阶段。'
+      return '客户原先的说法和现场情况可能存在不一致。请帮我核对具体哪里不一致、会影响哪些已约定内容，以及需要由谁确认。暂时不要修改项目范围或讨论解决方案。'
     }
-    return '请围绕 FDE 阶段 1“发现高价值问题”，读取当前项目已经归档的客户资料，判断哪个真实工作流问题值得继续。请明确当前工作流、流程知情者、代表案例、结果验证者、业务结果、现状基线、人工回退、访问边界、风险上限和证据缺口；每项结论区分已确认、推断和未验证。形成候选的现场观察记录与工作流章程初稿，但不要把文件存在当成客户确认，不设计技术方案，也不要推进项目阶段。'
+    if (action === 'narrow-workflow') {
+      return '我准备把当前问题缩小到：____。请根据已经确认的事实，保留原始范围和调整原因，更新优先处理的业务流程、暂不处理的部分、成功标准、停止条件和项目调整记录。不要推进项目阶段。'
+    }
+    if (action === 'pause-workflow') {
+      return '我决定暂时不推进这个问题，原因是：____。请记录当前决定人、暂停原因、仍缺少的证据和重新启动条件，并更新项目调整记录或业务流程状态。不要推进项目阶段。'
+    }
+    const materials = sourcePaths.map(path => `- ${path}`).join('\n')
+    return `请结合以下客户资料，从一个最近发生的案例开始，帮我还原客户现在怎么做、问题发生在哪一步，以及还需要向哪些业务人员确认。暂时不要讨论解决方案。\n\n本次参考资料：\n${materials}`
+  }
+
+  const focusNativeComposer = (): void => {
+    const focus = (): void => {
+      document.querySelector<HTMLTextAreaElement>('[data-input-scroll] textarea:not(:disabled)')?.focus()
+    }
+    if (typeof window.requestAnimationFrame === 'function') window.requestAnimationFrame(focus)
+    else window.setTimeout(focus, 0)
+  }
+
+  const enterProjectAgentConversation = (sessionId: string): void => {
+    const workspace = ctx.workspaces.list.getSnapshot().items.find(item => (
+      item.sessionIds.some(id => String(id) === sessionId)
+    ))
+    ctx.sessions.scope(sessionId as SessionId)?.get('conversation')?.selectView('chat')
+    ctx.sessions.open(sessionId as SessionId)
+    ctx.layout.collapseSidebar()
+    if (projectSidebar !== undefined && workspace !== undefined) {
+      revealProjectSidebar(projectSidebar, sessionId, workspace.path)
+    }
   }
 
   const stageWorkbenchInjected = (): ProjectStageWorkbenchInjected => ({
     hooks: { stageProgress: stages, projectSurfaces: surfaces, projectSources: sources },
     loadStage: workspaceId => { stages.load(workspaceId) },
     loadProjectSurface: workspaceId => { surfaces.load(workspaceId) },
+    refreshProjectSurface: workspaceId => { surfaces.refresh(workspaceId) },
     loadProjectSources: (workspaceId, force) => { sources.load(workspaceId, force) },
-    runDiscoveryAction: async (sessionId, action) => {
-      const session = ctx.sessions.binding(sessionId as SessionId)?.session
-      if (session === undefined) throw new Error('当前项目会话不可用。')
-      ctx.sessions.scope(sessionId as SessionId)?.get('conversation')?.selectView('chat')
+    completeRequirements: async (workspaceId, expectedRevision) => {
+      await stages.completeRequirements(workspaceId, expectedRevision)
+      surfaces.refresh(workspaceId)
+    },
+    completeV2Stage: async (workspaceId, expectedRevision, stage) => {
+      await stages.completeV2(workspaceId, expectedRevision, stage)
+      surfaces.refresh(workspaceId)
+    },
+    returnV2Stage: async (workspaceId, expectedRevision, reason) => {
+      await stages.returnV2(workspaceId, expectedRevision, reason)
+      surfaces.refresh(workspaceId)
+    },
+    openProjectSourceUpload: workspaceId => {
+      window.dispatchEvent(new CustomEvent(FDE_PROJECT_SOURCE_UPLOAD_OPEN_EVENT, { detail: { workspaceId } }))
+    },
+    prepareDiscoveryDraft: (sessionId, action, sourcePaths) => {
+      const scoped = ctx.sessions.scope(sessionId as SessionId)
+      const conversation = scoped?.get('conversation')
+      if (scoped === undefined || conversation === undefined) throw new Error('当前项目会话不可用。')
+      const input = conversation.input.for(scoped)
+      if (input.state.getSnapshot().draft.trim().length === 0) {
+        input.setDraft(discoveryDraft(action, sourcePaths))
+      } else {
+        input.notify('info', '输入框已有内容，已为你保留。请补充完整后再发送。')
+      }
+      enterProjectAgentConversation(sessionId)
+      focusNativeComposer()
+    },
+    prepareStageDraft: (sessionId, prompt) => {
+      const scoped = ctx.sessions.scope(sessionId as SessionId)
+      const conversation = scoped?.get('conversation')
+      if (scoped === undefined || conversation === undefined) throw new Error('当前项目会话不可用。')
+      const input = conversation.input.for(scoped)
+      if (input.state.getSnapshot().draft.trim().length === 0) input.setDraft(prompt)
+      else input.notify('info', '输入框已有内容，已为你保留。请补充完整后再发送。')
+      enterProjectAgentConversation(sessionId)
+      focusNativeComposer()
+    },
+    openProjectFile: async (sessionId, workspacePath, relativePath, title) => {
+      if (projectSidebar === undefined) throw new Error('右侧项目文件面板暂时不可用。')
       ctx.sessions.open(sessionId as SessionId)
-      const result = await session.prompt([{ type: 'text', text: discoveryPrompt(action) }], 'queue')
-      if (!result.ok) throw new Error(result.error.message)
+      await waitForProjectSidebarSession(projectSidebar, sessionId)
+      revealProjectSidebar(projectSidebar, sessionId, workspacePath)
+      const separator = workspacePath.endsWith('/') || relativePath.startsWith('/') ? '' : '/'
+      projectSidebar.openFile({ sessionId, cwd: workspacePath }, `${workspacePath}${separator}${relativePath}`, title)
     },
     openProjectConversation: sessionId => {
-      ctx.sessions.scope(sessionId as SessionId)?.get('conversation')?.selectView('chat')
-      ctx.sessions.open(sessionId as SessionId)
+      enterProjectAgentConversation(sessionId)
     },
     openProjectPage: page.open,
   })
@@ -442,7 +512,7 @@ export function apply(ctx: ClientContext): void {
   }, ProjectStageWorkbenchHero))
 
   ctx.slots.inject('conversation.view', () => ctx.slots.register({
-    name: 'conversation.view', id: 'fde-stage-workbench', order: 10, locale: NS,
+    name: 'conversation.view', id: 'fde-stage-workbench', order: -1000, locale: NS,
     label: () => t('view.stage'), inject: stageWorkbenchInjected,
   }, ProjectStageWorkbenchView))
 

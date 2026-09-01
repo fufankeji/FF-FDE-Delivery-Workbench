@@ -85,6 +85,7 @@ export {
   readProjectArchitecture, replaceProjectArchitecture,
 } from './snapshot.ts'
 export { loadProjectOpenApiConfig } from './snapshot.ts'
+export { loadV2StageSurface, loadV2StageSurfaces, V2_STAGE_DEFINITIONS } from './v2-stage-surface.ts'
 export {
   abandonRequirementWikiBuild,
   loadRequirementWikiSnapshot,
@@ -96,6 +97,7 @@ export {
   startRequirementWikiBuild,
 } from './requirement-wiki.ts'
 export { registerProjectArchitectureTools } from './architecture-tools.ts'
+export { DISCOVERY_CAPABILITY_ROUTE, loadDiscoveryStage } from './discovery-stage.ts'
 export {
   loadRequirementArtifacts,
   requirementArtifactFileUrl,

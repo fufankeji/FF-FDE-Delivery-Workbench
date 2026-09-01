@@ -12,7 +12,14 @@ import type {
   ValidationStageSnapshot,
 } from './controller.ts'
 import { readProjectMetadata, STAGE_NAMES } from './project-data.ts'
-import { FDE_STAGES, type FdeProjectState, type FdeStageId, type ProjectStageLoadState } from './stage-controller.ts'
+import {
+  FDE_STAGES,
+  FDE_V2_STAGE_IDS,
+  type FdeProjectState,
+  type FdeStageId,
+  type FdeV2StageId,
+  type ProjectStageLoadState,
+} from './stage-controller.ts'
 import type { ProjectSourceItem, ProjectSourceLoadState } from './source-controller.ts'
 import type { ProjectProgressOverlayProps, RequirementWikiRunTarget } from './slots.ts'
 import type { ProjectPreviewFile } from './slots.ts'
@@ -76,6 +83,37 @@ function currentStageIndex(stage: ProjectStageLoadState | undefined): number {
     : FDE_STAGES.findIndex(item => item.id === stage.value.currentStage)
 }
 
+const V2_STAGE_NAMES: Readonly<Record<FdeV2StageId, string>> = {
+  discovery: '发现高价值问题',
+  definition: '定义结果、范围与责任',
+  investigation: '调查现场条件',
+  design: '设计方案与纵向切片',
+  evaluation: '运行 PoC 与 Eval',
+  pilot: '企业集成与受控试点',
+  production: '生产采用与验收交接',
+  improvement: '持续改进与能力沉淀',
+}
+
+const LEGACY_TO_V2_STAGE: Readonly<Record<FdeProjectState, FdeV2StageId>> = {
+  requirements: 'discovery',
+  solution: 'definition',
+  development: 'design',
+  validation: 'evaluation',
+  pilot: 'pilot',
+  handoff: 'production',
+  completed: 'improvement',
+}
+
+function currentV2Stage(stage: ProjectStageLoadState | undefined): FdeV2StageId | undefined {
+  if (stage?.status !== 'ready') return undefined
+  return stage.value.v2Stage ?? LEGACY_TO_V2_STAGE[stage.value.currentStage]
+}
+
+function currentV2StageIndex(stage: ProjectStageLoadState | undefined): number {
+  const current = currentV2Stage(stage)
+  return current === undefined ? -1 : FDE_V2_STAGE_IDS.indexOf(current)
+}
+
 function stageReached(currentStage: FdeProjectState | undefined, target: FdeStageId): boolean {
   if (currentStage === undefined) return false
   if (currentStage === 'completed') return true
@@ -85,7 +123,7 @@ function stageReached(currentStage: FdeProjectState | undefined, target: FdeStag
 function stageLabel(stage: ProjectStageLoadState | undefined, loading: string, failed: string): string {
   if (stage === undefined || stage.status === 'loading') return loading
   if (stage.status === 'error') return failed
-  return STAGE_NAMES[stage.value.currentStage]
+  return V2_STAGE_NAMES[stage.value.v2Stage ?? LEGACY_TO_V2_STAGE[stage.value.currentStage]]
 }
 
 const STAGE_SUMMARIES: Readonly<Record<FdeStageId, string>> = {
@@ -97,9 +135,20 @@ const STAGE_SUMMARIES: Readonly<Record<FdeStageId, string>> = {
   handoff: '完成客户验收、交付材料、运行说明和后续责任移交。',
 }
 
-function portfolioStageId(row: ProjectRow): FdeStageId | undefined {
+const V2_STAGE_SUMMARIES: Readonly<Record<FdeV2StageId, string>> = {
+  discovery: '还原客户真实工作方式，找到值得继续投入且能够验证的业务问题。',
+  definition: '明确业务结果、当前基线、交付范围、责任人和停止条件。',
+  investigation: '核对数据、系统、接口、权限、安全要求和现场责任人。',
+  design: '比较实现方式，明确系统边界，并先走通一条端到端业务链路。',
+  evaluation: '用真实案例、明确指标和可追溯证据验证关键假设。',
+  pilot: '完成企业集成和可靠性准备，在授权范围内运行受控试点。',
+  production: '受控进入生产，推动实际使用，完成客户验收和责任移交。',
+  improvement: '根据生产证据选择改进，验证后发布，并沉淀可复用能力。',
+}
+
+function portfolioStageId(row: ProjectRow): FdeV2StageId | undefined {
   if (row.stage?.status !== 'ready') return undefined
-  return row.stage.value.currentStage === 'completed' ? 'handoff' : row.stage.value.currentStage
+  return row.stage.value.v2Stage ?? LEGACY_TO_V2_STAGE[row.stage.value.currentStage]
 }
 
 function portfolioHealth(row: ProjectRow): 'stable' | 'attention' | 'risk' {
@@ -128,21 +177,21 @@ function projectNextAction(row: ProjectRow): ProjectNextAction {
   if (row.runningSessions > 0) {
     return { priority: 3, reason: `${String(row.runningSessions)} 个会话正在运行`, action: '查看当前工作进展', decisionOwner: 'FDE 跟进' }
   }
-  if (row.stage.value.currentStage === 'completed') {
-    return { priority: 5, reason: '项目六阶段已经完成', action: '查看验收与移交记录', decisionOwner: 'FDE 复核' }
-  }
-  const actions: Readonly<Record<FdeStageId, string>> = {
-    requirements: '补充资料并确认需求基线',
-    solution: '审阅方案、架构与验收口径',
-    development: '继续开发并更新任务证据',
-    validation: '运行验证并处理证据缺口',
-    pilot: '记录试运行结果与问题',
-    handoff: '完成验收与责任移交',
+  const current = row.stage.value.v2Stage ?? LEGACY_TO_V2_STAGE[row.stage.value.currentStage]
+  const actions: Readonly<Record<FdeV2StageId, string>> = {
+    discovery: '补充现场事实并判断问题价值',
+    definition: '确认结果、范围、责任与停止条件',
+    investigation: '补齐数据、系统、权限与责任人信息',
+    design: '审阅实现方式、系统边界与纵向切片',
+    evaluation: '运行验证并处理证据缺口',
+    pilot: '核对集成准备并记录受控试点结果',
+    production: '完成生产采用、客户验收与责任移交',
+    improvement: '根据生产证据选择下一轮改进',
   }
   return {
     priority: 4,
-    reason: `当前处于${STAGE_NAMES[row.stage.value.currentStage]}`,
-    action: actions[row.stage.value.currentStage],
+    reason: `当前处于${V2_STAGE_NAMES[current]}`,
+    action: actions[current],
     decisionOwner: 'FDE 确认',
   }
 }
@@ -167,11 +216,15 @@ function projectProgressFacts(row: ProjectRow): ProjectProgressFacts {
     return { status: row.runningSessions > 0 ? 'AI FDE 正在执行' : '正在读取项目证据', evidence: `${String(row.sessions)} 个项目会话已登记。`, detail: row.runningSessions > 0 ? `${String(row.runningSessions)} 个会话正在运行。` : '读取完成后展示真实产物。' }
   }
   const surface = row.surface.value
-  if (row.stage.value.currentStage === 'completed') {
+  const currentV2 = row.stage.value.v2Stage ?? LEGACY_TO_V2_STAGE[row.stage.value.currentStage]
+  const v2Surface = currentV2 === 'discovery' ? undefined : surface.v2Stages?.[currentV2]
+  if (v2Surface !== undefined) {
     return {
-      status: '六阶段交付已完成',
-      evidence: `验收移交产物 ${String(surface.acceptanceHandover.artifacts.presentCount)}/${String(surface.acceptanceHandover.artifacts.requiredCount)}。`,
-      detail: surface.acceptanceHandover.blockers.length === 0 ? '当前没有未处理的移交阻塞。' : `${String(surface.acceptanceHandover.blockers.length)} 个移交问题仍需复核。`,
+      status: row.runningSessions > 0 ? `AI FDE 正在处理${V2_STAGE_NAMES[currentV2]}` : `${V2_STAGE_NAMES[currentV2]}记录已同步`,
+      evidence: `本阶段产物 ${String(v2Surface.presentCount)}/${String(v2Surface.requiredCount)}。`,
+      detail: v2Surface.blockers.filter(blocker => blocker.status === 'open').length === 0
+        ? v2Surface.reviewReady ? '材料已达到 FDE 评审条件。' : '当前没有已登记阻塞，仍需完成阶段工作。'
+        : `${String(v2Surface.blockers.filter(blocker => blocker.status === 'open').length)} 个问题待处理。`,
     }
   }
   const stage = row.stage.value.currentStage
@@ -269,15 +322,27 @@ function featureStatusLabel(status: string): string {
   return labels[status] ?? '状态待确认'
 }
 
+function v2StagePositionState(stage: ProjectStageLoadState | undefined, index: number): 'unknown' | 'done' | 'current' | 'reconfirm' | 'pending' {
+  const current = currentV2StageIndex(stage)
+  if (current < 0) return 'unknown'
+  if (index < current) return 'done'
+  if (index === current) return 'current'
+  if (stage?.status === 'ready' && stage.value.v2ReconfirmThrough !== undefined) {
+    const boundary = FDE_V2_STAGE_IDS.indexOf(stage.value.v2ReconfirmThrough)
+    if (index <= boundary) return 'reconfirm'
+  }
+  return 'pending'
+}
+
 function ProjectStagePath({ stage }: { readonly stage: ProjectStageLoadState | undefined }) {
   return (
-    <ol className={css.projectStagePath} aria-label="项目六阶段位置">
-      {FDE_STAGES.map((definition, index) => {
-        const state = stagePositionState(stage, index)
+    <ol className={css.projectStagePath} aria-label="项目八阶段位置">
+      {FDE_V2_STAGE_IDS.map((stageId, index) => {
+        const state = v2StagePositionState(stage, index)
         return (
-          <li key={definition.id} data-stage={definition.id} data-state={state}>
+          <li key={stageId} data-stage={stageId} data-state={state}>
             <span>{index + 1}</span>
-            <strong>{STAGE_NAMES[definition.id]}</strong>
+            <strong>{V2_STAGE_NAMES[stageId]}</strong>
           </li>
         )
       })}
@@ -638,12 +703,12 @@ function ProjectCard({ row, showProject, labels }: {
   readonly showProject: (workspaceId: string) => void
   readonly labels: ProjectRowLabels
 }) {
-  const index = currentStageIndex(row.stage)
-  const currentDefinition = index < 0 || index >= FDE_STAGES.length ? undefined : FDE_STAGES[index]
+  const index = currentV2StageIndex(row.stage)
+  const current = currentV2Stage(row.stage)
   const schedule = row.schedule.status === 'estimated'
     ? `${formatDate(row.schedule.startDate)} — ${formatDate(row.schedule.endDate)}`
     : labels.scheduleMissing
-  const stageId = currentDefinition?.id ?? (index >= FDE_STAGES.length ? 'handoff' : 'requirements')
+  const stageId = current ?? 'discovery'
   const nextAction = projectNextAction(row)
   return (
     <article className={css.projectCard} data-stage={stageId}>
@@ -656,26 +721,24 @@ function ProjectCard({ row, showProject, labels }: {
           </div>
         </div>
         <div className={css.projectStageHeadline}>
-          <span>{index < 0 ? '—' : String(Math.min(index + 1, 6)).padStart(2, '0')}<small>/06</small></span>
+          <span>{index < 0 ? '—' : String(index + 1).padStart(2, '0')}<small>/08</small></span>
           <div>
             <small>当前阶段</small>
             <strong>
-              {currentDefinition === undefined
+              {current === undefined
                 ? stageLabel(row.stage, labels.loading, labels.failed)
-                : STAGE_NAMES[currentDefinition.id]}
+                : V2_STAGE_NAMES[current]}
             </strong>
           </div>
         </div>
       </div>
       <div className={css.projectCardJourney}>
         <div>
-          <span>六阶段交付路径</span>
+          <span>八阶段交付路径</span>
           <span className={css.stageBadge} data-error={row.stage?.status === 'error' || undefined}>
             {index < 0
               ? stageLabel(row.stage, labels.loading, labels.failed)
-              : index >= FDE_STAGES.length
-                ? '六阶段已完成 · 项目已交付'
-                : `阶段 ${String(index + 1)}/6 · ${STAGE_NAMES[currentDefinition?.id ?? 'requirements']}`}
+              : `阶段 ${String(index + 1)}/8 · ${V2_STAGE_NAMES[current ?? 'discovery']}`}
           </span>
         </div>
         <ProjectStagePath stage={row.stage} />
@@ -716,15 +779,15 @@ function ProjectList({ rows, showProject, labels }: {
         </thead>
         <tbody>
           {rows.map((row) => {
-            const index = currentStageIndex(row.stage)
-            const stageId = portfolioStageId(row) ?? 'requirements'
+            const index = currentV2StageIndex(row.stage)
+            const stageId = portfolioStageId(row) ?? 'discovery'
             const health = portfolioHealth(row)
             const nextAction = projectNextAction(row)
             const schedule = row.schedule.status === 'estimated'
               ? `${formatDate(row.schedule.startDate)} — ${formatDate(row.schedule.endDate)}`
               : labels.scheduleMissing
             const stageName = stageLabel(row.stage, labels.loading, labels.failed)
-            const stagePosition = index < 0 ? '阶段待读取' : `阶段 ${String(Math.min(index + 1, 6))}/6`
+            const stagePosition = index < 0 ? '阶段待读取' : `阶段 ${String(index + 1)}/8`
             const healthLabel = health === 'stable' ? '进展平稳' : health === 'attention' ? '需要关注' : '存在阻塞'
             const healthDetail = row.stage?.status === 'error'
               ? labels.failed
@@ -790,10 +853,10 @@ function ProjectAttentionCard({ row, showProject, enterProject }: {
 }) {
   const action = projectNextAction(row)
   const progress = projectProgressFacts(row)
-  const stageId = portfolioStageId(row) ?? 'requirements'
+  const stageId = portfolioStageId(row) ?? 'discovery'
   const stage = stageLabel(row.stage, '阶段读取中', '阶段读取失败')
-  const stageIndex = currentStageIndex(row.stage)
-  const currentStage = stageIndex >= 0 && stageIndex < FDE_STAGES.length ? FDE_STAGES[stageIndex] : undefined
+  const stageIndex = currentV2StageIndex(row.stage)
+  const currentStage = currentV2Stage(row.stage)
   const schedule = row.schedule.status === 'estimated'
     ? `${formatDate(row.schedule.startDate)} — ${formatDate(row.schedule.endDate)}`
     : '交付周期待确认'
@@ -807,14 +870,14 @@ function ProjectAttentionCard({ row, showProject, enterProject }: {
         <span className={css.projectAttentionStage}>{stage}</span>
       </header>
       <div className={css.projectAttentionJourney}>
-        <div><span>项目阶段</span><strong>{stageIndex >= FDE_STAGES.length ? '六阶段交付完成' : `${String(Math.max(1, stageIndex + 1))}/6 · ${stage}`}</strong></div>
+        <div><span>项目阶段</span><strong>{stageIndex < 0 ? '阶段待读取' : `${String(stageIndex + 1)}/8 · ${stage}`}</strong></div>
         <ProjectStagePath stage={row.stage} />
       </div>
       <div className={css.projectAttentionBody}>
         <section className={css.projectWorkStatus}>
           <span>AI FDE 工作现场</span>
           <h3>{progress.status}</h3>
-          <p>{currentStage === undefined ? '正在读取当前阶段的工作内容。' : STAGE_SUMMARIES[currentStage.id]}</p>
+          <p>{currentStage === undefined ? '正在读取当前阶段的工作内容。' : V2_STAGE_SUMMARIES[currentStage]}</p>
           <dl>
             <div><dt>当前产物与证据</dt><dd>{progress.evidence}</dd></div>
             <div><dt>执行状态</dt><dd>{progress.detail}</dd></div>

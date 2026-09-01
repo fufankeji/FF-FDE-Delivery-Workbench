@@ -303,7 +303,7 @@ describe('plugin registration', () => {
     const b = await bench()
     expect(tabsOf(b.slots)).toEqual([
       { id: 'chat', label: 'Chat' },
-      { id: 'trajectory', label: 'Trajectory' },
+      { id: 'trajectory', label: 'Run trace' },
     ])
   })
 
@@ -362,9 +362,9 @@ describe('tab switching in ConversationRoot', () => {
     const b = await bench()
     const view = mount(b.slots)
     expect(screen.getByTestId('chat-body')).toBeTruthy()
-    expect(screen.getAllByRole('tab').map(t => t.textContent)).toEqual(['Chat', 'Trajectory'])
+    expect(screen.getAllByRole('tab').map(t => t.textContent)).toEqual(['Chat', 'Run trace'])
 
-    fireEvent.click(screen.getByRole('tab', { name: 'Trajectory' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'Run trace' }))
     expect(screen.queryByText(/turns ·/)).toBeNull()
     expect(view.container.querySelectorAll('tr[data-turn-start="true"]')).toHaveLength(2)
     expect(screen.queryByRole('columnheader')).toBeNull()
@@ -384,18 +384,18 @@ describe('tab switching in ConversationRoot', () => {
   it('labels the trajectory tab in the active locale', async () => {
     const b = await bench()
     const labelOf = () => tabsOf(b.slots).find(tab => tab.id === 'trajectory')?.label
-    expect(labelOf()).toBe('Trajectory')
+    expect(labelOf()).toBe('Run trace')
     const locale = b.ctx.get('locale') as { setLocale(id: string): void }
     locale.setLocale('zh')
-    expect(labelOf()).toBe('轨迹')
+    expect(labelOf()).toBe('运行轨迹')
     locale.setLocale('en')
-    expect(labelOf()).toBe('Trajectory')
+    expect(labelOf()).toBe('Run trace')
   })
 
   it('opens a local record inspector and switches payload tabs without opening chat details', async () => {
     const b = await bench()
     mount(b.slots)
-    fireEvent.click(screen.getByRole('tab', { name: 'Trajectory' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'Run trace' }))
 
     fireEvent.keyDown(screen.getByRole('row', { name: /TOOL/ }), { key: 'Enter' })
     expect(screen.getByRole('complementary', { name: 'Event details' })).toBeTruthy()
@@ -432,7 +432,7 @@ describe('tab switching in ConversationRoot', () => {
     }
     const b = await bench(historySnapshot(nodes, { requests: [compaction] }))
     const view = mount(b.slots, nodes)
-    fireEvent.click(screen.getByRole('tab', { name: 'Trajectory' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'Run trace' }))
 
     expect(screen.getByText('Between turns')).toBeTruthy()
     expect(view.container.textContent).not.toContain('Turn null')
@@ -484,7 +484,7 @@ describe('tab switching in ConversationRoot', () => {
     ]
     const b = await bench(historySnapshot(nodes, { requests: compactions }))
     mount(b.slots, nodes)
-    fireEvent.click(screen.getByRole('tab', { name: 'Trajectory' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'Run trace' }))
 
     const firstRequest = screen.getByRole('button', { name: 'Request #2 · Compaction' })
     const secondRequest = screen.getByRole('button', { name: 'Request #4 · Compaction' })
@@ -509,7 +509,7 @@ describe('tab switching in ConversationRoot', () => {
   it('dragging the overview focuses overlapping records without filtering the ledger', async () => {
     const b = await bench()
     mount(b.slots)
-    fireEvent.click(screen.getByRole('tab', { name: 'Trajectory' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'Run trace' }))
     const plot = screen.getByLabelText('Timeline overview; drag horizontally to focus events')
     vi.spyOn(plot, 'getBoundingClientRect').mockReturnValue({
       x: 0, y: 0, left: 0, top: 0, right: 100, bottom: 72, width: 100, height: 72,
@@ -541,7 +541,7 @@ describe('tab switching in ConversationRoot', () => {
   it('clicking a timeline block clears the range, selects the record, and opens its inspector', async () => {
     const b = await bench()
     const view = mount(b.slots)
-    fireEvent.click(screen.getByRole('tab', { name: 'Trajectory' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'Run trace' }))
     const plot = screen.getByLabelText('Timeline overview; drag horizontally to focus events')
     vi.spyOn(plot, 'getBoundingClientRect').mockReturnValue({
       x: 0, y: 0, left: 0, top: 0, right: 100, bottom: 72, width: 100, height: 72,
@@ -579,7 +579,7 @@ describe('tab switching in ConversationRoot', () => {
   it('empty window keeps the toolbar and reports no timing data', async () => {
     const b = await bench(historySnapshot([]))
     mount(b.slots)
-    fireEvent.click(screen.getByRole('tab', { name: 'Trajectory' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'Run trace' }))
     expect(screen.getByRole('toolbar', { name: '轨迹工具栏' })).toBeTruthy()
     expect(screen.getByText('No timing data')).toBeTruthy()
     expect(screen.getByRole<HTMLButtonElement>('button', {

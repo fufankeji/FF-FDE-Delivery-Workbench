@@ -2,7 +2,7 @@
 
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import type { WorkspaceId } from '@deepseek-ai/dsh-workspace'
-import type { ProjectStageRecord } from './spec.ts'
+import { FDE_V2_STAGE_IDS, type FdeV2StageId, type ProjectStageRecord } from './spec.ts'
 import { FdeStageConflictError, FdeStageReturnError, FdeStageTransitionError } from './state.ts'
 
 const MAX_BODY_BYTES = 16 * 1024
@@ -28,12 +28,40 @@ export interface StageRouteOptions {
   reportFailure?: (error: unknown) => void
 }
 
+/** One read-only method shown under a project delivery stage. */
+export interface StageSkillCatalogMethod {
+  readonly id: string
+  readonly label: string
+  readonly description: string
+  readonly whenToUse: string
+  readonly source: string
+  readonly content: string
+}
+
+/** Browser-safe catalog of methods that the FDE stage plugin actually registers. */
+export interface StageSkillCatalogValue {
+  readonly schemaVersion: 1
+  readonly stages: readonly {
+    readonly id: string
+    readonly index: number
+    readonly methods: readonly StageSkillCatalogMethod[]
+  }[]
+}
+
+/** Dependencies required by the read-only stage Skill catalog route. */
+export interface StageSkillCatalogRouteOptions {
+  trusted: (request: IncomingMessage) => boolean
+  catalog: StageSkillCatalogValue
+  reportFailure?: (error: unknown) => void
+}
+
 /** Dependencies for the fixed FDE-only requirement-research completion route. */
 export interface CompleteRequirementsRouteOptions {
   trusted: (request: IncomingMessage) => boolean
   workspaceExists: (workspaceId: string) => boolean
   requirements: (workspaceId: string) => Promise<{
-    readonly artifacts: readonly { readonly title: string; readonly status: 'missing' | 'present' | 'error' }[]
+    readonly reviewReady: boolean
+    readonly blockers: readonly string[]
   }>
   complete: (workspaceId: WorkspaceId, expectedRevision: number) => Promise<ProjectStageRecord>
   reportFailure?: (error: unknown) => void
@@ -106,6 +134,23 @@ export interface ReturnStageRouteOptions {
   reportFailure?: (error: unknown) => void
 }
 
+/** Dependencies for the authoritative V2 stage completion route. */
+export interface CompleteV2StageRouteOptions {
+  trusted: (request: IncomingMessage) => boolean
+  workspaceExists: (workspaceId: string) => boolean
+  readiness: (workspaceId: string, stage: FdeV2StageId) => Promise<{ readonly reviewReady: boolean; readonly reviewBlockers: readonly string[] }>
+  complete: (workspaceId: WorkspaceId, expectedRevision: number, stage: FdeV2StageId) => Promise<ProjectStageRecord>
+  reportFailure?: (error: unknown) => void
+}
+
+/** Dependencies for the authoritative V2 one-stage return route. */
+export interface ReturnV2StageRouteOptions {
+  trusted: (request: IncomingMessage) => boolean
+  workspaceExists: (workspaceId: string) => boolean
+  returnToPrevious: (workspaceId: WorkspaceId, expectedRevision: number, reason: string) => Promise<ProjectStageRecord>
+  reportFailure?: (error: unknown) => void
+}
+
 async function readJson(request: IncomingMessage): Promise<unknown> {
   const declaredRaw = request.headers['content-length']
   const declared = typeof declaredRaw === 'string' ? Number(declaredRaw) : undefined
@@ -160,6 +205,15 @@ function returnRequestOf(value: unknown): { workspaceId: string; expectedRevisio
   return { ...completion, reason: reason.trim() }
 }
 
+function v2CompletionRequestOf(value: unknown): { workspaceId: string; expectedRevision: number; stage: FdeV2StageId } {
+  const completion = completionRequestOf(value)
+  const stage = (value as { stage?: unknown }).stage
+  if (typeof stage !== 'string' || !(FDE_V2_STAGE_IDS as readonly string[]).includes(stage)) {
+    throw new FdeStageRequestError('invalid-request', 400, '阶段确认缺少有效的 V2 阶段。')
+  }
+  return { ...completion, stage: stage as FdeV2StageId }
+}
+
 function writeJson(response: ServerResponse, status: number, payload: unknown): void {
   response.writeHead(status, { 'content-type': 'application/json; charset=utf-8' })
   response.end(JSON.stringify(payload))
@@ -191,6 +245,33 @@ export function createStageRoute(options: StageRouteOptions): (request: Incoming
       }
       options.reportFailure?.(error)
       writeJson(response, 500, { ok: false, error: { code: 'internal-error', message: '项目阶段读取失败。' } })
+    }
+  }
+}
+
+/**
+ * Create the GET-only catalog for methods registered by this FDE stage plugin.
+ * @param options - request trust and the fixed product catalog.
+ * @returns a WebServer route handler.
+ */
+export function createStageSkillCatalogRoute(
+  options: StageSkillCatalogRouteOptions,
+): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
+  return async (request: IncomingMessage, response: ServerResponse): Promise<void> => {
+    try {
+      if (!options.trusted(request)) throw new FdeStageRequestError('forbidden', 403, '当前请求不能读取阶段工作方法。')
+      if (request.method !== 'GET') {
+        request.resume()
+        throw new FdeStageRequestError('method-not-allowed', 405, '阶段工作方法接口只接受 GET。')
+      }
+      writeJson(response, 200, { ok: true, value: options.catalog })
+    } catch (error) {
+      if (error instanceof FdeStageRequestError) {
+        writeJson(response, error.status, { ok: false, error: { code: error.code, message: error.message } })
+        return
+      }
+      options.reportFailure?.(error)
+      writeJson(response, 500, { ok: false, error: { code: 'internal-error', message: '阶段工作方法读取失败。' } })
     }
   }
 }
@@ -236,6 +317,53 @@ export function createReturnStageRoute(
   }
 }
 
+/** Create the POST-only authoritative V2 manual gate. */
+export function createCompleteV2StageRoute(
+  options: CompleteV2StageRouteOptions,
+): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
+  return async (request: IncomingMessage, response: ServerResponse): Promise<void> => {
+    let requestedWorkspaceId: string | undefined
+    try {
+      if (!options.trusted(request)) throw new FdeStageRequestError('forbidden', 403, '当前请求不能确认项目阶段。')
+      if (request.method !== 'POST') {
+        request.resume()
+        throw new FdeStageRequestError('method-not-allowed', 405, '阶段确认接口只接受 POST。')
+      }
+      const { workspaceId, expectedRevision, stage } = v2CompletionRequestOf(await readJson(request))
+      requestedWorkspaceId = workspaceId
+      if (!options.workspaceExists(workspaceId)) throw new FdeStageRequestError('workspace-not-found', 404, '当前项目不存在或已被移除。')
+      const readiness = await options.readiness(workspaceId, stage)
+      if (!readiness.reviewReady) {
+        throw new FdeStageRequestError('stage-review-incomplete', 409, `当前阶段尚未达到可评审状态：${readiness.reviewBlockers.join('；')}`)
+      }
+      const record = await options.complete(workspaceId as WorkspaceId, expectedRevision, stage)
+      writeJson(response, 200, { ok: true, value: { workspaceId, ...record } })
+    } catch (error) {
+      if (error instanceof FdeStageRequestError) {
+        writeJson(response, error.status, { ok: false, error: { code: error.code, message: error.message } })
+        return
+      }
+      if (error instanceof FdeStageConflictError || error instanceof FdeStageTransitionError) {
+        writeJson(response, 409, {
+          ok: false,
+          error: { code: error instanceof FdeStageConflictError ? 'stage-revision-conflict' : 'stage-invalid-transition', message: error.message },
+          ...(requestedWorkspaceId === undefined ? {} : { value: { workspaceId: requestedWorkspaceId, ...error.current } }),
+        })
+        return
+      }
+      options.reportFailure?.(error)
+      writeJson(response, 500, { ok: false, error: { code: 'internal-error', message: 'V2 项目阶段确认失败。' } })
+    }
+  }
+}
+
+/** Create the POST-only authoritative V2 one-stage return action. */
+export function createReturnV2StageRoute(
+  options: ReturnV2StageRouteOptions,
+): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
+  return createReturnStageRoute(options)
+}
+
 /** Create the POST-only, fixed requirements-to-solution manual gate. */
 export function createCompleteRequirementsRoute(
   options: CompleteRequirementsRouteOptions,
@@ -254,12 +382,11 @@ export function createCompleteRequirementsRoute(
         throw new FdeStageRequestError('workspace-not-found', 404, '当前项目不存在或已被移除。')
       }
       const requirements = await options.requirements(workspaceId)
-      const incomplete = requirements.artifacts.filter(artifact => artifact.status !== 'present')
-      if (incomplete.length > 0) {
+      if (!requirements.reviewReady) {
         throw new FdeStageRequestError(
           'stage-requirements-incomplete',
           409,
-          `需求调研产物尚未齐备：${incomplete.map(artifact => artifact.title).join('、')}。`,
+          `发现阶段候选材料尚未达到可评审状态：${requirements.blockers.join('；')}`,
         )
       }
       const record = await options.complete(workspaceId as WorkspaceId, expectedRevision)

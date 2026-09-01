@@ -4,6 +4,8 @@
 
 这是 `FF - FDE 交付工作台` 的私有完整交接仓库。任何修改都必须同时保护三类事实：工作台源码、`数据分析项目` 文件与数据、DeepSeek Harness 会话/阶段状态。
 
+当前仓库同时是 V2 八阶段开发与人工联调的唯一现场。在八阶段开发、调试和文档同步全部完成前，继续在本仓库开发，不切换到 `FDEDeliveryWorkbench/main`，不清理本仓库或其运行时。最终迁回主项目的既有检查点、待迁范围和操作顺序见 `docs/V2-main-merge-status.md`。
+
 产品设计与使用流程见 `PRODUCT_GUIDE.md`，克隆、恢复和启动流程见 `README.md`。
 
 ## 目录事实源
@@ -45,6 +47,9 @@ DSH_HOME=.runtime/dsh-home ./scripts/pnpm.sh dsh web --no-open --host 127.0.0.1 
 ## 开发与验证
 
 - 保持改动最小，并沿用 `app/deepseek-harness/AGENTS.md` 与更深层 `AGENTS.md` 的源码约束。
+- 当前 3080 服务必须继续从 `app/deepseek-harness/` 启动，并显式使用本仓库 `.runtime/dsh-home`；不得为了整理分支改从 `FDEDeliveryWorkbench/main` 启动。
+- 每个阶段完成后提交该阶段的源码、中文 Spec 和最窄验证记录；八阶段完成前不再次向 `FDEDeliveryWorkbench/main` 做部分迁移。
+- 最终合并前必须先更新 `docs/V2-main-merge-status.md` 中的源提交、目标提交和差异清单，不得凭目录名直接复制、覆盖或删除任一开发目录。
 - 数据分析项目的启动、测试与环境要求以 `workspaces/ai-analysis/AGENTS.md` 为准。
 - 修改工作台后，只运行与改动直接相关的最窄检查；不默认做浏览器截图、全量 E2E 或录屏。
 - 修改 Workspace、Session 或阶段状态时，至少验证恢复脚本能在临时目录中生成 3 个项目会话、9 份会话归档和正确的当前工作区路径。

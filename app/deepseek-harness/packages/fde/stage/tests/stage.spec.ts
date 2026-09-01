@@ -9,16 +9,28 @@ import {
   createCompleteRequirementsRoute,
   createCompleteSolutionRoute,
   createCompleteValidationRoute,
+  createCompleteV2StageRoute,
   createReturnStageRoute,
+  createReturnV2StageRoute,
+  createStageSkillCatalogRoute,
   createStageRoute,
 } from '../src/http.ts'
 import {
   ACCEPTANCE_HANDOVER_SKILL, acceptanceHandoverPrompt,
   DEPLOYMENT_TRIAL_SKILL, deploymentTrialPrompt,
+  DISCOVERY_STAGE_SKILL_CATALOG,
+  FDE_ORIENT_SKILL,
+  KNOWLEDGE_INTERVIEW_SKILL,
+  OWNERSHIP_MAP_SKILL,
   PROJECT_DEVELOPMENT_SKILL, projectDevelopmentPrompt,
-  REQUIREMENT_RESEARCH_SKILL, requirementResearchPrompt,
+  QUALIFY_AI_WORKFLOW_SKILL,
+  REFRAME_AI_ENGAGEMENT_SKILL,
+  REPO_RECON_SKILL,
+  requirementResearchPrompt,
   SOLUTION_DESIGN_SKILL, solutionDesignPrompt,
+  STAKEHOLDER_BRIEF_SKILL,
   VALIDATION_SKILL, validationPrompt,
+  V2_STAGE_SKILLS, v2StagePrompt,
 } from '../src/index.ts'
 import type { ProjectStageRecord } from '../src/spec.ts'
 import { FdeStageState } from '../src/state.ts'
@@ -77,7 +89,7 @@ describe('FdeStageState', () => {
     const state = new FdeStageState(data.value, () => '2026-08-26T00:00:00.000Z')
     const [first, second] = await Promise.all([state.open(wid('w-1')), state.open(wid('w-1'))])
     expect(first).toEqual({
-      currentStage: 'requirements', revision: 1,
+      currentStage: 'requirements', lifecycleVersion: 2, v2Stage: 'discovery', improvementCycles: 0, revision: 1,
       createdAt: '2026-08-26T00:00:00.000Z', updatedAt: '2026-08-26T00:00:00.000Z',
     })
     expect(second).toBe(first)
@@ -96,26 +108,26 @@ describe('FdeStageState', () => {
     await state.open(wid('w-1'))
     const next = await state.completeRequirements(wid('w-1'), 1)
     expect(next).toEqual({
-      currentStage: 'solution', revision: 2,
+      currentStage: 'solution', lifecycleVersion: 2, v2Stage: 'definition', improvementCycles: 0, revision: 2,
       createdAt: '2026-08-26T00:00:00.000Z', updatedAt: '2026-08-27T00:00:00.000Z',
     })
     await expect(state.completeRequirements(wid('w-1'), 1)).rejects.toThrow('已经变化')
     expect(state.current(wid('w-1'))).toBe(next)
     const development = await state.completeSolution(wid('w-1'), 2)
     expect(development).toEqual({
-      currentStage: 'development', revision: 3,
+      currentStage: 'development', lifecycleVersion: 2, v2Stage: 'design', improvementCycles: 0, revision: 3,
       createdAt: '2026-08-26T00:00:00.000Z', updatedAt: '2026-08-28T00:00:00.000Z',
     })
     await expect(state.completeSolution(wid('w-1'), 2)).rejects.toThrow('已经变化')
     const validation = await state.completeDevelopment(wid('w-1'), 3)
     expect(validation).toEqual({
-      currentStage: 'validation', revision: 4,
+      currentStage: 'validation', lifecycleVersion: 2, v2Stage: 'evaluation', improvementCycles: 0, revision: 4,
       createdAt: '2026-08-26T00:00:00.000Z', updatedAt: '2026-08-29T00:00:00.000Z',
     })
     await expect(state.completeDevelopment(wid('w-1'), 3)).rejects.toThrow('已经变化')
     const pilot = await state.completeValidation(wid('w-1'), 4)
     expect(pilot).toEqual({
-      currentStage: 'pilot', revision: 5,
+      currentStage: 'pilot', lifecycleVersion: 2, v2Stage: 'pilot', improvementCycles: 0, revision: 5,
       createdAt: '2026-08-26T00:00:00.000Z', updatedAt: '2026-08-30T00:00:00.000Z',
     })
     await expect(state.completeValidation(wid('w-1'), 4)).rejects.toThrow('已经变化')
@@ -175,14 +187,84 @@ describe('FdeStageState', () => {
     await expect(state.returnToPrevious(wid('new'), 1, '返回')).rejects.toThrow('第一个阶段')
     await expect(state.returnToPrevious(wid('new'), 1, '   ')).rejects.toThrow('返回原因必须填写')
   })
+
+  it('advances and returns through all eight authoritative V2 stages without closing continuous improvement', async () => {
+    const data = table()
+    let day = 1
+    const state = new FdeStageState(data.value, () => `2026-09-${String(day++).padStart(2, '0')}T00:00:00.000Z`)
+    let current = await state.open(wid('v2'))
+    for (const stage of ['discovery', 'definition', 'investigation', 'design', 'evaluation', 'pilot', 'production'] as const) {
+      current = await state.completeV2(wid('v2'), current.revision, stage)
+    }
+    expect(current).toMatchObject({ v2Stage: 'improvement', currentStage: 'completed', revision: 8, improvementCycles: 0 })
+
+    const cycle = await state.completeV2(wid('v2'), current.revision, 'improvement')
+    expect(cycle).toMatchObject({ v2Stage: 'improvement', currentStage: 'completed', revision: 9, improvementCycles: 1 })
+    expect(cycle.lastReviewedAt).toBe(cycle.updatedAt)
+
+    const returned = await state.returnV2ToPrevious(wid('v2'), cycle.revision, '生产反馈需要补充移交培训')
+    expect(returned).toMatchObject({
+      v2Stage: 'production', currentStage: 'handoff', revision: 10, v2ReconfirmThrough: 'improvement',
+      v2Returns: [{ from: 'improvement', to: 'production', reason: '生产反馈需要补充移交培训', revision: 10 }],
+    })
+    const returnedAgain = await state.returnV2ToPrevious(wid('v2'), 10, '继续返回')
+    expect(returnedAgain).toMatchObject({ v2Stage: 'pilot' })
+    const production = await state.completeV2(wid('v2'), returnedAgain.revision, 'pilot')
+    const improvement = await state.completeV2(wid('v2'), production.revision, 'production')
+    expect(improvement.v2ReconfirmThrough).toBe('improvement')
+    const reconfirmedCycle = await state.completeV2(wid('v2'), improvement.revision, 'improvement')
+    expect(reconfirmedCycle.v2ReconfirmThrough).toBeUndefined()
+    expect(reconfirmedCycle.improvementCycles).toBe(2)
+  })
 })
 
 describe('requirement-research model guidance', () => {
-  it('keeps the long contract in an on-demand Skill and removes the short prompt after requirements', () => {
-    expect(REQUIREMENT_RESEARCH_SKILL.name).toBe('fde-requirement-research')
-    expect(REQUIREMENT_RESEARCH_SKILL.content).toContain('requirement-baseline.md')
-    expect(REQUIREMENT_RESEARCH_SKILL.content).toContain('不得改变项目阶段')
-    expect(requirementResearchPrompt('requirements')).toContain('先加载 Skill')
+  it('publishes the seven registered discovery methods with business labels and full definitions', () => {
+    const stage = DISCOVERY_STAGE_SKILL_CATALOG.stages[0]
+    expect(stage).toMatchObject({ id: 'requirements', index: 0 })
+    expect(stage?.methods.map(method => method.label)).toEqual([
+      '项目启动与方向确认',
+      '访谈业务人员，还原真实做法',
+      '找到负责人和决策人',
+      '盘点现有系统与资料',
+      '判断问题是否值得继续投入',
+      '核对冲突并调整项目范围',
+      '整理给负责人看的决策简报',
+    ])
+    expect(stage?.methods.every(method => method.content.startsWith('# '))).toBe(true)
+    expect(stage?.methods.map(method => method.id)).toEqual([
+      FDE_ORIENT_SKILL.name,
+      KNOWLEDGE_INTERVIEW_SKILL.name,
+      OWNERSHIP_MAP_SKILL.name,
+      REPO_RECON_SKILL.name,
+      QUALIFY_AI_WORKFLOW_SKILL.name,
+      REFRAME_AI_ENGAGEMENT_SKILL.name,
+      STAKEHOLDER_BRIEF_SKILL.name,
+    ])
+  })
+
+  it('registers one explicit workflow for each post-discovery V2 stage', () => {
+    expect(V2_STAGE_SKILLS.map(skill => skill.name)).toEqual([
+      'fde-define-outcome-scope', 'fde-investigate-environment', 'fde-design-vertical-slice',
+      'fde-run-poc-eval', 'fde-integration-pilot', 'fde-production-handover', 'fde-continuous-improvement',
+    ])
+    expect(V2_STAGE_SKILLS.every(skill => skill.content.includes('你不能代替 FDE 推进项目阶段'))).toBe(true)
+    expect(v2StagePrompt('discovery')).toBe('')
+    expect(v2StagePrompt('evaluation')).toContain('`fde-run-poc-eval`')
+  })
+
+  it('uses a method-first stage-one route with separate conditional engineering skills', () => {
+    expect(QUALIFY_AI_WORKFLOW_SKILL.name).toBe('qualify-ai-workflow')
+    expect(QUALIFY_AI_WORKFLOW_SKILL.content).toContain('schemaVersion":2')
+    expect(QUALIFY_AI_WORKFLOW_SKILL.content).toContain('evidenceRefs')
+    expect(QUALIFY_AI_WORKFLOW_SKILL.content).toContain('.fde/discovery/artifacts.json')
+    expect(REFRAME_AI_ENGAGEMENT_SKILL.name).toBe('reframe-ai-engagement')
+    expect(REFRAME_AI_ENGAGEMENT_SKILL.content).toContain('engagement-reframe.md')
+    expect([FDE_ORIENT_SKILL, KNOWLEDGE_INTERVIEW_SKILL, OWNERSHIP_MAP_SKILL, REPO_RECON_SKILL, STAKEHOLDER_BRIEF_SKILL].map(skill => skill.name)).toEqual([
+      'fde-orient', 'knowledge-interview', 'ownership-map', 'repo-recon', 'stakeholder-brief',
+    ])
+    expect(requirementResearchPrompt('requirements')).toContain('先按方法层加载 `qualify-ai-workflow`')
+    expect(requirementResearchPrompt('requirements')).toContain('不得一次加载全部')
     expect(requirementResearchPrompt('solution')).toBe('')
   })
 
@@ -258,6 +340,29 @@ describe('requirement-research model guidance', () => {
 })
 
 describe('project-stage route', () => {
+  it('serves only the fixed registered method catalog through a trusted GET', async () => {
+    const handler = createStageSkillCatalogRoute({
+      trusted: () => true,
+      catalog: DISCOVERY_STAGE_SKILL_CATALOG,
+    })
+    const ok = response()
+    await handler(request({}, 'GET'), ok.value)
+    const snapshot = ok.snapshot()
+    expect(snapshot).toMatchObject({ status: 200, body: { ok: true, value: { schemaVersion: 1 } } })
+    const body = snapshot.body as { value: { stages: { id: string; methods: { id: string }[] }[] } }
+    expect(body.value.stages).toHaveLength(8)
+    expect(body.value.stages[0]).toMatchObject({ id: 'requirements' })
+    expect(body.value.stages[0]?.methods).toHaveLength(7)
+    expect(body.value.stages[0]?.methods[0]?.id).toBe('fde-orient')
+    expect(body.value.stages.slice(1).map(stage => stage.id)).toEqual([
+      'definition', 'investigation', 'design', 'evaluation', 'pilot', 'production', 'improvement',
+    ])
+
+    const method = response()
+    await handler(request({}, 'POST'), method.value)
+    expect(method.snapshot()).toMatchObject({ status: 405 })
+  })
+
   it('returns the exact Workspace stage and rejects unknown projects', async () => {
     const open = vi.fn(async () => ({
       currentStage: 'requirements' as const,
@@ -324,11 +429,7 @@ describe('project-stage route', () => {
       createdAt: '2026-08-26T00:00:00.000Z',
       updatedAt: '2026-08-27T00:00:00.000Z',
     }))
-    const requirements = vi.fn(async () => ({ artifacts: [
-      { title: '需求调研报告', status: 'present' as const },
-      { title: '需求确认清单', status: 'missing' as const },
-      { title: '需求基线', status: 'present' as const },
-    ] }))
+    const requirements = vi.fn(async () => ({ reviewReady: false, blockers: ['“事实确认清单”缺少最小章节。'] }))
     const handler = createCompleteRequirementsRoute({
       trusted: () => true,
       workspaceExists: id => id === 'w-1',
@@ -339,15 +440,11 @@ describe('project-stage route', () => {
     await handler(request({ workspaceId: 'w-1', expectedRevision: 1 }), blocked.value)
     expect(blocked.snapshot()).toEqual({
       status: 409,
-      body: { ok: false, error: { code: 'stage-requirements-incomplete', message: '需求调研产物尚未齐备：需求确认清单。' } },
+      body: { ok: false, error: { code: 'stage-requirements-incomplete', message: '发现阶段候选材料尚未达到可评审状态：“事实确认清单”缺少最小章节。' } },
     })
     expect(complete).not.toHaveBeenCalled()
 
-    requirements.mockResolvedValueOnce({ artifacts: [
-      { title: '需求调研报告', status: 'present' },
-      { title: '需求确认清单', status: 'present' },
-      { title: '需求基线', status: 'present' },
-    ] })
+    requirements.mockResolvedValueOnce({ reviewReady: true, blockers: [] })
     const accepted = response()
     await handler(request({ workspaceId: 'w-1', expectedRevision: 1 }), accepted.value)
     expect(accepted.snapshot()).toMatchObject({
@@ -355,6 +452,38 @@ describe('project-stage route', () => {
       body: { ok: true, value: { workspaceId: 'w-1', currentStage: 'solution', revision: 2 } },
     })
     expect(complete).toHaveBeenCalledWith('w-1', 1)
+  })
+
+  it('uses the V2 review state for manual completion and one-stage return', async () => {
+    const readiness = vi.fn(async () => ({ reviewReady: false, reviewBlockers: ['价值测算记录尚未形成'] }))
+    const complete = vi.fn(async () => ({
+      currentStage: 'requirements' as const, lifecycleVersion: 2 as const, v2Stage: 'investigation' as const,
+      improvementCycles: 0, revision: 3,
+      createdAt: '2026-09-01T00:00:00.000Z', updatedAt: '2026-09-02T00:00:00.000Z',
+    }))
+    const handler = createCompleteV2StageRoute({
+      trusted: () => true, workspaceExists: id => id === 'w-1', readiness, complete,
+    })
+    const blocked = response()
+    await handler(request({ workspaceId: 'w-1', expectedRevision: 2, stage: 'definition' }), blocked.value)
+    expect(blocked.snapshot()).toMatchObject({ status: 409, body: { error: { code: 'stage-review-incomplete' } } })
+    expect(complete).not.toHaveBeenCalled()
+
+    readiness.mockResolvedValueOnce({ reviewReady: true, reviewBlockers: [] })
+    const accepted = response()
+    await handler(request({ workspaceId: 'w-1', expectedRevision: 2, stage: 'definition' }), accepted.value)
+    expect(accepted.snapshot()).toMatchObject({ status: 200, body: { value: { v2Stage: 'investigation', revision: 3 } } })
+    expect(complete).toHaveBeenCalledWith('w-1', 2, 'definition')
+
+    const returnToPrevious = vi.fn(async () => ({
+      currentStage: 'requirements' as const, lifecycleVersion: 2 as const, v2Stage: 'definition' as const,
+      revision: 4, createdAt: '', updatedAt: '',
+    }))
+    const returnHandler = createReturnV2StageRoute({ trusted: () => true, workspaceExists: () => true, returnToPrevious })
+    const returned = response()
+    await returnHandler(request({ workspaceId: 'w-1', expectedRevision: 3, reason: '现场权限发生变化' }), returned.value)
+    expect(returned.snapshot()).toMatchObject({ status: 200, body: { value: { v2Stage: 'definition', revision: 4 } } })
+    expect(returnToPrevious).toHaveBeenCalledWith('w-1', 3, '现场权限发生变化')
   })
 
   it('requires five solution documents and a confirmed architecture before project development', async () => {

@@ -7,7 +7,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
 import type {} from '@deepseek-ai/dsh-client-ui-workspace/client'
 import type { AcceptanceHandoverDecision, FdeProjectSurfaceController } from './controller.ts'
 import type { ProjectPageController } from './page-controller.ts'
-import type { ProjectStageController } from './stage-controller.ts'
+import type { FdeV2StageId, ProjectStageController } from './stage-controller.ts'
 import type { ProjectSourceController, ProjectSourcePreviewKind } from './source-controller.ts'
 import type { RequirementWikiController } from './wiki-controller.ts'
 
@@ -54,6 +54,8 @@ export interface ProjectPageInjected {
   loadProjectSurface: (workspaceId: string) => void
   refreshProjectSurface: (workspaceId: string) => void
   completeRequirements: (workspaceId: string, expectedRevision: number) => Promise<void>
+  completeV2Stage: (workspaceId: string, expectedRevision: number, stage: FdeV2StageId) => Promise<void>
+  returnV2Stage: (workspaceId: string, expectedRevision: number, reason: string) => Promise<void>
   completeSolution: (workspaceId: string, expectedRevision: number) => Promise<void>
   completeDevelopment: (workspaceId: string, expectedRevision: number) => Promise<void>
   completeValidation: (workspaceId: string, expectedRevision: number) => Promise<void>
@@ -136,7 +138,12 @@ export interface ProjectRuntimeHeaderInjected {
 }
 
 /** Stage-one business actions exposed without leaking Skill names into product copy. */
-export type DiscoveryAction = 'qualify-workflow' | 'prepare-interview' | 'reframe-engagement'
+export type DiscoveryAction =
+  | 'qualify-workflow'
+  | 'prepare-interview'
+  | 'reframe-engagement'
+  | 'narrow-workflow'
+  | 'pause-workflow'
 
 /** Shared project-stage workbench data and actions. */
 export interface ProjectStageWorkbenchInjected {
@@ -147,8 +154,19 @@ export interface ProjectStageWorkbenchInjected {
   }
   loadStage: (workspaceId: string) => void
   loadProjectSurface: (workspaceId: string) => void
+  refreshProjectSurface: (workspaceId: string) => void
   loadProjectSources: (workspaceId: string, force?: boolean) => void
-  runDiscoveryAction: (sessionId: string, action: DiscoveryAction) => Promise<void>
+  completeRequirements: (workspaceId: string, expectedRevision: number) => Promise<void>
+  completeV2Stage: (workspaceId: string, expectedRevision: number, stage: FdeV2StageId) => Promise<void>
+  returnV2Stage: (workspaceId: string, expectedRevision: number, reason: string) => Promise<void>
+  openProjectSourceUpload: (workspaceId: string) => void
+  prepareDiscoveryDraft: (
+    sessionId: string,
+    action: DiscoveryAction,
+    sourcePaths: readonly string[],
+  ) => void
+  prepareStageDraft: (sessionId: string, prompt: string) => void
+  openProjectFile: (sessionId: string, workspacePath: string, relativePath: string, title: string) => Promise<void>
   openProjectConversation: (sessionId: string) => void
   openProjectPage: () => void
 }

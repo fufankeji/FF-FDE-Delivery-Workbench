@@ -2,7 +2,7 @@
 document: feature-plan
 feature: F005
 status: ready
-updated: "2026-08-31"
+updated: "2026-09-01"
 ---
 
 # F005 · 阶段 1：发现高价值问题实施计划
@@ -18,25 +18,25 @@ updated: "2026-08-31"
 
 | 路径/模块 | 当前职责 | 计划变化 | 对应 AC |
 |---|---|---|---|
-| `packages/fde/stage` | 阶段定义与快照 | 增加 V2 阶段 1 输入、工作、Artifact 和决定投影 | AC-F005-001, AC-F005-002 |
-| `packages/fde/project` | 项目 Artifact | 适配观察日志、Workflow Charter、Engagement Reframe | AC-F005-002 |
-| `packages/skill/*` | Skill 注册与调用 | 接入两项方法 Skill 与最小工程 Skill 路由 | AC-F005-001 |
+| `packages/fde/stage` | 阶段定义、Skill 注册与人工阶段门 | 用独立方法／工程 Skills 替换阶段 1 复合 Skill，并让人工阶段门复用结构化就绪合同 | AC-F005-001, AC-F005-002, AC-F005-003, AC-F005-006 |
+| `packages/fde/project` | 项目 Artifact 与阶段投影 | 校验工作流逐条证据、Artifact Catalog、来源版本、实际结构和成熟度 | AC-F005-002, AC-F005-003, AC-F005-006 |
+| `packages/client/ui-fde-project` | 阶段 1 工作台 | 展示证据聚合来源和 Artifact 结构成熟度；提供可编辑推荐动作；在当前项目完成 FDE 评审、二次确认和阶段推进 | AC-F005-001, AC-F005-002, AC-F005-003, AC-F005-004, AC-F005-005, AC-F005-006 |
 | `packages/client/ui-fde-stage` | 当前阶段工作台 | 呈现现场发现、冲突、证据和决定 | AC-F005-001, AC-F005-002 |
 | `packages/client/ui-fde-sources` | 项目资料 | 标记归档与当前发现工作的引用关系 | AC-F005-001 |
 
 ## 实现方案
 
-使用 Adapter 将 `fde-guide` 固定版本中的方法 Skill、Workflow Charter Schema、Engagement Reframe Schema 和 Field Observation Log 模板接入现有 Skill 与 Artifact 基础设施。方法输出先进入候选 Artifact；结构校验与证据可信度分开。阶段工作台沿用统一骨架，中心区域专门投影原始诉求与现场事实对照、观察时间线、人员／信任关系和访谈缺口；Skill 与 Schema 细节只在执行详情中展开。
+使用 Adapter 将 `fde-guide` 固定版本中的方法语义和 `forward-deployed-engineer` 固定版本中的工程纪律接入现有 Skill registry。阶段 1 注册独立 Skill，系统提示只负责编排“方法核心 → 条件方法 → 必要工程能力”，不再维护一个覆盖所有动作的复合 Skill。结构化数据使用两个小合同：`workflows.json` 保存逐条主张证据，`artifacts.json` 保存 Artifact 来源版本、内容版本、结构成熟度和引用关系。Host 统一校验这两个合同、实际 Markdown 和人工阶段门，前端只读取可信投影。
 
 ## 实施顺序
 
-1. 先实现项目内首屏：项目上下文侧栏、阶段 1 中央工作台、Agent 执行入口和条件默认打开的项目文件树。
-2. 首屏只使用现有项目资料、阶段快照和固定产物快照；尚无后端对象支持的现场事实分类如实显示待补充，不伪造数量。
-3. 固定并审查阶段 1 使用的外部文件、许可证和链接依赖。
-4. 实现三个 Artifact 类型和两个渐进 Schema Adapter。
-5. 接入方法 Skill 与最小工程 Skill 路由。
-6. 接入冲突分支、Artifact 预览、FDE 决定、返回影响和真实错误状态。
-7. 使用合成现场资料完成端到端验证。
+1. 先实现项目内首屏：项目上下文侧栏、阶段 1 中央工作台、原生对话执行入口和按需打开的项目文件树。
+2. 首屏只使用现有项目资料、阶段快照、候选工作流记录和固定产物快照；尚无后端对象支持的现场事实分类如实显示待补充，不伪造数量。
+3. 固定并审查阶段 1 方法与工程 Skill 的来源 commit、许可证和接入边界。
+4. 将复合 Skill 拆为两项方法 Skill 与五项按需工程 Skill，并更新第一阶段任务入口的明确路由。
+5. 实现 `workflows.json` schemaVersion 2 和 `artifacts.json` schemaVersion 1，校验逐条证据、来源版本、实际 Markdown 最小结构与成熟度。
+6. 让工作台、Artifact 预览和当前项目内的人工评审消费同一 Host 投影；评审入口不改变阶段，只有 FDE 二次确认后才调用既有阶段服务推进。
+7. 使用空白、只有文件、有效 starter、错误来源和无效引用五类夹具完成定向验证。
 
 ## 依赖与风险
 
@@ -56,3 +56,7 @@ updated: "2026-08-31"
 |---|---|---|---|
 | AC-F005-001 | 自然语言路由到正确发现方法且过程可理解 | 运行阶段 1 路由和工作台定向测试 | 正常、冲突、缺输入三类场景选择正确且只加载必要能力 |
 | AC-F005-002 | Artifact 可校验、引用并由 FDE 决定去留 | 运行 Artifact 与阶段决定测试 | 结构和证据状态独立，非人工事件不推进阶段 |
+| AC-F005-003 | 分层路由、逐条证据和结构成熟度使用同一合同 | 运行 Skill 注册、项目快照和阶段门定向测试 | 不存在复合 Skill；计数由引用聚合；只有文件、错误来源或无效结构都不能提交评审 |
+| AC-F005-004 | 当前阶段方法可理解且不可误执行 | 运行方法目录与只读详情交互测试 | 只展示当前阶段真实方法且不产生第二个执行入口 |
+| AC-F005-005 | 推荐动作只准备可编辑业务问题 | 运行推荐动作与原生输入框测试 | 不覆盖草稿、不自动发送并正确展开当前项目技术工作区 |
+| AC-F005-006 | Agent 落盘后同步阶段投影 | 运行 Artifact Catalog 和工作台刷新测试 | 四步进度、记录和候选流程来自同一次真实快照 |

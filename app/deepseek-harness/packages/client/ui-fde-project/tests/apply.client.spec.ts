@@ -11,7 +11,9 @@ import { ProjectProgressLauncher } from '../src/client/ProjectProgressLauncher.t
 import { ProjectProgressOverlay } from '../src/client/ProjectProgressOverlay.tsx'
 import { ProjectRuntimeHeader } from '../src/client/ProjectRuntimeHeader.tsx'
 import { ProjectStageWorkbenchHero, ProjectStageWorkbenchView } from '../src/client/StageWorkbench.tsx'
-import type { ProjectPageInjected, ProjectRuntimeHeaderInjected, ProjectViewInjected } from '../src/client/slots.ts'
+import type {
+  ProjectPageInjected, ProjectRuntimeHeaderInjected, ProjectStageWorkbenchInjected, ProjectViewInjected,
+} from '../src/client/slots.ts'
 
 afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks() })
 
@@ -32,8 +34,22 @@ describe('ui-fde-project apply', () => {
       _mode: string,
     ) => ({ ok: true as const, value: { accepted: true as const } }))
     const openTab = vi.fn()
+    const collapseSidebar = vi.fn()
     const selectView = vi.fn()
     const openSession = vi.fn()
+    let draft = ''
+    const setDraft = vi.fn((nextDraft: string) => { draft = nextDraft })
+    const notify = vi.fn()
+    const conversation = {
+      selectView,
+      input: {
+        for: () => ({
+          setDraft,
+          notify,
+          state: { getSnapshot: () => ({ draft }) },
+        }),
+      },
+    }
     ctx.provide('betterSidebar', {
       getSnapshot: () => ({
         prefs: {
@@ -51,7 +67,7 @@ describe('ui-fde-project apply', () => {
         current: 'session-1', phase: 'ready', subagentsByParent: {}, jobsBySession: {}, currentAddress: undefined,
       }),
       binding: () => ({ session: { prompt } }),
-      scope: () => ({ get: () => ({ selectView }) }),
+      scope: () => ({ get: () => conversation }),
       open: openSession,
     } as never)
     ctx.provide('workspaces', {
@@ -65,6 +81,9 @@ describe('ui-fde-project apply', () => {
     } as never)
     ctx.provide('modelDirectories', {} as never)
     ctx.provide('conversation', {} as never)
+    ctx.provide('layout', {
+      toggleSidebar: vi.fn(), collapseSidebar, openDetails: vi.fn(), closeDetails: vi.fn(),
+    } as never)
     const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
       const path = requestPath(input)
       const completedRequirements = path.endsWith('/requirements/complete')
@@ -129,6 +148,40 @@ describe('ui-fde-project apply', () => {
     expect(slots.entries('sidebar.workspaces.projectContext')[0]?.component).toBe(ProjectContextSidebar)
     expect(slots.entries('conversation.view').map(view => view.component)).toEqual([ProjectStageWorkbenchView])
 
+    const stageInjected = (slots.entries('conversation.hero.content')[0]!.inject as unknown as () => ProjectStageWorkbenchInjected)()
+    const openSourceUpload = vi.fn()
+    window.addEventListener('fde:project-source-upload-open', openSourceUpload)
+    stageInjected.openProjectSourceUpload('workspace-1')
+    expect(openSourceUpload).toHaveBeenCalledTimes(1)
+    expect((openSourceUpload.mock.calls[0]?.[0] as CustomEvent).detail).toEqual({ workspaceId: 'workspace-1' })
+    window.removeEventListener('fde:project-source-upload-open', openSourceUpload)
+
+    stageInjected.prepareDiscoveryDraft(
+      'session-1', 'qualify-workflow', ['fde-resources/客户访谈纪要.docx'],
+    )
+    expect(selectView).toHaveBeenCalledWith('chat')
+    expect(openSession).toHaveBeenCalledWith('session-1')
+    expect(collapseSidebar).toHaveBeenCalledTimes(1)
+    expect(openTab).toHaveBeenCalledWith(
+      { type: 'explorer', title: 'Files', path: '/project/one' },
+      { sessionId: 'session-1', cwd: '/project/one' },
+    )
+    expect(prompt).not.toHaveBeenCalled()
+    expect(setDraft).toHaveBeenCalledTimes(1)
+    expect(draft).toContain('请结合以下客户资料')
+    expect(draft).toContain('fde-resources/客户访谈纪要.docx')
+    expect(draft).not.toContain('Skill')
+    expect(draft).not.toContain('evidenceRef')
+    expect(draft).not.toContain('不要一次加载全部')
+
+    draft = '用户已经写好的问题'
+    setDraft.mockClear()
+    notify.mockClear()
+    stageInjected.prepareDiscoveryDraft('session-1', 'prepare-interview', [])
+    expect(setDraft).not.toHaveBeenCalled()
+    expect(draft).toBe('用户已经写好的问题')
+    expect(notify).toHaveBeenCalledWith('info', '输入框已有内容，已为你保留。请补充完整后再发送。')
+
     const injected = (slots.entries('shell.overlay')[0]!.inject as unknown as () => ProjectPageInjected)()
     const progressEvent = new CustomEvent('fde:project-progress-open', {
       cancelable: true,
@@ -152,7 +205,8 @@ describe('ui-fde-project apply', () => {
     expect(views.map((view) => {
       const label = view.options.label
       return typeof label === 'function' ? label() : label
-    })).toEqual(['阶段工作台', '系统架构'])
+    })).toEqual(['项目工作台', '系统架构'])
+    expect(views[0]?.options.order).toBe(-1000)
     const architectureInjected = (views[1]!.inject as unknown as (sessionId: string) => ProjectViewInjected)('session-1')
     await architectureInjected.requestArchitectureDraft(4)
     const architectureInstruction = prompt.mock.calls[0]?.[0][0]?.text
@@ -228,6 +282,9 @@ describe('ui-fde-project apply', () => {
     const loadModels = vi.fn(async () => models)
     ctx.provide('modelDirectories', { directoryFor: () => ({ load: loadModels }) } as never)
     ctx.provide('conversation', {} as never)
+    ctx.provide('layout', {
+      toggleSidebar: vi.fn(), collapseSidebar: vi.fn(), openDetails: vi.fn(), closeDetails: vi.fn(),
+    } as never)
     const fetchImpl = vi.fn(async () => new Response(JSON.stringify({
       ok: true,
       value: {
@@ -325,6 +382,9 @@ describe('ui-fde-project apply', () => {
     } as never)
     ctx.provide('modelDirectories', {} as never)
     ctx.provide('conversation', {} as never)
+    ctx.provide('layout', {
+      toggleSidebar: vi.fn(), collapseSidebar: vi.fn(), openDetails: vi.fn(), closeDetails: vi.fn(),
+    } as never)
     const slots = ctx.get('slots') as SlotRegistry
     slots.register({
       name: 'root',

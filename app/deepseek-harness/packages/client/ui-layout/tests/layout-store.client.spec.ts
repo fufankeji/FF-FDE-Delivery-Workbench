@@ -50,6 +50,20 @@ describe('createLayoutStore', () => {
     expect(store.getSnapshot().sidebar).toBe(SIDEBAR_DEFAULT)
   })
 
+  it('collapseSidebar closes the wide sidebar and clears only the narrow override', () => {
+    const { store, actions } = createLayoutStore().create()
+    actions.collapseSidebar()
+    expect(store.getSnapshot().sidebar).toBe(0)
+    actions.collapseSidebar()
+    expect(store.getSnapshot().sidebar).toBe(0)
+
+    actions.setSidebar(400)
+    actions.setNarrow(true)
+    actions.toggleSidebar()
+    actions.collapseSidebar()
+    expect(store.getSnapshot()).toMatchObject({ sidebar: 400, narrow: true, narrowExpanded: false })
+  })
+
   it('narrow toggleSidebar flips only the re-expand override; the width preference survives', () => {
     const { store, actions } = createLayoutStore().create()
     actions.setSidebar(400)

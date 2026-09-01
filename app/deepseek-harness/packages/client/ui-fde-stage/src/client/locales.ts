@@ -49,6 +49,14 @@ export const zh = {
   'stage.handoff.goal': '完成正式验收、运行说明、培训、责任边界和能力沉淀。',
   'stage.handoff.focus': '完成验收、运维说明与责任移交',
   'stage.handoff.question': 'FDE 离开后，客户能否继续使用和维护？',
+  'stage.v2.discovery.name': '发现高价值问题',
+  'stage.v2.definition.name': '定义结果、范围与责任',
+  'stage.v2.investigation.name': '调查数据、系统、接口、安全与组织',
+  'stage.v2.design.name': '设计方案并完成端到端纵向切片',
+  'stage.v2.evaluation.name': '运行 PoC 与 Eval',
+  'stage.v2.pilot.name': '企业集成、可靠性改造与受控 Pilot',
+  'stage.v2.production.name': '进入生产、推动采用并验收交接',
+  'stage.v2.improvement.name': '持续改进并沉淀可复用能力',
 } as const
 
 /** Locale keys owned by the FDE stage UI. */
@@ -101,4 +109,12 @@ export const en: Record<FdeStageKey, string> = {
   'stage.handoff.goal': 'Complete formal acceptance, operating guidance, training, responsibility boundaries, and capability transfer.',
   'stage.handoff.focus': 'Complete acceptance, operations guidance, and responsibility transfer',
   'stage.handoff.question': 'Can the customer operate and maintain it after the FDE leaves?',
+  'stage.v2.discovery.name': 'Discover a high-value problem',
+  'stage.v2.definition.name': 'Define outcomes, scope, and ownership',
+  'stage.v2.investigation.name': 'Investigate data, systems, interfaces, security, and organization',
+  'stage.v2.design.name': 'Design the solution and deliver an end-to-end vertical slice',
+  'stage.v2.evaluation.name': 'Run the PoC and evaluations',
+  'stage.v2.pilot.name': 'Integrate, harden reliability, and run a controlled pilot',
+  'stage.v2.production.name': 'Enter production, drive adoption, and hand over acceptance',
+  'stage.v2.improvement.name': 'Continuously improve and productize reusable capabilities',
 }

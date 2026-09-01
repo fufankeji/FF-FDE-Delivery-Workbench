@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { WorkspaceId } from '@deepseek-ai/dsh-client-runtime/client'
 import { makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
-import { ProjectResourceUploadAction } from '../src/client/ProjectResourceUploadAction.tsx'
+import { ProjectResourceComposerAction, ProjectResourceUploadAction } from '../src/client/ProjectResourceUploadAction.tsx'
 import { zh } from '../src/client/locales.ts'
 
 afterEach(() => {
@@ -26,6 +26,45 @@ function mount(fetchImpl: typeof fetch) {
 }
 
 describe('ProjectResourceUploadAction', () => {
+  it('shows one small project-scoped upload action inside the native composer', () => {
+    render(<ProjectResourceComposerAction
+      sessionId={'session-1' as never}
+      session={{} as never}
+      input={{} as never}
+      useSession={(() => undefined) as never}
+      useSessions={(() => undefined) as never}
+      useWorkspaces={((selector: (state: unknown) => unknown) => selector({
+        items: [{ workspaceId: 'workspace-1', path: '/projects/customer', sessionIds: ['session-1'] }],
+      })) as never}
+      useProjection={(() => undefined) as never}
+      useInput={(() => undefined) as never}
+      inputActions={{} as never}
+      t={t}
+    />)
+    const button = screen.getByRole('button', { name: '有客户资料？上传' })
+    expect(button).toBeTruthy()
+    fireEvent.mouseEnter(button)
+    fireEvent.focus(button)
+    expect(screen.queryByRole('tooltip')).toBeNull()
+    expect(screen.queryByRole('textbox')).toBeNull()
+  })
+
+  it('opens its picker only for the exact project request', () => {
+    const view = mount(vi.fn() as unknown as typeof fetch)
+    const input = view.container.querySelector('input[type="file"]') as HTMLInputElement
+    const click = vi.spyOn(input, 'click').mockImplementation(() => undefined)
+
+    window.dispatchEvent(new CustomEvent('fde:project-source-upload-open', {
+      detail: { workspaceId: 'workspace-2' },
+    }))
+    expect(click).not.toHaveBeenCalled()
+
+    window.dispatchEvent(new CustomEvent('fde:project-source-upload-open', {
+      detail: { workspaceId: 'workspace-1' },
+    }))
+    expect(click).toHaveBeenCalledTimes(1)
+  })
+
   it('uploads a multi-file batch for the exact project and reports success', async () => {
     const changed = vi.fn()
     window.addEventListener('fde:project-sources-changed', changed)

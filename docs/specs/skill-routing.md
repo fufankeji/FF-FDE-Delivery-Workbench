@@ -1,9 +1,9 @@
 ---
 document: fde-skill-routing
 status: confirmed
-updated: "2026-08-31"
+updated: "2026-09-01"
 primary_method_source: davidahmann/fde-guide@060ef0f3b67743b2e1fc3705763d423eae980236
-engineering_source: rpraharaj/forward-deployed-engineer
+engineering_source: rpraharaj/forward-deployed-engineer@ee045a66db5242617ccea9e5e33139a2980ab55e
 ---
 
 # FF - FDE 交付工作台 V2 Skill 与 Artifact 路由
@@ -15,7 +15,7 @@ engineering_source: rpraharaj/forward-deployed-engineer
 两个外部来源承担不同责任：
 
 - [`davidahmann/fde-guide`](https://github.com/davidahmann/fde-guide) 提供 11 个 AI-FDE 方法 Skills、Artifact 模板、JSON Schema、Control 和完整决策案例，负责“为什么做、要形成什么证据、下一项决定是什么”。当前评审快照为 `v1.29.0 / 060ef0f3`，Apache-2.0。
-- [`rpraharaj/forward-deployed-engineer`](https://github.com/rpraharaj/forward-deployed-engineer) 提供 43 个现场工程 Skills，负责“如何调查代码与数据、设计、实现、验证、发布、运维和交接”。
+- [`rpraharaj/forward-deployed-engineer`](https://github.com/rpraharaj/forward-deployed-engineer) 提供 43 个现场工程 Skills，负责“如何调查代码与数据、设计、实现、验证、发布、运维和交接”。当前评审快照为 `ee045a66db5242617ccea9e5e33139a2980ab55e`，MIT。
 
 本产品的 PRD、Product Spec、项目隔离、用户授权和 FDE 人工决定始终高于外部方法。外部内容是可适配参考，不是客户政策、生产授权或事实证据。
 
@@ -213,9 +213,17 @@ engineering_source: rpraharaj/forward-deployed-engineer
 4. 首个阶段真实测试通过后，再按 F006～F012 顺序逐阶段审查和接入，不预装其余 Skills 或 Artifact。
 5. 每个 Feature 的最低完成证据包括：业务语言路由、选用理由、按需加载记录、可见执行过程、真实工具证据、持久化 Artifact、结构与证据状态、后续引用和 FDE 决定。
 
-## 9. 变更记录
+## 9. 阶段 1 运行时合同
+
+- 运行时分别注册 `qualify-ai-workflow`、`reframe-ai-engagement`、`fde-orient`、`knowledge-interview`、`ownership-map`、`repo-recon` 和 `stakeholder-brief`；不得再注册一个覆盖所有第一阶段工作的 `fde-requirement-research`。
+- 系统提示只说明路由顺序和触发条件。普通发现默认加载 `qualify-ai-workflow`；只有边界冲突才追加 `reframe-ai-engagement`；工程 Skill 按任务缺口选择，不得一次加载全部。
+- `.fde/discovery/workflows.json` schemaVersion 2 保存逐条证据引用，计数由 Host 聚合。
+- `.fde/discovery/artifacts.json` schemaVersion 1 保存 Artifact 来源版本、内容版本、结构成熟度、证据状态和上下游引用。工作台与阶段门必须读取同一校验结果。
+
+## 10. 变更记录
 
 | 日期 | 变化 | 确认依据 |
 |---|---|---|
 | 2026-08-31 | 建立八阶段与 43 个工程 Skills 的初版路由 | 用户要求先行确定各阶段接入能力 |
 | 2026-08-31 | 调整为 AI-FDE 方法、工程执行、Harness 工具三层；引入 11 个方法 Skills、Artifact Catalog 和渐进结构状态 | 用户确认结合 `davidahmann/fde-guide` 重新调整 Spec |
+| 2026-09-01 | 固定 43 Skills 工程来源 commit，并把阶段 1 运行时收紧为独立分层 Skills、逐条证据和结构成熟度合同 | 用户要求在真实测试前补齐三项缺口 |

@@ -1,7 +1,10 @@
 /** Project-local sidebar: stage orientation and scoped project actions only. */
 
-import { useEffect } from 'react'
-import type { FdeProjectState } from './stage-controller.ts'
+import { MarkdownText } from '@deepseek-ai/dsh-client-ui-primitives'
+import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { FDE_V2_STAGE_IDS, type FdeProjectState } from './stage-controller.ts'
+import { fetchStageSkillCatalog, type StageSkillCatalogMethod } from './stage-skill-catalog.ts'
 import type { ProjectContextSidebarProps } from './slots.ts'
 import { V2_STAGE_NAMES } from './StageWorkbench.tsx'
 import css from './StageWorkbench.module.css'
@@ -10,7 +13,17 @@ const LEGACY_TO_V2_STAGE: Readonly<Record<FdeProjectState, number>> = {
   requirements: 0, solution: 1, development: 3, validation: 4, pilot: 5, handoff: 6, completed: 7,
 }
 
+type SkillCatalogState =
+  | { readonly status: 'idle' | 'loading' }
+  | { readonly status: 'ready'; readonly methods: readonly StageSkillCatalogMethod[] }
+  | { readonly status: 'error'; readonly message: string }
+
 export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
+  const [methodsOpen, setMethodsOpen] = useState(false)
+  const [catalogState, setCatalogState] = useState<SkillCatalogState>({ status: 'idle' })
+  const [catalogRequestRevision, setCatalogRequestRevision] = useState(0)
+  const catalogLoaded = useRef(false)
+  const [selectedMethod, setSelectedMethod] = useState<StageSkillCatalogMethod>()
   const workspaceId = String(props.workspaceId)
   const stageState = props.useStageProgress(snapshot => snapshot.byWorkspace[workspaceId])
   const sourceState = props.useProjectSources(snapshot => snapshot.byWorkspace[workspaceId])
@@ -21,10 +34,51 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
     props.loadProjectSurface(workspaceId)
   }, [props.loadProjectSources, props.loadProjectSurface, props.loadStage, workspaceId])
   const stage = stageState?.status === 'ready' ? stageState.value.currentStage : undefined
-  const active = stage === undefined ? 0 : LEGACY_TO_V2_STAGE[stage]
+  const active = stageState?.status === 'ready' && stageState.value.v2Stage !== undefined
+    ? FDE_V2_STAGE_IDS.indexOf(stageState.value.v2Stage)
+    : stage === undefined ? 0 : LEGACY_TO_V2_STAGE[stage]
+  const activeStageId = FDE_V2_STAGE_IDS[active] ?? 'discovery'
   const files = sourceState?.files.length ?? 0
   const surface = surfaceState?.status === 'ready' ? surfaceState.value : undefined
   const artifacts = surface?.requirements.presentCount ?? 0
+  useEffect(() => {
+    if (!methodsOpen || catalogLoaded.current) return
+    const abort = new AbortController()
+    setCatalogState({ status: 'loading' })
+    void fetchStageSkillCatalog(abort.signal).then((catalog) => {
+      const selected = catalog.stages.find(item => (
+        item.index === active && (item.id === activeStageId || (active === 0 && item.id === 'requirements'))
+      ))
+      if (selected === undefined || selected.methods.length === 0) {
+        throw new Error('当前阶段工作方法未完整注册。')
+      }
+      catalogLoaded.current = true
+      setCatalogState({ status: 'ready', methods: selected.methods })
+    }).catch((error: unknown) => {
+      if (abort.signal.aborted) return
+      setCatalogState({ status: 'error', message: error instanceof Error ? error.message : String(error) })
+    })
+    return () => { abort.abort() }
+  }, [active, activeStageId, catalogRequestRevision, methodsOpen])
+  useEffect(() => {
+    if (selectedMethod === undefined) return
+    const closeOnEscape = (event: KeyboardEvent): void => {
+      if (event.key === 'Escape') setSelectedMethod(undefined)
+    }
+    window.addEventListener('keydown', closeOnEscape)
+    return () => { window.removeEventListener('keydown', closeOnEscape) }
+  }, [selectedMethod])
+  useEffect(() => {
+    catalogLoaded.current = false
+    setCatalogState({ status: 'idle' })
+    setSelectedMethod(undefined)
+  }, [active])
+
+  const retryCatalog = (): void => {
+    catalogLoaded.current = false
+    setCatalogState({ status: 'idle' })
+    setCatalogRequestRevision(value => value + 1)
+  }
 
   return (
     <aside className={css.projectSidebar}>
@@ -35,23 +89,83 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
 
       <nav aria-label="项目交付阶段">
         <span>交付路径</span>
-        {V2_STAGE_NAMES.map((name, index) => (
-          <div key={name} data-active={index === active ? 'true' : 'false'} data-complete={index < active ? 'true' : 'false'}>
-            <i>{index < active ? '✓' : String(index + 1).padStart(2, '0')}</i>
-            <span><strong>{name}</strong>{index === active && <small>当前阶段</small>}</span>
-          </div>
-        ))}
+        {V2_STAGE_NAMES.map((name, index) => {
+          const current = index === active
+          return (
+            <div className={css.projectStageBranch} key={name} data-active={current ? 'true' : 'false'} data-complete={index < active ? 'true' : 'false'}>
+              <div className={css.projectStageRow}>
+                <i>{index < active ? '✓' : String(index + 1).padStart(2, '0')}</i>
+                <span><strong>{name}</strong>{current && <small>当前阶段</small>}</span>
+              </div>
+              {current && (
+                <div className={css.stageMethodTree}>
+                  <button
+                    type="button"
+                    className={css.stageMethodToggle}
+                    aria-expanded={methodsOpen}
+                    onClick={() => { setMethodsOpen(value => !value) }}
+                  >
+                    <span aria-hidden="true" className={css.stageMethodFolder}>◇</span>
+                    <span>本阶段工作方法</span>
+                    <b>{catalogState.status === 'ready' ? catalogState.methods.length : index === 0 ? 7 : 1}</b>
+                    <svg aria-hidden="true" viewBox="0 0 16 16"><path d="m5.5 3 5 5-5 5" /></svg>
+                  </button>
+                  {methodsOpen && (
+                    <div className={css.stageMethodList} aria-label={`第 ${String(index + 1)} 阶段工作方法`}>
+                      {catalogState.status === 'loading' && <span className={css.stageMethodMessage}>正在读取工作方法…</span>}
+                      {catalogState.status === 'error' && (
+                        <div className={css.stageMethodMessage} role="alert">
+                          <span>{catalogState.message}</span>
+                          <button type="button" onClick={retryCatalog}>重试</button>
+                        </div>
+                      )}
+                      {catalogState.status === 'ready' && catalogState.methods.map((method, methodIndex) => (
+                        <button key={method.id} type="button" className={css.stageMethodItem} onClick={() => { setSelectedMethod(method) }}>
+                          <span>{String(methodIndex + 1).padStart(2, '0')}</span>
+                          <strong>{method.label}</strong>
+                          <svg aria-hidden="true" viewBox="0 0 16 16"><path d="m5.5 3 5 5-5 5" /></svg>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )
+        })}
       </nav>
 
-      <section>
-        <span>项目操作</span>
-        <button type="button" onClick={() => { props.openProjectConversation(String(props.sessionId)) }}>
-          <i aria-hidden="true">✦</i><span><strong>Agent 执行</strong><small>对话、工具与过程留痕</small></span>
-        </button>
-        <div className={css.uploadAction}>
-          <i aria-hidden="true">＋</i><span><strong>添加项目资料</strong><small>归档原始文件，不触发对话</small></span>{props.projectActions}
-        </div>
-      </section>
+      {selectedMethod !== undefined && typeof document !== 'undefined' && createPortal(
+        <div
+          className={css.stageMethodDialogLayer}
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setSelectedMethod(undefined)
+          }}
+        >
+          <section className={css.stageMethodDialog} role="dialog" aria-modal="true" aria-labelledby="stage-method-title">
+            <header>
+              <div><span>第 {String(active + 1)} 阶段 · 工作方法</span><h2 id="stage-method-title">{selectedMethod.label}</h2><p>{selectedMethod.description}</p></div>
+              <button type="button" aria-label="关闭工作方法详情" onClick={() => { setSelectedMethod(undefined) }}>×</button>
+            </header>
+            <div className={css.stageMethodDialogBody}>
+              <section className={css.stageMethodUsage}>
+                <span>什么时候会用</span>
+                <p>{selectedMethod.whenToUse}</p>
+              </section>
+              <section className={css.stageMethodDefinition}>
+                <span>完整方法定义</span>
+                <MarkdownText text={selectedMethod.content} />
+              </section>
+              <details className={css.stageMethodTechnical}>
+                <summary>技术信息</summary>
+                <dl><div><dt>Skill</dt><dd><code>{selectedMethod.id}</code></dd></div><div><dt>固定来源</dt><dd><code>{selectedMethod.source}</code></dd></div></dl>
+              </details>
+            </div>
+          </section>
+        </div>,
+        document.body,
+      )}
     </aside>
   )
 }

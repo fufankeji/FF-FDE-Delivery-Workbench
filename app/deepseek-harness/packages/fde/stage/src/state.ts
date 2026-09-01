@@ -2,8 +2,8 @@
 
 import type { KvTable } from '@deepseek-ai/dsh-storage-domain'
 import type { WorkspaceId } from '@deepseek-ai/dsh-workspace'
-import { FDE_PROJECT_STATE_IDS } from './spec.ts'
-import type { FdeProjectState, FdeStageId, ProjectStageRecord } from './spec.ts'
+import { FDE_PROJECT_STATE_IDS, FDE_V2_STAGE_IDS } from './spec.ts'
+import type { FdeProjectState, FdeStageId, FdeV2StageId, ProjectStageRecord } from './spec.ts'
 
 /** Clock dependency used to stamp the one initial record. */
 export type StageClock = () => string
@@ -18,19 +18,15 @@ export class FdeStageConflictError extends Error {
 
 /** A fixed stage action was attempted from the wrong current stage. */
 export class FdeStageTransitionError extends Error {
-  constructor(readonly current: ProjectStageRecord, expected: FdeStageId) {
-    const label = expected === 'requirements'
-      ? '需求调研'
-      : expected === 'solution'
-        ? '方案设计'
-        : expected === 'development'
-          ? '项目开发'
-          : expected === 'validation'
-            ? '验证评估'
-            : expected === 'pilot'
-              ? '部署试运行'
-              : '验收移交'
-    super(`当前项目已经不在${label}阶段。`)
+  constructor(readonly current: ProjectStageRecord, expected: FdeStageId | FdeV2StageId) {
+    const label: Readonly<Record<FdeStageId | FdeV2StageId, string>> = {
+      requirements: '需求调研', solution: '方案设计', development: '项目开发', validation: '验证评估',
+      handoff: '验收移交', discovery: '发现高价值问题', definition: '定义结果、范围与责任',
+      investigation: '调查数据、系统、接口、安全与组织', design: '设计方案并完成端到端纵向切片',
+      evaluation: '运行 PoC 与 Eval', pilot: '企业集成、可靠性改造与受控 Pilot',
+      production: '进入生产、推动采用并验收交接', improvement: '持续改进并沉淀可复用能力',
+    }
+    super(`当前项目已经不在${label[expected]}阶段。`)
     this.name = 'FdeStageTransitionError'
   }
 }
@@ -52,8 +48,43 @@ const PREVIOUS_STAGE: Readonly<Record<Exclude<FdeProjectState, 'requirements'>, 
   completed: 'handoff',
 }
 
+const LEGACY_TO_V2: Readonly<Record<FdeProjectState, FdeV2StageId>> = {
+  requirements: 'discovery',
+  solution: 'definition',
+  development: 'design',
+  validation: 'evaluation',
+  pilot: 'pilot',
+  handoff: 'production',
+  completed: 'improvement',
+}
+
+const V2_TO_LEGACY: Readonly<Record<FdeV2StageId, FdeProjectState>> = {
+  discovery: 'requirements',
+  definition: 'solution',
+  investigation: 'solution',
+  design: 'development',
+  evaluation: 'validation',
+  pilot: 'pilot',
+  production: 'handoff',
+  improvement: 'completed',
+}
+
 function stateIndex(state: FdeProjectState): number {
   return FDE_PROJECT_STATE_IDS.indexOf(state)
+}
+
+function v2StateIndex(state: FdeV2StageId): number {
+  return FDE_V2_STAGE_IDS.indexOf(state)
+}
+
+function withV2State(record: ProjectStageRecord): ProjectStageRecord {
+  if (record.lifecycleVersion === 2 && record.v2Stage !== undefined) return record
+  return {
+    ...record,
+    lifecycleVersion: 2,
+    v2Stage: LEGACY_TO_V2[record.currentStage],
+    improvementCycles: record.currentStage === 'completed' ? 1 : 0,
+  }
 }
 
 /** Owns current-stage reads and coalesces one Workspace's first durable write. */
@@ -78,7 +109,13 @@ export class FdeStageState {
    */
   open(workspaceId: WorkspaceId): Promise<ProjectStageRecord> {
     const existing = this.table.get(workspaceId)
-    if (existing !== undefined) return Promise.resolve(existing)
+    if (existing !== undefined) {
+      const upgraded = withV2State(existing)
+      if (upgraded !== existing) {
+        return this.table.put(workspaceId, upgraded).then(() => upgraded)
+      }
+      return Promise.resolve(existing)
+    }
     const active = this.pending.get(workspaceId)
     if (active !== undefined) return active
     const attempt = this.initialize(workspaceId)
@@ -123,6 +160,47 @@ export class FdeStageState {
   /** Atomically complete acceptance handover and enter the terminal state. */
   completeHandoff(workspaceId: WorkspaceId, expectedRevision: number): Promise<ProjectStageRecord> {
     return this.transition(workspaceId, expectedRevision, 'handoff', 'completed')
+  }
+
+  /** Complete one exact V2 stage after an FDE review. The improvement stage records a cycle without leaving it. */
+  completeV2(workspaceId: WorkspaceId, expectedRevision: number, expectedStage: FdeV2StageId): Promise<ProjectStageRecord> {
+    const index = v2StateIndex(expectedStage)
+    const nextStage = FDE_V2_STAGE_IDS[index + 1]
+    return this.transitionV2(workspaceId, expectedRevision, expectedStage, nextStage)
+  }
+
+  /** Return exactly one authoritative V2 stage while retaining files and evidence. */
+  returnV2ToPrevious(workspaceId: WorkspaceId, expectedRevision: number, reason: string): Promise<ProjectStageRecord> {
+    const normalizedReason = reason.trim()
+    if (normalizedReason === '' || normalizedReason.length > 1000) {
+      return Promise.reject(new Error('返回原因必须填写，且不能超过 1000 个字符。'))
+    }
+    return this.serialize(workspaceId, async () => {
+      const current = await this.open(workspaceId)
+      if (current.revision !== expectedRevision) throw new FdeStageConflictError(current)
+      const from = current.v2Stage ?? LEGACY_TO_V2[current.currentStage]
+      const index = v2StateIndex(from)
+      if (index === 0) throw new FdeStageReturnError(current, '发现高价值问题已经是第一个阶段，不能继续返回。')
+      const to = FDE_V2_STAGE_IDS[index - 1]!
+      const returnedAt = this.clock()
+      const revision = current.revision + 1
+      const existingBoundary = current.v2ReconfirmThrough
+      const v2ReconfirmThrough = existingBoundary === undefined || index > v2StateIndex(existingBoundary)
+        ? from
+        : existingBoundary
+      const next: ProjectStageRecord = {
+        ...current,
+        lifecycleVersion: 2,
+        v2Stage: to,
+        currentStage: V2_TO_LEGACY[to],
+        revision,
+        updatedAt: returnedAt,
+        v2ReconfirmThrough,
+        v2Returns: [...(current.v2Returns ?? []), { from, to, reason: normalizedReason, returnedAt, revision }].slice(-50),
+      }
+      await this.table.put(workspaceId, next)
+      return next
+    })
   }
 
   /**
@@ -189,6 +267,8 @@ export class FdeStageState {
       const next: ProjectStageRecord = {
         ...recordForNext,
         currentStage: to,
+        lifecycleVersion: 2,
+        v2Stage: LEGACY_TO_V2[to],
         revision: current.revision + 1,
         updatedAt: this.clock(),
       }
@@ -201,12 +281,62 @@ export class FdeStageState {
     })
   }
 
+  private transitionV2(
+    workspaceId: WorkspaceId,
+    expectedRevision: number,
+    from: FdeV2StageId,
+    to: FdeV2StageId | undefined,
+  ): Promise<ProjectStageRecord> {
+    return this.serialize(workspaceId, async () => {
+      const current = await this.open(workspaceId)
+      if (current.revision !== expectedRevision) throw new FdeStageConflictError(current)
+      const currentV2 = current.v2Stage ?? LEGACY_TO_V2[current.currentStage]
+      if (currentV2 !== from) throw new FdeStageTransitionError(current, from)
+      const now = this.clock()
+      const target = to ?? from
+      const boundary = current.v2ReconfirmThrough
+      const clearReconfirmation = boundary !== undefined && (
+        v2StateIndex(target) > v2StateIndex(boundary)
+        || (to === undefined && from === boundary)
+      )
+      const next: ProjectStageRecord = {
+        ...current,
+        lifecycleVersion: 2,
+        v2Stage: target,
+        currentStage: V2_TO_LEGACY[target],
+        revision: current.revision + 1,
+        updatedAt: now,
+        ...(to === undefined
+          ? { improvementCycles: (current.improvementCycles ?? 0) + 1, lastReviewedAt: now }
+          : {}),
+      }
+      if (clearReconfirmation) delete next.v2ReconfirmThrough
+      await this.table.put(workspaceId, next)
+      return next
+    })
+  }
+
+  private serialize(
+    workspaceId: WorkspaceId,
+    operation: () => Promise<ProjectStageRecord>,
+  ): Promise<ProjectStageRecord> {
+    const before = this.transitions.get(workspaceId) ?? Promise.resolve(undefined)
+    const attempt = before.catch(() => undefined).then(operation)
+    this.transitions.set(workspaceId, attempt)
+    return attempt.finally(() => {
+      if (this.transitions.get(workspaceId) === attempt) this.transitions.delete(workspaceId)
+    })
+  }
+
   private async initialize(workspaceId: WorkspaceId): Promise<ProjectStageRecord> {
     const existing = this.table.get(workspaceId)
     if (existing !== undefined) return existing
     const now = this.clock()
     const record: ProjectStageRecord = {
       currentStage: 'requirements',
+      lifecycleVersion: 2,
+      v2Stage: 'discovery',
+      improvementCycles: 0,
       revision: 1,
       createdAt: now,
       updatedAt: now,

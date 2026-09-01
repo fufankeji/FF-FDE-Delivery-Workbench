@@ -783,6 +783,13 @@
 .projectAttentionCard[data-stage='validation'] { --project-accent: var(--fde-stage-validation); }
 .projectAttentionCard[data-stage='pilot'] { --project-accent: var(--fde-stage-pilot); }
 .projectAttentionCard[data-stage='handoff'] { --project-accent: var(--fde-stage-handoff); }
+.projectAttentionCard[data-stage='discovery'] { --project-accent: var(--fde-stage-requirements); }
+.projectAttentionCard[data-stage='definition'] { --project-accent: var(--fde-stage-solution); }
+.projectAttentionCard[data-stage='investigation'],
+.projectAttentionCard[data-stage='design'] { --project-accent: var(--fde-stage-development); }
+.projectAttentionCard[data-stage='evaluation'] { --project-accent: var(--fde-stage-validation); }
+.projectAttentionCard[data-stage='production'],
+.projectAttentionCard[data-stage='improvement'] { --project-accent: var(--fde-stage-handoff); }
 .projectAttentionCard > header { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 18px 22px; border-bottom: 1px solid var(--dsw-alias-border-l1); background: color-mix(in srgb, var(--dsw-alias-bg-overlay) 96%, transparent); }
 .projectAttentionStage { flex: none; padding: 6px 10px; border-radius: 999px; color: var(--project-accent); background: color-mix(in srgb, var(--project-accent) 10%, var(--dsw-alias-bg-layer-1)); font: var(--dsw-font-xxs-strong-12); }
 .projectAttentionJourney { padding: 15px 22px 17px; border-bottom: 1px solid var(--dsw-alias-border-l1); background: color-mix(in srgb, var(--dsw-alias-bg-layer-2) 72%, transparent); }
@@ -983,6 +990,13 @@
 .projectListRow[data-stage='validation'] { --project-accent: var(--fde-stage-validation); }
 .projectListRow[data-stage='pilot'] { --project-accent: var(--fde-stage-pilot); }
 .projectListRow[data-stage='handoff'] { --project-accent: var(--fde-stage-handoff); }
+.projectListRow[data-stage='discovery'] { --project-accent: var(--fde-stage-requirements); }
+.projectListRow[data-stage='definition'] { --project-accent: var(--fde-stage-solution); }
+.projectListRow[data-stage='investigation'],
+.projectListRow[data-stage='design'] { --project-accent: var(--fde-stage-development); }
+.projectListRow[data-stage='evaluation'] { --project-accent: var(--fde-stage-validation); }
+.projectListRow[data-stage='production'],
+.projectListRow[data-stage='improvement'] { --project-accent: var(--fde-stage-handoff); }
 .projectListRow[data-demo] { background: color-mix(in srgb, var(--project-accent) 3%, var(--dsw-alias-bg-overlay)); }
 .projectListRow:hover { background: color-mix(in srgb, var(--project-accent) 6%, var(--dsw-alias-bg-overlay)); }
 
@@ -1104,6 +1118,13 @@
 .projectCard[data-stage='validation'] { --project-accent: var(--fde-stage-validation); }
 .projectCard[data-stage='pilot'] { --project-accent: var(--fde-stage-pilot); }
 .projectCard[data-stage='handoff'] { --project-accent: var(--fde-stage-handoff); }
+.projectCard[data-stage='discovery'] { --project-accent: var(--fde-stage-requirements); }
+.projectCard[data-stage='definition'] { --project-accent: var(--fde-stage-solution); }
+.projectCard[data-stage='investigation'],
+.projectCard[data-stage='design'] { --project-accent: var(--fde-stage-development); }
+.projectCard[data-stage='evaluation'] { --project-accent: var(--fde-stage-validation); }
+.projectCard[data-stage='production'],
+.projectCard[data-stage='improvement'] { --project-accent: var(--fde-stage-handoff); }
 .projectCard[data-demo] { background: linear-gradient(145deg, color-mix(in srgb, var(--project-accent) 8%, var(--dsw-alias-bg-overlay)), var(--dsw-alias-bg-overlay) 48%); }
 
 .projectCard:hover {
@@ -1185,7 +1206,7 @@
 
 .projectStagePath {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(8, minmax(0, 1fr));
   gap: 0;
   margin: 32px 0 6px;
   padding: 0;
@@ -1199,6 +1220,13 @@
 .projectStagePath li[data-stage='validation'] { --stage-color: var(--fde-stage-validation); }
 .projectStagePath li[data-stage='pilot'] { --stage-color: var(--fde-stage-pilot); }
 .projectStagePath li[data-stage='handoff'] { --stage-color: var(--fde-stage-handoff); }
+.projectStagePath li[data-stage='discovery'] { --stage-color: var(--fde-stage-requirements); }
+.projectStagePath li[data-stage='definition'] { --stage-color: var(--fde-stage-solution); }
+.projectStagePath li[data-stage='investigation'],
+.projectStagePath li[data-stage='design'] { --stage-color: var(--fde-stage-development); }
+.projectStagePath li[data-stage='evaluation'] { --stage-color: var(--fde-stage-validation); }
+.projectStagePath li[data-stage='production'],
+.projectStagePath li[data-stage='improvement'] { --stage-color: var(--fde-stage-handoff); }
 .projectStagePath li::before { position: absolute; top: -6px; left: calc(50% - 5px); width: 10px; height: 10px; border: 2px solid var(--dsw-alias-bg-layer-2); border-radius: 50%; background: var(--dsw-alias-border-l2); content: ''; }
 .projectStagePath li[data-state='done'] { border-top-color: color-mix(in srgb, var(--stage-color) 68%, var(--dsw-alias-border-l2)); }
 .projectStagePath li[data-state='done']::before { background: var(--stage-color); }
@@ -2767,7 +2795,7 @@
   .projectFacts { grid-template-columns: 1fr; }
   .projectFacts div { display: flex; padding: 7px 0; border-right: 0; border-top: 1px solid var(--dsw-alias-border-l1); }
   .projectFacts dd { margin-top: 0; }
-  .projectStagePath { grid-template-columns: repeat(6, minmax(86px, 1fr)); overflow-x: auto; }
+  .projectStagePath { grid-template-columns: repeat(8, minmax(86px, 1fr)); overflow-x: auto; }
   .apiSurface { min-height: 0; }
   .apiLayout { grid-template-columns: 1fr; grid-template-rows: minmax(210px, 36%) minmax(0, 1fr); height: auto; min-height: 0; }
   .apiInfo { overflow-y: auto; border-right: 0; border-bottom: 1px solid var(--dsw-alias-border-l2); }
