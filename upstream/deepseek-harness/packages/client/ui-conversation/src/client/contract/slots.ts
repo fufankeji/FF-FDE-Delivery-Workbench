@@ -176,6 +176,8 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
      * reads the global workspace list.
      */
     'conversation.hero.workspace': { kind: 'single'; scope: 'root'; owner: EmptyWorkspaceOwnerProps }
+    /** Optional product-specific body replacing only the blank-session hero chrome. */
+    'conversation.hero.content': { kind: 'single'; scope: 'root'; owner: HeroContentOwnerProps }
     /**
      * Brand mark leading the blank-session headline. Declared by this
      * package's `conversation` entry; the shell supplies a fish fallback.
@@ -294,6 +296,20 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
 export interface HeroAgentPresetOwnerProps {
   /** Marker field: the chip owns its own roster, staging, and menu state. */
   children?: never
+}
+
+/** Blank-session hero context offered to a product-specific project home. */
+export interface HeroContentOwnerProps {
+  /** Current blank Session, absent on the global New Session screen. */
+  sessionId?: SessionId | undefined
+  /** Exact Workspace represented by the blank Session, when one exists. */
+  workspace?: {
+    readonly workspaceId: WorkspaceId
+    readonly title: string
+    readonly path: string
+  } | undefined
+  /** Official hero chrome that an occupant must preserve outside its own scope. */
+  defaultContent: ReactNode
 }
 
 /** Owner share of the strict session content seat. */
@@ -644,6 +660,7 @@ export type ConversationSlotProps =
     | 'conversation.input.dock' | 'conversation.composer.dock'
     | 'conversation.input.left' | 'conversation.input.right'
     | 'conversation.hero.brand.mark'
+    | 'conversation.hero.content'
     | 'conversation.hero.workspace'
     | 'conversation.hero.agentPreset'
   >

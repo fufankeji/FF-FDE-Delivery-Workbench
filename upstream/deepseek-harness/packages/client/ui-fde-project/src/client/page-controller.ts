@@ -11,7 +11,7 @@ export interface ProjectPageSnapshot {
 
 /** Apply-scoped page navigation shared by the sidebar launcher and page. */
 export class ProjectPageController {
-  private snapshot: ProjectPageSnapshot = { open: false, view: 'closed' }
+  private snapshot: ProjectPageSnapshot = { open: true, view: 'overview' }
   private readonly listeners = new Set<() => void>()
 
   /** Read the current immutable page state. */

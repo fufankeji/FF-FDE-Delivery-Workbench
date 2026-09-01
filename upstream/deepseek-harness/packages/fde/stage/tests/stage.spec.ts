@@ -10,14 +10,23 @@ import {
   createCompleteSolutionRoute,
   createCompleteValidationRoute,
   createReturnStageRoute,
+  createStageSkillCatalogRoute,
   createStageRoute,
 } from '../src/http.ts'
 import {
   ACCEPTANCE_HANDOVER_SKILL, acceptanceHandoverPrompt,
   DEPLOYMENT_TRIAL_SKILL, deploymentTrialPrompt,
+  DISCOVERY_STAGE_SKILL_CATALOG,
+  FDE_ORIENT_SKILL,
+  KNOWLEDGE_INTERVIEW_SKILL,
+  OWNERSHIP_MAP_SKILL,
   PROJECT_DEVELOPMENT_SKILL, projectDevelopmentPrompt,
-  REQUIREMENT_RESEARCH_SKILL, requirementResearchPrompt,
+  QUALIFY_AI_WORKFLOW_SKILL,
+  REFRAME_AI_ENGAGEMENT_SKILL,
+  REPO_RECON_SKILL,
+  requirementResearchPrompt,
   SOLUTION_DESIGN_SKILL, solutionDesignPrompt,
+  STAKEHOLDER_BRIEF_SKILL,
   VALIDATION_SKILL, validationPrompt,
 } from '../src/index.ts'
 import type { ProjectStageRecord } from '../src/spec.ts'
@@ -178,11 +187,45 @@ describe('FdeStageState', () => {
 })
 
 describe('requirement-research model guidance', () => {
-  it('keeps the long contract in an on-demand Skill and removes the short prompt after requirements', () => {
-    expect(REQUIREMENT_RESEARCH_SKILL.name).toBe('fde-requirement-research')
-    expect(REQUIREMENT_RESEARCH_SKILL.content).toContain('requirement-baseline.md')
-    expect(REQUIREMENT_RESEARCH_SKILL.content).toContain('不得改变项目阶段')
-    expect(requirementResearchPrompt('requirements')).toContain('先加载 Skill')
+  it('publishes the seven registered discovery methods with business labels and full definitions', () => {
+    const stage = DISCOVERY_STAGE_SKILL_CATALOG.stages[0]
+    expect(stage).toMatchObject({ id: 'requirements', index: 0 })
+    expect(stage?.methods.map(method => method.label)).toEqual([
+      '项目启动与方向确认',
+      '访谈业务人员，还原真实做法',
+      '找到负责人和决策人',
+      '盘点现有系统与资料',
+      '判断问题是否值得继续投入',
+      '核对冲突并调整项目范围',
+      '整理给负责人看的决策简报',
+    ])
+    expect(stage?.methods.every(method => method.content.startsWith('# '))).toBe(true)
+    expect(stage?.methods.map(method => method.id)).toEqual([
+      FDE_ORIENT_SKILL.name,
+      KNOWLEDGE_INTERVIEW_SKILL.name,
+      OWNERSHIP_MAP_SKILL.name,
+      REPO_RECON_SKILL.name,
+      QUALIFY_AI_WORKFLOW_SKILL.name,
+      REFRAME_AI_ENGAGEMENT_SKILL.name,
+      STAKEHOLDER_BRIEF_SKILL.name,
+    ])
+  })
+
+  it('uses a method-first stage-one route with separate conditional engineering skills', () => {
+    expect(QUALIFY_AI_WORKFLOW_SKILL.name).toBe('qualify-ai-workflow')
+    expect(QUALIFY_AI_WORKFLOW_SKILL.content).toContain('schemaVersion":2')
+    expect(QUALIFY_AI_WORKFLOW_SKILL.content).toContain('evidenceRefs')
+    expect(QUALIFY_AI_WORKFLOW_SKILL.content).toContain('.fde/discovery/artifacts.json')
+    expect(REFRAME_AI_ENGAGEMENT_SKILL.name).toBe('reframe-ai-engagement')
+    expect(REFRAME_AI_ENGAGEMENT_SKILL.content).toContain('engagement-reframe.md')
+    const engineeringSkillNames = [
+      FDE_ORIENT_SKILL, KNOWLEDGE_INTERVIEW_SKILL, OWNERSHIP_MAP_SKILL, REPO_RECON_SKILL, STAKEHOLDER_BRIEF_SKILL,
+    ].map(skill => skill.name)
+    expect(engineeringSkillNames).toEqual([
+      'fde-orient', 'knowledge-interview', 'ownership-map', 'repo-recon', 'stakeholder-brief',
+    ])
+    expect(requirementResearchPrompt('requirements')).toContain('先按方法层加载 `qualify-ai-workflow`')
+    expect(requirementResearchPrompt('requirements')).toContain('不得一次加载全部')
     expect(requirementResearchPrompt('solution')).toBe('')
   })
 
@@ -258,6 +301,26 @@ describe('requirement-research model guidance', () => {
 })
 
 describe('project-stage route', () => {
+  it('serves only the fixed registered method catalog through a trusted GET', async () => {
+    const handler = createStageSkillCatalogRoute({
+      trusted: () => true,
+      catalog: DISCOVERY_STAGE_SKILL_CATALOG,
+    })
+    const ok = response()
+    await handler(request({}, 'GET'), ok.value)
+    const snapshot = ok.snapshot()
+    expect(snapshot).toMatchObject({ status: 200, body: { ok: true, value: { schemaVersion: 1 } } })
+    const body = snapshot.body as { value: { stages: { id: string; methods: { id: string }[] }[] } }
+    expect(body.value.stages).toHaveLength(1)
+    expect(body.value.stages[0]).toMatchObject({ id: 'requirements' })
+    expect(body.value.stages[0]?.methods).toHaveLength(7)
+    expect(body.value.stages[0]?.methods[0]?.id).toBe('fde-orient')
+
+    const method = response()
+    await handler(request({}, 'POST'), method.value)
+    expect(method.snapshot()).toMatchObject({ status: 405 })
+  })
+
   it('returns the exact Workspace stage and rejects unknown projects', async () => {
     const open = vi.fn(async () => ({
       currentStage: 'requirements' as const,
@@ -324,11 +387,7 @@ describe('project-stage route', () => {
       createdAt: '2026-08-26T00:00:00.000Z',
       updatedAt: '2026-08-27T00:00:00.000Z',
     }))
-    const requirements = vi.fn(async () => ({ artifacts: [
-      { title: '需求调研报告', status: 'present' as const },
-      { title: '需求确认清单', status: 'missing' as const },
-      { title: '需求基线', status: 'present' as const },
-    ] }))
+    const requirements = vi.fn(async () => ({ reviewReady: false, blockers: ['“事实确认清单”缺少最小章节。'] }))
     const handler = createCompleteRequirementsRoute({
       trusted: () => true,
       workspaceExists: id => id === 'w-1',
@@ -339,15 +398,11 @@ describe('project-stage route', () => {
     await handler(request({ workspaceId: 'w-1', expectedRevision: 1 }), blocked.value)
     expect(blocked.snapshot()).toEqual({
       status: 409,
-      body: { ok: false, error: { code: 'stage-requirements-incomplete', message: '需求调研产物尚未齐备：需求确认清单。' } },
+      body: { ok: false, error: { code: 'stage-requirements-incomplete', message: '发现阶段候选材料尚未达到可评审状态：“事实确认清单”缺少最小章节。' } },
     })
     expect(complete).not.toHaveBeenCalled()
 
-    requirements.mockResolvedValueOnce({ artifacts: [
-      { title: '需求调研报告', status: 'present' },
-      { title: '需求确认清单', status: 'present' },
-      { title: '需求基线', status: 'present' },
-    ] })
+    requirements.mockResolvedValueOnce({ reviewReady: true, blockers: [] })
     const accepted = response()
     await handler(request({ workspaceId: 'w-1', expectedRevision: 1 }), accepted.value)
     expect(accepted.snapshot()).toMatchObject({

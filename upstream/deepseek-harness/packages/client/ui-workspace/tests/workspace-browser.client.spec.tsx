@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, createEvent, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import type { ReactNode } from 'react'
 import { bindSnapshotSelector } from '@deepseek-ai/dsh-client-test-runtime'
 import type {
   SessionId, SessionListState, SessionSummary, WorkspaceId, WorkspaceListState, WorkspaceView,
@@ -15,8 +16,19 @@ import {
 } from '../src/client/WorkspaceBrowser.tsx'
 import { zh } from '../src/client/locales.ts'
 
-afterEach(cleanup)
+const projectProgressListeners: EventListener[] = []
+
+afterEach(() => {
+  cleanup()
+  for (const listener of projectProgressListeners) window.removeEventListener('fde:project-progress-open', listener)
+  projectProgressListeners.length = 0
+})
 beforeEach(() => { localStorage.clear(); createWorkspaceViewStore().create().actions.setOrderBy('manual') })
+
+function listenForProjectProgress(listener: EventListener): void {
+  projectProgressListeners.push(listener)
+  window.addEventListener('fde:project-progress-open', listener)
+}
 
 // The seat's key domain is workspace ∪ common; the stub mirrors the real
 // lookup chain (namespace, then common vocabulary, then the key).
@@ -83,6 +95,7 @@ function mount(overrides: Partial<WorkspaceBrowserProps> = {}) {
     createWorkspace: vi.fn(async () => workspace('created', [])),
     createDirectory: vi.fn(async (path, name) => `${path}/${name}`),
     useDirectoryFlow: bindSnapshotSelector({ getSnapshot: () => true, subscribe: () => () => {} }),
+    useProjectContext: bindSnapshotSelector({ getSnapshot: () => false, subscribe: () => () => {} }),
     useHostDescription: selector => selector(undefined),
     renderSlot: ((_name: string, owner: { open: boolean }) => (owner.open ? <div data-testid="directory-flow" /> : null)) as never,
     t,
@@ -99,6 +112,35 @@ function rerender(b: ReturnType<typeof mount>, overrides: Partial<WorkspaceBrows
 }
 
 describe('WorkspaceBrowser', () => {
+  it('replaces the global project tree with the current project context when that surface is composed', () => {
+    const renderSlot = vi.fn((name: string, owner: { title?: string; open?: boolean; projectActions?: ReactNode }) => {
+      if (name === 'sidebar.workspaces.projectActions') return <span>添加资料</span>
+      if (name === 'sidebar.workspaces.projectContext') {
+        return <aside>项目上下文：{owner.title}{owner.projectActions}</aside>
+      }
+      return owner.open === true ? <div data-testid="directory-flow" /> : null
+    }) as never
+    mount({
+      useSessions: hook(sessionState([summary('alpha-s', 2)], { current: sid('alpha-s') })),
+      useWorkspaces: hook(workspaceState([
+        workspace('alpha', ['alpha-s'], '当前项目'),
+        workspace('beta', [], '其他项目'),
+      ])),
+      useProjectContext: bindSnapshotSelector({ getSnapshot: () => true, subscribe: () => () => {} }),
+      renderSlot,
+    })
+
+    expect(screen.getByText(/项目上下文：当前项目/)).toBeTruthy()
+    expect(screen.getByText('添加资料')).toBeTruthy()
+    expect(screen.queryByText('其他项目')).toBeNull()
+    expect(screen.queryByRole('button', { name: '新建项目' })).toBeNull()
+    expect(renderSlot).toHaveBeenCalledWith('sidebar.workspaces.projectContext', expect.objectContaining({
+      title: '当前项目',
+      sessionId: 'alpha-s',
+      sessionCount: 1,
+    }))
+  })
+
   it('renders project action contributions only for a real Workspace', () => {
     const renderSlot = vi.fn((name: string, owner: { title?: string; open?: boolean }) => {
       if (name === 'sidebar.workspaces.projectActions') return <span>Action for {owner.title}</span>
@@ -859,7 +901,15 @@ describe('WorkspaceBrowser', () => {
     expect(screen.queryByTestId('directory-flow')).toBeNull()
   })
 
-  it('requires a chosen root, creates with an independent ASCII name, remembers metadata and location, and enters', async () => {
+  it('opens the same structured form when Project Center requests project creation', () => {
+    mount()
+    const event = new Event('fde:project-create-open', { cancelable: true })
+    act(() => { window.dispatchEvent(event) })
+    expect(event.defaultPrevented).toBe(true)
+    expect(screen.getByRole('dialog', { name: '新建项目' })).toBeTruthy()
+  })
+
+  it('requires a chosen root, creates with an independent ASCII name, remembers metadata and location, and opens project management', async () => {
     type DirectoryOwner = {
       open: boolean
       busy: boolean
@@ -874,6 +924,8 @@ describe('WorkspaceBrowser', () => {
       path,
     }))
     const startSession = vi.fn()
+    const openProjectProgress = vi.fn((event: Event) => { event.preventDefault() })
+    listenForProjectProgress(openProjectProgress)
     const b = mount({
       createDirectory,
       createWorkspace,
@@ -888,7 +940,7 @@ describe('WorkspaceBrowser', () => {
     })
 
     fireEvent.click(screen.getByRole('button', { name: '新建项目' }))
-    fireEvent.click(screen.getByRole('button', { name: '创建并进入' }))
+    fireEvent.click(screen.getByRole('button', { name: '创建项目' }))
     expect(screen.getByRole('alert').textContent).toBe('请输入项目名称。')
     expect(createDirectory).not.toHaveBeenCalled()
 
@@ -907,11 +959,11 @@ describe('WorkspaceBrowser', () => {
     expect(document.activeElement).toBe(estimatedSchedule)
     fireEvent.change(screen.getByLabelText('预计开始日期'), { target: { value: '2026-09-10' } })
     fireEvent.change(screen.getByLabelText('预计交付日期'), { target: { value: '2026-09-01' } })
-    fireEvent.click(screen.getByRole('button', { name: '创建并进入' }))
+    fireEvent.click(screen.getByRole('button', { name: '创建项目' }))
     expect(screen.getByRole('alert').textContent).toBe('预计交付日期不能早于预计开始日期。')
 
     fireEvent.change(screen.getByLabelText('预计交付日期'), { target: { value: '2026-10-15' } })
-    fireEvent.click(screen.getByRole('button', { name: '创建并进入' }))
+    fireEvent.click(screen.getByRole('button', { name: '创建项目' }))
     expect(screen.getByRole('alert').textContent).toBe('请选择项目存储位置。')
     fireEvent.click(screen.getByRole('button', { name: '更改' }))
     expect(screen.getByTestId('directory-flow')).toBeTruthy()
@@ -919,8 +971,10 @@ describe('WorkspaceBrowser', () => {
     expect(screen.getByTitle('/projects-root')).toBeTruthy()
     const expectedPath = `/projects-root/${directoryInput.value}`
     expect(screen.getByTitle(expectedPath)).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: '创建并进入' }))
-    await waitFor(() => { expect(startSession).toHaveBeenCalledWith(wid('created')) })
+    fireEvent.click(screen.getByRole('button', { name: '创建项目' }))
+    await waitFor(() => { expect(openProjectProgress).toHaveBeenCalledTimes(1) })
+    expect((openProjectProgress.mock.calls[0]?.[0] as CustomEvent).detail).toEqual({ workspaceId: 'created' })
+    expect(startSession).not.toHaveBeenCalled()
     expect(createDirectory).toHaveBeenCalledWith('/projects-root', directoryInput.value)
     expect(createWorkspace).toHaveBeenCalledWith({ path: expectedPath })
     expect(b.store.getSnapshot().projectMetadataByPath[expectedPath]).toMatchObject({
@@ -944,7 +998,7 @@ describe('WorkspaceBrowser', () => {
     reopened.view.unmount()
   })
 
-  it('keeps import as a separate directory flow and enters the adopted project', async () => {
+  it('keeps import as a separate directory flow and opens management for the adopted project', async () => {
     type DirectoryOwner = {
       open: boolean
       busy: boolean
@@ -958,6 +1012,8 @@ describe('WorkspaceBrowser', () => {
       path,
     }))
     const startSession = vi.fn()
+    const openProjectProgress = vi.fn((event: Event) => { event.preventDefault() })
+    listenForProjectProgress(openProjectProgress)
     mount({
       createWorkspace,
       startSession,
@@ -971,7 +1027,9 @@ describe('WorkspaceBrowser', () => {
     fireEvent.click(screen.getByRole('button', { name: '导入已有项目' }))
     expect(screen.getByTestId('directory-flow')).toBeTruthy()
     act(() => { directoryOwner?.onPicked('/projects/existing-project') })
-    await waitFor(() => { expect(startSession).toHaveBeenCalledWith(wid('imported')) })
+    await waitFor(() => { expect(openProjectProgress).toHaveBeenCalledTimes(1) })
+    expect((openProjectProgress.mock.calls[0]?.[0] as CustomEvent).detail).toEqual({ workspaceId: 'imported' })
+    expect(startSession).not.toHaveBeenCalled()
     expect(createWorkspace).toHaveBeenCalledWith({ path: '/projects/existing-project' })
     expect(screen.queryByRole('dialog', { name: '新建项目' })).toBeNull()
   })

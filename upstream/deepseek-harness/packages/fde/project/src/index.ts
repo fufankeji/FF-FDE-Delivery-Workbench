@@ -96,6 +96,7 @@ export {
   startRequirementWikiBuild,
 } from './requirement-wiki.ts'
 export { registerProjectArchitectureTools } from './architecture-tools.ts'
+export { DISCOVERY_CAPABILITY_ROUTE, loadDiscoveryStage } from './discovery-stage.ts'
 export {
   loadRequirementArtifacts,
   requirementArtifactFileUrl,

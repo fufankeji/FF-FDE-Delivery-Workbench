@@ -352,7 +352,7 @@ describe('conversation slot inject API', () => {
     // Label falls back to the id when a rider declares none.
     const off2 = b.slots.register(
       { name: 'conversation.view', id: 'bare', order: 6 } as never, (() => null) as never)
-    expect(injected.views.list().map(v => v.label)).toEqual(['对话', 'X', 'bare'])
+    expect(injected.views.list().map(v => v.label)).toEqual(['Agent对话', 'X', 'bare'])
     off()
     off2()
     unsub()

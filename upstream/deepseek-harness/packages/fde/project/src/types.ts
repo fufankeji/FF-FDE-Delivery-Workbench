@@ -374,6 +374,115 @@ export interface RequirementArtifactsSnapshot {
   readonly artifacts: readonly RequirementArtifactSnapshot[]
 }
 
+/** Stable business work identifiers for FDE stage one. */
+export type DiscoveryWorkItemId = 'collect-originals' | 'restore-workflow' | 'qualify-value' | 'form-conclusion'
+
+/** One candidate business artifact used by the first-stage workbench. */
+export interface DiscoveryStageArtifactSnapshot {
+  readonly id: 'research-report' | 'confirmation-checklist' | 'requirement-baseline' | 'engagement-reframe'
+  readonly title: string
+  readonly path: string
+  readonly required: boolean
+  readonly purpose: string
+  readonly status: 'missing' | 'present' | 'error'
+  readonly structureState: 'missing' | 'invalid' | 'starter_valid' | 'complete_valid' | 'not_applicable'
+  readonly evidenceState: 'confirmed' | 'inferred' | 'unverified'
+  readonly version?: number
+  readonly sourceAdapter?: DiscoverySourceAdapterSnapshot
+  readonly evidenceRefs: readonly DiscoveryEvidenceReferenceSnapshot[]
+  readonly bytes?: number
+  readonly updatedAt?: string
+  readonly fileUrl?: string
+  readonly message?: string
+}
+
+/** Pinned upstream or product-local source used to adapt one stage-one Artifact. */
+export interface DiscoverySourceAdapterSnapshot {
+  readonly id: string
+  readonly version: string
+  readonly commit: string
+  readonly license: string
+  readonly artifact: string
+}
+
+/** Confidence carried by one concrete evidence reference. */
+export type DiscoveryEvidenceState = 'confirmed' | 'inferred' | 'unverified'
+
+/** Supported evidence origins for one stage-one claim. */
+export type DiscoveryEvidenceKind = 'project-file' | 'conversation' | 'interview' | 'observation' | 'system' | 'policy' | 'external'
+
+/** One claim-level reference; aggregate counts are derived from these records. */
+export interface DiscoveryEvidenceReferenceSnapshot {
+  readonly id: string
+  readonly state: DiscoveryEvidenceState
+  readonly kind: DiscoveryEvidenceKind
+  readonly ref: string
+  readonly summary: string
+}
+
+/** Human-readable disposition of one persisted candidate workflow. */
+export type DiscoveryWorkflowDisposition = 'candidate' | 'selected' | 'deferred' | 'rejected'
+
+/** One real workflow candidate identified during stage-one dialogue. */
+export interface DiscoveryWorkflowCandidateSnapshot {
+  readonly id: string
+  readonly title: string
+  readonly actor: string
+  readonly trigger: string
+  readonly problem: string
+  readonly disposition: DiscoveryWorkflowDisposition
+  readonly evidence: {
+    readonly confirmed: number
+    readonly inferred: number
+    readonly unverified: number
+  }
+  readonly evidenceRefs: readonly DiscoveryEvidenceReferenceSnapshot[]
+}
+
+/** Honest read state of the persisted stage-one workflow catalog. */
+export interface DiscoveryWorkflowCatalogSnapshot {
+  readonly path: '.fde/discovery/workflows.json'
+  readonly status: 'missing' | 'ready' | 'invalid'
+  readonly selectedWorkflowId?: string
+  readonly items: readonly DiscoveryWorkflowCandidateSnapshot[]
+  readonly message?: string
+}
+
+/** One pinned method or engineering Skill available to stage one. */
+export interface DiscoveryCapabilitySnapshot {
+  readonly skill: string
+  readonly layer: 'method' | 'engineering'
+  readonly condition: string
+  readonly source: DiscoverySourceAdapterSnapshot
+}
+
+/** Deterministic method-first route advertised by the trusted Host. */
+export interface DiscoveryCapabilityRouteSnapshot {
+  readonly primaryMethod: DiscoveryCapabilitySnapshot
+  readonly conditionalMethod: DiscoveryCapabilitySnapshot
+  readonly engineering: readonly DiscoveryCapabilitySnapshot[]
+}
+
+/** Host-derived first-stage business progress; it never advances the project. */
+export interface DiscoveryStageSnapshot {
+  readonly question: string
+  readonly status: 'collecting' | 'understanding' | 'qualifying' | 'ready-for-review'
+  readonly currentWorkId: DiscoveryWorkItemId
+  readonly workItems: readonly {
+    readonly id: DiscoveryWorkItemId
+    readonly title: string
+    readonly purpose: string
+    readonly status: 'complete' | 'current' | 'waiting'
+  }[]
+  readonly workflows: DiscoveryWorkflowCatalogSnapshot
+  readonly route: DiscoveryCapabilityRouteSnapshot
+  readonly artifacts: readonly DiscoveryStageArtifactSnapshot[]
+  readonly requiredCount: number
+  readonly presentCount: number
+  readonly reviewReady: boolean
+  readonly blockers: readonly string[]
+}
+
 /** One required Markdown output of the FDE solution-design stage. */
 export interface SolutionArtifactSnapshot {
   readonly id: 'project-prd' | 'solution-design' | 'development-plan' | 'acceptance-plan' | 'solution-baseline'
@@ -604,6 +713,7 @@ export interface ProjectSurfaceSnapshot {
   readonly validation: ValidationStageSnapshot
   readonly requirementWiki: RequirementWikiSnapshot
   readonly requirements: RequirementArtifactsSnapshot
+  readonly discovery: DiscoveryStageSnapshot
   readonly solution: SolutionArtifactsSnapshot
   readonly development: DevelopmentDocsSnapshot
   readonly deploymentTrial: DeploymentTrialStageSnapshot
