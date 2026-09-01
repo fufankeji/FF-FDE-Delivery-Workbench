@@ -341,6 +341,77 @@ export interface ProjectSurfaceSnapshot {
       readonly message?: string
     }[]
   }
+  readonly discovery: {
+    readonly question: string
+    readonly status: 'collecting' | 'understanding' | 'qualifying' | 'ready-for-review'
+    readonly currentWorkId: 'collect-originals' | 'restore-workflow' | 'qualify-value' | 'form-conclusion'
+    readonly workItems: readonly {
+      readonly id: 'collect-originals' | 'restore-workflow' | 'qualify-value' | 'form-conclusion'
+      readonly title: string
+      readonly purpose: string
+      readonly status: 'complete' | 'current' | 'waiting'
+    }[]
+    readonly workflows: {
+      readonly path: '.fde/discovery/workflows.json'
+      readonly status: 'missing' | 'ready' | 'invalid'
+      readonly selectedWorkflowId?: string
+      readonly items: readonly {
+        readonly id: string
+        readonly title: string
+        readonly actor: string
+        readonly trigger: string
+        readonly problem: string
+        readonly disposition: 'candidate' | 'selected' | 'deferred' | 'rejected'
+        readonly evidence: { readonly confirmed: number; readonly inferred: number; readonly unverified: number }
+        readonly evidenceRefs: readonly {
+          readonly id: string
+          readonly state: 'confirmed' | 'inferred' | 'unverified'
+          readonly kind: 'project-file' | 'conversation' | 'interview' | 'observation' | 'system' | 'policy' | 'external'
+          readonly ref: string
+          readonly summary: string
+        }[]
+      }[]
+      readonly message?: string
+    }
+    readonly route: {
+      readonly primaryMethod: { readonly skill: string; readonly layer: 'method'; readonly condition: string; readonly source: { readonly id: string; readonly version: string; readonly commit: string; readonly license: string; readonly artifact: string } }
+      readonly conditionalMethod: { readonly skill: string; readonly layer: 'method'; readonly condition: string; readonly source: { readonly id: string; readonly version: string; readonly commit: string; readonly license: string; readonly artifact: string } }
+      readonly engineering: readonly { readonly skill: string; readonly layer: 'engineering'; readonly condition: string; readonly source: { readonly id: string; readonly version: string; readonly commit: string; readonly license: string; readonly artifact: string } }[]
+    }
+    readonly artifacts: readonly {
+      readonly id: 'research-report' | 'confirmation-checklist' | 'requirement-baseline' | 'engagement-reframe'
+      readonly title: string
+      readonly path: string
+      readonly required: boolean
+      readonly purpose: string
+      readonly status: 'missing' | 'present' | 'error'
+      readonly structureState: 'missing' | 'invalid' | 'starter_valid' | 'complete_valid' | 'not_applicable'
+      readonly evidenceState: 'confirmed' | 'inferred' | 'unverified'
+      readonly version?: number
+      readonly sourceAdapter?: {
+        readonly id: string
+        readonly version: string
+        readonly commit: string
+        readonly license: string
+        readonly artifact: string
+      }
+      readonly evidenceRefs: readonly {
+        readonly id: string
+        readonly state: 'confirmed' | 'inferred' | 'unverified'
+        readonly kind: 'project-file' | 'conversation' | 'interview' | 'observation' | 'system' | 'policy' | 'external'
+        readonly ref: string
+        readonly summary: string
+      }[]
+      readonly bytes?: number
+      readonly updatedAt?: string
+      readonly fileUrl?: string
+      readonly message?: string
+    }[]
+    readonly requiredCount: number
+    readonly presentCount: number
+    readonly reviewReady: boolean
+    readonly blockers: readonly string[]
+  }
   readonly solution?: {
     readonly root: string
     readonly requiredCount: number

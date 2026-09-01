@@ -14,6 +14,7 @@
     { "path": "../ui-model-selection" },
     { "path": "../ui-primitives" },
     { "path": "../ui-sidebar" },
+    { "path": "../ui-workspace" },
     { "path": "../ui-slots" },
     { "path": "../../runtime-diagnostics/invariants" }
   ]

@@ -35,6 +35,32 @@ export const FDE_STAGES: readonly FdeStageDefinition[] = FDE_STAGE_IDS.map((id, 
   questionKey: `stage.${id}.question`,
 }))
 
+/** V2 eight-stage presentation projected from the persisted legacy stage state. */
+export const FDE_V2_STAGE_PRESENTATION: Readonly<Record<FdeProjectState, {
+  readonly current: number
+  readonly nameKey: FdeV2StageNameKey
+}>> = {
+  requirements: { current: 1, nameKey: 'stage.v2.discovery.name' },
+  solution: { current: 2, nameKey: 'stage.v2.definition.name' },
+  development: { current: 4, nameKey: 'stage.v2.design.name' },
+  validation: { current: 5, nameKey: 'stage.v2.evaluation.name' },
+  pilot: { current: 6, nameKey: 'stage.v2.pilot.name' },
+  handoff: { current: 7, nameKey: 'stage.v2.production.name' },
+  completed: { current: 8, nameKey: 'stage.v2.improvement.name' },
+}
+
+export const FDE_V2_STAGE_TOTAL = 8
+
+export type FdeV2StageNameKey =
+  | 'stage.v2.discovery.name'
+  | 'stage.v2.definition.name'
+  | 'stage.v2.investigation.name'
+  | 'stage.v2.design.name'
+  | 'stage.v2.evaluation.name'
+  | 'stage.v2.pilot.name'
+  | 'stage.v2.production.name'
+  | 'stage.v2.improvement.name'
+
 /**
  * Test whether a wire value is one of the six supported stage ids.
  * @param value - untrusted wire value.

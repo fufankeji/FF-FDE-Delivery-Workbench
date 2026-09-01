@@ -28,12 +28,40 @@ export interface StageRouteOptions {
   reportFailure?: (error: unknown) => void
 }
 
+/** One read-only method shown under a project delivery stage. */
+export interface StageSkillCatalogMethod {
+  readonly id: string
+  readonly label: string
+  readonly description: string
+  readonly whenToUse: string
+  readonly source: string
+  readonly content: string
+}
+
+/** Browser-safe catalog of methods that the FDE stage plugin actually registers. */
+export interface StageSkillCatalogValue {
+  readonly schemaVersion: 1
+  readonly stages: readonly {
+    readonly id: string
+    readonly index: number
+    readonly methods: readonly StageSkillCatalogMethod[]
+  }[]
+}
+
+/** Dependencies required by the read-only stage Skill catalog route. */
+export interface StageSkillCatalogRouteOptions {
+  trusted: (request: IncomingMessage) => boolean
+  catalog: StageSkillCatalogValue
+  reportFailure?: (error: unknown) => void
+}
+
 /** Dependencies for the fixed FDE-only requirement-research completion route. */
 export interface CompleteRequirementsRouteOptions {
   trusted: (request: IncomingMessage) => boolean
   workspaceExists: (workspaceId: string) => boolean
   requirements: (workspaceId: string) => Promise<{
-    readonly artifacts: readonly { readonly title: string; readonly status: 'missing' | 'present' | 'error' }[]
+    readonly reviewReady: boolean
+    readonly blockers: readonly string[]
   }>
   complete: (workspaceId: WorkspaceId, expectedRevision: number) => Promise<ProjectStageRecord>
   reportFailure?: (error: unknown) => void
@@ -195,6 +223,33 @@ export function createStageRoute(options: StageRouteOptions): (request: Incoming
   }
 }
 
+/**
+ * Create the GET-only catalog for methods registered by this FDE stage plugin.
+ * @param options - request trust and the fixed product catalog.
+ * @returns a WebServer route handler.
+ */
+export function createStageSkillCatalogRoute(
+  options: StageSkillCatalogRouteOptions,
+): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
+  return async (request: IncomingMessage, response: ServerResponse): Promise<void> => {
+    try {
+      if (!options.trusted(request)) throw new FdeStageRequestError('forbidden', 403, '当前请求不能读取阶段工作方法。')
+      if (request.method !== 'GET') {
+        request.resume()
+        throw new FdeStageRequestError('method-not-allowed', 405, '阶段工作方法接口只接受 GET。')
+      }
+      writeJson(response, 200, { ok: true, value: options.catalog })
+    } catch (error) {
+      if (error instanceof FdeStageRequestError) {
+        writeJson(response, error.status, { ok: false, error: { code: error.code, message: error.message } })
+        return
+      }
+      options.reportFailure?.(error)
+      writeJson(response, 500, { ok: false, error: { code: 'internal-error', message: '阶段工作方法读取失败。' } })
+    }
+  }
+}
+
 /** Create the POST-only, one-stage FDE return action. */
 export function createReturnStageRoute(
   options: ReturnStageRouteOptions,
@@ -254,12 +309,11 @@ export function createCompleteRequirementsRoute(
         throw new FdeStageRequestError('workspace-not-found', 404, '当前项目不存在或已被移除。')
       }
       const requirements = await options.requirements(workspaceId)
-      const incomplete = requirements.artifacts.filter(artifact => artifact.status !== 'present')
-      if (incomplete.length > 0) {
+      if (!requirements.reviewReady) {
         throw new FdeStageRequestError(
           'stage-requirements-incomplete',
           409,
-          `需求调研产物尚未齐备：${incomplete.map(artifact => artifact.title).join('、')}。`,
+          `发现阶段候选材料尚未达到可评审状态：${requirements.blockers.join('；')}`,
         )
       }
       const record = await options.complete(workspaceId as WorkspaceId, expectedRevision)

@@ -2,10 +2,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
-import { ProjectProgressLauncher } from '../src/client/ProjectProgressLauncher.tsx'
 import { ProjectProgressOverlay } from '../src/client/ProjectProgressOverlay.tsx'
 import { zh } from '../src/client/locales.ts'
-import type { ProjectProgressLauncherProps, ProjectProgressOverlayProps } from '../src/client/slots.ts'
+import type { ProjectProgressOverlayProps } from '../src/client/slots.ts'
 
 beforeEach(() => {
   vi.stubGlobal('ResizeObserver', class {
@@ -19,18 +18,7 @@ afterEach(() => { cleanup(); vi.unstubAllGlobals(); delete document.body.dataset
 const hook = <T,>(value: T) => <S,>(selector: (state: T) => S) => selector(value)
 
 describe('ProjectProgressOverlay standalone page', () => {
-  it('does not present the system home as an active Project Progress sidebar operation', () => {
-    const props = {
-      wide: true,
-      useProjectPage: hook({ open: true, view: 'home' as const }),
-      openProjectPage: vi.fn(),
-      t: makeTranslate(zh),
-    } as unknown as ProjectProgressLauncherProps
-    render(<ProjectProgressLauncher {...props} />)
-    expect(screen.getByRole('button', { name: '项目管理' }).getAttribute('aria-pressed')).toBe('false')
-  })
-
-  it('opens as the system home before project operations and restores hidden work surfaces on unmount', () => {
+  it('hides the center/details work surfaces while open and restores them on close', () => {
     const frame = document.createElement('div')
     const sidebar = document.createElement('div')
     const center = document.createElement('div')
@@ -38,9 +26,8 @@ describe('ProjectProgressOverlay standalone page', () => {
     const overlay = document.createElement('div')
     frame.append(sidebar, center, details, overlay)
     document.body.append(frame)
-    const showProjectOverview = vi.fn()
     const props = {
-      useProjectPage: hook({ open: true, view: 'home' as const }),
+      useProjectPage: hook({ open: true, view: 'overview' as const }),
       useStageProgress: hook({ byWorkspace: {} }),
       useProjectSurfaces: hook({ byWorkspace: {} }),
       useProjectSources: hook({ byWorkspace: {} }),
@@ -51,7 +38,7 @@ describe('ProjectProgressOverlay standalone page', () => {
       completeRequirements: vi.fn(), completeSolution: vi.fn(),
       loadProjectSources: vi.fn(), parseProjectSource: vi.fn(), loadRequirementWiki: vi.fn(),
       prepareRequirementWikiRun: vi.fn(), startRequirementWikiBuild: vi.fn(), abandonRequirementWikiBuild: vi.fn(),
-      enterProject: vi.fn(), reviewProjectArchitecture: vi.fn(), closeProjectPage: vi.fn(), showProjectOverview,
+      enterProject: vi.fn(), reviewProjectArchitecture: vi.fn(), closeProjectPage: vi.fn(), showProjectOverview: vi.fn(),
       showProjectTimeline: vi.fn(), showProjectDetail: vi.fn(), renderSlot: vi.fn(() => null),
       t: makeTranslate(zh),
     } as unknown as ProjectProgressOverlayProps
@@ -60,19 +47,6 @@ describe('ProjectProgressOverlay standalone page', () => {
     expect(center.style.visibility).toBe('hidden')
     expect(details.style.visibility).toBe('hidden')
     expect(center.getAttribute('aria-hidden')).toBe('true')
-    expect(screen.getByRole('region', { name: 'FF-FDE工作台产品首页' })).toBeTruthy()
-    expect(screen.getByRole('heading', { name: /把模糊需求，交付成\s*客户真正接管的业务结果/ })).toBeTruthy()
-    expect(screen.getByRole('link', { name: 'FF-FDE工作台首页' }).textContent).toBe('FF-FDE工作台')
-    expect(document.querySelector('img[src="/ff-brand/ff-logo.png"]')).toBeTruthy()
-    expect(screen.getByRole('region', { name: '示例项目动态交付窗口' })).toBeTruthy()
-    expect(screen.getByText('需求是待验证的假设')).toBeTruthy()
-    expect(screen.getByText('人工智能是可选机制')).toBeTruthy()
-    expect(screen.getByText('客户接管才算完成')).toBeTruthy()
-    expect(within(screen.getByRole('list', { name: '九步交付闭环' })).getAllByRole('listitem')).toHaveLength(9)
-    expect(screen.getByTitle('FF-FDE 九阶段交付生命周期交互图').getAttribute('src')).toBe('/ff-fde-lifecycle-embed.html?home=1&theme=light')
-    expect(screen.queryByRole('heading', { name: '项目进度' })).toBeNull()
-    fireEvent.click(screen.getByRole('button', { name: /进入交付工作台/ }))
-    expect(showProjectOverview).toHaveBeenCalledTimes(1)
     view.unmount()
     expect(document.body.dataset.fdePage).toBeUndefined()
     expect(center.style.visibility).toBe('')
@@ -80,8 +54,10 @@ describe('ProjectProgressOverlay standalone page', () => {
     frame.remove()
   })
 
-  it('compares projects by their real six-stage position before entering a project', () => {
+  it('starts from projects needing a human decision and keeps the real project collection available', () => {
     const showProjectDetail = vi.fn()
+    const enterProject = vi.fn()
+    const openProjectCreation = vi.fn()
     const props = {
       useProjectPage: hook({ open: true, view: 'overview' as const }),
       useStageProgress: hook({ byWorkspace: {
@@ -115,46 +91,45 @@ describe('ProjectProgressOverlay standalone page', () => {
       completeRequirements: vi.fn(), completeSolution: vi.fn(), completeDevelopment: vi.fn(),
       loadProjectSources: vi.fn(), parseProjectSource: vi.fn(), loadRequirementWiki: vi.fn(),
       prepareRequirementWikiRun: vi.fn(), startRequirementWikiBuild: vi.fn(), abandonRequirementWikiBuild: vi.fn(),
-      enterProject: vi.fn(), reviewProjectArchitecture: vi.fn(), closeProjectPage: vi.fn(), showProjectOverview: vi.fn(),
+      openProjectCreation, enterProject, reviewProjectArchitecture: vi.fn(), closeProjectPage: vi.fn(), showProjectOverview: vi.fn(),
       showProjectTimeline: vi.fn(), showProjectDetail, renderSlot: vi.fn(() => null),
       t: makeTranslate(zh),
     } as unknown as ProjectProgressOverlayProps
 
     render(<ProjectProgressOverlay {...props} />)
-    expect(screen.queryByRole('region', { name: 'FDE 交付方法首页' })).toBeNull()
-    expect(screen.getByRole('heading', { name: '项目管理' })).toBeTruthy()
-    expect(screen.getByText('项目关注')).toBeTruthy()
-    expect(screen.getByText('需要 FDE 介入')).toBeTruthy()
-    expect(screen.getByText('交付节点')).toBeTruthy()
-    expect(screen.getByText('最近会话')).toBeTruthy()
-    expect(screen.getByText('研发会话')).toBeTruthy()
-    expect(screen.getByText('六阶段从需求到验收')).toBeTruthy()
-    expect(screen.getByRole('region', { name: '标准 FDE 六阶段交付流程' })).toBeTruthy()
-    expect(screen.getByRole('article', { name: '项目阶段分布' })).toBeTruthy()
-    expect(screen.getByRole('article', { name: '项目交付健康分布' })).toBeTruthy()
-    expect(screen.getByRole('article', { name: '近六周项目动态' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: '项目中心' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '新建项目' }))
+    expect(openProjectCreation).toHaveBeenCalledTimes(1)
+    expect(screen.getByRole('button', { name: '待我处理 2' }).getAttribute('data-active')).not.toBeNull()
+    expect(screen.getByText('2 个项目需要你决定下一步')).toBeTruthy()
+    expect(screen.getAllByText('AI FDE 工作现场')).toHaveLength(2)
+    expect(screen.getAllByText('需要你决定')).toHaveLength(2)
+    expect(screen.getAllByRole('button', { name: '查看阶段与产物' })).toHaveLength(2)
+    const enterButtons = screen.getAllByRole('button', { name: /进入项目/ })
+    expect(enterButtons).toHaveLength(2)
+    fireEvent.click(enterButtons[0] as HTMLElement)
+    expect(enterProject).toHaveBeenCalledWith('workspace-1')
+    expect(screen.queryByText('项目现在集中在哪')).toBeNull()
+    expect(screen.queryByText('需要怎样介入')).toBeNull()
+    expect(screen.queryByText('六阶段从需求到验收')).toBeNull()
+    expect(screen.queryByText('演示项目')).toBeNull()
+    expect(screen.queryByText('演示数据')).toBeNull()
+    expect(screen.queryByRole('table', { name: '项目列表' })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: '全部项目 2' }))
     const cardView = screen.getByRole('button', { name: '卡片' })
     const listView = screen.getByRole('button', { name: '列表' })
     expect(cardView.getAttribute('aria-pressed')).toBe('false')
     expect(listView.getAttribute('aria-pressed')).toBe('true')
     const projectTable = screen.getByRole('table', { name: '项目列表' })
     expect(within(projectTable).getByText('客户需求梳理')).toBeTruthy()
-    expect(screen.queryByText(/演示/)).toBeNull()
-    const initialProjectButtons = within(projectTable).getAllByRole('button', { name: /查看项目/ })
-    expect(initialProjectButtons).toHaveLength(10)
-    expect(initialProjectButtons.filter(button => (button as HTMLButtonElement).disabled)).toHaveLength(8)
-    fireEvent.click(screen.getByRole('button', { name: '筛选阶段 3：项目开发，3 个项目' }))
-    expect(within(projectTable).queryByText('客户需求梳理')).toBeNull()
     expect(within(projectTable).getByText('数据分析项目')).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: /全部项目/ }))
+    expect(within(projectTable).getAllByRole('button', { name: /查看项目/ })).toHaveLength(2)
     const projectButtons = within(projectTable).getAllByRole('button', { name: /查看项目/ })
     fireEvent.click(projectButtons[1] as HTMLElement)
     expect(showProjectDetail).toHaveBeenCalledWith('workspace-2')
     fireEvent.click(cardView)
     expect(screen.queryByRole('table', { name: '项目列表' })).toBeNull()
-    expect(screen.getAllByText('阶段 1/6 · 需求调研')).toHaveLength(3)
-    expect(screen.getAllByText('阶段 3/6 · 项目开发')).toHaveLength(3)
-    expect(screen.getAllByRole('list', { name: '项目六阶段位置' })).toHaveLength(10)
+    expect(screen.getAllByRole('list', { name: '项目六阶段位置' })).toHaveLength(2)
   })
 
   it('separates stage inputs and outputs and requires the FDE second confirmation', async () => {

@@ -4,7 +4,9 @@
 
 FDE 项目当前阶段的 Host 端状态。该包打开一张以 Harness WorkspaceId 为键的 `storage-domain` 表，并提供仅限可信同源访问的 POST 路由：读取或初始化记录，以及执行六个固定转换——`requirements` 到 `solution`、`solution` 到 `development`、`development` 到 `validation`、`validation` 到 `pilot`、`pilot` 到 `handoff`，最后由 `handoff` 进入终态 `completed`。同一 Workspace 的并发首次读取共享一次写入；阶段转换按项目串行并要求页面提交精确 revision。六个交付门依次重新检查三份需求调研文件、包括项目 PRD 在内的五份方案设计文档与已确认架构、三份项目开发收口文件、当前已由 FDE 确认的验证方案/合同/证据/阻塞项和三份验证产物、部署试运行合同/环境授权/五类证据/问题和四份产物，以及最终验收移交合同/交付物/条件项/责任移交/证据和四份产物。另一条仅限 FDE 的路由每次只返回一个阶段，也可把 `completed` 重新打开到 `handoff`；它必须填写原因，保留全部文件和证据，记录有界审计，并把返回范围标记为待重新确认。所有路由都不接受任意目标阶段。
 
-该包同时注册内置 `fde-requirement-research`、`fde-solution-design`、`fde-project-development`、`fde-validation`、`fde-deployment-trial`、`fde-acceptance-handover` Skills 和一段简短的阶段感知系统提示。项目开发 Skill 直接约束项目唯一标准 `docs/` 与有证据的任务；验证 Skill 区分方案准备和执行，并要求每项指标引用此前阶段的真实文档。部署 Skill 记录目标环境、当前候选版本、项目内运行/回滚证据、问题和四份固定产物，不获得凭据，也不把本地启动当成部署完成；Agent 保持授权为 false 且不写 `status=ready`，这项 FDE 决定归属项目进度中的精确合同操作。移交 Skill 在 Markdown 过期时以 `.fde/deployment-trial.json` 为部署事实源，把企业验收证据写成有界数组，并把企业验收、制品可取得、条件决定与责任移交完成状态保留给项目进度中有证据的 FDE 操作。Skill 只能维护候选文件，不能调用阶段转换；记录移交事实与完成项目仍是两个独立的 FDE 动作。
+阶段一不再注册一个复合 Skill，而是分别注册方法 Skill `qualify-ai-workflow`、条件方法 `reframe-ai-engagement`，以及按需使用的工程 Skills `fde-orient`、`knowledge-interview`、`ownership-map`、`repo-recon`、`stakeholder-brief`。候选工作流保存逐条证据引用，Artifact Catalog 保存固定来源版本、内容版本、结构成熟度与证据状态；人工阶段门读取同一份校验投影，不再把文件存在视为就绪。后续阶段继续注册 `fde-solution-design`、`fde-project-development`、`fde-validation`、`fde-deployment-trial`、`fde-acceptance-handover` 和一段简短的阶段感知系统提示。Skill 只能维护候选文件，不能调用阶段转换；记录人工事实与推进项目仍是不同的 FDE 操作。
+
+可信同源的只读 `GET /api/fde-stage/skills` 路由只返回产品固定注册的七项第一阶段方法，包括面向用户的业务名称、适用场景、完整 Markdown 定义和来源。它不会枚举用户电脑、全局 Skill 目录或其他项目，也不提供执行或修改能力；客户端据此在当前阶段下展示可解释的方法目录。
 
 ## 模型体验
 

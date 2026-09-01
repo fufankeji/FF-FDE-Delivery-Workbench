@@ -18,6 +18,7 @@ import type {
 } from './types.ts'
 import { ARCHITECTURE_NODE_KINDS, ARCHITECTURE_STATUSES } from './types.ts'
 import { loadRequirementArtifacts, REQUIREMENT_ARTIFACT_ROOT } from './requirement-artifacts.ts'
+import { loadDiscoveryStage } from './discovery-stage.ts'
 import { loadSolutionArtifacts, SOLUTION_ARTIFACT_ROOT } from './solution-artifacts.ts'
 import { DEVELOPMENT_DOCS_ROOT, loadDevelopmentDocs } from './development-docs.ts'
 import { loadRequirementWikiSnapshot, requirementWikiPaths } from './requirement-wiki.ts'
@@ -557,6 +558,7 @@ export async function loadProjectSurfaceSnapshot(input: {
     loadDeploymentTrialStage(input.path, input.workspaceId),
     loadAcceptanceHandoverStage(input.path, input.workspaceId),
   ])
+  const discovery = await loadDiscoveryStage(input.path, requirements)
   return {
     workspaceId: input.workspaceId,
     title: input.title,
@@ -568,6 +570,7 @@ export async function loadProjectSurfaceSnapshot(input: {
     validation,
     requirementWiki,
     requirements,
+    discovery,
     solution,
     development,
     deploymentTrial,

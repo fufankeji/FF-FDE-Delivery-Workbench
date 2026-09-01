@@ -1,8 +1,9 @@
-import { useCallback, useRef, useState, type ChangeEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react'
 import {
   IconPaperclipOutline16, Toast, Tooltip,
 } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
+import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type {} from '@deepseek-ai/dsh-client-ui-workspace/client'
 import css from './ProjectResourceUploadAction.module.css'
 
@@ -10,6 +11,7 @@ import css from './ProjectResourceUploadAction.module.css'
 export const PROJECT_RESOURCE_UPLOAD_PATH = '/api/fde-project-resources/upload'
 export const PROJECT_RESOURCE_PARSE_PATH = '/api/fde-project-resources/parse'
 export const PROJECT_SOURCES_CHANGED_EVENT = 'fde:project-sources-changed'
+export const PROJECT_RESOURCE_UPLOAD_OPEN_EVENT = 'fde:project-source-upload-open'
 
 export interface UploadedProjectResource {
   readonly sourceId: string
@@ -80,8 +82,12 @@ async function recognizeProjectResource(
   if (payload.ok !== true) throw new Error('invalid-response')
 }
 
-/** Project-row file picker that persists files without creating a message or Agent turn. */
-export function ProjectResourceUploadAction({ workspaceId, path, t }: ProjectResourceUploadActionProps) {
+function ProjectResourceUploadControl({ workspaceId, path, t, composer = false }: {
+  readonly workspaceId: string
+  readonly path: string
+  readonly t: ProjectResourceUploadActionProps['t']
+  readonly composer?: boolean
+}) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
   const [toast, setToast] = useState<{ seq: number; text: string } | null>(null)
@@ -91,6 +97,16 @@ export function ProjectResourceUploadAction({ workspaceId, path, t }: ProjectRes
     toastSeq.current += 1
     setToast({ seq: toastSeq.current, text })
   }, [])
+
+  useEffect(() => {
+    const openForProject = (event: Event): void => {
+      const detail = (event as CustomEvent<{ workspaceId?: unknown }>).detail
+      if (detail?.workspaceId !== String(workspaceId) || busy) return
+      inputRef.current?.click()
+    }
+    window.addEventListener(PROJECT_RESOURCE_UPLOAD_OPEN_EVENT, openForProject)
+    return () => { window.removeEventListener(PROJECT_RESOURCE_UPLOAD_OPEN_EVENT, openForProject) }
+  }, [busy, workspaceId])
 
   const onChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const files = Array.from(event.currentTarget.files ?? [])
@@ -119,9 +135,9 @@ export function ProjectResourceUploadAction({ workspaceId, path, t }: ProjectRes
     }).finally(() => { setBusy(false) })
   }
 
-  const label = busy ? t('uploading') : t('action')
+  const label = busy ? t('uploading') : composer ? t('composerAction') : t('action')
   return (
-    <span className={css.root}>
+    <span className={css.root} data-composer={composer ? 'true' : undefined}>
       <input
         ref={inputRef}
         className={css.input}
@@ -145,6 +161,7 @@ export function ProjectResourceUploadAction({ workspaceId, path, t }: ProjectRes
           }}
         >
           <IconPaperclipOutline16 size={14} />
+          {composer && <span>{label}</span>}
         </button>
       </Tooltip>
       {toast !== null && (
@@ -154,7 +171,24 @@ export function ProjectResourceUploadAction({ workspaceId, path, t }: ProjectRes
   )
 }
 
+/** Project-row file picker that persists files without creating a message or Agent turn. */
+export function ProjectResourceUploadAction({ workspaceId, path, t }: ProjectResourceUploadActionProps) {
+  return <ProjectResourceUploadControl workspaceId={String(workspaceId)} path={path} t={t} />
+}
+
+/** Project-scoped lightweight upload control inside the native composer tool row. */
+export function ProjectResourceComposerAction({ sessionId, useWorkspaces, t }: ProjectResourceComposerActionProps) {
+  const workspace = useWorkspaces(state => state.items.find(item => item.sessionIds.includes(sessionId)))
+  if (workspace === undefined) return null
+  return <ProjectResourceUploadControl workspaceId={String(workspace.workspaceId)} path={workspace.path} t={t} composer />
+}
+
 /** Props supplied by the Workspace project-action slot and locale seat. */
 export type ProjectResourceUploadActionProps =
   PropsRuntime<'sidebar.workspaces.projectActions'>
+  & PropsLocale<'fdeSources'>
+
+/** Props supplied by the session-scoped native composer Slot. */
+export type ProjectResourceComposerActionProps =
+  PropsRuntime<'conversation.input.left'>
   & PropsLocale<'fdeSources'>

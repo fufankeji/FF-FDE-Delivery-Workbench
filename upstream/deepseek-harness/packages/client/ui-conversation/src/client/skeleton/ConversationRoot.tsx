@@ -122,6 +122,13 @@ export function ConversationRoot({
       {renderSlot('conversation.hero.agentPreset', {})}
     </div>
   )
+  const defaultHeroContent = (
+    <>
+      <HeroGlow className={css.heroGlow} />
+      <HeroShell t={t} renderSlot={renderSlot} />
+      {heroWorkspaceRow}
+    </>
+  )
 
   // The placeholder chip ("Choose workspace") and the Workspace-trigger input travel
   // together: no workspace picked yet (cold start, no session at all), or a
@@ -158,9 +165,15 @@ export function ConversationRoot({
 
   const composerBar = (
     <div className={clsx(css.composerStack, hero && css.composerHero)}>
-      {hero && <HeroGlow className={css.heroGlow} />}
-      {hero && <HeroShell t={t} renderSlot={renderSlot} />}
-      {hero && heroWorkspaceRow}
+      {hero && renderSlot('conversation.hero.content', {
+        sessionId,
+        workspace: sessionWorkspace === undefined ? undefined : {
+          workspaceId: sessionWorkspace.workspaceId,
+          title: sessionWorkspace.title,
+          path: sessionWorkspace.path,
+        },
+        defaultContent: defaultHeroContent,
+      }, { fallback: defaultHeroContent })}
       {zone !== undefined && renderSlot('conversation.input.dock', zone)}
       {inputBar}
     </div>

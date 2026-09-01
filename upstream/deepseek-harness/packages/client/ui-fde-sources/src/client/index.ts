@@ -2,8 +2,9 @@
 
 import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
 import type {} from '@deepseek-ai/dsh-client-locale/client'
+import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type {} from '@deepseek-ai/dsh-client-ui-workspace/client'
-import { ProjectResourceUploadAction } from './ProjectResourceUploadAction.tsx'
+import { ProjectResourceComposerAction, ProjectResourceUploadAction } from './ProjectResourceUploadAction.tsx'
 import { en, zh, type FdeSourcesKey } from './locales.ts'
 
 declare module '@deepseek-ai/dsh-client-ui-slots' {
@@ -28,4 +29,10 @@ export function apply(ctx: ClientContext): void {
     order: 10,
     locale: 'fdeSources',
   }, ProjectResourceUploadAction))
+  ctx.slots.inject('conversation.input.left', () => ctx.slots.register({
+    name: 'conversation.input.left',
+    id: 'fde-project-resources-composer',
+    order: 20,
+    locale: 'fdeSources',
+  }, ProjectResourceComposerAction))
 }

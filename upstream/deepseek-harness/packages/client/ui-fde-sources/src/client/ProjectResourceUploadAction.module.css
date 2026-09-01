@@ -30,8 +30,30 @@
   cursor: pointer;
 }
 
-.button:hover:not(:disabled) {
-  color: var(--dsw-alias-label-primary);
+.root[data-composer='true'] .button {
+  gap: 5px;
+  width: auto;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 7px;
+  color: var(--dsw-alias-label-secondary);
+  font-size: 12px;
+  white-space: nowrap;
+  transition:
+    background-color 160ms cubic-bezier(.22, 1, .36, 1),
+    color 160ms cubic-bezier(.22, 1, .36, 1),
+    transform 120ms cubic-bezier(.22, 1, .36, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .button:hover:not(:disabled) {
+    background: var(--dsw-alias-interactive-bg-hover);
+    color: var(--dsw-alias-label-primary);
+  }
+}
+
+.button:active:not(:disabled) {
+  transform: scale(.97);
 }
 
 .button:disabled {

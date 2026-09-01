@@ -3,11 +3,10 @@ import { describe, expect, it } from 'vitest'
 import { SlotRegistry } from '@deepseek-ai/dsh-client-runtime/client'
 import { LocaleRuntime } from '@deepseek-ai/dsh-client-locale/client'
 import { apply, inject } from '../src/client/index.ts'
-import { StageBlankStatus } from '../src/client/StageBlankStatus.tsx'
 import { StageHeaderStatus } from '../src/client/StageHeaderStatus.tsx'
 
 describe('ui-fde-stage apply', () => {
-  it('registers the two contextual stage entries only after their official Slots exist', async () => {
+  it('keeps stage orientation in the header without adding a second composer prompt', async () => {
     const ctx = new Context()
     await ctx.plugin(SlotRegistry).await()
     const locale = new LocaleRuntime(ctx)
@@ -24,7 +23,7 @@ describe('ui-fde-stage apply', () => {
     const fiber = ctx.plugin({ inject: [...inject], apply })
     await fiber.await()
 
-    expect(slots.entries('conversation.input.dock')[0]?.component).toBe(StageBlankStatus)
+    expect(slots.entries('conversation.input.dock')).toHaveLength(0)
     expect(slots.entries('conversation.session.header.utilities')[0]?.component).toBe(StageHeaderStatus)
     await fiber.dispose()
     expect(slots.entries('conversation.input.dock')).toHaveLength(0)

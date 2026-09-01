@@ -22,6 +22,7 @@
  * and a hole has exactly one declaring entry — they carry the same owner
  * contract and the same occupant.
  */
+import type { ReactNode } from 'react'
 import type { HostDescriptionSource } from '@deepseek-ai/dsh-client-connection/client'
 import type { HostObservable, PropsHooks, PropsLocale, PropsRenderSlots, PropsRuntime, PropsStore } from '@deepseek-ai/dsh-client-ui-slots'
 // Type-only: pull the owner SlotMap merges into programs that resolve the
@@ -61,6 +62,16 @@ export interface ProjectActionOwnerProps {
   path: string
 }
 
+/** Exact current-project context replacing the global project/session browser. */
+export interface ProjectContextOwnerProps extends ProjectActionOwnerProps {
+  /** Current project Session opened from Project Center. */
+  sessionId: SessionId
+  /** Number of visible ordinary Sessions currently owned by the project. */
+  sessionCount: number
+  /** Existing project-row actions, such as customer-resource upload. */
+  projectActions: ReactNode
+}
+
 declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface SlotMap {
     /** Directory-flow hole under the conversation empty-state picker (declared by the WorkspacePicker entry). */
@@ -69,6 +80,8 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
     'sidebar.workspaces.directoryFlow': { kind: 'single'; scope: 'root'; owner: DirectoryFlowOwnerProps }
     /** Compact actions rendered inside every real project row; the owner addresses one Workspace explicitly. */
     'sidebar.workspaces.projectActions': { kind: 'list'; scope: 'root'; owner: ProjectActionOwnerProps }
+    /** Project-local navigation replacing the global tree after entering a project. */
+    'sidebar.workspaces.projectContext': { kind: 'single'; scope: 'root'; owner: ProjectContextOwnerProps }
   }
 }
 
@@ -103,6 +116,8 @@ export type WorkspaceBrowserInjected = {
   hooks: DirectoryPickingInjected['hooks'] & {
     /** Current generation's Host description, bound by the slot renderer. */
     hostDescription: HostDescriptionSource
+    /** True while a project-local sidebar implementation is installed. */
+    projectContext: HostObservable<boolean>
   }
   /**
    * Start a New Session in a Workspace: reuse-or-create its blank session and
@@ -156,7 +171,7 @@ export type WorkspaceBrowserInjected = {
 /** Full browser props: shell owner share + viewing store + injected actions + the locale seat. */
 export type WorkspaceBrowserProps =
   PropsRuntime<'sidebar.workspaces'>
-  & PropsRenderSlots<'sidebar.workspaces.directoryFlow' | 'sidebar.workspaces.projectActions'>
+  & PropsRenderSlots<'sidebar.workspaces.directoryFlow' | 'sidebar.workspaces.projectActions' | 'sidebar.workspaces.projectContext'>
   & PropsStore<ReturnType<typeof createWorkspaceViewStore>>
   & Omit<WorkspaceBrowserInjected, 'hooks'>
   & PropsHooks<WorkspaceBrowserInjected['hooks']>

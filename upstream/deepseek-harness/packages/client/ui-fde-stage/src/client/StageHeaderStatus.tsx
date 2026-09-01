@@ -1,7 +1,7 @@
 /** Compact current-stage status in the active Session header. */
 
 import { useEffect } from 'react'
-import { FDE_STAGES } from './stages.ts'
+import { FDE_V2_STAGE_PRESENTATION, FDE_V2_STAGE_TOTAL } from './stages.ts'
 import type { FdeStageHeaderProps } from './slots.ts'
 import css from './stage.module.css'
 
@@ -30,23 +30,13 @@ export function StageHeaderStatus({
       </button>
     )
   }
-  if (stage.value.currentStage === 'completed') {
-    return (
-      <span className={css.headerStatus} data-state="ready">
-        <span className={css.statusDot} />
-        <span>{t('header.completed')}</span>
-      </span>
-    )
-  }
-  const index = FDE_STAGES.findIndex(item => item.id === stage.value.currentStage)
-  const definition = FDE_STAGES[index]
-  if (definition === undefined) return null
+  const presentation = FDE_V2_STAGE_PRESENTATION[stage.value.currentStage]
   return (
     <span className={css.headerStatus} data-state="ready">
       <span className={css.statusDot} />
-      <span>{t('header.stage', { current: index + 1, total: FDE_STAGES.length })}</span>
+      <span>{t('header.stage', { current: presentation.current, total: FDE_V2_STAGE_TOTAL })}</span>
       <span className={css.headerDivider}>·</span>
-      <span className={css.headerName}>{t(definition.nameKey)}</span>
+      <span className={css.headerName}>{t(presentation.nameKey)}</span>
     </span>
   )
 }
