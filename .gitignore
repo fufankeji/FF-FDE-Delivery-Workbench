@@ -1,6 +1,7 @@
 # Worktree-local runtime and parallel checkout state.
 /.runtime/
 /.worktrees/
+/.references/
 
 # Dependencies, generated libraries, builds, and test output.
 **/node_modules/

@@ -12,6 +12,8 @@ engineering_source: rpraharaj/forward-deployed-engineer@ee045a66db5242617ccea9e5
 
 本文确定八阶段在 DeepSeek Harness 中如何组合业务方法 Skill、工程执行 Skill、平台工具和 Artifact。它是产品与研发的路由合同，不是向用户展示的 Skill 菜单，也不代表外部源码已经安装。
 
+两个来源的本地研究快照、方法对比、八阶段当前运行时映射和规划／实现差异，见 [`docs/research/fde-open-source-skills-integration-study.md`](../research/fde-open-source-skills-integration-study.md)。
+
 两个外部来源承担不同责任：
 
 - [`davidahmann/fde-guide`](https://github.com/davidahmann/fde-guide) 提供 11 个 AI-FDE 方法 Skills、Artifact 模板、JSON Schema、Control 和完整决策案例，负责“为什么做、要形成什么证据、下一项决定是什么”。当前评审快照为 `v1.29.0 / 060ef0f3`，Apache-2.0。
