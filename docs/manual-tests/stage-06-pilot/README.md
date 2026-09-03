@@ -1,0 +1,27 @@
+# 阶段 6 手动测试：企业集成、可靠性改造与受控 Pilot
+
+测试项目：本地知识库。没有明确授权时，只准备材料和模拟，不执行生产影响动作。
+
+## 1. 定义 Pilot 范围
+
+```text
+进入第六阶段。请基于已通过的候选版本，定义本地知识库 Pilot 的使用人、文档范围、运行周期、允许动作、停止条件、人工接管和回滚触发。写入 fde-deliverables/06-pilot/pilot-scope.md，并更新 .fde/stages/pilot.json 的第一步状态。没有授权人时保持未授权。
+```
+
+## 2. 准备运行和回滚
+
+```text
+请整理 Pilot 的部署、启动、检查、监控、人工接管、停止和回滚步骤，区分技术健康与业务结果。写入 fde-deliverables/06-pilot/pilot-runbook.md，并更新 pilot.json 的第二步状态。未演练的步骤明确标为未演练。
+```
+
+## 3. 记录限定范围结果
+
+```text
+如果当前没有真实 Pilot 授权，只做一次本地模拟并如实标记；如果已有明确授权，只在批准范围内运行。把业务结果、技术指标、异常、接管、回滚和采用情况写入 fde-deliverables/06-pilot/pilot-report.md，并更新 pilot.json 的第三步状态。
+```
+
+## 4. 整理给 FDE 评审
+
+```text
+请核对 pilot-scope.md、pilot-runbook.md 和 pilot-report.md，列出授权缺口、范围变化、停止条件触发和无法测量的业务结果。材料齐备时把 .fde/stages/pilot.json 更新为待 FDE 评审；服务启动或 HTTP 200 不能单独作为通过依据。
+```

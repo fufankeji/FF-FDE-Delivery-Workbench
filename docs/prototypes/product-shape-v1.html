@@ -1,0 +1,1752 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FF - FDE 交付工作台 · 单项目全流程原型</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --page: #f1f4f0;
+        --shell: #ffffff;
+        --soft: #f7f9f6;
+        --soft-2: #edf1ec;
+        --ink: #172019;
+        --muted: #68736b;
+        --subtle: #8b958d;
+        --line: #dce3dc;
+        --line-strong: #c8d2ca;
+        --green: #176b4b;
+        --green-dark: #0f5238;
+        --green-soft: #e6f3ec;
+        --amber: #9a6516;
+        --amber-soft: #fff3dc;
+        --blue: #3562a4;
+        --blue-soft: #edf3ff;
+        --red: #a64242;
+        --red-soft: #fff0ee;
+        --shadow: 0 16px 45px rgba(28, 48, 34, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-width: 1180px;
+        background: var(--page);
+        color: var(--ink);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+          sans-serif;
+      }
+
+      button,
+      textarea,
+      input {
+        font: inherit;
+      }
+
+      button:focus-visible,
+      textarea:focus-visible,
+      input:focus-visible {
+        outline: 3px solid rgba(23, 107, 75, 0.24);
+        outline-offset: 2px;
+      }
+
+      .app {
+        min-height: 100vh;
+      }
+
+      .topbar {
+        height: 64px;
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        display: grid;
+        grid-template-columns: 300px minmax(440px, 1fr) 300px;
+        align-items: center;
+        gap: 20px;
+        padding: 0 22px;
+        background: rgba(255, 255, 255, 0.95);
+        border-bottom: 1px solid var(--line);
+        backdrop-filter: blur(14px);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+      }
+
+      .brand img {
+        width: 35px;
+        height: 35px;
+        object-fit: contain;
+        border-radius: 9px;
+      }
+
+      .brand-name {
+        font-size: 14px;
+        font-weight: 760;
+        letter-spacing: -0.02em;
+      }
+
+      .brand-subtitle {
+        margin-top: 2px;
+        color: var(--muted);
+        font-size: 11px;
+      }
+
+      .project-identity {
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .project-code {
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: var(--green-soft);
+        color: var(--green-dark);
+        font-size: 10px;
+        font-weight: 760;
+      }
+
+      .project-name {
+        max-width: 520px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .top-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px;
+      }
+
+      .local-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 11px;
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #2e9d69;
+        box-shadow: 0 0 0 4px #e6f5ed;
+      }
+
+      .button {
+        border: 1px solid var(--line-strong);
+        border-radius: 10px;
+        background: var(--shell);
+        color: var(--ink);
+        padding: 8px 12px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 680;
+      }
+
+      .button:hover {
+        border-color: #9daa9f;
+      }
+
+      .button.primary {
+        border-color: var(--green);
+        background: var(--green);
+        color: #fff;
+      }
+
+      .button.primary:hover {
+        background: var(--green-dark);
+      }
+
+      .button.soft {
+        border-color: transparent;
+        background: var(--green-soft);
+        color: var(--green-dark);
+      }
+
+      .button.ghost {
+        border-color: transparent;
+        background: transparent;
+        color: var(--muted);
+      }
+
+      .button:disabled {
+        cursor: not-allowed;
+        opacity: 0.46;
+      }
+
+      .shell {
+        display: grid;
+        grid-template-columns: 250px minmax(650px, 1fr) 320px;
+        min-height: calc(100vh - 64px);
+      }
+
+      .flow-sidebar {
+        padding: 20px 16px;
+        border-right: 1px solid var(--line);
+        background: #edf1ec;
+      }
+
+      .sidebar-heading {
+        padding: 0 8px;
+        color: var(--subtle);
+        font-size: 10px;
+        font-weight: 760;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .flow-list {
+        list-style: none;
+        padding: 0;
+        margin: 13px 0 0;
+      }
+
+      .flow-item {
+        position: relative;
+        padding-bottom: 9px;
+      }
+
+      .flow-item:not(:last-child)::after {
+        content: "";
+        position: absolute;
+        left: 21px;
+        top: 42px;
+        bottom: -1px;
+        width: 1px;
+        background: var(--line-strong);
+      }
+
+      .flow-button {
+        width: 100%;
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: 32px minmax(0, 1fr);
+        gap: 9px;
+        align-items: start;
+        border: 1px solid transparent;
+        border-radius: 12px;
+        background: transparent;
+        color: var(--muted);
+        padding: 9px;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .flow-button:hover {
+        background: rgba(255, 255, 255, 0.64);
+      }
+
+      .flow-button.active {
+        border-color: var(--line);
+        background: var(--shell);
+        color: var(--ink);
+        box-shadow: 0 9px 25px rgba(25, 46, 31, 0.06);
+      }
+
+      .flow-number {
+        width: 30px;
+        height: 30px;
+        display: grid;
+        place-items: center;
+        border-radius: 9px;
+        background: #e2e8e2;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 760;
+      }
+
+      .flow-button.done .flow-number {
+        background: var(--green);
+        color: #fff;
+      }
+
+      .flow-button.current .flow-number {
+        background: var(--green-soft);
+        color: var(--green-dark);
+      }
+
+      .flow-name {
+        display: block;
+        margin-top: 1px;
+        font-size: 12px;
+        font-weight: 720;
+      }
+
+      .flow-purpose {
+        display: block;
+        margin-top: 4px;
+        color: var(--subtle);
+        font-size: 10px;
+        line-height: 1.4;
+      }
+
+      .project-baseline {
+        margin-top: 21px;
+        padding: 14px 12px;
+        border-top: 1px solid var(--line-strong);
+      }
+
+      .baseline-label {
+        color: var(--subtle);
+        font-size: 10px;
+        font-weight: 740;
+      }
+
+      .baseline-value {
+        margin-top: 6px;
+        font-size: 12px;
+        font-weight: 680;
+        line-height: 1.5;
+      }
+
+      .baseline-meta {
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 10px;
+        line-height: 1.5;
+      }
+
+      .main {
+        min-width: 0;
+        padding: 25px 28px 40px;
+      }
+
+      .stage-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 24px;
+      }
+
+      .stage-kicker {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--green-dark);
+        font-size: 11px;
+        font-weight: 760;
+      }
+
+      .stage-state {
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: var(--amber-soft);
+        color: var(--amber);
+      }
+
+      .stage-state.done {
+        background: var(--green-soft);
+        color: var(--green-dark);
+      }
+
+      .stage-state.future {
+        background: var(--soft-2);
+        color: var(--muted);
+      }
+
+      h1 {
+        margin: 8px 0 7px;
+        font-size: 28px;
+        line-height: 1.22;
+        letter-spacing: -0.035em;
+      }
+
+      .stage-summary {
+        max-width: 770px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.65;
+      }
+
+      .stage-actions {
+        flex: 0 0 auto;
+        display: flex;
+        gap: 8px;
+      }
+
+      .project-truth {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr 0.8fr;
+        gap: 11px;
+        margin: 20px 0;
+      }
+
+      .truth-item {
+        min-width: 0;
+        padding: 13px 14px;
+        border: 1px solid var(--line);
+        border-radius: 13px;
+        background: rgba(255, 255, 255, 0.72);
+      }
+
+      .truth-label {
+        margin-bottom: 5px;
+        color: var(--subtle);
+        font-size: 10px;
+      }
+
+      .truth-value {
+        font-size: 12px;
+        font-weight: 680;
+        line-height: 1.48;
+      }
+
+      .work-card {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: var(--shell);
+        box-shadow: var(--shadow);
+      }
+
+      .work-card-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 18px 20px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .work-label {
+        color: var(--green-dark);
+        font-size: 10px;
+        font-weight: 760;
+        letter-spacing: 0.05em;
+      }
+
+      .work-title {
+        margin: 6px 0 4px;
+        font-size: 19px;
+        letter-spacing: -0.02em;
+      }
+
+      .work-description {
+        max-width: 700px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.55;
+      }
+
+      .work-status {
+        flex: 0 0 auto;
+        padding: 6px 9px;
+        border-radius: 999px;
+        background: var(--amber-soft);
+        color: var(--amber);
+        font-size: 10px;
+        font-weight: 740;
+      }
+
+      .work-status.ready {
+        background: var(--green-soft);
+        color: var(--green-dark);
+      }
+
+      .work-card-body {
+        padding: 20px;
+      }
+
+      .work-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
+        gap: 18px;
+      }
+
+      .subheading {
+        margin: 0 0 10px;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 760;
+      }
+
+      .surface {
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 13px;
+        background: var(--soft);
+      }
+
+      .surface + .surface {
+        margin-top: 11px;
+      }
+
+      .surface-title {
+        font-size: 12px;
+        font-weight: 720;
+      }
+
+      .surface-note {
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.5;
+      }
+
+      .source-input {
+        width: 100%;
+        min-height: 96px;
+        resize: vertical;
+        border: 1px solid var(--line-strong);
+        border-radius: 11px;
+        background: var(--shell);
+        color: var(--ink);
+        padding: 11px 12px;
+        line-height: 1.55;
+        font-size: 12px;
+      }
+
+      .input-actions,
+      .tool-row,
+      .footer-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .input-actions {
+        margin-top: 10px;
+      }
+
+      .source-list,
+      .check-list,
+      .evidence-list,
+      .handoff-list,
+      .agent-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .source-row,
+      .check-row,
+      .evidence-row,
+      .handoff-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .source-row:last-child,
+      .check-row:last-child,
+      .evidence-row:last-child,
+      .handoff-row:last-child {
+        border-bottom: 0;
+      }
+
+      .row-icon {
+        width: 25px;
+        height: 25px;
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        background: var(--soft-2);
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 760;
+      }
+
+      .row-icon.done {
+        background: var(--green-soft);
+        color: var(--green-dark);
+      }
+
+      .row-icon.warn {
+        background: var(--amber-soft);
+        color: var(--amber);
+      }
+
+      .row-content {
+        min-width: 0;
+        flex: 1;
+      }
+
+      .row-title {
+        font-size: 12px;
+        font-weight: 690;
+      }
+
+      .row-note {
+        margin-top: 3px;
+        color: var(--muted);
+        font-size: 10px;
+        line-height: 1.45;
+      }
+
+      .row-state {
+        flex: 0 0 auto;
+        color: var(--subtle);
+        font-size: 10px;
+      }
+
+      .map-grid,
+      .solution-grid,
+      .build-grid,
+      .validation-grid,
+      .delivery-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .map-node,
+      .solution-node,
+      .build-node,
+      .validation-node,
+      .delivery-node {
+        min-height: 108px;
+        padding: 13px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--shell);
+      }
+
+      .node-label {
+        color: var(--subtle);
+        font-size: 9px;
+        font-weight: 760;
+        letter-spacing: 0.05em;
+      }
+
+      .node-value {
+        margin-top: 6px;
+        font-size: 12px;
+        font-weight: 690;
+        line-height: 1.45;
+      }
+
+      .node-note {
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 10px;
+        line-height: 1.5;
+      }
+
+      .flow-diagram {
+        display: flex;
+        align-items: stretch;
+        gap: 7px;
+        overflow: hidden;
+      }
+
+      .flow-step {
+        position: relative;
+        flex: 1;
+        padding: 12px 10px;
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        background: var(--shell);
+        text-align: center;
+      }
+
+      .flow-step:not(:last-child)::after {
+        content: "→";
+        position: absolute;
+        right: -9px;
+        top: 50%;
+        z-index: 2;
+        transform: translateY(-50%);
+        color: var(--subtle);
+        background: var(--soft);
+      }
+
+      .flow-step strong {
+        display: block;
+        font-size: 11px;
+      }
+
+      .flow-step span {
+        display: block;
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 9px;
+        line-height: 1.4;
+      }
+
+      .code-surface {
+        overflow: hidden;
+        border: 1px solid #26352a;
+        border-radius: 13px;
+        background: #17231b;
+        color: #e6eee8;
+      }
+
+      .code-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 9px 12px;
+        border-bottom: 1px solid #2c3b31;
+        color: #9eaea2;
+        font-size: 10px;
+      }
+
+      .code-body {
+        min-height: 168px;
+        margin: 0;
+        padding: 14px;
+        white-space: pre-wrap;
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        font-size: 10px;
+        line-height: 1.65;
+      }
+
+      .metric-line {
+        display: grid;
+        grid-template-columns: 110px minmax(120px, 1fr) 70px;
+        gap: 10px;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .metric-line:last-child {
+        border-bottom: 0;
+      }
+
+      .metric-name {
+        font-size: 11px;
+        font-weight: 680;
+      }
+
+      .metric-track {
+        height: 6px;
+        border-radius: 999px;
+        background: var(--soft-2);
+        overflow: hidden;
+      }
+
+      .metric-track > span {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: var(--green);
+      }
+
+      .metric-state {
+        color: var(--muted);
+        text-align: right;
+        font-size: 10px;
+      }
+
+      .work-card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 20px;
+        border-top: 1px solid var(--line);
+        background: #fbfcfa;
+      }
+
+      .footer-hint {
+        color: var(--subtle);
+        font-size: 10px;
+        line-height: 1.5;
+      }
+
+      .evidence-strip {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .evidence-stat {
+        padding: 12px 13px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.72);
+      }
+
+      .evidence-stat-label {
+        color: var(--subtle);
+        font-size: 9px;
+      }
+
+      .evidence-stat-value {
+        margin-top: 4px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .rightbar {
+        padding: 20px 17px;
+        border-left: 1px solid var(--line);
+        background: #f7f9f6;
+      }
+
+      .assistant-panel,
+      .gate-panel,
+      .trace-panel {
+        padding: 15px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--shell);
+      }
+
+      .assistant-panel + .gate-panel,
+      .gate-panel + .trace-panel {
+        margin-top: 12px;
+      }
+
+      .panel-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+
+      .panel-title {
+        font-size: 12px;
+        font-weight: 750;
+      }
+
+      .panel-badge {
+        padding: 4px 7px;
+        border-radius: 999px;
+        background: var(--green-soft);
+        color: var(--green-dark);
+        font-size: 9px;
+        font-weight: 740;
+      }
+
+      .agent-summary {
+        padding: 11px;
+        border-radius: 11px;
+        background: var(--soft);
+        color: var(--muted);
+        font-size: 10px;
+        line-height: 1.55;
+      }
+
+      .agent-item {
+        padding: 10px 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .agent-item:last-child {
+        border-bottom: 0;
+      }
+
+      .agent-item-title {
+        font-size: 11px;
+        font-weight: 690;
+      }
+
+      .agent-item-note {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 10px;
+        line-height: 1.5;
+      }
+
+      .agent-actions {
+        display: flex;
+        gap: 7px;
+        margin-top: 12px;
+      }
+
+      .agent-actions .button {
+        flex: 1;
+        padding-left: 7px;
+        padding-right: 7px;
+      }
+
+      .gate-card {
+        padding: 12px;
+        border-radius: 11px;
+        background: var(--amber-soft);
+      }
+
+      .gate-card.ready {
+        background: var(--green-soft);
+      }
+
+      .gate-label {
+        color: var(--amber);
+        font-size: 9px;
+        font-weight: 760;
+      }
+
+      .gate-card.ready .gate-label {
+        color: var(--green-dark);
+      }
+
+      .gate-title {
+        margin-top: 5px;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .gate-note {
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 10px;
+        line-height: 1.5;
+      }
+
+      .trace-item {
+        position: relative;
+        padding: 0 0 13px 16px;
+        color: var(--muted);
+        font-size: 10px;
+        line-height: 1.45;
+      }
+
+      .trace-item::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 4px;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--line-strong);
+      }
+
+      .trace-item::after {
+        content: "";
+        position: absolute;
+        left: 3px;
+        top: 13px;
+        bottom: 1px;
+        width: 1px;
+        background: var(--line);
+      }
+
+      .trace-item:last-child::after {
+        display: none;
+      }
+
+      .trace-item strong {
+        color: var(--ink);
+        font-weight: 680;
+      }
+
+      .footer {
+        padding-top: 17px;
+        color: var(--subtle);
+        text-align: center;
+        font-size: 10px;
+      }
+
+      .toast {
+        position: fixed;
+        left: 50%;
+        bottom: 24px;
+        z-index: 50;
+        transform: translate(-50%, 12px);
+        padding: 10px 15px;
+        border-radius: 10px;
+        background: #152219;
+        color: #fff;
+        box-shadow: 0 14px 38px rgba(0, 0, 0, 0.22);
+        opacity: 0;
+        pointer-events: none;
+        transition: 160ms ease;
+        font-size: 11px;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <img
+            src="../../frontend/public/brand/ff-logo.png"
+            alt="FF - FDE 交付工作台 Logo"
+          />
+          <div>
+            <div class="brand-name">FF - FDE 交付工作台</div>
+            <div class="brand-subtitle">从企业需求到可验收交付</div>
+          </div>
+        </div>
+
+        <div class="project-identity">
+          <span class="project-code">FDE-2026-014</span>
+          <span class="project-name">售后工单智能分派与处理建议</span>
+        </div>
+
+        <div class="top-actions">
+          <div class="local-status">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span>本地项目环境正常</span>
+          </div>
+          <button class="button" id="project-contract-button">项目基线 v1</button>
+        </div>
+      </header>
+
+      <div class="shell">
+        <aside class="flow-sidebar">
+          <div class="sidebar-heading">项目交付链路</div>
+          <ol class="flow-list" id="flow-list"></ol>
+
+          <div class="project-baseline">
+            <div class="baseline-label">当前业务目标</div>
+            <div class="baseline-value">
+              让工单进入后获得一致、可追踪的分派和处理建议
+            </div>
+            <div class="baseline-meta" id="baseline-meta">
+              基线 v1 · 3 项已确认规则 · 2 项待企业确认
+            </div>
+          </div>
+        </aside>
+
+        <main class="main">
+          <section class="stage-head">
+            <div>
+              <div class="stage-kicker">
+                <span id="stage-index-label">阶段 1 / 6</span>
+                <span class="stage-state" id="stage-state">当前阶段</span>
+              </div>
+              <h1 id="stage-title">需求进入</h1>
+              <p class="stage-summary" id="stage-summary">
+                把已有的需求描述、文件、会议和系统资料放进同一个项目，并保留完整来源。
+              </p>
+            </div>
+            <div class="stage-actions">
+              <button class="button ghost" id="previous-stage">上一步</button>
+              <button class="button" id="preview-next-stage">预览下一阶段</button>
+            </div>
+          </section>
+
+          <section class="project-truth" aria-label="项目当前事实">
+            <div class="truth-item">
+              <div class="truth-label">企业原始诉求</div>
+              <div class="truth-value">
+                工单量增长后，人工分派不一致，希望用 AI 提高处理效率
+              </div>
+            </div>
+            <div class="truth-item">
+              <div class="truth-label">当前状态</div>
+              <div class="truth-value" id="project-state">需求材料收集中</div>
+            </div>
+            <div class="truth-item">
+              <div class="truth-label">当前阻塞</div>
+              <div class="truth-value" id="project-blocker">缺少升级规则说明</div>
+            </div>
+          </section>
+
+          <article class="work-card">
+            <header class="work-card-head">
+              <div>
+                <div class="work-label" id="work-label">当前工作包 · REQ-INTAKE-01</div>
+                <h2 class="work-title" id="work-title">建立可追溯的需求档案</h2>
+                <p class="work-description" id="work-description">
+                  先保存原始材料，再由 FDE Agent 提取事实、假设、冲突和缺口；此时不直接生成解决方案。
+                </p>
+              </div>
+              <div class="work-status" id="work-status">还缺 1 项关键来源</div>
+            </header>
+
+            <div class="work-card-body" id="work-body"></div>
+
+            <footer class="work-card-footer">
+              <div class="footer-hint" id="footer-hint">
+                阶段完成必须产生有效产物与可复核证据。
+              </div>
+              <div class="footer-actions">
+                <button class="button soft" id="secondary-action">让 Agent 检查缺口</button>
+                <button class="button primary" id="primary-action">确认需求并进入诊断</button>
+              </div>
+            </footer>
+          </article>
+
+          <section class="evidence-strip" aria-label="项目证据摘要">
+            <div class="evidence-stat">
+              <div class="evidence-stat-label">来源材料</div>
+              <div class="evidence-stat-value" id="source-count">4 份</div>
+            </div>
+            <div class="evidence-stat">
+              <div class="evidence-stat-label">项目决策</div>
+              <div class="evidence-stat-value" id="decision-count">1 项</div>
+            </div>
+            <div class="evidence-stat">
+              <div class="evidence-stat-label">验证证据</div>
+              <div class="evidence-stat-value" id="evidence-count">0 项</div>
+            </div>
+          </section>
+
+          <div class="footer">@赋范空间 独家研发</div>
+        </main>
+
+        <aside class="rightbar">
+          <section class="assistant-panel">
+            <div class="panel-head">
+              <div class="panel-title">FDE Agent</div>
+              <div class="panel-badge">项目上下文已连接</div>
+            </div>
+            <div class="agent-summary" id="agent-summary">
+              我会围绕当前工作包组织材料、调用工具并生成候选产物；只有你确认后，结果才会进入项目正式基线。
+            </div>
+            <ul class="agent-list" id="agent-list"></ul>
+            <div class="agent-actions">
+              <button class="button" id="agent-explain">解释当前工作</button>
+              <button class="button soft" id="agent-run">执行建议</button>
+            </div>
+          </section>
+
+          <section class="gate-panel">
+            <div class="panel-head">
+              <div class="panel-title">当前交付门</div>
+            </div>
+            <div class="gate-card" id="gate-card">
+              <div class="gate-label" id="gate-label">需要补充</div>
+              <div class="gate-title" id="gate-title">升级规则仍无可靠来源</div>
+              <div class="gate-note" id="gate-note">
+                会议纪要提到“紧急工单优先升级”，但尚未获得正式规则或业务负责人确认。
+              </div>
+            </div>
+          </section>
+
+          <section class="trace-panel">
+            <div class="panel-head">
+              <div class="panel-title">项目事件</div>
+            </div>
+            <div id="trace-list"></div>
+          </section>
+        </aside>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script>
+      const stages = [
+        {
+          name: "需求进入",
+          purpose: "汇集原始材料",
+          summary: "把已有的需求描述、文件、会议和系统资料放进同一个项目，并保留完整来源。",
+          state: "需求材料收集中",
+          blocker: "缺少升级规则说明",
+          workCode: "REQ-INTAKE-01",
+          workTitle: "建立可追溯的需求档案",
+          workDescription: "先保存原始材料，再由 FDE Agent 提取事实、假设、冲突和缺口；此时不直接生成解决方案。",
+          workStatus: "还缺 1 项关键来源",
+          primary: "确认需求并进入诊断",
+          secondary: "让 Agent 检查缺口",
+          footer: "原始材料只是来源，不会被自动写成已确认需求。",
+          gateLabel: "需要补充",
+          gateTitle: "升级规则仍无可靠来源",
+          gateNote: "会议纪要提到“紧急工单优先升级”，但尚未获得正式规则或业务负责人确认。",
+          agentSummary: "我会整理来源、标记事实与推断，并指出下一步需要向企业补什么材料。",
+          agentItems: [
+            ["发现 1 项来源冲突", "SOP 与会议纪要对“紧急工单”的处理方式不同。"],
+            ["建议下一步", "向售后主管索取最新升级规则和最近一次异常案例。"],
+          ],
+        },
+        {
+          name: "业务诊断",
+          purpose: "还原真实工作",
+          summary: "确认业务结果、岗位、当前 SOP、问题证据、系统与数据，并持续消除未知项。",
+          state: "业务现场诊断中",
+          blocker: "验收责任人待确认",
+          workCode: "DISCOVERY-02",
+          workTitle: "还原当前工单处理流程",
+          workDescription: "把工单进入、初筛、分派、升级和关闭的真实动作与判断节点组织成可复核流程。",
+          workStatus: "2 项待企业确认",
+          primary: "确认诊断并进入方案",
+          secondary: "生成下一轮访谈",
+          footer: "项目事实必须能够追溯到访谈、系统证据或企业确认。",
+          gateLabel: "存在未知项",
+          gateTitle: "谁对分派结果负责尚未统一",
+          gateNote: "客服主管负责日常调整，但质量部门掌握最终投诉指标，需要明确验收责任。",
+          agentSummary: "我已把当前流程、相关岗位和系统关系组织成需求全景，并标出了两项高影响未知。",
+          agentItems: [
+            ["需要确认验收责任", "当前访谈中有两个不同的最终负责人说法。"],
+            ["建议现场观察", "抽取一次从低置信度分派到人工改派的完整过程。"],
+          ],
+        },
+        {
+          name: "方案定义",
+          purpose: "冻结范围与验收",
+          summary: "确定目标流程、AI 与人工边界、交付范围、明确不做以及可观察的验收方法。",
+          state: "方案基线待确认",
+          blocker: "自动写入权限待审批",
+          workCode: "SOLUTION-03",
+          workTitle: "冻结 Agent 与人工处理边界",
+          workDescription: "明确哪些工单可以自动建议、哪些只能辅助判断，以及什么时候必须交给人工处理。",
+          workStatus: "范围候选 v1",
+          primary: "确认方案并开始建设",
+          secondary: "检查范围与验收",
+          footer: "范围、验收与权限必须在开发前形成同一份项目基线。",
+          gateLabel: "等待确认",
+          gateTitle: "生产环境只允许建议，不允许自动关闭",
+          gateNote: "该边界已经进入范围候选，仍需业务和技术负责人共同确认。",
+          agentSummary: "我会检查方案是否遗漏异常路径、权限限制和可验证结果，不会替你作出企业决定。",
+          agentItems: [
+            ["范围风险", "如果没有低置信度阈值，系统可能把复杂工单误送给普通队列。"],
+            ["验收建议", "分别验证常见工单、紧急工单和未知类别的处理结果。"],
+          ],
+        },
+        {
+          name: "实施构建",
+          purpose: "建设可运行系统",
+          summary: "组合业务规则、Agent、Skill、确定性程序和企业接口，形成可运行的端到端链路。",
+          state: "候选系统建设中",
+          blocker: "测试环境接口限流",
+          workCode: "BUILD-04",
+          workTitle: "完成工单分派端到端链路",
+          workDescription: "从真实工单输入开始，生成分类、分派建议、证据和人工接管状态，并写入测试环境。",
+          workStatus: "候选版本 v0.4",
+          primary: "完成构建并进入验证",
+          secondary: "运行端到端链路",
+          footer: "工程产物、运行日志和业务规则保持版本一致。",
+          gateLabel: "运行受限",
+          gateTitle: "测试接口每分钟只允许 20 次请求",
+          gateNote: "需要加入排队与重试策略，再运行完整验证集。",
+          agentSummary: "我可以调用项目文件、终端和测试环境，执行工作流并把失败定位到具体步骤。",
+          agentItems: [
+            ["最近一次运行", "18 个样本中 16 个完成，2 个因接口限流失败。"],
+            ["建议修复", "增加请求队列，保留幂等键并限制自动重试次数。"],
+          ],
+        },
+        {
+          name: "验证上线",
+          purpose: "证明可控可用",
+          summary: "验证业务结果、系统质量、权限、安全、人工接管和失败恢复，再发布受控版本。",
+          state: "上线候选验证中",
+          blocker: "低置信度样本未达门槛",
+          workCode: "VERIFY-05",
+          workTitle: "完成上线前评估与权限检查",
+          workDescription: "使用已确认样本验证分派、升级、人工接管和异常恢复，并检查生产权限配置。",
+          workStatus: "3 / 4 项门槛通过",
+          primary: "批准上线并进入交付",
+          secondary: "重新运行评估",
+          footer: "不能只看模型准确率；权限、恢复和人工路径同样属于上线条件。",
+          gateLabel: "暂不可上线",
+          gateTitle: "未知类别的人工接管仍不稳定",
+          gateNote: "两条边界工单没有携带完整上下文进入人工队列，需要修复后重新验证。",
+          agentSummary: "我会同时检查评估结果、Trace、权限和恢复证据，并明确哪些风险仍未覆盖。",
+          agentItems: [
+            ["评估发现", "未知类别识别正确，但移交人工时遗漏原始附件。"],
+            ["影响范围", "只影响人工接管步骤，不影响常见类别的自动建议。"],
+          ],
+        },
+        {
+          name: "交付移交",
+          purpose: "完成验收与承接",
+          summary: "组织企业验收、运行说明、权限、异常处理和后续责任，形成可持续使用的交付包。",
+          state: "交付包准备中",
+          blocker: "企业验收会议待安排",
+          workCode: "DELIVERY-06",
+          workTitle: "生成并核对最终交付包",
+          workDescription: "把可运行系统、验收证据、已知边界、部署说明和运维材料组织成企业可承接的结果。",
+          workStatus: "5 / 6 项已就绪",
+          primary: "完成验收并关闭项目",
+          secondary: "检查交付一致性",
+          footer: "项目只有在企业验收和移交完成后才算交付，不以代码完成为终点。",
+          gateLabel: "等待企业",
+          gateTitle: "最终验收会议尚未完成",
+          gateNote: "交付包已生成，需要企业按业务结果、岗位变化和系统质量完成验收。",
+          agentSummary: "我会检查交付材料与实际运行版本是否一致，并指出企业接手后仍需原 FDE 承担的事项。",
+          agentItems: [
+            ["一致性检查", "运行版本、Eval 报告和部署说明使用同一候选版本。"],
+            ["剩余事项", "需要在验收会议中确认上线后一周的异常响应责任。"],
+          ],
+        },
+      ];
+
+      const sourceRows = [
+        ["需", "企业原始需求描述", "业务负责人提供 · 已保留原文", "单一来源"],
+        ["会", "售后流程访谈纪要", "客服主管与质量负责人 · 2026-08-25", "已解析"],
+        ["文", "现行工单处理 SOP.pdf", "制度文件 · 版本 3.2", "有效"],
+        ["系", "工单系统 API 说明", "测试环境 · 只读与建议写入", "已授权"],
+      ];
+
+      const timeline = [
+        ["FDE Agent", "解析 4 份来源并建立需求档案", "刚刚"],
+        ["你", "确认企业原始诉求保留原文", "12 分钟前"],
+        ["项目", "创建本地隔离环境", "18 分钟前"],
+      ];
+
+      let activeStage = 0;
+      let committedStage = 0;
+      let extraSourceAdded = false;
+      let agentRan = false;
+      let baselineVersion = 1;
+
+      const flowList = document.getElementById("flow-list");
+      const workBody = document.getElementById("work-body");
+      const toast = document.getElementById("toast");
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add("show");
+        clearTimeout(showToast.timer);
+        showToast.timer = setTimeout(() => toast.classList.remove("show"), 2200);
+      }
+
+      function renderFlow() {
+        flowList.innerHTML = stages
+          .map((stage, index) => {
+            const done = index < committedStage;
+            const current = index === committedStage;
+            return `
+              <li class="flow-item">
+                <button class="flow-button ${index === activeStage ? "active" : ""} ${done ? "done" : ""} ${current ? "current" : ""}" data-stage="${index}" aria-pressed="${index === activeStage}">
+                  <span class="flow-number">${done ? "✓" : index + 1}</span>
+                  <span>
+                    <span class="flow-name">${stage.name}</span>
+                    <span class="flow-purpose">${stage.purpose}</span>
+                  </span>
+                </button>
+              </li>
+            `;
+          })
+          .join("");
+
+        flowList.querySelectorAll("[data-stage]").forEach((button) => {
+          button.addEventListener("click", () => {
+            activeStage = Number(button.dataset.stage);
+            render();
+          });
+        });
+      }
+
+      function renderDemandIntake() {
+        const rows = [...sourceRows];
+        if (extraSourceAdded) {
+          rows.push(["规", "最新工单升级规则.docx", "售后主管补充 · 已确认来源", "新来源"]);
+        }
+
+        return `
+          <div class="work-grid">
+            <div>
+              <h3 class="subheading">已有需求材料</h3>
+              <div class="surface">
+                <textarea class="source-input" aria-label="企业原始需求">我们现在每天有大量售后工单，客服人工判断后再分给不同小组。人员经验不同，分派经常不一致。希望用 AI 先判断工单类型、建议处理小组，并给出处理建议；紧急和不确定工单必须交给人工。</textarea>
+                <div class="input-actions">
+                  <button class="button" id="add-file">添加文件</button>
+                  <button class="button" id="add-meeting">记录会议</button>
+                  <button class="button" id="add-system">添加系统说明</button>
+                </div>
+              </div>
+              <div class="surface">
+                <ul class="source-list">
+                  ${rows
+                    .map(
+                      ([icon, title, note, state]) => `
+                        <li class="source-row">
+                          <span class="row-icon ${state === "新来源" ? "done" : ""}">${icon}</span>
+                          <span class="row-content">
+                            <span class="row-title">${title}</span>
+                            <span class="row-note">${note}</span>
+                          </span>
+                          <span class="row-state">${state}</span>
+                        </li>
+                      `,
+                    )
+                    .join("")}
+                </ul>
+              </div>
+            </div>
+            <div>
+              <h3 class="subheading">Agent 初步整理</h3>
+              <div class="map-grid">
+                <div class="map-node">
+                  <div class="node-label">已确认事实</div>
+                  <div class="node-value">工单先由客服人工判断，再分派到处理小组</div>
+                  <div class="node-note">来源：需求原文、SOP、访谈纪要</div>
+                </div>
+                <div class="map-node">
+                  <div class="node-label">业务目标</div>
+                  <div class="node-value">提高分派一致性，同时保留人工接管</div>
+                  <div class="node-note">具体效率基线仍待企业提供</div>
+                </div>
+                <div class="map-node">
+                  <div class="node-label">来源冲突</div>
+                  <div class="node-value">紧急工单是优先升级，还是必须直接人工处理</div>
+                  <div class="node-note">SOP 与会议纪要表述不同</div>
+                </div>
+                <div class="map-node">
+                  <div class="node-label">关键缺口</div>
+                  <div class="node-value">缺少正式升级规则和异常案例</div>
+                  <div class="node-note">补齐后才能进入完整业务诊断</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderDiscovery() {
+        return `
+          <div class="work-grid">
+            <div>
+              <h3 class="subheading">需求全景</h3>
+              <div class="map-grid">
+                <div class="map-node">
+                  <div class="node-label">业务结果</div>
+                  <div class="node-value">分派结果一致、可追踪，复杂工单得到正确人工承接</div>
+                  <div class="node-note">效率指标和投诉指标仍需建立基线</div>
+                </div>
+                <div class="map-node">
+                  <div class="node-label">相关岗位</div>
+                  <div class="node-value">一线客服、售后主管、质量负责人、系统管理员</div>
+                  <div class="node-note">最终验收责任人存在两种说法</div>
+                </div>
+                <div class="map-node">
+                  <div class="node-label">系统与数据</div>
+                  <div class="node-value">工单系统、知识库、历史工单与处理结果</div>
+                  <div class="node-note">生产写入权限尚未开放</div>
+                </div>
+                <div class="map-node">
+                  <div class="node-label">高影响未知</div>
+                  <div class="node-value">紧急工单、未知类别和重复工单的处理边界</div>
+                  <div class="node-note">需要访谈与真实案例共同确认</div>
+                </div>
+              </div>
+              <div class="surface">
+                <div class="surface-title">当前 SOP</div>
+                <div class="flow-diagram" style="margin-top: 11px">
+                  <div class="flow-step"><strong>工单进入</strong><span>文本、附件、客户信息</span></div>
+                  <div class="flow-step"><strong>人工初筛</strong><span>判断类别与紧急程度</span></div>
+                  <div class="flow-step"><strong>分派小组</strong><span>按经验选择处理队列</span></div>
+                  <div class="flow-step"><strong>处理升级</strong><span>异常时重新分派</span></div>
+                  <div class="flow-step"><strong>关闭复盘</strong><span>记录结果但较少反哺</span></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <h3 class="subheading">下一轮调研</h3>
+              <div class="surface">
+                <ul class="check-list">
+                  <li class="check-row">
+                    <span class="row-icon warn">问</span>
+                    <span class="row-content"><span class="row-title">确认最终验收责任人</span><span class="row-note">售后主管和质量负责人分别如何定义“分派正确”</span></span>
+                  </li>
+                  <li class="check-row">
+                    <span class="row-icon warn">看</span>
+                    <span class="row-content"><span class="row-title">观察一次人工改派</span><span class="row-note">记录触发原因、补充信息和后续动作</span></span>
+                  </li>
+                  <li class="check-row">
+                    <span class="row-icon done">取</span>
+                    <span class="row-content"><span class="row-title">获取最近异常案例</span><span class="row-note">企业已同意提供 20 条脱敏工单</span></span>
+                  </li>
+                </ul>
+              </div>
+              <div class="surface">
+                <div class="surface-title">进入方案前必须成立</div>
+                <div class="surface-note">业务问题有证据、能够接触必要数据、范围可控、验收方式可定义、权限存在可行路径。</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderSolution() {
+        return `
+          <div>
+            <h3 class="subheading">目标工作流</h3>
+            <div class="surface">
+              <div class="flow-diagram">
+                <div class="flow-step"><strong>工单进入</strong><span>保留原始内容与附件</span></div>
+                <div class="flow-step"><strong>Agent 判断</strong><span>类别、紧急度、置信度</span></div>
+                <div class="flow-step"><strong>规则校验</strong><span>确定性升级和权限规则</span></div>
+                <div class="flow-step"><strong>建议或接管</strong><span>建议分派 / 转人工</span></div>
+                <div class="flow-step"><strong>结果反馈</strong><span>人工改派与处理结果回流</span></div>
+              </div>
+            </div>
+            <div class="solution-grid" style="margin-top: 11px">
+              <div class="solution-node">
+                <div class="node-label">本轮交付</div>
+                <div class="node-value">工单分类、分派建议、处理建议、证据和人工接管</div>
+                <div class="node-note">接入测试环境，生产先采用建议模式</div>
+              </div>
+              <div class="solution-node">
+                <div class="node-label">明确不做</div>
+                <div class="node-value">不自动关闭工单，不替代最终责任人，不改造原工单系统</div>
+                <div class="node-note">避免扩大为完整客服系统重构</div>
+              </div>
+              <div class="solution-node">
+                <div class="node-label">人工边界</div>
+                <div class="node-value">紧急、未知、低置信度和权限不足时必须转人工</div>
+                <div class="node-note">人工获得原始工单、判断依据和建议动作</div>
+              </div>
+              <div class="solution-node">
+                <div class="node-label">三层验收</div>
+                <div class="node-value">业务结果、岗位流程变化、系统质量与安全</div>
+                <div class="node-note">具体阈值由企业样本和责任人共同确认</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderBuild() {
+        return `
+          <div class="work-grid">
+            <div>
+              <h3 class="subheading">Agent 工程环境</h3>
+              <div class="code-surface">
+                <div class="code-toolbar"><span>ticket-routing-agent / graph.py</span><span>候选版本 v0.4</span></div>
+                <pre class="code-body">intake_ticket
+  → extract_signals
+  → classify_category
+  → apply_escalation_rules
+  → choose_route
+      ├─ suggest_team
+      └─ handoff_to_human
+  → record_evidence
+
+最近运行：16 / 18 完成
+失败：2 次测试环境 API 限流</pre>
+              </div>
+              <div class="tool-row" style="margin-top: 10px">
+                <button class="button">文件与代码</button>
+                <button class="button">真实终端</button>
+                <button class="button">Agent / Skill</button>
+                <button class="button">项目环境</button>
+              </div>
+            </div>
+            <div>
+              <h3 class="subheading">当前实施结果</h3>
+              <div class="build-grid">
+                <div class="build-node"><div class="node-label">端到端链路</div><div class="node-value">已跑通</div><div class="node-note">输入、建议、人工接管和证据均可观察</div></div>
+                <div class="build-node"><div class="node-label">企业集成</div><div class="node-value">测试环境已连接</div><div class="node-note">建议写入可用，生产权限待审批</div></div>
+                <div class="build-node"><div class="node-label">业务规则</div><div class="node-value">3 条已编码</div><div class="node-note">升级、未知类别和低置信度处理</div></div>
+                <div class="build-node"><div class="node-label">当前失败</div><div class="node-value">接口限流</div><div class="node-note">需要排队、幂等和受控重试</div></div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderValidation() {
+        return `
+          <div class="work-grid">
+            <div>
+              <h3 class="subheading">上线门槛</h3>
+              <div class="surface">
+                <div class="metric-line"><div class="metric-name">常见类别分派</div><div class="metric-track"><span style="width: 94%"></span></div><div class="metric-state">通过</div></div>
+                <div class="metric-line"><div class="metric-name">紧急工单升级</div><div class="metric-track"><span style="width: 100%"></span></div><div class="metric-state">通过</div></div>
+                <div class="metric-line"><div class="metric-name">未知类别接管</div><div class="metric-track"><span style="width: 72%"></span></div><div class="metric-state">未通过</div></div>
+                <div class="metric-line"><div class="metric-name">失败恢复</div><div class="metric-track"><span style="width: 88%"></span></div><div class="metric-state">通过</div></div>
+              </div>
+              <div class="surface">
+                <div class="surface-title">失败样本 #EVAL-017</div>
+                <div class="surface-note">系统正确识别未知类别并转人工，但没有携带原始附件。人工无法继续判断，因此整条路径不算通过。</div>
+              </div>
+            </div>
+            <div>
+              <h3 class="subheading">上线证据</h3>
+              <div class="validation-grid">
+                <div class="validation-node"><div class="node-label">EVALS</div><div class="node-value">62 个验证样本</div><div class="node-note">覆盖常见、紧急、未知和异常路径</div></div>
+                <div class="validation-node"><div class="node-label">权限</div><div class="node-value">建议写入模式</div><div class="node-note">不允许自动关闭或修改客户信息</div></div>
+                <div class="validation-node"><div class="node-label">人工接管</div><div class="node-value">1 项待修复</div><div class="node-note">附件上下文传递不完整</div></div>
+                <div class="validation-node"><div class="node-label">恢复</div><div class="node-value">回退方案已验证</div><div class="node-note">可切回原人工流程且不丢工单</div></div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderDelivery() {
+        return `
+          <div class="work-grid">
+            <div>
+              <h3 class="subheading">最终交付包</h3>
+              <div class="surface">
+                <ul class="handoff-list">
+                  <li class="handoff-row"><span class="row-icon done">✓</span><span class="row-content"><span class="row-title">可运行系统与部署版本</span><span class="row-note">候选版本、依赖、配置和发布记录保持一致</span></span><span class="row-state">已就绪</span></li>
+                  <li class="handoff-row"><span class="row-icon done">✓</span><span class="row-content"><span class="row-title">业务范围与验收报告</span><span class="row-note">包含业务结果、岗位变化、系统质量与剩余边界</span></span><span class="row-state">已就绪</span></li>
+                  <li class="handoff-row"><span class="row-icon done">✓</span><span class="row-content"><span class="row-title">运行、监控与异常处理手册</span><span class="row-note">说明人工接管、失败恢复和问题升级路径</span></span><span class="row-state">已就绪</span></li>
+                  <li class="handoff-row"><span class="row-icon done">✓</span><span class="row-content"><span class="row-title">权限与凭据移交清单</span><span class="row-note">真实值不进入交付文档，只记录责任与存储位置</span></span><span class="row-state">已就绪</span></li>
+                  <li class="handoff-row"><span class="row-icon warn">会</span><span class="row-content"><span class="row-title">企业最终验收记录</span><span class="row-note">等待业务负责人和技术负责人完成验收会议</span></span><span class="row-state">待完成</span></li>
+                </ul>
+              </div>
+            </div>
+            <div>
+              <h3 class="subheading">交付结论</h3>
+              <div class="delivery-grid">
+                <div class="delivery-node"><div class="node-label">交付结果</div><div class="node-value">受控建议模式</div><div class="node-note">系统给出分派与处理建议，复杂工单由人工承接</div></div>
+                <div class="delivery-node"><div class="node-label">已知边界</div><div class="node-value">不自动关闭工单</div><div class="node-note">未知类别持续进入人工队列并记录反馈</div></div>
+                <div class="delivery-node"><div class="node-label">企业承接</div><div class="node-value">售后系统管理员</div><div class="node-note">负责运行监控、权限和问题升级</div></div>
+                <div class="delivery-node"><div class="node-label">最终状态</div><div class="node-value">等待验收</div><div class="node-note">验收完成后才能关闭项目</div></div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      const renderers = [
+        renderDemandIntake,
+        renderDiscovery,
+        renderSolution,
+        renderBuild,
+        renderValidation,
+        renderDelivery,
+      ];
+
+      function renderAgent(stage) {
+        document.getElementById("agent-summary").textContent = stage.agentSummary;
+        document.getElementById("agent-list").innerHTML = stage.agentItems
+          .map(
+            ([title, note]) => `
+              <li class="agent-item">
+                <div class="agent-item-title">${title}</div>
+                <div class="agent-item-note">${note}</div>
+              </li>
+            `,
+          )
+          .join("");
+      }
+
+      function renderTrace() {
+        document.getElementById("trace-list").innerHTML = timeline
+          .map(
+            ([actor, event, time]) => `
+              <div class="trace-item"><strong>${actor}</strong> ${event}<br />${time}</div>
+            `,
+          )
+          .join("");
+      }
+
+      function render() {
+        const stage = stages[activeStage];
+        const isDone = activeStage < committedStage;
+        const isCurrent = activeStage === committedStage;
+
+        renderFlow();
+        document.getElementById("stage-index-label").textContent = `阶段 ${activeStage + 1} / 6`;
+        const stateBadge = document.getElementById("stage-state");
+        stateBadge.className = `stage-state ${isDone ? "done" : isCurrent ? "" : "future"}`;
+        stateBadge.textContent = isDone ? "已通过" : isCurrent ? "当前阶段" : "阶段预览";
+        document.getElementById("stage-title").textContent = stage.name;
+        document.getElementById("stage-summary").textContent = stage.summary;
+        document.getElementById("project-state").textContent = stage.state;
+        document.getElementById("project-blocker").textContent = stage.blocker;
+        document.getElementById("work-label").textContent = `当前工作包 · ${stage.workCode}`;
+        document.getElementById("work-title").textContent = stage.workTitle;
+        document.getElementById("work-description").textContent = stage.workDescription;
+        const status = document.getElementById("work-status");
+        status.className = `work-status ${isDone ? "ready" : ""}`;
+        status.textContent = isDone ? "该阶段已经通过" : stage.workStatus;
+        document.getElementById("footer-hint").textContent = stage.footer;
+        document.getElementById("primary-action").textContent = isDone ? "阶段已完成" : stage.primary;
+        document.getElementById("secondary-action").textContent = stage.secondary;
+        document.getElementById("primary-action").disabled = !isCurrent;
+        document.getElementById("secondary-action").disabled = !isCurrent;
+        document.getElementById("previous-stage").disabled = activeStage === 0;
+        document.getElementById("preview-next-stage").disabled = activeStage === stages.length - 1;
+
+        workBody.innerHTML = renderers[activeStage]();
+        wireStageSpecificActions();
+
+        const gate = document.getElementById("gate-card");
+        gate.className = `gate-card ${isDone ? "ready" : ""}`;
+        document.getElementById("gate-label").textContent = isDone ? "已经通过" : stage.gateLabel;
+        document.getElementById("gate-title").textContent = isDone ? `${stage.name}的产物和证据已进入项目基线` : stage.gateTitle;
+        document.getElementById("gate-note").textContent = isDone ? "后续变化会生成影响分析，不会静默覆盖本阶段结论。" : stage.gateNote;
+
+        renderAgent(stage);
+        renderTrace();
+        document.getElementById("baseline-meta").textContent =
+          `基线 v${baselineVersion} · ${Math.max(3, committedStage + 3)} 项已确认规则 · ${Math.max(0, 2 - Math.floor(committedStage / 2))} 项待企业确认`;
+        document.getElementById("source-count").textContent = `${extraSourceAdded ? 5 : 4} 份`;
+        document.getElementById("decision-count").textContent = `${Math.max(1, committedStage + 1)} 项`;
+        document.getElementById("evidence-count").textContent = `${committedStage * 4} 项`;
+      }
+
+      function wireStageSpecificActions() {
+        ["add-file", "add-meeting", "add-system"].forEach((id) => {
+          const button = document.getElementById(id);
+          if (!button) return;
+          button.addEventListener("click", () => {
+            extraSourceAdded = true;
+            timeline.unshift(["你", "补充了最新工单升级规则", "刚刚"]);
+            showToast(id === "add-meeting" ? "会议记录已进入需求来源" : "新来源已加入需求档案");
+            render();
+          });
+        });
+      }
+
+      document.getElementById("previous-stage").addEventListener("click", () => {
+        activeStage = Math.max(0, activeStage - 1);
+        render();
+      });
+
+      document.getElementById("preview-next-stage").addEventListener("click", () => {
+        activeStage = Math.min(stages.length - 1, activeStage + 1);
+        render();
+      });
+
+      document.getElementById("primary-action").addEventListener("click", () => {
+        if (activeStage !== committedStage) return;
+        if (committedStage < stages.length - 1) {
+          const completedName = stages[committedStage].name;
+          committedStage += 1;
+          activeStage = committedStage;
+          baselineVersion += 1;
+          timeline.unshift(["你", `确认${completedName}并更新项目基线`, "刚刚"]);
+          showToast(`${completedName}已完成，进入${stages[committedStage].name}`);
+        } else {
+          timeline.unshift(["项目", "已记录最终验收，项目交付完成", "刚刚"]);
+          showToast("最终验收已记录，项目交付完成");
+        }
+        render();
+      });
+
+      document.getElementById("secondary-action").addEventListener("click", () => {
+        agentRan = true;
+        timeline.unshift(["FDE Agent", `完成${stages[activeStage].name}阶段检查`, "刚刚"]);
+        showToast("Agent 已执行检查，结果进入项目事件和候选产物");
+        renderTrace();
+      });
+
+      document.getElementById("agent-explain").addEventListener("click", () => {
+        showToast(`${stages[activeStage].name}：${stages[activeStage].purpose}`);
+      });
+
+      document.getElementById("agent-run").addEventListener("click", () => {
+        agentRan = true;
+        timeline.unshift(["FDE Agent", `执行了${stages[activeStage].name}的建议动作`, "刚刚"]);
+        showToast("建议动作已执行，正式事实仍需你确认");
+        renderTrace();
+      });
+
+      document.getElementById("project-contract-button").addEventListener("click", () => {
+        showToast(`当前项目基线 v${baselineVersion}：业务目标、范围、验收和权限边界`);
+      });
+
+      render();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,34 @@
+# Worktree-local runtime and parallel checkout state.
+/.runtime/
+/.worktrees/
+
+# Dependencies, generated libraries, builds, and test output.
+**/node_modules/
+**/lib/
+**/dist/
+**/build/
+**/.cache/
+**/.artifacts/
+**/.dsh-build/
+**/coverage/
+**/test-results/
+**/playwright-report/
+
+# Local caches and transient files.
+**/.DS_Store
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/.uv-cache/
+*.log
+*.pid
+*.tmp
+
+# Generated recordings and archives.
+**/recordings/
+*.mp4
+*.webm
+*.zip
+*.tar
+*.tgz
+*.tar.gz
