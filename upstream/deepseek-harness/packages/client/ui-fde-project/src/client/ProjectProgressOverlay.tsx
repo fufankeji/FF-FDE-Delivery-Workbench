@@ -50,6 +50,15 @@ interface ProjectRowLabels {
   readonly failed: string
 }
 
+type ProjectPalette = 'blue' | 'green' | 'orange' | 'violet'
+
+function projectPalette(title: string): ProjectPalette {
+  const palettes: readonly ProjectPalette[] = ['blue', 'green', 'orange', 'violet']
+  let hash = 0
+  for (const character of title) hash = (hash * 31 + (character.codePointAt(0) ?? 0)) >>> 0
+  return palettes[hash % palettes.length] as ProjectPalette
+}
+
 function formatDate(value: string): string {
   const date = new Date(value.length === 10 ? `${value}T00:00:00` : value)
   return Number.isNaN(date.getTime()) ? value : new Intl.DateTimeFormat('zh-CN', { month: 'short', day: 'numeric' }).format(date)
@@ -796,11 +805,15 @@ function ProjectAttentionCard({ row, showProject, enterProject }: {
     ? `${formatDate(row.schedule.startDate)} — ${formatDate(row.schedule.endDate)}`
     : '交付周期待确认'
   const runtime = row.surface?.status === 'ready' && row.surface.value.runtime.status === 'running' ? '运行中' : '未运行'
+  const palette = projectPalette(row.title)
+  const mark = palette === 'green'
+    ? <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 19V12M12 19V8M19 19V4" /></svg>
+    : row.title.slice(0, 1).toUpperCase()
   return (
-    <article className={css.projectAttentionCard} data-stage={stageId}>
+    <article className={css.projectAttentionCard} data-stage={stageId} data-palette={palette}>
       <header>
         <div className={css.projectIdentity}>
-          <span className={css.projectMark} aria-hidden="true">{row.title.slice(0, 1).toUpperCase()}</span>
+          <span className={css.projectMark} aria-hidden="true">{mark}</span>
           <div><h2>{row.title}</h2><p>{row.companyName || '未填写所属企业'} · {schedule}</p></div>
         </div>
         <span className={css.projectAttentionStage}>{stageIndex < 0 ? stage : `${String(stageIndex + 1)}/8 · ${stage}`}</span>
@@ -2766,7 +2779,7 @@ export function ProjectProgressOverlay({
               </span>
               <span title="帮助" aria-label="帮助"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" /><path d="M9.8 9a2.4 2.4 0 1 1 3.15 2.28c-.67.28-.95.72-.95 1.47v.25M12 16.5h.01" /></svg></span>
               <span className={css.projectAvatar} aria-hidden="true"><img src="/fde-dashboard/demo-avatar.png" alt="" /></span>
-              <strong>张三</strong>
+              <strong>赋范</strong>
               <svg className={css.projectAccountChevron} aria-hidden="true" viewBox="0 0 14 14"><path d="m4 5.5 3 3 3-3" /></svg>
             </div>
           </header>
@@ -2860,7 +2873,7 @@ export function ProjectProgressOverlay({
                   ? <p>项目产生会话活动后，会在这里按时间显示。</p>
                   : <ul>{visibleActivityRows.map(row => (
                     <li key={row.workspaceId}>
-                      <span className={css.projectActivityMark} data-stage={portfolioStageId(row) ?? 'discovery'} aria-hidden="true">{row.title.slice(0, 1).toUpperCase()}</span>
+                      <span className={css.projectActivityMark} data-stage={portfolioStageId(row) ?? 'discovery'} data-palette={projectPalette(row.title)} aria-hidden="true">{row.title.slice(0, 1).toUpperCase()}</span>
                       <div><strong>{row.title}</strong><small>{row.latestSessionTitle ?? '项目更新'}</small></div>
                       <time>{row.latestActivityAt === undefined ? '暂无时间' : formatActivityTime(row.latestActivityAt)}</time>
                       <button type="button" onClick={() => { showProjectDetail(row.workspaceId) }}>查看</button>
@@ -2874,7 +2887,7 @@ export function ProjectProgressOverlay({
                 </header>
                 <ul>{visibleScheduleRows.map(row => (
                   <li key={row.workspaceId} data-pending={row.schedule.status !== 'estimated' || undefined}>
-                    <span className={css.projectActivityMark} data-stage={portfolioStageId(row) ?? 'discovery'} aria-hidden="true">{row.title.slice(0, 1).toUpperCase()}</span>
+                    <span className={css.projectActivityMark} data-stage={portfolioStageId(row) ?? 'discovery'} data-palette={projectPalette(row.title)} aria-hidden="true">{row.title.slice(0, 1).toUpperCase()}</span>
                     <div>
                       <strong>{row.title}</strong>
                       <small>{stageLabel(row.stage, projectRowLabels.loading, projectRowLabels.failed)}</small>
