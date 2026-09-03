@@ -329,8 +329,9 @@
    deliberately stage-specific so project center and the other seven stage
    layouts keep their own composer geometry. */
 .scrollBody:has([data-conversation-composer-layout='stage-definition'][data-conversation-composer-overlay]) > .composerSeat {
-  right: 163px;
-  left: 97px;
+  right: 137px;
+  bottom: 20px;
+  left: 96px;
 }
 
 @media (max-width: 980px) {

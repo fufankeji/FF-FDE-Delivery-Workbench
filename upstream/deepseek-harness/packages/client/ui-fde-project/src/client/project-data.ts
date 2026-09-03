@@ -225,14 +225,22 @@ export function latestProjectSessionId(
   archivedSessionIds: readonly SessionId[],
 ): SessionId | undefined {
   const archived = new Set(archivedSessionIds)
-  let selected: SessionId | undefined
-  let selectedUpdatedAt = Number.NEGATIVE_INFINITY
+  let selectedActive: SessionId | undefined
+  let selectedActiveUpdatedAt = Number.NEGATIVE_INFINITY
+  let selectedBlank: SessionId | undefined
+  let selectedBlankUpdatedAt = Number.NEGATIVE_INFINITY
   for (const id of sessionIds) {
     const session = byId[id]
     if (session === undefined || session.origin === 'subagent' || archived.has(id)) continue
-    if (session.updatedAt <= selectedUpdatedAt) continue
-    selected = session.id
-    selectedUpdatedAt = session.updatedAt
+    if (session.blank) {
+      if (session.updatedAt <= selectedBlankUpdatedAt) continue
+      selectedBlank = session.id
+      selectedBlankUpdatedAt = session.updatedAt
+      continue
+    }
+    if (session.updatedAt <= selectedActiveUpdatedAt) continue
+    selectedActive = session.id
+    selectedActiveUpdatedAt = session.updatedAt
   }
-  return selected
+  return selectedActive ?? selectedBlank
 }

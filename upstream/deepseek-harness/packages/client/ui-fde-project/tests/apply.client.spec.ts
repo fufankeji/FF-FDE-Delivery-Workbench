@@ -252,12 +252,26 @@ describe('ui-fde-project apply', () => {
     ctx.provide('locale', locale)
     const open = vi.fn()
     const selectView = vi.fn()
+    const panelToggle = document.createElement('button')
+    const panelToggleClick = vi.spyOn(panelToggle, 'click')
+    vi.spyOn(panelToggle, 'getBoundingClientRect').mockReturnValue({
+      x: 900, y: 0, top: 0, right: 928, bottom: 28, left: 900, width: 28, height: 28,
+      toJSON: () => ({}),
+    })
+    const toggleCluster = document.createElement('div')
+    toggleCluster.dataset.dshToggleCluster = ''
+    toggleCluster.append(panelToggle)
+    const panelHost = document.createElement('div')
+    panelHost.dataset.dshPanelHost = ''
+    panelHost.append(toggleCluster)
+    document.body.append(panelHost)
     ctx.provide('sessions', {
       list: createSnapshotStore({
         ids: ['older', 'latest', 'child', 'archived'],
         byId: {
           older: { id: 'older', displayTitle: '旧会话', running: false, blank: false, updatedAt: 1 },
           latest: { id: 'latest', displayTitle: '最新会话', running: false, blank: false, updatedAt: 4 },
+          blank: { id: 'blank', displayTitle: '空会话', running: false, blank: true, updatedAt: 12 },
           child: { id: 'child', displayTitle: '子智能体', origin: 'subagent', running: false, blank: false, updatedAt: 9 },
           archived: { id: 'archived', displayTitle: '已归档', running: false, blank: false, updatedAt: 10 },
         },
@@ -272,7 +286,7 @@ describe('ui-fde-project apply', () => {
       list: createSnapshotStore({
         items: [{
           workspaceId: 'workspace-1', path: '/project/one', title: '项目一',
-          sessionIds: ['older', 'latest', 'child', 'archived'],
+          sessionIds: ['older', 'latest', 'blank', 'child', 'archived'],
           createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:00:00.000Z',
         }, {
           workspaceId: 'workspace-2', path: '/project/two', title: '项目二', sessionIds: [],
@@ -304,6 +318,7 @@ describe('ui-fde-project apply', () => {
     expect(selectView).toHaveBeenLastCalledWith('fde-stage-workbench')
     expect(open).toHaveBeenLastCalledWith('latest')
     expect(connectWorkspace).not.toHaveBeenCalled()
+    expect(panelToggleClick).toHaveBeenCalledTimes(1)
 
     await injected.reviewProjectArchitecture('workspace-1')
     expect(selectView).toHaveBeenLastCalledWith('fde-architecture')
@@ -315,5 +330,6 @@ describe('ui-fde-project apply', () => {
     expect(connectWorkspace).toHaveBeenCalledWith('workspace-2')
     expect(open).toHaveBeenLastCalledWith('new-session')
     await fiber.dispose()
+    panelHost.remove()
   })
 })

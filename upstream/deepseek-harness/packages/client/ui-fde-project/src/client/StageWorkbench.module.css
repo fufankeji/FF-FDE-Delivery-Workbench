@@ -2385,7 +2385,7 @@
   height: 100%;
   min-height: 0;
   margin: 0;
-  padding: 17px 18px calc(var(--dsh-composer-height, 132px) + 16px);
+  padding: 19px 20px calc(var(--dsh-composer-height, 132px) + 16px) 18px;
   overflow-x: hidden;
   overflow-y: auto;
 }
@@ -2393,20 +2393,22 @@
 .genericStageRoot[data-stage='definition'] .genericStageGrid {
   display: grid;
   width: 100%;
-  max-width: 1204px;
+  max-width: none;
   min-height: 0;
   margin: 0 auto;
-  grid-template-columns: minmax(0, 813px) minmax(320px, 373px);
+  grid-template-columns: minmax(0, 2.18fr) minmax(320px, 1fr);
   grid-template-rows: 207px 287px auto;
   align-content: start;
   align-items: start;
-  gap: 14px;
+  column-gap: 14px;
+  row-gap: 12px;
 }
 
 .genericStageRoot[data-stage='definition'] .genericStageGrid > main { display: contents; }
 
 .genericStageRoot[data-stage='definition'] .stageOverview {
   position: relative;
+  box-sizing: border-box;
   grid-column: 1 / -1;
   grid-row: 1;
   height: 207px;
@@ -2678,12 +2680,14 @@
   grid-column: 1 / -1;
   grid-row: 3;
   width: calc(100% - 32px);
-  min-height: 257px;
+  height: 257px;
+  min-height: 0;
   padding: 14px 20px 13px;
   border-color: #f2d4aa;
   border-radius: 15px;
   background: linear-gradient(135deg, rgba(255, 252, 246, .98), rgba(255, 248, 237, .96));
   box-shadow: 0 12px 30px rgba(134, 82, 25, .07);
+  transform: translateY(-3px);
 }
 
 .genericStageRoot[data-stage='definition'] .workflowsPanel > header { align-items: center; }

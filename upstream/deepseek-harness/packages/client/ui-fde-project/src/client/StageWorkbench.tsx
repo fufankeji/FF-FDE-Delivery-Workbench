@@ -56,7 +56,7 @@ function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage,
   readonly projectSurface: ProjectSurfaceSnapshot | undefined
   readonly sourceFiles: readonly ProjectSourceItem[]
 }) {
-  const [artifactsCollapsed, setArtifactsCollapsed] = useState(stage !== 'definition')
+  const [artifactsCollapsed, setArtifactsCollapsed] = useState(true)
   const [reviewing, setReviewing] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [returning, setReturning] = useState(false)
@@ -284,6 +284,7 @@ function sourceStatus(file: { readonly previewKind: string; readonly parse: { re
 }
 
 function stageArtifacts(surface: ProjectSurfaceSnapshot | undefined, index: number): readonly DiscoveryArtifact[] {
+  // oxlint-disable-next-line typescript/no-unnecessary-condition -- persisted pre-V2 snapshots can omit discovery.
   if (index === 0) return surface?.discovery?.artifacts ?? fallbackArtifacts(surface)
   const stage = FDE_V2_STAGE_IDS[index]
   if (stage === undefined || stage === 'discovery') return []
@@ -630,8 +631,7 @@ function StageWorkbenchPanel({ props, workspace, sessionId, view }: {
   const reviewReady = discovery?.reviewReady ?? presentCount === requiredArtifacts.length
   const hasEngagementReframe = artifacts.some(artifact => artifact.id === 'engagement-reframe' && artifact.status === 'present')
   const fallbackWorkIndex = presentCount === 0 ? 0 : presentCount === 1 ? 1 : 3
-  const fallbackWork = FALLBACK_WORK[fallbackWorkIndex] ?? FALLBACK_WORK[0]
-  if (fallbackWork === undefined) throw new Error('StageWorkbench requires at least one fallback work item.')
+  const fallbackWork = FALLBACK_WORK[fallbackWorkIndex]
   const currentWorkId = discovery?.currentWorkId ?? fallbackWork.id
   const workItems = discovery?.workItems ?? FALLBACK_WORK.map((item, index) => ({
     ...item,

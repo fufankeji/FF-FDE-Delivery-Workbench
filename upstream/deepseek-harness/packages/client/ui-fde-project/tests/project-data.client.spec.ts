@@ -68,23 +68,24 @@ describe('FDE project browser data', () => {
   })
 
   it('selects the latest visible ordinary project Session', () => {
-    const summary = (id: string, updatedAt: number, origin?: 'subagent'): SessionSummary => ({
+    const summary = (id: string, updatedAt: number, origin?: 'subagent', blank = false): SessionSummary => ({
       id: id as SessionId,
       displayTitle: id,
       running: false,
-      blank: false,
+      blank,
       updatedAt,
       ...(origin === undefined ? {} : { origin }),
     })
     const byId = {
       older: summary('older', 1),
       latest: summary('latest', 4),
+      blank: summary('blank', 12, undefined, true),
       child: summary('child', 9, 'subagent'),
       archived: summary('archived', 10),
     }
 
     expect(latestProjectSessionId(
-      ['older', 'latest', 'child', 'archived'] as SessionId[],
+      ['older', 'latest', 'blank', 'child', 'archived'] as SessionId[],
       byId,
       ['archived'] as SessionId[],
     )).toBe('latest')

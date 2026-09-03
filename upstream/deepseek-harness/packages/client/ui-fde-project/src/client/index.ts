@@ -98,6 +98,20 @@ export function apply(ctx: ClientContext): void {
   const activateProjectWorkbenchLayout = (): void => {
     ctx.layout.openSidebar(294)
     ctx.layout.closeDetails()
+    if (typeof document === 'undefined') return
+    let attempts = 0
+    const collapseProjectToolPanel = (): void => {
+      if (document.body.hasAttribute('data-dsh-sidebar-collapsed')) return
+      const toggles = document.querySelectorAll<HTMLButtonElement>('[data-dsh-toggle-cluster] button')
+      const toggle = [...toggles].find(button => button.getBoundingClientRect().left > window.innerWidth / 2)
+      if (toggle !== undefined) {
+        toggle.click()
+        return
+      }
+      attempts += 1
+      if (attempts < 12) window.requestAnimationFrame(collapseProjectToolPanel)
+    }
+    collapseProjectToolPanel()
   }
 
   const enterProject = async (workspaceId: string, viewId?: string): Promise<void> => {
@@ -105,12 +119,10 @@ export function apply(ctx: ClientContext): void {
     enteredProject = { workspaceId, sessionId: String(sessionId) }
     const targetView = viewId ?? 'fde-stage-workbench'
     ctx.sessions.open(sessionId)
-    if (targetView !== undefined) {
-      const scoped = ctx.sessions.scope(sessionId)
-      const conversation = scoped?.get('conversation')
-      if (conversation === undefined) throw new Error('当前项目会话暂时无法打开。')
-      conversation.selectView(targetView)
-    }
+    const scoped = ctx.sessions.scope(sessionId)
+    const conversation = scoped?.get('conversation')
+    if (conversation === undefined) throw new Error('当前项目会话暂时无法打开。')
+    conversation.selectView(targetView)
     page.close()
     // Opening the session can restore its last chat panel state. Apply the
     // workbench layout afterwards so chat's collapsed-left/open-files state
