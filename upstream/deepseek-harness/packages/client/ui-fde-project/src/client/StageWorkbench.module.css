@@ -1728,12 +1728,15 @@
 
 .projectSidebar {
   display: flex;
+  height: 100%;
   flex-direction: column;
-  min-height: 100%;
+  min-height: 0;
+  overflow: hidden;
   color: var(--dsw-alias-label-primary);
 }
 
 .projectSidebar > header {
+  flex: 0 0 auto;
   padding: 6px 10px 16px;
   border-bottom: 1px solid var(--dsw-alias-border-l2);
 }
@@ -1809,11 +1812,28 @@
   white-space: nowrap;
 }
 
-.projectSidebar nav {
+.projectStageNavigation {
   display: grid;
   position: relative;
+  min-height: 0;
+  flex: 1 1 auto;
+  align-content: start;
   gap: 2px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 15px 4px;
+  scrollbar-color: color-mix(in srgb, var(--dsw-alias-label-caption) 48%, transparent) transparent;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
+
+.projectStageNavigation::-webkit-scrollbar { width: 7px; }
+.projectStageNavigation::-webkit-scrollbar-track { background: transparent; }
+.projectStageNavigation::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--dsw-alias-label-caption) 48%, transparent);
+  background-clip: padding-box;
 }
 
 .projectStageNavHeader {

@@ -4,11 +4,7 @@ import { MarkdownText } from '@deepseek-ai/dsh-client-ui-primitives'
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { FDE_V2_STAGE_IDS, type FdeProjectState } from './stage-controller.ts'
-import {
-  fetchStageSkillCatalog,
-  type StageSkillCatalogMethod,
-  type StageSkillCatalogStage,
-} from './stage-skill-catalog.ts'
+import { fetchStageSkillCatalog, type StageSkillCatalogMethod } from './stage-skill-catalog.ts'
 import type { ProjectContextSidebarProps } from './slots.ts'
 import { V2_STAGE_NAMES } from './StageWorkbench.tsx'
 import css from './StageWorkbench.module.css'
@@ -30,21 +26,16 @@ function projectMonogram(title: string): string {
 
 type SkillCatalogState =
   | { readonly status: 'idle' | 'loading' }
-  | { readonly status: 'ready'; readonly stages: readonly StageSkillCatalogStage[] }
+  | { readonly status: 'ready'; readonly methods: readonly StageSkillCatalogMethod[] }
   | { readonly status: 'error'; readonly message: string }
-
-interface SelectedStageMethod {
-  readonly stageIndex: number
-  readonly method: StageSkillCatalogMethod
-}
 
 export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
   const [stageDetailsOpen, setStageDetailsOpen] = useState(true)
-  const [collapsedMethodStages, setCollapsedMethodStages] = useState<ReadonlySet<string>>(() => new Set())
+  const [methodsOpen, setMethodsOpen] = useState(false)
   const [catalogState, setCatalogState] = useState<SkillCatalogState>({ status: 'idle' })
   const [catalogRequestRevision, setCatalogRequestRevision] = useState(0)
   const catalogLoaded = useRef(false)
-  const [selectedMethod, setSelectedMethod] = useState<SelectedStageMethod>()
+  const [selectedMethod, setSelectedMethod] = useState<StageSkillCatalogMethod>()
   const workspaceId = String(props.workspaceId)
   const stageState = props.useStageProgress(snapshot => snapshot.byWorkspace[workspaceId])
   const sourceState = props.useProjectSources(snapshot => snapshot.byWorkspace[workspaceId])
@@ -71,26 +62,24 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
   const surface = surfaceState?.status === 'ready' ? surfaceState.value : undefined
   const artifacts = surface?.requirements.presentCount ?? 0
   useEffect(() => {
-    if (!stageDetailsOpen || catalogLoaded.current) return
+    if (!methodsOpen || catalogLoaded.current) return
     const abort = new AbortController()
     setCatalogState({ status: 'loading' })
     void fetchStageSkillCatalog(abort.signal).then((catalog) => {
-      const complete = FDE_V2_STAGE_IDS.every((stageId, stageIndex) => catalog.stages.some(stageItem => (
-        stageItem.index === stageIndex
-        && (stageItem.id === stageId || (stageIndex === 0 && stageItem.id === 'requirements'))
-        && stageItem.methods.length > 0
-      )))
-      if (!complete) {
-        throw new Error('阶段工作方法未完整注册。')
+      const selected = catalog.stages.find(item => (
+        item.index === viewed && (item.id === viewedStageId || (viewed === 0 && item.id === 'requirements'))
+      ))
+      if (selected === undefined || selected.methods.length === 0) {
+        throw new Error('当前阶段工作方法未完整注册。')
       }
       catalogLoaded.current = true
-      setCatalogState({ status: 'ready', stages: catalog.stages })
+      setCatalogState({ status: 'ready', methods: selected.methods })
     }).catch((error: unknown) => {
       if (abort.signal.aborted) return
       setCatalogState({ status: 'error', message: error instanceof Error ? error.message : String(error) })
     })
     return () => { abort.abort() }
-  }, [catalogRequestRevision, stageDetailsOpen])
+  }, [catalogRequestRevision, methodsOpen, viewed, viewedStageId])
   useEffect(() => {
     if (selectedMethod === undefined) return
     const closeOnEscape = (event: KeyboardEvent): void => {
@@ -100,7 +89,10 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
     return () => { window.removeEventListener('keydown', closeOnEscape) }
   }, [selectedMethod])
   useEffect(() => {
+    catalogLoaded.current = false
+    setCatalogState({ status: 'idle' })
     setSelectedMethod(undefined)
+    setStageDetailsOpen(true)
   }, [viewed])
 
   const retryCatalog = (): void => {
@@ -111,55 +103,33 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
 
   const toggleStageDetails = (): void => {
     if (stageDetailsOpen) {
+      setMethodsOpen(false)
       setSelectedMethod(undefined)
-    } else {
-      setCollapsedMethodStages(new Set())
     }
     setStageDetailsOpen(!stageDetailsOpen)
   }
 
-  const toggleStageMethods = (stageId: string): void => {
-    setCollapsedMethodStages((current) => {
-      const next = new Set(current)
-      if (next.has(stageId)) next.delete(stageId)
-      else next.add(stageId)
-      return next
-    })
-  }
-
-  const catalogStage = (stageId: string, stageIndex: number): StageSkillCatalogStage | undefined => (
-    catalogState.status === 'ready'
-      ? catalogState.stages.find(item => (
-        item.index === stageIndex && (item.id === stageId || (stageIndex === 0 && item.id === 'requirements'))
-      ))
-      : undefined
-  )
-
-  const renderMethod = (method: StageSkillCatalogMethod, methodIndex: number, stageIndex: number) => (
-    <button
-      key={method.id}
-      type="button"
-      className={css.stageMethodItem}
-      onClick={() => { setSelectedMethod({ stageIndex, method }) }}
-    >
+  const renderMethod = (method: StageSkillCatalogMethod, methodIndex: number) => (
+    <button key={method.id} type="button" className={css.stageMethodItem} onClick={() => { setSelectedMethod(method) }}>
       <span>{String(methodIndex + 1).padStart(2, '0')}</span>
       <strong>{method.label}</strong>
       <svg aria-hidden="true" viewBox="0 0 16 16"><path d="m5.5 3 5 5-5 5" /></svg>
     </button>
   )
 
-  const renderCatalogMethods = (methods: readonly StageSkillCatalogMethod[], stageIndex: number) => {
-    if (!methods.some(method => method.group !== undefined)) {
-      return methods.map((method, methodIndex) => renderMethod(method, methodIndex, stageIndex))
+  const renderCatalogMethods = () => {
+    if (catalogState.status !== 'ready') return null
+    if (!catalogState.methods.some(method => method.group !== undefined)) {
+      return catalogState.methods.map(renderMethod)
     }
     return (['required', 'conditional'] as const).map((group) => {
-      const groupedMethods = methods.filter(method => method.group === group)
-      if (groupedMethods.length === 0) return null
+      const methods = catalogState.methods.filter(method => method.group === group)
+      if (methods.length === 0) return null
       const label = group === 'required' ? '必做工作' : '按需处理'
       return (
         <section className={css.stageMethodGroup} key={group} aria-label={label}>
-          <div className={css.stageMethodGroupLabel}><span>{label}</span><b>{groupedMethods.length}</b></div>
-          {groupedMethods.map(method => renderMethod(method, methods.indexOf(method), stageIndex))}
+          <div className={css.stageMethodGroupLabel}><span>{label}</span><b>{methods.length}</b></div>
+          {methods.map(method => renderMethod(method, catalogState.methods.indexOf(method)))}
         </section>
       )
     })
@@ -179,7 +149,7 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
         </div>
       </header>
 
-      <nav aria-label="项目交付阶段">
+      <nav className={css.projectStageNavigation} aria-label="项目交付阶段">
         <div className={css.projectStageNavHeader}>
           <span>交付路径</span>
           <div className={css.projectStageNavActions}>
@@ -187,8 +157,8 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
             <button
               type="button"
               className={css.projectStageNavControl}
-              aria-label={stageDetailsOpen ? '一键收起所有阶段方法' : '展开所有阶段方法'}
-              title={stageDetailsOpen ? '一键收起所有阶段方法' : '展开所有阶段方法'}
+              aria-label={stageDetailsOpen ? '一键收起阶段详情' : '展开当前阶段详情'}
+              title={stageDetailsOpen ? '一键收起阶段详情' : '展开当前阶段详情'}
               onClick={toggleStageDetails}
             >
               <svg aria-hidden="true" viewBox="0 0 16 16">
@@ -213,8 +183,6 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
           const viewing = index === viewed
           const stage = FDE_V2_STAGE_IDS[index]
           if (stage === undefined) return null
-          const stageCatalog = catalogStage(stage, index)
-          const methodsOpen = !collapsedMethodStages.has(stage)
           return (
             <div className={css.projectStageBranch} key={name} data-active={current ? 'true' : 'false'} data-viewing={viewing ? 'true' : 'false'} data-complete={index < active ? 'true' : 'false'}>
               <button type="button" className={css.projectStageRow} aria-current={current ? 'step' : undefined} onClick={() => { props.viewProjectStage(workspaceId, stage) }}>
@@ -222,17 +190,17 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
                 <span><strong>{name}</strong>{current && <small>当前阶段</small>}{viewing && !current && <small>正在查看</small>}</span>
                 <svg aria-hidden="true" viewBox="0 0 16 16"><path d="m5.5 3 5 5-5 5" /></svg>
               </button>
-              {stageDetailsOpen && (
+              {viewing && stageDetailsOpen && (
                 <div className={css.stageMethodTree}>
                   <button
                     type="button"
                     className={css.stageMethodToggle}
                     aria-expanded={methodsOpen}
-                    onClick={() => { toggleStageMethods(stage) }}
+                    onClick={() => { setMethodsOpen(value => !value) }}
                   >
                     <span aria-hidden="true" className={css.stageMethodFolder}>◇</span>
                     <span>本阶段工作方法</span>
-                    <b>{stageCatalog?.methods.length ?? STAGE_METHOD_COUNTS[index]}</b>
+                    <b>{catalogState.status === 'ready' ? catalogState.methods.length : STAGE_METHOD_COUNTS[index]}</b>
                     <svg aria-hidden="true" viewBox="0 0 16 16"><path d="m5.5 3 5 5-5 5" /></svg>
                   </button>
                   {methodsOpen && (
@@ -244,7 +212,7 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
                           <button type="button" onClick={retryCatalog}>重试</button>
                         </div>
                       )}
-                      {stageCatalog === undefined ? null : renderCatalogMethods(stageCatalog.methods, index)}
+                      {renderCatalogMethods()}
                     </div>
                   )}
                 </div>
@@ -264,23 +232,23 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
         >
           <section className={css.stageMethodDialog} role="dialog" aria-modal="true" aria-labelledby="stage-method-title">
             <header>
-              <div><span>第 {String(selectedMethod.stageIndex + 1)} 阶段 · 工作方法</span><h2 id="stage-method-title">{selectedMethod.method.label}</h2><p>{selectedMethod.method.description}</p></div>
+              <div><span>第 {String(viewed + 1)} 阶段 · 工作方法</span><h2 id="stage-method-title">{selectedMethod.label}</h2><p>{selectedMethod.description}</p></div>
               <button type="button" aria-label="关闭工作方法详情" onClick={() => { setSelectedMethod(undefined) }}>×</button>
             </header>
             <div className={css.stageMethodDialogBody}>
               <section className={css.stageMethodUsage}>
                 <span>什么时候会用</span>
-                <p>{selectedMethod.method.whenToUse}</p>
+                <p>{selectedMethod.whenToUse}</p>
               </section>
               <section className={css.stageMethodDefinition}>
                 <span>完整方法定义</span>
-                <MarkdownText text={selectedMethod.method.content} />
+                <MarkdownText text={selectedMethod.content} />
               </section>
               <details className={css.stageMethodTechnical}>
                 <summary>技术信息</summary>
                 <dl>
-                  <div><dt>Skill</dt><dd><code>{selectedMethod.method.id}</code></dd></div>
-                  <div><dt>固定来源</dt><dd><code>{selectedMethod.method.source}</code></dd></div>
+                  <div><dt>Skill</dt><dd><code>{selectedMethod.id}</code></dd></div>
+                  <div><dt>固定来源</dt><dd><code>{selectedMethod.source}</code></dd></div>
                 </dl>
               </details>
             </div>
