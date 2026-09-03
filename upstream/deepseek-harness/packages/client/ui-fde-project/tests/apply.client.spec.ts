@@ -316,7 +316,7 @@ describe('ui-fde-project apply', () => {
     const injected = (slots.entries('shell.overlay')[0]!.inject as unknown as () => ProjectPageInjected)()
 
     await injected.enterProject('workspace-1')
-    expect(openSidebar).toHaveBeenLastCalledWith(354)
+    expect(openSidebar).toHaveBeenLastCalledWith(291)
     expect(selectView).toHaveBeenLastCalledWith('fde-stage-workbench')
     expect(open).toHaveBeenLastCalledWith('latest')
     expect(connectWorkspace).not.toHaveBeenCalled()

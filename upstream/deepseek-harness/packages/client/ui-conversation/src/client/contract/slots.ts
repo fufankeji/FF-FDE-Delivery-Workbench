@@ -76,7 +76,7 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
      * seat is declared by whoever occupies this one, so replacing the header
      * takes every action entry down with it.
      */
-    'conversation.session.header': { kind: 'single'; scope: 'session' }
+    'conversation.session.header': { kind: 'single'; scope: 'session'; owner: ConversationSessionHeaderOwnerProps }
     /**
      * One breadcrumb title and its lineage controls. The render site keeps
      * the ordinary title as fallback; an occupant receives plain title data
@@ -492,12 +492,19 @@ export interface ConversationInjected {
    * When a blank session is already current, carry its draft to the target.
    */
   selectWorkspace: (workspaceId: WorkspaceId) => Promise<void>
+  /** Whether a blank session belongs to a product workbench that keeps its native session chrome. */
+  showBlankSessionChrome: () => boolean
   /**
    * Framework-bound sources. `composerBlock` is this session's block when a
    * plugin raised one; the reason is the blocker's own localized copy, which
    * the root renders as the inert composer's placeholder.
    */
   hooks: { composerBlock: ObservableSnapshot<ComposerBlock | undefined> }
+}
+
+/** Root-owned blank-state posture for the native session header. */
+export interface ConversationSessionHeaderOwnerProps {
+  showWhenBlank: boolean
 }
 
 /** Business callbacks injected into the strict Session body seat. */

@@ -165,6 +165,7 @@ function mount(
       return opts?.fallback ?? null
     }
     if (key === 'conversation.session.header') {
+      const headerOwner = owner as { showWhenBlank: boolean }
       return (
         <ConversationSessionHeader
           sessionId={SID}
@@ -180,6 +181,7 @@ function mount(
           renderSlot={renderSlot as never}
           views={views}
           open={open}
+          showWhenBlank={headerOwner.showWhenBlank}
           t={t}
         />
       )
@@ -266,6 +268,7 @@ function mount(
     inputActions,
     renderSlot,
     renderSlotChain,
+    showBlankSessionChrome: () => viewTabs[0]?.id !== 'chat',
     selectWorkspace: retargetWorkspace,
     t,
   }
@@ -428,6 +431,25 @@ describe('ConversationRoot resident composer', () => {
     act(() => { owner.onPick(wid('second')) })
     expect(b.retargetWorkspace).toHaveBeenCalledWith(wid('second'))
     expect(b.view.getByText('Selected Folder')).toBeTruthy()
+  })
+
+  it('keeps native header and stats around a product workbench blank hero', () => {
+    const b = mount(
+      conversationSnapshot({ composerPhase: 'blank', blank: true }),
+      [{ ...workspace('one'), sessionIds: [SID] }],
+      undefined,
+      {
+        summaryBlank: true,
+        viewTabs: [
+          { id: 'fde-stage-workbench', label: '项目工作台' },
+          { id: 'chat', label: 'Agent 对话' },
+        ],
+      },
+    )
+
+    expect(b.view.container.querySelector('[data-phase]')?.getAttribute('data-phase')).toBe('hero')
+    expect(b.view.container.querySelector('header')?.getAttribute('aria-hidden')).toBeNull()
+    expect(b.slotCalls).toContain('conversation.composer.dock')
   })
 
   it('settling phase: a summary that does not prove the session blank hides the composer while it opens', () => {

@@ -71,6 +71,20 @@ function HistoricalArchiveIcon() {
   return <svg className={css.historicalArchiveIcon} viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 2.5 16 5v4.6c0 3.6-2.2 6.1-6 7.9-3.8-1.8-6-4.3-6-7.9V5l6-2.5Z" /><path d="m7.5 10 1.6 1.6 3.5-3.7" /></svg>
 }
 
+function EvidenceDocumentIcon() {
+  return <svg className={css.evidenceDocumentIcon} viewBox="0 0 20 20" fill="none" aria-hidden="true">
+    <path d="M5.25 2.75h6l3.5 3.5v10.25a.75.75 0 0 1-.75.75H5.25a.75.75 0 0 1-.75-.75v-13a.75.75 0 0 1 .75-.75Z" />
+    <path d="M11.25 3v3.5h3.5M7 10h5.5M7 13h5.5" />
+  </svg>
+}
+
+function EvidenceShieldIcon({ ready = true }: { readonly ready?: boolean }) {
+  return <svg className={css.evidenceShieldIcon} data-ready={ready ? 'true' : 'false'} viewBox="0 0 36 40" fill="none" aria-hidden="true">
+    <path d="M18 2.5 32 8v10.7c0 8.1-4.9 13.8-14 18.8C8.9 32.5 4 26.8 4 18.7V8l14-5.5Z" />
+    {ready ? <path d="m11.5 19.5 4.2 4.2 9-9.4" /> : <path d="M18 12.5v9M18 27v.5" />}
+  </svg>
+}
+
 type WorkbenchProps = ProjectStageWorkbenchHeroProps | ProjectStageWorkbenchViewProps
 
 function isStageRecordBlocker(value: string): boolean {
@@ -591,7 +605,7 @@ function BrowsedStagePanel({ props, workspace, sessionId, view, actualStage, vie
     })
   }
 
-  return <section className={`${css.root} ${css.browsedStage}`} data-stage={viewedStage} data-historical={historical ? 'true' : undefined} data-conversation-composer-layout={historical ? 'stage-history' : undefined} data-conversation-composer-overlay={view ? '' : undefined} aria-label={`正在查看：${title}`}>
+  return <section className={`${css.root} ${css.browsedStage}`} data-stage={viewedStage} data-historical={historical ? 'true' : undefined} data-future={historical ? undefined : 'true'} data-conversation-composer-layout="stage-history" data-conversation-composer-overlay={view ? '' : undefined} aria-label={`正在查看：${title}`}>
     <header className={css.browsedStageNotice}>
       {historical && <HistoricalNoticeIcon />}
       <div><span>{historical ? '阶段完成记录' : '未开始阶段'}</span><strong>正在查看第 {String(viewedIndex + 1)} 阶段，项目当前在“{V2_STAGE_NAMES[actualIndex]}”</strong><p>{historical ? '以下内容来自当前项目已经保存的资料和阶段记录，不用计划模板补齐缺失事实。' : '这里只说明该阶段何时可以开始，不代表已经安排或执行了工作。'}</p></div>
@@ -600,39 +614,42 @@ function BrowsedStagePanel({ props, workspace, sessionId, view, actualStage, vie
 
     {historical
       ? <>
-        <section className={css.browsedStageGoal}>
+        <section className={css.browsedStageGoal} data-stage-goal="">
           <div className={css.historicalGoalCopy}>
-            <span>第 {String(viewedIndex + 1)}/8 阶段 · 已完成</span><h1>{title}</h1><p>{explanation}</p>
+            <span>第 {String(viewedIndex + 1)}/8 阶段 · 已完成</span><h1 data-stage-title="">{title}</h1><p>{explanation}</p>
             <div className={css.historicalGoalFacts}>
               <span><HistoricalFactIcon type="input" />{sourceFiles.length} 份输入材料</span>
               <span><HistoricalFactIcon type="record" />{presentArtifacts.length} 份阶段记录</span>
               <span><HistoricalFactIcon type="gate" />已通过人工阶段门</span>
             </div>
           </div>
-          <div className={css.historicalCompletionRing} aria-label={`第 ${String(viewedIndex + 1)}/8 阶段已完成`}><strong>{viewedIndex + 1}<small>/8</small></strong><span>已完成</span><i>✓</i></div>
-          <div className={css.historicalGoalArt} aria-hidden="true"><img src="/fde-dashboard/stage-history-stack.svg" alt="" /></div>
-          <div className={css.historicalArchiveNote}>◷ 阶段记录已封存 · 可追溯</div>
+          <div className={css.historicalCompletionRing} data-stage-ring="" aria-label={`第 ${String(viewedIndex + 1)}/8 阶段已完成`}><strong>{viewedIndex + 1}<small>/8</small></strong><span>已完成</span><i>✓</i></div>
+          <div className={css.historicalGoalArt} data-stage-art="" aria-hidden="true"><img src="/fde-dashboard/stage-evidence-stack-3d.webp" alt="" /></div>
+          <div className={css.historicalArchiveNote} data-stage-art-note="">◷ 阶段记录已封存 · 可追溯</div>
         </section>
-        <section className={css.historicalEvidenceChain}>
+        <section className={css.historicalEvidenceChain} data-evidence-chain="">
           <header className={css.historicalEvidenceHeader}>
-            <div><span>阶段证据链</span><h2>从输入依据到人工结论</h2><p>所有结论均可回到来源材料与阶段记录。</p></div>
+            <div><span>阶段证据链</span><h2 data-evidence-title="">从输入依据到人工结论</h2><p>所有结论均可回到来源材料与阶段记录。</p></div>
             <div className={css.historicalEvidenceDirection} aria-hidden="true"><strong>01</strong><i /><strong>03</strong></div>
           </header>
           <div className={css.historicalStageGrid}>
-            <section>
-            <header><span>阶段输入</span><h2>当时依据了什么</h2></header>
+            <section data-evidence-input="">
+            <header className={css.historicalColumnHeader}><div><span>阶段输入</span><h2>当时依据了什么</h2></div><b>{viewedIndex === 0 ? sourceFiles.length : previousArtifacts.length} 份材料</b></header>
+            {viewedIndex === 0 && sourceFiles.length > 0 && <span className={css.evidenceGroupLabel}>客户提供</span>}
             <ul className={css.historicalFactList}>
-              {viewedIndex === 0 && sourceFiles.map(source => <li key={source.sourceId}>
+              {viewedIndex === 0 && sourceFiles.map(source => <li key={source.sourceId} data-evidence-row="" data-source-row="">
+                <EvidenceDocumentIcon />
                 <span>
-                  <strong>{source.originalName}</strong>
+                  <strong data-evidence-row-title="">{source.originalName}</strong>
                   <small>{sourceStatus(source)} · {formatSourceBytes(source.bytes)}</small>
                 </span>
                 <button type="button" onClick={() => {
                   openFile(source.relativePath, source.originalName)
                 }}>预览</button>
               </li>)}
-              {viewedIndex > 0 && previousArtifacts.map(artifact => <li key={artifact.id}>
-                <span><strong>{artifactDisplayTitle(artifact)}</strong><small>来自上一阶段的已保存记录</small></span>
+              {viewedIndex > 0 && previousArtifacts.map(artifact => <li key={artifact.id} data-evidence-row="" data-source-row="">
+                <EvidenceDocumentIcon />
+                <span><strong data-evidence-row-title="">{artifactDisplayTitle(artifact)}</strong><small>来自上一阶段的已保存记录</small></span>
                 <button type="button" onClick={() => {
                   openFile(artifact.path, artifactDisplayTitle(artifact))
                 }}>预览</button>
@@ -643,36 +660,79 @@ function BrowsedStagePanel({ props, workspace, sessionId, view, actualStage, vie
               || (viewedIndex > 0 && previousArtifacts.length === 0)
             ) && <p className={css.unregisteredFact}>未登记可直接追溯的阶段输入。</p>}
             </section>
-            <section>
-            <header><span>阶段输出</span><h2>已经留下什么</h2></header>
-            <ul className={css.historicalFactList}>{presentArtifacts.map(artifact => <li key={artifact.id}>
-              <span><strong>{artifactDisplayTitle(artifact)}</strong><small>{artifact.purpose}</small></span>
+            <section data-evidence-output="">
+            <header className={css.historicalColumnHeader}><div><span>阶段输出</span><h2>已经留下什么</h2></div><b>{presentArtifacts.length} 份记录</b></header>
+            <ul className={css.historicalFactList}>{presentArtifacts.map(artifact => <li key={artifact.id} data-evidence-row="">
+              <EvidenceDocumentIcon /><i className={css.evidenceStateDot} aria-hidden="true" />
+              <span><strong data-evidence-row-title="">{artifactDisplayTitle(artifact)}</strong><small>{artifact.purpose}</small></span>
               <button type="button" onClick={() => {
                 openFile(artifact.path, artifactDisplayTitle(artifact))
               }}>预览</button>
             </li>)}</ul>
             {presentArtifacts.length === 0 && <p className={css.unregisteredFact}>未发现可读取的阶段产物。</p>}
             </section>
-            <section>
+            <section data-evidence-decision="">
             <header><span>人工结论</span><h2>当时如何决定</h2></header>
-            <div className={css.historicalDecision}><i aria-hidden="true">✓</i><span><strong>已通过 FDE 人工阶段门</strong><small>项目随后进入“{nextStageTitle}”。</small></span></div>
+            <div className={css.historicalDecision}><EvidenceShieldIcon /><span><strong>已通过 FDE 人工阶段门</strong><small>项目随后进入“{nextStageTitle}”。</small></span></div>
             {selectedWorkflow !== undefined && viewedStage === 'discovery' && <dl><dt>选定业务流程</dt><dd>{selectedWorkflow.title}</dd></dl>}
             {stageRecommendation !== undefined && <dl><dt>阶段建议</dt><dd>{stageRecommendation}</dd></dl>}
               <dl><dt>遗留阻塞</dt><dd>{stageBlockers.length === 0 ? '未登记未解决阻塞' : `${String(stageBlockers.length)} 项`}</dd></dl>
               <div className={css.historicalDecisionLink}>查看决策记录 <span aria-hidden="true">→</span></div>
             </section>
           </div>
-          <ol className={css.historicalMilestones} aria-label="阶段封存轨迹">
+          <ol className={css.historicalMilestones} data-stage-milestones="" aria-label="阶段封存轨迹">
             {['材料进入', '事实还原', '待确认项', '流程冻结', 'FDE 阶段门'].map(item => <li key={item}><i>✓</i><span>{item}</span></li>)}
           </ol>
           <footer className={css.historicalArchiveFooter}><span><HistoricalArchiveIcon />阶段已封存；后续阶段可引用，但不能静默改写原始记录。</span><strong>查看全部阶段记录</strong></footer>
         </section>
       </>
-      : <section className={css.futureStageEmpty}>
-        <div className={css.futureStageIndex}>{String(viewedIndex + 1).padStart(2, '0')}</div>
-        <div><span>第 {String(viewedIndex + 1)}/8 阶段</span><h1>“{title}”尚未开始</h1><p>{objective}</p></div>
-        <dl><dt>当前项目阶段</dt><dd>{V2_STAGE_NAMES[actualIndex]}</dd><dt>开始条件</dt><dd>先完成当前阶段及此前所有前置阶段，并由 FDE 逐阶段确认。</dd><dt>开始后预计形成</dt><dd>{artifacts.length === 0 ? '阶段记录尚未加载' : artifacts.filter(artifact => artifact.required).map(artifact => artifactDisplayTitle(artifact)).join('、')}</dd></dl>
-      </section>}
+      : <>
+        <section className={css.browsedStageGoal}>
+          <div className={css.historicalGoalCopy}>
+            <span>第 {String(viewedIndex + 1)}/8 阶段 · 尚未开始</span><h1>{title}</h1><p>{explanation}</p>
+            <div className={css.historicalGoalFacts}>
+              <span><HistoricalFactIcon type="input" />{previousArtifacts.length} 份前置阶段记录</span>
+              <span><HistoricalFactIcon type="record" />{artifacts.filter(artifact => artifact.required).length} 份预计必备记录</span>
+              <span><HistoricalFactIcon type="gate" />尚未进入人工阶段门</span>
+            </div>
+          </div>
+          <div className={css.historicalCompletionRing} data-complete="false" data-future="true" aria-label={`第 ${String(viewedIndex + 1)}/8 阶段尚未开始`}><strong>{viewedIndex + 1}<small>/8</small></strong><span>未开始</span><i>{viewedIndex + 1}</i></div>
+          <div className={css.historicalGoalArt} aria-hidden="true"><img src="/fde-dashboard/stage-evidence-stack-3d.webp" alt="" /></div>
+          <div className={css.historicalArchiveNote} data-stage-art-note="">◷ 等待“{V2_STAGE_NAMES[actualIndex]}”完成并通过人工阶段门</div>
+        </section>
+        <section className={css.historicalEvidenceChain} data-future-stage="">
+          <header className={css.historicalEvidenceHeader}>
+            <div><span>阶段准备</span><h2>从前置条件到人工阶段门</h2><p>这里只展示开始条件和预计记录，不把尚未发生的工作写成事实。</p></div>
+            <div className={css.historicalEvidenceDirection} aria-hidden="true"><strong>01</strong><i /><strong>03</strong></div>
+          </header>
+          <div className={css.historicalStageGrid}>
+            <section>
+              <header><span>阶段输入</span><h2>开始前需要什么</h2></header>
+              <ul className={css.historicalFactList}>{previousArtifacts.map(artifact => <li key={artifact.id}>
+                <span><strong>{artifactDisplayTitle(artifact)}</strong><small>来自上一阶段的已保存记录</small></span>
+                <button type="button" onClick={() => { openFile(artifact.path, artifactDisplayTitle(artifact)) }}>预览</button>
+              </li>)}</ul>
+              {previousArtifacts.length === 0 && <p className={css.unregisteredFact}>当前阶段尚未完成，前置记录仍在形成。</p>}
+            </section>
+            <section>
+              <header><span>阶段输出</span><h2>开始后预计形成</h2></header>
+              <ul className={css.historicalFactList}>{artifacts.map(artifact => <li key={artifact.id} data-status="waiting">
+                <span><strong>{artifactDisplayTitle(artifact)}</strong><small>{artifact.required ? '必备记录' : '按需记录'} · {artifact.purpose}</small></span>
+              </li>)}</ul>
+              {artifacts.length === 0 && <p className={css.unregisteredFact}>阶段记录定义尚未加载。</p>}
+            </section>
+            <section>
+              <header><span>人工结论</span><h2>何时能够开始</h2></header>
+              <div className={css.historicalDecision}><i aria-hidden="true">{viewedIndex + 1}</i><span><strong>等待前置阶段完成</strong><small>尚未安排或执行本阶段工作。</small></span></div>
+              <dl><dt>当前阶段</dt><dd>{V2_STAGE_NAMES[actualIndex]}</dd><dt>开始条件</dt><dd>先完成此前阶段并由 FDE 确认</dd><dt>阶段目标</dt><dd>{objective}</dd></dl>
+            </section>
+          </div>
+          <ol className={css.historicalMilestones} aria-label={`第 ${String(viewedIndex + 1)} 阶段预计路径`}>
+            {['前置阶段完成', '开始条件确认', '执行阶段工作', '形成阶段记录', 'FDE 阶段门'].map((item, index) => <li key={item} data-status="waiting"><i>{index + 1}</i><span>{item}</span></li>)}
+          </ol>
+          <footer className={css.historicalArchiveFooter}><span><HistoricalArchiveIcon />当前只读查看；返回当前阶段继续形成真实记录。</span><strong>尚未开始</strong></footer>
+        </section>
+      </>}
     {fileError !== null && <p className={css.inlineError} role="alert">{fileError}</p>}
   </section>
 }
@@ -685,12 +745,10 @@ function StageWorkbenchPanel({ props, workspace, sessionId, view }: {
 }) {
   const [actionError, setActionError] = useState<string | null>(null)
   const [fileError, setFileError] = useState<string | null>(null)
-  const [artifactsCollapsed, setArtifactsCollapsed] = useState(true)
   const [reviewMode, setReviewMode] = useState(false)
   const [reviewConfirming, setReviewConfirming] = useState(false)
   const [reviewSubmitting, setReviewSubmitting] = useState(false)
   const [reviewError, setReviewError] = useState<string | null>(null)
-  const executionColumnRef = useRef<HTMLElement>(null)
   const sessionRunning = props.useSessions(snapshot => (
     snapshot.byId[sessionId as keyof typeof snapshot.byId]?.running ?? false
   ))
@@ -751,12 +809,6 @@ function StageWorkbenchPanel({ props, workspace, sessionId, view }: {
   const workflowEvidence = selectedWorkflow?.evidence ?? { confirmed: 0, inferred: 0, unverified: 0 }
   const artifactEvidenceCount = artifacts.reduce((total, artifact) => total + (artifact.evidenceRefs?.length ?? 0), 0)
 
-  useEffect(() => {
-    // A stage refresh can replace a shorter work item with a taller one while
-    // preserving the column's old scroll offset. Always reveal the new current
-    // work from the top instead of leaving the stage goal half clipped.
-    if (executionColumnRef.current !== null) executionColumnRef.current.scrollTop = 0
-  }, [currentWorkId, reviewReady])
   const openFile = (relativePath: string, title: string): void => {
     setFileError(null)
     void props.openProjectFile(sessionId, workspace.path, relativePath, title).catch((error: unknown) => {
@@ -901,96 +953,83 @@ function StageWorkbenchPanel({ props, workspace, sessionId, view }: {
 
   return (
     <section
-      className={css.root}
+      className={`${css.root} ${css.browsedStage} ${css.currentDiscoveryStage}`}
       data-conversation-hero-project=""
       data-fde-stage-workbench=""
+      data-stage="discovery"
       data-conversation-composer-layout="stage-execution"
       data-conversation-composer-overlay={view ? '' : undefined}
-      data-artifacts-collapsed={artifactsCollapsed ? 'true' : undefined}
+      data-artifacts-collapsed="true"
       aria-label="项目阶段工作台：发现高价值问题"
     >
-      <div className={css.workbenchGrid} data-artifacts-collapsed={artifactsCollapsed ? 'true' : undefined}>
-        <main ref={executionColumnRef} data-stage-execution-column="">
-          <section className={css.stageOverview}>
-            <header className={css.stageIntro}>
-              <span>本阶段目标</span>
-              <h1>先弄清客户现在怎么做、哪里出了问题，再决定先解决什么。</h1>
-              <p>结合客户资料、访谈和实际案例，还原实际流程，确认问题影响、责任人和结果判断方式。事实没弄清前，不急着定方案。</p>
-            </header>
+      <section className={css.browsedStageGoal} data-stage-goal="">
+        <div className={css.historicalGoalCopy}>
+          <span>第 1/8 阶段 · 进行中</span><h1 data-stage-title="">发现高价值问题</h1>
+          <p>结合客户资料和真实案例还原现状，保留未确认事实，由 FDE 判断是否值得继续投入。</p>
+          <div className={css.historicalGoalFacts}>
+            <span><HistoricalFactIcon type="input" />{files.length} 份输入材料</span>
+            <span><HistoricalFactIcon type="record" />{presentCount}/{requiredArtifacts.length} 份必备记录</span>
+            <span><HistoricalFactIcon type="gate" />{reviewReady ? '等待提交人工阶段门' : '尚未进入人工阶段门'}</span>
+          </div>
+        </div>
+        <div className={css.historicalCompletionRing} data-stage-ring="" data-complete="false" aria-label="当前处于第 1/8 阶段">
+          <strong>1<small>/8</small></strong><span>进行中</span><i>{currentWorkIndex + 1}</i>
+        </div>
+        <div className={css.historicalGoalArt} data-stage-art="" aria-hidden="true"><img src="/fde-dashboard/stage-evidence-stack-3d.webp" alt="" /></div>
+        <div className={css.historicalArchiveNote} data-stage-art-note="">◷ 当前记录持续更新 · 待 FDE 确认</div>
+      </section>
 
-            <div className={css.workPathMeta}><span>本阶段进度</span><b>第 {String(currentWorkIndex + 1)}/{String(workItems.length)} 步</b></div>
-            <ol className={css.workPath} aria-label="第一阶段工作路径" data-progress={String(currentWorkIndex)}>
-              {workItems.map((item, index) => {
-                const display = FALLBACK_WORK[index] ?? item
-                const hint = item.status === 'complete' ? '已完成' : item.status === 'current' ? '正在进行' : index === currentWorkIndex + 1 ? '下一步' : null
-                return <li key={item.id} data-status={item.status}>
-                  <i>{item.status === 'complete' ? '✓' : String(index + 1).padStart(2, '0')}</i>
-                  <span><strong>{display.title}</strong>{hint !== null && <small>{hint}</small>}</span>
-                </li>
-              })}
-            </ol>
+      <section className={css.historicalEvidenceChain} data-evidence-chain="" data-active-stage="">
+        <header className={css.historicalEvidenceHeader}>
+          <div><span>当前工作 · 第 {String(currentWorkIndex + 1)}/{String(workItems.length)} 步</span><h2 data-evidence-title="">{reviewReady ? '核对已经整理的记录' : currentWorkIndex === 0 ? '从一个最近发生的案例开始' : (FALLBACK_WORK[currentWorkIndex]?.title ?? currentWork.title)}</h2><p>{reviewReady ? '候选记录已经齐备，请回到依据逐项核对后再作出人工决定。' : (FALLBACK_WORK[currentWorkIndex]?.purpose ?? currentWork.purpose)}</p></div>
+          <div className={css.historicalEvidenceDirection} aria-hidden="true"><strong>01</strong><i /><strong>03</strong></div>
+        </header>
+        <div className={css.historicalStageGrid}>
+          <section data-evidence-input="">
+            <header className={css.historicalColumnHeader}><div><span>阶段输入</span><h2>现在依据了什么</h2></div><b>{files.length} 份材料</b></header>
+            {files.length > 0 && <span className={css.evidenceGroupLabel}>客户提供</span>}
+            <ul className={css.historicalFactList}>{files.map(source => <li key={source.sourceId} data-evidence-row="" data-source-row="">
+              <EvidenceDocumentIcon /><span><strong data-evidence-row-title="">{source.originalName}</strong><small>{sourceStatus(source)} · {formatSourceBytes(source.bytes)}</small></span>
+              <button type="button" aria-label={`预览客户资料：${source.originalName}`} onClick={() => { openFile(source.relativePath, source.originalName) }}>预览</button>
+            </li>)}</ul>
+            {files.length === 0 && <p className={css.unregisteredFact}>尚未登记客户资料，可直接从真实案例开始。</p>}
           </section>
-
-          <section className={css.currentWork}>
-            <header><span>现在先做</span><b>第 {String(currentWorkIndex + 1)} 步</b></header>
-            <h2>{reviewReady ? '核对已经整理的记录' : currentWorkIndex === 0 ? '从一个最近发生的案例开始' : (FALLBACK_WORK[currentWorkIndex]?.title ?? currentWork.title)}</h2>
-            <p>{reviewReady
-              ? '三份必备记录已经形成初稿。请继续核对信息来源、未确认事项和客户决策人，再由 FDE 决定是否进入下一阶段。'
-              : currentWorkIndex === 0
-                ? '请客户按时间顺序讲清楚：谁在什么情况下开始处理、经过哪些步骤、在哪里反复或出错，最后由谁判断结果。'
-                : (FALLBACK_WORK[currentWorkIndex]?.purpose ?? currentWork.purpose)}</p>
-            <div className={css.promptGuide}>
-              <span>可以直接这样开始</span>
-              <strong>“客户上周遇到了一次售后退款问题。请根据下面的描述，帮我整理还需要向业务人员核对的关键问题，暂时不要提出解决方案。”</strong>
-              <small>先把最近一次真实案例讲清楚，系统会继续追问缺少的事实。</small>
-            </div>
-            <div className={css.workActions}>
-              <button type="button" className={css.primaryButton} onClick={() => { prepareDraft('prepare-interview') }}>开始梳理真实流程</button>
-              {files.length > 0 && <button type="button" className={css.secondaryButton} onClick={() => { prepareDraft('qualify-workflow', files.map(file => file.relativePath)) }}>{`根据客户资料开始梳理（${String(files.length)}）`}</button>}
-              {hasEngagementReframe && <button type="button" className={css.tertiaryButton} onClick={() => { prepareDraft('reframe-engagement') }}>继续核对说法不一致</button>}
-            </div>
-            {actionError !== null && <p className={css.inlineError} role="alert">{actionError}</p>}
-            {sourceError !== null && <p className={css.inlineError} role="alert">项目资料读取失败：{sourceError}</p>}
+          <section data-evidence-output="">
+            <header className={css.historicalColumnHeader}><div><span>阶段输出</span><h2>正在形成什么</h2></div><b>{presentCount}/{requiredArtifacts.length} 份记录</b></header>
+            <ul className={css.historicalFactList}>{artifacts.map(artifact => <li key={artifact.id} data-evidence-row="" data-status={artifact.status}>
+              <EvidenceDocumentIcon /><i className={css.evidenceStateDot} data-status={artifact.status} aria-hidden="true" />
+              <span><strong data-evidence-row-title="">{artifactDisplayTitle(artifact)}</strong><small>{artifactStatus(artifact)} · {artifactGap(artifact)}</small></span>
+              {artifact.status === 'present' && <button type="button" aria-label={`预览阶段记录：${artifactDisplayTitle(artifact)}`} onClick={() => { openFile(artifact.path, artifactDisplayTitle(artifact)) }}>预览</button>}
+            </li>)}</ul>
           </section>
-
-          <section className={css.workflowsPanel}>
-            <header>
-              <div><span>调查结果</span><h2>待确认业务流程</h2><p>这里记录从客户描述中识别出的真实工作步骤，核对事实后再判断是否值得投入。</p></div>
-              <b>{workflowCatalog.items.length} 项</b>
-            </header>
-            {workflowCatalog.status === 'invalid' && <p className={css.inlineError} role="alert">业务流程记录读取失败：{workflowCatalog.message ?? '文件结构无效。'}</p>}
-            {workflowCatalog.items.length === 0 && workflowCatalog.status !== 'invalid' && <div className={css.emptyWorkflow}>
-              <i aria-hidden="true" />
-              <span><strong>还没有识别出具体流程</strong><small>先说清客户目前怎么做、由谁处理，以及在哪一步遇到问题。</small></span>
-            </div>}
-            {workflowCatalog.items.length > 0 && <div className={css.workflowList}>
-              {workflowCatalog.items.map(workflow => (
-                <article key={workflow.id} data-selected={workflow.disposition === 'selected' ? 'true' : undefined}>
-                  <header><span>{workflowDisposition(workflow.disposition)}</span><b>{workflow.title}</b></header>
-                  <dl><div><dt>谁在做</dt><dd>{workflow.actor}</dd></div><div><dt>何时发生</dt><dd>{workflow.trigger}</dd></div></dl>
-                  <p>{workflow.problem}</p>
-                  <footer><span data-kind="confirmed">已确认 {workflow.evidence.confirmed}</span><span data-kind="inferred">推断 {workflow.evidence.inferred}</span><span data-kind="unverified">待核对 {workflow.evidence.unverified}</span></footer>
-                </article>
-              ))}
-            </div>}
+          <section data-evidence-decision="">
+            <header><span>人工结论</span><h2>接下来如何决定</h2></header>
+            <div className={css.historicalDecision} data-ready={reviewReady ? 'true' : undefined}><EvidenceShieldIcon ready={reviewReady} /><span><strong>{reviewReady ? '候选材料已齐备' : '等待 FDE 完成本阶段判断'}</strong><small>{reviewReady ? '核对记录后可提交人工阶段门。' : '继续补齐事实与阶段记录。'}</small></span></div>
+            <dl><dt>当前工作</dt><dd>{FALLBACK_WORK[currentWorkIndex]?.title ?? currentWork.title}</dd><dt>待确认流程</dt><dd>{selectedWorkflow?.title ?? `${String(workflowCatalog.items.length)} 项`}</dd><dt>事实状态</dt><dd>已确认 {workflowEvidence.confirmed} · 待核对 {workflowEvidence.unverified}</dd><dt>遗留阻塞</dt><dd>{(discovery?.blockers ?? []).length} 项</dd></dl>
+            {reviewReady && <button type="button" className={css.historicalDecisionAction} data-stage-review-action="" onClick={() => { setReviewError(null); setReviewConfirming(false); setReviewMode(true) }}>提交 FDE 评审 <span aria-hidden="true">→</span></button>}
           </section>
-        </main>
-
-        <aside data-stage-artifact-column="" data-collapsed={artifactsCollapsed ? 'true' : undefined}>
-          <ProjectRecordPanel
-            actualStage="discovery"
-            collapsed={artifactsCollapsed}
-            projectSurface={surface}
-            sourceFiles={files}
-            openFile={openFile}
-            onCollapsedChange={setArtifactsCollapsed}
-            reviewReady={reviewReady}
-            onStartReview={() => { setReviewError(null); setReviewConfirming(false); setReviewMode(true) }}
-          />
-          {surfaceError !== null && <p className={css.inlineError} role="alert">阶段记录读取失败：{surfaceError}</p>}
-          {fileError !== null && <p className={css.inlineError} role="alert">{fileError}</p>}
-        </aside>
-      </div>
+        </div>
+        <ol className={css.historicalMilestones} data-stage-milestones="" aria-label="第一阶段工作路径">
+          {workItems.map((item, index) => {
+            const display = FALLBACK_WORK[index] ?? item
+            return <li key={item.id} data-status={item.status}><i>{item.status === 'complete' ? '✓' : index + 1}</i><span>{display.title}</span></li>
+          })}
+          <li data-status={reviewReady ? 'current' : 'waiting'}><i>5</i><span>FDE 阶段门</span></li>
+        </ol>
+        <footer className={css.historicalArchiveFooter}>
+          <span><HistoricalArchiveIcon />当前阶段记录会随对话与资料持续更新。</span>
+          <div className={css.activeStageActions}>
+            <button type="button" className={css.primaryButton} onClick={() => { prepareDraft('prepare-interview') }}>开始梳理真实流程</button>
+            {files.length > 0 && <button type="button" className={css.secondaryButton} onClick={() => { prepareDraft('qualify-workflow', files.map(file => file.relativePath)) }}>{`根据客户资料开始梳理（${String(files.length)}）`}</button>}
+            {hasEngagementReframe && <button type="button" className={css.tertiaryButton} onClick={() => { prepareDraft('reframe-engagement') }}>继续核对说法不一致</button>}
+          </div>
+        </footer>
+      </section>
+      {workflowCatalog.status === 'invalid' && <p className={css.inlineError} role="alert">业务流程记录读取失败：{workflowCatalog.message ?? '文件结构无效。'}</p>}
+      {actionError !== null && <p className={css.inlineError} role="alert">{actionError}</p>}
+      {sourceError !== null && <p className={css.inlineError} role="alert">项目资料读取失败：{sourceError}</p>}
+      {surfaceError !== null && <p className={css.inlineError} role="alert">阶段记录读取失败：{surfaceError}</p>}
+      {fileError !== null && <p className={css.inlineError} role="alert">{fileError}</p>}
     </section>
   )
 }

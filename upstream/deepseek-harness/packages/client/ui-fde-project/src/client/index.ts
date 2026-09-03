@@ -96,7 +96,7 @@ export function apply(ctx: ClientContext): void {
   }
 
   const activateProjectWorkbenchLayout = (): void => {
-    ctx.layout.openSidebar(354)
+    ctx.layout.openSidebar(291)
     ctx.layout.closeDetails()
     if (typeof document === 'undefined') return
     let attempts = 0

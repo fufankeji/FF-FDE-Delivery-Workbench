@@ -387,11 +387,23 @@
 /* A project-specific blank-session home may use the full delivery column;
    the Agent composer remains the same narrow execution surface below it. */
 .composerHero:has([data-conversation-hero-project]) {
+  height: 100%;
+  min-height: 0;
   align-self: stretch;
   width: 100%;
   padding: 24px 28px 32px;
   box-sizing: border-box;
   gap: 14px;
+}
+
+.root[data-phase='hero'] .scrollBody:has([data-conversation-hero-project]) > .composerSeat {
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.composerHero:has([data-conversation-hero-project]) > [data-conversation-hero-project] {
+  min-height: 0;
+  flex: 1 1 auto;
 }
 
 /* Blue backdrop ellipse (figma 313:14109), centered on the input card: the

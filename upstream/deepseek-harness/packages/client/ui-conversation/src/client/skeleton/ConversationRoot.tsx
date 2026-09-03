@@ -14,7 +14,7 @@ export type ConversationRootProps = ConversationSlotProps
 
 export function ConversationRoot({
   sessionId, useSession, useSessions, useWorkspaces, useInput, useComposerBlock,
-  renderSlot, renderSlotChain, selectWorkspace, t,
+  renderSlot, renderSlotChain, selectWorkspace, showBlankSessionChrome, t,
 }: ConversationRootProps) {
   const openState = useSession(s => s.openState)
   const composerPhase = useSession(s => s.composerPhase)
@@ -87,6 +87,7 @@ export function ConversationRoot({
     || (composerPhase === 'blank' && (openState === 'open' || summaryBlank === true))
   const zone: InputZone | undefined =
     session === undefined || inputState === undefined ? undefined : { session, input: inputState }
+  const keepProjectChrome = sessionId !== undefined && showBlankSessionChrome()
 
   // The chip is a selector; label resolution walks the flow top-down:
   //   1. a just-picked workspace (pending) → its title;
@@ -167,7 +168,9 @@ export function ConversationRoot({
     rightItems: zone === undefined ? null : renderSlot('conversation.input.right', zone),
     // Stats band under the card, inside the bar's width column so both
     // share one constraint (composer.dock = stats-line family).
-    footer: !hero && zone !== undefined ? renderSlot('conversation.composer.dock', zone) : null,
+    footer: (!hero || keepProjectChrome) && zone !== undefined
+      ? renderSlot('conversation.composer.dock', zone)
+      : null,
   })
 
   const composerBar = (
@@ -205,7 +208,7 @@ export function ConversationRoot({
 
   return (
     <div className={css.root} data-phase={phase}>
-      {renderSlot('conversation.session.header', {})}
+      {renderSlot('conversation.session.header', { showWhenBlank: keepProjectChrome })}
       <div className={css.scrollBody} data-conversation-scroll="">
         {renderSlot('conversation.session', {})}
         {composerSeat}

@@ -73,37 +73,31 @@ describe('ProjectStageWorkbenchHero', () => {
     const input = props()
     const view = render(<ProjectStageWorkbenchHero {...input} />)
 
-    expect(screen.getByRole('heading', { name: '先弄清客户现在怎么做、哪里出了问题，再决定先解决什么。' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: '发现高价值问题' })).toBeTruthy()
+    expect(view.container.querySelector('img')?.getAttribute('src')).toBe('/fde-dashboard/stage-evidence-stack-3d.webp')
     const workPath = screen.getByRole('list', { name: '第一阶段工作路径' })
     expect(workPath).toBeTruthy()
-    expect(screen.getByText('本阶段进度')).toBeTruthy()
-    expect(screen.getByText('第 1/4 步')).toBeTruthy()
+    expect(screen.getByText('当前工作 · 第 1/4 步')).toBeTruthy()
     expect(within(workPath).getByText('听客户怎么说')).toBeTruthy()
     expect(within(workPath).getByText('还原实际流程')).toBeTruthy()
     expect(within(workPath).getByText('确认是否值得做')).toBeTruthy()
     expect(within(workPath).getByText('决定下一步')).toBeTruthy()
-    expect(within(workPath).getByText('正在进行')).toBeTruthy()
-    expect(within(workPath).getByText('下一步')).toBeTruthy()
+    expect(within(workPath).getAllByRole('listitem')[0]?.getAttribute('data-status')).toBe('current')
     expect(screen.queryByText('等待前置事实')).toBeNull()
-    expect(screen.getByText('待确认业务流程')).toBeTruthy()
-    expect(screen.getByText('还没有识别出具体流程')).toBeTruthy()
+    expect(screen.getByText('待确认流程')).toBeTruthy()
+    expect(screen.getByText('等待 FDE 完成本阶段判断')).toBeTruthy()
     expect(screen.queryByRole('textbox')).toBeNull()
     expect(screen.queryByText('项目资料与现场记录')).toBeNull()
     expect(screen.queryByText('Agent 执行入口')).toBeNull()
     expect(screen.queryByText('AI FDE 执行入口')).toBeNull()
     const workbench = view.container.querySelector('[data-fde-stage-workbench]')
-    const execution = view.container.querySelector('[data-stage-execution-column]')
-    const artifacts = view.container.querySelector('[data-stage-artifact-column]')
     expect(workbench?.getAttribute('data-conversation-composer-layout')).toBe('stage-execution')
-    expect(execution).toBeTruthy()
-    expect(artifacts).toBeTruthy()
+    expect(workbench?.getAttribute('data-artifacts-collapsed')).toBe('true')
+    expect(view.container.querySelector('[data-active-stage]')).toBeTruthy()
     expect(view.container.querySelector('[data-stage-decision-gate]')).toBeNull()
     expect(view.container.querySelector('[data-stage-review-action]')).toBeNull()
-    expect(artifacts?.getAttribute('data-collapsed')).toBe('true')
     expect(screen.queryByText('现场观察记录')).toBeNull()
-    const currentRecord = screen.getByRole('button', { name: '查看第 1 阶段记录：发现高价值问题' })
-    expect(within(currentRecord).getByText('0/3')).toBeTruthy()
-    expect(currentRecord.getAttribute('data-tooltip')).toBe('第 1 阶段 · 发现高价值问题 · 当前阶段 · 0/3 项必备记录')
+    expect(screen.getByText((_, element) => element?.textContent === '0/3 份必备记录')).toBeTruthy()
     expect(screen.queryByRole('button', { name: '查看第 2 阶段记录：定义结果、范围与责任' })).toBeNull()
 
     expect(screen.getByText('从一个最近发生的案例开始')).toBeTruthy()
@@ -112,28 +106,21 @@ describe('ProjectStageWorkbenchHero', () => {
     fireEvent.click(startButton)
     expect(input.prepareDiscoveryDraft).toHaveBeenCalledWith('session-1', 'prepare-interview', [])
 
-    fireEvent.click(currentRecord)
-    expect(artifacts?.getAttribute('data-collapsed')).toBeNull()
-    const sourceHeading = screen.getByText('当时依据了什么')
-    const outputHeading = screen.getByText('留下了什么')
+    const sourceHeading = screen.getByText('现在依据了什么')
+    const outputHeading = screen.getByText('正在形成什么')
     expect(sourceHeading.compareDocumentPosition(outputHeading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(screen.getByText('客户访谈纪要.docx')).toBeTruthy()
-    expect(screen.getByText('1.0 KB · 已识别，可预览')).toBeTruthy()
+    expect(screen.getByText('已识别，可预览 · 1.0 KB')).toBeTruthy()
     expect(screen.getByText('客户现状记录')).toBeTruthy()
     expect(screen.getByText('待确认事项')).toBeTruthy()
     expect(screen.getByText('业务流程说明')).toBeTruthy()
     expect(screen.getByText('项目调整记录')).toBeTruthy()
-    expect(screen.getAllByText('0/3').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('尚未整理').length).toBe(3)
-    expect(screen.getByText('按需生成')).toBeTruthy()
+    expect(screen.getAllByText(/尚未整理 ·/).length).toBe(3)
+    expect(screen.getByText(/按需生成 ·/)).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: '预览客户资料：客户访谈纪要.docx' }))
     expect(input.openProjectFile).toHaveBeenCalledWith(
       'session-1', '/isolated/project', 'fde-resources/客户访谈纪要.docx', '客户访谈纪要.docx',
     )
-    fireEvent.click(screen.getByRole('button', { name: '收起项目记录' }))
-    expect(artifacts?.getAttribute('data-collapsed')).toBe('true')
-    expect(screen.queryByText('客户现状记录')).toBeNull()
-
     fireEvent.click(screen.getByRole('button', { name: '根据客户资料开始梳理（1）' }))
     expect(input.prepareDiscoveryDraft).toHaveBeenCalledWith(
       'session-1',
@@ -148,8 +135,8 @@ describe('ProjectStageWorkbenchHero', () => {
     })
     render(<ProjectStageWorkbenchHero {...input} />)
 
-    expect(screen.getByText('还没有识别出具体流程')).toBeTruthy()
-    expect(screen.getByText(/先说清客户目前怎么做/)).toBeTruthy()
+    expect(screen.getByText('尚未登记客户资料，可直接从真实案例开始。')).toBeTruthy()
+    expect(screen.getByText('保留客户原话、已有资料和现场条件。')).toBeTruthy()
     expect(screen.queryByRole('button', { name: /分析已上传资料/ })).toBeNull()
     expect(screen.queryByRole('textbox')).toBeNull()
   })
@@ -176,17 +163,12 @@ describe('ProjectStageWorkbenchHero', () => {
     expect(loadProjectSources).toHaveBeenCalledTimes(2)
   })
 
-  it('returns the execution column to the stage goal when the current work changes', () => {
+  it('updates the visible current step when project records change', () => {
     let surfaces: Record<string, unknown> = { byWorkspace: {} }
     const input = props({
       useProjectSurfaces: <S,>(selector: (state: Record<string, unknown>) => S): S => selector(surfaces),
     })
     const view = render(<ProjectStageWorkbenchHero {...input} />)
-    const execution = view.container.querySelector<HTMLElement>('[data-stage-execution-column]')
-    expect(execution).toBeTruthy()
-    if (execution === null) return
-
-    execution.scrollTop = 144
     surfaces = {
       byWorkspace: {
         'workspace-1': {
@@ -209,8 +191,8 @@ describe('ProjectStageWorkbenchHero', () => {
     }
     view.rerender(<ProjectStageWorkbenchHero {...input} />)
 
-    expect(execution.scrollTop).toBe(0)
-    expect(screen.getByText('第 2/4 步')).toBeTruthy()
+    expect(screen.getByText('当前工作 · 第 2/4 步')).toBeTruthy()
+    expect(screen.getByRole('heading', { name: '还原实际流程' })).toBeTruthy()
   })
 
   it('reviews persisted evidence inside the project and advances only after a second FDE confirmation', async () => {
@@ -261,16 +243,14 @@ describe('ProjectStageWorkbenchHero', () => {
     })
     render(<ProjectStageWorkbenchHero {...input} />)
 
-    fireEvent.click(screen.getByRole('button', { name: '查看第 1 阶段记录：发现高价值问题' }))
     expect(screen.getByText('候选材料已齐备')).toBeTruthy()
-    expect(screen.getByText('请先阅读记录，再由 FDE 决定是否推进。')).toBeTruthy()
+    expect(screen.getByText('核对记录后可提交人工阶段门。')).toBeTruthy()
     expect(screen.getByText('退款申请复核')).toBeTruthy()
-    expect(screen.getByText('已确认 3')).toBeTruthy()
-    expect(screen.getByText('待核对 2')).toBeTruthy()
-    expect(screen.getAllByText('已有初稿 · v1').length).toBe(4)
+    expect(screen.getByText('已确认 3 · 待核对 2')).toBeTruthy()
+    expect(screen.getAllByText(/已有初稿 · v1 ·/).length).toBe(4)
     expect(screen.getByRole('button', { name: '继续核对说法不一致' })).toBeTruthy()
-    expect(document.querySelector('[data-stage-artifact-column]')?.contains(document.querySelector('[data-stage-review-action]'))).toBe(true)
-    fireEvent.click(screen.getAllByRole('button', { name: '预览' })[0]!)
+    expect(document.querySelector('[data-active-stage]')?.contains(document.querySelector('[data-stage-review-action]'))).toBe(true)
+    fireEvent.click(screen.getByRole('button', { name: '预览阶段记录：客户现状记录' }))
     expect(input.openProjectFile).toHaveBeenCalledWith(
       'session-1', '/isolated/project',
       'fde-deliverables/01-requirement-research/requirement-research-report.md', '客户现状记录',
@@ -470,8 +450,10 @@ describe('ProjectStageWorkbenchHero', () => {
 
     expect(screen.getByText('未开始阶段')).toBeTruthy()
     expect(screen.getByText(/项目当前在“发现高价值问题”/)).toBeTruthy()
-    expect(screen.getByRole('heading', { name: '“调查数据、系统、接口、安全与组织”尚未开始' })).toBeTruthy()
-    expect(screen.getByText('先完成当前阶段及此前所有前置阶段，并由 FDE 逐阶段确认。')).toBeTruthy()
+    expect(screen.getByRole('heading', { name: '调查数据、系统、接口、安全与组织' })).toBeTruthy()
+    expect(screen.getByText('从前置条件到人工阶段门')).toBeTruthy()
+    expect(screen.getByText('等待前置阶段完成')).toBeTruthy()
+    expect(screen.getByText('先完成此前阶段并由 FDE 确认')).toBeTruthy()
     expect(screen.getByText('系统与接口清单')).toBeTruthy()
     expect(screen.queryByText('盘点现有系统')).toBeNull()
     expect(screen.queryByText('会依次做什么')).toBeNull()
