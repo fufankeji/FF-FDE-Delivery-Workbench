@@ -21,10 +21,8 @@ import {
   type ProjectStageLoadState,
 } from './stage-controller.ts'
 import type { ProjectSourceItem, ProjectSourceLoadState } from './source-controller.ts'
-import type { ProjectProgressOverlayProps, RequirementWikiRunTarget } from './slots.ts'
+import type { ProjectProgressOverlayProps } from './slots.ts'
 import type { ProjectPreviewFile } from './slots.ts'
-import { RequirementIssuePanel, RequirementWikiPanel } from './RequirementWikiPanel.tsx'
-import type { RequirementWikiLoadState } from './wiki-controller.ts'
 import css from './project.module.css'
 
 interface ProjectRow {
@@ -36,7 +34,6 @@ interface ProjectRow {
   readonly runningSessions: number
   readonly latestSessionTitle?: string
   readonly latestActivityAt?: number
-  readonly wikiSessionId?: string
   readonly companyName: string
   readonly schedule: ReturnType<typeof readProjectMetadata>['schedule']
   readonly stage: ProjectStageLoadState | undefined
@@ -389,11 +386,10 @@ function scheduleDayCount(startDate: string, endDate: string): number {
   return Math.max(1, Math.round((end - start) / 86_400_000) + 1)
 }
 
-function ProjectDeliverySummary({ row, sourceState, surfaceState, wikiState }: {
+function ProjectDeliverySummary({ row, sourceState, surfaceState }: {
   readonly row: ProjectRow
   readonly sourceState: ProjectSourceLoadState | undefined
   readonly surfaceState: ProjectSurfaceLoadState | undefined
-  readonly wikiState: RequirementWikiLoadState | undefined
 }) {
   const snapshot = surfaceState?.status === 'ready' ? surfaceState.value : undefined
   const development = snapshot?.development
@@ -439,8 +435,6 @@ function ProjectDeliverySummary({ row, sourceState, surfaceState, wikiState }: {
   const evidenceTotal = evidenceGroups.reduce((total, group) => total + group.total, 0)
   const sources = sourceState?.files ?? []
   const parsedSources = sources.filter(source => source.parse.status === 'ready').length
-  const wiki = wikiState?.value?.current
-  const unresolved = (wiki?.conflicts.length ?? 0) + (wiki?.unknowns.length ?? 0)
   const scheduled = row.schedule.status === 'estimated'
   const startTime = scheduled ? new Date(`${row.schedule.startDate}T00:00:00`).getTime() : 0
   const endTime = scheduled ? new Date(`${row.schedule.endDate}T23:59:59`).getTime() : 0
@@ -482,12 +476,10 @@ function ProjectDeliverySummary({ row, sourceState, surfaceState, wikiState }: {
         </div>
       </section>
       <section className={css.projectDataPanel}>
-        <header><div><span>项目数据</span><h2>资料、知识与研发证据</h2></div></header>
+        <header><div><span>项目数据</span><h2>资料与研发证据</h2></div></header>
         <dl>
           <div><dt>客户资料</dt><dd>{sources.length}</dd></div>
           <div><dt>已识别</dt><dd>{parsedSources}</dd></div>
-          <div><dt>知识页 / 关系</dt><dd>{wiki?.pages.length ?? 0}<small> / {wiki?.relations.length ?? 0}</small></dd></div>
-          <div><dt>冲突与待确认</dt><dd>{unresolved}</dd></div>
           <div><dt>Feature</dt><dd>{development?.features.length ?? 0}</dd></div>
           <div><dt>任务证据</dt><dd>{taskCompleted}<small> / {taskTotal}</small></dd></div>
           <div><dt>评估用例</dt><dd>{snapshot?.evaluation.casesCount ?? 0}</dd></div>
@@ -498,16 +490,14 @@ function ProjectDeliverySummary({ row, sourceState, surfaceState, wikiState }: {
   )
 }
 
-function StageVisualSummary({ viewedStage, sourceState, surfaceState, wikiState }: {
+function StageVisualSummary({ viewedStage, sourceState, surfaceState }: {
   readonly viewedStage: FdeStageId
   readonly sourceState: ProjectSourceLoadState | undefined
   readonly surfaceState: ProjectSurfaceLoadState | undefined
-  readonly wikiState: RequirementWikiLoadState | undefined
 }) {
   const snapshot = surfaceState?.status === 'ready' ? surfaceState.value : undefined
   const sources = sourceState?.files ?? []
   const parsedSources = sources.filter(source => source.parse.status === 'ready').length
-  const wiki = wikiState?.value?.current
   const development = snapshot?.development
   const taskTotal = development?.features.reduce((total, feature) => total + feature.taskTotal, 0) ?? 0
   const taskCompleted = development?.features.reduce((total, feature) => total + feature.taskCompleted, 0) ?? 0
@@ -515,21 +505,15 @@ function StageVisualSummary({ viewedStage, sourceState, surfaceState, wikiState 
   if (viewedStage === 'requirements') {
     return (
       <section className={`${css.stageVisual} ${css.requirementsVisual}`} aria-label="需求调研数据链路">
-        <header><span>需求知识链路</span><h3>原始资料如何沉淀为可确认需求</h3></header>
+        <header><span>需求调研链路</span><h3>原始资料如何沉淀为可确认需求</h3></header>
         <div className={css.requirementsFlow}>
           <article><span>01</span><strong>{sources.length}</strong><small>输入资料 · {parsedSources} 份已识别</small></article>
           <i aria-hidden="true">→</i>
           <article>
-            <span>02</span><strong>{wiki?.pages.length ?? 0}</strong>
-            <small>知识节点 · {wiki?.relations.length ?? 0} 条关系</small>
-          </article>
-          <i aria-hidden="true">→</i>
-          <article>
-            <span>03</span><strong>{snapshot?.requirements.presentCount ?? 0}</strong>
+            <span>02</span><strong>{snapshot?.requirements.presentCount ?? 0}</strong>
             <small>阶段文件 · 共 {snapshot?.requirements.requiredCount ?? 0} 份</small>
           </article>
         </div>
-        <dl><div><dt>冲突</dt><dd>{wiki?.conflicts.length ?? 0}</dd></div><div><dt>待确认</dt><dd>{wiki?.unknowns.length ?? 0}</dd></div></dl>
       </section>
     )
   }
@@ -2347,8 +2331,8 @@ function StageOutputs({
 }
 
 function ProjectDetail({
-  row, sourceState, surfaceState, wikiState, selectedSource, selectSource, parseSource,
-  prepareWiki, startWiki, abandonWiki, refreshWiki, completeRequirements, completeSolution,
+  row, sourceState, surfaceState, selectedSource, selectSource, parseSource,
+  completeRequirements, completeSolution,
   completeDevelopment, completeValidation, completePilot, completeHandoff, returnToPrevious,
   acceptValidationMetric, waiveValidationIssue,
   acceptDeploymentTrialIssue, confirmDeploymentTrialReadiness, recordAcceptanceHandoverDecision,
@@ -2357,18 +2341,9 @@ function ProjectDetail({
   readonly row: ProjectRow
   readonly sourceState: ProjectSourceLoadState | undefined
   readonly surfaceState: ProjectSurfaceLoadState | undefined
-  readonly wikiState: RequirementWikiLoadState | undefined
   readonly selectedSource: ProjectSourceItem | undefined
   readonly selectSource: (sourceId: string) => void
   readonly parseSource: (sourceId: string) => void
-  readonly prepareWiki: (sessionId: string) => Promise<RequirementWikiRunTarget>
-  readonly startWiki: (
-    sourceIds: readonly string[],
-    expectedRevision: number,
-    target: RequirementWikiRunTarget,
-  ) => Promise<void>
-  readonly abandonWiki: (buildId: string) => Promise<void>
-  readonly refreshWiki: () => void
   readonly completeRequirements: (revision: number) => Promise<void>
   readonly completeSolution: (revision: number) => Promise<void>
   readonly completeDevelopment: (revision: number) => Promise<void>
@@ -2388,7 +2363,7 @@ function ProjectDetail({
 }) {
   const currentStage = row.stage?.status === 'ready' ? row.stage.value.currentStage : undefined
   const [viewedStage, setViewedStage] = useState<FdeStageId>(currentStage === 'completed' ? 'handoff' : currentStage ?? 'requirements')
-  const [section, setSection] = useState<'inputs' | 'outputs' | 'wiki' | 'conflicts' | 'unknowns'>('inputs')
+  const [section, setSection] = useState<'inputs' | 'outputs'>('inputs')
   const [returnOpen, setReturnOpen] = useState(false)
   const [returnReason, setReturnReason] = useState('')
   const [returnError, setReturnError] = useState<string | undefined>()
@@ -2402,7 +2377,6 @@ function ProjectDetail({
     setReturnError(undefined)
   }, [currentStage, row.workspaceId])
   const canParse = selectedSource !== undefined && ['pending', 'error', 'stale'].includes(selectedSource.parse.status)
-  const openSource = (sourceId: string): void => { selectSource(sourceId); setViewedStage('requirements'); setSection('inputs') }
   const viewedIndex = FDE_STAGES.findIndex(item => item.id === viewedStage)
   const viewedState = stagePositionState(row.stage, viewedIndex)
   const validationReached = stageReached(currentStage, 'validation')
@@ -2497,7 +2471,7 @@ function ProjectDetail({
         <p>{latestReturn.reason}</p>
         <time dateTime={latestReturn.returnedAt}>{formatAuditTime(latestReturn.returnedAt)}</time>
       </aside>}
-      <ProjectDeliverySummary row={row} sourceState={sourceState} surfaceState={surfaceState} wikiState={wikiState} />
+      <ProjectDeliverySummary row={row} sourceState={sourceState} surfaceState={surfaceState} />
       <div className={css.stageExperience}>
         <aside className={css.stageRail}>
           <header><span>交付阶段</span><h2>六阶段工作区</h2><p>选择阶段后，在右侧查看对应数据与产物。</p></header>
@@ -2520,33 +2494,14 @@ function ProjectDetail({
             viewedStage={viewedStage}
             sourceState={sourceState}
             surfaceState={surfaceState}
-            wikiState={wikiState}
           />
           <nav className={css.detailSections} aria-label={`${STAGE_NAMES[viewedStage]}工作区`}>
             {viewedStage === 'requirements' && <>
               <button type="button" data-active={section === 'inputs' || undefined} onClick={() => { setSection('inputs') }}>阶段输入 <span>{sourceState?.files.length ?? 0}</span></button>
               <button type="button" data-active={section === 'outputs' || undefined} onClick={() => { setSection('outputs') }}>阶段产出 <span>{outputCount}</span></button>
-              <button type="button" data-active={section === 'wiki' || undefined} onClick={() => { setSection('wiki') }}>需求知识图谱</button>
-              <button type="button" data-active={section === 'conflicts' || undefined} onClick={() => { setSection('conflicts') }}>冲突与缺口 <span>{wikiState?.value?.current?.conflicts.length ?? 0}</span></button>
-              <button type="button" data-active={section === 'unknowns' || undefined} onClick={() => { setSection('unknowns') }}>待确认事项 <span>{wikiState?.value?.current?.unknowns.length ?? 0}</span></button>
             </>}
             {viewedStage !== 'requirements' && <button type="button" data-active>阶段产出 <span>{outputCount}</span></button>}
           </nav>
-          {viewedStage === 'requirements' && section === 'wiki' && (
-            <RequirementWikiPanel
-              workspaceId={row.workspaceId}
-              runSessionId={row.wikiSessionId}
-              wikiState={wikiState}
-              sourceState={sourceState}
-              onPrepare={prepareWiki}
-              onStart={startWiki}
-              onAbandon={abandonWiki}
-              onRefresh={refreshWiki}
-              onOpenSource={openSource}
-            />
-          )}
-          {viewedStage === 'requirements' && section === 'conflicts' && <RequirementIssuePanel kind="conflicts" wikiState={wikiState} onOpenSource={openSource} />}
-          {viewedStage === 'requirements' && section === 'unknowns' && <RequirementIssuePanel kind="unknowns" wikiState={wikiState} onOpenSource={openSource} />}
           {(viewedStage !== 'requirements' || section === 'outputs') && <StageOutputs
             workspaceId={row.workspaceId}
             stage={row.stage}
@@ -2621,9 +2576,9 @@ function ProjectDetail({
 
 /** Render the global full page while retaining the ordinary project/session sidebar. */
 export function ProjectProgressOverlay({
-  useProjectPage, useStageProgress, useProjectSurfaces, useProjectSources, useRequirementWiki, useWorkspaces, useSessions,
-  loadStage, retryStage, loadProjectSurface, refreshProjectSurface, loadProjectSources, parseProjectSource, loadRequirementWiki,
-  prepareRequirementWikiRun, startRequirementWikiBuild, abandonRequirementWikiBuild, openProjectCreation, enterProject, reviewProjectArchitecture,
+  useProjectPage, useStageProgress, useProjectSurfaces, useProjectSources, useWorkspaces, useSessions,
+  loadStage, retryStage, loadProjectSurface, refreshProjectSurface, loadProjectSources, parseProjectSource,
+  openProjectCreation, enterProject, reviewProjectArchitecture,
   completeRequirements, completeSolution, completeDevelopment, completeValidation, completePilot, completeHandoff, returnToPrevious,
   acceptValidationMetric, waiveValidationIssue, acceptDeploymentTrialIssue, confirmDeploymentTrialReadiness,
   recordAcceptanceHandoverDecision,
@@ -2636,7 +2591,6 @@ export function ProjectProgressOverlay({
   const stages = useStageProgress(state => state.byWorkspace)
   const surfaces = useProjectSurfaces(state => state.byWorkspace)
   const sources = useProjectSources(state => state.byWorkspace)
-  const requirementWikis = useRequirementWiki(state => state.byWorkspace)
   const [selectedSourceId, setSelectedSourceId] = useState<string | undefined>()
   const [projectScope, setProjectScope] = useState<'attention' | 'all'>('attention')
   const [projectCollectionView, setProjectCollectionView] = useState<'card' | 'list'>('list')
@@ -2657,16 +2611,7 @@ export function ProjectProgressOverlay({
     setSelectedSourceId(undefined)
     refreshProjectSurface(page.workspaceId)
     loadProjectSources(page.workspaceId)
-    loadRequirementWiki(page.workspaceId)
-  }, [loadProjectSources, loadRequirementWiki, page.view, page.workspaceId, refreshProjectSurface])
-
-  useEffect(() => {
-    if (page.view !== 'project' || page.workspaceId === undefined) return
-    const build = requirementWikis[page.workspaceId]?.value?.build
-    if (build === null || build === undefined || (build.status !== 'queued' && build.status !== 'running')) return
-    const timer = window.setInterval(() => { loadRequirementWiki(page.workspaceId as string, true) }, 2_500)
-    return () => { window.clearInterval(timer) }
-  }, [loadRequirementWiki, page.view, page.workspaceId, requirementWikis])
+  }, [loadProjectSources, page.view, page.workspaceId, refreshProjectSurface])
 
   useEffect(() => {
     if (page.view !== 'project' || page.workspaceId === undefined || selectedSourceId !== undefined) return
@@ -2677,14 +2622,12 @@ export function ProjectProgressOverlay({
   const rows = useMemo<readonly ProjectRow[]>(() => workspaces.map((workspace) => {
     const workspaceSessions = workspace.sessionIds.map(id => sessions.byId[id]).filter(item => item !== undefined)
     const latestSession = workspaceSessions.toSorted((left, right) => right.updatedAt - left.updatedAt)[0]
-    const wikiSessionId = workspaceSessions.find(item => item.origin !== 'subagent')?.id
     const metadata = readProjectMetadata(workspace.path)
     return {
       workspaceId: String(workspace.workspaceId), title: workspace.title, path: workspace.path,
       createdAt: workspace.createdAt, sessions: workspaceSessions.length,
       runningSessions: workspaceSessions.filter(item => item.running).length,
       ...(latestSession === undefined ? {} : { latestSessionTitle: latestSession.displayTitle, latestActivityAt: latestSession.updatedAt }),
-      ...(wikiSessionId === undefined ? {} : { wikiSessionId: String(wikiSessionId) }),
       companyName: metadata.companyName, schedule: metadata.schedule,
       stage: stages[String(workspace.workspaceId)],
       surface: surfaces[String(workspace.workspaceId)],
@@ -2695,7 +2638,6 @@ export function ProjectProgressOverlay({
   const detailRow = page.workspaceId === undefined ? undefined : rows.find(row => row.workspaceId === page.workspaceId)
   const sourceState = page.workspaceId === undefined ? undefined : sources[page.workspaceId]
   const surfaceState = page.workspaceId === undefined ? undefined : surfaces[page.workspaceId]
-  const wikiState = page.workspaceId === undefined ? undefined : requirementWikis[page.workspaceId]
   const selectedSource = sourceState?.files.find(source => source.sourceId === selectedSourceId)
   const attentionRows = rows.filter(projectRequiresAttention)
   const runningSessionCount = rows.reduce((total, row) => total + row.runningSessions, 0)
@@ -2712,24 +2654,12 @@ export function ProjectProgressOverlay({
           row={detailRow}
           sourceState={sourceState}
           surfaceState={surfaceState}
-          wikiState={wikiState}
           selectedSource={selectedSource}
           selectSource={setSelectedSourceId}
           parseSource={(sourceId) => {
             void parseProjectSource(detailRow.workspaceId, sourceId)
-              .then(() => { loadRequirementWiki(detailRow.workspaceId, true) })
               .catch(() => undefined)
           }}
-          prepareWiki={async (sessionId) => {
-            return await prepareRequirementWikiRun(detailRow.workspaceId, sessionId)
-          }}
-          startWiki={async (sourceIds, expectedRevision, target) => {
-            await startRequirementWikiBuild(detailRow.workspaceId, sourceIds, expectedRevision, target)
-          }}
-          abandonWiki={async (buildId) => {
-            await abandonRequirementWikiBuild(detailRow.workspaceId, buildId)
-          }}
-          refreshWiki={() => { loadRequirementWiki(detailRow.workspaceId, true) }}
           completeRequirements={async (revision) => {
             try {
               await completeRequirements(detailRow.workspaceId, revision)

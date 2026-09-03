@@ -69,7 +69,6 @@ import * as ToolWorkflow from '@deepseek-ai/dsh-tool-workflow'
 import {
   registerProjectArchitectureTools,
   registerProjectOpenApiTools,
-  registerRequirementWikiTools,
 } from '@deepseek-ai/dsh-fde-project'
 import { githubSlug } from './verify-md-links.ts'
 
@@ -200,11 +199,9 @@ const TOOL_PACKAGES: ToolPackage[] = [
       openapi_list: 'packages/fde/project/src/openapi-tools.ts',
       openapi_describe: 'packages/fde/project/src/openapi-tools.ts',
       openapi_call: 'packages/fde/project/src/openapi-tools.ts',
-      requirement_wiki_get: 'packages/fde/project/src/requirement-wiki-tools.ts',
-      requirement_wiki_publish: 'packages/fde/project/src/requirement-wiki-tools.ts',
     },
-    requires: ['ctx.tools', 'ctx.workspaceRegistry and a registered calling Agent Workspace at execution time', 'the FDE Source catalog for requirement Wiki tools', 'locked dsh-openapi implementation'],
-    writes: ['tool/call', 'project .fde/architecture.json for architecture_set', 'project .fde/requirement-wiki/ for requirement_wiki_publish', 'bounded external HTTP only for openapi_call', 'tool/result'],
+    requires: ['ctx.tools', 'ctx.workspaceRegistry and a registered calling Agent Workspace at execution time', 'locked dsh-openapi implementation'],
+    writes: ['tool/call', 'project .fde/architecture.json for architecture_set', 'bounded external HTTP only for openapi_call', 'tool/result'],
     mount(ctx) {
       registerProjectArchitectureTools(ctx)
       registerProjectOpenApiTools(ctx, {
@@ -214,11 +211,10 @@ const TOOL_PACKAGES: ToolPackage[] = [
         maxRedirects: 3,
         maxOperations: 1_000,
       })
-      registerRequirementWikiTools(ctx)
       return Promise.resolve()
     },
     note:
-      'Every execution resolves the calling Agent cwd through the Workspace registry. OpenAPI tools load only that project configuration; architecture_set and requirement_wiki_publish require exact revisions before atomic replacement, and Wiki publication accepts only the active build\'s fixed Sources.',
+      'Every execution resolves the calling Agent cwd through the Workspace registry. OpenAPI tools load only that project configuration, and architecture_set requires an exact revision before atomic replacement.',
   },
   {
     pkg: '@deepseek-ai/dsh-tool-ask-user',

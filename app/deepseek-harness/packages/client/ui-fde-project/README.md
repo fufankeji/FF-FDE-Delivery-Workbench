@@ -2,7 +2,7 @@
 
 English | [中文](README.zh.md)
 
-Browser presentation for the FDE project delivery workspace. The system opens on the root-level Project Center, where the user creates or manages a project before entering its single-project home and delivery environment. Project Center and the persistent sidebar open the same browser-owned New Project form. Creation establishes the project and opens its management page; only an explicit Enter Project action opens or creates a Session. The package also adds a project requirement Wiki with Galaxy View and stage-aware delivery views. System Architecture appears from solution design, Usage Analysis and project runtime controls from development, Evaluation & Optimization from validation, and API Docs only while the project is running with a real OpenAPI source.
+Browser presentation for the FDE project delivery workspace. The system opens on the root-level Project Center, where the user creates or manages a project before entering its single-project home and delivery environment. Project Center and the persistent sidebar open the same browser-owned New Project form. Creation establishes the project and opens its management page; only an explicit Enter Project action opens or creates a Session. System Architecture appears from solution design, Usage Analysis and project runtime controls from development, Evaluation & Optimization from validation, and API Docs only while the project is running with a real OpenAPI source.
 
 ## Behavior
 
@@ -15,8 +15,6 @@ Browser presentation for the FDE project delivery workspace. The system opens on
 - Usage Analysis aggregates the current project's existing `sessionStats` and `tokenUsage` projections into Token, model-call, Session-activity, and runtime views. External export remains disabled until deployment configuration opts in.
 - From validation onward, Evaluation & Optimization shows the explicit sequence Generate Evaluation Plan, Confirm Evaluation Plan, and Start Validation. Its overview derives completion, result distribution, evidence and artifact coverage, blockers, category coverage, and five-step progress from the current project snapshot; result and category filters are presentation-only. Metrics expose their prior-stage document references, and confirmation is bound to the current plan-definition digest; result updates and FDE decisions do not invalidate it. Project Progress keeps long hashes, paths, and issue text inside their cards. An open issue offers an inline FDE-only acceptance form. An unmet required metric separately offers Accept Metric: the FDE must record a reason before that metric stops blocking, while its real NOT_RUN/FAIL status and evidence gap stay visible. Both actions refresh the current project snapshot, affect only their addressed item, and never turn a metric into PASS. The existing Agent Trial runner remains available as Run Fixed Cases, an optional validation method rather than the complete workflow. Plan generation, validation execution, and fixed cases each require an explicit user action; mounting or viewing the page never starts a model call.
 - Deployment Trial presents the current candidate, target-environment authorization, five project-local evidence classes, issue decisions, blockers, and four fixed outputs. An unresolved issue exposes an inline FDE-only acceptance form whose reason is bound to the exact displayed contract; accepting one issue does not rewrite its evidence, authorize the environment, or clear another blocker. When evidence, issue decisions, and outputs are otherwise complete, a separate two-step FDE action confirms the exact displayed target and trial conclusion; the Host records authorization and readiness without executing deployment, stop, or rollback. Acceptance Handover presents the final version, enterprise conclusion, controlled deliverable locations, conditions, training/access/operations responsibility transfer, blockers, and four fixed outputs. Its four-step FDE form records the enterprise conclusion with multiple project evidence paths, marks only actually obtainable deliverables, resolves or explicitly accepts each condition, and records training plus access/operations responsibility transfer with evidence against the exact displayed digest. Saving the form changes facts only: it neither performs those real-world actions nor completes the project. Each page keeps its stage transition behind a separate second FDE confirmation; terminal completion keeps the handover record visible while all six stage segments remain complete.
-- Requirement Wiki browsing never starts a model call. An FDE selects only locally parsed `ready` Sources, then confirms the exact existing project Session, provider, model, possible cost, and customer-data transfer. The package rechecks that target before creating a build and queues the instruction only in the confirmed Session.
-- The Wiki labels every result as candidate understanding and shows its revision, stale/build state, Source links, conflicts, and unknowns. Its Three.js Galaxy View and keyboard-operable page/relation list read the same immutable revision; search, topic filtering, one-hop focus, camera movement, and selection never change Wiki facts.
 
 ## Project files
 
@@ -59,38 +57,9 @@ fde-deliverables/06-acceptance-handover/delivery-inventory.md
 fde-deliverables/06-acceptance-handover/acceptance-report.md
 fde-deliverables/06-acceptance-handover/operations-and-maintenance-guide.md
 fde-deliverables/06-acceptance-handover/handover-record.md
-.fde/requirement-wiki/build.json
-.fde/requirement-wiki/current.json
-.fde/requirement-wiki/versions/RNNNNNN/manifest.json
-.fde/requirement-wiki/versions/RNNNNNN/pages/*.md
 ```
 
 ## Model Experience
-
-### Requirement Wiki build instruction
-
-#### What the model sees
-
-Only after the FDE confirms one source set and the displayed Session/provider/model target, the package queues the following user message in that exact Session. `<BuildId>`, `<revision>`, and `<source-list>` are data-dependent values from the trusted Host build; each source-list row contains only one selected SourceId, derivative path, and stored filename.
-
-##### Queued user message
-
-```markdown
-请执行当前 FDE 项目的需求知识整理。BuildId=<BuildId>，页面基于 revision R<revision>。
-
-先调用 requirement_wiki_get，并传入 BuildId；随后只读取它返回的以下固定派生文本，不要读取其他项目或自行扩展来源：
-<source-list>
-
-把资料整体梳理为业务目标、角色、流程/SOP、系统与数据、业务规则、约束、验收方向、风险、冲突和未知项。每个知识页、关系、冲突和未知项都必须引用一个或多个本次 SourceId。完成后调用 requirement_wiki_publish 一次提交完整候选，expectedRevision 必须使用 requirement_wiki_get 返回的值。不要把候选理解写成客户已确认事实，不要推进项目阶段或项目基线。
-```
-
-#### Token effect
-
-No tokens are added by loading or browsing the page. One confirmed build appends the message and selected Source list to the target Session; derivative text and Wiki data enter context only through the Host-owned read and requirement Wiki tools the Agent subsequently invokes.
-
-#### KV Cache effect
-
-The confirmed instruction appends to the ordinary Session suffix and does not replace an earlier request prefix. BuildId, revision, and Source rows vary per build, so that suffix is build-specific.
 
 ### Project start and stop instructions
 
@@ -114,5 +83,3 @@ The runtime instruction is appended to the ordinary Session suffix. Its operatio
 - The v1 architecture diagram uses a deterministic grouped layout rather than an interactive editor.
 - External Langfuse/OTLP status is not shown while the exporter is disabled by deployment configuration.
 - Project Details keeps files read-only. Its mutations are limited to explicit FDE stage confirmation after Host-side document, structured-state, evidence, architecture, and revision checks; an explained one-step stage return; and explained manual acceptance of one still-open validation issue or one unmet required metric after exact-contract Host checks. Returning a stage never edits or deletes project artifacts. Metric acceptance records a separate decision and never overrides the real result. Editing, moving, deleting, metric-result overrides, deployment execution, customer signatures, and Agent use remain in Project Delivery or the project's controlled external process.
-- Requirement knowledge cannot be built until the project has a Session with a routable model and at least one current `ready` Source. A changed target requires another confirmation.
-- The browser presents the current Wiki revision only and has no general Wiki editor or revision diff. A viewport below 520 px, unavailable WebGL, context loss, or reduced-motion preference keeps the same knowledge available through the semantic list.

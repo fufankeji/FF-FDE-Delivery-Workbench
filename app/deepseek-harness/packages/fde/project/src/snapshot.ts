@@ -21,7 +21,6 @@ import { loadRequirementArtifacts, REQUIREMENT_ARTIFACT_ROOT } from './requireme
 import { loadDiscoveryStage } from './discovery-stage.ts'
 import { loadSolutionArtifacts, SOLUTION_ARTIFACT_ROOT } from './solution-artifacts.ts'
 import { DEVELOPMENT_DOCS_ROOT, loadDevelopmentDocs } from './development-docs.ts'
-import { loadRequirementWikiSnapshot, requirementWikiPaths } from './requirement-wiki.ts'
 import { loadProjectRuntimeSnapshot, PROJECT_RUNTIME_PATH } from './project-runtime.ts'
 import { loadValidationStage, VALIDATION_CONTRACT_PATH } from './validation.ts'
 import {
@@ -541,7 +540,6 @@ export async function loadProjectSurfaceSnapshot(input: {
     architecture,
     evaluation,
     validation,
-    requirementWiki,
     requirements,
     solution,
     development,
@@ -553,7 +551,6 @@ export async function loadProjectSurfaceSnapshot(input: {
     loadArchitecture(input.path),
     loadEvaluation(input.path),
     loadValidationStage(input.path, input.workspaceId),
-    loadRequirementWikiSnapshot(input.path),
     loadRequirementArtifacts(input.path, input.workspaceId),
     loadSolutionArtifacts(input.path, input.workspaceId),
     loadDevelopmentDocs(input.path, input.workspaceId),
@@ -571,7 +568,6 @@ export async function loadProjectSurfaceSnapshot(input: {
     ...(architecture.error === undefined ? {} : { architectureError: architecture.error }),
     evaluation,
     validation,
-    requirementWiki,
     requirements,
     discovery,
     solution,
@@ -589,7 +585,6 @@ export const projectSurfacePaths = {
   architecture: `${FDE_DIRECTORY}/${ARCHITECTURE_FILE}`,
   evaluation: `${FDE_DIRECTORY}/${EVALUATION_DIRECTORY}`,
   validation: VALIDATION_CONTRACT_PATH,
-  requirementWiki: requirementWikiPaths.root,
   requirements: REQUIREMENT_ARTIFACT_ROOT,
   solution: SOLUTION_ARTIFACT_ROOT,
   development: DEVELOPMENT_DOCS_ROOT,

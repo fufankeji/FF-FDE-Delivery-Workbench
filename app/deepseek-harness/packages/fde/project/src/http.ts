@@ -111,24 +111,6 @@ export interface EvaluationBaselineRouteOptions {
   readonly reportFailure?: (error: unknown) => void
 }
 
-/** Dependencies of the explicit requirement-Wiki build start route. */
-export interface RequirementWikiStartRouteOptions {
-  readonly trusted: (request: IncomingMessage) => boolean
-  readonly start: (
-    workspaceId: string,
-    sourceIds: readonly string[],
-    expectedRevision: number,
-  ) => Promise<ProjectSurfaceSnapshot | undefined>
-  readonly reportFailure?: (error: unknown) => void
-}
-
-/** Dependencies of the explicit requirement-Wiki build abandonment route. */
-export interface RequirementWikiAbandonRouteOptions {
-  readonly trusted: (request: IncomingMessage) => boolean
-  readonly abandon: (workspaceId: string, buildId: string) => Promise<ProjectSurfaceSnapshot | undefined>
-  readonly reportFailure?: (error: unknown) => void
-}
-
 /** Dependencies of a project runtime start/stop route. */
 export interface ProjectRuntimeActionRouteOptions {
   readonly trusted: (request: IncomingMessage) => boolean
@@ -297,34 +279,6 @@ function evaluationBaselineOf(value: unknown): { readonly workspaceId: string; r
     throw new FdeProjectRequestError('invalid-request', 400, '评估基线请求缺少报告路径。')
   }
   return { workspaceId, reportPath }
-}
-
-function requirementWikiStartOf(value: unknown): {
-  readonly workspaceId: string
-  readonly sourceIds: readonly string[]
-  readonly expectedRevision: number
-} {
-  const workspaceId = workspaceIdOf(value)
-  const sourceIds = (value as { sourceIds?: unknown }).sourceIds
-  const expectedRevision = (value as { expectedRevision?: unknown }).expectedRevision
-  if (!Array.isArray(sourceIds) || sourceIds.length === 0 || sourceIds.length > 30
-    || !sourceIds.every((sourceId): sourceId is string => typeof sourceId === 'string' && sourceId.trim() !== '')
-    || new Set(sourceIds).size !== sourceIds.length) {
-    throw new FdeProjectRequestError('invalid-request', 400, '需求整理请求需要 1 到 30 个不重复的项目资料标识。')
-  }
-  if (!Number.isSafeInteger(expectedRevision) || Number(expectedRevision) < 0) {
-    throw new FdeProjectRequestError('invalid-request', 400, '需求整理请求缺少有效的当前版本。')
-  }
-  return { workspaceId, sourceIds, expectedRevision: Number(expectedRevision) }
-}
-
-function requirementWikiAbandonOf(value: unknown): { readonly workspaceId: string; readonly buildId: string } {
-  const workspaceId = workspaceIdOf(value)
-  const buildId = (value as { buildId?: unknown }).buildId
-  if (typeof buildId !== 'string' || !/^wiki_[a-f0-9]{32}$/u.test(buildId)) {
-    throw new FdeProjectRequestError('invalid-request', 400, '结束需求整理请求缺少有效 BuildId。')
-  }
-  return { workspaceId, buildId }
 }
 
 function runtimeActionOf(value: unknown): { readonly workspaceId: string; readonly sessionId: string } {
@@ -727,78 +681,6 @@ export function createEvaluationBaselineRoute(
         error: {
           code: 'evaluation-baseline-failed',
           message: error instanceof Error ? error.message : '评估基线设置失败。',
-        },
-      })
-    }
-  }
-}
-
-/**
- * Create the trusted explicit requirement-Wiki build start handler.
- * @param options - Trust decision, Workspace-scoped start operation, and failure reporter.
- * @returns An exact-route HTTP handler that publishes no state for rejected requests.
- */
-export function createRequirementWikiStartRoute(
-  options: RequirementWikiStartRouteOptions,
-): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
-  return async (request: IncomingMessage, response: ServerResponse): Promise<void> => {
-    try {
-      if (!options.trusted(request)) throw new FdeProjectRequestError('forbidden', 403, '当前请求不能启动需求整理。')
-      if (request.method !== 'POST') {
-        request.resume()
-        throw new FdeProjectRequestError('method-not-allowed', 405, '需求整理接口只接受 POST。')
-      }
-      const input = requirementWikiStartOf(await readJson(request))
-      const snapshot = await options.start(input.workspaceId, input.sourceIds, input.expectedRevision)
-      if (snapshot === undefined) throw new FdeProjectRequestError('workspace-not-found', 404, '当前项目不存在或已被移除。')
-      writeJson(response, 200, { ok: true, value: snapshot })
-    } catch (error) {
-      if (error instanceof FdeProjectRequestError) {
-        writeJson(response, error.status, { ok: false, error: { code: error.code, message: error.message } })
-        return
-      }
-      options.reportFailure?.(error)
-      writeJson(response, 409, {
-        ok: false,
-        error: {
-          code: 'requirement-wiki-start-failed',
-          message: error instanceof Error ? error.message : '需求整理启动失败。',
-        },
-      })
-    }
-  }
-}
-
-/**
- * Create the trusted requirement-Wiki build abandonment handler.
- * @param options - Trust decision, Workspace-scoped cancellation operation, and failure reporter.
- * @returns An exact-route HTTP handler for cancelling one active BuildId.
- */
-export function createRequirementWikiAbandonRoute(
-  options: RequirementWikiAbandonRouteOptions,
-): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
-  return async (request: IncomingMessage, response: ServerResponse): Promise<void> => {
-    try {
-      if (!options.trusted(request)) throw new FdeProjectRequestError('forbidden', 403, '当前请求不能结束需求整理。')
-      if (request.method !== 'POST') {
-        request.resume()
-        throw new FdeProjectRequestError('method-not-allowed', 405, '结束需求整理接口只接受 POST。')
-      }
-      const input = requirementWikiAbandonOf(await readJson(request))
-      const snapshot = await options.abandon(input.workspaceId, input.buildId)
-      if (snapshot === undefined) throw new FdeProjectRequestError('workspace-not-found', 404, '当前项目不存在或已被移除。')
-      writeJson(response, 200, { ok: true, value: snapshot })
-    } catch (error) {
-      if (error instanceof FdeProjectRequestError) {
-        writeJson(response, error.status, { ok: false, error: { code: error.code, message: error.message } })
-        return
-      }
-      options.reportFailure?.(error)
-      writeJson(response, 409, {
-        ok: false,
-        error: {
-          code: 'requirement-wiki-abandon-failed',
-          message: error instanceof Error ? error.message : '结束需求整理失败。',
         },
       })
     }
