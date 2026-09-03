@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import type { ComponentProps } from 'react'
 import { ProjectContextSidebar } from '../src/client/ProjectContextSidebar.tsx'
@@ -49,6 +49,49 @@ const methodNames = [
   ['stakeholder-brief', '整理给负责人看的决策简报'],
 ] as const
 
+const catalogStageIds = [
+  'requirements', 'definition', 'investigation', 'design',
+  'evaluation', 'pilot', 'production', 'improvement',
+] as const
+
+interface CatalogMethodFixture {
+  readonly id: string
+  readonly label: string
+  readonly description: string
+  readonly whenToUse: string
+  readonly source: string
+  readonly content: string
+  readonly group?: 'required' | 'conditional'
+}
+
+interface CatalogStageFixture {
+  readonly id: string
+  readonly index: number
+  readonly methods: readonly CatalogMethodFixture[]
+}
+
+function completeCatalogStages(): CatalogStageFixture[] {
+  return catalogStageIds.map((id, index) => ({
+    id,
+    index,
+    methods: [{
+      id: `${id}-method`,
+      label: `第 ${String(index + 1)} 阶段方法`,
+      description: '阶段方法的业务用途。',
+      whenToUse: '需要完成本阶段工作时使用。',
+      source: 'fixed/source@commit',
+      content: `# 第 ${String(index + 1)} 阶段方法`,
+    }],
+  }))
+}
+
+beforeEach(() => {
+  vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({
+    ok: true,
+    value: { schemaVersion: 1, stages: completeCatalogStages() },
+  }), { status: 200, headers: { 'content-type': 'application/json' } })))
+})
+
 describe('ProjectContextSidebar stage methods', () => {
   it('keeps an in-flight catalog request alive while the tree remains open', async () => {
     let requestSignal: AbortSignal | undefined
@@ -61,45 +104,53 @@ describe('ProjectContextSidebar stage methods', () => {
     vi.stubGlobal('fetch', fetchMock)
 
     render(<ProjectContextSidebar {...sidebarProps()} />)
-    fireEvent.click(screen.getByRole('button', { name: /本阶段工作方法/ }))
 
     await waitFor(() => { expect(fetchMock).toHaveBeenCalledTimes(1) })
-    expect(screen.getByText('正在读取工作方法…')).toBeTruthy()
+    expect(screen.getAllByText('正在读取工作方法…')).toHaveLength(8)
     expect(requestSignal?.aborted).toBe(false)
   })
 
-  it('keeps the business method tree collapsed and opens one read-only Markdown definition', async () => {
+  it('opens every business method tree by default and opens one read-only Markdown definition', async () => {
+    const stages = completeCatalogStages()
+    stages[0] = {
+      id: 'requirements',
+      index: 0,
+      methods: methodNames.map(([id, label]) => ({
+        id,
+        label,
+        description: `${label}的业务用途。`,
+        whenToUse: `需要${label}时使用。`,
+        source: 'fixed/source@commit',
+        content: `# ${label}\n\n这是完整方法定义。`,
+      })),
+    }
     const fetchMock = vi.fn(async () => new Response(JSON.stringify({
       ok: true,
       value: {
         schemaVersion: 1,
-        stages: [{
-          id: 'requirements',
-          index: 0,
-          methods: methodNames.map(([id, label]) => ({
-            id,
-            label,
-            description: `${label}的业务用途。`,
-            whenToUse: `需要${label}时使用。`,
-            source: 'fixed/source@commit',
-            content: `# ${label}\n\n这是完整方法定义。`,
-          })),
-        }],
+        stages,
       },
     }), { status: 200, headers: { 'content-type': 'application/json' } }))
     vi.stubGlobal('fetch', fetchMock)
 
     render(<ProjectContextSidebar {...sidebarProps()} />)
 
-    const toggle = screen.getByRole('button', { name: /本阶段工作方法/ })
-    expect(toggle.getAttribute('aria-expanded')).toBe('false')
-    expect(screen.queryByText('项目启动与方向确认')).toBeNull()
-    expect(fetchMock).not.toHaveBeenCalled()
-
-    fireEvent.click(toggle)
+    expect(screen.getAllByRole('button', { name: /本阶段工作方法/ })).toHaveLength(8)
+    const discoveryBranch = screen.getByText('发现高价值问题').closest('[data-active]')
+    expect(discoveryBranch).toBeTruthy()
+    const toggle = within(discoveryBranch as HTMLElement).getByRole('button', { name: /本阶段工作方法/ })
+    expect(toggle.getAttribute('aria-expanded')).toBe('true')
     await waitFor(() => { expect(screen.getByText('项目启动与方向确认')).toBeTruthy() })
     expect(fetchMock).toHaveBeenCalledWith('/api/fde-stage/skills', expect.objectContaining({ method: 'GET' }))
     expect(screen.getAllByRole('button').filter(button => methodNames.some(([, label]) => button.textContent?.includes(label)))).toHaveLength(7)
+
+    fireEvent.click(toggle)
+    expect(toggle.getAttribute('aria-expanded')).toBe('false')
+    expect(screen.queryByText('项目启动与方向确认')).toBeNull()
+    fireEvent.click(toggle)
+    expect(toggle.getAttribute('aria-expanded')).toBe('true')
+    expect(await screen.findByText('项目启动与方向确认')).toBeTruthy()
+    expect(fetchMock).toHaveBeenCalledTimes(1)
 
     fireEvent.click(screen.getByRole('button', { name: /项目启动与方向确认/ }))
     const dialog = screen.getByRole('dialog', { name: '项目启动与方向确认' })
@@ -116,31 +167,33 @@ describe('ProjectContextSidebar stage methods', () => {
   })
 
   it('loads the current V2 stage method instead of keeping the first-stage catalog', async () => {
+    const stages = completeCatalogStages()
+    stages[1] = {
+      id: 'definition',
+      index: 1,
+      methods: ([
+        ['engineer-ai-value', '算清当前成本和问题影响', 'required'],
+        ['requirements-to-spec', '把成功标准写成可验收要求', 'required'],
+        ['feasibility-probe', '检查现有条件是否做得到', 'required'],
+        ['estimation', '估算周期、人力和主要风险', 'required'],
+        ['delivery-plan', '按风险排出交付顺序', 'required'],
+        ['qualify-ai-workflow', '信息不足时，返回补充业务流程', 'conditional'],
+        ['reframe-ai-engagement', '现场事实变化时，重新界定项目', 'conditional'],
+        ['stakeholder-brief', '需要负责人决定时，整理决策简报', 'conditional'],
+        ['escalation-and-renegotiation', '范围、周期或资源冲突时，发起重谈', 'conditional'],
+      ] as const).map(([id, label, group]) => ({
+        id, label, group,
+        description: `${label}的业务用途。`,
+        whenToUse: `需要${label}时使用。`,
+        source: 'fixed/source@commit',
+        content: `# ${label}`,
+      })),
+    }
     const fetchMock = vi.fn(async () => new Response(JSON.stringify({
       ok: true,
       value: {
         schemaVersion: 1,
-        stages: [{
-          id: 'definition',
-          index: 1,
-          methods: [
-            ['engineer-ai-value', '算清当前成本和问题影响', 'required'],
-            ['requirements-to-spec', '把成功标准写成可验收要求', 'required'],
-            ['feasibility-probe', '检查现有条件是否做得到', 'required'],
-            ['estimation', '估算周期、人力和主要风险', 'required'],
-            ['delivery-plan', '按风险排出交付顺序', 'required'],
-            ['qualify-ai-workflow', '信息不足时，返回补充业务流程', 'conditional'],
-            ['reframe-ai-engagement', '现场事实变化时，重新界定项目', 'conditional'],
-            ['stakeholder-brief', '需要负责人决定时，整理决策简报', 'conditional'],
-            ['escalation-and-renegotiation', '范围、周期或资源冲突时，发起重谈', 'conditional'],
-          ].map(([id, label, group]) => ({
-            id, label, group,
-            description: `${label}的业务用途。`,
-            whenToUse: `需要${label}时使用。`,
-            source: 'fixed/source@commit',
-            content: `# ${label}`,
-          })),
-        }],
+        stages,
       },
     }), { status: 200, headers: { 'content-type': 'application/json' } }))
     vi.stubGlobal('fetch', fetchMock)
@@ -159,7 +212,6 @@ describe('ProjectContextSidebar stage methods', () => {
 
     render(<ProjectContextSidebar {...props} />)
     expect(screen.getByText('定义结果、范围与责任').closest('[data-active="true"]')).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: /本阶段工作方法/ }))
     await waitFor(() => { expect(screen.getByRole('button', { name: /算清当前成本和问题影响/ })).toBeTruthy() })
     expect(screen.getByRole('region', { name: '必做工作' })).toBeTruthy()
     expect(screen.getByRole('region', { name: '按需处理' })).toBeTruthy()
@@ -177,18 +229,19 @@ describe('ProjectContextSidebar stage methods', () => {
     expect(input.returnToCurrentStage).not.toHaveBeenCalled()
   })
 
-  it('collapses and restores the viewed stage details without changing the stage', () => {
+  it('collapses and restores every stage method tree without changing the stage', () => {
     const input = sidebarProps()
     render(<ProjectContextSidebar {...input} />)
 
-    expect(screen.getByRole('button', { name: /本阶段工作方法/ })).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: '一键收起阶段详情' }))
-    expect(screen.queryByRole('button', { name: /本阶段工作方法/ })).toBeNull()
+    expect(screen.getAllByRole('button', { name: /本阶段工作方法/ })).toHaveLength(8)
+    fireEvent.click(screen.getByRole('button', { name: '一键收起所有阶段方法' }))
+    expect(screen.queryAllByRole('button', { name: /本阶段工作方法/ })).toHaveLength(0)
     expect(input.viewProjectStage).not.toHaveBeenCalled()
     expect(input.returnToCurrentStage).not.toHaveBeenCalled()
 
-    fireEvent.click(screen.getByRole('button', { name: '展开当前阶段详情' }))
-    expect(screen.getByRole('button', { name: /本阶段工作方法/ })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '展开所有阶段方法' }))
+    expect(screen.getAllByRole('button', { name: /本阶段工作方法/ })).toHaveLength(8)
+    expect(screen.getAllByRole('button', { name: /本阶段工作方法/ }).every(button => button.getAttribute('aria-expanded') === 'true')).toBe(true)
   })
 
   it('delegates one-click sidebar scaling to the shared layout', () => {
@@ -220,6 +273,8 @@ describe('ProjectContextSidebar stage methods', () => {
     input.useStageView = hook({ byWorkspace: { 'workspace-1': 'investigation' } }) as typeof input.useStageView
     render(<ProjectContextSidebar {...input} />)
 
-    expect(screen.getByRole('button', { name: /本阶段工作方法/ }).textContent).toContain('7')
+    const investigationBranch = screen.getByText('调查数据、系统、接口、安全与组织').closest('[data-viewing="true"]')
+    expect(investigationBranch).toBeTruthy()
+    expect(within(investigationBranch as HTMLElement).getByRole('button', { name: /本阶段工作方法/ }).textContent).toContain('7')
   })
 })
