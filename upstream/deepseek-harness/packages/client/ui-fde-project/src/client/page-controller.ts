@@ -1,6 +1,6 @@
 /** Shared navigation state for the root Project Progress page. */
 
-export type ProjectPageView = 'closed' | 'overview' | 'timeline' | 'project'
+export type ProjectPageView = 'closed' | 'home' | 'overview' | 'timeline' | 'project'
 
 /** Immutable root-page navigation state exposed to Slot components. */
 export interface ProjectPageSnapshot {
@@ -11,7 +11,7 @@ export interface ProjectPageSnapshot {
 
 /** Apply-scoped page navigation shared by the sidebar launcher and page. */
 export class ProjectPageController {
-  private snapshot: ProjectPageSnapshot = { open: true, view: 'overview' }
+  private snapshot: ProjectPageSnapshot = { open: true, view: 'home' }
   private readonly listeners = new Set<() => void>()
 
   /** Read the current immutable page state. */

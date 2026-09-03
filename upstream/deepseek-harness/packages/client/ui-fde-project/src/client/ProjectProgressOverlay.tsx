@@ -23,6 +23,7 @@ import {
 import type { ProjectSourceItem, ProjectSourceLoadState } from './source-controller.ts'
 import type { ProjectProgressOverlayProps } from './slots.ts'
 import type { ProjectPreviewFile } from './slots.ts'
+import { DeliveryHomepage } from './DeliveryHomepage.tsx'
 import css from './project.module.css'
 
 interface ProjectRow {
@@ -214,7 +215,8 @@ function projectProgressFacts(row: ProjectRow): ProjectProgressFacts {
   }
   const surface = row.surface.value
   const currentV2 = row.stage.value.v2Stage ?? LEGACY_TO_V2_STAGE[row.stage.value.currentStage]
-  const v2Surface = currentV2 === 'discovery' ? undefined : surface.v2Stages?.[currentV2]
+  const compatibleV2Stages = (surface as { readonly v2Stages?: typeof surface.v2Stages }).v2Stages
+  const v2Surface = currentV2 === 'discovery' ? undefined : compatibleV2Stages?.[currentV2]
   if (v2Surface !== undefined) {
     return {
       status: row.runningSessions > 0 ? `AI FDE 正在处理${V2_STAGE_NAMES[currentV2]}` : `${V2_STAGE_NAMES[currentV2]}记录已同步`,
@@ -397,6 +399,7 @@ function ProjectDeliverySummary({ row, sourceState, surfaceState }: {
   const taskTotal = development?.features.reduce((total, feature) => total + feature.taskTotal, 0) ?? 0
   const taskCompleted = development?.features.reduce((total, feature) => total + feature.taskCompleted, 0) ?? 0
   const architectureTotal = snapshot?.solution === undefined ? 0 : 1
+  const compatibleSnapshot = snapshot as Partial<NonNullable<typeof snapshot>> | undefined
   const evidenceGroups = [
     {
       id: 'requirements', label: '需求调研',
@@ -417,18 +420,18 @@ function ProjectDeliverySummary({ row, sourceState, surfaceState }: {
     },
     {
       id: 'validation', label: '验证评估',
-      present: snapshot?.validation?.artifacts.presentCount ?? 0,
-      total: snapshot?.validation?.artifacts.requiredCount ?? 0,
+      present: compatibleSnapshot?.validation?.artifacts.presentCount ?? 0,
+      total: compatibleSnapshot?.validation?.artifacts.requiredCount ?? 0,
     },
     {
       id: 'pilot', label: '部署试运行',
-      present: snapshot?.deploymentTrial?.artifacts.presentCount ?? 0,
-      total: snapshot?.deploymentTrial?.artifacts.requiredCount ?? 0,
+      present: compatibleSnapshot?.deploymentTrial?.artifacts.presentCount ?? 0,
+      total: compatibleSnapshot?.deploymentTrial?.artifacts.requiredCount ?? 0,
     },
     {
       id: 'handoff', label: '验收移交',
-      present: snapshot?.acceptanceHandover?.artifacts.presentCount ?? 0,
-      total: snapshot?.acceptanceHandover?.artifacts.requiredCount ?? 0,
+      present: compatibleSnapshot?.acceptanceHandover?.artifacts.presentCount ?? 0,
+      total: compatibleSnapshot?.acceptanceHandover?.artifacts.requiredCount ?? 0,
     },
   ] as const
   const evidencePresent = evidenceGroups.reduce((total, group) => total + group.present, 0)
@@ -2098,7 +2101,7 @@ function StageOutputs({
     }
     return <DevelopmentOutputs
       workspaceId={workspaceId}
-      currentStage={currentStage as FdeProjectState}
+      currentStage={currentStage}
       revision={stage?.status === 'ready' ? stage.value.revision : undefined}
       development={surfaceState.value.development}
       completeDevelopment={completeDevelopment}
@@ -2371,7 +2374,7 @@ function ProjectDetail({
   const stageValue = row.stage?.status === 'ready' ? row.stage.value : undefined
   const returnTarget = currentStage === undefined ? undefined : previousStageOf(currentStage)
   const returnLabel = currentStage === 'completed' ? '重新打开项目' : '返回上一阶段'
-  const latestReturn = stageValue?.returns?.[(stageValue.returns.length ?? 0) - 1]
+  const latestReturn = stageValue?.returns?.at(-1)
   return (
     <main className={css.detailPage}>
       <section className={css.detailHeader}>
@@ -2558,14 +2561,14 @@ export function ProjectProgressOverlay({
   const surfaces = useProjectSurfaces(state => state.byWorkspace)
   const sources = useProjectSources(state => state.byWorkspace)
   const [selectedSourceId, setSelectedSourceId] = useState<string | undefined>()
-  const [projectScope, setProjectScope] = useState<'attention' | 'all'>('attention')
+  const [projectScope, setProjectScope] = useState<'attention' | 'all'>('all')
   const [projectCollectionView, setProjectCollectionView] = useState<'card' | 'list'>('card')
   const [projectSort, setProjectSort] = useState<'priority' | 'activity'>('priority')
   const [rootRef, sidebarOffset] = useSidebarOffset(page.open)
   useStandalonePage(page.open, rootRef)
 
   useEffect(() => {
-    if (!page.open) return
+    if (!page.open || page.view === 'home') return
     for (const workspace of workspaces) {
       const workspaceId = String(workspace.workspaceId)
       loadStage(workspaceId)
@@ -2626,16 +2629,31 @@ export function ProjectProgressOverlay({
     if (projectSort === 'activity') return (right.latestActivityAt ?? 0) - (left.latestActivityAt ?? 0)
     return compareProjectPriority(left, right)
   })
-  const visibleActivityRows = visibleRows
+  const visibleActivityRows = rows
     .filter(row => row.latestActivityAt !== undefined)
     .toSorted((left, right) => (right.latestActivityAt ?? 0) - (left.latestActivityAt ?? 0))
     .slice(0, 4)
-  const visibleScheduleRows = visibleRows.toSorted((left, right) => {
+  const visibleScheduleRows = rows.toSorted((left, right) => {
     if (left.schedule.status === 'estimated' && right.schedule.status === 'estimated') return left.schedule.endDate.localeCompare(right.schedule.endDate)
     if (left.schedule.status === 'estimated') return -1
     if (right.schedule.status === 'estimated') return 1
     return left.title.localeCompare(right.title, 'zh-CN')
   }).slice(0, 4)
+
+  if (page.view === 'home') {
+    return (
+      <div
+        ref={rootRef}
+        className={css.pageOverlay}
+        style={{ left: sidebarOffset, width: `calc(100% - ${String(sidebarOffset)}px)` }}
+        data-testid="fde-delivery-home"
+      >
+        <main className={`${css.pageBody} ${css.homeBody}`}>
+          <DeliveryHomepage projectCount={rows.length} openProjects={showProjectOverview} />
+        </main>
+      </div>
+    )
+  }
 
   return (
     <div

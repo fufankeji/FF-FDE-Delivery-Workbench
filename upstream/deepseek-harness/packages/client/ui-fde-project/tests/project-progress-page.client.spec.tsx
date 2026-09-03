@@ -7,17 +7,47 @@ import { zh } from '../src/client/locales.ts'
 import type { ProjectProgressOverlayProps } from '../src/client/slots.ts'
 
 beforeEach(() => {
+  localStorage.clear()
   vi.stubGlobal('ResizeObserver', class {
     observe(): void {}
     disconnect(): void {}
   })
 })
 
-afterEach(() => { cleanup(); vi.unstubAllGlobals(); delete document.body.dataset.fdePage })
+afterEach(() => { cleanup(); localStorage.clear(); vi.unstubAllGlobals(); delete document.body.dataset.fdePage })
 
 const hook = <T,>(value: T) => <S,>(selector: (state: T) => S) => selector(value)
 
 describe('ProjectProgressOverlay standalone page', () => {
+  it('opens on the product homepage before entering project operations', () => {
+    const showProjectOverview = vi.fn()
+    const loadStage = vi.fn()
+    const props = {
+      useProjectPage: hook({ open: true, view: 'home' as const }),
+      useStageProgress: hook({ byWorkspace: {} }),
+      useProjectSurfaces: hook({ byWorkspace: {} }),
+      useProjectSources: hook({ byWorkspace: {} }),
+      useWorkspaces: hook({ items: [{
+        workspaceId: 'workspace-1', title: '数据分析项目', path: '/project/one', sessionIds: [],
+        createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:00:00.000Z',
+      }] }),
+      useSessions: hook({ byId: {} }),
+      loadStage, retryStage: vi.fn(), loadProjectSurface: vi.fn(), refreshProjectSurface: vi.fn(),
+      completeRequirements: vi.fn(), completeSolution: vi.fn(),
+      loadProjectSources: vi.fn(), parseProjectSource: vi.fn(),
+      enterProject: vi.fn(), reviewProjectArchitecture: vi.fn(), closeProjectPage: vi.fn(), showProjectOverview,
+      showProjectTimeline: vi.fn(), showProjectDetail: vi.fn(), renderSlot: vi.fn(() => null),
+      t: makeTranslate(zh),
+    } as unknown as ProjectProgressOverlayProps
+
+    render(<ProjectProgressOverlay {...props} />)
+    expect(screen.getByRole('region', { name: 'FF-FDE工作台产品首页' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: /进入交付工作台 · 1 个项目/ })).toBeTruthy()
+    expect(loadStage).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: /进入交付工作台 · 1 个项目/ }))
+    expect(showProjectOverview).toHaveBeenCalledTimes(1)
+  })
+
   it('hides the center/details work surfaces while open and restores them on close', () => {
     const frame = document.createElement('div')
     const sidebar = document.createElement('div')
@@ -52,11 +82,17 @@ describe('ProjectProgressOverlay standalone page', () => {
     frame.remove()
   })
 
-  it('starts from projects needing a human decision and keeps the real project collection available', () => {
+  it('shows every real project by default and keeps decision filtering separate from portfolio summaries', () => {
     const showProjectDetail = vi.fn()
     const showProjectTimeline = vi.fn()
     const enterProject = vi.fn()
     const openProjectCreation = vi.fn()
+    localStorage.setItem('dsh.workspace.view.v6', JSON.stringify({
+      projectMetadataByPath: {
+        '/project/one': { companyName: '甲方', schedule: { status: 'estimated', startDate: '2026-08-27', endDate: '2026-09-27' } },
+        '/project/two': { companyName: '乙方', schedule: { status: 'estimated', startDate: '2026-08-28', endDate: '2026-09-28' } },
+      },
+    }))
     const props = {
       useProjectPage: hook({ open: true, view: 'overview' as const }),
       useStageProgress: hook({ byWorkspace: {
@@ -65,7 +101,7 @@ describe('ProjectProgressOverlay standalone page', () => {
           createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:00:00.000Z',
         } },
         'workspace-2': { status: 'ready', value: {
-          workspaceId: 'workspace-2', currentStage: 'development', revision: 3,
+          workspaceId: 'workspace-2', currentStage: 'completed', revision: 3,
           createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:02:00.000Z',
         } },
       } }),
@@ -83,7 +119,7 @@ describe('ProjectProgressOverlay standalone page', () => {
       ] }),
       useSessions: hook({ byId: {
         'session-1': { id: 'session-1', displayTitle: '需求会话', running: false, blank: false, updatedAt: 1 },
-        'session-2': { id: 'session-2', displayTitle: '研发会话', running: true, blank: false, updatedAt: 2 },
+        'session-2': { id: 'session-2', displayTitle: '研发会话', running: false, blank: false, updatedAt: 2 },
       } }),
       loadStage: vi.fn(), retryStage: vi.fn(), loadProjectSurface: vi.fn(), refreshProjectSurface: vi.fn(),
       completeRequirements: vi.fn(), completeSolution: vi.fn(), completeDevelopment: vi.fn(),
@@ -106,11 +142,11 @@ describe('ProjectProgressOverlay standalone page', () => {
     expect(screen.getByRole('button', { name: /查看并处理/ })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: '新建项目' }))
     expect(openProjectCreation).toHaveBeenCalledTimes(1)
-    const filterButton = screen.getByRole('button', { name: '筛选项目，当前：待我处理' })
+    const filterButton = screen.getByRole('button', { name: '筛选项目，当前：全部项目' })
     const sortButton = screen.getByRole('button', { name: '项目排序，当前：优先事项' })
     expect(filterButton).toBeTruthy()
     expect(sortButton).toBeTruthy()
-    expect(screen.getByText('2 个项目需要你决定下一步')).toBeTruthy()
+    expect(screen.getByText('2 个项目正在管理中')).toBeTruthy()
     expect(screen.getAllByText('最近进展')).toHaveLength(2)
     expect(screen.getAllByText('需要你决定')).toHaveLength(2)
     expect(screen.getAllByRole('button', { name: '查看产物' })).toHaveLength(2)
@@ -134,19 +170,20 @@ describe('ProjectProgressOverlay standalone page', () => {
     expect(within(attentionTable).getAllByRole('button', { name: '查看产物' })).toHaveLength(2)
     expect(within(attentionTable).getAllByRole('button', { name: /进入项目/ })).toHaveLength(2)
     fireEvent.click(filterButton)
-    expect(screen.getByRole('button', { name: '筛选项目，当前：全部项目' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: '筛选项目，当前：待我处理' })).toBeTruthy()
     expect(cardView.getAttribute('aria-pressed')).toBe('false')
     expect(listView.getAttribute('aria-pressed')).toBe('true')
     const projectTable = screen.getByRole('table', { name: '项目列表' })
     expect(within(projectTable).getByText('客户需求梳理')).toBeTruthy()
-    expect(within(projectTable).getByText('数据分析项目')).toBeTruthy()
-    expect(within(projectTable).getAllByRole('button', { name: '查看产物' })).toHaveLength(2)
+    expect(within(projectTable).queryByText('数据分析项目')).toBeNull()
+    expect(within(projectTable).getAllByRole('button', { name: '查看产物' })).toHaveLength(1)
+    expect(screen.getAllByText('数据分析项目').length).toBeGreaterThanOrEqual(2)
     const projectButtons = within(projectTable).getAllByRole('button', { name: '查看产物' })
-    fireEvent.click(projectButtons[1] as HTMLElement)
+    fireEvent.click(projectButtons[0] as HTMLElement)
     expect(showProjectDetail).toHaveBeenCalledWith('workspace-1')
     fireEvent.click(cardView)
     expect(screen.queryByRole('table', { name: '项目列表' })).toBeNull()
-    expect(screen.getAllByRole('list', { name: '项目八阶段位置' })).toHaveLength(2)
+    expect(screen.getAllByRole('list', { name: '项目八阶段位置' })).toHaveLength(1)
   })
 
   it('separates stage inputs and outputs and requires the FDE second confirmation', async () => {

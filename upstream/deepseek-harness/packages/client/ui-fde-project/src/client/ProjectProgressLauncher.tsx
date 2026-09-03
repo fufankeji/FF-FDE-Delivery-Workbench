@@ -15,7 +15,7 @@ function ProjectManagementIcon() {
 
 /** Render a wide sidebar row or compact rail icon from the same action. */
 export function ProjectProgressLauncher({ wide, useProjectPage, openProjectPage, t }: ProjectProgressLauncherProps) {
-  const active = useProjectPage(state => state.open)
+  const active = useProjectPage(state => state.open && state.view !== 'home')
   return (
     <button
       type="button"
