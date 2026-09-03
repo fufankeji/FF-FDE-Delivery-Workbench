@@ -309,6 +309,53 @@ export interface AcceptanceHandoverDecision {
   }
 }
 
+/** Authoritative post-discovery lifecycle stage identifiers. */
+export type V2LifecycleStageId = 'definition' | 'investigation' | 'design' | 'evaluation' | 'pilot' | 'production' | 'improvement'
+
+/** Browser-safe guided surface for one V2 stage. */
+export interface V2StageSurfaceSnapshot {
+  readonly id: V2LifecycleStageId
+  readonly index: number
+  readonly title: string
+  readonly objective: string
+  readonly explanation: string
+  readonly statePath: string
+  readonly skill: string
+  readonly prompt: string
+  readonly stateStatus: 'missing' | 'ready' | 'invalid'
+  readonly status: 'working' | 'blocked' | 'review-ready'
+  readonly currentWorkId: string
+  readonly workItems: readonly {
+    readonly id: string
+    readonly title: string
+    readonly purpose: string
+    readonly status: 'complete' | 'current' | 'waiting' | 'blocked'
+  }[]
+  readonly blockers: readonly {
+    readonly id: string
+    readonly title: string
+    readonly severity: 'low' | 'medium' | 'high' | 'critical'
+    readonly status: 'open' | 'resolved'
+  }[]
+  readonly recommendation: 'pending' | 'go' | 'revise' | 'narrow' | 'stop'
+  readonly artifacts: readonly {
+    readonly id: string
+    readonly title: string
+    readonly path: string
+    readonly purpose: string
+    readonly required: boolean
+    readonly status: 'missing' | 'present' | 'error'
+    readonly bytes?: number
+    readonly updatedAt?: string
+    readonly message?: string
+  }[]
+  readonly requiredCount: number
+  readonly presentCount: number
+  readonly reviewReady: boolean
+  readonly reviewBlockers: readonly string[]
+  readonly message?: string
+}
+
 /** One project-level read model returned by the trusted Host route. */
 export interface ProjectSurfaceSnapshot {
   readonly workspaceId: string
@@ -326,6 +373,7 @@ export interface ProjectSurfaceSnapshot {
   readonly validation: ValidationStageSnapshot
   readonly deploymentTrial: DeploymentTrialStageSnapshot
   readonly acceptanceHandover: AcceptanceHandoverStageSnapshot
+  readonly v2Stages: Readonly<Record<V2LifecycleStageId, V2StageSurfaceSnapshot>>
   readonly requirements: {
     readonly root: string
     readonly requiredCount: number
@@ -798,7 +846,6 @@ export class FdeProjectSurfaceController {
    */
   load(workspaceId: string): void {
     if (this.disposed) return
-    this.cancelOtherRequests(workspaceId)
     if (this.snapshot.byWorkspace[workspaceId] !== undefined) return
     this.start(workspaceId)
   }
@@ -809,7 +856,6 @@ export class FdeProjectSurfaceController {
    */
   refresh(workspaceId: string): void {
     if (this.disposed) return
-    this.cancelOtherRequests(workspaceId)
     this.start(workspaceId)
   }
 
@@ -1036,14 +1082,6 @@ export class FdeProjectSurfaceController {
     ).finally(() => {
       if (this.requests.get(workspaceId) === controller) this.requests.delete(workspaceId)
     })
-  }
-
-  private cancelOtherRequests(workspaceId: string): void {
-    for (const [id, request] of this.requests) {
-      if (id === workspaceId) continue
-      request.abort()
-      this.requests.delete(id)
-    }
   }
 
   private canPublish(workspaceId: string, controller: AbortController): boolean {

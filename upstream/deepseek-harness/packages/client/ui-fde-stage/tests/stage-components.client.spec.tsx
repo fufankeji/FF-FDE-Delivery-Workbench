@@ -31,7 +31,7 @@ const useWorkspaces = hook({
   recentWorkspaceId: workspaceId,
 }) as never
 
-function runtime() {
+function runtime(stageSnapshot: FdeStageProgressSnapshot = ready) {
   return {
     sessionId,
     useSession: (() => undefined) as never,
@@ -40,7 +40,7 @@ function runtime() {
     useProjection: (() => undefined) as never,
     useInput: (() => undefined) as never,
     inputActions: {} as never,
-    useStageProgress: hook(ready),
+    useStageProgress: hook(stageSnapshot),
     loadStage: vi.fn(),
     retryStage: vi.fn(),
     openProjectProgress: vi.fn(),
@@ -55,5 +55,23 @@ describe('FDE stage components', () => {
     expect(screen.getByText('阶段 1/8')).toBeTruthy()
     expect(screen.getByText('发现高价值问题')).toBeTruthy()
     header.unmount()
+  })
+
+  it('uses the authoritative V2 stage when the legacy projection spans multiple V2 stages', () => {
+    const props = runtime({
+      byWorkspace: {
+        'w-1': {
+          status: 'ready',
+          value: {
+            workspaceId: 'w-1', currentStage: 'solution', lifecycleVersion: 2,
+            v2Stage: 'investigation', revision: 3,
+            createdAt: '2026-08-26T00:00:00.000Z', updatedAt: '2026-08-26T00:00:00.000Z',
+          },
+        },
+      },
+    })
+    render(<StageHeaderStatus {...props} />)
+    expect(screen.getByText('阶段 3/8')).toBeTruthy()
+    expect(screen.getByText('调查数据、系统、接口、安全与组织')).toBeTruthy()
   })
 })

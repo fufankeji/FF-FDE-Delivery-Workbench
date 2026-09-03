@@ -6,6 +6,10 @@ export const FDE_STAGE_IDS = ['requirements', 'solution', 'development', 'valida
 export type FdeStageId = typeof FDE_STAGE_IDS[number]
 /** Six active stages plus the terminal completion state. */
 export type FdeProjectState = FdeStageId | 'completed'
+/** Authoritative eight-stage V2 lifecycle ids. */
+export const FDE_V2_STAGE_IDS = ['discovery', 'definition', 'investigation', 'design', 'evaluation', 'pilot', 'production', 'improvement'] as const
+/** One authoritative V2 lifecycle stage. */
+export type FdeV2StageId = typeof FDE_V2_STAGE_IDS[number]
 /** Ordered stage metadata for the global progress segments. */
 export const FDE_STAGES = FDE_STAGE_IDS.map((id, index) => ({ id, number: index + 1 }))
 /** Fixed manual gate owned by the Host stage plugin. */
@@ -22,6 +26,10 @@ export const FDE_STAGE_COMPLETE_PILOT_PATH = '/api/fde-stage/pilot/complete'
 export const FDE_STAGE_COMPLETE_HANDOFF_PATH = '/api/fde-stage/handoff/complete'
 /** FDE-only one-stage return route, including completed-project reopening. */
 export const FDE_STAGE_RETURN_PATH = '/api/fde-stage/return'
+/** Authoritative V2 manual completion route. */
+export const FDE_V2_STAGE_COMPLETE_PATH = '/api/fde-stage/v2/complete'
+/** Authoritative V2 one-stage return route. */
+export const FDE_V2_STAGE_RETURN_PATH = '/api/fde-stage/v2/return'
 /** Browser-local cache invalidation emitted after one durable stage commit. */
 export const FDE_STAGE_CHANGED_EVENT = 'fde:project-stage-changed'
 
@@ -32,8 +40,23 @@ export interface ProjectStageValue {
   readonly revision: number
   readonly createdAt: string
   readonly updatedAt: string
+  readonly lifecycleVersion?: 2
+  readonly v2Stage?: FdeV2StageId
+  readonly v2ReconfirmThrough?: FdeV2StageId
+  readonly improvementCycles?: number
+  readonly lastReviewedAt?: string
+  readonly v2Returns?: readonly ProjectV2StageReturnRecord[]
   readonly reconfirmThrough?: FdeProjectState
   readonly returns?: readonly ProjectStageReturnRecord[]
+}
+
+/** One durable V2 stage-return audit entry. */
+export interface ProjectV2StageReturnRecord {
+  readonly from: FdeV2StageId
+  readonly to: FdeV2StageId
+  readonly reason: string
+  readonly returnedAt: string
+  readonly revision: number
 }
 
 /** One durable FDE stage-return audit entry. */
@@ -58,10 +81,23 @@ function isProjectState(value: unknown): value is FdeProjectState {
   return value === 'completed' || (typeof value === 'string' && (FDE_STAGE_IDS as readonly string[]).includes(value))
 }
 
+function isV2Stage(value: unknown): value is FdeV2StageId {
+  return typeof value === 'string' && (FDE_V2_STAGE_IDS as readonly string[]).includes(value)
+}
+
 function isProjectStageValue(value: Partial<ProjectStageValue> | undefined, workspaceId: string): value is ProjectStageValue {
   if (value?.workspaceId !== workspaceId || !isProjectState(value.currentStage) || !Number.isSafeInteger(value.revision)
     || typeof value.createdAt !== 'string' || typeof value.updatedAt !== 'string') return false
   if (value.reconfirmThrough !== undefined && !isProjectState(value.reconfirmThrough)) return false
+  if (value.lifecycleVersion !== undefined && value.lifecycleVersion !== 2) return false
+  if (value.v2Stage !== undefined && !isV2Stage(value.v2Stage)) return false
+  if (value.v2ReconfirmThrough !== undefined && !isV2Stage(value.v2ReconfirmThrough)) return false
+  if (value.improvementCycles !== undefined && (!Number.isSafeInteger(value.improvementCycles) || value.improvementCycles < 0)) return false
+  if (value.lastReviewedAt !== undefined && typeof value.lastReviewedAt !== 'string') return false
+  if (value.v2Returns !== undefined && (!Array.isArray(value.v2Returns) || value.v2Returns.some(entry => (
+    !isV2Stage(entry.from) || !isV2Stage(entry.to) || typeof entry.reason !== 'string' || entry.reason.trim() === ''
+    || typeof entry.returnedAt !== 'string' || !Number.isSafeInteger(entry.revision)
+  )))) return false
   if (value.returns !== undefined && (!Array.isArray(value.returns) || value.returns.some(entry => (
     !isProjectState(entry.from)
     || !(FDE_STAGE_IDS as readonly string[]).includes(entry.to)
@@ -211,6 +247,44 @@ export async function returnProjectStage(
   )
 }
 
+/** Submit one explicit FDE decision for the authoritative V2 stage. */
+export async function completeV2ProjectStage(
+  workspaceId: string,
+  expectedRevision: number,
+  stage: FdeV2StageId,
+  signal?: AbortSignal,
+  fetchImpl?: typeof fetch,
+): Promise<ProjectStageValue> {
+  return await submitStage(
+    FDE_V2_STAGE_COMPLETE_PATH,
+    workspaceId,
+    { expectedRevision, stage },
+    '当前阶段确认失败。',
+    '阶段确认响应无效。',
+    signal,
+    fetchImpl,
+  )
+}
+
+/** Return the authoritative V2 lifecycle by exactly one stage. */
+export async function returnV2ProjectStage(
+  workspaceId: string,
+  expectedRevision: number,
+  reason: string,
+  signal?: AbortSignal,
+  fetchImpl?: typeof fetch,
+): Promise<ProjectStageValue> {
+  return await submitStage(
+    FDE_V2_STAGE_RETURN_PATH,
+    workspaceId,
+    { expectedRevision, reason },
+    '当前阶段返回失败。',
+    '阶段返回响应无效。',
+    signal,
+    fetchImpl,
+  )
+}
+
 async function completeStage(
   path: string,
   workspaceId: string,
@@ -317,6 +391,24 @@ export class ProjectStageController {
   /** Complete acceptance handover and publish the terminal project state. */
   async completeHandoff(workspaceId: string, expectedRevision: number): Promise<void> {
     await this.complete(workspaceId, expectedRevision, completeAcceptanceHandover)
+  }
+
+  /** Complete one authoritative V2 stage without inventing a target stage in the browser. */
+  async completeV2(workspaceId: string, expectedRevision: number, stage: FdeV2StageId): Promise<void> {
+    await this.complete(
+      workspaceId,
+      expectedRevision,
+      async (id, revision, signal) => await completeV2ProjectStage(id, revision, stage, signal),
+    )
+  }
+
+  /** Return one authoritative V2 stage and retain all project evidence. */
+  async returnV2(workspaceId: string, expectedRevision: number, reason: string): Promise<void> {
+    await this.complete(
+      workspaceId,
+      expectedRevision,
+      async (id, revision, signal) => await returnV2ProjectStage(id, revision, reason, signal),
+    )
   }
 
   /** Return exactly one stage and publish the durable audit-bearing record. */

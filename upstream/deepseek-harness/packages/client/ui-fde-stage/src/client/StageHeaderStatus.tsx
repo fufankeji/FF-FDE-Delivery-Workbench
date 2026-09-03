@@ -1,7 +1,7 @@
 /** Compact current-stage status in the active Session header. */
 
 import { useEffect } from 'react'
-import { FDE_V2_STAGE_PRESENTATION, FDE_V2_STAGE_TOTAL } from './stages.ts'
+import { FDE_V2_STAGE_BY_ID, FDE_V2_STAGE_PRESENTATION, FDE_V2_STAGE_TOTAL } from './stages.ts'
 import type { FdeStageHeaderProps } from './slots.ts'
 import css from './stage.module.css'
 
@@ -30,7 +30,9 @@ export function StageHeaderStatus({
       </button>
     )
   }
-  const presentation = FDE_V2_STAGE_PRESENTATION[stage.value.currentStage]
+  const presentation = stage.value.v2Stage === undefined
+    ? FDE_V2_STAGE_PRESENTATION[stage.value.currentStage]
+    : FDE_V2_STAGE_BY_ID[stage.value.v2Stage]
   return (
     <span className={css.headerStatus} data-state="ready">
       <span className={css.statusDot} />

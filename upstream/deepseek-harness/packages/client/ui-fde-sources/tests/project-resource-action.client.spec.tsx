@@ -41,7 +41,11 @@ describe('ProjectResourceUploadAction', () => {
       inputActions={{} as never}
       t={t}
     />)
-    expect(screen.getByRole('button', { name: '有客户资料？上传' })).toBeTruthy()
+    const button = screen.getByRole('button', { name: '有客户资料？上传' })
+    expect(button).toBeTruthy()
+    fireEvent.mouseEnter(button)
+    fireEvent.focus(button)
+    expect(screen.queryByRole('tooltip')).toBeNull()
     expect(screen.queryByRole('textbox')).toBeNull()
   })
 

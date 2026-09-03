@@ -12,7 +12,14 @@ import type {
   ValidationStageSnapshot,
 } from './controller.ts'
 import { readProjectMetadata, STAGE_NAMES } from './project-data.ts'
-import { FDE_STAGES, type FdeProjectState, type FdeStageId, type ProjectStageLoadState } from './stage-controller.ts'
+import {
+  FDE_STAGES,
+  FDE_V2_STAGE_IDS,
+  type FdeProjectState,
+  type FdeStageId,
+  type FdeV2StageId,
+  type ProjectStageLoadState,
+} from './stage-controller.ts'
 import type { ProjectSourceItem, ProjectSourceLoadState } from './source-controller.ts'
 import type { ProjectProgressOverlayProps } from './slots.ts'
 import type { ProjectPreviewFile } from './slots.ts'
@@ -73,6 +80,37 @@ function currentStageIndex(stage: ProjectStageLoadState | undefined): number {
     : FDE_STAGES.findIndex(item => item.id === stage.value.currentStage)
 }
 
+const V2_STAGE_NAMES: Readonly<Record<FdeV2StageId, string>> = {
+  discovery: '发现高价值问题',
+  definition: '定义结果、范围与责任',
+  investigation: '调查现场条件',
+  design: '设计方案与纵向切片',
+  evaluation: '运行 PoC 与 Eval',
+  pilot: '企业集成与受控试点',
+  production: '生产采用与验收交接',
+  improvement: '持续改进与能力沉淀',
+}
+
+const LEGACY_TO_V2_STAGE: Readonly<Record<FdeProjectState, FdeV2StageId>> = {
+  requirements: 'discovery',
+  solution: 'definition',
+  development: 'design',
+  validation: 'evaluation',
+  pilot: 'pilot',
+  handoff: 'production',
+  completed: 'improvement',
+}
+
+function currentV2Stage(stage: ProjectStageLoadState | undefined): FdeV2StageId | undefined {
+  if (stage?.status !== 'ready') return undefined
+  return stage.value.v2Stage ?? LEGACY_TO_V2_STAGE[stage.value.currentStage]
+}
+
+function currentV2StageIndex(stage: ProjectStageLoadState | undefined): number {
+  const current = currentV2Stage(stage)
+  return current === undefined ? -1 : FDE_V2_STAGE_IDS.indexOf(current)
+}
+
 function stageReached(currentStage: FdeProjectState | undefined, target: FdeStageId): boolean {
   if (currentStage === undefined) return false
   if (currentStage === 'completed') return true
@@ -82,7 +120,7 @@ function stageReached(currentStage: FdeProjectState | undefined, target: FdeStag
 function stageLabel(stage: ProjectStageLoadState | undefined, loading: string, failed: string): string {
   if (stage === undefined || stage.status === 'loading') return loading
   if (stage.status === 'error') return failed
-  return STAGE_NAMES[stage.value.currentStage]
+  return V2_STAGE_NAMES[stage.value.v2Stage ?? LEGACY_TO_V2_STAGE[stage.value.currentStage]]
 }
 
 const STAGE_SUMMARIES: Readonly<Record<FdeStageId, string>> = {
@@ -94,9 +132,20 @@ const STAGE_SUMMARIES: Readonly<Record<FdeStageId, string>> = {
   handoff: '完成客户验收、交付材料、运行说明和后续责任移交。',
 }
 
-function portfolioStageId(row: ProjectRow): FdeStageId | undefined {
+const V2_STAGE_SUMMARIES: Readonly<Record<FdeV2StageId, string>> = {
+  discovery: '还原客户真实工作方式，找到值得继续投入且能够验证的业务问题。',
+  definition: '明确业务结果、当前基线、交付范围、责任人和停止条件。',
+  investigation: '核对数据、系统、接口、权限、安全要求和现场责任人。',
+  design: '比较实现方式，明确系统边界，并先走通一条端到端业务链路。',
+  evaluation: '用真实案例、明确指标和可追溯证据验证关键假设。',
+  pilot: '完成企业集成和可靠性准备，在授权范围内运行受控试点。',
+  production: '受控进入生产，推动实际使用，完成客户验收和责任移交。',
+  improvement: '根据生产证据选择改进，验证后发布，并沉淀可复用能力。',
+}
+
+function portfolioStageId(row: ProjectRow): FdeV2StageId | undefined {
   if (row.stage?.status !== 'ready') return undefined
-  return row.stage.value.currentStage === 'completed' ? 'handoff' : row.stage.value.currentStage
+  return row.stage.value.v2Stage ?? LEGACY_TO_V2_STAGE[row.stage.value.currentStage]
 }
 
 function portfolioHealth(row: ProjectRow): 'stable' | 'attention' | 'risk' {
@@ -125,21 +174,21 @@ function projectNextAction(row: ProjectRow): ProjectNextAction {
   if (row.runningSessions > 0) {
     return { priority: 3, reason: `${String(row.runningSessions)} 个会话正在运行`, action: '查看当前工作进展', decisionOwner: 'FDE 跟进' }
   }
-  if (row.stage.value.currentStage === 'completed') {
-    return { priority: 5, reason: '项目六阶段已经完成', action: '查看验收与移交记录', decisionOwner: 'FDE 复核' }
-  }
-  const actions: Readonly<Record<FdeStageId, string>> = {
-    requirements: '补充资料并确认需求基线',
-    solution: '审阅方案、架构与验收口径',
-    development: '继续开发并更新任务证据',
-    validation: '运行验证并处理证据缺口',
-    pilot: '记录试运行结果与问题',
-    handoff: '完成验收与责任移交',
+  const current = row.stage.value.v2Stage ?? LEGACY_TO_V2_STAGE[row.stage.value.currentStage]
+  const actions: Readonly<Record<FdeV2StageId, string>> = {
+    discovery: '补充现场事实并判断问题价值',
+    definition: '确认结果、范围、责任与停止条件',
+    investigation: '补齐数据、系统、权限与责任人信息',
+    design: '审阅实现方式、系统边界与纵向切片',
+    evaluation: '运行验证并处理证据缺口',
+    pilot: '核对集成准备并记录受控试点结果',
+    production: '完成生产采用、客户验收与责任移交',
+    improvement: '根据生产证据选择下一轮改进',
   }
   return {
     priority: 4,
-    reason: `当前处于${STAGE_NAMES[row.stage.value.currentStage]}`,
-    action: actions[row.stage.value.currentStage],
+    reason: `当前处于${V2_STAGE_NAMES[current]}`,
+    action: actions[current],
     decisionOwner: 'FDE 确认',
   }
 }
@@ -164,11 +213,15 @@ function projectProgressFacts(row: ProjectRow): ProjectProgressFacts {
     return { status: row.runningSessions > 0 ? 'AI FDE 正在执行' : '正在读取项目证据', evidence: `${String(row.sessions)} 个项目会话已登记。`, detail: row.runningSessions > 0 ? `${String(row.runningSessions)} 个会话正在运行。` : '读取完成后展示真实产物。' }
   }
   const surface = row.surface.value
-  if (row.stage.value.currentStage === 'completed') {
+  const currentV2 = row.stage.value.v2Stage ?? LEGACY_TO_V2_STAGE[row.stage.value.currentStage]
+  const v2Surface = currentV2 === 'discovery' ? undefined : surface.v2Stages?.[currentV2]
+  if (v2Surface !== undefined) {
     return {
-      status: '六阶段交付已完成',
-      evidence: `验收移交产物 ${String(surface.acceptanceHandover.artifacts.presentCount)}/${String(surface.acceptanceHandover.artifacts.requiredCount)}。`,
-      detail: surface.acceptanceHandover.blockers.length === 0 ? '当前没有未处理的移交阻塞。' : `${String(surface.acceptanceHandover.blockers.length)} 个移交问题仍需复核。`,
+      status: row.runningSessions > 0 ? `AI FDE 正在处理${V2_STAGE_NAMES[currentV2]}` : `${V2_STAGE_NAMES[currentV2]}记录已同步`,
+      evidence: `本阶段产物 ${String(v2Surface.presentCount)}/${String(v2Surface.requiredCount)}。`,
+      detail: v2Surface.blockers.filter(blocker => blocker.status === 'open').length === 0
+        ? v2Surface.reviewReady ? '材料已达到 FDE 评审条件。' : '当前没有已登记阻塞，仍需完成阶段工作。'
+        : `${String(v2Surface.blockers.filter(blocker => blocker.status === 'open').length)} 个问题待处理。`,
     }
   }
   const stage = row.stage.value.currentStage
@@ -266,15 +319,27 @@ function featureStatusLabel(status: string): string {
   return labels[status] ?? '状态待确认'
 }
 
+function v2StagePositionState(stage: ProjectStageLoadState | undefined, index: number): 'unknown' | 'done' | 'current' | 'reconfirm' | 'pending' {
+  const current = currentV2StageIndex(stage)
+  if (current < 0) return 'unknown'
+  if (index < current) return 'done'
+  if (index === current) return 'current'
+  if (stage?.status === 'ready' && stage.value.v2ReconfirmThrough !== undefined) {
+    const boundary = FDE_V2_STAGE_IDS.indexOf(stage.value.v2ReconfirmThrough)
+    if (index <= boundary) return 'reconfirm'
+  }
+  return 'pending'
+}
+
 function ProjectStagePath({ stage }: { readonly stage: ProjectStageLoadState | undefined }) {
   return (
-    <ol className={css.projectStagePath} aria-label="项目六阶段位置">
-      {FDE_STAGES.map((definition, index) => {
-        const state = stagePositionState(stage, index)
+    <ol className={css.projectStagePath} aria-label="项目八阶段位置">
+      {FDE_V2_STAGE_IDS.map((stageId, index) => {
+        const state = v2StagePositionState(stage, index)
         return (
-          <li key={definition.id} data-stage={definition.id} data-state={state}>
+          <li key={stageId} data-stage={stageId} data-state={state}>
             <span>{index + 1}</span>
-            <strong>{STAGE_NAMES[definition.id]}</strong>
+            <strong>{V2_STAGE_NAMES[stageId]}</strong>
           </li>
         )
       })}
@@ -617,72 +682,11 @@ function useStandalonePage(open: boolean, rootRef: RefObject<HTMLDivElement>): v
   }, [open, rootRef])
 }
 
-function ProjectCard({ row, showProject, labels }: {
-  readonly row: ProjectRow
-  readonly showProject: (workspaceId: string) => void
-  readonly labels: ProjectRowLabels
-}) {
-  const index = currentStageIndex(row.stage)
-  const currentDefinition = index < 0 || index >= FDE_STAGES.length ? undefined : FDE_STAGES[index]
-  const schedule = row.schedule.status === 'estimated'
-    ? `${formatDate(row.schedule.startDate)} — ${formatDate(row.schedule.endDate)}`
-    : labels.scheduleMissing
-  const stageId = currentDefinition?.id ?? (index >= FDE_STAGES.length ? 'handoff' : 'requirements')
-  const nextAction = projectNextAction(row)
-  return (
-    <article className={css.projectCard} data-stage={stageId}>
-      <div className={css.projectCardLead}>
-        <div className={css.projectIdentity}>
-          <span className={css.projectMark} aria-hidden="true">{row.title.slice(0, 1).toUpperCase()}</span>
-          <div>
-            <div className={css.projectTitleLine}><h2>{row.title}</h2></div>
-            <p>{row.companyName || labels.companyMissing}</p>
-          </div>
-        </div>
-        <div className={css.projectStageHeadline}>
-          <span>{index < 0 ? '—' : String(Math.min(index + 1, 6)).padStart(2, '0')}<small>/06</small></span>
-          <div>
-            <small>当前阶段</small>
-            <strong>
-              {currentDefinition === undefined
-                ? stageLabel(row.stage, labels.loading, labels.failed)
-                : STAGE_NAMES[currentDefinition.id]}
-            </strong>
-          </div>
-        </div>
-      </div>
-      <div className={css.projectCardJourney}>
-        <div>
-          <span>六阶段交付路径</span>
-          <span className={css.stageBadge} data-error={row.stage?.status === 'error' || undefined}>
-            {index < 0
-              ? stageLabel(row.stage, labels.loading, labels.failed)
-              : index >= FDE_STAGES.length
-                ? '六阶段已完成 · 项目已交付'
-                : `阶段 ${String(index + 1)}/6 · ${STAGE_NAMES[currentDefinition?.id ?? 'requirements']}`}
-          </span>
-        </div>
-        <ProjectStagePath stage={row.stage} />
-      </div>
-      <dl className={css.projectFacts}>
-        <div><dt>交付周期</dt><dd>{schedule}</dd></div>
-        <div><dt>项目会话</dt><dd>{row.sessions} 个</dd></div>
-        <div><dt>下一动作</dt><dd>{nextAction.action}</dd></div>
-      </dl>
-      <div className={css.projectCardFoot}>
-        <span>{labels.created(formatDate(row.createdAt))} · {nextAction.decisionOwner}</span>
-        <button type="button" onClick={() => { showProject(row.workspaceId) }}>
-          {labels.view}<span aria-hidden="true">→</span>
-        </button>
-      </div>
-    </article>
-  )
-}
-
-function ProjectList({ rows, showProject, labels }: {
+function ProjectList({ rows, showProject, labels, enterProject }: {
   readonly rows: readonly ProjectRow[]
   readonly showProject: (workspaceId: string) => void
   readonly labels: ProjectRowLabels
+  readonly enterProject?: (workspaceId: string) => void
 }) {
   return (
     <div className={css.projectListFrame}>
@@ -700,15 +704,15 @@ function ProjectList({ rows, showProject, labels }: {
         </thead>
         <tbody>
           {rows.map((row) => {
-            const index = currentStageIndex(row.stage)
-            const stageId = portfolioStageId(row) ?? 'requirements'
+            const index = currentV2StageIndex(row.stage)
+            const stageId = portfolioStageId(row) ?? 'discovery'
             const health = portfolioHealth(row)
             const nextAction = projectNextAction(row)
             const schedule = row.schedule.status === 'estimated'
               ? `${formatDate(row.schedule.startDate)} — ${formatDate(row.schedule.endDate)}`
               : labels.scheduleMissing
             const stageName = stageLabel(row.stage, labels.loading, labels.failed)
-            const stagePosition = index < 0 ? '阶段待读取' : `阶段 ${String(Math.min(index + 1, 6))}/6`
+            const stagePosition = index < 0 ? '阶段待读取' : `阶段 ${String(index + 1)}/8`
             const healthLabel = health === 'stable' ? '进展平稳' : health === 'attention' ? '需要关注' : '存在阻塞'
             const healthDetail = row.stage?.status === 'error'
               ? labels.failed
@@ -754,9 +758,16 @@ function ProjectList({ rows, showProject, labels }: {
                   </span>
                 </td>
                 <td>
-                  <button className={css.projectListAction} type="button" onClick={() => { showProject(row.workspaceId) }}>
-                    {labels.view}<span aria-hidden="true">→</span>
-                  </button>
+                  {enterProject !== undefined
+                    ? <div className={css.projectListActions}>
+                      <button className={css.projectListSecondaryAction} type="button" onClick={() => { showProject(row.workspaceId) }}>查看产物</button>
+                      <button className={css.projectListAction} type="button" onClick={() => { enterProject(row.workspaceId) }}>
+                        进入项目<span aria-hidden="true">→</span>
+                      </button>
+                    </div>
+                    : <button className={css.projectListAction} type="button" onClick={() => { showProject(row.workspaceId) }}>
+                      {labels.view}<span aria-hidden="true">→</span>
+                    </button>}
                 </td>
               </tr>
             )
@@ -774,13 +785,14 @@ function ProjectAttentionCard({ row, showProject, enterProject }: {
 }) {
   const action = projectNextAction(row)
   const progress = projectProgressFacts(row)
-  const stageId = portfolioStageId(row) ?? 'requirements'
+  const stageId = portfolioStageId(row) ?? 'discovery'
   const stage = stageLabel(row.stage, '阶段读取中', '阶段读取失败')
-  const stageIndex = currentStageIndex(row.stage)
-  const currentStage = stageIndex >= 0 && stageIndex < FDE_STAGES.length ? FDE_STAGES[stageIndex] : undefined
+  const stageIndex = currentV2StageIndex(row.stage)
+  const currentStage = currentV2Stage(row.stage)
   const schedule = row.schedule.status === 'estimated'
     ? `${formatDate(row.schedule.startDate)} — ${formatDate(row.schedule.endDate)}`
     : '交付周期待确认'
+  const runtime = row.surface?.status === 'ready' && row.surface.value.runtime.status === 'running' ? '运行中' : '未运行'
   return (
     <article className={css.projectAttentionCard} data-stage={stageId}>
       <header>
@@ -788,38 +800,37 @@ function ProjectAttentionCard({ row, showProject, enterProject }: {
           <span className={css.projectMark} aria-hidden="true">{row.title.slice(0, 1).toUpperCase()}</span>
           <div><h2>{row.title}</h2><p>{row.companyName || '未填写所属企业'} · {schedule}</p></div>
         </div>
-        <span className={css.projectAttentionStage}>{stage}</span>
+        <span className={css.projectAttentionStage}>{stageIndex < 0 ? stage : `${String(stageIndex + 1)}/8 · ${stage}`}</span>
       </header>
       <div className={css.projectAttentionJourney}>
-        <div><span>项目阶段</span><strong>{stageIndex >= FDE_STAGES.length ? '六阶段交付完成' : `${String(Math.max(1, stageIndex + 1))}/6 · ${stage}`}</strong></div>
         <ProjectStagePath stage={row.stage} />
       </div>
       <div className={css.projectAttentionBody}>
         <section className={css.projectWorkStatus}>
-          <span>AI FDE 工作现场</span>
+          <span>最近进展</span>
           <h3>{progress.status}</h3>
-          <p>{currentStage === undefined ? '正在读取当前阶段的工作内容。' : STAGE_SUMMARIES[currentStage.id]}</p>
-          <dl>
-            <div><dt>当前产物与证据</dt><dd>{progress.evidence}</dd></div>
-            <div><dt>执行状态</dt><dd>{progress.detail}</dd></div>
-          </dl>
+          <p>{progress.evidence}</p>
+          <small>{currentStage === undefined ? '正在读取当前阶段的工作内容。' : V2_STAGE_SUMMARIES[currentStage]}</small>
         </section>
         <aside className={css.projectDecisionPanel}>
           <span>需要你决定</span>
           <h3>{action.reason}</h3>
-          <p><strong>下一步：</strong>{action.action}</p>
-          <small>AI FDE 提供事实与执行证据，阶段推进仍由 {action.decisionOwner}。</small>
-          <div>
-            <button type="button" onClick={() => { showProject(row.workspaceId) }}>查看阶段与产物</button>
-            <button type="button" onClick={() => { enterProject(row.workspaceId) }}>进入项目 <span aria-hidden="true">→</span></button>
-          </div>
+          <p>{action.action}</p>
+          <small>由 {action.decisionOwner} 根据现有事实决定。</small>
         </aside>
       </div>
       <footer className={css.projectActivityFacts}>
-        <span><small>最近工作</small><strong>{row.latestSessionTitle ?? '暂无项目会话'}</strong>{row.latestActivityAt === undefined ? null : <em>{formatActivityTime(row.latestActivityAt)}</em>}</span>
-        <span><small>会话</small><strong>{row.sessions} 个</strong><em>{row.runningSessions > 0 ? `${String(row.runningSessions)} 个运行中` : '当前无运行会话'}</em></span>
-        <span><small>项目运行</small><strong>{row.surface?.status === 'ready' && row.surface.value.runtime.status === 'running' ? '运行中' : '未运行'}</strong><em>状态来自当前工作区</em></span>
-        <span><small>交付周期</small><strong>{schedule}</strong><em>{row.schedule.status === 'estimated' ? '已登记' : '需要 FDE 补充'}</em></span>
+        <div className={css.projectAttentionMeta}>
+          <span title={row.latestSessionTitle ?? '暂无项目会话'}>最近：{row.latestSessionTitle ?? '暂无项目会话'}</span>
+          <span>{row.sessions} 个会话{row.runningSessions > 0 ? ` · ${String(row.runningSessions)} 个运行中` : ''}</span>
+          <span>{runtime}</span>
+          <span>{schedule}</span>
+          {row.latestActivityAt === undefined ? null : <span>{formatActivityTime(row.latestActivityAt)}</span>}
+        </div>
+        <div className={css.projectAttentionActions}>
+          <button type="button" onClick={() => { showProject(row.workspaceId) }}>查看产物</button>
+          <button type="button" onClick={() => { enterProject(row.workspaceId) }}>进入项目 <span aria-hidden="true">→</span></button>
+        </div>
       </footer>
     </article>
   )
@@ -830,21 +841,39 @@ function ProjectAttentionList({ rows, showProject, enterProject }: {
   readonly showProject: (workspaceId: string) => void
   readonly enterProject: (workspaceId: string) => void
 }) {
-  const sortedRows = rows.toSorted((left, right) => projectNextAction(left).priority - projectNextAction(right).priority)
   return (
     <section className={css.projectAttention} aria-label="待我处理的项目">
-      <div className={css.projectCenterIntro}>
-        <span>待人工处理</span>
-        <h2>{sortedRows.length === 0 ? '当前没有待决定事项' : `${String(sortedRows.length)} 个项目需要你决定下一步`}</h2>
-        <p>查看 AI FDE 已完成的工作、阶段证据和最近活动，再进入项目执行或确认。</p>
-      </div>
-      {sortedRows.length === 0
+      {rows.length === 0
         ? <div className={css.projectCenterEmpty}>所有真实项目当前都没有待处理动作，可切换到“全部项目”查看。</div>
-        : <div className={css.projectAttentionCards}>{sortedRows.map(row => (
+        : <div className={css.projectAttentionCards}>{rows.map(row => (
           <ProjectAttentionCard key={row.workspaceId} row={row} showProject={showProject} enterProject={enterProject} />
         ))}</div>}
     </section>
   )
+}
+
+type DashboardIconKind = 'projects' | 'decisions' | 'sessions' | 'schedule' | 'attention' | 'filter' | 'sort'
+
+function DashboardIcon({ kind }: { readonly kind: DashboardIconKind }) {
+  if (kind === 'projects') {
+    return <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 8.5h16v10.25A1.25 1.25 0 0 1 18.75 20H5.25A1.25 1.25 0 0 1 4 18.75V8.5Z" /><path d="M8.5 8.5V6.25A1.25 1.25 0 0 1 9.75 5h4.5a1.25 1.25 0 0 1 1.25 1.25V8.5M4 12h16M12 10.5v3" /></svg>
+  }
+  if (kind === 'decisions') {
+    return <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10" cy="8" r="3" /><path d="M4.75 18.5c.65-3.1 2.4-4.65 5.25-4.65 1.6 0 2.85.48 3.75 1.45M17 10.5v5M14.5 13h5M16.25 19.5h1.5" /></svg>
+  }
+  if (kind === 'sessions') {
+    return <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5.25 6.25h13.5A2.25 2.25 0 0 1 21 8.5v6a2.25 2.25 0 0 1-2.25 2.25H11l-4.75 3v-3h-1A2.25 2.25 0 0 1 3 14.5v-6a2.25 2.25 0 0 1 2.25-2.25Z" /><circle cx="8" cy="11.5" r=".7" /><circle cx="12" cy="11.5" r=".7" /><circle cx="16" cy="11.5" r=".7" /></svg>
+  }
+  if (kind === 'schedule') {
+    return <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="4" y="5.5" width="16" height="14.5" rx="2" /><path d="M8 3.5v4M16 3.5v4M4 9.5h16M8 13h2M14 13h2M8 17h2M14 17h2" /></svg>
+  }
+  if (kind === 'attention') {
+    return <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" /><path d="M12 7.5v5l3 1.75" /></svg>
+  }
+  if (kind === 'filter') {
+    return <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 6h16l-6.25 7v4.75L10.25 20v-7L4 6Z" /></svg>
+  }
+  return <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M8 5v14M5 8l3-3 3 3M16 19V5M13 16l3 3 3-3" /></svg>
 }
 
 function Timeline({ rows, showProject, todayLabel }: {
@@ -2515,8 +2544,7 @@ function ProjectDetail({
 export function ProjectProgressOverlay({
   useProjectPage, useStageProgress, useProjectSurfaces, useProjectSources, useWorkspaces, useSessions,
   loadStage, retryStage, loadProjectSurface, refreshProjectSurface, loadProjectSources, parseProjectSource,
-  openProjectCreation, enterProject,
-  reviewProjectArchitecture,
+  openProjectCreation, enterProject, reviewProjectArchitecture,
   completeRequirements, completeSolution, completeDevelopment, completeValidation, completePilot, completeHandoff, returnToPrevious,
   acceptValidationMetric, waiveValidationIssue, acceptDeploymentTrialIssue, confirmDeploymentTrialReadiness,
   recordAcceptanceHandoverDecision,
@@ -2531,7 +2559,8 @@ export function ProjectProgressOverlay({
   const sources = useProjectSources(state => state.byWorkspace)
   const [selectedSourceId, setSelectedSourceId] = useState<string | undefined>()
   const [projectScope, setProjectScope] = useState<'attention' | 'all'>('attention')
-  const [projectCollectionView, setProjectCollectionView] = useState<'card' | 'list'>('list')
+  const [projectCollectionView, setProjectCollectionView] = useState<'card' | 'list'>('card')
+  const [projectSort, setProjectSort] = useState<'priority' | 'activity'>('priority')
   const [rootRef, sidebarOffset] = useSidebarOffset(page.open)
   useStandalonePage(page.open, rootRef)
 
@@ -2579,14 +2608,42 @@ export function ProjectProgressOverlay({
   const selectedSource = sourceState?.files.find(source => source.sourceId === selectedSourceId)
   const attentionRows = rows.filter(projectRequiresAttention)
   const runningSessionCount = rows.reduce((total, row) => total + row.runningSessions, 0)
+  const scheduledProjectCount = rows.filter(row => row.schedule.status === 'estimated').length
+  const compareProjectPriority = (left: ProjectRow, right: ProjectRow): number => {
+    const priorityDifference = projectNextAction(left).priority - projectNextAction(right).priority
+    if (priorityDifference !== 0) return priorityDifference
+    const stageDifference = currentV2StageIndex(right.stage) - currentV2StageIndex(left.stage)
+    return stageDifference === 0 ? (right.latestActivityAt ?? 0) - (left.latestActivityAt ?? 0) : stageDifference
+  }
+  const primaryAttentionRow = attentionRows.toSorted(compareProjectPriority)[0]
+  const primaryAttentionAction = primaryAttentionRow === undefined ? undefined : projectNextAction(primaryAttentionRow)
   const projectRowLabels: ProjectRowLabels = {
     companyMissing: t('progress.companyMissing'), scheduleMissing: t('progress.scheduleMissing'),
     view: t('progress.viewProject'), created: date => t('progress.createdAt', { date }),
     loading: t('progress.stageLoading'), failed: t('progress.stageError'),
   }
+  const visibleRows = (projectScope === 'attention' ? attentionRows : rows).toSorted((left, right) => {
+    if (projectSort === 'activity') return (right.latestActivityAt ?? 0) - (left.latestActivityAt ?? 0)
+    return compareProjectPriority(left, right)
+  })
+  const visibleActivityRows = visibleRows
+    .filter(row => row.latestActivityAt !== undefined)
+    .toSorted((left, right) => (right.latestActivityAt ?? 0) - (left.latestActivityAt ?? 0))
+    .slice(0, 4)
+  const visibleScheduleRows = visibleRows.toSorted((left, right) => {
+    if (left.schedule.status === 'estimated' && right.schedule.status === 'estimated') return left.schedule.endDate.localeCompare(right.schedule.endDate)
+    if (left.schedule.status === 'estimated') return -1
+    if (right.schedule.status === 'estimated') return 1
+    return left.title.localeCompare(right.title, 'zh-CN')
+  }).slice(0, 4)
 
   return (
-    <div ref={rootRef} className={css.pageOverlay} style={{ left: sidebarOffset, width: `calc(100% - ${String(sidebarOffset)}px)` }} data-testid="fde-project-progress">
+    <div
+      ref={rootRef}
+      className={`${css.pageOverlay} ${page.view === 'project' ? '' : css.projectCenterOverlay}`}
+      style={page.view === 'project' ? { left: sidebarOffset, width: `calc(100% - ${String(sidebarOffset)}px)` } : undefined}
+      data-testid="fde-project-progress"
+    >
       {page.view === 'project' && detailRow !== undefined
         ? <ProjectDetail
           row={detailRow}
@@ -2675,73 +2732,142 @@ export function ProjectProgressOverlay({
           renderPreview={source => renderSlot('fde.project.source.preview', { source })}
         />
         : <main className={`${css.pageBody} ${css.projectCenterBody}`}>
-          <section className={css.projectCenterOverview}>
+          <header className={css.projectCenterHeader}>
             <div>
-              <span>项目交付总览</span>
+              <p className={css.projectCenterBreadcrumb}><span>项目交付</span><i>/</i><strong>项目中心</strong></p>
               <h1>项目中心</h1>
-              <p>查看项目处于哪个阶段、AI FDE 已完成什么，以及下一步需要谁来决定。</p>
+              <p>先处理需要人工决定的事项，再进入项目继续交付。</p>
               <button type="button" className={css.projectCreateAction} onClick={openProjectCreation}>
-                <span aria-hidden="true">＋</span>{t('progress.createProject')}
+                <span aria-hidden="true">＋</span>新建项目
               </button>
             </div>
-            <dl>
-              <div><dt>真实项目</dt><dd>{rows.length}</dd><small>当前隔离工作区</small></div>
-              <div><dt>待人工决定</dt><dd>{attentionRows.length}</dd><small>需要 FDE 处理</small></div>
-              <div><dt>运行中会话</dt><dd>{runningSessionCount}</dd><small>Agent 正在执行</small></div>
+            <div className={css.projectDemoAccount} aria-label="当前用户">
+              <span className={css.projectNotification} title="通知" aria-label="3 条通知">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6.5 9.5a5.5 5.5 0 0 1 11 0c0 6 2.5 6 2.5 7H4c0-1 2.5-1 2.5-7ZM10 19h4" /></svg>
+                <b>3</b>
+              </span>
+              <span title="帮助" aria-label="帮助"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" /><path d="M9.8 9a2.4 2.4 0 1 1 3.15 2.28c-.67.28-.95.72-.95 1.47v.25M12 16.5h.01" /></svg></span>
+              <span className={css.projectAvatar} aria-hidden="true"><img src="/fde-dashboard/demo-avatar.png" alt="" /></span>
+              <strong>张三</strong>
+              <svg className={css.projectAccountChevron} aria-hidden="true" viewBox="0 0 14 14"><path d="m4 5.5 3 3 3-3" /></svg>
+            </div>
+          </header>
+
+          <section className={css.projectCenterSummary} aria-label="项目概览">
+            <dl className={css.projectCenterMetrics}>
+              <div data-kind="projects"><span className={css.projectMetricIcon}><DashboardIcon kind="projects" /></span><div><dt>真实项目</dt><dd>{rows.length}</dd></div></div>
+              <div data-kind="decisions"><span className={css.projectMetricIcon}><DashboardIcon kind="decisions" /></span><div><dt>待人工决定</dt><dd>{attentionRows.length}</dd></div></div>
+              <div data-kind="sessions"><span className={css.projectMetricIcon}><DashboardIcon kind="sessions" /></span><div><dt>运行中会话</dt><dd>{runningSessionCount}</dd></div></div>
+              <div data-kind="schedule"><span className={css.projectMetricIcon}><DashboardIcon kind="schedule" /></span><div><dt>已登记周期</dt><dd>{scheduledProjectCount}</dd></div></div>
             </dl>
+            <aside className={css.projectCenterPriority} data-empty={primaryAttentionRow === undefined ? true : undefined}>
+              <div className={css.projectPriorityCopy}>
+                <span><b aria-hidden="true">★</b> 当前优先事项</span>
+                {primaryAttentionRow === undefined || primaryAttentionAction === undefined
+                  ? <><strong>目前没有待处理事项</strong><p>可以查看全部项目，或创建新的交付项目。</p></>
+                  : <>
+                    <strong>{primaryAttentionRow.title}</strong>
+                    <p>{primaryAttentionAction.reason}</p>
+                    <div>
+                      <span>⚠ {primaryAttentionAction.action}</span>
+                      <button type="button" onClick={() => { showProjectDetail(primaryAttentionRow.workspaceId) }}>查看并处理 <span aria-hidden="true">→</span></button>
+                    </div>
+                  </>}
+              </div>
+              <div className={css.projectPriorityArt} aria-hidden="true">
+                <img src="/fde-dashboard/project-priority-stack.png" alt="" />
+              </div>
+            </aside>
           </section>
-          <div className={css.projectCenterNavigation}>
-            <nav aria-label="项目中心范围">
-              <button
-                type="button"
-                data-active={projectScope === 'attention' || undefined}
-                onClick={() => { setProjectScope('attention'); showProjectOverview() }}
-              >待我处理 <strong>{attentionRows.length}</strong></button>
-              <button
-                type="button"
-                data-active={projectScope === 'all' || undefined}
-                onClick={() => { setProjectScope('all'); showProjectOverview() }}
-              >全部项目 <strong>{rows.length}</strong></button>
-            </nav>
-          </div>
-          {projectScope === 'attention'
-            ? (
-              <ProjectAttentionList
-                rows={attentionRows}
-                showProject={showProjectDetail}
-                enterProject={(workspaceId) => { void enterProject(workspaceId) }}
-              />
-            )
-            : <>
-              <div className={css.pageToolbar}>
-                <div><h2>全部项目</h2><span>只显示当前隔离工作区中登记的真实项目。</span></div>
-                <div className={css.projectViewControls}>
-                  {page.view === 'overview' && <div className={css.collectionViewSwitch} role="group" aria-label="项目展示方式">
-                    <button type="button" aria-pressed={projectCollectionView === 'card'} data-active={projectCollectionView === 'card' || undefined} onClick={() => { setProjectCollectionView('card') }}>
-                      <svg aria-hidden="true" viewBox="0 0 14 14"><rect x="1.5" y="1.5" width="4" height="4" rx="0.8" /><rect x="8.5" y="1.5" width="4" height="4" rx="0.8" /><rect x="1.5" y="8.5" width="4" height="4" rx="0.8" /><rect x="8.5" y="8.5" width="4" height="4" rx="0.8" /></svg>卡片
-                    </button>
-                    <button type="button" aria-pressed={projectCollectionView === 'list'} data-active={projectCollectionView === 'list' || undefined} onClick={() => { setProjectCollectionView('list') }}>
-                      <svg aria-hidden="true" viewBox="0 0 14 14"><circle cx="2.2" cy="3" r="0.9" /><circle cx="2.2" cy="7" r="0.9" /><circle cx="2.2" cy="11" r="0.9" /><path d="M5 3h7M5 7h7M5 11h7" /></svg>列表
-                    </button>
-                  </div>}
-                  <div className={css.segmented} role="group" aria-label="全部项目查看方式">
-                    <button type="button" data-active={page.view === 'overview' || undefined} onClick={showProjectOverview}>{t('progress.overview')}</button>
-                    <button type="button" data-active={page.view === 'timeline' || undefined} onClick={showProjectTimeline}>{t('progress.timeline')}</button>
-                  </div>
+
+          <section className={css.projectCollectionSurface} aria-label="项目集合">
+            <div className={css.projectCollectionHeader}>
+              <div className={css.projectCollectionTitle}>
+                <span className={css.projectCollectionIcon}><DashboardIcon kind="attention" /></span>
+                <div>
+                  <span>{projectScope === 'attention' ? '待我处理' : '全部项目'}</span>
+                  <h2>{projectScope === 'attention'
+                    ? attentionRows.length === 0 ? '当前没有待决定事项' : `${String(attentionRows.length)} 个项目需要你决定下一步`
+                    : `${String(rows.length)} 个项目正在管理中`}</h2>
+                  <p>{projectScope === 'attention'
+                    ? '先看最近进展和待决定事项，再进入项目执行或确认。'
+                    : '查看当前隔离工作区中登记的全部真实项目。'}</p>
                 </div>
               </div>
-              {rows.length === 0
-                ? <div className={css.pageEmpty}>{t('progress.empty')}</div>
+              <div className={css.projectViewControls}>
+                <div className={css.collectionViewSwitch} role="group" aria-label="项目展示方式">
+                  <button type="button" aria-pressed={page.view === 'overview' && projectCollectionView === 'card'} data-active={(page.view === 'overview' && projectCollectionView === 'card') || undefined} onClick={() => { setProjectCollectionView('card'); showProjectOverview() }}>
+                    <svg aria-hidden="true" viewBox="0 0 14 14"><rect x="1.5" y="1.5" width="4" height="4" rx="0.8" /><rect x="8.5" y="1.5" width="4" height="4" rx="0.8" /><rect x="1.5" y="8.5" width="4" height="4" rx="0.8" /><rect x="8.5" y="8.5" width="4" height="4" rx="0.8" /></svg>卡片
+                  </button>
+                  <button type="button" aria-pressed={page.view === 'overview' && projectCollectionView === 'list'} data-active={(page.view === 'overview' && projectCollectionView === 'list') || undefined} onClick={() => { setProjectCollectionView('list'); showProjectOverview() }}>
+                    <svg aria-hidden="true" viewBox="0 0 14 14"><circle cx="2.2" cy="3" r="0.9" /><circle cx="2.2" cy="7" r="0.9" /><circle cx="2.2" cy="11" r="0.9" /><path d="M5 3h7M5 7h7M5 11h7" /></svg>列表
+                  </button>
+                </div>
+                <button type="button" className={css.projectToolButton} data-active={projectScope === 'all' || undefined} aria-label={`筛选项目，当前：${projectScope === 'attention' ? '待我处理' : '全部项目'}`} onClick={() => { setProjectScope(current => current === 'attention' ? 'all' : 'attention'); showProjectOverview() }}>
+                  <DashboardIcon kind="filter" />筛选
+                </button>
+                <button type="button" className={css.projectToolButton} data-active={projectSort === 'activity' || undefined} aria-label={`项目排序，当前：${projectSort === 'priority' ? '优先事项' : '最近更新'}`} onClick={() => { setProjectSort(current => current === 'priority' ? 'activity' : 'priority') }}>
+                  <DashboardIcon kind="sort" />排序
+                </button>
+              </div>
+            </div>
+            <div className={css.projectCenterContent}>
+              {visibleRows.length === 0
+                ? <div className={css.projectCenterEmpty}>{projectScope === 'attention' ? '当前没有需要人工决定的项目。' : t('progress.empty')}</div>
                 : page.view === 'timeline'
-                  ? <Timeline rows={rows} showProject={showProjectDetail} todayLabel={t('progress.today')} />
+                  ? <Timeline rows={visibleRows} showProject={showProjectDetail} todayLabel={t('progress.today')} />
                   : projectCollectionView === 'list'
-                    ? <ProjectList rows={rows} showProject={showProjectDetail} labels={projectRowLabels} />
-                    : <div className={css.projectGrid}>{rows.map(row => (
-                      <ProjectCard key={row.workspaceId} row={row} showProject={showProjectDetail} labels={projectRowLabels} />
-                    ))}</div>}
-            </>}
-          {Object.values(stages).some(stage => stage.status === 'error') && (
-            <button type="button" className={css.retryAll} onClick={() => { for (const row of rows) if (row.stage?.status === 'error') retryStage(row.workspaceId) }}>重新读取失败的项目阶段</button>
+                    ? <ProjectList
+                      rows={visibleRows} showProject={showProjectDetail} labels={projectRowLabels}
+                      enterProject={(workspaceId) => { void enterProject(workspaceId) }}
+                    />
+                    : <ProjectAttentionList
+                      rows={visibleRows} showProject={showProjectDetail}
+                      enterProject={(workspaceId) => { void enterProject(workspaceId) }}
+                    />}
+              {Object.values(stages).some(stage => stage.status === 'error') && (
+                <button type="button" className={css.retryAll} onClick={() => { for (const row of rows) if (row.stage?.status === 'error') retryStage(row.workspaceId) }}>重新读取失败的项目阶段</button>
+              )}
+            </div>
+          </section>
+
+          {page.view === 'overview' && visibleRows.length > 0 && (
+            <div className={css.projectManagementDetails}>
+              <section aria-labelledby="recent-project-activity-title">
+                <header>
+                  <div><span>项目动态</span><h3 id="recent-project-activity-title">最近发生了什么</h3></div>
+                  <small>{visibleActivityRows.length} 条</small>
+                </header>
+                {visibleActivityRows.length === 0
+                  ? <p>项目产生会话活动后，会在这里按时间显示。</p>
+                  : <ul>{visibleActivityRows.map(row => (
+                    <li key={row.workspaceId}>
+                      <span className={css.projectActivityMark} data-stage={portfolioStageId(row) ?? 'discovery'} aria-hidden="true">{row.title.slice(0, 1).toUpperCase()}</span>
+                      <div><strong>{row.title}</strong><small>{row.latestSessionTitle ?? '项目更新'}</small></div>
+                      <time>{row.latestActivityAt === undefined ? '暂无时间' : formatActivityTime(row.latestActivityAt)}</time>
+                      <button type="button" onClick={() => { showProjectDetail(row.workspaceId) }}>查看</button>
+                    </li>
+                  ))}</ul>}
+              </section>
+              <section aria-labelledby="project-delivery-schedule-title">
+                <header>
+                  <div><span>交付周期</span><h3 id="project-delivery-schedule-title">近期需要关注的日期</h3></div>
+                  <button type="button" className={css.projectTimelineAction} onClick={showProjectTimeline}>{scheduledProjectCount}/{rows.length} 已登记 <span aria-hidden="true">→</span></button>
+                </header>
+                <ul>{visibleScheduleRows.map(row => (
+                  <li key={row.workspaceId} data-pending={row.schedule.status !== 'estimated' || undefined}>
+                    <span className={css.projectActivityMark} data-stage={portfolioStageId(row) ?? 'discovery'} aria-hidden="true">{row.title.slice(0, 1).toUpperCase()}</span>
+                    <div>
+                      <strong>{row.title}</strong>
+                      <small>{stageLabel(row.stage, projectRowLabels.loading, projectRowLabels.failed)}</small>
+                    </div>
+                    <span>{row.schedule.status === 'estimated'
+                      ? `${formatDate(row.schedule.startDate)} — ${formatDate(row.schedule.endDate)}`
+                      : '周期待确认'}</span>
+                  </li>
+                ))}</ul>
+              </section>
+            </div>
           )}
         </main>}
     </div>

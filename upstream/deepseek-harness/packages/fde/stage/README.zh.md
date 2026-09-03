@@ -4,13 +4,13 @@
 
 FDE 项目当前阶段的 Host 端状态。该包打开一张以 Harness WorkspaceId 为键的 `storage-domain` 表，并提供仅限可信同源访问的 POST 路由：读取或初始化记录，以及执行六个固定转换——`requirements` 到 `solution`、`solution` 到 `development`、`development` 到 `validation`、`validation` 到 `pilot`、`pilot` 到 `handoff`，最后由 `handoff` 进入终态 `completed`。同一 Workspace 的并发首次读取共享一次写入；阶段转换按项目串行并要求页面提交精确 revision。六个交付门依次重新检查三份需求调研文件、包括项目 PRD 在内的五份方案设计文档与已确认架构、三份项目开发收口文件、当前已由 FDE 确认的验证方案/合同/证据/阻塞项和三份验证产物、部署试运行合同/环境授权/五类证据/问题和四份产物，以及最终验收移交合同/交付物/条件项/责任移交/证据和四份产物。另一条仅限 FDE 的路由每次只返回一个阶段，也可把 `completed` 重新打开到 `handoff`；它必须填写原因，保留全部文件和证据，记录有界审计，并把返回范围标记为待重新确认。所有路由都不接受任意目标阶段。
 
-阶段一不再注册一个复合 Skill，而是分别注册方法 Skill `qualify-ai-workflow`、条件方法 `reframe-ai-engagement`，以及按需使用的工程 Skills `fde-orient`、`knowledge-interview`、`ownership-map`、`repo-recon`、`stakeholder-brief`。候选工作流保存逐条证据引用，Artifact Catalog 保存固定来源版本、内容版本、结构成熟度与证据状态；人工阶段门读取同一份校验投影，不再把文件存在视为就绪。后续阶段继续注册 `fde-solution-design`、`fde-project-development`、`fde-validation`、`fde-deployment-trial`、`fde-acceptance-handover` 和一段简短的阶段感知系统提示。Skill 只能维护候选文件，不能调用阶段转换；记录人工事实与推进项目仍是不同的 FDE 操作。
+阶段一不再注册一个复合 Skill，而是分别注册方法 Skill `qualify-ai-workflow`、条件方法 `reframe-ai-engagement`，以及按需使用的工程 Skills `fde-orient`、`knowledge-interview`、`ownership-map`、`repo-recon`、`stakeholder-brief`。候选工作流保存逐条证据引用，Artifact Catalog 保存固定来源版本、内容版本、结构成熟度与证据状态；人工阶段门读取同一份校验投影，不再把文件存在视为就绪。阶段二提供九项方法，阶段三至阶段六各提供七项，阶段七提供八项，阶段八提供七项。每个目录都区分必做工作与按需处理，使用业务名称，并对应运行时真实注册的 Skill。Agent 只加载当前任务需要的最少方法。Skill 只能维护候选文件，不能调用阶段转换；记录人工事实与推进项目仍是不同的 FDE 操作。
 
-可信同源的只读 `GET /api/fde-stage/skills` 路由只返回产品固定注册的七项第一阶段方法，包括面向用户的业务名称、适用场景、完整 Markdown 定义和来源。它不会枚举用户电脑、全局 Skill 目录或其他项目，也不提供执行或修改能力；客户端据此在当前阶段下展示可解释的方法目录。
+可信同源的只读 `GET /api/fde-stage/skills` 路由只返回产品固定注册的方法，包括面向用户的业务名称、适用时的必做／按需分组、使用场景、完整 Markdown 定义和来源。它不会枚举用户电脑、全局 Skill 目录或其他项目，也不提供执行或修改能力；客户端据此在当前阶段下展示可解释的方法目录。
 
 ## 模型体验
 
-当 Agent 属于已登记项目的任一活动交付阶段时，模型会看到一段短提示：当前阶段、固定产物目录、按需加载的 Skill，以及不得确认客户结论或推进项目。对应完整 Skill 正文只在既有 skill 工具被调用后加载；终态 `completed` 不再贡献阶段提示。本包不注册阶段推进工具。
+当 Agent 属于已登记项目的任一活动交付阶段时，模型会看到一段短提示：当前阶段、固定产物目录、可选工作方法，以及不得确认客户结论或推进项目。只有当前任务选中的 Skill 正文才会在既有 skill 工具被调用后加载；终态 `completed` 不再贡献阶段提示。本包不注册阶段推进工具。
 
 #### KV Cache 影响
 

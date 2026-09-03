@@ -7,6 +7,7 @@ import { projectEvaluationDecision } from '../src/evaluation-guard.ts'
 import { loadDevelopmentDocs, resolveDevelopmentArtifact } from '../src/development-docs.ts'
 import { resolveRequirementArtifact } from '../src/requirement-artifacts.ts'
 import { resolveSolutionArtifact } from '../src/solution-artifacts.ts'
+import { loadV2StageSurface } from '../src/v2-stage-surface.ts'
 import {
   acceptValidationMetric, confirmValidationPlan, loadValidationStage, resolveValidationArtifact, waiveValidationIssue,
 } from '../src/validation.ts'
@@ -47,6 +48,67 @@ const localSource = {
 }
 
 describe('FDE project surface snapshot', () => {
+  it('derives one V2 stage from real files and blocks review on unresolved high-risk facts', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'fde-v2-definition-'))
+    const outputs = join(root, 'fde-deliverables', '02-outcome-scope')
+    const states = join(root, '.fde', 'stages')
+    await mkdir(outputs, { recursive: true })
+    await mkdir(states, { recursive: true })
+    for (const name of ['outcome-contract.md', 'value-case.md', 'delivery-plan.md']) {
+      await writeFile(join(outputs, name), `# ${name}\n`)
+    }
+    await writeFile(join(states, 'definition.json'), JSON.stringify({
+      schemaVersion: 1,
+      stage: 'definition',
+      status: 'review-ready',
+      workItems: [
+        { id: 'baseline', status: 'complete' }, { id: 'outcome', status: 'complete' },
+        { id: 'scope', status: 'complete' }, { id: 'ownership', status: 'complete' },
+      ],
+      blockers: [{ id: 'owner', title: '客户尚未确认最终验证人', severity: 'high', status: 'open' }],
+      recommendation: 'go',
+    }))
+
+    const blocked = await loadV2StageSurface(root, 'definition')
+    expect(blocked).toMatchObject({
+      stateStatus: 'ready', status: 'blocked', presentCount: 3, requiredCount: 3, reviewReady: false,
+      reviewBlockers: ['客户尚未确认最终验证人'], recommendation: 'go',
+    })
+    expect(blocked.workItems.every(item => item.status === 'complete')).toBe(true)
+
+    await writeFile(join(states, 'definition.json'), JSON.stringify({
+      schemaVersion: 1,
+      stage: 'definition',
+      status: 'review-ready',
+      workItems: blocked.workItems,
+      blockers: [
+        { id: 'owner', title: '客户尚未确认最终验证人', severity: 'high', status: 'resolved' },
+        { id: 'baseline-data', title: '基线数据仍待客户核对', severity: 'medium', status: 'open' },
+      ],
+      recommendation: 'go',
+    }))
+    await expect(loadV2StageSurface(root, 'definition')).resolves.toMatchObject({
+      status: 'review-ready', presentCount: 3, reviewReady: true, reviewBlockers: [],
+      blockers: [
+        { id: 'owner', severity: 'high', status: 'resolved' },
+        { id: 'baseline-data', severity: 'medium', status: 'open' },
+      ],
+    })
+
+    await writeFile(join(states, 'definition.json'), JSON.stringify({
+      schemaVersion: 1,
+      stage: 'outcome-scope',
+      status: 'review-ready',
+      workItems: blocked.workItems,
+      blockers: [],
+      recommendation: 'go',
+    }))
+    await expect(loadV2StageSurface(root, 'definition')).resolves.toMatchObject({
+      stateStatus: 'invalid', status: 'blocked', reviewReady: false,
+      reviewBlockers: ['阶段状态文件无法读取：stage 必须是 definition。'],
+    })
+  })
+
   it('keeps unconfigured project surfaces honest', async () => {
     const root = await mkdtemp(join(tmpdir(), 'fde-project-empty-'))
     const value = await loadProjectSurfaceSnapshot({ workspaceId: 'w1', title: '空白项目', path: root })
@@ -200,6 +262,17 @@ describe('FDE project surface snapshot', () => {
     ])
     expect(ready.discovery.route.primaryMethod).toMatchObject({ skill: 'qualify-ai-workflow', layer: 'method' })
     expect(ready.discovery.route.engineering.map(item => item.skill)).toEqual(['fde-orient', 'knowledge-interview', 'ownership-map', 'repo-recon', 'stakeholder-brief'])
+
+    const compatibleRecords = records.map((item, index) => ({
+      ...item,
+      ...(index === 0 ? { id: 'requirement-research-report' } : {}),
+      evidenceRefs: ['workflow-1'],
+      supersedes: null,
+    }))
+    await writeFile(join(state, 'artifacts.json'), JSON.stringify({ schemaVersion: 1, artifacts: compatibleRecords }))
+    const compatible = await loadProjectSurfaceSnapshot({ workspaceId: 'w1', title: '发现项目', path: root })
+    expect(compatible.discovery).toMatchObject({ status: 'ready-for-review', presentCount: 3, reviewReady: true, blockers: [] })
+    expect(compatible.discovery.artifacts[0]).toMatchObject({ id: 'research-report', status: 'present', structureState: 'starter_valid' })
 
     records[2] = { ...records[2]!, sourceAdapter: { ...guideSource('workflow-charter'), commit: 'unreviewed' } }
     await writeFile(join(state, 'artifacts.json'), JSON.stringify({ schemaVersion: 1, artifacts: records }))

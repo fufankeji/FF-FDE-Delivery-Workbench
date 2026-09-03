@@ -29,6 +29,7 @@ import {
   loadAcceptanceHandoverStage,
   loadDeploymentTrialStage,
 } from './delivery-closeout.ts'
+import { loadV2StageSurfaces } from './v2-stage-surface.ts'
 
 const FDE_DIRECTORY = '.fde'
 const API_DOCS_FILE = 'api-docs.json'
@@ -544,6 +545,7 @@ export async function loadProjectSurfaceSnapshot(input: {
     development,
     deploymentTrial,
     acceptanceHandover,
+    v2Stages,
   ] = await Promise.all([
     loadApiDocs(input.path, runtime),
     loadArchitecture(input.path),
@@ -554,6 +556,7 @@ export async function loadProjectSurfaceSnapshot(input: {
     loadDevelopmentDocs(input.path, input.workspaceId),
     loadDeploymentTrialStage(input.path, input.workspaceId),
     loadAcceptanceHandoverStage(input.path, input.workspaceId),
+    loadV2StageSurfaces(input.path),
   ])
   const discovery = await loadDiscoveryStage(input.path, requirements)
   return {
@@ -571,6 +574,7 @@ export async function loadProjectSurfaceSnapshot(input: {
     development,
     deploymentTrial,
     acceptanceHandover,
+    v2Stages,
   }
 }
 

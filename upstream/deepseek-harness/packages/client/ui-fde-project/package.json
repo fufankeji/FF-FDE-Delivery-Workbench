@@ -67,5 +67,5 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
-  "files": ["lib/index.js", "lib/invariant.js", "lib/client.js", "lib/types/**/*.d.ts", "THIRD_PARTY_NOTICES.md"]
+  "files": ["lib/index.js", "lib/invariant.js", "lib/client.js", "lib/types/**/*.d.ts"]
 }

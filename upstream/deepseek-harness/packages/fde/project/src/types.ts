@@ -590,6 +590,56 @@ export interface AcceptanceHandoverStageSnapshot {
   readonly blockers: readonly string[]
 }
 
+/** One V2 lifecycle stage supported by the guided project workbench. */
+export type V2LifecycleStageId = 'definition' | 'investigation' | 'design' | 'evaluation' | 'pilot' | 'production' | 'improvement'
+
+/** One fixed V2 stage output read from the current project. */
+export interface V2StageArtifactSnapshot {
+  readonly id: string
+  readonly title: string
+  readonly path: string
+  readonly purpose: string
+  readonly required: boolean
+  readonly status: 'missing' | 'present' | 'error'
+  readonly bytes?: number
+  readonly updatedAt?: string
+  readonly message?: string
+}
+
+/** Host-derived business state for one post-discovery V2 stage. */
+export interface V2StageSurfaceSnapshot {
+  readonly id: V2LifecycleStageId
+  readonly index: number
+  readonly title: string
+  readonly objective: string
+  readonly explanation: string
+  readonly statePath: string
+  readonly stateStatus: 'missing' | 'ready' | 'invalid'
+  readonly status: 'working' | 'review-ready' | 'blocked'
+  readonly currentWorkId: string
+  readonly workItems: readonly {
+    readonly id: string
+    readonly title: string
+    readonly purpose: string
+    readonly status: 'complete' | 'current' | 'waiting' | 'blocked'
+  }[]
+  readonly blockers: readonly {
+    readonly id: string
+    readonly title: string
+    readonly severity: 'low' | 'medium' | 'high' | 'critical'
+    readonly status: 'open' | 'resolved'
+  }[]
+  readonly recommendation: 'go' | 'revise' | 'narrow' | 'stop' | 'pending'
+  readonly artifacts: readonly V2StageArtifactSnapshot[]
+  readonly requiredCount: number
+  readonly presentCount: number
+  readonly reviewReady: boolean
+  readonly reviewBlockers: readonly string[]
+  readonly prompt: string
+  readonly skill: string
+  readonly message?: string
+}
+
 /** Combined read model for project delivery views and Project Detail. */
 export interface ProjectSurfaceSnapshot {
   readonly workspaceId: string
@@ -606,6 +656,7 @@ export interface ProjectSurfaceSnapshot {
   readonly development: DevelopmentDocsSnapshot
   readonly deploymentTrial: DeploymentTrialStageSnapshot
   readonly acceptanceHandover: AcceptanceHandoverStageSnapshot
+  readonly v2Stages: Readonly<Record<V2LifecycleStageId, V2StageSurfaceSnapshot>>
 }
 
 /** Host-only API configuration consumed by the project-scoped OpenAPI adapter. */

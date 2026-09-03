@@ -11,6 +11,7 @@ import {
   loadRequirementArtifacts,
   loadSolutionArtifacts,
   loadValidationStage,
+  loadV2StageSurface,
   readProjectArchitecture,
 } from '@deepseek-ai/dsh-fde-project'
 import type {} from '@deepseek-ai/dsh-host-webserver'
@@ -25,19 +26,23 @@ import {
   createCompleteRequirementsRoute,
   createCompleteSolutionRoute,
   createCompleteValidationRoute,
+  createCompleteV2StageRoute,
   createReturnStageRoute,
+  createReturnV2StageRoute,
   createStageSkillCatalogRoute,
   createStageRoute,
   type StageSkillCatalogValue,
 } from './http.ts'
 import { fdeStageDomainSpec, type FdeProjectState } from './spec.ts'
 import { FdeStageState } from './state.ts'
+import { DEFINITION_STAGE_SKILL_CATALOG_METHODS, V2_STAGE_SKILL_CATALOG, V2_STAGE_SKILLS, v2StagePrompt } from './v2-skills.ts'
 
-export { FdeStageRequestError, createCompleteDevelopmentRoute, createCompleteHandoffRoute, createCompletePilotRoute, createCompleteRequirementsRoute, createCompleteSolutionRoute, createCompleteValidationRoute, createReturnStageRoute, createStageRoute, createStageSkillCatalogRoute } from './http.ts'
+export { FdeStageRequestError, createCompleteDevelopmentRoute, createCompleteHandoffRoute, createCompletePilotRoute, createCompleteRequirementsRoute, createCompleteSolutionRoute, createCompleteValidationRoute, createCompleteV2StageRoute, createReturnStageRoute, createReturnV2StageRoute, createStageRoute, createStageSkillCatalogRoute } from './http.ts'
 export type { StageSkillCatalogMethod, StageSkillCatalogValue } from './http.ts'
-export { FDE_PROJECT_STATE_IDS, FDE_STAGE_IDS, fdeProjectState, fdeStageDomainSpec, fdeStageId, projectStageRecord, stageReturnRecord } from './spec.ts'
-export type { FdeProjectState, FdeStageId, ProjectStageRecord } from './spec.ts'
+export { FDE_PROJECT_STATE_IDS, FDE_STAGE_IDS, FDE_V2_STAGE_IDS, fdeProjectState, fdeStageDomainSpec, fdeStageId, fdeV2StageId, projectStageRecord, stageReturnRecord, v2StageReturnRecord } from './spec.ts'
+export type { FdeProjectState, FdeStageId, FdeV2StageId, ProjectStageRecord } from './spec.ts'
 export { FdeStageConflictError, FdeStageReturnError, FdeStageState, FdeStageTransitionError } from './state.ts'
+export { V2_STAGE_SKILL_CATALOG, V2_STAGE_SKILLS, v2StagePrompt } from './v2-skills.ts'
 
 /** Stable Host route used by the FDE Stage browser plugin. */
 export const FDE_STAGE_OPEN_PATH = '/api/fde-stage/open'
@@ -55,6 +60,10 @@ export const FDE_STAGE_COMPLETE_PILOT_PATH = '/api/fde-stage/pilot/complete'
 export const FDE_STAGE_COMPLETE_HANDOFF_PATH = '/api/fde-stage/handoff/complete'
 /** FDE-only one-step return route, including terminal project reopening. */
 export const FDE_STAGE_RETURN_PATH = '/api/fde-stage/return'
+/** Authoritative V2 manual gate. */
+export const FDE_V2_STAGE_COMPLETE_PATH = '/api/fde-stage/v2/complete'
+/** Authoritative V2 one-stage return route. */
+export const FDE_V2_STAGE_RETURN_PATH = '/api/fde-stage/v2/return'
 /** Read-only catalog of the methods registered for each FDE stage. */
 export const FDE_STAGE_SKILL_CATALOG_PATH = '/api/fde-stage/skills'
 /** Cordis plugin name. */
@@ -92,6 +101,8 @@ const DISCOVERY_STRUCTURED_OUTPUT_CONTRACT = `## 阶段 1 持久化合同
 ### Artifact Catalog
 
 维护 \`.fde/discovery/artifacts.json\`，根对象固定为 \`{"schemaVersion":1,"artifacts":[]}\`。每项必须包含 \`id\`、正整数 \`version\`、固定 \`contentPath\`、\`sourceAdapter\`、\`structureState\`、\`evidenceState\`、非空 \`evidenceRefs\`、\`inputRefs\`、\`decisionRefs\` 和 \`supersedes\`。structureState 只能是 missing、invalid、starter_valid、complete_valid 或 not_applicable；evidenceState 只能是 confirmed、inferred 或 unverified。
+
+三项必备产物的 id 固定为 \`research-report\`、\`confirmation-checklist\`、\`requirement-baseline\`；条件产物固定为 \`engagement-reframe\`。\`inputRefs\`、\`decisionRefs\` 和 \`supersedes\` 必须使用字符串数组；没有引用或被替代版本时写 \`[]\`，不要写 null。
 
 固定来源适配器如下，字段和值必须完整保留：
 
@@ -217,7 +228,17 @@ export const DISCOVERY_STAGE_SKILL_CATALOG = {
       { id: REFRAME_AI_ENGAGEMENT_SKILL.name, label: '核对冲突并调整项目范围', description: REFRAME_AI_ENGAGEMENT_SKILL.description, whenToUse: REFRAME_AI_ENGAGEMENT_SKILL.whenToUse, source: REFRAME_AI_ENGAGEMENT_SKILL.source, content: REFRAME_AI_ENGAGEMENT_SKILL.content },
       { id: STAKEHOLDER_BRIEF_SKILL.name, label: '整理给负责人看的决策简报', description: STAKEHOLDER_BRIEF_SKILL.description, whenToUse: STAKEHOLDER_BRIEF_SKILL.whenToUse, source: STAKEHOLDER_BRIEF_SKILL.source, content: STAKEHOLDER_BRIEF_SKILL.content },
     ],
-  }],
+  }, {
+    id: 'definition',
+    index: 1,
+    methods: [
+      ...DEFINITION_STAGE_SKILL_CATALOG_METHODS.slice(0, 5),
+      { id: QUALIFY_AI_WORKFLOW_SKILL.name, label: '信息不足时，返回补充业务流程', description: QUALIFY_AI_WORKFLOW_SKILL.description, whenToUse: QUALIFY_AI_WORKFLOW_SKILL.whenToUse, source: QUALIFY_AI_WORKFLOW_SKILL.source, content: QUALIFY_AI_WORKFLOW_SKILL.content, group: 'conditional' as const },
+      { id: REFRAME_AI_ENGAGEMENT_SKILL.name, label: '现场事实变化时，重新界定项目', description: REFRAME_AI_ENGAGEMENT_SKILL.description, whenToUse: REFRAME_AI_ENGAGEMENT_SKILL.whenToUse, source: REFRAME_AI_ENGAGEMENT_SKILL.source, content: REFRAME_AI_ENGAGEMENT_SKILL.content, group: 'conditional' as const },
+      { id: STAKEHOLDER_BRIEF_SKILL.name, label: '需要负责人决定时，整理决策简报', description: STAKEHOLDER_BRIEF_SKILL.description, whenToUse: STAKEHOLDER_BRIEF_SKILL.whenToUse, source: STAKEHOLDER_BRIEF_SKILL.source, content: STAKEHOLDER_BRIEF_SKILL.content, group: 'conditional' as const },
+      ...DEFINITION_STAGE_SKILL_CATALOG_METHODS.slice(5),
+    ],
+  }, ...V2_STAGE_SKILL_CATALOG],
 } as const satisfies StageSkillCatalogValue
 
 /** Runtime Skill loaded on demand while an FDE is consolidating the solution. */
@@ -487,6 +508,7 @@ export async function apply(ctx: Context): Promise<void> {
   ctx.skills.register(VALIDATION_SKILL)
   ctx.skills.register(DEPLOYMENT_TRIAL_SKILL)
   ctx.skills.register(ACCEPTANCE_HANDOVER_SKILL)
+  for (const skill of V2_STAGE_SKILLS) ctx.skills.register(skill)
   ctx.systemPrompt.section({
     name: 'fde:requirement-research',
     order: 90,
@@ -495,7 +517,10 @@ export async function apply(ctx: Context): Promise<void> {
       if (cwd === undefined) return ''
       const workspace = ctx.workspaceRegistry.list().find(item => item.path === cwd)
       if (workspace === undefined) return ''
-      const stage = state.current(workspace.id)?.currentStage ?? 'requirements'
+      const record = state.current(workspace.id)
+      const v2Prompt = v2StagePrompt(record?.v2Stage ?? 'discovery')
+      if (v2Prompt !== '') return v2Prompt
+      const stage = record?.currentStage ?? 'requirements'
       return requirementResearchPrompt(stage)
         || solutionDesignPrompt(stage)
         || projectDevelopmentPrompt(stage)
@@ -641,6 +666,32 @@ export async function apply(ctx: Context): Promise<void> {
     path: FDE_STAGE_RETURN_PATH,
     handler: returnStage,
   }), `fde-stage: ${FDE_STAGE_RETURN_PATH}`)
+  const completeV2 = createCompleteV2StageRoute({
+    trusted: request => isTrustedApiRequest(request, []),
+    workspaceExists: id => ctx.workspaceRegistry.get(WorkspaceId(id)) !== undefined,
+    readiness: async (workspaceId, stage) => {
+      const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
+      if (workspace === undefined) throw new Error('当前项目不存在或已被移除。')
+      if (stage === 'discovery') {
+        const artifacts = await loadRequirementArtifacts(workspace.path)
+        const discovery = await loadDiscoveryStage(workspace.path, artifacts)
+        return { reviewReady: discovery.reviewReady, reviewBlockers: discovery.blockers }
+      }
+      return await loadV2StageSurface(workspace.path, stage)
+    },
+    complete: async (workspaceId, expectedRevision, stage) => await state.completeV2(workspaceId, expectedRevision, stage),
+    reportFailure: (error) => { ctx.logger.warn(error instanceof Error ? error : new Error(String(error))) },
+  })
+  ctx.effect(() => ctx.webServer.register({ kind: 'exact', path: FDE_V2_STAGE_COMPLETE_PATH, handler: completeV2 }), `fde-stage: ${FDE_V2_STAGE_COMPLETE_PATH}`)
+  const returnV2 = createReturnV2StageRoute({
+    trusted: request => isTrustedApiRequest(request, []),
+    workspaceExists: id => ctx.workspaceRegistry.get(WorkspaceId(id)) !== undefined,
+    returnToPrevious: async (workspaceId, expectedRevision, reason) => await state.returnV2ToPrevious(
+      workspaceId, expectedRevision, reason,
+    ),
+    reportFailure: (error) => { ctx.logger.warn(error instanceof Error ? error : new Error(String(error))) },
+  })
+  ctx.effect(() => ctx.webServer.register({ kind: 'exact', path: FDE_V2_STAGE_RETURN_PATH, handler: returnV2 }), `fde-stage: ${FDE_V2_STAGE_RETURN_PATH}`)
 }
 
 /** Model-facing content is limited to one short stage section and an on-demand Skill. */

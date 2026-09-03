@@ -147,7 +147,7 @@ function ProjectResourceUploadControl({ workspaceId, path, t, composer = false }
         aria-hidden
         onChange={onChange}
       />
-      <Tooltip label={label} side="top" delayMs={500}>
+      <Tooltip label={label} side="top" delayMs={500} disabled={composer}>
         <button
           type="button"
           className={css.button}

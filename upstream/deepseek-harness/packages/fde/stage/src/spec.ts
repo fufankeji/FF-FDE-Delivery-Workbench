@@ -23,11 +23,38 @@ export const FDE_PROJECT_STATE_IDS = [...FDE_STAGE_IDS, 'completed'] as const
 /** One durable project delivery state. */
 export type FdeProjectState = typeof FDE_PROJECT_STATE_IDS[number]
 
+/** Authoritative V2 lifecycle stages in the business order shown by the project workbench. */
+export const FDE_V2_STAGE_IDS = [
+  'discovery',
+  'definition',
+  'investigation',
+  'design',
+  'evaluation',
+  'pilot',
+  'production',
+  'improvement',
+] as const
+
+/** One authoritative V2 lifecycle stage. */
+export type FdeV2StageId = typeof FDE_V2_STAGE_IDS[number]
+
 /** Runtime validation for the closed stage set. */
 export const fdeStageId = z.enum(FDE_STAGE_IDS)
 
 /** Runtime validation for active stages and the terminal state. */
 export const fdeProjectState = z.enum(FDE_PROJECT_STATE_IDS)
+
+/** Runtime validation for the authoritative V2 stage set. */
+export const fdeV2StageId = z.enum(FDE_V2_STAGE_IDS)
+
+/** One explicit FDE decision to return a V2 project by exactly one stage. */
+export const v2StageReturnRecord = z.object({
+  from: fdeV2StageId,
+  to: fdeV2StageId,
+  reason: z.string().min(1).max(1000),
+  returnedAt: z.string(),
+  revision: z.number().int().min(2),
+})
 
 /** One explicit FDE decision to return a project by exactly one stage. */
 export const stageReturnRecord = z.object({
@@ -41,11 +68,17 @@ export const stageReturnRecord = z.object({
 /** One Workspace's committed stage projection. */
 export const projectStageRecord = z.object({
   currentStage: fdeProjectState,
+  lifecycleVersion: z.literal(2).optional(),
+  v2Stage: fdeV2StageId.optional(),
   revision: z.number().int().min(1),
   createdAt: z.string(),
   updatedAt: z.string(),
   reconfirmThrough: fdeProjectState.optional(),
   returns: z.array(stageReturnRecord).max(50).optional(),
+  v2ReconfirmThrough: fdeV2StageId.optional(),
+  v2Returns: z.array(v2StageReturnRecord).max(50).optional(),
+  improvementCycles: z.number().int().min(0).optional(),
+  lastReviewedAt: z.string().optional(),
 })
 
 /** Stored stage record inferred from the durable schema. */

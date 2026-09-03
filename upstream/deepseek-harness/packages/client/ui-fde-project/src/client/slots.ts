@@ -7,7 +7,8 @@ import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
 import type {} from '@deepseek-ai/dsh-client-ui-workspace/client'
 import type { AcceptanceHandoverDecision, FdeProjectSurfaceController } from './controller.ts'
 import type { ProjectPageController } from './page-controller.ts'
-import type { ProjectStageController } from './stage-controller.ts'
+import type { FdeV2StageId, ProjectStageController } from './stage-controller.ts'
+import type { ProjectStageViewController } from './stage-view-controller.ts'
 import type { ProjectSourceController, ProjectSourcePreviewKind } from './source-controller.ts'
 
 /** Browser-safe read-only file currency passed from Project Detail to one preview occupant. */
@@ -43,6 +44,8 @@ export interface ProjectPageInjected {
   loadProjectSurface: (workspaceId: string) => void
   refreshProjectSurface: (workspaceId: string) => void
   completeRequirements: (workspaceId: string, expectedRevision: number) => Promise<void>
+  completeV2Stage: (workspaceId: string, expectedRevision: number, stage: FdeV2StageId) => Promise<void>
+  returnV2Stage: (workspaceId: string, expectedRevision: number, reason: string) => Promise<void>
   completeSolution: (workspaceId: string, expectedRevision: number) => Promise<void>
   completeDevelopment: (workspaceId: string, expectedRevision: number) => Promise<void>
   completeValidation: (workspaceId: string, expectedRevision: number) => Promise<void>
@@ -116,7 +119,12 @@ export interface ProjectRuntimeHeaderInjected {
 }
 
 /** Stage-one business actions exposed without leaking Skill names into product copy. */
-export type DiscoveryAction = 'qualify-workflow' | 'prepare-interview' | 'reframe-engagement'
+export type DiscoveryAction =
+  | 'qualify-workflow'
+  | 'prepare-interview'
+  | 'reframe-engagement'
+  | 'narrow-workflow'
+  | 'pause-workflow'
 
 /** Shared project-stage workbench data and actions. */
 export interface ProjectStageWorkbenchInjected {
@@ -124,19 +132,40 @@ export interface ProjectStageWorkbenchInjected {
     stageProgress: ProjectStageController
     projectSurfaces: FdeProjectSurfaceController
     projectSources: ProjectSourceController
+    stageView: ProjectStageViewController
   }
   loadStage: (workspaceId: string) => void
   loadProjectSurface: (workspaceId: string) => void
+  refreshProjectSurface: (workspaceId: string) => void
   loadProjectSources: (workspaceId: string, force?: boolean) => void
+  completeRequirements: (workspaceId: string, expectedRevision: number) => Promise<void>
+  completeV2Stage: (workspaceId: string, expectedRevision: number, stage: FdeV2StageId) => Promise<void>
+  returnV2Stage: (workspaceId: string, expectedRevision: number, reason: string) => Promise<void>
   openProjectSourceUpload: (workspaceId: string) => void
-  runDiscoveryAction: (
+  prepareDiscoveryDraft: (
     sessionId: string,
     action: DiscoveryAction,
     sourcePaths: readonly string[],
-    problemDescription: string,
-  ) => Promise<void>
+  ) => void
+  prepareStageDraft: (sessionId: string, prompt: string) => void
   openProjectFile: (sessionId: string, workspacePath: string, relativePath: string, title: string) => Promise<void>
   openProjectConversation: (sessionId: string) => void
+  resolveProjectWorkspace: (sessionId: string) => {
+    workspaceId: string
+    title: string
+    path: string
+  } | undefined
+  resolveEnteredProject: () => {
+    sessionId: string
+    workspaceId: string
+    title: string
+    path: string
+  } | undefined
+  /** Restore the full project-workbench frame after leaving the Agent execution view. */
+  activateProjectWorkbenchLayout?: () => void
+  viewProjectStage: (workspaceId: string, stage: FdeV2StageId) => void
+  returnToCurrentStage: (workspaceId: string) => void
+  toggleProjectSidebar: () => void
   openProjectPage: () => void
 }
 

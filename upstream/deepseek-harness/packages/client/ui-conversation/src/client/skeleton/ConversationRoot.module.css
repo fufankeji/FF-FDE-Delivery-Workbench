@@ -324,8 +324,22 @@
   right: 104px;
 }
 
+/* The stage-two reference keeps the Agent entry aligned to the working card,
+   while leaving the project-record rail visible on the right. This selector is
+   deliberately stage-specific so project center and the other seven stage
+   layouts keep their own composer geometry. */
+.scrollBody:has([data-conversation-composer-layout='stage-definition'][data-conversation-composer-overlay]) > .composerSeat {
+  right: 163px;
+  left: 97px;
+}
+
 @media (max-width: 980px) {
   .scrollBody:has([data-conversation-composer-layout='stage-execution'][data-conversation-composer-overlay]) > .composerSeat {
+    right: var(--dsh-scrollbar-width);
+    left: 0;
+  }
+
+  .scrollBody:has([data-conversation-composer-layout='stage-definition'][data-conversation-composer-overlay]) > .composerSeat {
     right: var(--dsh-scrollbar-width);
     left: 0;
   }

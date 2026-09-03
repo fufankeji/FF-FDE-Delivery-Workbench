@@ -76,14 +76,18 @@ export const DISCOVERY_CAPABILITY_ROUTE: DiscoveryCapabilityRouteSnapshot = {
   ],
 }
 
-const WORK_ITEMS = [
+const WORK_ITEMS: readonly { readonly id: DiscoveryWorkItemId; readonly title: string; readonly purpose: string }[] = [
   { id: 'collect-originals', title: '收集原始情况', purpose: '保留客户说法、资料和已知现场条件。' },
   { id: 'restore-workflow', title: '还原真实工作', purpose: '核对正常流程、异常流程、人工回退和责任人。' },
   { id: 'qualify-value', title: '核对问题价值', purpose: '找到可验证的业务结果、现状基线和停止条件。' },
   { id: 'form-conclusion', title: '形成阶段结论', purpose: '整理候选材料，供 FDE 做 Go、Revise、Narrow 或 Stop 决定。' },
-] as const satisfies readonly { readonly id: DiscoveryWorkItemId; readonly title: string; readonly purpose: string }[]
+] as const
 
 type DiscoveryArtifactId = DiscoveryStageArtifactSnapshot['id']
+
+const DISCOVERY_ARTIFACT_ID_ALIASES: Readonly<Record<string, DiscoveryArtifactId>> = {
+  'requirement-research-report': 'research-report',
+}
 
 interface ArtifactDefinition {
   readonly id: DiscoveryArtifactId
@@ -177,11 +181,20 @@ function evidenceReference(value: unknown, field: string): DiscoveryEvidenceRefe
   }
 }
 
-function evidenceReferences(value: unknown, field: string): readonly DiscoveryEvidenceReferenceSnapshot[] {
+function evidenceReferences(
+  value: unknown,
+  field: string,
+  referencedEvidence: ReadonlyMap<string, DiscoveryEvidenceReferenceSnapshot> = new Map(),
+): readonly DiscoveryEvidenceReferenceSnapshot[] {
   if (!Array.isArray(value) || value.length === 0 || value.length > 200) {
     throw new Error(`${field} 必须包含 1 至 200 条逐条证据引用。`)
   }
-  const items = value.map((item, index) => evidenceReference(item, `${field}[${String(index)}]`))
+  const items = value.map((item, index) => {
+    if (typeof item !== 'string') return evidenceReference(item, `${field}[${String(index)}]`)
+    const resolved = referencedEvidence.get(item)
+    if (resolved === undefined) throw new Error(`${field}[${String(index)}] 未指向候选工作流中的已有证据。`)
+    return resolved
+  })
   if (new Set(items.map(item => item.id)).size !== items.length) throw new Error(`${field} 的 id 不能重复。`)
   return items
 }
@@ -264,11 +277,17 @@ function sameSource(actual: DiscoverySourceAdapterSnapshot, expected: DiscoveryS
     && actual.artifact === expected.artifact
 }
 
-function artifactCatalogItem(value: unknown, index: number): ArtifactCatalogItem {
+function artifactCatalogItem(
+  value: unknown,
+  index: number,
+  referencedEvidence: ReadonlyMap<string, DiscoveryEvidenceReferenceSnapshot>,
+): ArtifactCatalogItem {
   const item = record(value)
   if (item === undefined) throw new Error(`artifacts[${String(index)}] 必须是对象。`)
-  const id = item.id
-  if (typeof id !== 'string' || !(id in ARTIFACT_DEFINITIONS)) throw new Error(`artifacts[${String(index)}].id 无效。`)
+  const rawId = item.id
+  if (typeof rawId !== 'string') throw new Error(`artifacts[${String(index)}].id 无效。`)
+  const id = DISCOVERY_ARTIFACT_ID_ALIASES[rawId] ?? rawId
+  if (!(id in ARTIFACT_DEFINITIONS)) throw new Error(`artifacts[${String(index)}].id 无效。`)
   const definition = ARTIFACT_DEFINITIONS[id as DiscoveryArtifactId]
   const version = item.version
   if (!Number.isSafeInteger(version) || Number(version) < 1) throw new Error(`artifacts[${String(index)}].version 必须是正整数。`)
@@ -286,7 +305,7 @@ function artifactCatalogItem(value: unknown, index: number): ArtifactCatalogItem
   if (!sameSource(adapter, definition.source)) throw new Error(`artifacts[${String(index)}].sourceAdapter 不是已审查的固定版本。`)
   stringList(item.inputRefs, `artifacts[${String(index)}].inputRefs`)
   stringList(item.decisionRefs, `artifacts[${String(index)}].decisionRefs`)
-  stringList(item.supersedes, `artifacts[${String(index)}].supersedes`)
+  if (item.supersedes !== null) stringList(item.supersedes, `artifacts[${String(index)}].supersedes`)
   return {
     id: id as DiscoveryArtifactId,
     version: Number(version),
@@ -294,16 +313,19 @@ function artifactCatalogItem(value: unknown, index: number): ArtifactCatalogItem
     sourceAdapter: adapter,
     structureState: structureState as DiscoveryStageArtifactSnapshot['structureState'],
     evidenceState: evidenceState as DiscoveryEvidenceState,
-    evidenceRefs: evidenceReferences(item.evidenceRefs, `artifacts[${String(index)}].evidenceRefs`),
+    evidenceRefs: evidenceReferences(item.evidenceRefs, `artifacts[${String(index)}].evidenceRefs`, referencedEvidence),
   }
 }
 
-async function loadArtifactCatalog(projectRoot: string): Promise<ArtifactCatalogResult> {
+async function loadArtifactCatalog(
+  projectRoot: string,
+  referencedEvidence: ReadonlyMap<string, DiscoveryEvidenceReferenceSnapshot>,
+): Promise<ArtifactCatalogResult> {
   try {
     const parsed = await readDiscoveryJson(projectRoot, ARTIFACT_CATALOG_PATH)
     if (parsed.schemaVersion !== 1 || !Array.isArray(parsed.artifacts)) throw new Error('Artifact Catalog 不符合 schemaVersion 1。')
     if (parsed.artifacts.length > 20) throw new Error('Artifact Catalog 不能超过 20 项。')
-    const items = parsed.artifacts.map(artifactCatalogItem)
+    const items = parsed.artifacts.map((item, index) => artifactCatalogItem(item, index, referencedEvidence))
     if (new Set(items.map(item => item.id)).size !== items.length) throw new Error('Artifact Catalog 的 id 不能重复。')
     return { status: 'ready', items: new Map(items.map(item => [item.id, item])) }
   } catch (error) {
@@ -407,10 +429,9 @@ export async function loadDiscoveryStage(
   projectRoot: string,
   requirements: RequirementArtifactsSnapshot,
 ): Promise<DiscoveryStageSnapshot> {
-  const [workflows, artifactCatalog] = await Promise.all([
-    loadWorkflowCatalog(projectRoot),
-    loadArtifactCatalog(projectRoot),
-  ])
+  const workflows = await loadWorkflowCatalog(projectRoot)
+  const referencedEvidence = new Map(workflows.items.flatMap(item => item.evidenceRefs).map(item => [item.id, item]))
+  const artifactCatalog = await loadArtifactCatalog(projectRoot, referencedEvidence)
   const requirementById = new Map(requirements.artifacts.map(item => [item.id, item]))
   const artifacts = await Promise.all((Object.values(ARTIFACT_DEFINITIONS) as ArtifactDefinition[]).map(
     async definition => await projectArtifact(projectRoot, requirementById.get(definition.id as RequirementArtifactSnapshot['id']), definition, artifactCatalog),
@@ -430,11 +451,10 @@ export async function loadDiscoveryStage(
   if (workflows.status === 'missing') blockers.push('尚未形成带逐条证据引用的候选工作流。')
   if (workflows.status === 'invalid') blockers.push(`候选工作流结构无效：${workflows.message ?? '未知错误'}。`)
   if (workflows.status === 'ready' && workflows.items.length === 0) blockers.push('候选工作流仍为空，尚不能提交阶段评审。')
-  const currentWorkItem = WORK_ITEMS[currentIndex] ?? WORK_ITEMS[0]
   return {
     question: '哪个真实工作流问题值得继续解决？',
     status,
-    currentWorkId: currentWorkItem.id,
+    currentWorkId: WORK_ITEMS[currentIndex]?.id ?? WORK_ITEMS[0]?.id ?? 'collect-originals',
     workItems: WORK_ITEMS.map((item, index) => ({
       ...item,
       status: reviewReady || index < currentIndex ? 'complete' : index === currentIndex ? 'current' : 'waiting',

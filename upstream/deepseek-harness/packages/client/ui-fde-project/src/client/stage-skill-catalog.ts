@@ -11,6 +11,7 @@ export interface StageSkillCatalogMethod {
   readonly whenToUse: string
   readonly source: string
   readonly content: string
+  readonly group?: 'required' | 'conditional'
 }
 
 /** One stage and the methods that the product actually registers for it. */
@@ -32,8 +33,10 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isMethod(value: unknown): value is StageSkillCatalogMethod {
   if (!isRecord(value)) return false
+  const group = value.group
   return ['id', 'label', 'description', 'whenToUse', 'source', 'content']
     .every(key => typeof value[key] === 'string' && value[key].trim() !== '')
+    && (group === undefined || group === 'required' || group === 'conditional')
 }
 
 function isStage(value: unknown): value is StageSkillCatalogStage {

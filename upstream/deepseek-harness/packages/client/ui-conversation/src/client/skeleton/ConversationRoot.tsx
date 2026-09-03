@@ -48,9 +48,16 @@ export function ConversationRoot({
     seatObserver.current.observe(seat)
   }, [])
 
+  const normalizedCwd = cwd?.replace(/\/+$/, '')
   const sessionWorkspace = sessionId === undefined
     ? undefined
     : workspaces.items.find(workspace => workspace.sessionIds.includes(sessionId))
+      // A newly connected project Session can become current one render before
+      // the Workspace sessionIds list is refreshed. Its cwd is already exact,
+      // so keep the project-scoped hero instead of flashing the generic home.
+      ?? (normalizedCwd === undefined || normalizedCwd === ''
+        ? undefined
+        : workspaces.items.find(workspace => workspace.path.replace(/\/+$/, '') === normalizedCwd))
   const pendingWorkspace = workspaces.items.find(
     workspace => workspace.workspaceId === pendingWorkspaceId,
   )
