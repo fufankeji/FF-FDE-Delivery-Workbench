@@ -2380,6 +2380,7 @@
    cannot leak into the DeepSeek Harness workbench. */
 .genericStageRoot[data-stage='definition'] {
   box-sizing: border-box;
+  container-type: inline-size;
   width: 100%;
   max-width: none;
   height: 100%;
@@ -2437,7 +2438,8 @@
 .genericStageRoot[data-stage='definition'] .stageIntro {
   position: relative;
   z-index: 2;
-  max-width: 820px;
+  box-sizing: border-box;
+  max-width: min(820px, calc(100% - 330px));
   padding: 18px 36px 0;
 }
 
@@ -2451,7 +2453,7 @@
   max-width: 810px;
   margin: 7px 0 5px;
   color: #fff;
-  font-size: 27px;
+  font-size: 25px;
   line-height: 1.27;
   letter-spacing: -.025em;
 }
@@ -2552,15 +2554,32 @@
 }
 
 .genericStageRoot[data-stage='definition'] .workPath::before,
-.genericStageRoot[data-stage='definition'] .workPath::after { top: 19px; }
+.genericStageRoot[data-stage='definition'] .workPath::after { display: none; }
 
-.genericStageRoot[data-stage='definition'] .workPath li { grid-template-rows: 25px 24px; gap: 0; padding: 0 5px; }
-.genericStageRoot[data-stage='definition'] .workPath i { width: 24px; height: 24px; box-shadow: 0 0 0 3px #fff; }
+.genericStageRoot[data-stage='definition'] .workPath li {
+  grid-template-columns: 24px auto;
+  grid-template-rows: auto;
+  justify-content: start;
+  align-items: center;
+  column-gap: 10px;
+  padding: 0 5px 0 23px;
+  text-align: left;
+}
+.genericStageRoot[data-stage='definition'] .workPath li:not(:last-child)::after {
+  position: absolute;
+  top: 12px;
+  right: -17px;
+  left: 132px;
+  height: 1px;
+  background: #cfe8de;
+  content: '';
+}
+.genericStageRoot[data-stage='definition'] .workPath i { grid-row: 1; width: 24px; height: 24px; box-shadow: 0 0 0 3px #fff; }
 .genericStageRoot[data-stage='definition'] .workPath li[data-status='current'] i { border: 2px solid #14b866; background: #fff; color: #14b866; font-size: 8px; }
 .genericStageRoot[data-stage='definition'] .workPath li[data-status='current'] > span { background: transparent; }
-.genericStageRoot[data-stage='definition'] .workPath li > span { min-height: 0; gap: 0; padding: 0 5px; }
-.genericStageRoot[data-stage='definition'] .workPath strong { font-size: 11.5px; line-height: 1.15; }
-.genericStageRoot[data-stage='definition'] .workPath small { font-size: 9.5px; line-height: 1.15; }
+.genericStageRoot[data-stage='definition'] .workPath li > span { grid-column: 2; grid-row: 1; min-height: 0; justify-items: start; gap: 1px; padding: 0; }
+.genericStageRoot[data-stage='definition'] .workPath strong { font-size: 12px; line-height: 1.2; }
+.genericStageRoot[data-stage='definition'] .workPath small { font-size: 10.5px; line-height: 1.2; }
 
 .genericStageRoot[data-stage='definition'] .currentWork {
   position: relative;
@@ -2574,12 +2593,15 @@
   border-radius: 15px;
   background: rgba(255, 255, 255, .94);
   box-shadow: 0 12px 30px rgba(35, 78, 154, .09);
+  overflow: hidden;
 }
 
-.genericStageRoot[data-stage='definition'] .currentWork h2 { margin: 3px 0 3px; font-size: 20px; }
-.genericStageRoot[data-stage='definition'] .currentWork > p { font-size: 12.5px; line-height: 1.45; }
+.genericStageRoot[data-stage='definition'] .currentWork > header > span { font-size: 12.5px; }
+.genericStageRoot[data-stage='definition'] .currentWork h2 { margin: 3px 0 3px; font-size: 21px; }
+.genericStageRoot[data-stage='definition'] .currentWork > p { font-size: 13px; line-height: 1.45; }
 .genericStageRoot[data-stage='definition'] .promptGuide {
   position: relative;
+  box-sizing: border-box;
   grid-template-columns: 48px minmax(0, 1fr);
   column-gap: 10px;
   margin-top: 8px;
@@ -2590,19 +2612,19 @@
   background: linear-gradient(135deg, #eff5ff, #f7faff);
 }
 .promptGuideCopy { display: grid; min-width: 0; gap: 4px; }
-.genericStageRoot[data-stage='definition'] .promptGuideCopy > span { color: #075fe0; font-weight: 700; }
-.genericStageRoot[data-stage='definition'] .promptGuideCopy > strong { font-size: 12.5px; line-height: 1.45; }
-.genericStageRoot[data-stage='definition'] .promptGuideCopy > small { color: #a2abbd; }
-.genericStageRoot[data-stage='definition'] .promptGuideCopy mark { justify-self: start; padding: 2px 8px; border-radius: 999px; background: #dceaff; color: #0961dd; font-size: 10px; font-weight: 700; }
+.genericStageRoot[data-stage='definition'] .promptGuideCopy > span { color: #075fe0; font-size: 12px; font-weight: 700; }
+.genericStageRoot[data-stage='definition'] .promptGuideCopy > strong { font-size: 13px; line-height: 1.45; }
+.genericStageRoot[data-stage='definition'] .promptGuideCopy > small { color: #939eb2; font-size: 11.5px; }
+.genericStageRoot[data-stage='definition'] .promptGuideCopy mark { justify-self: start; padding: 2px 8px; border-radius: 999px; background: #dceaff; color: #0961dd; font-size: 10.5px; font-weight: 700; line-height: 1.25; }
 .promptSparkleIcon { box-sizing: border-box; width: 42px; height: 42px; align-self: start; padding: 7px; border-radius: 9px; background: #e7f0ff; color: #0c66ff; }
 .promptSparkleAccent { position: absolute; top: 18px; right: 15px; color: #c9d9ff; font-size: 20px; font-style: normal; }
 .genericStageRoot[data-stage='definition'] .workActions { position: absolute; right: 23px; bottom: 9px; left: 23px; gap: 10px; margin-top: 0; }
 .genericStageRoot[data-stage='definition'] .workActions button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; }
 .genericStageRoot[data-stage='definition'] .workActions button > svg { width: 15px; height: 15px; flex: none; }
-.genericStageRoot[data-stage='definition'] .workActions .primaryButton { border-color: #0b5df1; background: linear-gradient(180deg, #176fff, #0055e8); box-shadow: 0 5px 12px rgba(0, 80, 232, .24), inset 0 1px rgba(255, 255, 255, .24); }
+.genericStageRoot[data-stage='definition'] .workActions .primaryButton { border-color: #0b5df1; background: linear-gradient(180deg, #176fff, #0055e8); box-shadow: 0 3px 8px rgba(0, 80, 232, .22), inset 0 1px rgba(255, 255, 255, .24); }
 .genericStageRoot[data-stage='definition'] .workActions .primaryButton > svg { fill: #fff; }
 .genericStageRoot[data-stage='definition'] .workActions .secondaryButton > svg { stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.5; }
-.stageUpdateStatus { display: inline-flex; align-items: center; gap: 8px; margin-left: 6px; color: #8b96aa; font-size: 11px; }
+.stageUpdateStatus { display: inline-flex; align-items: center; gap: 8px; margin-left: 6px; color: #7e899e; font-size: 11.5px; }
 .stageUpdateStatus > i { width: 7px; height: 7px; border-radius: 50%; background: #17c56e; }
 
 .genericStageRoot[data-stage='definition'] .genericStageGrid > aside {
@@ -2630,7 +2652,7 @@
   padding: 0 0 22px;
   color: #174eb2;
 }
-.genericStageRoot[data-stage='definition'] .projectRecordRail > header span { font-size: 13px; font-weight: 700; }
+.genericStageRoot[data-stage='definition'] .projectRecordRail > header span { font-size: 14px; font-weight: 700; }
 .genericStageRoot[data-stage='definition'] .artifactRailIcon { width: 18px; height: 18px; stroke: #5272ad; }
 .genericStageRoot[data-stage='definition'] .projectRecordRail > header .artifactRailIcon { display: none; }
 
@@ -2646,7 +2668,7 @@
 .genericStageRoot[data-stage='definition'] .projectRecordNodes::before {
   position: absolute;
   top: 24px;
-  bottom: -48px;
+  bottom: 27px;
   left: 20px;
   width: 2px;
   background: linear-gradient(#4081ff, #39c978 58%, #d8e2f5 58%);
@@ -2691,9 +2713,9 @@
   color: #1552c0;
 }
 .genericStageRoot[data-stage='definition'] .projectRecordNode[data-current='true']::before { background: #2073ff; box-shadow: 0 0 0 4px rgba(32, 115, 255, .14); }
-.genericStageRoot[data-stage='definition'] .projectRecordNode i { grid-row: 1 / -1; align-self: center; font-size: 17px; }
-.genericStageRoot[data-stage='definition'] .projectRecordNode span { font-size: 10px; }
-.genericStageRoot[data-stage='definition'] .projectRecordNode b { font-size: 10px; }
+.genericStageRoot[data-stage='definition'] .projectRecordNode i { grid-row: 1 / -1; align-self: center; font-size: 18px; }
+.genericStageRoot[data-stage='definition'] .projectRecordNode span { font-size: 11px; }
+.genericStageRoot[data-stage='definition'] .projectRecordNode b { font-size: 11px; }
 .recordDocumentIcon { width: 20px; height: 20px; grid-column: 3; grid-row: 1 / -1; align-self: center; justify-self: end; stroke: #8796b4; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.55; }
 .recordDocumentIcon[data-state='current'] { stroke: #075ff0; }
 .recordDocumentIcon[data-state='complete'] { stroke: #16b95f; }
@@ -2703,10 +2725,11 @@
   position: relative;
   display: grid;
   box-sizing: border-box;
-  width: calc(100% - 60px);
+  width: 100%;
   min-height: 54px;
   grid-template-columns: 1fr 24px;
-  margin: 16px 0 0 60px;
+  margin: 0;
+  padding: 8px 14px 8px 18px;
   border-color: #dbe3f2;
   border-radius: 11px;
   background: #f7f9fd;
@@ -2738,10 +2761,10 @@
 .genericStageRoot[data-stage='definition'] .reviewHeading > span { display: grid; width: 36px; height: 36px; flex: none; place-items: center; border-radius: 9px; background: #fff0dc; color: #f18113; }
 .genericStageRoot[data-stage='definition'] .reviewHeading > span svg { width: 22px; height: 22px; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.5; }
 .reviewHeading > div { display: grid; min-width: 0; }
-.genericStageRoot[data-stage='definition'] .reviewHeading small { color: #ef7f12; font-size: 10px; font-weight: 750; line-height: 1.1; }
-.genericStageRoot[data-stage='definition'] .workflowsPanel h2 { margin: 0; font-size: 18px; }
-.genericStageRoot[data-stage='definition'] .workflowsPanel header p { font-size: 11px; }
-.reviewSummary { display: grid; width: 506px; grid-template-columns: auto auto 1fr auto; align-items: center; gap: 12px; }
+.genericStageRoot[data-stage='definition'] .reviewHeading small { color: #ef7f12; font-size: 11px; font-weight: 750; line-height: 1.1; }
+.genericStageRoot[data-stage='definition'] .workflowsPanel h2 { margin: 0; font-size: 19px; }
+.genericStageRoot[data-stage='definition'] .workflowsPanel header p { font-size: 11.5px; }
+.reviewSummary { display: flex; width: auto; align-items: center; justify-content: flex-end; gap: 12px; margin-left: auto; }
 .reviewSummary > b { display: inline-flex; min-height: 24px; align-items: center; gap: 6px; padding: 0 12px; border: 1px solid transparent; border-radius: 999px; font-size: 11px; white-space: nowrap; }
 .reviewSummary > b > i { font-style: normal; }
 .reviewSummary > b[data-kind='materials'] { border-color: #d5eee1; background: #edf9f2; color: #129454; }
@@ -2778,10 +2801,10 @@
 .stageReviewArtifacts > article > b { color: #5b6680; font-family: var(--ds-font-family-code); font-size: 11px; }
 .stageReviewArtifacts > article > span { display: flex; min-width: 0; align-items: center; gap: 8px; }
 .stageReviewArtifacts > article > span svg { width: 17px; height: 17px; flex: none; fill: none; stroke: #435779; stroke-width: 1.5; }
-.stageReviewArtifacts > article > span strong { overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
-.stageReviewArtifacts > article > small { overflow: hidden; color: #8790a1; font-size: 10.5px; text-overflow: ellipsis; white-space: nowrap; }
-.stageReviewArtifacts > article > em { justify-self: start; color: #17a963; font-size: 11px; font-style: normal; font-weight: 700; white-space: nowrap; }
-.stageReviewArtifacts > article > button { min-height: 28px; padding: 0 10px; border: 1px solid #d9e3f3; border-radius: 7px; background: #fff; color: #26334f; font: inherit; font-size: 11px; cursor: pointer; }
+.stageReviewArtifacts > article > span strong { overflow: hidden; font-size: 12.5px; text-overflow: ellipsis; white-space: nowrap; }
+.stageReviewArtifacts > article > small { overflow: hidden; color: #7d879a; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.stageReviewArtifacts > article > em { justify-self: start; color: #17a963; font-size: 11.5px; font-style: normal; font-weight: 700; white-space: nowrap; }
+.stageReviewArtifacts > article > button { min-height: 28px; padding: 0 10px; border: 1px solid #d9e3f3; border-radius: 7px; background: #fff; color: #26334f; font: inherit; font-size: 11.5px; cursor: pointer; }
 .stageReviewArtifacts > article[data-review-pending='true'] > button { border-color: #f4a048; color: #e67808; }
 
 .reviewAllRecords { align-self: flex-start; min-height: 20px; margin-top: 2px; padding: 0; border: 0; background: transparent; color: #4269b0; font: inherit; font-size: 10px; cursor: pointer; }
@@ -2814,6 +2837,27 @@
   .genericStageRoot[data-stage='definition'] .promptGuide { min-height: 190px; }
   .genericStageRoot[data-stage='definition'] .workflowsPanel { height: 297px; }
   .genericStageRoot[data-stage='definition'] .stageReviewArtifacts > article { height: 40px; }
+}
+
+@container (max-width: 950px) {
+  .genericStageRoot[data-stage='definition'] .stageIntro { max-width: calc(100% - 290px); }
+  .genericStageRoot[data-stage='definition'] .stageIntro h1 { text-wrap: balance; }
+  .genericStageRoot[data-stage='definition'] .definitionStageRing { right: 205px; }
+  .genericStageRoot[data-stage='definition'] .genericStageGrid {
+    grid-template-columns: minmax(0, 1fr) minmax(270px, .72fr);
+  }
+
+  .genericStageRoot[data-stage='definition'] .workActions { gap: 6px; }
+  .genericStageRoot[data-stage='definition'] .workActions button { padding-right: 10px; padding-left: 10px; font-size: 11.5px; }
+  .genericStageRoot[data-stage='definition'] .stageUpdateStatus { gap: 5px; margin-left: 0; font-size: 10.5px; }
+  .genericStageRoot[data-stage='definition'] .reviewSummary { gap: 6px; }
+  .genericStageRoot[data-stage='definition'] .reviewSummary > b { padding-right: 8px; padding-left: 8px; }
+  .genericStageRoot[data-stage='definition'] .stageReviewArtifacts > article {
+    grid-template-columns: 20px 34px 150px minmax(0, 1fr) 64px auto;
+    gap: 6px;
+    padding-right: 8px;
+    padding-left: 8px;
+  }
 }
 
 @media (max-width: 980px) {

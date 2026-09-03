@@ -134,12 +134,12 @@ function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage,
         <section className={css.stageOverview} data-definition-hero={stage === 'definition' ? '' : undefined}>
           <header className={css.stageIntro}>
             <span>第 {surface.index}/8 阶段 · 本阶段目标</span>
-            <h1>{surface.objective}</h1>
+            <h1 data-definition-stage-title={stage === 'definition' ? '' : undefined}>{surface.objective}</h1>
             <p>{surface.explanation}</p>
           </header>
           {stage === 'definition' && <>
             <div className={css.definitionHeroDecoration} aria-hidden="true"><img src="/fde-dashboard/project-priority-stack.png" alt="" /></div>
-            <div className={css.definitionStageRing} aria-label={`当前处于第 ${String(surface.index)} 阶段，共 8 个阶段`}><strong>{surface.index}</strong><span>/8</span><small>当前阶段</small></div>
+            <div className={css.definitionStageRing} data-definition-stage-ring="" aria-label={`当前处于第 ${String(surface.index)} 阶段，共 8 个阶段`}><strong>{surface.index}</strong><span>/8</span><small>当前阶段</small></div>
           </>}
           <div className={css.workPathMeta}><span>本阶段进度</span><b>{surface.presentCount}/{surface.requiredCount} 项必备记录已形成</b></div>
           <ol
@@ -193,7 +193,7 @@ function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage,
               <div><small>评审准备</small><h2>{surface.reviewReady ? '材料已具备，请逐项核对' : `本阶段还差 ${String(unresolvedReviewCount)} 项才能评审`}</h2><p>{surface.reviewReady ? '文件齐备只代表可以开始评审，是否进入下一阶段仍由 FDE 决定。' : '先把阶段进度和必备记录整理完整；文件生成后刷新，仍由 FDE 人工判断。'}</p></div>
             </div>
             {surface.reviewReady
-              ? <div className={css.reviewSummary}>
+              ? <div className={css.reviewSummary} data-definition-review-summary={stage === 'definition' ? '' : undefined}>
                 <b data-kind="materials"><i>✓</i>材料齐备 {surface.presentCount}/{surface.requiredCount}</b>
                 <b data-kind="manual"><i>⊕</i>人工核对 {reviewedCount}/{requiredArtifacts.length}</b>
                 <button type="button" onClick={() => { setReviewCollapsed(value => !value) }}><span aria-hidden="true">⌃</span>{reviewCollapsed ? '展开清单' : '收起清单'}</button>
@@ -425,8 +425,8 @@ function ProjectRecordPanel({
             onClick={() => { selectStage(index) }}
           ><i>{String(index + 1).padStart(2, '0')}</i><span>{current ? '当前' : '已完成'}</span><b>{present}/{required.length}</b><DocumentStatusIcon state={current ? 'current' : 'complete'} /></button>
         })}
+        <button type="button" className={css.projectRecordAllButton} data-definition-record-all={actualStage === 'definition' ? '' : undefined} aria-label="查看全部项目记录" data-tooltip="查看全部已有阶段记录" onClick={() => { setShowAll(true); onCollapsedChange(false) }}>全部<DocumentStatusIcon state="all" /></button>
       </div>
-      <button type="button" className={css.projectRecordAllButton} data-definition-record-all={actualStage === 'definition' ? '' : undefined} aria-label="查看全部项目记录" data-tooltip="查看全部已有阶段记录" onClick={() => { setShowAll(true); onCollapsedChange(false) }}>全部<DocumentStatusIcon state="all" /></button>
     </section>
   }
 
