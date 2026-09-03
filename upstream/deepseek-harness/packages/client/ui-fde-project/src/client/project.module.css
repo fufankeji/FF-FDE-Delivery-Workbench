@@ -1617,6 +1617,10 @@
 .projectListRow[data-stage='evaluation'] { --project-accent: var(--fde-stage-validation); }
 .projectListRow[data-stage='production'],
 .projectListRow[data-stage='improvement'] { --project-accent: var(--fde-stage-handoff); }
+.projectListRow[data-palette='blue'] { --project-accent: #195ccf; }
+.projectListRow[data-palette='green'] { --project-accent: #08a45b; }
+.projectListRow[data-palette='orange'] { --project-accent: #df7710; }
+.projectListRow[data-palette='violet'] { --project-accent: #6a20c8; }
 .projectListRow[data-demo] { background: color-mix(in srgb, var(--project-accent) 3%, var(--dsw-alias-bg-overlay)); }
 .projectListRow:hover { background: color-mix(in srgb, var(--project-accent) 6%, var(--dsw-alias-bg-overlay)); }
 
@@ -1678,6 +1682,7 @@
   background: linear-gradient(145deg, var(--project-accent), color-mix(in srgb, var(--project-accent) 66%, var(--dsw-alias-label-primary)));
   font-weight: 700;
 }
+.projectListMark svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-width: 3; }
 
 .projectListStage,
 .projectListHealth { position: relative; display: block; min-width: 0; padding-left: 12px; }
@@ -3400,7 +3405,9 @@
 .projectCenterPriority[data-empty] { color: #fff; background: linear-gradient(135deg, #17233a, #214d9b); }
 
 .projectCollectionSurface {
+  display: flex;
   flex: none;
+  flex-direction: column;
   height: clamp(444px, 28.906vw, 600px);
   min-height: clamp(444px, 28.906vw, 600px);
   margin-top: clamp(16px, 1.042vw, 22px);
@@ -3413,6 +3420,7 @@
 }
 .projectCollectionHeader {
   display: flex;
+  flex: none;
   align-items: flex-start;
   justify-content: space-between;
   gap: 18px;
@@ -3451,7 +3459,18 @@
 .projectToolButton[data-active] { border-color: color-mix(in srgb, var(--dsw-alias-state-business-primary) 46%, var(--dsw-alias-border-l1)); color: var(--dsw-alias-state-business-primary); }
 .collectionViewSwitch button:active,
 .projectToolButton:active { transform: scale(0.97); }
-.projectCenterContent { width: 100%; margin: 0; }
+.projectCenterContent {
+  width: 100%;
+  min-height: 0;
+  flex: 1;
+  margin: 0;
+  padding-right: 4px;
+  overflow-y: auto;
+  box-sizing: border-box;
+  scrollbar-color: #c7d4e8 transparent;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
 .projectAttention { max-width: none; margin: 0; }
 .projectAttentionCards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(12px, 0.781vw, 17px); }
 .projectAttentionCard { display: grid; grid-template-rows: auto auto 1fr auto; min-height: clamp(331px, 21.549vw, 450px); box-sizing: border-box; border-width: 1px; border-radius: 13px; background: color-mix(in srgb, var(--project-accent) 1.6%, #fff); box-shadow: 0 7px 20px color-mix(in srgb, var(--project-accent) 8%, transparent); }
@@ -3480,8 +3499,9 @@
 .projectActivityFacts { min-height: 50px; padding: 10px 10px 10px 14px; box-sizing: border-box; }
 
 .projectManagementDetails { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(12px, 0.781vw, 17px); height: clamp(156px, 10.156vw, 210px); margin-top: clamp(12px, 0.781vw, 17px); box-sizing: border-box; }
-.projectManagementDetails > section { min-height: 0; padding: 12px 14px; overflow: hidden; box-sizing: border-box; border: 1px solid #e1e8f3; border-radius: 13px; background: #fff; box-shadow: 0 7px 20px rgba(22, 50, 91, 0.08); }
+.projectManagementDetails > section { display: flex; min-height: 0; flex-direction: column; padding: 12px 14px; overflow: hidden; box-sizing: border-box; border: 1px solid #e1e8f3; border-radius: 13px; background: #fff; box-shadow: 0 7px 20px rgba(22, 50, 91, 0.08); }
 .projectManagementDetails > section > header { padding-bottom: 8px; }
+.projectManagementDetails > section > ul { min-height: 0; overflow-x: hidden; overflow-y: auto; scrollbar-color: #c7d4e8 transparent; scrollbar-gutter: stable; scrollbar-width: thin; }
 .projectManagementDetails li { padding-block: 8px; }
 .projectActivityMark { flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; color: var(--dsw-alias-label-primary-inverted); background: var(--dsw-alias-state-business-primary); font: var(--dsw-font-xxxs-11); font-weight: 650; }
 .projectActivityMark[data-stage='definition'],

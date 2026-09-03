@@ -59,6 +59,17 @@ function projectPalette(title: string): ProjectPalette {
   return palettes[hash % palettes.length] as ProjectPalette
 }
 
+function ProjectMark({ title, palette, className }: {
+  readonly title: string
+  readonly palette: ProjectPalette
+  readonly className: string
+}) {
+  const glyph = palette === 'green'
+    ? <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 19V12M12 19V8M19 19V4" /></svg>
+    : title.slice(0, 1).toUpperCase()
+  return <span className={className} data-project-mark={palette} aria-hidden="true">{glyph}</span>
+}
+
 function formatDate(value: string): string {
   const date = new Date(value.length === 10 ? `${value}T00:00:00` : value)
   return Number.isNaN(date.getTime()) ? value : new Intl.DateTimeFormat('zh-CN', { month: 'short', day: 'numeric' }).format(date)
@@ -718,6 +729,7 @@ function ProjectList({ rows, showProject, labels, enterProject }: {
           {rows.map((row) => {
             const index = currentV2StageIndex(row.stage)
             const stageId = portfolioStageId(row) ?? 'discovery'
+            const palette = projectPalette(row.title)
             const health = portfolioHealth(row)
             const nextAction = projectNextAction(row)
             const schedule = row.schedule.status === 'estimated'
@@ -734,10 +746,10 @@ function ProjectList({ rows, showProject, labels, enterProject }: {
                   ? `${String(row.runningSessions)} 个会话运行中`
                   : '暂无运行会话'
             return (
-              <tr key={row.workspaceId} className={css.projectListRow} data-stage={stageId}>
+              <tr key={row.workspaceId} className={css.projectListRow} data-stage={stageId} data-palette={palette}>
                 <td>
                   <div className={css.projectListIdentity}>
-                    <span className={css.projectListMark} aria-hidden="true">{row.title.slice(0, 1).toUpperCase()}</span>
+                    <ProjectMark title={row.title} palette={palette} className={css.projectListMark} />
                     <span>
                       <strong>{row.title}</strong>
                       <small>{row.companyName || labels.companyMissing}</small>
@@ -806,14 +818,11 @@ function ProjectAttentionCard({ row, showProject, enterProject }: {
     : '交付周期待确认'
   const runtime = row.surface?.status === 'ready' && row.surface.value.runtime.status === 'running' ? '运行中' : '未运行'
   const palette = projectPalette(row.title)
-  const mark = palette === 'green'
-    ? <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 19V12M12 19V8M19 19V4" /></svg>
-    : row.title.slice(0, 1).toUpperCase()
   return (
     <article className={css.projectAttentionCard} data-stage={stageId} data-palette={palette}>
       <header>
         <div className={css.projectIdentity}>
-          <span className={css.projectMark} aria-hidden="true">{mark}</span>
+          <ProjectMark title={row.title} palette={palette} className={css.projectMark} />
           <div><h2>{row.title}</h2><p>{row.companyName || '未填写所属企业'} · {schedule}</p></div>
         </div>
         <span className={css.projectAttentionStage}>{stageIndex < 0 ? stage : `${String(stageIndex + 1)}/8 · ${stage}`}</span>

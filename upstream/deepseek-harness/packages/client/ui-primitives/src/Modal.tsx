@@ -19,6 +19,7 @@ import css from './Modal.module.css'
  * @param props.description - optional supporting sentence under the title.
  * @param props.children - body (inputs, etc.).
  * @param props.footer - action row (Cancel / Create).
+ * @param props.maskClassName - optional mask override for owners that do not blur the background.
  * @param props.contentClassName - optional class for a scrollable content region.
  * @param props.headless - render children directly in the card (no default
  * header/close/body chrome) for dialogs whose figma frame owns its own
@@ -28,7 +29,7 @@ import css from './Modal.module.css'
  * @returns null when closed; otherwise the overlay tree.
  */
 export function Modal({
-  open, onClose, title, closeLabel = 'Close', description, children, footer, className, contentClassName, headless = false,
+  open, onClose, title, closeLabel = 'Close', description, children, footer, className, contentClassName, maskClassName, headless = false,
 }: {
   open: boolean
   onClose: () => void
@@ -39,6 +40,7 @@ export function Modal({
   footer?: ReactNode
   className?: string
   contentClassName?: string
+  maskClassName?: string
   headless?: boolean
 }) {
   useEffect(() => {
@@ -54,7 +56,7 @@ export function Modal({
 
   return createPortal((
     <div className={css.root} role="presentation">
-      <div className={css.mask} aria-hidden="true" onClick={onClose} />
+      <div className={clsx(css.mask, maskClassName)} aria-hidden="true" onClick={onClose} />
       <div
         className={clsx(css.dialog, className)}
         role="dialog"

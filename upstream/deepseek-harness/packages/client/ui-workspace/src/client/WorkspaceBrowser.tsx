@@ -1452,6 +1452,7 @@ export function WorkspaceBrowser({
         closeLabel={t('close')}
         title={t('projectForm.title')}
         className={css.projectDialog ?? ''}
+        maskClassName={css.projectDialogMask ?? ''}
         footer={(
           <>
             <Button variant="outline" disabled={creatingProject || directoryBusy} onClick={closeProjectForm}>

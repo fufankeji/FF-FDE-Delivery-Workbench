@@ -69,6 +69,10 @@
   width: min(560px, 100%);
 }
 
+.projectDialogMask {
+  backdrop-filter: none;
+}
+
 .projectForm {
   display: flex;
   flex-direction: column;
