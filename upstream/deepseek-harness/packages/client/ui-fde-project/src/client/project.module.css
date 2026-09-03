@@ -1961,20 +1961,15 @@
 .stageVisual > header { padding: 15px 18px 0; }
 .stageVisual > header span { color: var(--dsw-alias-state-business-primary); font: var(--dsw-font-xxxs-11); font-weight: 650; letter-spacing: 0.05em; }
 .stageVisual > header h3 { display: inline; margin: 0 0 0 9px; font-size: 15px; }
-.requirementsVisual { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; background: linear-gradient(135deg, color-mix(in srgb, var(--dsw-alias-label-primary-bluish) 10%, transparent), transparent 60%), var(--dsw-alias-bg-layer-2); }
+.requirementsVisual { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); background: linear-gradient(135deg, color-mix(in srgb, var(--dsw-alias-label-primary-bluish) 10%, transparent), transparent 60%), var(--dsw-alias-bg-layer-2); }
 .requirementsVisual > header { grid-column: 1 / -1; }
-.requirementsFlow { display: grid; grid-template-columns: minmax(110px, 1fr) 20px minmax(110px, 1fr) 20px minmax(110px, 1fr); align-items: center; gap: 8px; padding: 16px 18px 18px; }
+.requirementsFlow { display: grid; grid-template-columns: minmax(110px, 1fr) 20px minmax(110px, 1fr); align-items: center; gap: 8px; padding: 16px 18px 18px; }
 .requirementsFlow article { min-width: 0; padding: 11px 12px; border-top: 2px solid var(--dsw-alias-label-primary-bluish); background: color-mix(in srgb, var(--dsw-alias-bg-layer-1) 70%, transparent); }
 .requirementsFlow article:nth-of-type(2) { border-color: var(--dsw-alias-state-business-primary); }
-.requirementsFlow article:nth-of-type(3) { border-color: var(--dsw-alias-state-success-primary); }
 .requirementsFlow article > span { color: var(--dsw-alias-label-caption); font: 9px/1 var(--ds-font-family-code); }
 .requirementsFlow article strong { display: block; margin-top: 5px; font-size: 22px; }
 .requirementsFlow article small { display: block; overflow: hidden; margin-top: 4px; color: var(--dsw-alias-label-secondary); font: var(--dsw-font-xxxs-11); text-overflow: ellipsis; white-space: nowrap; }
 .requirementsFlow > i { color: var(--dsw-alias-label-caption); font-style: normal; text-align: center; }
-.requirementsVisual > dl { display: grid; align-content: center; min-width: 130px; margin: 16px 18px 18px 0; border-left: 1px solid var(--dsw-alias-border-l1); }
-.requirementsVisual > dl div { padding: 7px 0 7px 18px; }
-.requirementsVisual > dl dt { color: var(--dsw-alias-label-caption); font: var(--dsw-font-xxxs-11); }
-.requirementsVisual > dl dd { margin: 4px 0 0; color: var(--dsw-alias-state-warn-label); font-size: 18px; font-weight: 620; }
 
 .solutionVisual { background: radial-gradient(circle at 50% 100%, color-mix(in srgb, var(--dsw-alias-brand-primary) 13%, transparent), transparent 54%), var(--dsw-alias-bg-layer-2); }
 .solutionBlueprint { display: grid; grid-template-columns: minmax(110px, 1fr) 150px minmax(110px, 1fr); align-items: center; gap: 28px; max-width: 720px; margin: 12px auto 0; padding: 0 20px 20px; }
@@ -2986,127 +2981,6 @@
 .closureEvidenceList .outputBadge { justify-self: center; }
 .closureEvidenceList .outputItem code { max-width: 100%; }
 
-.wikiRoot,
-.issueRoot {
-  min-width: 0;
-  padding: 20px;
-  border: 1px solid var(--dsw-alias-border-l2);
-  border-radius: 16px;
-  background: var(--dsw-alias-bg-layer-2);
-}
-
-.wikiHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 18px; }
-.wikiHeader > div:first-child { min-width: 0; }
-.wikiHeader h2,
-.issueRoot > header h2 { margin: 7px 0 0; font-size: 19px; font-weight: 650; }
-.wikiHeader p,
-.issueRoot > header p { max-width: 760px; margin: 6px 0 0; color: var(--dsw-alias-label-secondary); font: var(--dsw-font-xxs-12); line-height: 1.6; }
-.candidateBadge { display: inline-flex; padding: 4px 8px; border-radius: 999px; color: var(--dsw-alias-state-warn-label); background: var(--dsw-alias-state-warn-tertiary); font: var(--dsw-font-xxxs-11); }
-.wikiHeaderActions { flex: none; display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
-.wikiHeaderActions button,
-.wikiBuildState button,
-.wikiSourcePickerFoot button,
-.galaxyToolbar button,
-.galaxyFallback button { min-height: 31px; padding: 0 11px; border: 1px solid var(--dsw-alias-border-l2); border-radius: 8px; color: var(--dsw-alias-label-primary); background: var(--dsw-alias-bg-layer-1); font: var(--dsw-font-xxxs-11); cursor: pointer; }
-.wikiHeaderActions button:last-child,
-.wikiSourcePickerFoot button { border-color: var(--dsw-alias-label-primary); color: var(--dsw-alias-label-primary-inverted); background: var(--dsw-alias-label-primary); }
-.wikiHeaderActions button:disabled,
-.wikiSourcePickerFoot button:disabled,
-.galaxyToolbar button:disabled { opacity: 0.42; cursor: not-allowed; }
-.wikiRevision { padding: 5px 9px; border-radius: 999px; color: var(--dsw-alias-state-success-primary); background: var(--dsw-alias-state-success-tertiary); font: var(--dsw-font-xxxs-11); }
-.wikiRevision[data-stale] { color: var(--dsw-alias-state-warn-label); background: var(--dsw-alias-state-warn-tertiary); }
-.wikiInlineState { margin: 10px 0; color: var(--dsw-alias-label-secondary); font: var(--dsw-font-xxs-12); }
-.wikiInlineState[data-error] { color: var(--dsw-alias-state-error-primary); }
-
-.wikiBuildState { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin: 12px 0; padding: 13px 15px; border: 1px solid color-mix(in srgb, var(--dsw-alias-state-business-primary) 28%, var(--dsw-alias-border-l2)); border-radius: 11px; background: color-mix(in srgb, var(--dsw-alias-state-business-primary) 7%, var(--dsw-alias-bg-layer-2)); }
-.wikiBuildState[data-status='failed'] { border-color: var(--dsw-alias-state-error-secondary); background: var(--dsw-alias-state-error-tertiary); }
-.wikiBuildState strong { font: var(--dsw-font-xs-strong-13); }
-.wikiBuildState p { margin: 4px 0 0; color: var(--dsw-alias-label-secondary); font: var(--dsw-font-xxxs-11); }
-
-.wikiSourcePicker { margin: 16px 0; padding: 17px; border: 1px solid var(--dsw-alias-border-l2); border-radius: 13px; background: var(--dsw-alias-bg-layer-1); }
-.wikiSourcePicker h3 { margin: 0; font-size: 14px; }
-.wikiSourcePicker > div:first-child > p { margin: 5px 0 0; color: var(--dsw-alias-label-secondary); font: var(--dsw-font-xxxs-11); }
-.wikiSourceChoices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
-.wikiSourceChoices label { display: flex; align-items: flex-start; gap: 9px; min-width: 0; padding: 11px; border: 1px solid var(--dsw-alias-border-l1); border-radius: 9px; background: var(--dsw-alias-bg-layer-2); cursor: pointer; }
-.wikiSourceChoices input { flex: none; margin-top: 2px; accent-color: var(--dsw-alias-state-business-primary); }
-.wikiSourceChoices span { min-width: 0; }
-.wikiSourceChoices strong,
-.wikiSourceChoices small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.wikiSourceChoices strong { font: var(--dsw-font-xxs-12); }
-.wikiSourceChoices small { margin-top: 4px; color: var(--dsw-alias-label-caption); font: 10px/1.4 var(--ds-font-family-code); }
-.wikiSourcePickerFoot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; color: var(--dsw-alias-label-secondary); font: var(--dsw-font-xxs-12); }
-
-.wikiEmpty,
-.wikiPageEmpty { display: grid; place-content: center; min-height: 300px; padding: 32px; border: 1px dashed var(--dsw-alias-border-l2); border-radius: 13px; text-align: center; }
-.wikiEmpty strong { font-size: 15px; }
-.wikiEmpty p { max-width: 600px; margin: 7px 0 0; color: var(--dsw-alias-label-secondary); font: var(--dsw-font-xxs-12); line-height: 1.6; }
-
-.wikiGalaxyLayout { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.72fr); gap: 14px; min-height: 620px; }
-.galaxyRoot { display: flex; min-width: 0; min-height: 620px; flex-direction: column; overflow: hidden; border: 1px solid var(--dsw-alias-border-l2); border-radius: 14px; background: var(--dsw-alias-bg-base); }
-.galaxyToolbar { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 8px; padding: 11px; border-bottom: 1px solid var(--dsw-alias-border-l2); background: var(--dsw-alias-bg-layer-1); }
-.galaxyToolbar label { display: grid; gap: 4px; color: var(--dsw-alias-label-secondary); font-size: 10px; }
-.galaxyToolbar input,
-.galaxyToolbar select { height: 30px; min-width: 130px; padding: 0 9px; border: 1px solid var(--dsw-alias-border-l2); border-radius: 7px; outline: none; color: var(--dsw-alias-label-primary); background: var(--dsw-alias-bg-layer-2); font: 11px/1 var(--ds-font-family-code); }
-.galaxyToolbar input:focus,
-.galaxyToolbar select:focus { border-color: var(--dsw-alias-state-business-primary); }
-.galaxyToolbar button { border-color: var(--dsw-alias-border-l2); color: var(--dsw-alias-label-primary); background: var(--dsw-alias-bg-layer-2); }
-.galaxyToolbar button[data-active] { border-color: var(--dsw-alias-state-business-primary); color: var(--dsw-alias-state-business-primary); }
-.galaxyCount { margin-left: auto; align-self: center; color: var(--dsw-alias-label-caption); font: 10px/1.3 var(--ds-font-family-code); white-space: nowrap; }
-.galaxyViewport { position: relative; flex: 1; min-height: 480px; overflow: hidden; }
-.galaxyCanvas { display: block; width: 100%; height: 100%; outline: none; }
-.galaxyTooltip { position: absolute; top: 14px; left: 14px; z-index: 2; max-width: 260px; padding: 9px 11px; border: 1px solid var(--dsw-alias-state-business-primary); border-radius: 8px; color: var(--dsw-alias-label-primary); background: var(--dsw-alias-tooltip-bg); box-shadow: 0 8px 24px var(--dsw-alias-bg-mask-2); pointer-events: none; }
-.galaxyTooltip strong,
-.galaxyTooltip span { display: block; }
-.galaxyTooltip strong { font-size: 12px; }
-.galaxyTooltip span { margin-top: 4px; color: var(--dsw-alias-label-secondary); font-size: 10px; }
-.galaxyFallback { position: absolute; inset: 0; z-index: 3; display: grid; place-content: center; padding: 32px; color: var(--dsw-alias-label-primary); background: radial-gradient(circle at center, var(--dsw-alias-bg-layer-2), var(--dsw-alias-bg-base) 70%); text-align: center; }
-.galaxyFallback p { max-width: 520px; margin: 7px 0 14px; color: var(--dsw-alias-label-secondary); font-size: 12px; line-height: 1.6; }
-.galaxyFallback button { justify-self: center; border-color: var(--dsw-alias-border-l2); color: var(--dsw-alias-label-primary); background: var(--dsw-alias-bg-layer-2); }
-.galaxyAccessible { max-height: 350px; overflow: auto; padding: 10px; border-top: 1px solid var(--dsw-alias-border-l2); color: var(--dsw-alias-label-secondary); background: var(--dsw-alias-bg-layer-1); }
-.galaxyAccessible > details > summary { color: var(--dsw-alias-label-primary); font: var(--dsw-font-xxxs-11); cursor: pointer; }
-.galaxyAccessible > p { text-align: center; }
-.galaxyAccessible ul { display: grid; gap: 5px; margin: 8px 0 0; padding: 0; list-style: none; }
-.galaxyAccessible li button { display: grid; grid-template-columns: 9px minmax(0, 1fr) auto; gap: 8px; align-items: center; width: 100%; padding: 8px; border: 0; border-radius: 7px; color: var(--dsw-alias-label-primary); background: transparent; text-align: left; cursor: pointer; }
-.galaxyAccessible li button:hover,
-.galaxyAccessible li button[data-active] { background: var(--dsw-alias-interactive-bg-hover-accent); }
-.galaxyAccessible li button > span { --galaxy-topic: var(--dsw-alias-label-secondary); width: 7px; height: 7px; border-radius: 50%; background: var(--galaxy-topic); box-shadow: 0 0 8px var(--galaxy-topic); }
-.galaxyAccessible li button > span[data-topic='business-goal'] { --galaxy-topic: var(--dsw-alias-state-business-primary); }
-.galaxyAccessible li button > span[data-topic='role'] { --galaxy-topic: var(--dsw-alias-brand-primary); }
-.galaxyAccessible li button > span[data-topic='process'] { --galaxy-topic: var(--dsw-alias-state-success-primary); }
-.galaxyAccessible li button > span[data-topic='system-data'] { --galaxy-topic: var(--dsw-alias-label-primary-bluish); }
-.galaxyAccessible li button > span[data-topic='rule'] { --galaxy-topic: var(--dsw-alias-state-warn-primary); }
-.galaxyAccessible li button > span[data-topic='constraint'] { --galaxy-topic: var(--dsw-alias-state-warn-secondary); }
-.galaxyAccessible li button > span[data-topic='acceptance'] { --galaxy-topic: var(--dsw-alias-state-success-secondary); }
-.galaxyAccessible li button > span[data-topic='risk'] { --galaxy-topic: var(--dsw-alias-state-error-secondary); }
-.galaxyAccessible li button > span[data-topic='conflict'] { --galaxy-topic: var(--dsw-alias-state-error-primary); }
-.galaxyAccessible li button strong { overflow: hidden; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
-.galaxyAccessible li button small { color: var(--dsw-alias-label-caption); font-size: 9px; }
-.galaxyAccessible section { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--dsw-alias-border-l1); font-size: 10px; }
-.galaxyAccessible section h3 { margin: 0; color: var(--dsw-alias-label-primary); font-size: 10px; }
-.galaxyAccessible section ul { padding-left: 16px; list-style: disc; }
-
-.wikiPageDetail { min-width: 0; overflow: auto; padding: 20px; border: 1px solid var(--dsw-alias-border-l2); border-radius: 14px; background: var(--dsw-alias-bg-layer-1); }
-.wikiPageDetail header > span { color: var(--dsw-alias-state-business-primary); font: var(--dsw-font-xxxs-11); }
-.wikiPageDetail h3 { margin: 7px 0 0; font-size: 18px; }
-.wikiPageDetail header p { margin: 7px 0 0; color: var(--dsw-alias-label-secondary); font: var(--dsw-font-xxs-12); line-height: 1.6; }
-.wikiMarkdown { margin-top: 18px; color: var(--dsw-alias-label-primary); font-size: 13px; line-height: 1.7; }
-.wikiSourceChips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 17px; }
-.wikiSourceChips button { padding: 5px 8px; border: 1px solid var(--dsw-alias-border-l2); border-radius: 999px; color: var(--dsw-alias-state-business-primary); background: var(--dsw-alias-bg-layer-2); font: 10px/1.3 var(--ds-font-family-code); cursor: pointer; }
-.wikiRelations { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--dsw-alias-border-l1); }
-.wikiRelations h4 { margin: 0 0 9px; font-size: 12px; }
-.wikiRelations ul { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
-.wikiRelations li { display: flex; justify-content: space-between; gap: 10px; color: var(--dsw-alias-label-secondary); font: var(--dsw-font-xxxs-11); }
-.wikiRelations li strong { overflow: hidden; color: var(--dsw-alias-label-primary); font-weight: 550; text-overflow: ellipsis; white-space: nowrap; }
-.wikiPageEmpty { color: var(--dsw-alias-label-secondary); font: var(--dsw-font-xxs-12); }
-
-.issueRoot > header { margin-bottom: 18px; }
-.issueGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-.issueGrid article { min-width: 0; padding: 17px; border: 1px solid var(--dsw-alias-border-l1); border-radius: 12px; background: var(--dsw-alias-bg-layer-1); }
-.issueGrid article > span { color: var(--dsw-alias-state-warn-label); font: var(--dsw-font-xxxs-11); }
-.issueGrid h3 { margin: 7px 0 0; font-size: 14px; }
-.issueGrid p { margin: 8px 0 0; color: var(--dsw-alias-label-secondary); font: var(--dsw-font-xxs-12); line-height: 1.65; }
-.issueGrid small { display: block; margin-top: 9px; color: var(--dsw-alias-label-caption); font: var(--dsw-font-xxxs-11); }
-
 .runtimeControl,
 .runtimeStatus {
   display: inline-flex;
@@ -3231,8 +3105,6 @@
   .featureProgressCard { grid-template-columns: minmax(210px, 0.8fr) minmax(260px, 1.2fr); }
   .featureProgressMeta { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .featureNoEvidence { grid-column: 2; }
-  .wikiGalaxyLayout { grid-template-columns: 1fr; }
-  .wikiPageDetail { max-height: 520px; }
   .handoffFieldGrid { grid-template-columns: 1fr; }
   .handoffWideField { grid-column: 1; }
   .handoffConditionFields { grid-template-columns: 1fr; }
@@ -3354,9 +3226,8 @@
   .stageWorkspaceState { grid-column: 1 / -1; width: 100%; box-sizing: border-box; padding: 8px 0 0; border-top: 1px solid var(--dsw-alias-border-l1); border-left: 0; text-align: left; }
   .detailLayout { grid-template-columns: 1fr; }
   .requirementsVisual { grid-template-columns: 1fr; }
-  .requirementsFlow { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .requirementsFlow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .requirementsFlow > i { display: none; }
-  .requirementsVisual > dl { grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0 18px 18px; border-top: 1px solid var(--dsw-alias-border-l1); border-left: 0; }
   .solutionBlueprint { grid-template-columns: minmax(90px, 1fr) 110px minmax(90px, 1fr); gap: 16px; }
   .solutionCore { min-height: 76px; }
   .developmentVisualGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -3371,7 +3242,6 @@
   .previewHeader { align-items: flex-start; flex-direction: column; }
   .previewActions { flex-wrap: wrap; }
   .outputPreviewPanel { width: min(92%, 680px); min-width: 0; }
-  .wikiHeader { flex-direction: column; }
   .outputHeader { flex-direction: column; }
   .outputItem { grid-template-columns: 42px minmax(0, 1fr); }
   .outputBadge { grid-column: 2; justify-self: start; }
@@ -3386,13 +3256,8 @@
   .featureNoEvidence { grid-column: 1; }
   .closureEvidenceList::before { display: none; }
   .featureArtifactList { grid-template-columns: 1fr; }
-  .wikiHeaderActions { justify-content: flex-start; }
-  .wikiSourceChoices,
-  .issueGrid { grid-template-columns: 1fr; }
   .runConfirmation,
-  .fixedCasesHeader,
-  .wikiBuildState { align-items: flex-start; flex-direction: column; }
-  .galaxyRoot { min-height: 540px; }
+  .fixedCasesHeader { align-items: flex-start; flex-direction: column; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -243,117 +243,6 @@ export interface ValidationStageSnapshot {
   readonly blockers: readonly string[]
 }
 
-/** Controlled requirement-Wiki topics shared by Agent validation and Galaxy View. */
-export const REQUIREMENT_WIKI_TOPICS = [
-  'business-goal',
-  'role',
-  'process',
-  'system-data',
-  'rule',
-  'constraint',
-  'acceptance',
-  'risk',
-  'conflict',
-  'unknown',
-] as const
-
-/** Controlled relation meanings shared by Agent validation and Galaxy View. */
-export const REQUIREMENT_WIKI_RELATIONS = [
-  'depends-on',
-  'part-of',
-  'uses',
-  'produces',
-  'constrains',
-  'conflicts-with',
-  'validates',
-  'relates-to',
-] as const
-
-/** One bounded Wiki topic. */
-export type RequirementWikiTopic = typeof REQUIREMENT_WIKI_TOPICS[number]
-/** One bounded Wiki relation meaning. */
-export type RequirementWikiRelationType = typeof REQUIREMENT_WIKI_RELATIONS[number]
-
-/** Exact local derivative admitted to one Wiki build. */
-export interface RequirementWikiSource {
-  readonly sourceId: string
-  readonly storedName: string
-  readonly relativePath: string
-  readonly derivedPath: string
-  readonly bytes: number
-  readonly mtimeMs: number
-  readonly parser: string
-  readonly parserVersion: string
-}
-
-/** One traceable candidate knowledge page. */
-export interface RequirementWikiPage {
-  readonly id: string
-  readonly topic: RequirementWikiTopic
-  readonly title: string
-  readonly summary?: string
-  readonly body: string
-  readonly sourceIds: readonly string[]
-}
-
-/** One traceable relation between pages in the same Wiki revision. */
-export interface RequirementWikiRelation {
-  readonly id: string
-  readonly from: string
-  readonly to: string
-  readonly type: RequirementWikiRelationType
-  readonly label?: string
-  readonly directed: boolean
-  readonly sourceIds: readonly string[]
-}
-
-/** One candidate conflict or unknown that remains outside confirmed facts. */
-export interface RequirementWikiIssue {
-  readonly id: string
-  readonly title: string
-  readonly detail: string
-  readonly impact?: string
-  readonly pageIds: readonly string[]
-  readonly sourceIds: readonly string[]
-}
-
-/** Complete immutable candidate Wiki revision. */
-export interface RequirementWikiVersion {
-  readonly schemaVersion: 1
-  readonly revision: number
-  readonly buildId: string
-  readonly generatedAt: string
-  readonly generatedBy: string
-  readonly sourceCatalogFingerprint: string
-  readonly sources: readonly RequirementWikiSource[]
-  readonly pages: readonly RequirementWikiPage[]
-  readonly relations: readonly RequirementWikiRelation[]
-  readonly conflicts: readonly RequirementWikiIssue[]
-  readonly unknowns: readonly RequirementWikiIssue[]
-}
-
-/** Durable lifecycle of the latest explicit Wiki build. */
-export interface RequirementWikiBuild {
-  readonly schemaVersion: 1
-  readonly id: string
-  readonly status: 'queued' | 'running' | 'succeeded' | 'failed' | 'cancelled'
-  readonly expectedRevision: number
-  readonly sourceCatalogFingerprint: string
-  readonly sources: readonly RequirementWikiSource[]
-  readonly createdAt: string
-  readonly updatedAt: string
-  readonly message?: string
-  readonly publishedRevision?: number
-}
-
-/** Project-level requirement Wiki state presented by the trusted Host route. */
-export interface RequirementWikiSnapshot {
-  readonly status: 'absent' | 'ready' | 'stale'
-  readonly current: RequirementWikiVersion | null
-  readonly build: RequirementWikiBuild | null
-  readonly message?: string
-}
-
 /** One required output of the FDE requirement-research stage. */
 export interface RequirementArtifactSnapshot {
   readonly id: 'research-report' | 'confirmation-checklist' | 'requirement-baseline'
@@ -711,7 +600,6 @@ export interface ProjectSurfaceSnapshot {
   readonly architectureError?: string
   readonly evaluation: EvaluationSnapshot
   readonly validation: ValidationStageSnapshot
-  readonly requirementWiki: RequirementWikiSnapshot
   readonly requirements: RequirementArtifactsSnapshot
   readonly discovery: DiscoveryStageSnapshot
   readonly solution: SolutionArtifactsSnapshot

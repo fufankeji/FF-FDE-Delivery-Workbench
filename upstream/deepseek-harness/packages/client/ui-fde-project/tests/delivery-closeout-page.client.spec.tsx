@@ -34,7 +34,6 @@ function propsFor(stage: 'pilot' | 'handoff' | 'completed', surface: unknown, ac
     } } } }),
     useProjectSurfaces: hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: surface } } }),
     useProjectSources: hook({ byWorkspace: { 'workspace-1': { status: 'ready', files: [] } } }),
-    useRequirementWiki: hook({ byWorkspace: {} }),
     useWorkspaces: hook({ items: [{
       workspaceId: 'workspace-1', title: '数据分析项目', path: '/project/one', sessionIds: ['session-1'],
       createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:06:00.000Z',
@@ -47,8 +46,7 @@ function propsFor(stage: 'pilot' | 'handoff' | 'completed', surface: unknown, ac
     acceptDeploymentTrialIssue: actions.acceptDeploymentTrialIssue ?? vi.fn(),
     confirmDeploymentTrialReadiness: actions.confirmDeploymentTrialReadiness ?? vi.fn(),
     recordAcceptanceHandoverDecision: actions.recordAcceptanceHandoverDecision ?? vi.fn(),
-    loadProjectSources: vi.fn(), parseProjectSource: vi.fn(), loadRequirementWiki: vi.fn(),
-    prepareRequirementWikiRun: vi.fn(), startRequirementWikiBuild: vi.fn(), abandonRequirementWikiBuild: vi.fn(),
+    loadProjectSources: vi.fn(), parseProjectSource: vi.fn(),
     enterProject: vi.fn(), reviewProjectArchitecture: vi.fn(), closeProjectPage: vi.fn(), showProjectOverview: vi.fn(),
     showProjectTimeline: vi.fn(), showProjectDetail: vi.fn(), renderSlot: vi.fn(() => <div>固定产物正文</div>),
     t: makeTranslate(zh),

@@ -2,7 +2,7 @@
 
 [English](README.md) | 中文
 
-FDE 项目交付页面使用的可信 Host 支持。它只解析显式 Harness WorkspaceId，只读取该项目的 `.fde/project-runtime.json`、`.fde/api-docs.json`、`.fde/architecture.json`、`.fde/evaluations/`、`.fde/deployment-trial.json`、`.fde/acceptance-handover.json`、六阶段固定产物、标准项目开发文档和需求 Wiki 状态，校验有界结构后，通过同源接口返回一个浏览器快照。阶段产物读取器只报告已有、缺失或读取失败，不创建文件，也不把文件存在当成确认；已有的 Markdown 产物会获得有大小限制的同源只读预览地址，Host 按已索引产物标识选择文件，不接受浏览器传入路径。它还适配锁定版本 `dsh-openapi` 的解析和 HTTP 实现，使标准 OpenAPI 工具按调用 Agent 所属的已注册 Workspace 解析配置，而不是使用进程级共享 API 清单。
+FDE 项目交付页面使用的可信 Host 支持。它只解析显式 Harness WorkspaceId，只读取该项目的 `.fde/project-runtime.json`、`.fde/api-docs.json`、`.fde/architecture.json`、`.fde/evaluations/`、`.fde/deployment-trial.json`、`.fde/acceptance-handover.json`、六阶段固定产物和标准项目开发文档，校验有界结构后，通过同源接口返回一个浏览器快照。阶段产物读取器只报告已有、缺失或读取失败，不创建文件，也不把文件存在当成确认；已有的 Markdown 产物会获得有大小限制的同源只读预览地址，Host 按已索引产物标识选择文件，不接受浏览器传入路径。它还适配锁定版本 `dsh-openapi` 的解析和 HTTP 实现，使标准 OpenAPI 工具按调用 Agent 所属的已注册 Workspace 解析配置，而不是使用进程级共享 API 清单。
 
 ## 项目开发文档
 
@@ -22,12 +22,6 @@ FDE 项目交付页面使用的可信 Host 支持。它只解析显式 Harness W
 
 验收移交投影有界解析 schema v1 的 `.fde/acceptance-handover.json`，支持最多四十份项目相对的企业验收证据，验证项目相对证据与交付物文件，只记录外部 HTTP(S) 交付物而不主动获取，并索引 `fde-deliverables/06-acceptance-handover/` 下四份固定 Markdown。一项带文件锁的精确合同 FDE 操作只能更新验收结论与证据、各登记交付物的可取得状态、条件决定，以及三项责任移交事实和证据；它拒绝过期摘要和已变化的条目集合，并保留交付物标识、位置、版本与校验值。项目完成条件包括：验收通过或带条件通过且有证据、部署试运行基线可读取、至少一项交付物可取得、无开放条件、接受条件包含理由/责任/后续安排、培训/权限/运维责任与项目内证据均已移交，以及四份产物齐备。记录这些事实不会完成项目，固定 Host 阶段路由仍要求一次独立的最终确认。两个投影都不执行部署、不上传或下载制品、不认证客户、不完成签章，也不自行推进项目。
 
-## 需求 Wiki
-
-可信启动 route 接受既有 FDE Source 目录中的 1～30 个明确 SourceId。每个 Source 必须在 `.fde/derived/` 下拥有当前有效的 `ready` 派生文件；构建会冻结原件字节数与修改时间、解析器身份与版本、派生路径、完整 Source 目录指纹和预期 Wiki revision。发布会重新检查每项冻结事实，并拒绝发生变化、被移除、新增、来自其他项目、仍待解析或被重新解析的资料。
-
-`requirement_wiki_get` 只公开精确的活动构建，并把它标记为运行中。`requirement_wiki_publish` 校验一份完整候选，最多允许 120 个知识页、360 条关系、80 个冲突和 80 个未知项；每一项都必须引用构建中的 SourceId，页面 Markdown 不能包含可执行 HTML。成功发布会创建不可变的 `.fde/requirement-wiki/versions/RNNNNNN/` 目录，并原子替换 `current.json`。失败或取消只更新 `build.json`，不会改变上一份当前 revision。项目 Source 目录变化会把当前 revision 标记为 stale，但绝不会自动启动重建。
-
 ## 模型体验
 
 ### 项目 OpenAPI 与系统架构工具
@@ -43,20 +37,6 @@ FDE 项目交付页面使用的可信 Host 支持。它只解析显式 Harness W
 #### KV 缓存影响
 
 Schema 在不同项目和请求之间保持一致，因此修改当前项目 OpenAPI 文件不会改变可缓存的工具 Schema 前缀。工具结果只改变普通对话后缀。
-
-### 需求 Wiki 工具
-
-#### 模型看到什么
-
-两个稳定工具 Schema：[`requirement_wiki_get`](../../../docs/tool-catalog.zh.md#requirement_wiki_get) 和 [`requirement_wiki_publish`](../../../docs/tool-catalog.zh.md#requirement_wiki_publish)。前者返回精确 BuildId 对应的固定 Source 元数据、预期 revision 和可选的当前 Wiki；后者接受一份完整且可追溯的候选。两个工具都不会发现用户确认构建之外的 Source。
-
-#### Token 影响
-
-能看到全局工具注册表的 Agent，其每次请求会增加两个固定 Schema 的输入 Token。构建元数据和当前 Wiki 只在调用 `requirement_wiki_get` 后进入上下文；选定的派生内容只在 Agent 读取返回的项目路径后进入上下文；已发布候选则通过有界的 `requirement_wiki_publish` 结果进入上下文。
-
-#### KV 缓存影响
-
-Schema 在不同项目和构建之间保持一致，因此 Source 或 Wiki 变化不会改变可缓存的工具 Schema 前缀。工具调用和依赖数据的结果会扩展普通对话后缀。
 
 ### 项目运行报告工具
 
@@ -81,5 +61,3 @@ Schema 在不同项目之间保持稳定；每次操作只改变普通对话后�
 - 部署试运行与验收移交记录仍是项目文件。Agent 维护候选说明与固定文档，保留的 FDE 决定字段归属项目进度中的精确合同操作。Host 不执行部署、不探测外部交付物地址、不收集客户签章，也不管理凭据。
 - 适配层刻意复用锁定插件的解析和请求模块，因为上游插件的进程级静态 API 清单本身无法提供 Workspace 隔离。
 - 系统架构历史以文件形式保存在 `.fde/architecture-history/`；浏览器当前只展示最新版本。
-- 需求 Wiki 历史以文件形式保存在 `.fde/requirement-wiki/versions/`；Host 快照只展示完整的当前 revision 和最近构建。
-- 本包不会上传或解析 Source、编辑 Wiki 页面、运行自动重建，也不会把候选知识提升为需求基线或交付阶段。

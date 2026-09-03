@@ -4,7 +4,6 @@ import type { ClientContext, SessionId, WorkspaceId } from '@deepseek-ai/dsh-cli
 import type {} from '@deepseek-ai/dsh-client-locale/client'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type {} from '@deepseek-ai/dsh-client-ui-layout/client'
-import type {} from '@deepseek-ai/dsh-client-ui-model-selection/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
 import type {} from '@deepseek-ai/dsh-client-ui-workspace/client'
 import type { BetterSidebarService } from 'dsh-better-sidebar'
@@ -36,11 +35,9 @@ import type {
   ProjectRuntimeHeaderInjected,
   ProjectViewInjected,
   DiscoveryAction,
-  RequirementWikiRunTarget,
 } from './slots.ts'
 import { ProjectStageController } from './stage-controller.ts'
 import { ProjectSourceController } from './source-controller.ts'
-import { RequirementWikiController } from './wiki-controller.ts'
 import { projectViewVisible, type FdeProjectViewId } from './view-availability.ts'
 
 export type { ProjectSourcePreviewOwnerProps } from './slots.ts'
@@ -54,7 +51,7 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
 }
 
 /** Required browser services and the Slot owners that declare our targets. */
-export const inject = ['slots', 'locale', 'modelDirectories', 'sessions', 'workspaces', 'conversation']
+export const inject = ['slots', 'locale', 'sessions', 'workspaces', 'conversation']
 
 const FDE_PROJECT_PROGRESS_OPEN_EVENT = 'fde:project-progress-open'
 const FDE_PROJECT_CREATE_OPEN_EVENT = 'fde:project-create-open'
@@ -65,9 +62,8 @@ export function apply(ctx: ClientContext): void {
   const page = new ProjectPageController()
   const stages = new ProjectStageController()
   const sources = new ProjectSourceController()
-  const requirementWiki = new RequirementWikiController()
   const surfaces = new FdeProjectSurfaceController()
-  ctx.effect(() => () => { page.dispose(); stages.dispose(); sources.dispose(); requirementWiki.dispose(); surfaces.dispose() }, 'ui-fde-project: controllers')
+  ctx.effect(() => () => { page.dispose(); stages.dispose(); sources.dispose(); surfaces.dispose() }, 'ui-fde-project: controllers')
   ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'ui-fde-project: dictionaries')
   ctx.effect(() => {
     if (typeof window === 'undefined') return () => undefined
@@ -110,7 +106,7 @@ export function apply(ctx: ClientContext): void {
   }
 
   const pageInjected = (): ProjectPageInjected => ({
-    hooks: { projectPage: page, stageProgress: stages, projectSurfaces: surfaces, projectSources: sources, requirementWiki },
+    hooks: { projectPage: page, stageProgress: stages, projectSurfaces: surfaces, projectSources: sources },
     loadStage: (workspaceId) => { stages.load(workspaceId) },
     retryStage: (workspaceId) => { stages.retry(workspaceId) },
     loadProjectSurface: (workspaceId) => { surfaces.load(workspaceId) },
@@ -160,57 +156,6 @@ export function apply(ctx: ClientContext): void {
     },
     loadProjectSources: (workspaceId, force) => { sources.load(workspaceId, force) },
     parseProjectSource: async (workspaceId, sourceId) => { await sources.parse(workspaceId, sourceId) },
-    loadRequirementWiki: (workspaceId, force) => { requirementWiki.load(workspaceId, force) },
-    prepareRequirementWikiRun: async (workspaceId, sessionId) => {
-      const workspace = ctx.workspaces.list.getSnapshot().items.find(item => String(item.workspaceId) === workspaceId)
-      if (workspace === undefined || !workspace.sessionIds.some(id => String(id) === sessionId)) {
-        throw new Error('当前项目没有可用于需求整理的会话。')
-      }
-      const directory = await ctx.modelDirectories.directoryFor(sessionId as SessionId).load()
-      if (!directory.routable) throw new Error('当前项目会话的模型不可用，请先在项目交付中选择可用模型。')
-      const group = directory.groups.find(item => item.id === directory.current.provider)
-      const model = group?.models.find(item => item.id === directory.current.model)
-      return {
-        sessionId,
-        provider: directory.current.provider,
-        providerName: group?.name ?? directory.current.provider,
-        model: directory.current.model,
-        modelName: model?.name ?? directory.current.model,
-      } satisfies RequirementWikiRunTarget
-    },
-    startRequirementWikiBuild: async (workspaceId, sourceIds, expectedRevision, target) => {
-      const workspace = ctx.workspaces.list.getSnapshot().items.find(item => String(item.workspaceId) === workspaceId)
-      if (workspace === undefined || !workspace.sessionIds.some(id => String(id) === target.sessionId)) {
-        throw new Error('已确认的需求整理会话不再属于当前项目，请重新确认。')
-      }
-      const directory = await ctx.modelDirectories.directoryFor(target.sessionId as SessionId).load()
-      if (!directory.routable
-        || directory.current.provider !== target.provider
-        || directory.current.model !== target.model) {
-        throw new Error('当前项目会话的模型已变化，请重新确认 Provider 与模型边界。')
-      }
-      const snapshot = await requirementWiki.startBuild(workspaceId, sourceIds, expectedRevision)
-      const build = snapshot.build
-      if (build === null || (build.status !== 'queued' && build.status !== 'running')) {
-        throw new Error('需求整理任务没有进入可执行状态。')
-      }
-      try {
-        const session = ctx.sessions.binding(target.sessionId as SessionId)?.session
-        if (session === undefined) throw new Error('当前项目会话不可用。')
-        const sourceList = build.sources.map(source => `- ${source.sourceId}: ${source.derivedPath}（${source.storedName}）`).join('\n')
-        const result = await session.prompt([{
-          type: 'text',
-          text: `请执行当前 FDE 项目的需求知识整理。BuildId=${build.id}，页面基于 revision R${String(build.expectedRevision)}。\n\n先调用 requirement_wiki_get，并传入 BuildId；随后只读取它返回的以下固定派生文本，不要读取其他项目或自行扩展来源：\n${sourceList}\n\n把资料整体梳理为业务目标、角色、流程/SOP、系统与数据、业务规则、约束、验收方向、风险、冲突和未知项。每个知识页、关系、冲突和未知项都必须引用一个或多个本次 SourceId。完成后调用 requirement_wiki_publish 一次提交完整候选，expectedRevision 必须使用 requirement_wiki_get 返回的值。不要把候选理解写成客户已确认事实，不要推进项目阶段或项目基线。`,
-        }], 'queue')
-        if (!result.ok) throw new Error(result.error.message)
-      } catch (error) {
-        await requirementWiki.abandonBuild(workspaceId, build.id).catch(() => undefined)
-        throw error
-      }
-    },
-    abandonRequirementWikiBuild: async (workspaceId, buildId) => {
-      await requirementWiki.abandonBuild(workspaceId, buildId)
-    },
     openProjectCreation: () => {
       window.dispatchEvent(new Event(FDE_PROJECT_CREATE_OPEN_EVENT, { cancelable: true }))
     },

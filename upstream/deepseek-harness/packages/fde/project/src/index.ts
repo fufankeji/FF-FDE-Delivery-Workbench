@@ -18,16 +18,12 @@ import {
   createProjectRuntimeStartRoute,
   createProjectRuntimeStopRoute,
   createRequirementArtifactFileRoute,
-  createRequirementWikiAbandonRoute,
-  createRequirementWikiStartRoute,
   createValidationMetricAcceptRoute,
   createValidationIssueWaiveRoute,
   createValidationPlanConfirmRoute,
 } from './http.ts'
 import { registerProjectOpenApiTools, type ProjectOpenApiPolicy } from './openapi-tools.ts'
 import { approveProjectEvaluationBaseline, confirmProjectArchitecture, loadProjectSurfaceSnapshot } from './snapshot.ts'
-import { abandonRequirementWikiBuild, startRequirementWikiBuild } from './requirement-wiki.ts'
-import { registerRequirementWikiTools } from './requirement-wiki-tools.ts'
 import {
   abandonProjectRuntimeOperation,
   beginProjectRuntimeOperation,
@@ -74,8 +70,6 @@ export {
   createProjectRuntimeStartRoute,
   createProjectRuntimeStopRoute,
   createRequirementArtifactFileRoute,
-  createRequirementWikiAbandonRoute,
-  createRequirementWikiStartRoute,
   createValidationMetricAcceptRoute,
   createValidationIssueWaiveRoute,
   createValidationPlanConfirmRoute,
@@ -85,16 +79,6 @@ export {
   readProjectArchitecture, replaceProjectArchitecture,
 } from './snapshot.ts'
 export { loadProjectOpenApiConfig } from './snapshot.ts'
-export {
-  abandonRequirementWikiBuild,
-  loadRequirementWikiSnapshot,
-  markRequirementWikiBuildRunning,
-  parseRequirementWikiCandidate,
-  publishRequirementWiki,
-  readCurrentRequirementWiki,
-  requirementWikiPaths,
-  startRequirementWikiBuild,
-} from './requirement-wiki.ts'
 export { registerProjectArchitectureTools } from './architecture-tools.ts'
 export { DISCOVERY_CAPABILITY_ROUTE, loadDiscoveryStage } from './discovery-stage.ts'
 export {
@@ -150,7 +134,6 @@ export {
   resolveAcceptanceHandoverArtifact,
   resolveDeploymentTrialArtifact,
 } from './delivery-closeout.ts'
-export { registerRequirementWikiTools } from './requirement-wiki-tools.ts'
 export {
   abandonProjectRuntimeOperation,
   beginProjectRuntimeOperation,
@@ -195,10 +178,6 @@ export const FDE_DEPLOYMENT_TRIAL_READINESS_CONFIRM_PATH = '/api/fde-project/pil
 export const FDE_ACCEPTANCE_HANDOVER_DECISION_PATH = '/api/fde-project/handoff/record-decision'
 /** Project evaluation baseline approval route. */
 export const FDE_EVALUATION_BASELINE_PATH = '/api/fde-project/evaluation/baseline'
-/** Explicit project requirement-Wiki build start route. */
-export const FDE_REQUIREMENT_WIKI_START_PATH = '/api/fde-project/requirement-wiki/start'
-/** Explicit project requirement-Wiki build abandonment route. */
-export const FDE_REQUIREMENT_WIKI_ABANDON_PATH = '/api/fde-project/requirement-wiki/abandon'
 /** Begin one Agent-driven project start operation. */
 export const FDE_PROJECT_RUNTIME_START_PATH = '/api/fde-project/runtime/start'
 /** Begin one Agent-driven project stop operation. */
@@ -237,7 +216,6 @@ export function apply(ctx: Context, config: Config): void {
   positiveInteger('artifactPreviewMaxBytes', config.artifactPreviewMaxBytes, 1_024)
   registerProjectOpenApiTools(ctx, config)
   registerProjectArchitectureTools(ctx)
-  registerRequirementWikiTools(ctx)
   registerProjectRuntimeTools(ctx)
   registerProjectEvaluationGuard(ctx)
   const reportFailure = (error: unknown): void => { ctx.logger.warn(error instanceof Error ? error : new Error(String(error))) }
@@ -469,36 +447,6 @@ export function apply(ctx: Context, config: Config): void {
     path: FDE_EVALUATION_BASELINE_PATH,
     handler: baseline,
   }), `fde-project: ${FDE_EVALUATION_BASELINE_PATH}`)
-  const startWiki = createRequirementWikiStartRoute({
-    trusted: request => isTrustedApiRequest(request, []),
-    start: async (workspaceId, sourceIds, expectedRevision) => {
-      const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
-      if (workspace === undefined) return undefined
-      await startRequirementWikiBuild(workspace.path, sourceIds, expectedRevision)
-      return await loadProjectSurfaceSnapshot({ workspaceId, title: workspace.title, path: workspace.path })
-    },
-    reportFailure,
-  })
-  ctx.effect(() => ctx.webServer.register({
-    kind: 'exact',
-    path: FDE_REQUIREMENT_WIKI_START_PATH,
-    handler: startWiki,
-  }), `fde-project: ${FDE_REQUIREMENT_WIKI_START_PATH}`)
-  const abandonWiki = createRequirementWikiAbandonRoute({
-    trusted: request => isTrustedApiRequest(request, []),
-    abandon: async (workspaceId, buildId) => {
-      const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
-      if (workspace === undefined) return undefined
-      await abandonRequirementWikiBuild(workspace.path, buildId)
-      return await loadProjectSurfaceSnapshot({ workspaceId, title: workspace.title, path: workspace.path })
-    },
-    reportFailure,
-  })
-  ctx.effect(() => ctx.webServer.register({
-    kind: 'exact',
-    path: FDE_REQUIREMENT_WIKI_ABANDON_PATH,
-    handler: abandonWiki,
-  }), `fde-project: ${FDE_REQUIREMENT_WIKI_ABANDON_PATH}`)
   const startRuntime = createProjectRuntimeStartRoute({
     trusted: request => isTrustedApiRequest(request, []),
     act: async (workspaceId, sessionId) => {
