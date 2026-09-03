@@ -13,8 +13,6 @@ const LEGACY_TO_V2_STAGE: Readonly<Record<FdeProjectState, number>> = {
   requirements: 0, solution: 1, development: 3, validation: 4, pilot: 5, handoff: 6, completed: 7,
 }
 
-const STAGE_METHOD_COUNTS = [7, 9, 7, 7, 7, 7, 8, 7] as const
-
 function projectMonogram(title: string): string {
   if (/llm[-\s]?wiki/i.test(title)) return 'IW'
   const latinWords = title.match(/[a-z0-9]+/gi)
@@ -30,8 +28,7 @@ type SkillCatalogState =
   | { readonly status: 'error'; readonly message: string }
 
 export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
-  const [stageDetailsOpen, setStageDetailsOpen] = useState(true)
-  const [methodsOpen, setMethodsOpen] = useState(false)
+  const [expandedStage, setExpandedStage] = useState<number>()
   const [catalogState, setCatalogState] = useState<SkillCatalogState>({ status: 'idle' })
   const [catalogRequestRevision, setCatalogRequestRevision] = useState(0)
   const catalogLoaded = useRef(false)
@@ -58,11 +55,12 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
   const activeStageId = FDE_V2_STAGE_IDS[active] ?? 'discovery'
   const viewedStageId = selectedStage ?? activeStageId
   const viewed = Math.max(0, FDE_V2_STAGE_IDS.indexOf(viewedStageId))
+  const stageDetailsOpen = expandedStage === viewed
   const files = sourceState?.files.length ?? 0
   const surface = surfaceState?.status === 'ready' ? surfaceState.value : undefined
   const artifacts = surface?.requirements.presentCount ?? 0
   useEffect(() => {
-    if (!methodsOpen || catalogLoaded.current) return
+    if (!stageDetailsOpen || catalogLoaded.current) return
     const abort = new AbortController()
     setCatalogState({ status: 'loading' })
     void fetchStageSkillCatalog(abort.signal).then((catalog) => {
@@ -79,7 +77,7 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
       setCatalogState({ status: 'error', message: error instanceof Error ? error.message : String(error) })
     })
     return () => { abort.abort() }
-  }, [catalogRequestRevision, methodsOpen, viewed, viewedStageId])
+  }, [catalogRequestRevision, stageDetailsOpen, viewed, viewedStageId])
   useEffect(() => {
     if (selectedMethod === undefined) return
     const closeOnEscape = (event: KeyboardEvent): void => {
@@ -92,7 +90,6 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
     catalogLoaded.current = false
     setCatalogState({ status: 'idle' })
     setSelectedMethod(undefined)
-    setStageDetailsOpen(true)
   }, [viewed])
 
   const retryCatalog = (): void => {
@@ -102,11 +99,8 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
   }
 
   const toggleStageDetails = (): void => {
-    if (stageDetailsOpen) {
-      setMethodsOpen(false)
-      setSelectedMethod(undefined)
-    }
-    setStageDetailsOpen(!stageDetailsOpen)
+    setSelectedMethod(undefined)
+    setExpandedStage(stageDetailsOpen ? undefined : viewed)
   }
 
   const renderMethod = (method: StageSkillCatalogMethod, methodIndex: number) => (
@@ -185,36 +179,36 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
           if (stage === undefined) return null
           return (
             <div className={css.projectStageBranch} key={name} data-active={current ? 'true' : 'false'} data-viewing={viewing ? 'true' : 'false'} data-complete={index < active ? 'true' : 'false'}>
-              <button type="button" className={css.projectStageRow} aria-current={current ? 'step' : undefined} onClick={() => { props.viewProjectStage(workspaceId, stage) }}>
+              {viewing && stageDetailsOpen && <span className={css.projectStageFocusSurface} aria-hidden="true" />}
+              <button
+                type="button"
+                className={css.projectStageRow}
+                aria-current={current ? 'step' : undefined}
+                aria-expanded={viewing ? stageDetailsOpen : undefined}
+                onClick={() => {
+                  if (viewing) toggleStageDetails()
+                  else {
+                    setExpandedStage(index)
+                    props.viewProjectStage(workspaceId, stage)
+                  }
+                }}
+              >
                 <i>{index < active ? '✓' : String(index + 1).padStart(2, '0')}</i>
                 <span><strong>{name}</strong>{current && <small>当前阶段</small>}{viewing && !current && <small>正在查看</small>}</span>
-                <svg aria-hidden="true" viewBox="0 0 16 16"><path d="m5.5 3 5 5-5 5" /></svg>
+                <svg aria-hidden="true" viewBox="0 0 16 16">{viewing && stageDetailsOpen ? <path d="m3 10.5 5-5 5 5" /> : <path d="m5.5 3 5 5-5 5" />}</svg>
               </button>
               {viewing && stageDetailsOpen && (
-                <div className={css.stageMethodTree}>
-                  <button
-                    type="button"
-                    className={css.stageMethodToggle}
-                    aria-expanded={methodsOpen}
-                    onClick={() => { setMethodsOpen(value => !value) }}
-                  >
-                    <span aria-hidden="true" className={css.stageMethodFolder}>◇</span>
-                    <span>本阶段工作方法</span>
-                    <b>{catalogState.status === 'ready' ? catalogState.methods.length : STAGE_METHOD_COUNTS[index]}</b>
-                    <svg aria-hidden="true" viewBox="0 0 16 16"><path d="m5.5 3 5 5-5 5" /></svg>
-                  </button>
-                  {methodsOpen && (
-                    <div className={css.stageMethodList} aria-label={`第 ${String(index + 1)} 阶段工作方法`}>
-                      {catalogState.status === 'loading' && <span className={css.stageMethodMessage}>正在读取工作方法…</span>}
-                      {catalogState.status === 'error' && (
-                        <div className={css.stageMethodMessage} role="alert">
-                          <span>{catalogState.message}</span>
-                          <button type="button" onClick={retryCatalog}>重试</button>
-                        </div>
-                      )}
-                      {renderCatalogMethods()}
-                    </div>
-                  )}
+                <div className={css.stageMethodTree} data-stage-method-tree="">
+                  <div className={css.stageMethodList} aria-label={`第 ${String(index + 1)} 阶段工作方法`}>
+                    {catalogState.status === 'loading' && <span className={css.stageMethodMessage}>正在读取工作方法…</span>}
+                    {catalogState.status === 'error' && (
+                      <div className={css.stageMethodMessage} role="alert">
+                        <span>{catalogState.message}</span>
+                        <button type="button" onClick={retryCatalog}>重试</button>
+                      </div>
+                    )}
+                    {renderCatalogMethods()}
+                  </div>
                 </div>
               )}
             </div>

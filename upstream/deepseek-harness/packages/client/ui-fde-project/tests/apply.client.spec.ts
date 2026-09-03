@@ -298,8 +298,9 @@ describe('ui-fde-project apply', () => {
       connectWorkspace,
     } as never)
     ctx.provide('conversation', {} as never)
+    const openSidebar = vi.fn()
     ctx.provide('layout', {
-      toggleSidebar: vi.fn(), openSidebar: vi.fn(), collapseSidebar: vi.fn(), openDetails: vi.fn(), closeDetails: vi.fn(),
+      toggleSidebar: vi.fn(), openSidebar, collapseSidebar: vi.fn(), openDetails: vi.fn(), closeDetails: vi.fn(),
     } as never)
     const slots = ctx.get('slots') as SlotRegistry
     slots.register({
@@ -315,6 +316,7 @@ describe('ui-fde-project apply', () => {
     const injected = (slots.entries('shell.overlay')[0]!.inject as unknown as () => ProjectPageInjected)()
 
     await injected.enterProject('workspace-1')
+    expect(openSidebar).toHaveBeenLastCalledWith(354)
     expect(selectView).toHaveBeenLastCalledWith('fde-stage-workbench')
     expect(open).toHaveBeenLastCalledWith('latest')
     expect(connectWorkspace).not.toHaveBeenCalled()

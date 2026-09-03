@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="195" viewBox="0 0 300 195" fill="none">
+  <defs>
+    <linearGradient id="layer" x1="88" y1="35" x2="222" y2="151" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1182A0" stop-opacity=".72"/>
+      <stop offset="1" stop-color="#013E54" stop-opacity=".9"/>
+    </linearGradient>
+    <linearGradient id="top" x1="104" y1="30" x2="211" y2="109" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#258EAD" stop-opacity=".92"/>
+      <stop offset="1" stop-color="#06455F" stop-opacity=".92"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <g opacity=".55" stroke="#16A6C0" stroke-width=".7" stroke-dasharray="2 4">
+    <ellipse cx="164" cy="92" rx="130" ry="67" transform="rotate(-8 164 92)"/>
+    <ellipse cx="158" cy="99" rx="105" ry="52" transform="rotate(10 158 99)"/>
+    <path d="M8 105C67 54 204 34 294 85M24 146C108 95 220 93 288 135"/>
+  </g>
+  <g fill="#36E5FF">
+    <circle cx="42" cy="58" r="1.8" filter="url(#glow)"/><circle cx="265" cy="45" r="1.6" filter="url(#glow)"/>
+    <circle cx="244" cy="119" r="1.2"/><circle cx="75" cy="132" r="1.1"/>
+  </g>
+  <g stroke="#33CAE8" stroke-width="1">
+    <path d="M89 96 157 56a8 8 0 0 1 8 0l76 43c5 3 5 8 0 11l-69 40a8 8 0 0 1-8 0l-75-43c-5-3-5-8 0-11Z" fill="url(#layer)" opacity=".62"/>
+    <path d="M89 77 157 37a8 8 0 0 1 8 0l76 43c5 3 5 8 0 11l-69 40a8 8 0 0 1-8 0L89 88c-5-3-5-8 0-11Z" fill="url(#layer)" opacity=".78"/>
+    <path d="M89 58 157 18a8 8 0 0 1 8 0l76 43c5 3 5 8 0 11l-69 40a8 8 0 0 1-8 0L89 69c-5-3-5-8 0-11Z" fill="url(#top)"/>
+  </g>
+  <g fill="#40B4D0" opacity=".78" transform="matrix(.866 .5 -.866 .5 126 38)">
+    <rect width="13" height="7" rx="1"/><rect x="18" width="34" height="7" rx="1"/><rect x="57" width="22" height="7" rx="1"/>
+    <rect y="12" width="20" height="7" rx="1"/><rect x="25" y="12" width="46" height="7" rx="1"/>
+    <rect y="24" width="31" height="7" rx="1"/><rect x="36" y="24" width="41" height="7" rx="1"/>
+    <rect y="36" width="22" height="7" rx="1"/><rect x="27" y="36" width="33" height="7" rx="1"/>
+  </g>
+  <circle cx="188" cy="112" r="24" fill="#0EA86B" stroke="white" stroke-width="3" filter="url(#glow)"/>
+  <path d="m176.5 112 7.5 7.5 15.5-17" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

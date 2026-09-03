@@ -50,6 +50,27 @@ function SparkleIcon() {
   </svg>
 }
 
+function HistoricalNoticeIcon() {
+  return <svg className={css.historicalNoticeIcon} viewBox="0 0 48 48" fill="none" aria-hidden="true">
+    <path d="M12 7.5h16.5l7.5 7.5v18.5A4.5 4.5 0 0 1 31.5 38H12a4.5 4.5 0 0 1-4.5-4.5V12A4.5 4.5 0 0 1 12 7.5Z" />
+    <path d="M28.5 8v7h7M15 21h9M15 27h7" />
+    <circle cx="34.5" cy="33.5" r="9" />
+    <path d="M34.5 28.5v5.5l3.5 2" />
+  </svg>
+}
+
+function HistoricalFactIcon({ type }: { readonly type: 'input' | 'record' | 'gate' }) {
+  return <svg className={css.historicalFactIcon} viewBox="0 0 20 20" fill="none" aria-hidden="true">
+    {type === 'input' && <><rect x="4" y="4" width="12" height="12" rx="3" /><path d="M7 10h6M10 7v6" /></>}
+    {type === 'record' && <><path d="M5 5.5h10v10H5z" /><path d="M7.5 3.5h5v3h-5zM7.5 9h5M7.5 12h4" /></>}
+    {type === 'gate' && <><circle cx="10" cy="10" r="7" /><path d="m7 10 2 2 4-4" /></>}
+  </svg>
+}
+
+function HistoricalArchiveIcon() {
+  return <svg className={css.historicalArchiveIcon} viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 2.5 16 5v4.6c0 3.6-2.2 6.1-6 7.9-3.8-1.8-6-4.3-6-7.9V5l6-2.5Z" /><path d="m7.5 10 1.6 1.6 3.5-3.7" /></svg>
+}
+
 type WorkbenchProps = ProjectStageWorkbenchHeroProps | ProjectStageWorkbenchViewProps
 
 function isStageRecordBlocker(value: string): boolean {
@@ -570,19 +591,35 @@ function BrowsedStagePanel({ props, workspace, sessionId, view, actualStage, vie
     })
   }
 
-  return <section className={`${css.root} ${css.browsedStage}`} data-conversation-composer-overlay={view ? '' : undefined} aria-label={`正在查看：${title}`}>
+  return <section className={`${css.root} ${css.browsedStage}`} data-stage={viewedStage} data-historical={historical ? 'true' : undefined} data-conversation-composer-layout={historical ? 'stage-history' : undefined} data-conversation-composer-overlay={view ? '' : undefined} aria-label={`正在查看：${title}`}>
     <header className={css.browsedStageNotice}>
+      {historical && <HistoricalNoticeIcon />}
       <div><span>{historical ? '阶段完成记录' : '未开始阶段'}</span><strong>正在查看第 {String(viewedIndex + 1)} 阶段，项目当前在“{V2_STAGE_NAMES[actualIndex]}”</strong><p>{historical ? '以下内容来自当前项目已经保存的资料和阶段记录，不用计划模板补齐缺失事实。' : '这里只说明该阶段何时可以开始，不代表已经安排或执行了工作。'}</p></div>
-      <button type="button" className={css.secondaryButton} onClick={() => { props.returnToCurrentStage(workspace.workspaceId) }}>返回当前阶段</button>
+      <button type="button" className={css.secondaryButton} onClick={() => { props.returnToCurrentStage(workspace.workspaceId) }}>返回当前阶段 {historical && <span aria-hidden="true">→</span>}</button>
     </header>
 
     {historical
       ? <>
         <section className={css.browsedStageGoal}>
-          <span>第 {String(viewedIndex + 1)}/8 阶段 · 已完成</span><h1>{title}</h1><p>{explanation}</p>
+          <div className={css.historicalGoalCopy}>
+            <span>第 {String(viewedIndex + 1)}/8 阶段 · 已完成</span><h1>{title}</h1><p>{explanation}</p>
+            <div className={css.historicalGoalFacts}>
+              <span><HistoricalFactIcon type="input" />{sourceFiles.length} 份输入材料</span>
+              <span><HistoricalFactIcon type="record" />{presentArtifacts.length} 份阶段记录</span>
+              <span><HistoricalFactIcon type="gate" />已通过人工阶段门</span>
+            </div>
+          </div>
+          <div className={css.historicalCompletionRing} aria-label={`第 ${String(viewedIndex + 1)}/8 阶段已完成`}><strong>{viewedIndex + 1}<small>/8</small></strong><span>已完成</span><i>✓</i></div>
+          <div className={css.historicalGoalArt} aria-hidden="true"><img src="/fde-dashboard/stage-history-stack.svg" alt="" /></div>
+          <div className={css.historicalArchiveNote}>◷ 阶段记录已封存 · 可追溯</div>
         </section>
-        <div className={css.historicalStageGrid}>
-          <section>
+        <section className={css.historicalEvidenceChain}>
+          <header className={css.historicalEvidenceHeader}>
+            <div><span>阶段证据链</span><h2>从输入依据到人工结论</h2><p>所有结论均可回到来源材料与阶段记录。</p></div>
+            <div className={css.historicalEvidenceDirection} aria-hidden="true"><strong>01</strong><i /><strong>03</strong></div>
+          </header>
+          <div className={css.historicalStageGrid}>
+            <section>
             <header><span>阶段输入</span><h2>当时依据了什么</h2></header>
             <ul className={css.historicalFactList}>
               {viewedIndex === 0 && sourceFiles.map(source => <li key={source.sourceId}>
@@ -605,8 +642,8 @@ function BrowsedStagePanel({ props, workspace, sessionId, view, actualStage, vie
               (viewedIndex === 0 && sourceFiles.length === 0)
               || (viewedIndex > 0 && previousArtifacts.length === 0)
             ) && <p className={css.unregisteredFact}>未登记可直接追溯的阶段输入。</p>}
-          </section>
-          <section>
+            </section>
+            <section>
             <header><span>阶段输出</span><h2>已经留下什么</h2></header>
             <ul className={css.historicalFactList}>{presentArtifacts.map(artifact => <li key={artifact.id}>
               <span><strong>{artifactDisplayTitle(artifact)}</strong><small>{artifact.purpose}</small></span>
@@ -615,15 +652,21 @@ function BrowsedStagePanel({ props, workspace, sessionId, view, actualStage, vie
               }}>预览</button>
             </li>)}</ul>
             {presentArtifacts.length === 0 && <p className={css.unregisteredFact}>未发现可读取的阶段产物。</p>}
-          </section>
-          <section>
+            </section>
+            <section>
             <header><span>人工结论</span><h2>当时如何决定</h2></header>
             <div className={css.historicalDecision}><i aria-hidden="true">✓</i><span><strong>已通过 FDE 人工阶段门</strong><small>项目随后进入“{nextStageTitle}”。</small></span></div>
             {selectedWorkflow !== undefined && viewedStage === 'discovery' && <dl><dt>选定业务流程</dt><dd>{selectedWorkflow.title}</dd></dl>}
             {stageRecommendation !== undefined && <dl><dt>阶段建议</dt><dd>{stageRecommendation}</dd></dl>}
-            <dl><dt>遗留阻塞</dt><dd>{stageBlockers.length === 0 ? '未登记未解决阻塞' : `${String(stageBlockers.length)} 项`}</dd></dl>
-          </section>
-        </div>
+              <dl><dt>遗留阻塞</dt><dd>{stageBlockers.length === 0 ? '未登记未解决阻塞' : `${String(stageBlockers.length)} 项`}</dd></dl>
+              <div className={css.historicalDecisionLink}>查看决策记录 <span aria-hidden="true">→</span></div>
+            </section>
+          </div>
+          <ol className={css.historicalMilestones} aria-label="阶段封存轨迹">
+            {['材料进入', '事实还原', '待确认项', '流程冻结', 'FDE 阶段门'].map(item => <li key={item}><i>✓</i><span>{item}</span></li>)}
+          </ol>
+          <footer className={css.historicalArchiveFooter}><span><HistoricalArchiveIcon />阶段已封存；后续阶段可引用，但不能静默改写原始记录。</span><strong>查看全部阶段记录</strong></footer>
+        </section>
       </>
       : <section className={css.futureStageEmpty}>
         <div className={css.futureStageIndex}>{String(viewedIndex + 1).padStart(2, '0')}</div>

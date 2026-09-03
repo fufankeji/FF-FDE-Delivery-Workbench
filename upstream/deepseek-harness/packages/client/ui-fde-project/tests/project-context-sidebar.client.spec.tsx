@@ -61,14 +61,14 @@ describe('ProjectContextSidebar stage methods', () => {
     vi.stubGlobal('fetch', fetchMock)
 
     render(<ProjectContextSidebar {...sidebarProps()} />)
-    fireEvent.click(screen.getByRole('button', { name: /本阶段工作方法/ }))
+    fireEvent.click(screen.getByRole('button', { name: /发现高价值问题/ }))
 
     await waitFor(() => { expect(fetchMock).toHaveBeenCalledTimes(1) })
     expect(screen.getByText('正在读取工作方法…')).toBeTruthy()
     expect(requestSignal?.aborted).toBe(false)
   })
 
-  it('keeps the business method tree collapsed and opens one read-only Markdown definition', async () => {
+  it('expands the business method tree from the stage row and opens one read-only Markdown definition', async () => {
     const fetchMock = vi.fn(async () => new Response(JSON.stringify({
       ok: true,
       value: {
@@ -91,12 +91,13 @@ describe('ProjectContextSidebar stage methods', () => {
 
     render(<ProjectContextSidebar {...sidebarProps()} />)
 
-    const toggle = screen.getByRole('button', { name: /本阶段工作方法/ })
+    const toggle = screen.getByRole('button', { name: /发现高价值问题/ })
     expect(toggle.getAttribute('aria-expanded')).toBe('false')
     expect(screen.queryByText('项目启动与方向确认')).toBeNull()
     expect(fetchMock).not.toHaveBeenCalled()
 
     fireEvent.click(toggle)
+    expect(toggle.getAttribute('aria-expanded')).toBe('true')
     await waitFor(() => { expect(screen.getByText('项目启动与方向确认')).toBeTruthy() })
     expect(fetchMock).toHaveBeenCalledWith('/api/fde-stage/skills', expect.objectContaining({ method: 'GET' }))
     expect(screen.getAllByRole('button').filter(button => methodNames.some(([, label]) => button.textContent?.includes(label)))).toHaveLength(7)
@@ -159,7 +160,7 @@ describe('ProjectContextSidebar stage methods', () => {
 
     render(<ProjectContextSidebar {...props} />)
     expect(screen.getByText('定义结果、范围与责任').closest('[data-active="true"]')).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: /本阶段工作方法/ }))
+    fireEvent.click(screen.getByRole('button', { name: /定义结果、范围与责任/ }))
     await waitFor(() => { expect(screen.getByRole('button', { name: /算清当前成本和问题影响/ })).toBeTruthy() })
     expect(screen.getByRole('region', { name: '必做工作' })).toBeTruthy()
     expect(screen.getByRole('region', { name: '按需处理' })).toBeTruthy()
@@ -181,14 +182,16 @@ describe('ProjectContextSidebar stage methods', () => {
     const input = sidebarProps()
     render(<ProjectContextSidebar {...input} />)
 
-    expect(screen.getByRole('button', { name: /本阶段工作方法/ })).toBeTruthy()
+    expect(screen.queryByLabelText('第 1 阶段工作方法')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: /发现高价值问题/ }))
+    expect(screen.getByLabelText('第 1 阶段工作方法')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: '一键收起阶段详情' }))
-    expect(screen.queryByRole('button', { name: /本阶段工作方法/ })).toBeNull()
+    expect(screen.queryByLabelText('第 1 阶段工作方法')).toBeNull()
     expect(input.viewProjectStage).not.toHaveBeenCalled()
     expect(input.returnToCurrentStage).not.toHaveBeenCalled()
 
     fireEvent.click(screen.getByRole('button', { name: '展开当前阶段详情' }))
-    expect(screen.getByRole('button', { name: /本阶段工作方法/ })).toBeTruthy()
+    expect(screen.getByLabelText('第 1 阶段工作方法')).toBeTruthy()
   })
 
   it('delegates one-click sidebar scaling to the shared layout', () => {
@@ -215,11 +218,13 @@ describe('ProjectContextSidebar stage methods', () => {
     expect(input.returnToCurrentStage).toHaveBeenCalledWith('workspace-1')
   })
 
-  it('shows the planned method count for a later stage before its catalog loads', () => {
+  it('keeps a later stage collapsed until its stage row is selected', () => {
     const input = sidebarProps()
     input.useStageView = hook({ byWorkspace: { 'workspace-1': 'investigation' } }) as typeof input.useStageView
     render(<ProjectContextSidebar {...input} />)
 
-    expect(screen.getByRole('button', { name: /本阶段工作方法/ }).textContent).toContain('7')
+    const stage = screen.getByRole('button', { name: /调查数据、系统、接口、安全与组织/ })
+    expect(stage.getAttribute('aria-expanded')).toBe('false')
+    expect(screen.queryByLabelText('第 3 阶段工作方法')).toBeNull()
   })
 })

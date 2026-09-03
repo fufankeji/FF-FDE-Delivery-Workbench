@@ -334,6 +334,17 @@
   left: 96px;
 }
 
+.root:has([data-conversation-composer-layout='stage-history'][data-conversation-composer-overlay]) {
+  --dsh-chat-content-width: 950px;
+
+  background: linear-gradient(180deg, #fafdff 0%, #fff 46%, #fbfdff 100%);
+}
+
+.scrollBody:has([data-conversation-composer-layout='stage-history'][data-conversation-composer-overlay]) > .composerSeat {
+  right: 68px;
+  bottom: 16px;
+}
+
 @media (max-width: 980px) {
   .scrollBody:has([data-conversation-composer-layout='stage-execution'][data-conversation-composer-overlay]) > .composerSeat {
     right: var(--dsh-scrollbar-width);
@@ -343,6 +354,15 @@
   .scrollBody:has([data-conversation-composer-layout='stage-definition'][data-conversation-composer-overlay]) > .composerSeat {
     right: var(--dsh-scrollbar-width);
     left: 0;
+  }
+
+  .root:has([data-conversation-composer-layout='stage-history'][data-conversation-composer-overlay]) {
+    --dsh-chat-content-width: 748px;
+  }
+
+  .scrollBody:has([data-conversation-composer-layout='stage-history'][data-conversation-composer-overlay]) > .composerSeat {
+    right: var(--dsh-scrollbar-width);
+    bottom: 0;
   }
 }
 

@@ -532,6 +532,7 @@ describe('ProjectStageWorkbenchHero', () => {
     render(<ProjectStageWorkbenchHero {...input} />)
 
     expect(screen.getByText('阶段完成记录')).toBeTruthy()
+    expect(screen.getByText('从输入依据到人工结论')).toBeTruthy()
     expect(screen.getByRole('heading', { name: '定义结果、范围与责任' })).toBeTruthy()
     expect(screen.getByText('当时依据了什么')).toBeTruthy()
     expect(screen.getByText('业务流程说明')).toBeTruthy()
@@ -539,6 +540,8 @@ describe('ProjectStageWorkbenchHero', () => {
     expect(screen.getByText('结果与成功标准')).toBeTruthy()
     expect(screen.getByText('已通过 FDE 人工阶段门')).toBeTruthy()
     expect(screen.getByText('项目随后进入“调查数据、系统、接口、安全与组织”。')).toBeTruthy()
+    expect(screen.getByLabelText('阶段封存轨迹')).toBeTruthy()
+    expect(screen.getByText('查看全部阶段记录')).toBeTruthy()
     expect(screen.getByText('继续推进')).toBeTruthy()
     expect(screen.queryByText('会依次做什么')).toBeNull()
     expect(screen.queryByRole('button', { name: '开始本阶段工作' })).toBeNull()

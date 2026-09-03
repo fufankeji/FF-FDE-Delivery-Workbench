@@ -7,13 +7,13 @@
    mid-slide. */
 
 .root {
-  --dsh-sidebar-inline-padding: 12px;
+  --dsh-sidebar-inline-padding: 14px;
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 6px var(--dsh-sidebar-inline-padding);
+  padding: 0 var(--dsh-sidebar-inline-padding) 6px;
   box-sizing: border-box;
-  background: var(--dsw-specific-sidebar-fill);
+  background: color-mix(in srgb, var(--dsw-specific-sidebar-fill) 45%, var(--dsw-alias-bg-base));
   color: var(--dsw-alias-label-primary);
   font-size: 14px;
   /* The sidebar is elevated above the conversation surface, so a revealed
@@ -92,9 +92,9 @@
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
-  height: 60px;
-  padding: 8px 0 8px 4px;
-  margin-bottom: 8px;
+  height: 48px;
+  padding: 0 0 0 4px;
+  margin-bottom: 5px;
   box-sizing: border-box;
   overflow: hidden;
 }
