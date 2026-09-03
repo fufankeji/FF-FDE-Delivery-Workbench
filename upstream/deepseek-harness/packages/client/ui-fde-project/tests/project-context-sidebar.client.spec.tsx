@@ -68,7 +68,7 @@ describe('ProjectContextSidebar stage methods', () => {
     expect(requestSignal?.aborted).toBe(false)
   })
 
-  it('expands the business method tree from the stage row and opens one read-only Markdown definition', async () => {
+  it('expands the business method tree and opens a Chinese-first structured method reader', async () => {
     const fetchMock = vi.fn(async () => new Response(JSON.stringify({
       ok: true,
       value: {
@@ -79,6 +79,8 @@ describe('ProjectContextSidebar stage methods', () => {
           methods: methodNames.map(([id, label]) => ({
             id,
             label,
+            role: id === 'qualify-ai-workflow' ? 'core' : id === 'reframe-ai-engagement' ? 'conditional' : 'engineering',
+            group: id === 'reframe-ai-engagement' ? 'conditional' : 'required',
             description: `${label}的业务用途。`,
             whenToUse: `需要${label}时使用。`,
             source: 'fixed/source@commit',
@@ -105,6 +107,11 @@ describe('ProjectContextSidebar stage methods', () => {
     fireEvent.click(screen.getByRole('button', { name: /项目启动与方向确认/ }))
     const dialog = screen.getByRole('dialog', { name: '项目启动与方向确认' })
     expect(within(dialog).getByRole('heading', { name: '项目启动与方向确认', level: 2 })).toBeTruthy()
+    expect(within(dialog).getByText('工程能力')).toBeTruthy()
+    expect(within(dialog).getByRole('button', { name: '概览' }).getAttribute('aria-current')).toBe('page')
+    expect(within(dialog).getByText('什么时候会用')).toBeTruthy()
+    expect(within(dialog).queryByText('这是完整方法定义。')).toBeNull()
+    fireEvent.click(within(dialog).getByRole('button', { name: '完整定义' }))
     expect(within(dialog).getByRole('heading', { name: '项目启动与方向确认', level: 1 })).toBeTruthy()
     expect(within(dialog).getByText('这是完整方法定义。')).toBeTruthy()
     expect(within(dialog).queryByRole('button', { name: /运行|安装|启用/ })).toBeNull()
@@ -114,6 +121,61 @@ describe('ProjectContextSidebar stage methods', () => {
 
     fireEvent.click(within(dialog).getByRole('button', { name: '关闭工作方法详情' }))
     expect(screen.queryByRole('dialog')).toBeNull()
+  })
+
+  it('explains the core method, opens related capabilities, and exposes typed references', async () => {
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify({
+      ok: true,
+      value: {
+        schemaVersion: 1,
+        stages: [{
+          id: 'requirements', index: 0,
+          methods: [{
+            id: 'qualify-ai-workflow', label: '判断问题是否值得继续投入', role: 'core', group: 'required',
+            description: '判断真实工作流是否值得继续研究。', whenToUse: '第一阶段优先使用。',
+            source: 'davidahmann/fde-guide@commit', sourceUrl: 'https://example.com/source',
+            sourceLanguage: 'en', adapterLanguage: 'zh-CN', license: 'Apache-2.0', content: '# 资格判断',
+            answers: ['客户描述的是不是真实流程？'], workflow: ['保留客户原始说法', '等待 FDE 人工决定'],
+            artifacts: [{ label: '客户现状记录', path: 'deliverable.md', purpose: '记录来源事实。', required: true }],
+            collaborators: [{ id: 'fde-orient', label: '建立项目定向', condition: '项目刚开始', contribution: '原始诉求与调查顺序', role: 'engineering' }],
+            example: { title: '智修协同', summary: '示例说明。', steps: [{ batch: '第一批', input: '客户简报', finding: '缺少案例', skills: ['资格判断'], output: '候选工作流' }] },
+            references: [{ label: '发现与价值方法', path: 'playbooks/discovery.md', category: 'method', kind: 'markdown', purpose: '方法说明。', url: 'https://example.com/discovery' }],
+          }, {
+            id: 'fde-orient', label: '项目启动与方向确认', role: 'engineering', group: 'required',
+            description: '建立项目定向。', whenToUse: '项目刚开始时。', source: 'fixed/source@commit', content: '# 项目定向',
+          }],
+        }],
+      },
+    }), { status: 200, headers: { 'content-type': 'application/json' } }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    render(<ProjectContextSidebar {...sidebarProps()} />)
+    fireEvent.click(screen.getByRole('button', { name: /发现高价值问题/ }))
+    await waitFor(() => { expect(screen.getByRole('button', { name: /判断问题是否值得继续投入/ })).toBeTruthy() })
+    fireEvent.click(screen.getByRole('button', { name: /判断问题是否值得继续投入/ }))
+
+    let dialog = screen.getByRole('dialog', { name: '判断问题是否值得继续投入' })
+    expect(within(dialog).getByText('核心方法')).toBeTruthy()
+    expect(within(dialog).getByText('客户描述的是不是真实流程？')).toBeTruthy()
+    expect(within(dialog).getByText('客户现状记录')).toBeTruthy()
+
+    fireEvent.click(within(dialog).getByRole('button', { name: '协同关系' }))
+    expect(within(dialog).getByText('根据证据缺口按需协同')).toBeTruthy()
+    fireEvent.click(within(dialog).getByRole('button', { name: /建立项目定向/ }))
+    dialog = screen.getByRole('dialog', { name: '项目启动与方向确认' })
+    expect(within(dialog).getByText('工程能力')).toBeTruthy()
+
+    fireEvent.click(within(dialog).getByRole('button', { name: '关闭工作方法详情' }))
+    fireEvent.click(screen.getByRole('button', { name: /判断问题是否值得继续投入/ }))
+    dialog = screen.getByRole('dialog', { name: '判断问题是否值得继续投入' })
+    fireEvent.click(within(dialog).getByRole('button', { name: '示例' }))
+    expect(within(dialog).getByRole('heading', { name: '智修协同' })).toBeTruthy()
+    expect(within(dialog).getByText('示例不代表当前项目已经执行')).toBeTruthy()
+
+    fireEvent.click(within(dialog).getByRole('button', { name: '参考资料 1' }))
+    const reference = within(dialog).getByRole('link', { name: /发现与价值方法/ })
+    expect(reference.getAttribute('href')).toBe('https://example.com/discovery')
+    expect(reference.textContent).toContain('阅读原文')
   })
 
   it('loads the current V2 stage method instead of keeping the first-stage catalog', async () => {

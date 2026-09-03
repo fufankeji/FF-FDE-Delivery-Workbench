@@ -224,23 +224,26 @@ describe('requirement-research model guidance', () => {
     const stage = DISCOVERY_STAGE_SKILL_CATALOG.stages[0]
     expect(stage).toMatchObject({ id: 'requirements', index: 0 })
     expect(stage?.methods.map(method => method.label)).toEqual([
+      '判断问题是否值得继续投入',
       '项目启动与方向确认',
       '访谈业务人员，还原真实做法',
       '找到负责人和决策人',
       '盘点现有系统与资料',
-      '判断问题是否值得继续投入',
-      '核对冲突并调整项目范围',
       '整理给负责人看的决策简报',
+      '核对冲突并调整项目范围',
     ])
     expect(stage?.methods.every(method => method.content.startsWith('# '))).toBe(true)
     expect(stage?.methods.map(method => method.id)).toEqual([
+      QUALIFY_AI_WORKFLOW_SKILL.name,
       FDE_ORIENT_SKILL.name,
       KNOWLEDGE_INTERVIEW_SKILL.name,
       OWNERSHIP_MAP_SKILL.name,
       REPO_RECON_SKILL.name,
-      QUALIFY_AI_WORKFLOW_SKILL.name,
-      REFRAME_AI_ENGAGEMENT_SKILL.name,
       STAKEHOLDER_BRIEF_SKILL.name,
+      REFRAME_AI_ENGAGEMENT_SKILL.name,
+    ])
+    expect(stage?.methods.map(method => method.role)).toEqual([
+      'core', 'engineering', 'engineering', 'engineering', 'engineering', 'engineering', 'conditional',
     ])
   })
 
@@ -396,11 +399,18 @@ describe('project-stage route', () => {
     await handler(request({}, 'GET'), ok.value)
     const snapshot = ok.snapshot()
     expect(snapshot).toMatchObject({ status: 200, body: { ok: true, value: { schemaVersion: 1 } } })
-    const body = snapshot.body as { value: { stages: { id: string; methods: { id: string }[] }[] } }
+    const body = snapshot.body as { value: { stages: { id: string; methods: StageSkillCatalogMethod[] }[] } }
     expect(body.value.stages).toHaveLength(8)
     expect(body.value.stages[0]).toMatchObject({ id: 'requirements' })
     expect(body.value.stages[0]?.methods).toHaveLength(7)
-    expect(body.value.stages[0]?.methods[0]?.id).toBe('fde-orient')
+    expect(body.value.stages[0]?.methods[0]).toMatchObject({
+      id: 'qualify-ai-workflow', role: 'core', group: 'required', license: 'Apache-2.0',
+    })
+    expect(body.value.stages[0]?.methods[0]?.answers).toHaveLength(7)
+    expect(body.value.stages[0]?.methods[0]?.workflow).toHaveLength(8)
+    expect(body.value.stages[0]?.methods[0]?.collaborators).toHaveLength(6)
+    expect(body.value.stages[0]?.methods[0]?.references).toHaveLength(10)
+    expect(body.value.stages[0]?.methods[0]?.example?.steps).toHaveLength(3)
     expect(body.value.stages.slice(1).map(stage => stage.id)).toEqual([
       'definition', 'investigation', 'design', 'evaluation', 'pilot', 'production', 'improvement',
     ])

@@ -2213,6 +2213,14 @@
   transition: background-color 140ms ease, color 140ms ease, transform 140ms cubic-bezier(.23, 1, .32, 1);
 }
 
+.stageMethodItem[data-role='core'] {
+  background: color-mix(in srgb, var(--dsw-alias-state-business-tertiary) 74%, transparent);
+  color: var(--dsw-alias-state-business-primary);
+}
+
+.stageMethodItem[data-role='core'] > span { font-weight: 750; }
+.stageMethodItem[data-role='conditional'] { color: var(--dsw-alias-state-warning-primary); }
+
 .stageMethodItem:active { transform: scale(.98); }
 
 .stageMethodItem:hover {
@@ -2332,23 +2340,55 @@
 .stageMethodDialog > header {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 24px;
-  padding: 28px 30px 24px;
+  gap: 14px 24px;
+  padding: 22px 28px 0;
   border-bottom: 1px solid var(--dsw-alias-border-l2);
 }
 
-.stageMethodDialog > header > div { display: grid; gap: 8px; }
-.stageMethodDialog > header span,
+.stageMethodDialogHeading { display: grid; gap: 7px; }
+.stageMethodDialogEyebrow { display: flex; align-items: center; gap: 8px; }
+.stageMethodDialogEyebrow > span,
 .stageMethodDialogBody > section > span {
   color: var(--dsw-alias-state-business-primary);
   font-size: 12px;
   font-weight: 650;
 }
 
+.stageMethodDialogEyebrow > span {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--dsw-alias-state-business-tertiary);
+}
+
+.stageMethodDialogEyebrow > span[data-role='conditional'] {
+  color: var(--dsw-alias-state-warning-primary);
+  background: var(--dsw-alias-state-warning-tertiary);
+}
+
+.stageMethodDialogEyebrow > span[data-role='engineering'] {
+  color: var(--dsw-alias-label-secondary);
+  background: var(--dsw-alias-bg-layer-2);
+}
+
+.stageMethodDialogEyebrow > b {
+  color: var(--dsw-alias-label-caption);
+  font-size: 11px;
+  font-weight: 600;
+}
+
 .stageMethodDialog h2 {
   margin: 0;
   font-size: 25px;
   line-height: 1.25;
+}
+
+.stageMethodDialogHeading > code {
+  justify-self: start;
+  padding: 3px 7px;
+  border-radius: 6px;
+  color: var(--dsw-alias-label-secondary);
+  background: var(--dsw-alias-bg-layer-2);
+  font-size: 11px;
 }
 
 .stageMethodDialog header p {
@@ -2376,13 +2416,55 @@
 .stageMethodDialog > header > button:hover { background: var(--dsw-alias-state-business-tertiary); }
 .stageMethodDialog > header > button:active { transform: scale(.96); }
 
-.stageMethodDialogBody {
-  display: grid;
-  align-content: start;
-  gap: 24px;
-  overflow: auto;
-  padding: 26px 30px 40px;
+.stageMethodTabs {
+  display: flex;
+  grid-column: 1 / -1;
+  gap: 18px;
+  min-width: 0;
+  overflow-x: auto;
 }
+
+.stageMethodTabs button {
+  position: relative;
+  min-height: 42px;
+  flex: 0 0 auto;
+  padding: 0 1px;
+  border: 0;
+  background: transparent;
+  color: var(--dsw-alias-label-tertiary);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 560;
+}
+
+.stageMethodTabs button[aria-current='page'] {
+  color: var(--dsw-alias-state-business-primary);
+  font-weight: 700;
+}
+
+.stageMethodTabs button[aria-current='page']::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  border-radius: 999px 999px 0 0;
+  background: var(--dsw-alias-state-business-primary);
+  content: '';
+}
+
+.stageMethodTabs button:active { transform: scale(.97); }
+
+.stageMethodDialogBody {
+  overflow: auto;
+  padding: 22px 28px 40px;
+}
+
+.stageMethodOverview,
+.stageMethodOrchestration,
+.stageMethodExample,
+.stageMethodReferences,
+.stageMethodDefinitionTab { display: grid; align-content: start; gap: 20px; }
 
 .stageMethodUsage {
   display: grid;
@@ -2400,7 +2482,170 @@
   line-height: 1.65;
 }
 
+.stageMethodAnswers,
+.stageMethodArtifacts,
+.stageMethodWorkflow,
+.stageMethodCollaborators,
+.stageMethodReferences > section { display: grid; gap: 12px; }
+
+.stageMethodAnswers > header,
+.stageMethodArtifacts > header,
+.stageMethodWorkflow > header,
+.stageMethodCollaborators > header,
+.stageMethodExample > header,
+.stageMethodReferences > header { display: grid; gap: 4px; }
+
+.stageMethodAnswers header > span,
+.stageMethodArtifacts header > span,
+.stageMethodWorkflow header > span,
+.stageMethodCollaborators header > span,
+.stageMethodExample > header > span,
+.stageMethodReferences > header > span {
+  color: var(--dsw-alias-state-business-primary);
+  font-size: 11px;
+  font-weight: 720;
+  letter-spacing: .06em;
+}
+
+.stageMethodAnswers h3,
+.stageMethodArtifacts h3,
+.stageMethodWorkflow h3,
+.stageMethodCollaborators h3,
+.stageMethodExample h3,
+.stageMethodReferences h3 { margin: 0; font-size: 18px; line-height: 1.35; }
+
+.stageMethodAnswers ol {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stageMethodAnswers li {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  align-items: start;
+  gap: 9px;
+  min-height: 58px;
+  padding: 11px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 10px;
+  background: var(--dsw-alias-bg-layer-1);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.stageMethodAnswers li > i {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border-radius: 8px;
+  color: var(--dsw-alias-state-business-primary);
+  background: var(--dsw-alias-state-business-tertiary);
+  font-family: var(--ds-font-family-code);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 750;
+}
+
+.stageMethodArtifacts > div { display: grid; gap: 8px; }
+.stageMethodArtifacts article {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 11px;
+  padding: 12px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 10px;
+  background: var(--dsw-alias-bg-layer-1);
+}
+.stageMethodArtifacts article > i { display: grid; width: 32px; height: 32px; place-items: center; border-radius: 9px; color: var(--dsw-alias-state-business-primary); background: var(--dsw-alias-state-business-tertiary); font-style: normal; font-weight: 750; }
+.stageMethodArtifacts article > span { display: grid; min-width: 0; gap: 3px; }
+.stageMethodArtifacts article strong { font-size: 14px; }
+.stageMethodArtifacts article small { color: var(--dsw-alias-label-secondary); font-size: 12px; line-height: 1.45; }
+.stageMethodArtifacts article code { overflow: hidden; color: var(--dsw-alias-label-caption); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.stageMethodArtifacts article > b { padding: 3px 7px; border-radius: 999px; color: var(--dsw-alias-state-success-primary); background: var(--dsw-alias-state-success-tertiary); font-size: 10px; }
+.stageMethodArtifacts article:not([data-required='true']) > b { color: var(--dsw-alias-label-secondary); background: var(--dsw-alias-bg-layer-2); }
+
+.stageMethodSimpleOverview { display: grid; gap: 9px; padding: 16px 18px; border: 1px solid var(--dsw-alias-border-l2); border-radius: 12px; background: var(--dsw-alias-bg-layer-1); }
+.stageMethodSimpleOverview > span { color: var(--dsw-alias-state-business-primary); font-size: 12px; font-weight: 700; }
+.stageMethodSimpleOverview p { margin: 0; color: var(--dsw-alias-label-secondary); font-size: 14px; line-height: 1.65; }
+
+.stageMethodDriver { display: grid; gap: 5px; padding: 16px 18px; border: 1px solid color-mix(in srgb, var(--dsw-alias-state-business-primary) 28%, var(--dsw-alias-border-l2)); border-radius: 12px; background: linear-gradient(135deg, var(--dsw-alias-state-business-tertiary), var(--dsw-alias-bg-layer-1)); }
+.stageMethodDriver > span { color: var(--dsw-alias-state-business-primary); font-size: 11px; font-weight: 720; }
+.stageMethodDriver > strong { font-size: 18px; }
+.stageMethodDriver > code { justify-self: start; color: var(--dsw-alias-label-secondary); font-size: 11px; }
+.stageMethodDriver > p { margin: 4px 0 0; color: var(--dsw-alias-label-secondary); font-size: 13px; line-height: 1.55; }
+
+.stageMethodWorkflow ol { display: grid; margin: 0; padding: 0; list-style: none; }
+.stageMethodWorkflow li { position: relative; display: grid; min-height: 42px; grid-template-columns: 28px minmax(0, 1fr); align-items: center; gap: 10px; padding-bottom: 8px; font-size: 13px; }
+.stageMethodWorkflow li:not(:last-child)::before { position: absolute; top: 27px; bottom: -1px; left: 13px; width: 1px; background: var(--dsw-alias-border-l2); content: ''; }
+.stageMethodWorkflow li > i { display: grid; position: relative; z-index: 1; width: 27px; height: 27px; place-items: center; border: 1px solid color-mix(in srgb, var(--dsw-alias-state-business-primary) 35%, var(--dsw-alias-border-l2)); border-radius: 50%; color: var(--dsw-alias-state-business-primary); background: var(--dsw-alias-bg-layer-1); font-style: normal; font-weight: 720; }
+
+.stageMethodCollaborators > div { display: grid; gap: 8px; }
+.stageMethodCollaborators button {
+  display: grid;
+  grid-template-columns: minmax(150px, .8fr) minmax(150px, 1fr) minmax(150px, 1fr) 18px;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 12px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 10px;
+  background: var(--dsw-alias-bg-layer-1);
+  color: var(--dsw-alias-label-primary);
+  font: inherit;
+  text-align: left;
+  transition: border-color 140ms ease, background-color 140ms ease, transform 140ms cubic-bezier(.23, 1, .32, 1);
+}
+.stageMethodCollaborators button[data-role='conditional'] { border-color: color-mix(in srgb, var(--dsw-alias-state-warning-primary) 34%, var(--dsw-alias-border-l2)); background: color-mix(in srgb, var(--dsw-alias-state-warning-tertiary) 38%, var(--dsw-alias-bg-layer-1)); }
+.stageMethodCollaborators button > span { display: grid; min-width: 0; gap: 3px; }
+.stageMethodCollaborators button > span > i { justify-self: start; color: var(--dsw-alias-state-business-primary); font-size: 10px; font-style: normal; font-weight: 680; }
+.stageMethodCollaborators button[data-role='conditional'] > span > i { color: var(--dsw-alias-state-warning-primary); }
+.stageMethodCollaborators button strong { overflow: hidden; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.stageMethodCollaborators button code { overflow: hidden; color: var(--dsw-alias-label-caption); font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.stageMethodCollaborators button small { color: var(--dsw-alias-label-caption); font-size: 10px; }
+.stageMethodCollaborators button b { overflow: hidden; font-size: 11px; font-weight: 560; line-height: 1.4; text-overflow: ellipsis; }
+.stageMethodCollaborators button em { color: var(--dsw-alias-state-business-primary); font-size: 17px; font-style: normal; }
+.stageMethodCollaborators button:active { transform: scale(.985); }
+
+.stageMethodExample > header { position: relative; padding: 16px 18px; border: 1px solid var(--dsw-alias-border-l2); border-radius: 12px; background: var(--dsw-alias-state-business-tertiary); }
+.stageMethodExample > header p { margin: 3px 0 0; color: var(--dsw-alias-label-secondary); font-size: 13px; line-height: 1.55; }
+.stageMethodExample > header > b { justify-self: start; margin-top: 7px; padding: 4px 8px; border-radius: 999px; color: var(--dsw-alias-label-secondary); background: var(--dsw-alias-bg-layer-1); font-size: 10px; }
+.stageMethodExample > ol { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.stageMethodExample > ol > li { position: relative; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; padding-bottom: 12px; }
+.stageMethodExample > ol > li:not(:last-child)::before { position: absolute; top: 30px; bottom: -1px; left: 16px; width: 1px; background: var(--dsw-alias-border-l2); content: ''; }
+.stageMethodExample > ol > li > i { display: grid; position: relative; z-index: 1; width: 32px; height: 32px; place-items: center; border-radius: 10px; color: #fff; background: var(--dsw-alias-state-business-primary); font-style: normal; font-weight: 750; }
+.stageMethodExample article { display: grid; gap: 7px; padding: 13px 14px; border: 1px solid var(--dsw-alias-border-l2); border-radius: 11px; background: var(--dsw-alias-bg-layer-1); }
+.stageMethodExample article > span { color: var(--dsw-alias-state-business-primary); font-size: 10px; font-weight: 720; }
+.stageMethodExample article h4 { margin: 0; font-size: 14px; line-height: 1.45; }
+.stageMethodExample article p { margin: 0; color: var(--dsw-alias-label-secondary); font-size: 12px; line-height: 1.55; }
+.stageMethodExample article > div { display: flex; flex-wrap: wrap; gap: 5px; }
+.stageMethodExample article > div b { padding: 3px 7px; border-radius: 999px; color: var(--dsw-alias-state-business-primary); background: var(--dsw-alias-state-business-tertiary); font-size: 10px; }
+.stageMethodExample article footer { padding-top: 7px; border-top: 1px solid var(--dsw-alias-border-l2); color: var(--dsw-alias-label-caption); font-size: 11px; }
+.stageMethodExample article footer strong { color: var(--dsw-alias-label-primary); }
+
+.stageMethodReferences > header p { margin: 0; color: var(--dsw-alias-label-secondary); font-size: 13px; line-height: 1.55; }
+.stageMethodReferences > section > header { display: flex; align-items: center; justify-content: space-between; }
+.stageMethodReferences > section h4 { margin: 0; font-size: 14px; }
+.stageMethodReferences > section > header b { color: var(--dsw-alias-label-caption); font-size: 11px; }
+.stageMethodReferences > section > div { display: grid; gap: 7px; }
+.stageMethodReferences a { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; align-items: center; gap: 11px; padding: 10px 12px; border: 1px solid var(--dsw-alias-border-l2); border-radius: 10px; color: inherit; background: var(--dsw-alias-bg-layer-1); text-decoration: none; transition: border-color 140ms ease, background-color 140ms ease, transform 140ms cubic-bezier(.23, 1, .32, 1); }
+.stageMethodReferences a > span { display: grid; min-width: 0; gap: 2px; }
+.stageMethodReferences a strong { font-size: 13px; }
+.stageMethodReferences a small { color: var(--dsw-alias-label-secondary); font-size: 11px; }
+.stageMethodReferences a code { overflow: hidden; color: var(--dsw-alias-label-caption); font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.stageMethodReferences a em { color: var(--dsw-alias-state-business-primary); font-size: 11px; font-style: normal; font-weight: 650; white-space: nowrap; }
+.stageMethodReferences a:active { transform: scale(.985); }
+.methodReferenceIcon { width: 30px; height: 30px; padding: 5px; box-sizing: border-box; border-radius: 8px; color: var(--dsw-alias-state-business-primary); background: var(--dsw-alias-state-business-tertiary); stroke: currentcolor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.6; }
+.methodReferenceIcon[data-kind='json'] { color: var(--dsw-alias-state-warning-primary); background: var(--dsw-alias-state-warning-tertiary); }
+.methodReferenceIcon[data-kind='pattern'],
+.methodReferenceIcon[data-kind='catalog'] { color: var(--dsw-alias-state-success-primary); background: var(--dsw-alias-state-success-tertiary); }
+
 .stageMethodDefinition { display: grid; gap: 14px; }
+.stageMethodDefinition > span { color: var(--dsw-alias-state-business-primary); font-size: 12px; font-weight: 700; }
 .stageMethodDefinition > div { font-size: 14px; line-height: 1.7; }
 
 .stageMethodTechnical {
@@ -2416,6 +2661,19 @@
 .stageMethodTechnical dl > div { display: grid; grid-template-columns: 80px minmax(0, 1fr); gap: 12px; }
 .stageMethodTechnical dt { color: var(--dsw-alias-label-caption); }
 .stageMethodTechnical dd { min-width: 0; margin: 0; overflow-wrap: anywhere; }
+.stageMethodTechnical > a { display: inline-flex; margin-top: 12px; color: var(--dsw-alias-state-business-primary); font-size: 12px; font-weight: 650; text-decoration: none; }
+
+@media (hover: hover) and (pointer: fine) {
+  .stageMethodCollaborators button:hover,
+  .stageMethodReferences a:hover { border-color: color-mix(in srgb, var(--dsw-alias-state-business-primary) 42%, var(--dsw-alias-border-l2)); background: var(--dsw-alias-state-business-tertiary); }
+}
+
+@media (max-width: 720px) {
+  .stageMethodAnswers ol { grid-template-columns: 1fr; }
+  .stageMethodCollaborators button { grid-template-columns: 1fr 18px; }
+  .stageMethodCollaborators button > span:not(:first-child) { grid-column: 1 / -1; }
+  .stageMethodCollaborators button > em { grid-column: 2; grid-row: 1; }
+}
 
 @keyframes stageMethodDrawerIn {
   from { opacity: 0; transform: translateX(18px); }
@@ -2425,6 +2683,8 @@
 @media (prefers-reduced-motion: reduce) {
   .stageMethodDialog { animation: none; }
   .stageMethodItem,
+  .stageMethodCollaborators button,
+  .stageMethodReferences a,
   .stageMethodDialog > header > button { transition: none; }
 }
 

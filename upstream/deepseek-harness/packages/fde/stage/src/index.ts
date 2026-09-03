@@ -73,6 +73,19 @@ export const inject = ['skills', 'storageDomain', 'systemPrompt', 'workspaceRegi
 
 const DISCOVERY_METHOD_SOURCE = 'davidahmann/fde-guide@060ef0f3b67743b2e1fc3705763d423eae980236'
 const DISCOVERY_ENGINEERING_SOURCE = 'rpraharaj/forward-deployed-engineer@ee045a66db5242617ccea9e5e33139a2980ab55e'
+const DISCOVERY_METHOD_COMMIT = '060ef0f3b67743b2e1fc3705763d423eae980236'
+const DISCOVERY_METHOD_URL = `https://github.com/davidahmann/fde-guide/blob/${DISCOVERY_METHOD_COMMIT}/.agents/skills/qualify-ai-workflow/SKILL.md`
+
+const discoveryReference = (
+  label: string,
+  path: string,
+  category: 'method' | 'artifact' | 'control',
+  kind: 'markdown' | 'json' | 'pattern' | 'catalog',
+  purpose: string,
+) => ({
+  label, path, category, kind, purpose,
+  url: `https://github.com/davidahmann/fde-guide/blob/${DISCOVERY_METHOD_COMMIT}/${path}`,
+})
 
 const DISCOVERY_STRUCTURED_OUTPUT_CONTRACT = `## 阶段 1 持久化合同
 
@@ -220,13 +233,72 @@ export const DISCOVERY_STAGE_SKILL_CATALOG = {
     id: 'requirements',
     index: 0,
     methods: [
-      { id: FDE_ORIENT_SKILL.name, label: '项目启动与方向确认', description: FDE_ORIENT_SKILL.description, whenToUse: FDE_ORIENT_SKILL.whenToUse, source: FDE_ORIENT_SKILL.source, content: FDE_ORIENT_SKILL.content },
-      { id: KNOWLEDGE_INTERVIEW_SKILL.name, label: '访谈业务人员，还原真实做法', description: KNOWLEDGE_INTERVIEW_SKILL.description, whenToUse: KNOWLEDGE_INTERVIEW_SKILL.whenToUse, source: KNOWLEDGE_INTERVIEW_SKILL.source, content: KNOWLEDGE_INTERVIEW_SKILL.content },
-      { id: OWNERSHIP_MAP_SKILL.name, label: '找到负责人和决策人', description: OWNERSHIP_MAP_SKILL.description, whenToUse: OWNERSHIP_MAP_SKILL.whenToUse, source: OWNERSHIP_MAP_SKILL.source, content: OWNERSHIP_MAP_SKILL.content },
-      { id: REPO_RECON_SKILL.name, label: '盘点现有系统与资料', description: REPO_RECON_SKILL.description, whenToUse: REPO_RECON_SKILL.whenToUse, source: REPO_RECON_SKILL.source, content: REPO_RECON_SKILL.content },
-      { id: QUALIFY_AI_WORKFLOW_SKILL.name, label: '判断问题是否值得继续投入', description: QUALIFY_AI_WORKFLOW_SKILL.description, whenToUse: QUALIFY_AI_WORKFLOW_SKILL.whenToUse, source: QUALIFY_AI_WORKFLOW_SKILL.source, content: QUALIFY_AI_WORKFLOW_SKILL.content },
-      { id: REFRAME_AI_ENGAGEMENT_SKILL.name, label: '核对冲突并调整项目范围', description: REFRAME_AI_ENGAGEMENT_SKILL.description, whenToUse: REFRAME_AI_ENGAGEMENT_SKILL.whenToUse, source: REFRAME_AI_ENGAGEMENT_SKILL.source, content: REFRAME_AI_ENGAGEMENT_SKILL.content },
-      { id: STAKEHOLDER_BRIEF_SKILL.name, label: '整理给负责人看的决策简报', description: STAKEHOLDER_BRIEF_SKILL.description, whenToUse: STAKEHOLDER_BRIEF_SKILL.whenToUse, source: STAKEHOLDER_BRIEF_SKILL.source, content: STAKEHOLDER_BRIEF_SKILL.content },
+      {
+        id: QUALIFY_AI_WORKFLOW_SKILL.name, label: '判断问题是否值得继续投入', role: 'core', group: 'required',
+        description: QUALIFY_AI_WORKFLOW_SKILL.description, whenToUse: QUALIFY_AI_WORKFLOW_SKILL.whenToUse,
+        source: QUALIFY_AI_WORKFLOW_SKILL.source, sourceUrl: DISCOVERY_METHOD_URL,
+        sourceLanguage: 'en', adapterLanguage: 'zh-CN', license: 'Apache-2.0', content: QUALIFY_AI_WORKFLOW_SKILL.content,
+        answers: [
+          '客户描述的是不是真实、稳定的业务流程？',
+          '谁实际执行流程，谁负责结果，谁有权决定？',
+          '正常路径和重要异常路径分别是什么？',
+          '当前问题有没有能够追溯的可信证据？',
+          '业务结果是什么，当前基线已经测量还是未知？',
+          '哪些风险要求收窄、暂缓或停止项目？',
+          '现有事实是否足以进入下一阶段的价值工程？',
+        ],
+        workflow: [
+          '保留客户原始说法和显式引用来源',
+          '寻找近期正常案例和重要异常案例',
+          '区分人员陈述、现场观察、系统行为和政策授权',
+          '补齐角色、基线、结果、回退和停止条件',
+          '判断当前最关键的证据缺口',
+          '根据缺口按需协同工程能力',
+          '形成候选工作流、阶段记录和候选建议',
+          '等待 FDE 作出 Go、Revise、Narrow 或 Stop 决定',
+        ],
+        artifacts: [
+          { label: '客户现状记录', path: 'fde-deliverables/01-requirement-research/requirement-research-report.md', purpose: '记录来源事实、代表案例、现场观察和未验证事项。', required: true },
+          { label: '待确认事项', path: 'fde-deliverables/01-requirement-research/confirmation-checklist.md', purpose: '区分待确认事实、已确认事实和决策权。', required: true },
+          { label: '业务流程说明', path: 'fde-deliverables/01-requirement-research/requirement-baseline.md', purpose: '记录候选工作流、业务结果、基线、边界和停止条件。', required: true },
+          { label: '项目调整记录', path: 'fde-deliverables/01-requirement-research/engagement-reframe.md', purpose: '仅在重大事实改变项目边界时形成。', required: false },
+        ],
+        collaborators: [
+          { id: FDE_ORIENT_SKILL.name, label: '建立项目定向', condition: '项目刚开始，或任务性质发生变化', contribution: '原始诉求、发起人、项目类型与调查顺序', role: 'engineering' },
+          { id: KNOWLEDGE_INTERVIEW_SKILL.name, label: '访谈业务人员，还原真实做法', condition: '文件和系统无法回答关键事实', contribution: '有来源的访谈事实、例外与未知项', role: 'engineering' },
+          { id: OWNERSHIP_MAP_SKILL.name, label: '找到负责人和决策人', condition: '负责人、验证者或批准人不清楚', contribution: '责任、维护和决策权候选', role: 'engineering' },
+          { id: REPO_RECON_SKILL.name, label: '盘点现有系统与资料', condition: '问题涉及已有系统、代码或数据', contribution: '系统入口、边界、集成和风险线索', role: 'engineering' },
+          { id: STAKEHOLDER_BRIEF_SKILL.name, label: '整理给负责人看的决策简报', condition: '当前证据已经足以请求一个决定', contribution: '建议、事实、风险和待决定事项', role: 'engineering' },
+          { id: REFRAME_AI_ENGAGEMENT_SKILL.name, label: '核对冲突并调整项目范围', condition: '目标、现场事实或政策授权发生重大冲突', contribution: '保留原始目标，形成可追溯的重新界定候选', role: 'conditional' },
+        ],
+        example: {
+          title: '智修协同：从自动派单到人工确认草稿',
+          summary: '展示核心方法如何逐步补齐事实，并在权限冲突出现后收窄候选边界。',
+          steps: [
+            { batch: '第一批', input: '客户原始简报：自动处理 80% 报修并自动派单', finding: '这只是发起人的目标，缺少代表案例、流程知情者和权限依据。', skills: ['资格判断', '项目定向'], output: '候选工作流与首轮待核对问题' },
+            { batch: '第二批', input: '聊天、工单、设备台账、政策和现场图片', finding: '重复工单、设备身份、合同约束和自动派单权限存在冲突。', skills: ['系统勘察', '责任映射'], output: '客户现状记录与待确认事项' },
+            { batch: '第三批', input: '流程知情者访谈与审批事实', finding: '区域经理、采购、财务和信息安全尚未批准自动派单。', skills: ['知识访谈', '重新界定'], output: '“建议＋人工确认工单草稿”的候选边界' },
+          ],
+        },
+        references: [
+          discoveryReference('现场参与与可问责重新界定', 'playbooks/00-field-engagement-and-reframing.md', 'method', 'markdown', '现场参与、问责和边界变化方法。'),
+          discoveryReference('AI 价值工程十二要素', 'library/14-twelve-factors-ai-value-engineering.md', 'method', 'markdown', '判断价值、责任、证据与风险的十二项因素。'),
+          discoveryReference('发现与价值方法', 'playbooks/01-discovery-and-value.md', 'method', 'markdown', '从发现到价值判断的完整方法。'),
+          discoveryReference('现场观察记录模板', 'templates/field-observation-log.md', 'artifact', 'markdown', '记录现场事实、案例和未知项。'),
+          discoveryReference('FDE 发现材料包', 'templates/fde-discovery-pack.md', 'artifact', 'markdown', '组织阶段发现材料和候选结论。'),
+          discoveryReference('项目重新界定模板', 'templates/engagement-reframe.json', 'artifact', 'json', '记录触发事实、原边界、新边界与决策人。'),
+          discoveryReference('工作流章程模板', 'templates/workflow-charter.json', 'artifact', 'json', '定义候选工作流、角色、结果和边界。'),
+          discoveryReference('数据准备度评估', 'templates/data-readiness-assessment.md', 'artifact', 'markdown', '检查数据来源、质量、访问和使用边界。'),
+          discoveryReference('业务流程模式索引', 'solutions/business-flows/README.md', 'control', 'pattern', '浏览可参考的业务流程模式。'),
+          discoveryReference('控制规则目录', 'controls/control-catalog.json', 'control', 'catalog', '查看方法涉及的 FDE、VAL 与 CTX 控制项。'),
+        ],
+      },
+      { id: FDE_ORIENT_SKILL.name, label: '项目启动与方向确认', role: 'engineering', group: 'required', description: FDE_ORIENT_SKILL.description, whenToUse: FDE_ORIENT_SKILL.whenToUse, source: FDE_ORIENT_SKILL.source, content: FDE_ORIENT_SKILL.content },
+      { id: KNOWLEDGE_INTERVIEW_SKILL.name, label: '访谈业务人员，还原真实做法', role: 'engineering', group: 'required', description: KNOWLEDGE_INTERVIEW_SKILL.description, whenToUse: KNOWLEDGE_INTERVIEW_SKILL.whenToUse, source: KNOWLEDGE_INTERVIEW_SKILL.source, content: KNOWLEDGE_INTERVIEW_SKILL.content },
+      { id: OWNERSHIP_MAP_SKILL.name, label: '找到负责人和决策人', role: 'engineering', group: 'required', description: OWNERSHIP_MAP_SKILL.description, whenToUse: OWNERSHIP_MAP_SKILL.whenToUse, source: OWNERSHIP_MAP_SKILL.source, content: OWNERSHIP_MAP_SKILL.content },
+      { id: REPO_RECON_SKILL.name, label: '盘点现有系统与资料', role: 'engineering', group: 'required', description: REPO_RECON_SKILL.description, whenToUse: REPO_RECON_SKILL.whenToUse, source: REPO_RECON_SKILL.source, content: REPO_RECON_SKILL.content },
+      { id: STAKEHOLDER_BRIEF_SKILL.name, label: '整理给负责人看的决策简报', role: 'engineering', group: 'required', description: STAKEHOLDER_BRIEF_SKILL.description, whenToUse: STAKEHOLDER_BRIEF_SKILL.whenToUse, source: STAKEHOLDER_BRIEF_SKILL.source, content: STAKEHOLDER_BRIEF_SKILL.content },
+      { id: REFRAME_AI_ENGAGEMENT_SKILL.name, label: '核对冲突并调整项目范围', role: 'conditional', group: 'conditional', description: REFRAME_AI_ENGAGEMENT_SKILL.description, whenToUse: REFRAME_AI_ENGAGEMENT_SKILL.whenToUse, source: REFRAME_AI_ENGAGEMENT_SKILL.source, content: REFRAME_AI_ENGAGEMENT_SKILL.content },
     ],
   }, {
     id: 'definition',

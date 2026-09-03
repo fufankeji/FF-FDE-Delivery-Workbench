@@ -1,11 +1,11 @@
 /** Project-local sidebar: stage orientation and scoped project actions only. */
 
-import { MarkdownText } from '@deepseek-ai/dsh-client-ui-primitives'
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { FDE_V2_STAGE_IDS, type FdeProjectState } from './stage-controller.ts'
 import { fetchStageSkillCatalog, type StageSkillCatalogMethod } from './stage-skill-catalog.ts'
 import type { ProjectContextSidebarProps } from './slots.ts'
+import { StageMethodDialog } from './StageMethodDialog.tsx'
 import { V2_STAGE_NAMES } from './StageWorkbench.tsx'
 import css from './StageWorkbench.module.css'
 
@@ -104,7 +104,7 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
   }
 
   const renderMethod = (method: StageSkillCatalogMethod, methodIndex: number) => (
-    <button key={method.id} type="button" className={css.stageMethodItem} onClick={() => { setSelectedMethod(method) }}>
+    <button key={method.id} type="button" className={css.stageMethodItem} data-role={method.role} onClick={() => { setSelectedMethod(method) }}>
       <span>{String(methodIndex + 1).padStart(2, '0')}</span>
       <strong>{method.label}</strong>
       <svg aria-hidden="true" viewBox="0 0 16 16"><path d="m5.5 3 5 5-5 5" /></svg>
@@ -217,37 +217,14 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
       </nav>
 
       {selectedMethod !== undefined && typeof document !== 'undefined' && createPortal(
-        <div
-          className={css.stageMethodDialogLayer}
-          role="presentation"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) setSelectedMethod(undefined)
-          }}
-        >
-          <section className={css.stageMethodDialog} role="dialog" aria-modal="true" aria-labelledby="stage-method-title">
-            <header>
-              <div><span>第 {String(viewed + 1)} 阶段 · 工作方法</span><h2 id="stage-method-title">{selectedMethod.label}</h2><p>{selectedMethod.description}</p></div>
-              <button type="button" aria-label="关闭工作方法详情" onClick={() => { setSelectedMethod(undefined) }}>×</button>
-            </header>
-            <div className={css.stageMethodDialogBody}>
-              <section className={css.stageMethodUsage}>
-                <span>什么时候会用</span>
-                <p>{selectedMethod.whenToUse}</p>
-              </section>
-              <section className={css.stageMethodDefinition}>
-                <span>完整方法定义</span>
-                <MarkdownText text={selectedMethod.content} />
-              </section>
-              <details className={css.stageMethodTechnical}>
-                <summary>技术信息</summary>
-                <dl>
-                  <div><dt>Skill</dt><dd><code>{selectedMethod.id}</code></dd></div>
-                  <div><dt>固定来源</dt><dd><code>{selectedMethod.source}</code></dd></div>
-                </dl>
-              </details>
-            </div>
-          </section>
-        </div>,
+        <StageMethodDialog
+          key={selectedMethod.id}
+          method={selectedMethod}
+          methods={catalogState.status === 'ready' ? catalogState.methods : []}
+          stageIndex={viewed}
+          onClose={() => { setSelectedMethod(undefined) }}
+          onSelectMethod={setSelectedMethod}
+        />,
         document.body,
       )}
     </aside>

@@ -37,6 +37,45 @@ export interface StageSkillCatalogMethod {
   readonly source: string
   readonly content: string
   readonly group?: 'required' | 'conditional'
+  readonly role?: 'core' | 'conditional' | 'engineering'
+  readonly answers?: readonly string[]
+  readonly workflow?: readonly string[]
+  readonly artifacts?: readonly {
+    readonly label: string
+    readonly path: string
+    readonly purpose: string
+    readonly required: boolean
+  }[]
+  readonly collaborators?: readonly {
+    readonly id: string
+    readonly label: string
+    readonly condition: string
+    readonly contribution: string
+    readonly role: 'engineering' | 'conditional'
+  }[]
+  readonly example?: {
+    readonly title: string
+    readonly summary: string
+    readonly steps: readonly {
+      readonly batch: string
+      readonly input: string
+      readonly finding: string
+      readonly skills: readonly string[]
+      readonly output: string
+    }[]
+  }
+  readonly references?: readonly {
+    readonly label: string
+    readonly path: string
+    readonly category: 'method' | 'artifact' | 'control'
+    readonly kind: 'markdown' | 'json' | 'pattern' | 'catalog'
+    readonly purpose: string
+    readonly url: string
+  }[]
+  readonly sourceUrl?: string
+  readonly sourceLanguage?: 'en'
+  readonly adapterLanguage?: 'zh-CN'
+  readonly license?: string
 }
 
 /** Browser-safe catalog of methods that the FDE stage plugin actually registers. */

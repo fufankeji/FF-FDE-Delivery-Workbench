@@ -12,6 +12,53 @@ export interface StageSkillCatalogMethod {
   readonly source: string
   readonly content: string
   readonly group?: 'required' | 'conditional'
+  readonly role?: 'core' | 'conditional' | 'engineering'
+  readonly answers?: readonly string[]
+  readonly workflow?: readonly string[]
+  readonly artifacts?: readonly StageSkillCatalogArtifact[]
+  readonly collaborators?: readonly StageSkillCatalogCollaborator[]
+  readonly example?: StageSkillCatalogExample
+  readonly references?: readonly StageSkillCatalogReference[]
+  readonly sourceUrl?: string
+  readonly sourceLanguage?: 'en'
+  readonly adapterLanguage?: 'zh-CN'
+  readonly license?: string
+}
+
+export interface StageSkillCatalogArtifact {
+  readonly label: string
+  readonly path: string
+  readonly purpose: string
+  readonly required: boolean
+}
+
+export interface StageSkillCatalogCollaborator {
+  readonly id: string
+  readonly label: string
+  readonly condition: string
+  readonly contribution: string
+  readonly role: 'engineering' | 'conditional'
+}
+
+export interface StageSkillCatalogExample {
+  readonly title: string
+  readonly summary: string
+  readonly steps: readonly {
+    readonly batch: string
+    readonly input: string
+    readonly finding: string
+    readonly skills: readonly string[]
+    readonly output: string
+  }[]
+}
+
+export interface StageSkillCatalogReference {
+  readonly label: string
+  readonly path: string
+  readonly category: 'method' | 'artifact' | 'control'
+  readonly kind: 'markdown' | 'json' | 'pattern' | 'catalog'
+  readonly purpose: string
+  readonly url: string
 }
 
 /** One stage and the methods that the product actually registers for it. */
@@ -31,12 +78,61 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.trim() !== ''
+}
+
+function isStringArray(value: unknown): value is readonly string[] {
+  return Array.isArray(value) && value.every(isNonEmptyString)
+}
+
+function isArtifact(value: unknown): value is StageSkillCatalogArtifact {
+  return isRecord(value)
+    && ['label', 'path', 'purpose'].every(key => isNonEmptyString(value[key]))
+    && typeof value.required === 'boolean'
+}
+
+function isCollaborator(value: unknown): value is StageSkillCatalogCollaborator {
+  return isRecord(value)
+    && ['id', 'label', 'condition', 'contribution'].every(key => isNonEmptyString(value[key]))
+    && (value.role === 'engineering' || value.role === 'conditional')
+}
+
+function isExample(value: unknown): value is StageSkillCatalogExample {
+  return isRecord(value)
+    && isNonEmptyString(value.title)
+    && isNonEmptyString(value.summary)
+    && Array.isArray(value.steps)
+    && value.steps.every(step => isRecord(step)
+      && ['batch', 'input', 'finding', 'output'].every(key => isNonEmptyString(step[key]))
+      && isStringArray(step.skills))
+}
+
+function isReference(value: unknown): value is StageSkillCatalogReference {
+  return isRecord(value)
+    && ['label', 'path', 'purpose', 'url'].every(key => isNonEmptyString(value[key]))
+    && (value.category === 'method' || value.category === 'artifact' || value.category === 'control')
+    && (value.kind === 'markdown' || value.kind === 'json' || value.kind === 'pattern' || value.kind === 'catalog')
+}
+
 function isMethod(value: unknown): value is StageSkillCatalogMethod {
   if (!isRecord(value)) return false
   const group = value.group
+  const role = value.role
   return ['id', 'label', 'description', 'whenToUse', 'source', 'content']
-    .every(key => typeof value[key] === 'string' && value[key].trim() !== '')
+    .every(key => isNonEmptyString(value[key]))
     && (group === undefined || group === 'required' || group === 'conditional')
+    && (role === undefined || role === 'core' || role === 'conditional' || role === 'engineering')
+    && (value.answers === undefined || isStringArray(value.answers))
+    && (value.workflow === undefined || isStringArray(value.workflow))
+    && (value.artifacts === undefined || (Array.isArray(value.artifacts) && value.artifacts.every(isArtifact)))
+    && (value.collaborators === undefined || (Array.isArray(value.collaborators) && value.collaborators.every(isCollaborator)))
+    && (value.example === undefined || isExample(value.example))
+    && (value.references === undefined || (Array.isArray(value.references) && value.references.every(isReference)))
+    && (value.sourceUrl === undefined || isNonEmptyString(value.sourceUrl))
+    && (value.sourceLanguage === undefined || value.sourceLanguage === 'en')
+    && (value.adapterLanguage === undefined || value.adapterLanguage === 'zh-CN')
+    && (value.license === undefined || isNonEmptyString(value.license))
 }
 
 function isStage(value: unknown): value is StageSkillCatalogStage {
