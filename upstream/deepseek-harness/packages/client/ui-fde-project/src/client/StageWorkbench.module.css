@@ -2397,7 +2397,7 @@
   min-height: 0;
   margin: 0 auto;
   grid-template-columns: minmax(0, 2.18fr) minmax(320px, 1fr);
-  grid-template-rows: 207px 287px auto;
+  grid-template-rows: 207px 287px 257px;
   align-content: start;
   align-items: start;
   column-gap: 14px;
@@ -2412,15 +2412,26 @@
   grid-column: 1 / -1;
   grid-row: 1;
   height: 207px;
-  overflow: hidden;
-  border-color: rgba(75, 119, 233, .42);
+  overflow: visible;
+  border-color: transparent;
+  border-radius: 16px;
+  background: transparent;
+  box-shadow: none;
+  color: #fff;
+}
+
+.genericStageRoot[data-stage='definition'] .stageOverview::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0 0 10px;
+  border: 1px solid rgba(75, 119, 233, .42);
   border-radius: 16px;
   background:
     radial-gradient(circle at 76% 22%, rgba(45, 139, 255, .26), transparent 23%),
     radial-gradient(circle at 95% 50%, rgba(0, 227, 216, .15), transparent 24%),
     linear-gradient(112deg, #071c49 0%, #061331 48%, #06183f 100%);
   box-shadow: 0 12px 28px rgba(18, 52, 116, .16);
-  color: #fff;
+  content: '';
 }
 
 .genericStageRoot[data-stage='definition'] .stageIntro {
@@ -2527,34 +2538,37 @@
   position: absolute;
   right: 39px;
   bottom: 0;
-  left: 39px;
+  left: 37px;
   z-index: 3;
   height: 64px;
   box-sizing: border-box;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   margin: 0;
-  padding: 9px 235px 7px 22px;
+  padding: 7px 235px 5px 22px;
   border: 1px solid rgba(220, 228, 242, .94);
-  border-radius: 16px 16px 0 0;
+  border-radius: 16px;
   background: rgba(255, 255, 255, .98);
   box-shadow: 0 -6px 20px rgba(22, 44, 89, .09);
 }
 
 .genericStageRoot[data-stage='definition'] .workPath::before,
-.genericStageRoot[data-stage='definition'] .workPath::after { top: 22px; }
+.genericStageRoot[data-stage='definition'] .workPath::after { top: 19px; }
 
-.genericStageRoot[data-stage='definition'] .workPath li { grid-template-rows: 28px auto; gap: 1px; padding: 0 5px; }
-.genericStageRoot[data-stage='definition'] .workPath i { width: 27px; height: 27px; box-shadow: 0 0 0 3px #fff; }
-.genericStageRoot[data-stage='definition'] .workPath li > span { min-height: 25px; padding: 1px 5px; }
-.genericStageRoot[data-stage='definition'] .workPath strong { font-size: 11.5px; }
-.genericStageRoot[data-stage='definition'] .workPath small { font-size: 9.5px; }
+.genericStageRoot[data-stage='definition'] .workPath li { grid-template-rows: 25px 24px; gap: 0; padding: 0 5px; }
+.genericStageRoot[data-stage='definition'] .workPath i { width: 24px; height: 24px; box-shadow: 0 0 0 3px #fff; }
+.genericStageRoot[data-stage='definition'] .workPath li[data-status='current'] i { border: 2px solid #14b866; background: #fff; color: #14b866; font-size: 8px; }
+.genericStageRoot[data-stage='definition'] .workPath li[data-status='current'] > span { background: transparent; }
+.genericStageRoot[data-stage='definition'] .workPath li > span { min-height: 0; gap: 0; padding: 0 5px; }
+.genericStageRoot[data-stage='definition'] .workPath strong { font-size: 11.5px; line-height: 1.15; }
+.genericStageRoot[data-stage='definition'] .workPath small { font-size: 9.5px; line-height: 1.15; }
 
 .genericStageRoot[data-stage='definition'] .currentWork {
+  position: relative;
   grid-column: 1;
   grid-row: 2;
   box-sizing: border-box;
   height: 287px;
-  padding: 19px 23px;
+  padding: 13px 23px 16px;
   border: 1px solid #d7e2f5;
   border-left: 6px solid #1473ff;
   border-radius: 15px;
@@ -2562,18 +2576,34 @@
   box-shadow: 0 12px 30px rgba(35, 78, 154, .09);
 }
 
-.genericStageRoot[data-stage='definition'] .currentWork h2 { margin-top: 5px; font-size: 22px; }
-.genericStageRoot[data-stage='definition'] .currentWork > p { font-size: 12.5px; }
+.genericStageRoot[data-stage='definition'] .currentWork h2 { margin: 3px 0 3px; font-size: 20px; }
+.genericStageRoot[data-stage='definition'] .currentWork > p { font-size: 12.5px; line-height: 1.45; }
 .genericStageRoot[data-stage='definition'] .promptGuide {
-  margin-top: 12px;
-  padding: 11px 15px;
+  position: relative;
+  grid-template-columns: 48px minmax(0, 1fr);
+  column-gap: 10px;
+  margin-top: 8px;
+  min-height: 140px;
+  padding: 10px 60px 9px 10px;
   border-left-width: 0;
   border-radius: 10px;
   background: linear-gradient(135deg, #eff5ff, #f7faff);
 }
-.genericStageRoot[data-stage='definition'] .promptGuide span { color: #1563d8; font-weight: 700; }
-.genericStageRoot[data-stage='definition'] .promptGuide strong { font-size: 12.5px; line-height: 1.45; }
-.genericStageRoot[data-stage='definition'] .workActions { margin-top: 8px; }
+.promptGuideCopy { display: grid; min-width: 0; gap: 4px; }
+.genericStageRoot[data-stage='definition'] .promptGuideCopy > span { color: #075fe0; font-weight: 700; }
+.genericStageRoot[data-stage='definition'] .promptGuideCopy > strong { font-size: 12.5px; line-height: 1.45; }
+.genericStageRoot[data-stage='definition'] .promptGuideCopy > small { color: #a2abbd; }
+.genericStageRoot[data-stage='definition'] .promptGuideCopy mark { justify-self: start; padding: 2px 8px; border-radius: 999px; background: #dceaff; color: #0961dd; font-size: 10px; font-weight: 700; }
+.promptSparkleIcon { box-sizing: border-box; width: 42px; height: 42px; align-self: start; padding: 7px; border-radius: 9px; background: #e7f0ff; color: #0c66ff; }
+.promptSparkleAccent { position: absolute; top: 18px; right: 15px; color: #c9d9ff; font-size: 20px; font-style: normal; }
+.genericStageRoot[data-stage='definition'] .workActions { position: absolute; right: 23px; bottom: 9px; left: 23px; gap: 10px; margin-top: 0; }
+.genericStageRoot[data-stage='definition'] .workActions button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; }
+.genericStageRoot[data-stage='definition'] .workActions button > svg { width: 15px; height: 15px; flex: none; }
+.genericStageRoot[data-stage='definition'] .workActions .primaryButton { border-color: #0b5df1; background: linear-gradient(180deg, #176fff, #0055e8); box-shadow: 0 5px 12px rgba(0, 80, 232, .24), inset 0 1px rgba(255, 255, 255, .24); }
+.genericStageRoot[data-stage='definition'] .workActions .primaryButton > svg { fill: #fff; }
+.genericStageRoot[data-stage='definition'] .workActions .secondaryButton > svg { stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.5; }
+.stageUpdateStatus { display: inline-flex; align-items: center; gap: 8px; margin-left: 6px; color: #8b96aa; font-size: 11px; }
+.stageUpdateStatus > i { width: 7px; height: 7px; border-radius: 50%; background: #17c56e; }
 
 .genericStageRoot[data-stage='definition'] .genericStageGrid > aside {
   grid-column: 2;
@@ -2597,18 +2627,19 @@
   display: flex;
   justify-content: flex-start;
   gap: 8px;
-  padding: 0 0 10px;
-  color: #273553;
+  padding: 0 0 22px;
+  color: #174eb2;
 }
 .genericStageRoot[data-stage='definition'] .projectRecordRail > header span { font-size: 13px; font-weight: 700; }
 .genericStageRoot[data-stage='definition'] .artifactRailIcon { width: 18px; height: 18px; stroke: #5272ad; }
+.genericStageRoot[data-stage='definition'] .projectRecordRail > header .artifactRailIcon { display: none; }
 
 .genericStageRoot[data-stage='definition'] .projectRecordNodes {
   position: relative;
   display: grid;
-  gap: 10px;
+  gap: 16px;
   max-height: none;
-  padding: 0 0 0 28px;
+  padding: 0 0 0 60px;
   overflow: visible;
 }
 
@@ -2616,7 +2647,7 @@
   position: absolute;
   top: 24px;
   bottom: -48px;
-  left: 10px;
+  left: 20px;
   width: 2px;
   background: linear-gradient(#4081ff, #39c978 58%, #d8e2f5 58%);
   content: '';
@@ -2626,7 +2657,7 @@
   position: relative;
   display: grid;
   min-height: 59px;
-  grid-template-columns: 54px minmax(0, 1fr);
+  grid-template-columns: 48px minmax(0, 1fr) 24px;
   grid-template-rows: auto auto;
   place-items: start;
   align-content: center;
@@ -2643,7 +2674,7 @@
 .genericStageRoot[data-stage='definition'] .projectRecordAllButton::before {
   position: absolute;
   top: 50%;
-  left: -26px;
+  left: -50px;
   width: 12px;
   height: 12px;
   border: 3px solid #fff;
@@ -2663,11 +2694,19 @@
 .genericStageRoot[data-stage='definition'] .projectRecordNode i { grid-row: 1 / -1; align-self: center; font-size: 17px; }
 .genericStageRoot[data-stage='definition'] .projectRecordNode span { font-size: 10px; }
 .genericStageRoot[data-stage='definition'] .projectRecordNode b { font-size: 10px; }
+.recordDocumentIcon { width: 20px; height: 20px; grid-column: 3; grid-row: 1 / -1; align-self: center; justify-self: end; stroke: #8796b4; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.55; }
+.recordDocumentIcon[data-state='current'] { stroke: #075ff0; }
+.recordDocumentIcon[data-state='complete'] { stroke: #16b95f; }
+.recordDocumentIcon[data-state='all'] { stroke: #8796b4; }
 
 .genericStageRoot[data-stage='definition'] .projectRecordAllButton {
   position: relative;
-  min-height: 42px;
-  margin: 10px 0 0 28px;
+  display: grid;
+  box-sizing: border-box;
+  width: calc(100% - 60px);
+  min-height: 54px;
+  grid-template-columns: 1fr 24px;
+  margin: 16px 0 0 60px;
   border-color: #dbe3f2;
   border-radius: 11px;
   background: #f7f9fd;
@@ -2675,14 +2714,18 @@
   font-size: 12px;
   font-weight: 700;
 }
+.genericStageRoot[data-stage='definition'] .projectRecordAllButton > .recordDocumentIcon { grid-column: 2; grid-row: 1; }
 
 .genericStageRoot[data-stage='definition'] .workflowsPanel {
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: column;
   grid-column: 1 / -1;
   grid-row: 3;
-  width: calc(100% - 32px);
+  width: 100%;
   height: 257px;
   min-height: 0;
-  padding: 14px 20px 13px;
+  padding: 8px 14px 9px;
   border-color: #f2d4aa;
   border-radius: 15px;
   background: linear-gradient(135deg, rgba(255, 252, 246, .98), rgba(255, 248, 237, .96));
@@ -2691,16 +2734,25 @@
 }
 
 .genericStageRoot[data-stage='definition'] .workflowsPanel > header { align-items: center; }
-.genericStageRoot[data-stage='definition'] .workflowsPanel > header > div { display: grid; grid-template-columns: auto 1fr; column-gap: 12px; align-items: center; }
-.genericStageRoot[data-stage='definition'] .workflowsPanel > header span { grid-row: 1 / 3; display: grid; width: 36px; height: 36px; place-items: center; border-radius: 9px; background: #fff0dc; color: #f18113; font-size: 0; }
-.genericStageRoot[data-stage='definition'] .workflowsPanel > header span::after { content: '✓'; font-size: 18px; }
+.reviewHeading { display: flex; min-width: 0; align-items: center; gap: 29px; }
+.genericStageRoot[data-stage='definition'] .reviewHeading > span { display: grid; width: 36px; height: 36px; flex: none; place-items: center; border-radius: 9px; background: #fff0dc; color: #f18113; }
+.genericStageRoot[data-stage='definition'] .reviewHeading > span svg { width: 22px; height: 22px; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.5; }
+.reviewHeading > div { display: grid; min-width: 0; }
+.genericStageRoot[data-stage='definition'] .reviewHeading small { color: #ef7f12; font-size: 10px; font-weight: 750; line-height: 1.1; }
 .genericStageRoot[data-stage='definition'] .workflowsPanel h2 { margin: 0; font-size: 18px; }
 .genericStageRoot[data-stage='definition'] .workflowsPanel header p { font-size: 11px; }
+.reviewSummary { display: grid; width: 506px; grid-template-columns: auto auto 1fr auto; align-items: center; gap: 12px; }
+.reviewSummary > b { display: inline-flex; min-height: 24px; align-items: center; gap: 6px; padding: 0 12px; border: 1px solid transparent; border-radius: 999px; font-size: 11px; white-space: nowrap; }
+.reviewSummary > b > i { font-style: normal; }
+.reviewSummary > b[data-kind='materials'] { border-color: #d5eee1; background: #edf9f2; color: #129454; }
+.reviewSummary > b[data-kind='manual'] { border-color: #d9e4ff; background: #f0f4ff; color: #215bd3; }
+.reviewSummary > button { display: inline-flex; min-height: 28px; align-items: center; gap: 7px; padding: 0 4px; border: 0; background: transparent; color: #34405b; font: inherit; font-size: 11px; font-weight: 700; cursor: pointer; }
+.reviewSummary > button > span { color: #203d78; font-size: 14px; }
 
 .stageReviewArtifacts {
   display: grid;
   gap: 0;
-  margin-top: 10px;
+  margin-top: 6px;
   overflow: hidden;
   border: 1px solid #efdcc0;
   border-radius: 10px;
@@ -2708,9 +2760,11 @@
 }
 
 .stageReviewArtifacts > article {
+  box-sizing: border-box;
   display: grid;
-  min-height: 42px;
-  grid-template-columns: 20px 28px 184px minmax(0, 1fr) 70px auto;
+  height: 34px;
+  min-height: 0;
+  grid-template-columns: 20px 68px 184px minmax(0, 1fr) clamp(180px, 24vw, 360px) auto;
   align-items: center;
   gap: 8px;
   padding: 4px 12px;
@@ -2718,20 +2772,49 @@
 }
 .stageReviewArtifacts > article:last-child { border-bottom: 0; }
 .stageReviewArtifacts > article > i { color: #15b968; font-style: normal; font-weight: 800; }
+.stageReviewArtifacts > article[data-review-pending='true'] { background: rgba(255, 247, 232, .72); }
+.stageReviewArtifacts > article[data-review-pending='true'] > i,
+.stageReviewArtifacts > article[data-review-pending='true'] > em { color: #f08312; }
 .stageReviewArtifacts > article > b { color: #5b6680; font-family: var(--ds-font-family-code); font-size: 11px; }
 .stageReviewArtifacts > article > span { display: flex; min-width: 0; align-items: center; gap: 8px; }
 .stageReviewArtifacts > article > span svg { width: 17px; height: 17px; flex: none; fill: none; stroke: #435779; stroke-width: 1.5; }
 .stageReviewArtifacts > article > span strong { overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
 .stageReviewArtifacts > article > small { overflow: hidden; color: #8790a1; font-size: 10.5px; text-overflow: ellipsis; white-space: nowrap; }
-.stageReviewArtifacts > article > em { color: #17a963; font-size: 11px; font-style: normal; font-weight: 700; white-space: nowrap; }
+.stageReviewArtifacts > article > em { justify-self: start; color: #17a963; font-size: 11px; font-style: normal; font-weight: 700; white-space: nowrap; }
 .stageReviewArtifacts > article > button { min-height: 28px; padding: 0 10px; border: 1px solid #d9e3f3; border-radius: 7px; background: #fff; color: #26334f; font: inherit; font-size: 11px; cursor: pointer; }
+.stageReviewArtifacts > article[data-review-pending='true'] > button { border-color: #f4a048; color: #e67808; }
+
+.reviewAllRecords { align-self: flex-start; min-height: 20px; margin-top: 2px; padding: 0; border: 0; background: transparent; color: #4269b0; font: inherit; font-size: 10px; cursor: pointer; }
+.reviewAllRecords > span { margin-left: 4px; }
 
 .genericStageRoot[data-stage='definition'] .genericGateActions {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-rows: 32px 12px;
   justify-content: flex-end;
-  margin-top: 10px;
+  margin-top: auto;
+  gap: 2px 12px;
+  padding-top: 2px;
 }
-.genericStageRoot[data-stage='definition'] .genericGateActions .primaryButton { min-width: 166px; border-color: #f08a13; background: linear-gradient(#ff9f22, #ec7d00); }
-.genericStageRoot[data-stage='definition'] .genericGateActions .tertiaryButton { min-width: 150px; border-color: #d8e1ef; background: #fff; }
+.genericStageRoot[data-stage='definition'] .genericGateActions .primaryButton { min-width: 166px; min-height: 32px; border-color: #f08a13; background: linear-gradient(#ff9f22, #ec7d00); box-shadow: 0 5px 12px rgba(225, 113, 0, .16), inset 0 1px rgba(255, 255, 255, .22); }
+.genericStageRoot[data-stage='definition'] .genericGateActions .tertiaryButton { min-width: 150px; min-height: 32px; border-color: #d8e1ef; background: #fff; }
+.gateDecisionHint { grid-column: 1; display: inline-flex; align-items: center; justify-content: center; gap: 5px; color: #8d98aa; font-size: 10px; }
+.gateDecisionHint > i { color: #f28a15; font-style: normal; }
+
+@media (min-width: 981px) and (min-height: 1100px) {
+  .genericStageRoot[data-stage='definition'] .genericStageGrid {
+    grid-template-rows: 237px 337px 297px;
+    row-gap: 22px;
+  }
+
+  .genericStageRoot[data-stage='definition'] .stageOverview { height: 237px; }
+  .genericStageRoot[data-stage='definition'] .currentWork,
+  .genericStageRoot[data-stage='definition'] .genericStageGrid > aside,
+  .genericStageRoot[data-stage='definition'] .projectRecordRail { height: 337px; }
+  .genericStageRoot[data-stage='definition'] .promptGuide { min-height: 190px; }
+  .genericStageRoot[data-stage='definition'] .workflowsPanel { height: 297px; }
+  .genericStageRoot[data-stage='definition'] .stageReviewArtifacts > article { height: 40px; }
+}
 
 @media (max-width: 980px) {
   .genericStageGrid,

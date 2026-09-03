@@ -343,6 +343,12 @@ describe('ProjectStageWorkbenchHero', () => {
     expect(screen.getByRole('heading', { name: '把成功、范围、责任和停止条件说清楚。' })).toBeTruthy()
     expect(screen.getByText('3/3 项必备记录已形成')).toBeTruthy()
     expect(screen.getAllByText('确认责任与停止条件')).toHaveLength(2)
+    expect(screen.getByText(/材料齐备 3\/3/)).toBeTruthy()
+    expect(screen.getByText(/人工核对 2\/3/)).toBeTruthy()
+    expect(screen.getByText('当前基线记录')).toBeTruthy()
+    expect(screen.getByText('成功标准与交付边界')).toBeTruthy()
+    expect(screen.getByText('责任人与停止条件')).toBeTruthy()
+    expect(screen.getByText('阶段记录已更新 · 刚刚')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: '开始本阶段工作' }))
     expect(input.prepareStageDraft).toHaveBeenCalledWith('session-1', definition.prompt)
 
@@ -351,7 +357,7 @@ describe('ProjectStageWorkbenchHero', () => {
     const recordTabs = screen.getByRole('navigation', { name: '切换已有阶段记录' })
     expect(within(recordTabs).getByRole('button', { name: '01' })).toBeTruthy()
     expect(within(recordTabs).queryByRole('button', { name: '03' })).toBeNull()
-    expect(screen.getAllByText('结果与成功标准')).toHaveLength(2)
+    expect(screen.getAllByText('结果与成功标准')).toHaveLength(1)
     fireEvent.click(screen.getAllByRole('button', { name: '预览' })[0]!)
     expect(input.openProjectFile).toHaveBeenCalledWith(
       'session-1', '/isolated/project',

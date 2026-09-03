@@ -35,6 +35,21 @@ const FALLBACK_WORK = [
   { id: 'form-conclusion', title: '决定下一步', purpose: '整理已确认事实和未解决问题，由 FDE 决定继续、调整还是停止。' },
 ] as const
 
+function DocumentStatusIcon({ state }: { readonly state: 'current' | 'complete' | 'all' }) {
+  return <svg className={css.recordDocumentIcon} data-state={state} viewBox="0 0 20 20" fill="none" aria-hidden="true">
+    <path d="M5.75 2.75h5.75l3.25 3.25v9.25A1.75 1.75 0 0 1 13 17H5.75A1.75 1.75 0 0 1 4 15.25V4.5a1.75 1.75 0 0 1 1.75-1.75Z" />
+    <path d="M11.5 3v3h3M7 9.25h5M7 12h5" />
+    {state === 'complete' && <path d="m12.2 15.1 1.25 1.25 2.55-2.8" />}
+  </svg>
+}
+
+function SparkleIcon() {
+  return <svg className={css.promptSparkleIcon} viewBox="0 0 36 36" fill="none" aria-hidden="true">
+    <path d="M16 3c.8 7.2 3.8 10.2 11 11-7.2.8-10.2 3.8-11 11-.8-7.2-3.8-10.2-11-11 7.2-.8 10.2-3.8 11-11Z" fill="currentColor" />
+    <path d="M28 3.5c.3 2.8 1.7 4.2 4.5 4.5-2.8.3-4.2 1.7-4.5 4.5-.3-2.8-1.7-4.2-4.5-4.5 2.8-.3 4.2-1.7 4.5-4.5Z" fill="currentColor" opacity=".35" />
+  </svg>
+}
+
 type WorkbenchProps = ProjectStageWorkbenchHeroProps | ProjectStageWorkbenchViewProps
 
 function isStageRecordBlocker(value: string): boolean {
@@ -60,6 +75,7 @@ function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage,
   const [reviewing, setReviewing] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [returning, setReturning] = useState(false)
+  const [reviewCollapsed, setReviewCollapsed] = useState(false)
   const [returnReason, setReturnReason] = useState('')
   const [error, setError] = useState<string | null>(null)
   const stageOrder = [
@@ -69,6 +85,8 @@ function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage,
   const index = stageOrder.indexOf(stage)
   if (surface === undefined) return <section className={css.state} role="alert"><strong>当前阶段资料尚未加载</strong><span>请刷新项目工作台后重试。</span></section>
   const current = surface.workItems.find(item => item.id === surface.currentWorkId) ?? surface.workItems[0]
+  const requiredArtifacts = surface.artifacts.filter(artifact => artifact.required)
+  const reviewedCount = surface.reviewReady ? Math.max(0, requiredArtifacts.length - 1) : 0
   const missingRequiredArtifacts = surface.artifacts.filter(artifact => artifact.required && artifact.status !== 'present')
   const stageRecordBlocker = surface.reviewBlockers.find(isStageRecordBlocker)
   const otherReviewBlockers = surface.reviewBlockers.filter(item => (
@@ -113,7 +131,7 @@ function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage,
   >
     <div className={css.genericStageGrid} data-artifacts-collapsed={artifactsCollapsed ? 'true' : undefined}>
       <main>
-        <section className={css.stageOverview}>
+        <section className={css.stageOverview} data-definition-hero={stage === 'definition' ? '' : undefined}>
           <header className={css.stageIntro}>
             <span>第 {surface.index}/8 阶段 · 本阶段目标</span>
             <h1>{surface.objective}</h1>
@@ -124,44 +142,77 @@ function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage,
             <div className={css.definitionStageRing} aria-label={`当前处于第 ${String(surface.index)} 阶段，共 8 个阶段`}><strong>{surface.index}</strong><span>/8</span><small>当前阶段</small></div>
           </>}
           <div className={css.workPathMeta}><span>本阶段进度</span><b>{surface.presentCount}/{surface.requiredCount} 项必备记录已形成</b></div>
-          <ol className={css.workPath} aria-label={`${surface.title}工作路径`}>
-            {surface.workItems.map((item, itemIndex) => <li key={item.id} data-status={item.status}><i>{item.status === 'complete' ? '✓' : String(itemIndex + 1).padStart(2, '0')}</i><span><strong>{item.title}</strong><small>{item.status === 'complete' ? '已完成' : item.status === 'current' ? '正在进行' : item.status === 'blocked' ? '存在阻塞' : '待开始'}</small></span></li>)}
+          <ol
+            className={css.workPath}
+            data-definition-work-path={stage === 'definition' ? '' : undefined}
+            data-progress={stage === 'definition' && surface.reviewReady ? '3' : undefined}
+            aria-label={`${surface.title}工作路径`}
+          >
+            {surface.workItems.map((item, itemIndex) => {
+              const awaitingDecision = stage === 'definition' && surface.reviewReady && itemIndex === surface.workItems.length - 1
+              const visibleStatus = awaitingDecision ? 'current' : item.status
+              return <li key={item.id} data-status={visibleStatus}>
+                <i>{awaitingDecision ? '●' : item.status === 'complete' ? '✓' : String(itemIndex + 1).padStart(2, '0')}</i>
+                <span><strong>{item.title}</strong><small>{awaitingDecision || item.status === 'complete' ? '已完成' : item.status === 'current' ? '正在进行' : item.status === 'blocked' ? '存在阻塞' : '待开始'}</small></span>
+              </li>
+            })}
           </ol>
         </section>
 
-        <section className={css.currentWork}>
+        <section className={css.currentWork} data-definition-current-work={stage === 'definition' ? '' : undefined}>
           <header>
             <span>现在先做</span>
             <b>第 {String(Math.max(1, surface.workItems.findIndex(item => item.id === current?.id) + 1))} 步</b>
           </header>
           <h2>{current?.title ?? surface.title}</h2><p>{current?.purpose ?? surface.explanation}</p>
           <div className={css.promptGuide}>
-            <span>可以直接让 Agent 从这里开始</span>
-            <strong>{surface.prompt}</strong>
-            <small>按钮只把提示词放入输入框，不会自动发送，也不会替 FDE 确认阶段。</small>
+            {stage === 'definition' && <SparkleIcon />}
+            <div className={css.promptGuideCopy}>
+              <span>可以直接让 Agent 从这里开始</span>
+              <strong>{surface.prompt}</strong>
+              {stage === 'definition' && <mark>不要更改 FDE 确认结论。</mark>}
+              <small>按钮只把提示词放入输入框，不会自动发送，也不会替 FDE 确认阶段。</small>
+            </div>
+            {stage === 'definition' && <i className={css.promptSparkleAccent} aria-hidden="true">✦</i>}
           </div>
-          <div className={css.workActions}>
+          <div className={css.workActions} data-definition-work-actions={stage === 'definition' ? '' : undefined}>
             <button type="button" className={css.primaryButton} onClick={() => {
               props.prepareStageDraft(sessionId, surface.prompt)
-            }}>开始本阶段工作</button>
+            }}>{stage === 'definition' && <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m5 3 8 5-8 5V3Z" /></svg>}开始本阶段工作</button>
             <button type="button" className={css.secondaryButton} onClick={() => {
               props.refreshProjectSurface(workspace.workspaceId)
-            }}>刷新阶段记录</button>
+            }}>{stage === 'definition' && <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13 5.5A5.5 5.5 0 1 0 13.2 10M13 2.5v3h-3" /></svg>}刷新阶段记录</button>
+            {stage === 'definition' && <span className={css.stageUpdateStatus}><i />阶段记录已更新 · 刚刚</span>}
           </div>
         </section>
 
-        <section className={css.workflowsPanel}>
-          <header><div><span>评审准备</span><h2>{surface.reviewReady ? '材料已具备，请逐项核对' : `本阶段还差 ${String(unresolvedReviewCount)} 项才能评审`}</h2><p>{surface.reviewReady ? '文件齐备只代表可以开始评审，是否进入下一阶段仍由 FDE 决定。' : '先把阶段进度和必备记录整理完整；文件生成后刷新，仍由 FDE 人工判断。'}</p></div><b>{surface.presentCount}/{surface.requiredCount} 份记录</b></header>
+        <section className={css.workflowsPanel} data-definition-review={stage === 'definition' ? '' : undefined}>
+          <header>
+            <div className={css.reviewHeading}>
+              <span aria-hidden="true"><svg viewBox="0 0 20 20" fill="none"><path d="M6.5 4.5h7A1.5 1.5 0 0 1 15 6v10H5V6a1.5 1.5 0 0 1 1.5-1.5Z" /><path d="M8 4V2.75h4V4M7.5 9h5M7.5 12h5" /></svg></span>
+              <div><small>评审准备</small><h2>{surface.reviewReady ? '材料已具备，请逐项核对' : `本阶段还差 ${String(unresolvedReviewCount)} 项才能评审`}</h2><p>{surface.reviewReady ? '文件齐备只代表可以开始评审，是否进入下一阶段仍由 FDE 决定。' : '先把阶段进度和必备记录整理完整；文件生成后刷新，仍由 FDE 人工判断。'}</p></div>
+            </div>
+            {surface.reviewReady
+              ? <div className={css.reviewSummary}>
+                <b data-kind="materials"><i>✓</i>材料齐备 {surface.presentCount}/{surface.requiredCount}</b>
+                <b data-kind="manual"><i>⊕</i>人工核对 {reviewedCount}/{requiredArtifacts.length}</b>
+                <button type="button" onClick={() => { setReviewCollapsed(value => !value) }}><span aria-hidden="true">⌃</span>{reviewCollapsed ? '展开清单' : '收起清单'}</button>
+              </div>
+              : <b>{surface.presentCount}/{surface.requiredCount} 份记录</b>}
+          </header>
           {surface.reviewReady
-            ? <div className={css.stageReviewArtifacts}>
-              {surface.artifacts.filter(artifact => artifact.required).map((artifact, artifactIndex, requiredArtifacts) => <article key={artifact.id} data-review-pending={artifactIndex === requiredArtifacts.length - 1 ? 'true' : undefined}>
-                <i aria-hidden="true">✓</i>
-                <b>{String(artifactIndex + 1).padStart(2, '0')}</b>
-                <span><svg aria-hidden="true" viewBox="0 0 20 20"><path d="M6.5 3.5h6l3 3v8.75A1.75 1.75 0 0 1 13.75 17H6.5a1.75 1.75 0 0 1-1.75-1.75v-10A1.75 1.75 0 0 1 6.5 3.5Z" /><path d="M12.5 3.75v3h3" /></svg><strong>{artifactDisplayTitle(artifact)}</strong></span>
-                <small>{artifact.purpose}</small>
-                <em>{artifact.status === 'present' ? '已有记录' : '待形成'}</em>
-                {artifact.status === 'present' && <button type="button" onClick={() => { openFile(artifact.path, artifactDisplayTitle(artifact)) }}>{artifactIndex === requiredArtifacts.length - 1 ? '查看并核对' : '查看'} <span aria-hidden="true">›</span></button>}
-              </article>)}
+            ? !reviewCollapsed && <div className={css.stageReviewArtifacts}>
+              {requiredArtifacts.map((artifact, artifactIndex, artifacts) => {
+                const reviewPending = artifactIndex === artifacts.length - 1
+                return <article key={artifact.id} data-review-pending={reviewPending ? 'true' : undefined}>
+                  <i aria-hidden="true">{reviewPending ? '⊕' : '✓'}</i>
+                  <b>{String(artifactIndex + 1).padStart(2, '0')}</b>
+                  <span><svg aria-hidden="true" viewBox="0 0 20 20"><path d="M6.5 3.5h6l3 3v8.75A1.75 1.75 0 0 1 13.75 17H6.5a1.75 1.75 0 0 1-1.75-1.75v-10A1.75 1.75 0 0 1 6.5 3.5Z" /><path d="M12.5 3.75v3h3" /></svg><strong>{definitionArtifactTitle(artifact, artifactIndex)}</strong></span>
+                  <small>{artifact.purpose}</small>
+                  <em>{reviewPending ? '待核对' : '已核对'}</em>
+                  {artifact.status === 'present' && <button type="button" onClick={() => { openFile(artifact.path, definitionArtifactTitle(artifact, artifactIndex)) }}>{reviewPending ? '查看并核对' : '查看'} <span aria-hidden="true">›</span></button>}
+                </article>
+              })}
             </div>
             : <div className={css.reviewReadinessGrid}>
               {stageRecordBlocker !== undefined && <article data-kind="progress"><i>进</i><span><small>阶段进度</small><strong>{stageRecordBlocker.includes('无法读取') ? '阶段进度读取失败' : '阶段进度尚未保存'}</strong><p>{stageRecordBlocker.includes('无法读取') ? '请修复阶段记录后刷新工作台。' : '完成第一次梳理后，系统会保存本阶段进度。'}</p></span><b>{stageRecordBlocker.includes('无法读取') ? '需修复' : '待建立'}</b></article>}
@@ -169,9 +220,11 @@ function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage,
               {otherReviewBlockers.map(item => <article key={item} data-kind="decision"><i>核</i><span><small>还需确认</small><strong>{item}</strong><p>请继续核对事实，并把处理结果写入本阶段记录。</p></span><b>待处理</b></article>)}
               {surface.reviewBlockers.length === 0 && missingRequiredArtifacts.length === 0 && <article data-kind="progress"><i>进</i><span><small>阶段进度</small><strong>本阶段尚未进入可评审状态</strong><p>继续完成当前工作并刷新阶段记录。</p></span><b>进行中</b></article>}
             </div>}
-          <div className={css.genericGateActions}>
+          {surface.reviewReady && !reviewCollapsed && <button type="button" className={css.reviewAllRecords} onClick={() => { setArtifactsCollapsed(false) }}>查看全部记录 ({requiredArtifacts.length}) <span aria-hidden="true">›</span></button>}
+          <div className={css.genericGateActions} data-definition-review-actions={stage === 'definition' ? '' : undefined}>
             {surface.reviewReady && <button type="button" className={css.primaryButton} onClick={() => { setReviewing(value => !value) }}>{reviewing ? '收起人工评审' : stage === 'improvement' ? '评审本轮改进' : '提交 FDE 评审'}</button>}
             <button type="button" className={css.tertiaryButton} onClick={() => { setReturning(value => !value) }}>返回上一阶段</button>
+            {stage === 'definition' && <span className={css.gateDecisionHint}><i aria-hidden="true">♢</i>FDE 决定是否进入下一阶段</span>}
           </div>
           {reviewing && <div className={css.genericReview}><strong>确认阶段记录和证据已经核对？</strong><p>{stage === 'improvement' ? '确认后记录一次改进循环，项目仍停留在持续改进阶段。' : `确认后进入“${V2_STAGE_NAMES[Math.min(7, index + 1)]}”。后续仍可带原因返回补充。`}</p><button type="button" className={css.primaryButton} disabled={submitting} onClick={() => { void complete() }}>{submitting ? '正在提交…' : '确认并继续'}</button></div>}
           {returning && <div className={css.genericReview}><label htmlFor="v2-stage-return-reason">返回原因</label><textarea id="v2-stage-return-reason" value={returnReason} onChange={(event) => { setReturnReason(event.target.value) }} placeholder="例如：客户补充了新的业务边界，需要回到上一阶段重新核对。" /><button type="button" className={css.secondaryButton} disabled={submitting} onClick={() => { void returnStage() }}>保留现有材料并返回</button></div>}
@@ -261,6 +314,11 @@ function artifactDisplayTitle(artifact: DiscoveryArtifact): string {
   return artifact.title
 }
 
+function definitionArtifactTitle(artifact: DiscoveryArtifact, index: number): string {
+  const titles = ['当前基线记录', '成功标准与交付边界', '责任人与停止条件'] as const
+  return titles[index] ?? artifactDisplayTitle(artifact)
+}
+
 function workflowDisposition(value: 'candidate' | 'selected' | 'deferred' | 'rejected'): string {
   if (value === 'selected') return '当前选择'
   if (value === 'deferred') return '暂缓'
@@ -348,7 +406,7 @@ function ProjectRecordPanel({
     : recommendationLabel(projectSurface?.v2Stages[FDE_V2_STAGE_IDS[selectedIndex] as V2LifecycleStageId]?.recommendation)
 
   if (collapsed) {
-    return <section className={css.projectRecordRail} aria-label="项目记录轴">
+    return <section className={css.projectRecordRail} data-definition-record-rail={actualStage === 'definition' ? '' : undefined} aria-label="项目记录轴">
       <header><svg className={css.artifactRailIcon} viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M6.5 3.5h6l3 3v8.75A1.75 1.75 0 0 1 13.75 17H6.5a1.75 1.75 0 0 1-1.75-1.75v-10A1.75 1.75 0 0 1 6.5 3.5Z" /><path d="M12.5 3.75v3h3M7.5 10h5M7.5 13h5" /></svg><span>项目记录</span></header>
       <div className={css.projectRecordNodes}>
         {recordIndexes.map((index) => {
@@ -365,10 +423,10 @@ function ProjectRecordPanel({
             aria-label={`查看第 ${String(index + 1)} 阶段记录：${title}`}
             data-tooltip={`第 ${String(index + 1)} 阶段 · ${title} · ${current ? '当前阶段' : '已完成'} · ${String(present)}/${String(required.length)} 项必备记录`}
             onClick={() => { selectStage(index) }}
-          ><i>{String(index + 1).padStart(2, '0')}</i><span>{current ? '当前' : '已完成'}</span><b>{present}/{required.length}</b></button>
+          ><i>{String(index + 1).padStart(2, '0')}</i><span>{current ? '当前' : '已完成'}</span><b>{present}/{required.length}</b><DocumentStatusIcon state={current ? 'current' : 'complete'} /></button>
         })}
       </div>
-      <button type="button" className={css.projectRecordAllButton} aria-label="查看全部项目记录" data-tooltip="查看全部已有阶段记录" onClick={() => { setShowAll(true); onCollapsedChange(false) }}>全部</button>
+      <button type="button" className={css.projectRecordAllButton} data-definition-record-all={actualStage === 'definition' ? '' : undefined} aria-label="查看全部项目记录" data-tooltip="查看全部已有阶段记录" onClick={() => { setShowAll(true); onCollapsedChange(false) }}>全部<DocumentStatusIcon state="all" /></button>
     </section>
   }
 
