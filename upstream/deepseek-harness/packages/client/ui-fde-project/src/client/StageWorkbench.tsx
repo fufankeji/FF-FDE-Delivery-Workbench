@@ -280,7 +280,7 @@ function InvestigationStagePanel({ props, workspace, sessionId, view, stageState
   </section>
 }
 
-function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage, surface, projectSurface, sourceFiles }: {
+function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage, surface, projectSurface, sourceFiles, historicalActualStage }: {
   readonly props: WorkbenchProps
   readonly workspace: { readonly workspaceId: string; readonly title: string; readonly path: string }
   readonly sessionId: string
@@ -290,6 +290,7 @@ function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage,
   readonly surface: V2StageSurfaceSnapshot | undefined
   readonly projectSurface: ProjectSurfaceSnapshot | undefined
   readonly sourceFiles: readonly ProjectSourceItem[]
+  readonly historicalActualStage?: FdeV2StageId
 }) {
   const [artifactsCollapsed, setArtifactsCollapsed] = useState(true)
   const [reviewing, setReviewing] = useState(false)
@@ -303,10 +304,14 @@ function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage,
     'evaluation', 'pilot', 'production', 'improvement',
   ] as const
   const index = stageOrder.indexOf(stage)
+  const historical = historicalActualStage !== undefined
+  const actualStageIndex = historicalActualStage === undefined ? -1 : stageOrder.indexOf(historicalActualStage)
   if (surface === undefined) return <section className={css.state} role="alert"><strong>当前阶段资料尚未加载</strong><span>请刷新项目工作台后重试。</span></section>
   const current = surface.workItems.find(item => item.id === surface.currentWorkId) ?? surface.workItems[0]
   const requiredArtifacts = surface.artifacts.filter(artifact => artifact.required)
-  const reviewedCount = surface.reviewReady ? Math.max(0, requiredArtifacts.length - 1) : 0
+  const reviewedCount = historical
+    ? requiredArtifacts.length
+    : surface.reviewReady ? Math.max(0, requiredArtifacts.length - 1) : 0
   const missingRequiredArtifacts = surface.artifacts.filter(artifact => artifact.required && artifact.status !== 'present')
   const stageRecordBlocker = surface.reviewBlockers.find(isStageRecordBlocker)
   const otherReviewBlockers = surface.reviewBlockers.filter(item => (
@@ -370,26 +375,32 @@ function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage,
     finally { setSubmitting(false) }
   }
   return <section
-    className={`${css.root} ${css.genericStageRoot}`}
+    className={`${css.root} ${css.genericStageRoot}${historical ? ` ${css.browsedStage}` : ''}`}
     data-fde-stage-workbench=""
     data-conversation-hero-project=""
     data-stage={stage}
-    data-conversation-composer-layout={stage === 'definition' ? 'stage-definition' : 'stage-execution'}
+    data-historical={historical ? 'true' : undefined}
+    data-conversation-composer-layout={historical ? 'stage-history' : stage === 'definition' ? 'stage-definition' : 'stage-execution'}
     data-conversation-composer-overlay={view ? '' : undefined}
     data-artifacts-collapsed={artifactsCollapsed ? 'true' : undefined}
-    aria-label={`项目阶段工作台：${surface.title}`}
+    aria-label={`${historical ? '历史' : '项目'}阶段工作台：${surface.title}`}
   >
+    {historical && <header className={css.browsedStageNotice}>
+      <HistoricalNoticeIcon />
+      <div><span>阶段完成记录</span><strong>正在查看第 {surface.index} 阶段，项目当前在“{V2_STAGE_NAMES[actualStageIndex]}”</strong><p>保留本阶段原有工作台与真实记录，当前为只读查看。</p></div>
+      <button type="button" className={css.secondaryButton} onClick={() => { props.returnToCurrentStage(workspace.workspaceId) }}>返回当前阶段 <span aria-hidden="true">→</span></button>
+    </header>}
     <div className={css.genericStageGrid} data-artifacts-collapsed={artifactsCollapsed ? 'true' : undefined}>
       <main>
         <section className={css.stageOverview} data-definition-hero={stage === 'definition' ? '' : undefined}>
           <header className={css.stageIntro}>
-            <span>第 {surface.index}/8 阶段 · 本阶段目标</span>
+            <span>第 {surface.index}/8 阶段 · {historical ? '已完成' : '本阶段目标'}</span>
             <h1 data-definition-stage-title={stage === 'definition' ? '' : undefined}>{surface.objective}</h1>
             <p>{surface.explanation}</p>
           </header>
           {stage === 'definition' && <>
             <div className={css.definitionHeroDecoration} aria-hidden="true"><img src="/fde-dashboard/project-priority-stack.png" alt="" /></div>
-            <div className={css.definitionStageRing} data-definition-stage-ring="" aria-label={`当前处于第 ${String(surface.index)} 阶段，共 8 个阶段`}><strong>{surface.index}</strong><span>/8</span><small>当前阶段</small></div>
+            <div className={css.definitionStageRing} data-definition-stage-ring="" aria-label={`${historical ? '正在查看已完成的' : '当前处于'}第 ${String(surface.index)} 阶段，共 8 个阶段`}><strong>{surface.index}</strong><span>/8</span><small>{historical ? '已完成' : '当前阶段'}</small></div>
           </>}
           <div className={css.workPathMeta}><span>本阶段进度</span><b>{surface.presentCount}/{surface.requiredCount} 项必备记录已形成</b></div>
           <ol
@@ -399,7 +410,7 @@ function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage,
             aria-label={`${surface.title}工作路径`}
           >
             {surface.workItems.map((item, itemIndex) => {
-              const awaitingDecision = stage === 'definition' && surface.reviewReady && itemIndex === surface.workItems.length - 1
+              const awaitingDecision = !historical && stage === 'definition' && surface.reviewReady && itemIndex === surface.workItems.length - 1
               const visibleStatus = awaitingDecision ? 'current' : item.status
               return <li key={item.id} data-status={visibleStatus}>
                 <i>{awaitingDecision ? '●' : item.status === 'complete' ? '✓' : String(itemIndex + 1).padStart(2, '0')}</i>
@@ -411,28 +422,30 @@ function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage,
 
         <section className={css.currentWork} data-definition-current-work={stage === 'definition' ? '' : undefined}>
           <header>
-            <span>现在先做</span>
+            <span>{historical ? '当时完成' : '现在先做'}</span>
             <b>第 {String(Math.max(1, surface.workItems.findIndex(item => item.id === current?.id) + 1))} 步</b>
           </header>
           <h2>{current?.title ?? surface.title}</h2><p>{current?.purpose ?? surface.explanation}</p>
           <div className={css.promptGuide}>
             {stage === 'definition' && <SparkleIcon />}
             <div className={css.promptGuideCopy}>
-              <span>可以直接让 Agent 从这里开始</span>
+              <span>{historical ? '本阶段采用的工作方法' : '可以直接让 Agent 从这里开始'}</span>
               <strong>{surface.prompt}</strong>
-              {stage === 'definition' && <mark>不要更改 FDE 确认结论。</mark>}
-              <small>按钮只把提示词放入输入框，不会自动发送，也不会替 FDE 确认阶段。</small>
+              {stage === 'definition' && <mark>{historical ? '阶段已完成，内容只读。' : '不要更改 FDE 确认结论。'}</mark>}
+              <small>{historical ? '这是本阶段保存的工作提示，不会触发新的执行。' : '按钮只把提示词放入输入框，不会自动发送，也不会替 FDE 确认阶段。'}</small>
             </div>
             {stage === 'definition' && <i className={css.promptSparkleAccent} aria-hidden="true">✦</i>}
           </div>
           <div className={css.workActions} data-definition-work-actions={stage === 'definition' ? '' : undefined}>
-            <button type="button" className={css.primaryButton} onClick={() => {
-              props.prepareStageDraft(sessionId, surface.prompt)
-            }}>{stage === 'definition' && <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m5 3 8 5-8 5V3Z" /></svg>}开始本阶段工作</button>
-            <button type="button" className={css.secondaryButton} onClick={() => {
-              props.refreshProjectSurface(workspace.workspaceId)
-            }}>{stage === 'definition' && <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13 5.5A5.5 5.5 0 1 0 13.2 10M13 2.5v3h-3" /></svg>}刷新阶段记录</button>
-            {stage === 'definition' && <span className={css.stageUpdateStatus}><i />阶段记录已更新 · 刚刚</span>}
+            {historical
+              ? <span className={css.stageUpdateStatus}><i />阶段记录已封存 · 只读</span>
+              : <><button type="button" className={css.primaryButton} onClick={() => {
+                props.prepareStageDraft(sessionId, surface.prompt)
+              }}>{stage === 'definition' && <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m5 3 8 5-8 5V3Z" /></svg>}开始本阶段工作</button>
+              <button type="button" className={css.secondaryButton} onClick={() => {
+                props.refreshProjectSurface(workspace.workspaceId)
+              }}>{stage === 'definition' && <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13 5.5A5.5 5.5 0 1 0 13.2 10M13 2.5v3h-3" /></svg>}刷新阶段记录</button>
+              {stage === 'definition' && <span className={css.stageUpdateStatus}><i />阶段记录已更新 · 刚刚</span>}</>}
           </div>
         </section>
 
@@ -440,7 +453,7 @@ function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage,
           <header>
             <div className={css.reviewHeading}>
               <span aria-hidden="true"><svg viewBox="0 0 20 20" fill="none"><path d="M6.5 4.5h7A1.5 1.5 0 0 1 15 6v10H5V6a1.5 1.5 0 0 1 1.5-1.5Z" /><path d="M8 4V2.75h4V4M7.5 9h5M7.5 12h5" /></svg></span>
-              <div><small>评审准备</small><h2>{surface.reviewReady ? '材料已具备，请逐项核对' : '本阶段尚未达到评审条件'}</h2><p>{surface.reviewReady ? '文件齐备只代表可以开始评审，是否进入下一阶段仍由 FDE 决定。' : '还需保存阶段进度并补齐必备记录；材料齐备后仍由 FDE 人工判断。'}</p></div>
+              <div><small>{historical ? '阶段完成记录' : '评审准备'}</small><h2>{historical ? '材料与人工决定已封存' : surface.reviewReady ? '材料已具备，请逐项核对' : '本阶段尚未达到评审条件'}</h2><p>{historical ? '以下材料和状态来自本阶段最终保存的真实记录。' : surface.reviewReady ? '文件齐备只代表可以开始评审，是否进入下一阶段仍由 FDE 决定。' : '还需保存阶段进度并补齐必备记录；材料齐备后仍由 FDE 人工判断。'}</p></div>
             </div>
             {surface.reviewReady
               ? <div className={css.reviewSummary} data-definition-review-summary={stage === 'definition' ? '' : undefined}>
@@ -453,7 +466,7 @@ function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage,
           {surface.reviewReady
             ? !reviewCollapsed && <div className={css.stageReviewArtifacts}>
               {requiredArtifacts.map((artifact, artifactIndex, artifacts) => {
-                const reviewPending = artifactIndex === artifacts.length - 1
+                const reviewPending = !historical && artifactIndex === artifacts.length - 1
                 return <article key={artifact.id} data-review-pending={reviewPending ? 'true' : undefined}>
                   <i aria-hidden="true">{reviewPending ? '⊕' : '✓'}</i>
                   <b>{String(artifactIndex + 1).padStart(2, '0')}</b>
@@ -472,20 +485,23 @@ function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage,
               </article>)}
             </div>}
           {surface.reviewReady && !reviewCollapsed && <button type="button" className={css.reviewAllRecords} onClick={() => { setArtifactsCollapsed(false) }}>查看全部记录 ({requiredArtifacts.length}) <span aria-hidden="true">›</span></button>}
-          <div className={css.genericGateActions} data-definition-review-actions={stage === 'definition' ? '' : undefined}>
+          {historical
+            ? <footer className={css.historicalArchiveFooter}><span><HistoricalArchiveIcon />阶段已封存；可继续查看当时的工作记录和固定材料。</span><strong>只读记录</strong></footer>
+            : <><div className={css.genericGateActions} data-definition-review-actions={stage === 'definition' ? '' : undefined}>
             {surface.reviewReady && <button type="button" className={css.primaryButton} onClick={() => { setReviewing(value => !value) }}>{reviewing ? '收起人工评审' : stage === 'improvement' ? '评审本轮改进' : '提交 FDE 评审'}</button>}
             <button type="button" className={css.tertiaryButton} onClick={() => { setReturning(value => !value) }}>返回上一阶段</button>
             {stage === 'definition' && <span className={css.gateDecisionHint}><i aria-hidden="true">♢</i>FDE 决定是否进入下一阶段</span>}
           </div>
           {reviewing && <div className={css.genericReview}><strong>确认阶段记录和证据已经核对？</strong><p>{stage === 'improvement' ? '确认后记录一次改进循环，项目仍停留在持续改进阶段。' : `确认后进入“${V2_STAGE_NAMES[Math.min(7, index + 1)]}”。后续仍可带原因返回补充。`}</p><button type="button" className={css.primaryButton} disabled={submitting} onClick={() => { void complete() }}>{submitting ? '正在提交…' : '确认并继续'}</button></div>}
           {returning && <div className={css.genericReview}><label htmlFor="v2-stage-return-reason">返回原因</label><textarea id="v2-stage-return-reason" value={returnReason} onChange={(event) => { setReturnReason(event.target.value) }} placeholder="例如：客户补充了新的业务边界，需要回到上一阶段重新核对。" /><button type="button" className={css.secondaryButton} disabled={submitting} onClick={() => { void returnStage() }}>保留现有材料并返回</button></div>}
+          </>}
           {error !== null && <p className={css.inlineError} role="alert">{error}</p>}
         </section>
       </main>
 
       <aside data-stage-artifact-column="" data-collapsed={artifactsCollapsed ? 'true' : undefined}>
         <ProjectRecordPanel
-          actualStage={stage}
+          actualStage={historicalActualStage ?? stage}
           collapsed={artifactsCollapsed}
           projectSurface={projectSurface}
           sourceFiles={sourceFiles}
@@ -1115,6 +1131,23 @@ function StageWorkbenchPanel({ props, workspace, sessionId, view }: {
       return <InvestigationStagePanel
         props={props} workspace={workspace} sessionId={sessionId} view={view}
         stageState={stageState.value} surface={surface?.v2Stages.investigation}
+        historicalActualStage={v2Stage}
+      />
+    }
+    const historicalLaterStage = viewedStage !== 'discovery'
+      && viewedStage !== 'investigation'
+      && FDE_V2_STAGE_IDS.indexOf(viewedStage) < FDE_V2_STAGE_IDS.indexOf(v2Stage)
+    const historicalLaterSurface = viewedStage === 'discovery' || viewedStage === 'investigation'
+      ? undefined
+      : surface?.v2Stages[viewedStage as V2LifecycleStageId]
+    const hasDedicatedHistoricalSurface = Array.isArray(historicalLaterSurface?.workItems)
+      && Array.isArray(historicalLaterSurface?.artifacts)
+    if (historicalLaterStage && hasDedicatedHistoricalSurface && stageState?.status === 'ready') {
+      return <LaterStagePanel
+        props={props} workspace={workspace} sessionId={sessionId} view={view}
+        stageState={stageState.value} stage={viewedStage}
+        surface={historicalLaterSurface}
+        projectSurface={surface} sourceFiles={files}
         historicalActualStage={v2Stage}
       />
     }

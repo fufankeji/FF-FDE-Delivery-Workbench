@@ -658,6 +658,74 @@ describe('ProjectStageWorkbenchHero', () => {
     expect(input.returnV2Stage).not.toHaveBeenCalled()
   })
 
+  it('keeps the completed second-stage workspace visible and read only after advancing', () => {
+    const definition = {
+      id: 'definition', index: 2, title: '定义结果、范围与责任',
+      objective: '把成功、范围、责任和停止条件说清楚。',
+      explanation: '先建立当前基线，再明确谁用什么证据判断成功。',
+      statePath: '.fde/stages/definition.json', skill: 'engineer-ai-value',
+      prompt: '请根据第一阶段记录，定义业务结果、成功标准、范围、责任和停止条件。',
+      status: 'complete', currentWorkId: 'ownership', recommendation: 'go',
+      requiredCount: 3, presentCount: 3, reviewReady: true, reviewBlockers: [], blockers: [],
+      workItems: [
+        { id: 'baseline', title: '建立当前基线', purpose: '记录现状。', status: 'complete' },
+        { id: 'outcome', title: '定义业务结果', purpose: '定义成功。', status: 'complete' },
+        { id: 'scope', title: '划定交付范围', purpose: '明确边界。', status: 'complete' },
+        { id: 'ownership', title: '确认责任与停止条件', purpose: '确认负责人。', status: 'complete' },
+      ],
+      artifacts: [
+        { id: 'outcome-contract', title: '结果与成功标准', path: 'fde-deliverables/02-outcome-scope/outcome-contract.md', purpose: '记录结果。', required: true, status: 'present' },
+        { id: 'value-case', title: '价值与成本判断', path: 'fde-deliverables/02-outcome-scope/value-case.md', purpose: '记录价值。', required: true, status: 'present' },
+        { id: 'delivery-plan', title: '范围与责任计划', path: 'fde-deliverables/02-outcome-scope/delivery-plan.md', purpose: '记录范围。', required: true, status: 'present' },
+      ],
+      stateStatus: 'ready',
+    }
+    const input = props({
+      useStageProgress: hook({
+        byWorkspace: {
+          'workspace-1': {
+            status: 'ready',
+            value: {
+              workspaceId: 'workspace-1', currentStage: 'development', revision: 7,
+              lifecycleVersion: 2, v2Stage: 'design', createdAt: '', updatedAt: '',
+            },
+          },
+        },
+      }),
+      useStageView: hook({ byWorkspace: { 'workspace-1': 'definition' } }),
+      useProjectSurfaces: hook({
+        byWorkspace: {
+          'workspace-1': {
+            status: 'ready',
+            value: { requirements: { artifacts: [] }, v2Stages: { definition } },
+          },
+        },
+      }),
+    })
+    const view = render(<ProjectStageWorkbenchHero {...input} />)
+
+    const workbench = view.container.querySelector('[data-stage="definition"]')
+    expect(workbench?.getAttribute('data-historical')).toBe('true')
+    expect(workbench?.getAttribute('data-conversation-composer-layout')).toBe('stage-history')
+    expect(screen.getAllByText('阶段完成记录')).toHaveLength(2)
+    expect(screen.getByRole('heading', { name: definition.objective })).toBeTruthy()
+    expect(screen.getByText('材料与人工决定已封存')).toBeTruthy()
+    expect(screen.getByText(/人工核对 3\/3/)).toBeTruthy()
+    expect(screen.getByText('当前基线记录')).toBeTruthy()
+    expect(screen.getByText('成功标准与交付边界')).toBeTruthy()
+    expect(screen.getByText('责任人与停止条件')).toBeTruthy()
+    expect(screen.queryByText('从输入依据到人工结论')).toBeNull()
+    expect(screen.queryByRole('button', { name: '开始本阶段工作' })).toBeNull()
+    expect(screen.queryByRole('button', { name: '刷新阶段记录' })).toBeNull()
+    expect(screen.queryByRole('button', { name: '提交 FDE 评审' })).toBeNull()
+    expect(screen.queryByRole('button', { name: '返回上一阶段' })).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: /返回当前阶段/ }))
+    expect(input.returnToCurrentStage).toHaveBeenCalledWith('workspace-1')
+    expect(input.completeV2Stage).not.toHaveBeenCalled()
+    expect(input.returnV2Stage).not.toHaveBeenCalled()
+  })
+
   it('shows a future stage as not started without presenting planned work as completed activity', () => {
     const input = props({
       useStageView: hook({ byWorkspace: { 'workspace-1': 'investigation' } }),
