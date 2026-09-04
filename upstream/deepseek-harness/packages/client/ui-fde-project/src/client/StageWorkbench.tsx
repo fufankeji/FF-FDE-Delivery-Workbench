@@ -95,6 +95,179 @@ function matchesArtifactBlocker(value: string, title: string): boolean {
   return value.includes(title) && (value.includes('尚未形成') || value.includes('无法读取'))
 }
 
+function investigationStateLabel(status: 'complete' | 'current' | 'waiting' | 'blocked'): string {
+  if (status === 'complete') return '已形成记录'
+  if (status === 'current') return '正在调查'
+  if (status === 'blocked') return '存在阻塞'
+  return '待调查'
+}
+
+function investigationFactLabel(status: 'confirmed' | 'conditional' | 'pending' | 'blocked'): string {
+  if (status === 'confirmed') return '已确认'
+  if (status === 'conditional') return '有条件'
+  if (status === 'blocked') return '阻塞'
+  return '待确认'
+}
+
+function investigationActionLabel(status: 'allowed' | 'conditional' | 'pending' | 'denied' | 'not-applicable'): string {
+  if (status === 'allowed') return '允许'
+  if (status === 'conditional') return '有条件'
+  if (status === 'denied') return '禁止'
+  if (status === 'not-applicable') return '—'
+  return '待确认'
+}
+
+function governanceAreaLabel(area: 'security' | 'privacy' | 'legal' | 'procurement' | 'finance' | 'business'): string {
+  return {
+    security: '安全',
+    privacy: '隐私',
+    legal: '法务',
+    procurement: '采购',
+    finance: '财务',
+    business: '业务',
+  }[area]
+}
+
+function InvestigationStagePanel({ props, workspace, sessionId, view, stageState, surface }: {
+  readonly props: WorkbenchProps
+  readonly workspace: { readonly workspaceId: string; readonly title: string; readonly path: string }
+  readonly sessionId: string
+  readonly view: boolean
+  readonly stageState: ProjectStageValue
+  readonly surface: V2StageSurfaceSnapshot | undefined
+}) {
+  const [reviewing, setReviewing] = useState(false)
+  const [returning, setReturning] = useState(false)
+  const [returnReason, setReturnReason] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  if (surface === undefined) return <section className={css.state} role="alert"><strong>第三阶段资料尚未加载</strong><span>请刷新项目工作台后重试。</span></section>
+
+  const investigation = surface.investigation
+  const currentWork = surface.workItems.find(item => item.id === surface.currentWorkId) ?? surface.workItems[0]
+  const openBlockers = surface.blockers.filter(item => item.status === 'open')
+  const artifactById = new Map(surface.artifacts.map(artifact => [artifact.id, artifact]))
+  const systemMap = artifactById.get('system-access-map')
+  const dataReadiness = artifactById.get('data-readiness')
+  const governanceReview = artifactById.get('governance-review')
+  const structured = investigation !== undefined
+  const systemNodes = investigation?.systems ?? []
+  const connections = investigation?.connections ?? []
+  const actionBoundaries = investigation?.actionBoundaries ?? []
+  const dataFindings = investigation?.dataFindings ?? []
+  const governanceReviews = investigation?.governanceReviews ?? []
+
+  const openFile = (path: string, title: string): void => {
+    setError(null)
+    void props.openProjectFile(sessionId, workspace.path, path, title).catch((cause: unknown) => {
+      setError(cause instanceof Error ? cause.message : String(cause))
+    })
+  }
+  const complete = async (): Promise<void> => {
+    setSubmitting(true); setError(null)
+    try { await props.completeV2Stage(workspace.workspaceId, stageState.revision, 'investigation') }
+    catch (cause: unknown) { setError(cause instanceof Error ? cause.message : String(cause)) }
+    finally { setSubmitting(false) }
+  }
+  const returnStage = async (): Promise<void> => {
+    if (returnReason.trim() === '') { setError('请先说明为什么要返回上一阶段。'); return }
+    setSubmitting(true); setError(null)
+    try { await props.returnV2Stage(workspace.workspaceId, stageState.revision, returnReason) }
+    catch (cause: unknown) { setError(cause instanceof Error ? cause.message : String(cause)) }
+    finally { setSubmitting(false) }
+  }
+
+  return <section
+    className={`${css.root} ${css.investigationStageRoot}`}
+    data-fde-stage-workbench=""
+    data-conversation-hero-project=""
+    data-stage="investigation"
+    data-conversation-composer-layout="stage-investigation"
+    data-conversation-composer-overlay={view ? '' : undefined}
+    aria-label="项目阶段工作台：调查数据、系统、接口、安全与组织"
+  >
+    <div className={css.investigationShell}>
+      <main>
+        <section className={css.investigationHero}>
+          <div>
+            <span>第 3/8 阶段 · 真实环境尽职调查</span>
+            <h1>{surface.objective}</h1>
+            <p>{surface.explanation}</p>
+            <div className={css.investigationHeroFacts}>
+              <b>{surface.presentCount}/{surface.requiredCount} 份固定记录</b>
+              <b>{openBlockers.length} 项未解决事项</b>
+              <b>{surface.reviewReady ? '可提交 FDE 评审' : '尚未进入方案设计'}</b>
+            </div>
+          </div>
+          <div className={css.investigationStageRing} aria-label="当前处于第 3 阶段，共 8 个阶段"><strong>3<small>/8</small></strong><span>{surface.reviewReady ? '待评审' : '调查中'}</span></div>
+          <img src="/fde-dashboard/stage-evidence-stack-3d.webp" alt="" aria-hidden="true" />
+        </section>
+
+        <section className={css.investigationOverview} aria-label="第三阶段调查总览">
+          <header><div><span>调查总览</span><h2>四个现场条件必须分别有证据</h2></div><b>{currentWork?.title ?? '等待调查记录'}</b></header>
+          <div>{surface.workItems.map((item, index) => <article key={item.id} data-status={item.status}>
+            <i>{String(index + 1).padStart(2, '0')}</i>
+            <span><small>{['数据能不能用', '系统能不能接', 'AI 允许做到哪一步', '谁负责和谁批准'][index] ?? item.title}</small><strong>{item.title}</strong><p>{item.purpose}</p></span>
+            <b>{investigationStateLabel(item.status)}</b>
+          </article>)}</div>
+        </section>
+
+        <div className={css.investigationPrimaryGrid}>
+          <section className={css.environmentMap}>
+            <header><div><span>系统与数据关系</span><h2>真实环境中的对象和连接</h2><p>节点、连接、Owner 和条件只来自调查记录，不根据示例推断。</p></div>
+              {systemMap?.status === 'present' && <button type="button" onClick={() => { openFile(systemMap.path, systemMap.title) }}>查看系统与访问记录</button>}
+            </header>
+            {systemNodes.length > 0
+              ? <><div className={css.environmentNodes}>{systemNodes.map(node => <article key={node.id} data-kind={node.kind} data-status={node.status}>
+                <i>{node.kind === 'data' ? '数' : node.kind === 'system' ? '系' : node.kind === 'actor' ? '责' : '外'}</i>
+                <span><strong>{node.label}</strong><small>{node.owner === undefined ? 'Owner 待确认' : `Owner · ${node.owner}`}</small>{node.note !== undefined && <p>{node.note}</p>}</span>
+                <b>{investigationFactLabel(node.status)}</b>
+              </article>)}</div>
+              {connections.length > 0 && <div className={css.environmentConnections}>{connections.map((connection, index) => <span key={`${connection.from}-${connection.to}-${String(index)}`}><b>{systemNodes.find(node => node.id === connection.from)?.label ?? connection.from}</b><i>→</i><b>{systemNodes.find(node => node.id === connection.to)?.label ?? connection.to}</b><small>{connection.label ?? '关系已登记'}</small></span>)}</div>}</>
+              : <div className={css.investigationEmpty}><strong>还没有登记真实系统关系</strong><p>完成数据与系统只读调查后，这里才显示真实节点、连接、Owner 和访问条件。</p></div>}
+          </section>
+
+          <section className={css.actionBoundaryMatrix}>
+            <header><span>AI 动作边界</span><h2>读取、建议、草稿和执行不能混淆</h2><p>工具可用不等于获准执行；未知权限始终保持待确认。</p></header>
+            <div className={css.actionBoundaryTable}>
+              <div><b>调查对象</b><b>读取</b><b>生成建议</b><b>写草稿</b><b>正式执行</b></div>
+              {actionBoundaries.map(row => <div key={row.target}><strong>{row.target}</strong>{(['read', 'suggest', 'draft', 'execute'] as const).map(action => <span key={action} data-status={row[action]}>{investigationActionLabel(row[action])}</span>)}</div>)}
+            </div>
+            {actionBoundaries.length === 0 && <div className={css.investigationEmpty}><strong>动作权限尚未形成矩阵</strong><p>请分别核对读取、生成建议、写草稿和正式执行，不要用一个“有权限”概括。</p></div>}
+          </section>
+        </div>
+
+        <div className={css.investigationSecondaryGrid}>
+          <section className={css.investigationFindings}>
+            <header><div><span>数据适用性</span><h2>质量、口径和可取得条件</h2></div>{dataReadiness?.status === 'present' && <button type="button" onClick={() => { openFile(dataReadiness.path, dataReadiness.title) }}>查看记录</button>}</header>
+            {dataFindings.length > 0 ? <div>{dataFindings.map(item => <article key={item.label} data-status={item.status}><span><strong>{item.label}</strong><small>{item.status === 'confirmed' ? '已确认' : item.status === 'warning' ? '需关注' : item.status === 'blocked' ? '阻塞' : '待确认'}</small></span><b>{item.value}</b></article>)}</div> : <div className={css.investigationEmpty}><strong>尚未登记结构化数据发现</strong><p>{dataReadiness?.status === 'present' ? '已有数据记录，但还没有可投影的字段质量、缺失率或口径结论。' : '数据来源、质量、敏感性和取得方式仍待调查。'}</p></div>}
+          </section>
+
+          <section className={css.investigationGovernance}>
+            <header><div><span>治理与责任</span><h2>各类审查独立记录</h2></div>{governanceReview?.status === 'present' && <button type="button" onClick={() => { openFile(governanceReview.path, governanceReview.title) }}>查看记录</button>}</header>
+            {governanceReviews.length > 0 ? <div>{governanceReviews.map(item => <article key={item.area} data-status={item.status}><i>{governanceAreaLabel(item.area).slice(0, 1)}</i><span><strong>{governanceAreaLabel(item.area)}</strong><small>{item.owner ?? '批准人待确认'}</small>{item.note !== undefined && <p>{item.note}</p>}</span><b>{investigationFactLabel(item.status)}</b></article>)}</div> : <div className={css.investigationEmpty}><strong>安全、隐私和责任结论尚未登记</strong><p>一种审查通过不能替代其他审查；没有有权确认人时必须保持待确认。</p></div>}
+          </section>
+        </div>
+
+        <section className={css.investigationGate}>
+          <header><div><span>阻塞、固定产物与 FDE 阶段门</span><h2>{surface.reviewReady ? '环境证据已齐备，等待人工决定' : '还不能进入方案设计'}</h2><p>{structured ? '以下状态来自当前调查记录。' : '当前只有阶段骨架；结构化环境事实尚未写入状态文件。'}</p></div><b>{surface.presentCount}/{surface.requiredCount} 份记录</b></header>
+          <div className={css.investigationArtifacts}>{surface.artifacts.map(artifact => <article key={artifact.id} data-status={artifact.status}><i><EvidenceDocumentIcon /></i><span><strong>{artifact.title}</strong><small>{artifact.purpose}</small></span><b>{artifact.status === 'present' ? '已形成' : artifact.status === 'error' ? '读取失败' : '待形成'}</b>{artifact.status === 'present' && <button type="button" onClick={() => { openFile(artifact.path, artifact.title) }}>查看</button>}</article>)}</div>
+          {openBlockers.length > 0 && <div className={css.investigationBlockers}>{openBlockers.map(blocker => <span key={blocker.id} data-severity={blocker.severity}><b>{blocker.severity === 'critical' ? '严重' : blocker.severity === 'high' ? '高风险' : '待确认'}</b>{blocker.title}</span>)}</div>}
+          <div className={css.investigationActions}>
+            <button type="button" className={css.primaryButton} onClick={() => { props.prepareStageDraft(sessionId, surface.prompt) }}>开始环境调查</button>
+            <button type="button" className={css.secondaryButton} onClick={() => { props.refreshProjectSurface(workspace.workspaceId) }}>刷新调查记录</button>
+            {surface.reviewReady && <button type="button" className={css.primaryButton} onClick={() => { setReviewing(value => !value) }}>{reviewing ? '收起人工评审' : '提交 FDE 评审'}</button>}
+            <button type="button" className={css.tertiaryButton} onClick={() => { setReturning(value => !value) }}>返回上一阶段</button>
+          </div>
+          {reviewing && <div className={css.genericReview}><strong>确认环境证据和动作边界已经核对？</strong><p>确认后进入“设计方案并完成端到端纵向切片”。未授权能力仍不能被视为可执行。</p><button type="button" className={css.primaryButton} disabled={submitting} onClick={() => { void complete() }}>{submitting ? '正在提交…' : '确认并继续'}</button></div>}
+          {returning && <div className={css.genericReview}><label htmlFor="investigation-return-reason">返回原因</label><textarea id="investigation-return-reason" value={returnReason} onChange={(event) => { setReturnReason(event.target.value) }} placeholder="例如：客户补充了新的业务边界，需要回到第二阶段重新核对。" /><button type="button" className={css.secondaryButton} disabled={submitting} onClick={() => { void returnStage() }}>保留现有材料并返回</button></div>}
+          {error !== null && <p className={css.inlineError} role="alert">{error}</p>}
+        </section>
+      </main>
+    </div>
+  </section>
+}
+
 function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage, surface, projectSurface, sourceFiles }: {
   readonly props: WorkbenchProps
   readonly workspace: { readonly workspaceId: string; readonly title: string; readonly path: string }
@@ -931,6 +1104,12 @@ function StageWorkbenchPanel({ props, workspace, sessionId, view }: {
   }
 
   if (v2Stage !== undefined && v2Stage !== 'discovery' && stageState?.status === 'ready') {
+    if (v2Stage === 'investigation') {
+      return <InvestigationStagePanel
+        props={props} workspace={workspace} sessionId={sessionId} view={view}
+        stageState={stageState.value} surface={surface?.v2Stages.investigation}
+      />
+    }
     return <LaterStagePanel
       props={props} workspace={workspace} sessionId={sessionId} view={view}
       stageState={stageState.value} stage={v2Stage}

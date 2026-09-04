@@ -2,7 +2,7 @@
 
 import { readFile, stat } from 'node:fs/promises'
 import { join } from 'node:path'
-import type { V2LifecycleStageId, V2StageArtifactSnapshot, V2StageSurfaceSnapshot } from './types.ts'
+import type { V2InvestigationSnapshot, V2LifecycleStageId, V2StageArtifactSnapshot, V2StageSurfaceSnapshot } from './types.ts'
 
 const MAX_STATE_BYTES = 256 * 1024
 
@@ -176,7 +176,45 @@ async function readState(root: string, definition: StageDefinition): Promise<{ s
     const info = await stat(path)
     if (!info.isFile() || info.size > MAX_STATE_BYTES) throw new Error('阶段状态文件不是普通 JSON，或超过 256 KiB。')
     const value = asRecord(JSON.parse(await readFile(path, 'utf8')) as unknown)
-    if (value === undefined || value.stage !== definition.id) throw new Error(`stage 必须是 ${definition.id}。`)
+    if (value === undefined) throw new Error('根对象必须是 JSON 对象。')
+    if (value.schemaVersion !== 1) throw new Error('schemaVersion 必须是 1。')
+    if (value.stage !== definition.id) throw new Error(`stage 必须是 ${definition.id}。`)
+    if (stageStatus(value.status) === undefined) throw new Error('status 必须是 working、blocked 或 review-ready。')
+
+    if (!Array.isArray(value.workItems)) throw new Error('workItems 必须是数组，不能写成对象映射。')
+    const expectedWorkIds = new Set(definition.workItems.map(item => item.id))
+    const foundWorkIds = new Set<string>()
+    for (const raw of value.workItems) {
+      const item = asRecord(raw)
+      if (item === undefined || typeof item.id !== 'string' || !expectedWorkIds.has(item.id)) {
+        throw new Error('workItems 包含未知或无效的固定工作项 ID。')
+      }
+      if (foundWorkIds.has(item.id)) throw new Error(`workItems 中的 ${item.id} 重复。`)
+      if (workStatus(item.status) === undefined) throw new Error(`workItems.${item.id}.status 无效。`)
+      foundWorkIds.add(item.id)
+    }
+    const missingWorkIds = definition.workItems.filter(item => !foundWorkIds.has(item.id)).map(item => item.id)
+    if (missingWorkIds.length > 0) throw new Error(`workItems 缺少固定工作项：${missingWorkIds.join('、')}。`)
+
+    if (!Array.isArray(value.blockers)) throw new Error('blockers 必须是数组。')
+    const blockerIds = new Set<string>()
+    for (const raw of value.blockers) {
+      const blocker = asRecord(raw)
+      if (blocker === undefined || typeof blocker.id !== 'string' || blocker.id.trim() === '') {
+        throw new Error('blockers 每项必须包含非空 id。')
+      }
+      if (blockerIds.has(blocker.id)) throw new Error(`blockers 中的 ${blocker.id} 重复。`)
+      if (typeof blocker.title !== 'string' || blocker.title.trim() === '') throw new Error(`blockers.${blocker.id}.title 必须是非空字符串。`)
+      if (blocker.severity !== 'low' && blocker.severity !== 'medium' && blocker.severity !== 'high' && blocker.severity !== 'critical') {
+        throw new Error(`blockers.${blocker.id}.severity 无效。`)
+      }
+      if (blocker.status !== 'open' && blocker.status !== 'resolved') throw new Error(`blockers.${blocker.id}.status 无效。`)
+      blockerIds.add(blocker.id)
+    }
+    if (recommendationStatus(value.recommendation) === undefined) {
+      throw new Error('recommendation 必须是 pending、go、revise、narrow 或 stop。')
+    }
+    if (definition.id === 'investigation') parseInvestigation(value.investigation)
     return { status: 'ready', value }
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') return { status: 'missing' }
@@ -184,12 +222,120 @@ async function readState(root: string, definition: StageDefinition): Promise<{ s
   }
 }
 
+function stageStatus(value: unknown): 'working' | 'blocked' | 'review-ready' | undefined {
+  return value === 'working' || value === 'blocked' || value === 'review-ready' ? value : undefined
+}
+
 function workStatus(value: unknown): 'complete' | 'current' | 'waiting' | 'blocked' | undefined {
   return value === 'complete' || value === 'current' || value === 'waiting' || value === 'blocked' ? value : undefined
 }
 
+function recommendationStatus(value: unknown): V2StageSurfaceSnapshot['recommendation'] | undefined {
+  return value === 'pending' || value === 'go' || value === 'revise' || value === 'narrow' || value === 'stop' ? value : undefined
+}
+
 function recommendation(value: unknown): V2StageSurfaceSnapshot['recommendation'] {
-  return value === 'go' || value === 'revise' || value === 'narrow' || value === 'stop' ? value : 'pending'
+  return recommendationStatus(value) ?? 'pending'
+}
+
+function requiredText(record: Record<string, unknown>, key: string, path: string): string {
+  const value = record[key]
+  if (typeof value !== 'string' || value.trim() === '') throw new Error(`${path}.${key} 必须是非空字符串。`)
+  return value
+}
+
+function optionalText(record: Record<string, unknown>, key: string, path: string): string | undefined {
+  const value = record[key]
+  if (value === undefined) return undefined
+  if (typeof value !== 'string' || value.trim() === '') throw new Error(`${path}.${key} 必须是非空字符串。`)
+  return value
+}
+
+function investigationStatus(value: unknown): 'confirmed' | 'conditional' | 'pending' | 'blocked' | undefined {
+  return value === 'confirmed' || value === 'conditional' || value === 'pending' || value === 'blocked' ? value : undefined
+}
+
+function actionBoundaryStatus(value: unknown): 'allowed' | 'conditional' | 'pending' | 'denied' | 'not-applicable' | undefined {
+  return value === 'allowed' || value === 'conditional' || value === 'pending' || value === 'denied' || value === 'not-applicable' ? value : undefined
+}
+
+function parseInvestigation(value: unknown): V2InvestigationSnapshot | undefined {
+  if (value === undefined) return undefined
+  const record = asRecord(value)
+  if (record === undefined) throw new Error('investigation 必须是 JSON 对象。')
+  for (const key of ['systems', 'connections', 'actionBoundaries', 'dataFindings', 'governanceReviews']) {
+    if (!Array.isArray(record[key])) throw new Error(`investigation.${key} 必须是数组。`)
+  }
+
+  const systemIds = new Set<string>()
+  const systems = (record.systems as unknown[]).map((raw, index) => {
+    const path = `investigation.systems[${String(index)}]`
+    const item = asRecord(raw)
+    if (item === undefined) throw new Error(`${path} 必须是 JSON 对象。`)
+    const id = requiredText(item, 'id', path)
+    if (systemIds.has(id)) throw new Error(`investigation.systems 中的 ${id} 重复。`)
+    if (item.kind !== 'data' && item.kind !== 'system' && item.kind !== 'external' && item.kind !== 'actor') throw new Error(`${path}.kind 无效。`)
+    const status = investigationStatus(item.status)
+    if (status === undefined) throw new Error(`${path}.status 无效。`)
+    const owner = optionalText(item, 'owner', path)
+    const note = optionalText(item, 'note', path)
+    systemIds.add(id)
+    return {
+      id,
+      label: requiredText(item, 'label', path),
+      kind: item.kind,
+      status,
+      ...(owner === undefined ? {} : { owner }),
+      ...(note === undefined ? {} : { note }),
+    }
+  })
+
+  const connections = (record.connections as unknown[]).map((raw, index) => {
+    const path = `investigation.connections[${String(index)}]`
+    const item = asRecord(raw)
+    if (item === undefined) throw new Error(`${path} 必须是 JSON 对象。`)
+    const from = requiredText(item, 'from', path)
+    const to = requiredText(item, 'to', path)
+    if (!systemIds.has(from) || !systemIds.has(to)) throw new Error(`${path} 必须引用已登记的系统节点。`)
+    const label = optionalText(item, 'label', path)
+    return { from, to, ...(label === undefined ? {} : { label }) }
+  })
+
+  const actionBoundaries = (record.actionBoundaries as unknown[]).map((raw, index) => {
+    const path = `investigation.actionBoundaries[${String(index)}]`
+    const item = asRecord(raw)
+    if (item === undefined) throw new Error(`${path} 必须是 JSON 对象。`)
+    const read = actionBoundaryStatus(item.read)
+    const suggest = actionBoundaryStatus(item.suggest)
+    const draft = actionBoundaryStatus(item.draft)
+    const execute = actionBoundaryStatus(item.execute)
+    if (read === undefined || suggest === undefined || draft === undefined || execute === undefined) throw new Error(`${path} 包含无效动作边界状态。`)
+    return { target: requiredText(item, 'target', path), read, suggest, draft, execute }
+  })
+
+  const dataFindings = (record.dataFindings as unknown[]).map((raw, index) => {
+    const path = `investigation.dataFindings[${String(index)}]`
+    const item = asRecord(raw)
+    if (item === undefined) throw new Error(`${path} 必须是 JSON 对象。`)
+    const status = item.status
+    if (status !== 'confirmed' && status !== 'warning' && status !== 'pending' && status !== 'blocked') throw new Error(`${path}.status 无效。`)
+    return { label: requiredText(item, 'label', path), value: requiredText(item, 'value', path), status }
+  })
+
+  const governanceReviews = (record.governanceReviews as unknown[]).map((raw, index) => {
+    const path = `investigation.governanceReviews[${String(index)}]`
+    const item = asRecord(raw)
+    if (item === undefined) throw new Error(`${path} 必须是 JSON 对象。`)
+    const area = item.area
+    if (area !== 'security' && area !== 'privacy' && area !== 'legal' && area !== 'procurement' && area !== 'finance' && area !== 'business') throw new Error(`${path}.area 无效。`)
+    const status = investigationStatus(item.status)
+    if (status === undefined) throw new Error(`${path}.status 无效。`)
+    const owner = optionalText(item, 'owner', path)
+    const note = optionalText(item, 'note', path)
+    return { area, status, ...(owner === undefined ? {} : { owner }), ...(note === undefined ? {} : { note }) }
+  })
+
+  return { systems, connections, actionBoundaries, dataFindings, governanceReviews }
 }
 
 /** Load one V2 stage without mutating project files or trusting declared artifact presence. */
@@ -206,10 +352,9 @@ export async function loadV2StageSurface(root: string, stageId: V2LifecycleStage
     const record = asRecord(raw)
     return [typeof record?.id === 'string' ? record.id : '', workStatus(record?.status)] as const
   }))
-  const fallbackIndex = Math.min(definition.workItems.length - 1, presentCount)
   const workItems = definition.workItems.map((item, index) => ({
     ...item,
-    status: declared.get(item.id) ?? (index < fallbackIndex ? 'complete' as const : index === fallbackIndex ? 'current' as const : 'waiting' as const),
+    status: declared.get(item.id) ?? (index === 0 ? 'current' as const : 'waiting' as const),
   }))
   const currentWorkId = workItems.find(item => item.status === 'current' || item.status === 'blocked')?.id
     ?? workItems.at(-1)?.id
@@ -229,12 +374,21 @@ export async function loadV2StageSurface(root: string, stageId: V2LifecycleStage
       status: status as 'open' | 'resolved',
     }]
   })
+  const investigation = definition.id === 'investigation'
+    ? parseInvestigation(state.value?.investigation)
+    : undefined
   const reviewBlockers: string[] = []
   if (state.status === 'missing') reviewBlockers.push(`尚未生成阶段状态文件 ${definition.statePath}`)
   if (state.status === 'invalid') reviewBlockers.push(`阶段状态文件无法读取：${state.message ?? '结构无效'}`)
+  if (definition.id === 'investigation' && state.status === 'ready' && investigation === undefined) {
+    reviewBlockers.push('环境调查驾驶舱尚未形成结构化记录')
+  }
   for (const artifact of artifacts.filter(item => item.required && item.status !== 'present')) reviewBlockers.push(`${artifact.title}尚未形成`)
   for (const blocker of blockers.filter(item => item.status === 'open' && (item.severity === 'high' || item.severity === 'critical'))) reviewBlockers.push(blocker.title)
   const declaredStatus = state.value?.status
+  if (declaredStatus === 'review-ready' && workItems.some(item => item.status !== 'complete')) {
+    reviewBlockers.push('阶段工作项尚未全部完成')
+  }
   const status = reviewBlockers.length > 0 || declaredStatus === 'blocked'
     ? 'blocked'
     : declaredStatus === 'review-ready'
@@ -253,6 +407,7 @@ export async function loadV2StageSurface(root: string, stageId: V2LifecycleStage
     presentCount,
     reviewReady: reviewBlockers.length === 0 && status === 'review-ready',
     reviewBlockers,
+    ...(definition.id !== 'investigation' ? {} : { investigation }),
     ...(state.message === undefined ? {} : { message: state.message }),
   }
 }

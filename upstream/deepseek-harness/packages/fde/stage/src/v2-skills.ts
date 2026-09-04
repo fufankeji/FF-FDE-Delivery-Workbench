@@ -33,11 +33,13 @@ const COMMON_V2_STAGE_RULES = `## 共同行为
 - \`schemaVersion: 1\`；
 - \`stage\`：必须等于当前阶段 ID；
 - \`status\`：只能是 \`working\`、\`blocked\` 或 \`review-ready\`；
-- \`workItems\`：逐项记录固定工作项 ID 与 \`waiting\`、\`current\`、\`blocked\` 或 \`complete\`；
+- \`workItems\`：必须是 JSON 数组，每项包含固定工作项 \`id\` 与 \`status\`；不得写成对象映射；每个固定 ID 必须恰好出现一次，\`status\` 只能是 \`waiting\`、\`current\`、\`blocked\` 或 \`complete\`；
 - \`blockers\`：每项包含稳定 \`id\`、\`title\`、\`severity\`（low／medium／high／critical）和 \`status\`（open／resolved）；
 - \`recommendation\`：只能是 \`pending\`、\`go\`、\`revise\`、\`narrow\` 或 \`stop\`。
 
-只有固定产物都已形成、工作项已如实更新且没有未解决的 high／critical 阻塞时，才可把 status 写为 review-ready。最终回复说明本轮读取了什么、更新了什么、仍缺什么，以及建议 FDE 接下来做哪一项人工判断。`
+先更新固定产物，再重新读取全部固定产物和当前状态，最后写入状态文件。状态文件必须是本轮最后一次文件写入；已经完成、当前处理和受阻的工作项要分别写为 complete、current 和 blocked，不能把全部工作项长期保留为 current。
+
+只有固定产物都已形成、工作项已如实更新且没有未解决的 high／critical 阻塞时，才可把 status 写为 review-ready。最终回复必须在最后一次重读之后，说明本轮读取了什么、更新了什么、仍缺什么，以及建议 FDE 接下来做哪一项人工判断。`
 
 const VALUE_METHOD_SOURCE = 'davidahmann/fde-guide@060ef0f3b67743b2e1fc3705763d423eae980236'
 const FRAME_ENGINEERING_SOURCE = 'rpraharaj/forward-deployed-engineer@ee045a66db5242617ccea9e5e33139a2980ab55e'
@@ -447,7 +449,25 @@ const V2_STAGE_SKILL_DEFINITIONS: readonly V2GroupedStageSkillDefinition[] = [
 function contentFor(definition: V2StageSkillDefinition): string {
   const artifactList = definition.artifacts.map((path, index) => `${String(index + 1)}. \`${path}\``).join('\n')
   const workItemList = definition.workItems.map(id => `\`${id}\``).join('、')
-  return `# ${definition.label}\n\n${definition.instructions}\n\n## 固定产物\n\n${artifactList}\n\n状态文件：\`${definition.statePath}\`；其中根对象 \`stage\` 必须固定写为 \`${definition.stage}\`，不能写成产物目录名或中文阶段名。固定工作项 ID：${workItemList}。\n\n${COMMON_V2_STAGE_RULES}`
+  const stateExample = JSON.stringify({
+    schemaVersion: 1,
+    stage: definition.stage,
+    status: 'working',
+    workItems: definition.workItems.map((id, index) => ({ id, status: index === 0 ? 'current' : 'waiting' })),
+    blockers: [],
+    recommendation: 'pending',
+    ...(definition.stage !== 'investigation' ? {} : {
+      investigation: {
+        systems: [],
+        connections: [],
+        actionBoundaries: [],
+        dataFindings: [],
+        governanceReviews: [],
+      },
+    }),
+  }, null, 2)
+  const investigationRules = definition.stage !== 'investigation' ? '' : `\n\n## 环境调查驾驶舱\n\n为了让工作台展示真实环境，而不是写死示例，调查后同步维护 \`investigation\`：\`systems\` 记录数据源、系统、外部服务和责任人节点；\`connections\` 只引用已登记节点；\`actionBoundaries\` 对每个真实对象分别记录 read、suggest、draft、execute，状态只能是 allowed、conditional、pending、denied 或 not-applicable；\`dataFindings\` 记录有来源的质量与口径发现；\`governanceReviews\` 将安全、隐私、法务、采购、财务和业务审查分别记录。没有证据时使用空数组或 pending，不得填入演示数据。\n\n第三阶段只调查真实环境与动作边界，不构建本体、不设计架构、不选择模型，也不开始开发。`
+  return `# ${definition.label}\n\n${definition.instructions}\n\n## 固定产物\n\n${artifactList}\n\n状态文件：\`${definition.statePath}\`；其中根对象 \`stage\` 必须固定写为 \`${definition.stage}\`，不能写成产物目录名或中文阶段名。固定工作项 ID：${workItemList}。\n\n## 状态文件结构\n\n下面只示范固定 JSON 结构；各项状态、阻塞和建议必须依据本轮事实填写：\n\n\`\`\`json\n${stateExample}\n\`\`\`${investigationRules}\n\n${COMMON_V2_STAGE_RULES}`
 }
 
 function registeredSkill(definition: V2StageSkillDefinition) {
@@ -510,7 +530,7 @@ export const V2_STAGE_SKILL_CATALOG = V2_POST_DEFINITION_STAGES.map(stage => ({
 /** Return short model guidance for the current authoritative V2 stage. */
 export function v2StagePrompt(stage: FdeV2StageId): string {
   if (stage === 'definition') {
-    return '当前 FDE 项目处于“定义结果、范围与责任”。用户开展本阶段工作时，先按任务加载必要方法：通常从 `engineer-ai-value` 开始，再根据当前缺口使用 `requirements-to-spec`、`feasibility-probe`、`estimation` 或 `delivery-plan`；信息不足、现场事实变化、需要负责人决定或范围周期资源冲突时，才分别使用 `qualify-ai-workflow`、`reframe-ai-engagement`、`stakeholder-brief` 或 `escalation-and-renegotiation`。不得为了显得完整一次加载全部。严格维护固定产物与状态文件；`.fde/stages/definition.json` 根对象的 `stage` 必须固定写为 `definition`，不能写成 `outcome-scope`。只记录真实来源和执行证据；你不能代替 FDE 确认客户结论、执行未授权外部动作或推进项目阶段。'
+    return '当前 FDE 项目处于“定义结果、范围与责任”。用户开展本阶段工作时，先按任务加载必要方法：通常从 `engineer-ai-value` 开始，再根据当前缺口使用 `requirements-to-spec`、`feasibility-probe`、`estimation` 或 `delivery-plan`；信息不足、现场事实变化、需要负责人决定或范围周期资源冲突时，才分别使用 `qualify-ai-workflow`、`reframe-ai-engagement`、`stakeholder-brief` 或 `escalation-and-renegotiation`。不得为了显得完整一次加载全部。严格维护固定产物与状态文件；`.fde/stages/definition.json` 根对象的 `stage` 必须固定写为 `definition`，不能写成 `outcome-scope`；`workItems` 必须是逐项包含 `id` 与 `status` 的数组，不能写成对象映射。只记录真实来源和执行证据；你不能代替 FDE 确认客户结论、执行未授权外部动作或推进项目阶段。'
   }
   const stageDefinition = V2_POST_DEFINITION_STAGES.find(item => item.id === stage)
   const definitions = V2_STAGE_SKILL_DEFINITIONS.filter(item => item.stage === stage)
@@ -519,5 +539,6 @@ export function v2StagePrompt(stage: FdeV2StageId): string {
   const required = definitions.filter(item => item.group === 'required').map(item => `\`${item.name}\``).join('、')
   const conditional = definitions.filter(item => item.group === 'conditional').map(item => `\`${item.name}\``).join('、')
   const statePath = firstDefinition.statePath
-  return `当前 FDE 项目处于“${stageDefinition.label}”。本阶段必做方法：${required}；只有出现对应业务条件时才使用：${conditional}。先判断当前任务和缺口，再加载最少必要的 Skill；不得为了显得完整一次加载全部。严格维护固定产物与状态文件；\`${statePath}\` 根对象的 \`stage\` 必须固定写为 \`${stage}\`。只记录真实来源和执行证据；你不能代替 FDE 确认客户结论、执行未授权外部动作或推进项目阶段。`
+  const stageBoundary = stage === 'investigation' ? '同步维护 investigation 的真实系统节点、连接、动作边界、数据发现和独立治理审查；没有证据时保持空数组或 pending。第三阶段不得设计架构、选择模型或开始开发。' : ''
+  return `当前 FDE 项目处于“${stageDefinition.label}”。本阶段必做方法：${required}；只有出现对应业务条件时才使用：${conditional}。先判断当前任务和缺口，再加载最少必要的 Skill；不得为了显得完整一次加载全部。严格维护固定产物与状态文件；\`${statePath}\` 根对象的 \`stage\` 必须固定写为 \`${stage}\`；\`workItems\` 必须是逐项包含 \`id\` 与 \`status\` 的数组，不能写成对象映射。${stageBoundary}只记录真实来源和执行证据；你不能代替 FDE 确认客户结论、执行未授权外部动作或推进项目阶段。`
 }

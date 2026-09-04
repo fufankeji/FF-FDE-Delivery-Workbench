@@ -107,6 +107,21 @@ describe('FDE project surface snapshot', () => {
       stateStatus: 'invalid', status: 'blocked', reviewReady: false,
       reviewBlockers: ['阶段状态文件无法读取：stage 必须是 definition。'],
     })
+
+    await writeFile(join(states, 'definition.json'), JSON.stringify({
+      schemaVersion: 1,
+      stage: 'definition',
+      status: 'working',
+      workItems: { baseline: 'complete', outcome: 'current', scope: 'waiting', ownership: 'waiting' },
+      blockers: [],
+      recommendation: 'pending',
+    }))
+    const invalidShape = await loadV2StageSurface(root, 'definition')
+    expect(invalidShape).toMatchObject({
+      stateStatus: 'invalid', status: 'blocked', reviewReady: false,
+      reviewBlockers: ['阶段状态文件无法读取：workItems 必须是数组，不能写成对象映射。'],
+    })
+    expect(invalidShape.workItems.map(item => item.status)).toEqual(['current', 'waiting', 'waiting', 'waiting'])
   })
 
   it('keeps unconfigured project surfaces honest', async () => {
@@ -136,6 +151,88 @@ describe('FDE project surface snapshot', () => {
       contract: { status: 'missing', metrics: [] },
       artifacts: { requiredCount: 3, presentCount: 0 },
       gateReady: false,
+    })
+  })
+
+  it('projects structured investigation facts and rejects relationships to unknown nodes', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'fde-v2-investigation-'))
+    const outputs = join(root, 'fde-deliverables', '03-environment')
+    const states = join(root, '.fde', 'stages')
+    await mkdir(outputs, { recursive: true })
+    await mkdir(states, { recursive: true })
+    for (const name of ['data-readiness.md', 'system-access-map.md', 'governance-review.md']) {
+      await writeFile(join(outputs, name), `# ${name}\n`)
+    }
+    const state = {
+      schemaVersion: 1,
+      stage: 'investigation',
+      status: 'working',
+      workItems: [
+        { id: 'data', status: 'complete' }, { id: 'systems', status: 'current' },
+        { id: 'access', status: 'waiting' }, { id: 'owners', status: 'waiting' },
+      ],
+      blockers: [],
+      recommendation: 'pending',
+      investigation: {
+        systems: [
+          { id: 'tickets', label: '历史工单', kind: 'data', status: 'confirmed', owner: '售后主管' },
+          { id: 'sandbox', label: '工单 Sandbox', kind: 'system', status: 'conditional' },
+        ],
+        connections: [{ from: 'tickets', to: 'sandbox', label: '只读样本' }],
+        actionBoundaries: [{
+          target: '工单 Sandbox', read: 'allowed', suggest: 'allowed',
+          draft: 'conditional', execute: 'denied',
+        }],
+        dataFindings: [{ label: '设备 ID 缺失率', value: '17%', status: 'warning' }],
+        governanceReviews: [{ area: 'security', status: 'conditional', owner: '信息安全' }],
+      },
+    }
+    await writeFile(join(states, 'investigation.json'), JSON.stringify(state))
+
+    await expect(loadV2StageSurface(root, 'investigation')).resolves.toMatchObject({
+      stateStatus: 'ready',
+      investigation: {
+        systems: [{ id: 'tickets', status: 'confirmed' }, { id: 'sandbox', status: 'conditional' }],
+        connections: [{ from: 'tickets', to: 'sandbox', label: '只读样本' }],
+        actionBoundaries: [{ target: '工单 Sandbox', execute: 'denied' }],
+        dataFindings: [{ label: '设备 ID 缺失率', value: '17%', status: 'warning' }],
+        governanceReviews: [{ area: 'security', status: 'conditional', owner: '信息安全' }],
+      },
+    })
+
+    await writeFile(join(states, 'investigation.json'), JSON.stringify({
+      ...state,
+      status: 'review-ready',
+      recommendation: 'go',
+    }))
+    await expect(loadV2StageSurface(root, 'investigation')).resolves.toMatchObject({
+      status: 'blocked',
+      reviewReady: false,
+      reviewBlockers: ['阶段工作项尚未全部完成'],
+    })
+
+    await writeFile(join(states, 'investigation.json'), JSON.stringify({
+      schemaVersion: 1,
+      stage: 'investigation',
+      status: 'review-ready',
+      workItems: state.workItems.map(item => ({ ...item, status: 'complete' })),
+      blockers: [],
+      recommendation: 'go',
+    }))
+    await expect(loadV2StageSurface(root, 'investigation')).resolves.toMatchObject({
+      stateStatus: 'ready',
+      status: 'blocked',
+      reviewReady: false,
+      reviewBlockers: ['环境调查驾驶舱尚未形成结构化记录'],
+    })
+
+    await writeFile(join(states, 'investigation.json'), JSON.stringify({
+      ...state,
+      investigation: { ...state.investigation, connections: [{ from: 'tickets', to: 'production' }] },
+    }))
+    await expect(loadV2StageSurface(root, 'investigation')).resolves.toMatchObject({
+      stateStatus: 'invalid',
+      reviewBlockers: ['阶段状态文件无法读取：investigation.connections[0] 必须引用已登记的系统节点。'],
     })
   })
 

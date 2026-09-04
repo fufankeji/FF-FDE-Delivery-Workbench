@@ -503,6 +503,88 @@ describe('ProjectStageWorkbenchHero', () => {
     expect(screen.queryByRole('button', { name: '提交 FDE 评审' })).toBeNull()
   })
 
+  it('uses an evidence-backed environment cockpit for the active investigation stage', () => {
+    const input = props({
+      useStageProgress: hook({
+        byWorkspace: {
+          'workspace-1': {
+            status: 'ready',
+            value: {
+              workspaceId: 'workspace-1', currentStage: 'development', revision: 5,
+              lifecycleVersion: 2, v2Stage: 'investigation', createdAt: '', updatedAt: '',
+            },
+          },
+        },
+      }),
+      useProjectSurfaces: hook({
+        byWorkspace: {
+          'workspace-1': {
+            status: 'ready',
+            value: {
+              requirements: { artifacts: [] },
+              v2Stages: {
+                investigation: {
+                  id: 'investigation', index: 3, title: '调查数据、系统、接口、安全与组织',
+                  objective: '弄清客户现场允许做什么、现有条件能支持什么、还缺什么。',
+                  explanation: '核对真实数据、系统、权限和责任，不在未知条件上设计方案。',
+                  statePath: '.fde/stages/investigation.json', skill: 'access-and-onboarding',
+                  prompt: '请开始最小范围的环境调查。',
+                  stateStatus: 'ready', status: 'working', currentWorkId: 'systems',
+                  requiredCount: 3, presentCount: 2, reviewReady: false,
+                  reviewBlockers: ['安全审批人尚未确认'],
+                  recommendation: 'pending',
+                  workItems: [
+                    { id: 'data', title: '检查数据条件', purpose: '确认数据来源和质量。', status: 'complete' },
+                    { id: 'systems', title: '梳理系统与接口', purpose: '确认真实系统和接口。', status: 'current' },
+                    { id: 'access', title: '核对权限与安全', purpose: '确认动作边界。', status: 'waiting' },
+                    { id: 'owners', title: '确认现场责任人', purpose: '确认 Owner 和批准人。', status: 'waiting' },
+                  ],
+                  blockers: [{ id: 'security-owner', title: '安全审批人尚未确认', severity: 'high', status: 'open' }],
+                  artifacts: [
+                    { id: 'data-readiness', title: '数据可用性评估', path: 'fde-deliverables/03-environment/data-readiness.md', purpose: '记录数据条件。', required: true, status: 'present' },
+                    { id: 'system-access-map', title: '系统与访问清单', path: 'fde-deliverables/03-environment/system-access-map.md', purpose: '记录系统和权限。', required: true, status: 'present' },
+                    { id: 'governance-review', title: '安全与治理核对记录', path: 'fde-deliverables/03-environment/governance-review.md', purpose: '记录独立治理审查。', required: true, status: 'missing' },
+                  ],
+                  investigation: {
+                    systems: [
+                      { id: 'tickets', label: '历史工单', kind: 'data', status: 'confirmed', owner: '售后主管' },
+                      { id: 'sandbox', label: '工单 Sandbox', kind: 'system', status: 'conditional', note: '仅开放只读样本。' },
+                    ],
+                    connections: [{ from: 'tickets', to: 'sandbox', label: '只读样本' }],
+                    actionBoundaries: [{ target: '工单 Sandbox', read: 'allowed', suggest: 'allowed', draft: 'conditional', execute: 'denied' }],
+                    dataFindings: [{ label: '设备 ID 缺失率', value: '17%', status: 'warning' }],
+                    governanceReviews: [{ area: 'security', status: 'pending', owner: '信息安全' }],
+                  },
+                },
+              },
+            },
+          },
+        },
+      }),
+    })
+    const view = render(<ProjectStageWorkbenchHero {...input} />)
+
+    expect(screen.getByRole('heading', { name: '四个现场条件必须分别有证据' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: '真实环境中的对象和连接' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: '读取、建议、草稿和执行不能混淆' })).toBeTruthy()
+    expect(screen.getAllByText('历史工单')).toHaveLength(2)
+    expect(screen.getAllByText('工单 Sandbox')).toHaveLength(3)
+    expect(screen.getByText('17%')).toBeTruthy()
+    expect(screen.getByText('安全审批人尚未确认')).toBeTruthy()
+    expect(screen.getByText('禁止')).toBeTruthy()
+    expect(screen.queryByText('现在先做')).toBeNull()
+    expect(view.container.querySelector('[data-stage="investigation"]')?.getAttribute('data-conversation-composer-layout')).toBe('stage-investigation')
+    expect(view.container.querySelector('[data-stage="investigation"] [data-stage-artifact-column]')).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: '开始环境调查' }))
+    expect(input.prepareStageDraft).toHaveBeenCalledWith('session-1', '请开始最小范围的环境调查。')
+    fireEvent.click(screen.getByRole('button', { name: '查看系统与访问记录' }))
+    expect(input.openProjectFile).toHaveBeenCalledWith(
+      'session-1', '/isolated/project',
+      'fde-deliverables/03-environment/system-access-map.md', '系统与访问清单',
+    )
+  })
+
   it('shows a future stage as not started without presenting planned work as completed activity', () => {
     const input = props({
       useStageView: hook({ byWorkspace: { 'workspace-1': 'investigation' } }),
