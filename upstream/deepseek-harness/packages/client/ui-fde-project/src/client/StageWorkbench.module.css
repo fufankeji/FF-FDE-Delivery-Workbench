@@ -3469,7 +3469,7 @@
   grid-template-rows: auto minmax(0, 1fr);
   height: 287px;
   gap: 0;
-  padding: 17px 21px 14px;
+  padding: 10px 13px;
   overflow: hidden;
   border-color: #d9e3f3;
   border-radius: 15px;
@@ -3481,10 +3481,10 @@
   display: flex;
   justify-content: flex-start;
   gap: 8px;
-  padding: 0 0 22px;
+  padding: 0 0 8px;
   color: #174eb2;
 }
-.genericStageRoot[data-stage='definition'] .projectRecordRail > header span { font-size: 14px; font-weight: 700; }
+.genericStageRoot[data-stage='definition'] .projectRecordRail > header span { font-size: 13px; font-weight: 700; }
 .genericStageRoot[data-stage='definition'] .artifactRailIcon { width: 18px; height: 18px; stroke: #5272ad; }
 .genericStageRoot[data-stage='definition'] .projectRecordRail > header .artifactRailIcon { display: none; }
 
@@ -3492,9 +3492,9 @@
   position: relative;
   display: grid;
   min-height: 0;
-  gap: 16px;
+  gap: 5px;
   max-height: 100%;
-  padding: 0 5px 0 60px;
+  padding: 0 4px 0 44px;
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -3508,9 +3508,9 @@
 
 .genericStageRoot[data-stage='definition'] .projectRecordNodes::before {
   position: absolute;
-  top: 24px;
-  bottom: 27px;
-  left: 20px;
+  top: 21px;
+  bottom: 21px;
+  left: 14px;
   width: 2px;
   background: linear-gradient(#4081ff, #39c978 58%, #d8e2f5 58%);
   content: '';
@@ -3519,13 +3519,13 @@
 .genericStageRoot[data-stage='definition'] .projectRecordNode {
   position: relative;
   display: grid;
-  min-height: 59px;
-  grid-template-columns: 48px minmax(0, 1fr) 24px;
+  min-height: 44px;
+  grid-template-columns: 40px minmax(0, 1fr) 22px;
   grid-template-rows: auto auto;
   place-items: start;
   align-content: center;
-  gap: 3px 6px;
-  padding: 10px 15px;
+  gap: 1px 5px;
+  padding: 6px 11px;
   border-color: #dbe3f2;
   border-radius: 11px;
   background: #f7f9fd;
@@ -3537,9 +3537,9 @@
 .genericStageRoot[data-stage='definition'] .projectRecordAllButton::before {
   position: absolute;
   top: 50%;
-  left: -50px;
-  width: 12px;
-  height: 12px;
+  left: -36px;
+  width: 10px;
+  height: 10px;
   border: 3px solid #fff;
   border-radius: 50%;
   background: #8da0c7;
@@ -3554,10 +3554,10 @@
   color: #1552c0;
 }
 .genericStageRoot[data-stage='definition'] .projectRecordNode[data-current='true']::before { background: #2073ff; box-shadow: 0 0 0 4px rgba(32, 115, 255, .14); }
-.genericStageRoot[data-stage='definition'] .projectRecordNode i { grid-row: 1 / -1; align-self: center; font-size: 18px; }
-.genericStageRoot[data-stage='definition'] .projectRecordNode span { font-size: 11px; }
-.genericStageRoot[data-stage='definition'] .projectRecordNode b { font-size: 11px; }
-.recordDocumentIcon { width: 20px; height: 20px; grid-column: 3; grid-row: 1 / -1; align-self: center; justify-self: end; stroke: #8796b4; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.55; }
+.genericStageRoot[data-stage='definition'] .projectRecordNode i { grid-row: 1 / -1; align-self: center; font-size: 16px; }
+.genericStageRoot[data-stage='definition'] .projectRecordNode span { font-size: 10px; }
+.genericStageRoot[data-stage='definition'] .projectRecordNode b { font-size: 10px; }
+.recordDocumentIcon { width: 17px; height: 17px; grid-column: 3; grid-row: 1 / -1; align-self: center; justify-self: end; stroke: #8796b4; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.55; }
 .recordDocumentIcon[data-state='current'] { stroke: #075ff0; }
 .recordDocumentIcon[data-state='complete'] { stroke: #16b95f; }
 .recordDocumentIcon[data-state='all'] { stroke: #8796b4; }
@@ -3567,17 +3567,17 @@
   display: grid;
   box-sizing: border-box;
   width: 100%;
-  min-height: 54px;
-  grid-template-columns: 1fr 24px;
+  min-height: 44px;
+  grid-template-columns: 1fr 22px;
   align-items: center;
   justify-items: start;
   margin: 0;
-  padding: 8px 14px 8px 18px;
+  padding: 6px 11px;
   border-color: #dbe3f2;
   border-radius: 11px;
   background: #f7f9fd;
   color: #273553;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
 }
 .genericStageRoot[data-stage='definition'] .projectRecordAllButton > .recordDocumentIcon { grid-column: 2; grid-row: 1; justify-self: end; }
