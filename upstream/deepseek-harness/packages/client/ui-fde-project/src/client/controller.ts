@@ -24,6 +24,13 @@ export const FDE_PROJECT_RUNTIME_START_PATH = '/api/fde-project/runtime/start'
 export const FDE_PROJECT_RUNTIME_STOP_PATH = '/api/fde-project/runtime/stop'
 /** Exact Host route for settling an operation whose Agent prompt was not queued. */
 export const FDE_PROJECT_RUNTIME_ABANDON_PATH = '/api/fde-project/runtime/abandon'
+/** Exact Host routes owned by the stage-four Semantica Provider. */
+export const FDE_SEMANTICA_ROUTE_PATH = '/api/fde-semantica/route'
+export const FDE_SEMANTICA_SOURCES_PATH = '/api/fde-semantica/sources'
+export const FDE_SEMANTICA_DEFINITION_PATH = '/api/fde-semantica/definition'
+export const FDE_SEMANTICA_CANDIDATES_PATH = '/api/fde-semantica/candidates'
+export const FDE_SEMANTICA_RUN_PATH = '/api/fde-semantica/run'
+export const FDE_SEMANTICA_DECISION_PATH = '/api/fde-semantica/decision'
 
 /** Architecture node styles accepted from the project artifact. */
 export type ArchitectureNodeKind = 'default' | 'entry' | 'core' | 'store' | 'external' | 'output'
@@ -347,6 +354,256 @@ export interface V2InvestigationSnapshot {
   }[]
 }
 
+export interface V2KnowledgeGraphSnapshot {
+  readonly schemaVersion: 1
+  readonly provider: { readonly id: string; readonly version?: string }
+  readonly graphId: string
+  readonly revision: string
+  readonly ontologyVersion: string
+  readonly updatedAt: string
+  readonly nodes: readonly {
+    readonly id: string
+    readonly label: string
+    readonly type: string
+    readonly summary?: string
+    readonly communityId?: string
+    readonly confidence?: number
+    readonly validFrom?: string
+    readonly validUntil?: string
+    readonly sourceRefs: readonly string[]
+  }[]
+  readonly edges: readonly {
+    readonly id: string
+    readonly source: string
+    readonly target: string
+    readonly type: string
+    readonly label?: string
+    readonly weight: number
+    readonly confidence?: number
+    readonly validFrom?: string
+    readonly validUntil?: string
+    readonly sourceRefs: readonly string[]
+  }[]
+  readonly communities: readonly {
+    readonly id: string
+    readonly label: string
+    readonly level: number
+    readonly nodeIds: readonly string[]
+  }[]
+}
+
+export type DesignExecutionMechanism = 'manual' | 'rules' | 'software' | 'retrieval' | 'model' | 'agent' | 'hybrid'
+
+export interface SemanticDefinitionInput {
+  readonly version: string
+  readonly competencyQuestions: readonly {
+    readonly id: string
+    readonly text: string
+    readonly required: boolean
+    readonly query: {
+      readonly kind: 'lookup' | 'edge' | 'path'
+      readonly sourceType?: string
+      readonly relationshipType?: string
+      readonly targetType?: string
+      readonly maxDepth: number
+      readonly minAnswers: number
+    }
+  }[]
+  readonly classes: readonly {
+    readonly id: string
+    readonly label: string
+    readonly description?: string
+    readonly aliases: readonly string[]
+    readonly identityKeys: readonly string[]
+    readonly properties: readonly {
+      readonly id: string
+      readonly label: string
+      readonly dataType: 'string' | 'number' | 'boolean' | 'date' | 'datetime'
+      readonly required: boolean
+      readonly unique: boolean
+    }[]
+    readonly fieldMappings: readonly { readonly sourceField: string; readonly targetProperty: string }[]
+    readonly extractionPatterns: readonly string[]
+  }[]
+  readonly relationships: readonly {
+    readonly id: string
+    readonly label: string
+    readonly domain: string
+    readonly range: string
+    readonly description?: string
+    readonly cardinality: 'one-to-one' | 'one-to-many' | 'many-to-one' | 'many-to-many'
+    readonly extractionPatterns: readonly string[]
+  }[]
+  readonly provenanceRules: readonly { readonly id: string; readonly label: string; readonly description: string }[]
+  readonly temporalRules: readonly { readonly id: string; readonly label: string; readonly description: string }[]
+  readonly confidenceThreshold: number
+  readonly shaclSeverity: 'Violation' | 'Warning' | 'Info'
+}
+
+export interface V2SemanticWorkspaceSnapshot {
+  readonly status: 'missing' | 'ready' | 'invalid'
+  readonly path: '.fde/design/semantica/workspace.json'
+  readonly revision?: number
+  readonly updatedAt?: string
+  readonly evidenceDigest?: string
+  readonly provider: {
+    readonly id: 'semantica'
+    readonly expectedVersion: '0.6.7'
+    readonly status: 'unchecked' | 'ready' | 'unavailable' | 'invalid'
+    readonly version?: string
+    readonly configDigest?: string
+    readonly checkedAt?: string
+    readonly message?: string
+  }
+  readonly route?: {
+    readonly execution: {
+      readonly mechanism: DesignExecutionMechanism
+      readonly label: string
+      readonly rationale: string
+    }
+    readonly semantics: {
+      readonly mode: 'schema' | 'ontology'
+      readonly rationale: string
+    }
+    readonly conclusion: 'pending' | 'not_required' | 'validated' | 'validation_failed' | 'insufficient_evidence'
+  }
+  readonly sources: readonly {
+    readonly sourceId: string
+    readonly name: string
+    readonly relativePath: string
+    readonly digest: string
+    readonly bytes: number
+    readonly modifiedAt: string
+    readonly parseStatus: string
+    readonly permissionScope: string
+    readonly authority: 'primary' | 'supporting'
+  }[]
+  readonly definition: SemanticDefinitionInput & {
+    readonly status: 'missing' | 'draft' | 'review' | 'published' | 'stale'
+    readonly revision: number
+    readonly digest?: string
+    readonly updatedAt?: string
+  }
+  readonly candidates: {
+    readonly status: 'not_run' | 'ready' | 'failed' | 'stale'
+    readonly updatedAt?: string
+    readonly entities: readonly {
+      readonly id: string
+      readonly label: string
+      readonly type: string
+      readonly confidence: number
+      readonly sourceRefs: readonly string[]
+      readonly decision: 'pending' | 'accepted' | 'rejected'
+    }[]
+    readonly relationships: readonly {
+      readonly id: string
+      readonly source: string
+      readonly target: string
+      readonly type: string
+      readonly label?: string
+      readonly confidence: number
+      readonly sourceRefs: readonly string[]
+      readonly decision: 'pending' | 'accepted' | 'rejected'
+    }[]
+    readonly warnings: readonly string[]
+  }
+  readonly runs: readonly {
+    readonly id: string
+    readonly kind: 'extract' | 'propose-schema' | 'publish-schema' | 'build' | 'validate' | 'context' | 'slice'
+    readonly status: 'waiting' | 'running' | 'succeeded' | 'failed' | 'cancelled' | 'stale'
+    readonly startedAt: string
+    readonly completedAt?: string
+    readonly providerVersion?: string
+    readonly definitionVersion?: string
+    readonly definitionDigest?: string
+    readonly sourceDigests: readonly string[]
+    readonly summary?: string
+    readonly evidencePaths: readonly string[]
+    readonly diagnostics: readonly string[]
+  }[]
+  readonly validation?: {
+    readonly runId: string
+    readonly status: 'passed' | 'failed' | 'unavailable' | 'stale'
+    readonly checkedAt: string
+    readonly graphRevision: string
+    readonly definitionDigest: string
+    readonly structuralValid: boolean
+    readonly issues: readonly { readonly code: string; readonly severity: string; readonly message: string }[]
+    readonly questions: readonly {
+      readonly questionId: string
+      readonly status: 'passed' | 'failed' | 'unavailable'
+      readonly answerCount: number
+      readonly sourceRefs: readonly string[]
+      readonly message: string
+    }[]
+  }
+  readonly context?: {
+    readonly runId: string
+    readonly status: 'ready' | 'failed' | 'stale'
+    readonly createdAt: string
+    readonly query: string
+    readonly schemaVersion: string
+    readonly graphRevision: string
+    readonly entityCount: number
+    readonly relationshipCount: number
+    readonly sources: readonly string[]
+    readonly permissionScope: string
+  }
+  readonly slice?: {
+    readonly runId: string
+    readonly status: 'succeeded' | 'failed' | 'stale'
+    readonly createdAt: string
+    readonly task: string
+    readonly result: string
+    readonly contextRunId?: string
+    readonly evidenceRefs: readonly string[]
+    readonly diagnostics: readonly string[]
+  }
+  readonly decision?: {
+    readonly id: string
+    readonly outcome: 'go' | 'revise' | 'narrow' | 'stop'
+    readonly rationale: string
+    readonly decidedAt: string
+    readonly workspaceRevision: number
+    readonly evidenceDigest: string
+    readonly status: 'current' | 'stale'
+    readonly routeConclusion: 'pending' | 'not_required' | 'validated' | 'validation_failed' | 'insufficient_evidence'
+    readonly semanticMode: 'schema' | 'ontology'
+    readonly definitionDigest?: string
+    readonly graphRevision?: string
+    readonly sliceRunId?: string
+  }
+  readonly message?: string
+}
+
+export interface V2DesignSnapshot {
+  readonly execution: {
+    readonly status: 'undecided' | 'candidate' | 'selected'
+    readonly mechanism?: 'manual' | 'rules' | 'software' | 'retrieval' | 'model' | 'agent' | 'hybrid'
+    readonly label?: string
+    readonly rationale?: string
+  }
+  readonly semantics: {
+    readonly mode: 'undecided' | 'schema' | 'ontology'
+    readonly rationale?: string
+    readonly conclusion: 'pending' | 'not_required' | 'validated' | 'validation_failed' | 'insufficient_evidence'
+  }
+  readonly ontology: {
+    readonly status: 'not_applicable' | 'not_started' | 'draft' | 'review' | 'published' | 'stale'
+    readonly schemaVersion?: string
+    readonly classCount?: number
+    readonly relationshipTypeCount?: number
+  }
+  readonly graph: {
+    readonly path: '.fde/design/knowledge-graph.json'
+    readonly status: 'not_applicable' | 'missing' | 'ready' | 'invalid'
+    readonly buildStatus: 'not_applicable' | 'waiting' | 'running' | 'succeeded' | 'failed' | 'cancelled' | 'stale'
+    readonly snapshot?: V2KnowledgeGraphSnapshot
+    readonly message?: string
+  }
+  readonly workspace: V2SemanticWorkspaceSnapshot
+}
+
 export interface V2StageSurfaceSnapshot {
   readonly id: V2LifecycleStageId
   readonly index: number
@@ -388,6 +645,7 @@ export interface V2StageSurfaceSnapshot {
   readonly reviewReady: boolean
   readonly reviewBlockers: readonly string[]
   readonly investigation?: V2InvestigationSnapshot
+  readonly design?: V2DesignSnapshot
   readonly message?: string
 }
 
@@ -600,6 +858,96 @@ export async function fetchProjectSurface(
     throw new Error(failure.error?.message ?? `项目页面读取失败（HTTP ${String(response.status)}）。`)
   }
   return parseSnapshot(payload, workspaceId)
+}
+
+async function mutateStageFour(
+  path: string,
+  workspaceId: string,
+  body: Readonly<Record<string, unknown>>,
+  failureMessage: string,
+  fetchImpl: typeof fetch = fetch,
+  signal?: AbortSignal,
+): Promise<ProjectSurfaceSnapshot> {
+  const response = await fetchImpl(path, {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ workspaceId, ...body }), ...(signal === undefined ? {} : { signal }),
+  })
+  let payload: unknown
+  try { payload = await response.json() } catch { throw new Error(`${failureMessage}响应无效。`) }
+  if (!response.ok) {
+    const failure = payload as SnapshotFailure
+    throw new Error(failure.error?.message ?? `${failureMessage}失败（HTTP ${String(response.status)}）。`)
+  }
+  return parseSnapshot(payload, workspaceId)
+}
+
+/** Save the independent execution mechanism and semantic-foundation choices. */
+export async function configureDesignRoute(
+  workspaceId: string,
+  input: {
+    readonly execution: { readonly mechanism: DesignExecutionMechanism; readonly label: string; readonly rationale: string }
+    readonly semantics: { readonly mode: 'schema' | 'ontology'; readonly rationale: string }
+  },
+  fetchImpl: typeof fetch = fetch,
+  signal?: AbortSignal,
+): Promise<ProjectSurfaceSnapshot> {
+  return await mutateStageFour(FDE_SEMANTICA_ROUTE_PATH, workspaceId, input, '保存第四阶段路线', fetchImpl, signal)
+}
+
+/** Bind already-recognized project materials to the current semantic build revision. */
+export async function bindDesignSources(
+  workspaceId: string,
+  sourceIds: readonly string[],
+  permissionScope: string,
+  authority: 'primary' | 'supporting',
+  fetchImpl: typeof fetch = fetch,
+  signal?: AbortSignal,
+): Promise<ProjectSurfaceSnapshot> {
+  return await mutateStageFour(FDE_SEMANTICA_SOURCES_PATH, workspaceId, { sourceIds, permissionScope, authority }, '绑定项目材料', fetchImpl, signal)
+}
+
+/** Save one optimistic-lock protected ontology definition revision. */
+export async function saveDesignDefinition(
+  workspaceId: string,
+  expectedRevision: number,
+  definition: SemanticDefinitionInput,
+  fetchImpl: typeof fetch = fetch,
+  signal?: AbortSignal,
+): Promise<ProjectSurfaceSnapshot> {
+  return await mutateStageFour(FDE_SEMANTICA_DEFINITION_PATH, workspaceId, { expectedRevision, definition }, '保存 Ontology 定义', fetchImpl, signal)
+}
+
+/** Apply explicit accept or reject decisions to extracted candidates. */
+export async function reviewDesignCandidates(
+  workspaceId: string,
+  decisions: readonly { readonly id: string; readonly decision: 'accepted' | 'rejected' }[],
+  fetchImpl: typeof fetch = fetch,
+  signal?: AbortSignal,
+): Promise<ProjectSurfaceSnapshot> {
+  return await mutateStageFour(FDE_SEMANTICA_CANDIDATES_PATH, workspaceId, { decisions }, '保存候选知识审核', fetchImpl, signal)
+}
+
+/** Run one explicit Semantica step without conflating build, validation, and use. */
+export async function runDesignSemantica(
+  workspaceId: string,
+  action: 'health' | 'extract' | 'propose-schema' | 'publish-schema' | 'build' | 'validate' | 'context',
+  input: Readonly<Record<string, unknown>> = {},
+  fetchImpl: typeof fetch = fetch,
+  signal?: AbortSignal,
+): Promise<ProjectSurfaceSnapshot> {
+  return await mutateStageFour(FDE_SEMANTICA_RUN_PATH, workspaceId, { action, input }, '运行 Semantica', fetchImpl, signal)
+}
+
+/** Persist one explicit FDE stage-four outcome against the exact current evidence revision. */
+export async function recordDesignDecision(
+  workspaceId: string,
+  expectedRevision: number,
+  outcome: 'go' | 'revise' | 'narrow' | 'stop',
+  rationale: string,
+  fetchImpl: typeof fetch = fetch,
+  signal?: AbortSignal,
+): Promise<ProjectSurfaceSnapshot> {
+  return await mutateStageFour(FDE_SEMANTICA_DECISION_PATH, workspaceId, { expectedRevision, outcome, rationale }, '保存 FDE 决定', fetchImpl, signal)
 }
 
 /**
@@ -1073,6 +1421,59 @@ export class FdeProjectSurfaceController {
     }
   }
 
+  /** Save the fourth-stage route and publish the returned project snapshot. */
+  async configureDesignRoute(
+    workspaceId: string,
+    input: Parameters<typeof configureDesignRoute>[1],
+  ): Promise<void> {
+    await this.designOperation(workspaceId, signal => configureDesignRoute(workspaceId, input, fetch, signal))
+  }
+
+  /** Replace the exact set of project materials bound to the ontology loop. */
+  async bindDesignSources(
+    workspaceId: string,
+    sourceIds: readonly string[],
+    permissionScope: string,
+    authority: 'primary' | 'supporting',
+  ): Promise<void> {
+    await this.designOperation(workspaceId, signal => bindDesignSources(workspaceId, sourceIds, permissionScope, authority, fetch, signal))
+  }
+
+  /** Save one versioned ontology definition. */
+  async saveDesignDefinition(workspaceId: string, expectedRevision: number, definition: SemanticDefinitionInput): Promise<void> {
+    await this.designOperation(workspaceId, signal => saveDesignDefinition(workspaceId, expectedRevision, definition, fetch, signal))
+  }
+
+  /** Persist explicit candidate review decisions. */
+  async reviewDesignCandidates(
+    workspaceId: string,
+    decisions: readonly { readonly id: string; readonly decision: 'accepted' | 'rejected' }[],
+  ): Promise<void> {
+    await this.designOperation(workspaceId, signal => reviewDesignCandidates(workspaceId, decisions, fetch, signal))
+  }
+
+  /** Run one Semantica operation and keep the current workbench visible. */
+  async runDesignSemantica(
+    workspaceId: string,
+    action: Parameters<typeof runDesignSemantica>[1],
+    input: Readonly<Record<string, unknown>> = {},
+  ): Promise<void> {
+    await this.designOperation(workspaceId, signal => runDesignSemantica(workspaceId, action, input, fetch, signal))
+  }
+
+  /** Save one version-bound FDE outcome without advancing the project implicitly. */
+  async recordDesignDecision(
+    workspaceId: string,
+    expectedRevision: number,
+    outcome: 'go' | 'revise' | 'narrow' | 'stop',
+    rationale: string,
+  ): Promise<void> {
+    await this.designOperation(
+      workspaceId,
+      signal => recordDesignDecision(workspaceId, expectedRevision, outcome, rationale, fetch, signal),
+    )
+  }
+
   /** Cancel pending reads and release subscribers. */
   dispose(): void {
     if (this.disposed) return
@@ -1095,6 +1496,23 @@ export class FdeProjectSurfaceController {
       if (!this.canPublish(workspaceId, controller)) throw new Error('项目运行操作已被新的请求替代。')
       this.publish(workspaceId, { status: 'ready', value })
       return value.runtime
+    } finally {
+      if (this.requests.get(workspaceId) === controller) this.requests.delete(workspaceId)
+    }
+  }
+
+  private async designOperation(
+    workspaceId: string,
+    operation: (signal: AbortSignal) => Promise<ProjectSurfaceSnapshot>,
+  ): Promise<void> {
+    if (this.disposed) throw new Error('项目页面已关闭。')
+    this.requests.get(workspaceId)?.abort()
+    const controller = new AbortController()
+    this.requests.set(workspaceId, controller)
+    try {
+      const value = await operation(controller.signal)
+      if (!this.canPublish(workspaceId, controller)) throw new Error('第四阶段操作已被新的请求替代。')
+      this.publish(workspaceId, { status: 'ready', value })
     } finally {
       if (this.requests.get(workspaceId) === controller) this.requests.delete(workspaceId)
     }

@@ -22,6 +22,24 @@
   --dsh-scrollbar-thumb-hover: var(--dsw-alias-scrollbar-hover-l2);
 }
 
+/* Project delivery owns the full-height stage navigator shown in the product
+   reference. Keep the generic session browser unchanged outside this mode. */
+.root:has([data-fde-project-context-sidebar]) {
+  background: #fbfcff;
+}
+
+.root:has([data-fde-project-context-sidebar]) .brand {
+  padding-left: 4px;
+}
+
+.root:has([data-fde-project-context-sidebar]) .toggle {
+  margin-right: 5px;
+}
+
+.root:has([data-fde-project-context-sidebar]) .footArea {
+  display: none;
+}
+
 /* Rail geometry (figma rail spec): 36x36 control boxes centered in the 56px
    rail (10px side padding), 12px vertical rhythm, 18px from the rail top to
    the whale's box (24px to the 24-wide whale glyph itself). */

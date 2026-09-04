@@ -103,6 +103,31 @@ const BUILD_TIME_TOOLS = [
   },
 ]
 
+/** Upstream source whose implementation ideas or substantial portions were adapted. */
+const ADAPTED_SOURCE = [
+  {
+    name: 'GraphRAG Workbench',
+    license: 'MIT',
+    copyright: 'Copyright (c) 2026 Lyon Industries (Christopher Lyon)',
+    repo: 'https://github.com/lyon-industries/graphrag-workbench',
+    revision: '066727de7457f2226eb93b2c8ccbff9a498b2e12',
+    role: '3D knowledge-graph scene, community-aware force layout, progressive reveal, camera focus, and bloom treatment adapted in `packages/client/ui-fde-project/src/client/KnowledgeGraphExplorer.tsx` and `knowledge-graph-layout.ts`',
+  },
+] as const
+
+/** Optional local runtimes invoked through a first-party adapter but not bundled. */
+const OPTIONAL_EXTERNAL_RUNTIMES = [
+  {
+    name: 'Semantica',
+    version: '0.6.7',
+    license: 'MIT',
+    copyright: 'Copyright (c) 2026 Semantica',
+    repo: 'https://github.com/semantica-agi/semantica',
+    revision: '3acf8012733ec6a1b07508660fe69c1e58e70242',
+    role: 'optional project-scoped Python runtime invoked by `@deepseek-ai/dsh-fde-semantica`; its source, virtual environment, graph stores, and other runtime artifacts are not bundled in this repository',
+  },
+] as const
+
 /** The `package.json` fields this generator reads. */
 export interface Manifest {
   name?: string
@@ -705,6 +730,26 @@ The Cordis framework and its foundation libraries are source-vendored into this 
 | Package | Upstream name | Upstream | License |
 | --- | --- | --- | --- |
 ${vendored.map(row => `| \`${row.npmName}\` | \`${row.upstreamName}\` | [${row.upstream.replace('https://', '')}](${row.upstream}) | MIT |`).join('\n')}
+
+## Adapted source
+
+The following upstream source informed or was adapted into first-party files. The pinned revision records the exact source boundary used by this repository.
+
+| Project | Revision | License | Adapted use |
+| --- | --- | --- | --- |
+${ADAPTED_SOURCE.map(source => `| [${source.name}](${source.repo}/tree/${source.revision}) | [\`${source.revision}\`](${source.repo}/commit/${source.revision}) | ${source.license} | ${source.role} |`).join('\n')}
+
+${ADAPTED_SOURCE.map(source => `${source.copyright}\n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.`).join('\n\n')}
+
+## Optional external runtimes
+
+The following runtime is an optional local integration. DeepSeek Harness calls an operator-configured installation through a first-party Host adapter; it does not bundle the runtime, its dependency tree, or its generated project data.
+
+| Project | Version | Revision | License | Integration use |
+| --- | --- | --- | --- | --- |
+${OPTIONAL_EXTERNAL_RUNTIMES.map(runtime => `| [${runtime.name}](${runtime.repo}/tree/${runtime.revision}) | ${runtime.version} | [\`${runtime.revision}\`](${runtime.repo}/commit/${runtime.revision}) | ${runtime.license} | ${runtime.role} |`).join('\n')}
+
+${OPTIONAL_EXTERNAL_RUNTIMES.map(runtime => `${runtime.copyright}\n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.`).join('\n\n')}
 
 ## Runtime npm dependencies
 

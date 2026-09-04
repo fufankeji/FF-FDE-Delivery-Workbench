@@ -165,6 +165,7 @@
     { "path": "./packages/fde/stage" },
     { "path": "./packages/fde/project" },
     { "path": "./packages/fde/source" },
+    { "path": "./packages/fde/semantica" },
     { "path": "./packages/session/session-title" },
     { "path": "./packages/session/session-title-llm" },
     { "path": "./packages/session/session-title-first-prompt-llm" },

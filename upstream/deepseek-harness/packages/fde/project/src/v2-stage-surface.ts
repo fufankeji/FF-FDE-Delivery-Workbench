@@ -1,10 +1,29 @@
 /** Read-only business surfaces for V2 lifecycle stages two through eight. */
 
-import { readFile, stat } from 'node:fs/promises'
-import { join } from 'node:path'
-import type { V2InvestigationSnapshot, V2LifecycleStageId, V2StageArtifactSnapshot, V2StageSurfaceSnapshot } from './types.ts'
+import { readFile, realpath, stat } from 'node:fs/promises'
+import { join, relative, resolve, sep } from 'node:path'
+import type {
+  V2DesignSnapshot,
+  V2InvestigationSnapshot,
+  V2KnowledgeGraphSnapshot,
+  V2LifecycleStageId,
+  V2SemanticWorkspaceSnapshot,
+  V2StageArtifactSnapshot,
+  V2StageSurfaceSnapshot,
+} from './types.ts'
 
 const MAX_STATE_BYTES = 256 * 1024
+const DESIGN_GRAPH_PATH = '.fde/design/knowledge-graph.json' as const
+const MAX_GRAPH_BYTES = 2 * 1024 * 1024
+const MAX_GRAPH_NODES = 500
+const MAX_GRAPH_EDGES = 1_500
+const MAX_GRAPH_COMMUNITIES = 100
+const SEMANTIC_WORKSPACE_PATH = '.fde/design/semantica/workspace.json' as const
+const MAX_SEMANTIC_WORKSPACE_BYTES = 4 * 1024 * 1024
+const MAX_SEMANTIC_SOURCES = 40
+const MAX_SEMANTIC_DEFINITIONS = 500
+const MAX_SEMANTIC_CANDIDATES = 500
+const MAX_SEMANTIC_RUNS = 80
 
 interface StageDefinition {
   readonly id: V2LifecycleStageId
@@ -215,6 +234,7 @@ async function readState(root: string, definition: StageDefinition): Promise<{ s
       throw new Error('recommendation 必须是 pending、go、revise、narrow 或 stop。')
     }
     if (definition.id === 'investigation') parseInvestigation(value.investigation)
+    if (definition.id === 'design') parseDesign(value.design)
     return { status: 'ready', value }
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') return { status: 'missing' }
@@ -338,6 +358,673 @@ function parseInvestigation(value: unknown): V2InvestigationSnapshot | undefined
   return { systems, connections, actionBoundaries, dataFindings, governanceReviews }
 }
 
+type ParsedDesignState = Omit<V2DesignSnapshot, 'graph' | 'workspace'> & {
+  readonly graphBuildStatus: V2DesignSnapshot['graph']['buildStatus']
+  readonly graphBuildMessage?: string
+}
+
+function optionalCount(record: Record<string, unknown>, key: string, path: string): number | undefined {
+  const value = record[key]
+  if (value === undefined) return undefined
+  if (!Number.isInteger(value) || (value as number) < 0 || (value as number) > 100_000) {
+    throw new Error(`${path}.${key} 必须是非负整数。`)
+  }
+  return value as number
+}
+
+function parseDesign(value: unknown): ParsedDesignState | undefined {
+  if (value === undefined) return undefined
+  const record = asRecord(value)
+  if (record === undefined) throw new Error('design 必须是 JSON 对象。')
+  const execution = asRecord(record.execution)
+  const semantics = asRecord(record.semantics)
+  const ontology = asRecord(record.ontology)
+  const graphBuild = asRecord(record.graphBuild)
+  if (execution === undefined || semantics === undefined || ontology === undefined || graphBuild === undefined) {
+    throw new Error('design 必须包含 execution、semantics、ontology 和 graphBuild。')
+  }
+
+  const executionStatus = execution.status
+  if (executionStatus !== 'undecided' && executionStatus !== 'candidate' && executionStatus !== 'selected') {
+    throw new Error('design.execution.status 无效。')
+  }
+  const mechanism = execution.mechanism
+  if (mechanism !== undefined && mechanism !== 'manual' && mechanism !== 'rules' && mechanism !== 'software'
+    && mechanism !== 'retrieval' && mechanism !== 'model' && mechanism !== 'agent' && mechanism !== 'hybrid') {
+    throw new Error('design.execution.mechanism 无效。')
+  }
+  if (executionStatus !== 'undecided' && mechanism === undefined) {
+    throw new Error('design.execution 已形成候选时必须包含 mechanism。')
+  }
+  const executionLabel = optionalText(execution, 'label', 'design.execution')
+  const executionRationale = optionalText(execution, 'rationale', 'design.execution')
+
+  const semanticMode = semantics.mode
+  if (semanticMode !== 'undecided' && semanticMode !== 'schema' && semanticMode !== 'ontology') {
+    throw new Error('design.semantics.mode 无效。')
+  }
+  const semanticConclusion = semantics.conclusion
+  if (semanticConclusion !== 'pending' && semanticConclusion !== 'not_required' && semanticConclusion !== 'validated'
+    && semanticConclusion !== 'validation_failed' && semanticConclusion !== 'insufficient_evidence') {
+    throw new Error('design.semantics.conclusion 无效。')
+  }
+  if (semanticMode === 'schema' && semanticConclusion !== 'pending' && semanticConclusion !== 'not_required') {
+    throw new Error('普通 Schema 路线的本体机制结论只能是 pending 或 not_required。')
+  }
+  if (semanticMode !== 'ontology' && (semanticConclusion === 'validated' || semanticConclusion === 'validation_failed')) {
+    throw new Error('只有本体路线可以记录 validated 或 validation_failed。')
+  }
+  const semanticRationale = optionalText(semantics, 'rationale', 'design.semantics')
+
+  const ontologyStatus = ontology.status
+  if (ontologyStatus !== 'not_applicable' && ontologyStatus !== 'not_started' && ontologyStatus !== 'draft'
+    && ontologyStatus !== 'review' && ontologyStatus !== 'published' && ontologyStatus !== 'stale') {
+    throw new Error('design.ontology.status 无效。')
+  }
+  if (semanticMode !== 'ontology' && ontologyStatus !== 'not_applicable') {
+    throw new Error('未选择本体路线时 design.ontology.status 必须是 not_applicable。')
+  }
+  const ontologyVersion = optionalText(ontology, 'schemaVersion', 'design.ontology')
+  const classCount = optionalCount(ontology, 'classCount', 'design.ontology')
+  const relationshipTypeCount = optionalCount(ontology, 'relationshipTypeCount', 'design.ontology')
+
+  const graphBuildStatus = graphBuild.status
+  if (graphBuildStatus !== 'not_applicable' && graphBuildStatus !== 'waiting' && graphBuildStatus !== 'running'
+    && graphBuildStatus !== 'succeeded' && graphBuildStatus !== 'failed' && graphBuildStatus !== 'cancelled'
+    && graphBuildStatus !== 'stale') {
+    throw new Error('design.graphBuild.status 无效。')
+  }
+  if (semanticMode !== 'ontology' && graphBuildStatus !== 'not_applicable') {
+    throw new Error('未选择本体路线时 design.graphBuild.status 必须是 not_applicable。')
+  }
+
+  const graphBuildMessage = optionalText(graphBuild, 'message', 'design.graphBuild')
+  return {
+    execution: {
+      status: executionStatus,
+      ...(mechanism === undefined ? {} : { mechanism }),
+      ...(executionLabel === undefined ? {} : { label: executionLabel }),
+      ...(executionRationale === undefined ? {} : { rationale: executionRationale }),
+    },
+    semantics: {
+      mode: semanticMode,
+      conclusion: semanticConclusion,
+      ...(semanticRationale === undefined ? {} : { rationale: semanticRationale }),
+    },
+    ontology: {
+      status: ontologyStatus,
+      ...(ontologyVersion === undefined ? {} : { schemaVersion: ontologyVersion }),
+      ...(classCount === undefined ? {} : { classCount }),
+      ...(relationshipTypeCount === undefined ? {} : { relationshipTypeCount }),
+    },
+    graphBuildStatus,
+    ...(graphBuildMessage === undefined ? {} : { graphBuildMessage }),
+  }
+}
+
+function boundedText(record: Record<string, unknown>, key: string, path: string, max = 240): string {
+  const value = requiredText(record, key, path).trim()
+  if (value.length > max) throw new Error(`${path}.${key} 不能超过 ${String(max)} 个字符。`)
+  return value
+}
+
+function optionalBoundedText(record: Record<string, unknown>, key: string, path: string, max = 600): string | undefined {
+  const value = optionalText(record, key, path)?.trim()
+  if (value !== undefined && value.length > max) throw new Error(`${path}.${key} 不能超过 ${String(max)} 个字符。`)
+  return value
+}
+
+function optionalConfidence(value: unknown, path: string): number | undefined {
+  if (value === undefined) return undefined
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0 || value > 1) {
+    throw new Error(`${path} 必须是 0 到 1 之间的数字。`)
+  }
+  return value
+}
+
+function optionalDate(record: Record<string, unknown>, key: string, path: string): string | undefined {
+  const value = optionalBoundedText(record, key, path, 80)
+  if (value !== undefined && !Number.isFinite(Date.parse(value))) throw new Error(`${path}.${key} 必须是有效日期时间。`)
+  return value
+}
+
+function stringList(value: unknown, path: string, maxItems = 32): readonly string[] {
+  if (!Array.isArray(value) || value.length > maxItems) throw new Error(`${path} 必须是最多 ${String(maxItems)} 项的字符串数组。`)
+  return value.map((item, index) => {
+    if (typeof item !== 'string' || item.trim() === '' || item.length > 500) {
+      throw new Error(`${path}[${String(index)}] 必须是 1 到 500 个字符的字符串。`)
+    }
+    return item.trim()
+  })
+}
+
+function parseKnowledgeGraph(value: unknown): V2KnowledgeGraphSnapshot {
+  const record = asRecord(value)
+  if (record === undefined) throw new Error('知识图谱快照根对象必须是 JSON 对象。')
+  if (record.schemaVersion !== 1) throw new Error('知识图谱快照 schemaVersion 必须是 1。')
+  const provider = asRecord(record.provider)
+  if (provider === undefined) throw new Error('知识图谱快照 provider 必须是 JSON 对象。')
+  if (!Array.isArray(record.nodes) || record.nodes.length > MAX_GRAPH_NODES) {
+    throw new Error(`知识图谱快照 nodes 必须是最多 ${String(MAX_GRAPH_NODES)} 项的数组。`)
+  }
+  if (!Array.isArray(record.edges) || record.edges.length > MAX_GRAPH_EDGES) {
+    throw new Error(`知识图谱快照 edges 必须是最多 ${String(MAX_GRAPH_EDGES)} 项的数组。`)
+  }
+  if (!Array.isArray(record.communities) || record.communities.length > MAX_GRAPH_COMMUNITIES) {
+    throw new Error(`知识图谱快照 communities 必须是最多 ${String(MAX_GRAPH_COMMUNITIES)} 项的数组。`)
+  }
+
+  const nodeIds = new Set<string>()
+  const nodes = record.nodes.map((raw, index): V2KnowledgeGraphSnapshot['nodes'][number] => {
+    const path = `nodes[${String(index)}]`
+    const item = asRecord(raw)
+    if (item === undefined) throw new Error(`${path} 必须是 JSON 对象。`)
+    const id = boundedText(item, 'id', path, 200)
+    if (nodeIds.has(id)) throw new Error(`知识图谱节点 ${id} 重复。`)
+    nodeIds.add(id)
+    const summary = optionalBoundedText(item, 'summary', path, 1_200)
+    const communityId = optionalBoundedText(item, 'communityId', path, 200)
+    const confidence = optionalConfidence(item.confidence, `${path}.confidence`)
+    const validFrom = optionalDate(item, 'validFrom', path)
+    const validUntil = optionalDate(item, 'validUntil', path)
+    return {
+      id,
+      label: boundedText(item, 'label', path, 240),
+      type: boundedText(item, 'type', path, 160),
+      ...(summary === undefined ? {} : { summary }),
+      ...(communityId === undefined ? {} : { communityId }),
+      ...(confidence === undefined ? {} : { confidence }),
+      ...(validFrom === undefined ? {} : { validFrom }),
+      ...(validUntil === undefined ? {} : { validUntil }),
+      sourceRefs: stringList(item.sourceRefs, `${path}.sourceRefs`),
+    }
+  })
+
+  const edgeIds = new Set<string>()
+  const edges = record.edges.map((raw, index): V2KnowledgeGraphSnapshot['edges'][number] => {
+    const path = `edges[${String(index)}]`
+    const item = asRecord(raw)
+    if (item === undefined) throw new Error(`${path} 必须是 JSON 对象。`)
+    const id = boundedText(item, 'id', path, 200)
+    if (edgeIds.has(id)) throw new Error(`知识图谱关系 ${id} 重复。`)
+    edgeIds.add(id)
+    const source = boundedText(item, 'source', path, 200)
+    const target = boundedText(item, 'target', path, 200)
+    if (!nodeIds.has(source) || !nodeIds.has(target)) throw new Error(`${path} 必须引用已登记的节点。`)
+    const weight = item.weight
+    if (typeof weight !== 'number' || !Number.isFinite(weight) || weight <= 0 || weight > 1_000) {
+      throw new Error(`${path}.weight 必须是大于 0 且不超过 1000 的数字。`)
+    }
+    const label = optionalBoundedText(item, 'label', path, 240)
+    const confidence = optionalConfidence(item.confidence, `${path}.confidence`)
+    const validFrom = optionalDate(item, 'validFrom', path)
+    const validUntil = optionalDate(item, 'validUntil', path)
+    return {
+      id,
+      source,
+      target,
+      type: boundedText(item, 'type', path, 160),
+      ...(label === undefined ? {} : { label }),
+      weight,
+      ...(confidence === undefined ? {} : { confidence }),
+      ...(validFrom === undefined ? {} : { validFrom }),
+      ...(validUntil === undefined ? {} : { validUntil }),
+      sourceRefs: stringList(item.sourceRefs, `${path}.sourceRefs`),
+    }
+  })
+
+  const communityIds = new Set<string>()
+  const communities = record.communities.map((raw, index): V2KnowledgeGraphSnapshot['communities'][number] => {
+    const path = `communities[${String(index)}]`
+    const item = asRecord(raw)
+    if (item === undefined) throw new Error(`${path} 必须是 JSON 对象。`)
+    const id = boundedText(item, 'id', path, 200)
+    if (communityIds.has(id)) throw new Error(`知识图谱社区 ${id} 重复。`)
+    communityIds.add(id)
+    const level = item.level
+    if (!Number.isInteger(level) || (level as number) < 0 || (level as number) > 16) throw new Error(`${path}.level 必须是 0 到 16 的整数。`)
+    const nodeIdsInCommunity = stringList(item.nodeIds, `${path}.nodeIds`, MAX_GRAPH_NODES)
+    if (nodeIdsInCommunity.some(nodeId => !nodeIds.has(nodeId))) throw new Error(`${path}.nodeIds 包含未知节点。`)
+    return { id, label: boundedText(item, 'label', path, 240), level: level as number, nodeIds: nodeIdsInCommunity }
+  })
+  for (const node of nodes) {
+    if (node.communityId !== undefined && !communityIds.has(node.communityId)) {
+      throw new Error(`节点 ${node.id} 引用了未知社区 ${node.communityId}。`)
+    }
+  }
+
+  const updatedAt = boundedText(record, 'updatedAt', '知识图谱快照', 80)
+  if (!Number.isFinite(Date.parse(updatedAt))) throw new Error('知识图谱快照 updatedAt 必须是有效日期时间。')
+  const providerVersion = optionalBoundedText(provider, 'version', 'provider', 120)
+  return {
+    schemaVersion: 1,
+    provider: { id: boundedText(provider, 'id', 'provider', 120), ...(providerVersion === undefined ? {} : { version: providerVersion }) },
+    graphId: boundedText(record, 'graphId', '知识图谱快照', 200),
+    revision: boundedText(record, 'revision', '知识图谱快照', 120),
+    ontologyVersion: boundedText(record, 'ontologyVersion', '知识图谱快照', 120),
+    updatedAt,
+    nodes,
+    edges,
+    communities,
+  }
+}
+
+function isInside(root: string, candidate: string): boolean {
+  const value = relative(root, candidate)
+  return value !== '' && value !== '..' && !value.startsWith(`..${sep}`) && !value.startsWith('../')
+}
+
+async function loadKnowledgeGraph(
+  root: string,
+  buildStatus: V2DesignSnapshot['graph']['buildStatus'],
+): Promise<V2DesignSnapshot['graph']> {
+  try {
+    const canonicalRoot = await realpath(resolve(root))
+    const candidate = await realpath(join(root, DESIGN_GRAPH_PATH))
+    if (!isInside(canonicalRoot, candidate)) throw new Error('知识图谱快照越过项目目录。')
+    const info = await stat(candidate)
+    if (!info.isFile() || info.size > MAX_GRAPH_BYTES) throw new Error('知识图谱快照不是普通 JSON，或超过 2 MiB。')
+    const snapshot = parseKnowledgeGraph(JSON.parse(await readFile(candidate, 'utf8')) as unknown)
+    return { path: DESIGN_GRAPH_PATH, status: 'ready', buildStatus, snapshot }
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return { path: DESIGN_GRAPH_PATH, status: 'missing', buildStatus }
+    return { path: DESIGN_GRAPH_PATH, status: 'invalid', buildStatus, message: error instanceof Error ? error.message : String(error) }
+  }
+}
+
+function array(value: unknown, path: string, max: number): readonly unknown[] {
+  if (!Array.isArray(value) || value.length > max) throw new Error(`${path} 必须是最多 ${String(max)} 项的数组。`)
+  return value
+}
+
+function integer(value: unknown, path: string, max = Number.MAX_SAFE_INTEGER): number {
+  if (!Number.isSafeInteger(value) || (value as number) < 0 || (value as number) > max) throw new Error(`${path} 必须是非负整数。`)
+  return value as number
+}
+
+function dateText(record: Record<string, unknown>, key: string, path: string): string {
+  const value = boundedText(record, key, path, 80)
+  if (!Number.isFinite(Date.parse(value))) throw new Error(`${path}.${key} 必须是有效日期时间。`)
+  return value
+}
+
+function emptySemanticWorkspace(status: 'missing' | 'invalid', message?: string): V2SemanticWorkspaceSnapshot {
+  return {
+    status,
+    path: SEMANTIC_WORKSPACE_PATH,
+    provider: { id: 'semantica', expectedVersion: '0.6.7', status: status === 'invalid' ? 'invalid' : 'unchecked' },
+    sources: [],
+    definition: {
+      status: 'missing', version: '0.1.0', revision: 0,
+      competencyQuestions: [], classes: [], relationships: [], provenanceRules: [], temporalRules: [],
+      confidenceThreshold: 0.65, shaclSeverity: 'Violation',
+    },
+    candidates: { status: 'not_run', entities: [], relationships: [], warnings: [] },
+    runs: [],
+    ...(message === undefined ? {} : { message }),
+  }
+}
+
+function parseRule(value: unknown, path: string): V2SemanticWorkspaceSnapshot['definition']['provenanceRules'][number] {
+  const record = asRecord(value)
+  if (record === undefined) throw new Error(`${path} 必须是 JSON 对象。`)
+  return {
+    id: boundedText(record, 'id', path, 80),
+    label: boundedText(record, 'label', path, 120),
+    description: boundedText(record, 'description', path, 1_000),
+  }
+}
+
+function parseSemanticWorkspace(value: unknown): V2SemanticWorkspaceSnapshot {
+  const record = asRecord(value)
+  if (record === undefined || record.schemaVersion !== 1) throw new Error('语义工作区 schemaVersion 必须是 1。')
+  const provider = asRecord(record.provider)
+  const definition = asRecord(record.definition)
+  const candidates = asRecord(record.candidates)
+  if (provider === undefined || definition === undefined || candidates === undefined) {
+    throw new Error('语义工作区必须包含 provider、definition 和 candidates。')
+  }
+  if (provider.id !== 'semantica' || provider.expectedVersion !== '0.6.7') throw new Error('语义工作区 Provider 标识或目标版本无效。')
+  const providerStatus = provider.status
+  if (providerStatus !== 'unchecked' && providerStatus !== 'ready' && providerStatus !== 'unavailable' && providerStatus !== 'invalid') {
+    throw new Error('语义工作区 Provider 状态无效。')
+  }
+  const checkedAt = optionalDate(provider, 'checkedAt', 'provider')
+  const providerVersion = optionalBoundedText(provider, 'version', 'provider', 80)
+  const providerConfigDigest = optionalBoundedText(provider, 'configDigest', 'provider', 160)
+  const providerMessage = optionalBoundedText(provider, 'message', 'provider', 1_000)
+  const routeRecord = asRecord(record.route)
+  const route: V2SemanticWorkspaceSnapshot['route'] = routeRecord === undefined ? undefined : (() => {
+    const execution = asRecord(routeRecord.execution)
+    const semantics = asRecord(routeRecord.semantics)
+    if (execution === undefined || semantics === undefined) throw new Error('route 必须包含 execution 和 semantics。')
+    const mechanism = execution.mechanism
+    if (mechanism !== 'manual' && mechanism !== 'rules' && mechanism !== 'software' && mechanism !== 'retrieval'
+      && mechanism !== 'model' && mechanism !== 'agent' && mechanism !== 'hybrid') throw new Error('route.execution.mechanism 无效。')
+    const mode = semantics.mode
+    if (mode !== 'schema' && mode !== 'ontology') throw new Error('route.semantics.mode 无效。')
+    const conclusion = routeRecord.conclusion
+    if (conclusion !== 'pending' && conclusion !== 'not_required' && conclusion !== 'validated'
+      && conclusion !== 'validation_failed' && conclusion !== 'insufficient_evidence') throw new Error('route.conclusion 无效。')
+    if (mode === 'schema' && conclusion !== 'pending' && conclusion !== 'not_required') throw new Error('普通 Schema 路线不能记录本体验证结论。')
+    return {
+      execution: {
+        mechanism,
+        label: boundedText(execution, 'label', 'route.execution', 120),
+        rationale: boundedText(execution, 'rationale', 'route.execution', 2_000),
+      },
+      semantics: {
+        mode,
+        rationale: boundedText(semantics, 'rationale', 'route.semantics', 2_000),
+      },
+      conclusion,
+    }
+  })()
+  const sources = array(record.sources, 'sources', MAX_SEMANTIC_SOURCES).map((raw, index): V2SemanticWorkspaceSnapshot['sources'][number] => {
+    const path = `sources[${String(index)}]`
+    const item = asRecord(raw)
+    if (item === undefined) throw new Error(`${path} 必须是 JSON 对象。`)
+    if (item.authority !== 'primary' && item.authority !== 'supporting') throw new Error(`${path}.authority 无效。`)
+    return {
+      sourceId: boundedText(item, 'sourceId', path, 200),
+      name: boundedText(item, 'name', path, 300),
+      relativePath: boundedText(item, 'relativePath', path, 1_000),
+      digest: boundedText(item, 'digest', path, 160),
+      bytes: integer(item.bytes, `${path}.bytes`, 64 * 1024 * 1024),
+      modifiedAt: dateText(item, 'modifiedAt', path),
+      parseStatus: boundedText(item, 'parseStatus', path, 80),
+      permissionScope: boundedText(item, 'permissionScope', path, 1_000),
+      authority: item.authority,
+    }
+  })
+
+  const definitionStatus = definition.status
+  if (definitionStatus !== 'missing' && definitionStatus !== 'draft' && definitionStatus !== 'review'
+    && definitionStatus !== 'published' && definitionStatus !== 'stale') throw new Error('definition.status 无效。')
+  const questions = array(definition.competencyQuestions, 'definition.competencyQuestions', 100).map((raw, index): V2SemanticWorkspaceSnapshot['definition']['competencyQuestions'][number] => {
+    const path = `definition.competencyQuestions[${String(index)}]`
+    const item = asRecord(raw)
+    const query = asRecord(item?.query)
+    if (item === undefined || query === undefined) throw new Error(`${path} 必须包含 query。`)
+    if (query.kind !== 'lookup' && query.kind !== 'edge' && query.kind !== 'path') throw new Error(`${path}.query.kind 无效。`)
+    const sourceType = optionalBoundedText(query, 'sourceType', `${path}.query`, 160)
+    const relationshipType = optionalBoundedText(query, 'relationshipType', `${path}.query`, 160)
+    const targetType = optionalBoundedText(query, 'targetType', `${path}.query`, 160)
+    return {
+      id: boundedText(item, 'id', path, 80), text: boundedText(item, 'text', path, 500), required: item.required === true,
+      query: {
+        kind: query.kind,
+        ...(sourceType === undefined ? {} : { sourceType }),
+        ...(relationshipType === undefined ? {} : { relationshipType }),
+        ...(targetType === undefined ? {} : { targetType }),
+        maxDepth: integer(query.maxDepth, `${path}.query.maxDepth`, 8),
+        minAnswers: integer(query.minAnswers, `${path}.query.minAnswers`, 1_000),
+      },
+    }
+  })
+  const classes = array(definition.classes, 'definition.classes', MAX_SEMANTIC_DEFINITIONS).map((raw, index): V2SemanticWorkspaceSnapshot['definition']['classes'][number] => {
+    const path = `definition.classes[${String(index)}]`
+    const item = asRecord(raw)
+    if (item === undefined) throw new Error(`${path} 必须是 JSON 对象。`)
+    const description = optionalBoundedText(item, 'description', path, 600)
+    return {
+      id: boundedText(item, 'id', path, 80), label: boundedText(item, 'label', path, 120),
+      ...(description === undefined ? {} : { description }),
+      aliases: stringList(Array.isArray(item.aliases) ? item.aliases : [], `${path}.aliases`, 30),
+      identityKeys: stringList(item.identityKeys, `${path}.identityKeys`, 20),
+      properties: array(item.properties, `${path}.properties`, 100).map((rawProperty, propertyIndex) => {
+        const propertyPath = `${path}.properties[${String(propertyIndex)}]`
+        const property = asRecord(rawProperty)
+        if (property === undefined) throw new Error(`${propertyPath} 必须是 JSON 对象。`)
+        const dataType = property.dataType
+        if (dataType !== 'string' && dataType !== 'number' && dataType !== 'boolean' && dataType !== 'date' && dataType !== 'datetime') {
+          throw new Error(`${propertyPath}.dataType 无效。`)
+        }
+        return {
+          id: boundedText(property, 'id', propertyPath, 80), label: boundedText(property, 'label', propertyPath, 120),
+          dataType, required: property.required === true, unique: property.unique === true,
+        }
+      }),
+      fieldMappings: array(Array.isArray(item.fieldMappings) ? item.fieldMappings : [], `${path}.fieldMappings`, 100).map((rawMapping, mappingIndex) => {
+        const mappingPath = `${path}.fieldMappings[${String(mappingIndex)}]`
+        const mapping = asRecord(rawMapping)
+        if (mapping === undefined) throw new Error(`${mappingPath} 必须是 JSON 对象。`)
+        return {
+          sourceField: boundedText(mapping, 'sourceField', mappingPath, 200),
+          targetProperty: boundedText(mapping, 'targetProperty', mappingPath, 80),
+        }
+      }),
+      extractionPatterns: stringList(item.extractionPatterns, `${path}.extractionPatterns`, 12),
+    }
+  })
+  const relationships = array(definition.relationships, 'definition.relationships', MAX_SEMANTIC_DEFINITIONS).map((raw, index): V2SemanticWorkspaceSnapshot['definition']['relationships'][number] => {
+    const path = `definition.relationships[${String(index)}]`
+    const item = asRecord(raw)
+    if (item === undefined) throw new Error(`${path} 必须是 JSON 对象。`)
+    const cardinality = item.cardinality
+    if (cardinality !== 'one-to-one' && cardinality !== 'one-to-many' && cardinality !== 'many-to-one' && cardinality !== 'many-to-many') {
+      throw new Error(`${path}.cardinality 无效。`)
+    }
+    const description = optionalBoundedText(item, 'description', path, 600)
+    return {
+      id: boundedText(item, 'id', path, 80), label: boundedText(item, 'label', path, 120),
+      domain: boundedText(item, 'domain', path, 80), range: boundedText(item, 'range', path, 80),
+      ...(description === undefined ? {} : { description }), cardinality,
+      extractionPatterns: stringList(item.extractionPatterns, `${path}.extractionPatterns`, 12),
+    }
+  })
+  const confidenceThreshold = definition.confidenceThreshold
+  if (typeof confidenceThreshold !== 'number' || !Number.isFinite(confidenceThreshold) || confidenceThreshold < 0 || confidenceThreshold > 1) {
+    throw new Error('definition.confidenceThreshold 必须在 0 到 1 之间。')
+  }
+  if (definition.shaclSeverity !== 'Violation' && definition.shaclSeverity !== 'Warning' && definition.shaclSeverity !== 'Info') {
+    throw new Error('definition.shaclSeverity 无效。')
+  }
+  const definitionDigest = optionalBoundedText(definition, 'digest', 'definition', 160)
+  const definitionUpdatedAt = optionalDate(definition, 'updatedAt', 'definition')
+
+  const candidateStatus = candidates.status
+  if (candidateStatus !== 'not_run' && candidateStatus !== 'ready' && candidateStatus !== 'failed' && candidateStatus !== 'stale') {
+    throw new Error('candidates.status 无效。')
+  }
+  const candidateUpdatedAt = optionalDate(candidates, 'updatedAt', 'candidates')
+  const parseDecision = (value: unknown, path: string): 'pending' | 'accepted' | 'rejected' => {
+    if (value !== 'pending' && value !== 'accepted' && value !== 'rejected') throw new Error(`${path}.decision 无效。`)
+    return value
+  }
+  const entities = array(candidates.entities, 'candidates.entities', MAX_SEMANTIC_CANDIDATES).map((raw, index): V2SemanticWorkspaceSnapshot['candidates']['entities'][number] => {
+    const path = `candidates.entities[${String(index)}]`
+    const item = asRecord(raw)
+    if (item === undefined) throw new Error(`${path} 必须是 JSON 对象。`)
+    return {
+      id: boundedText(item, 'id', path, 200), label: boundedText(item, 'label', path, 300), type: boundedText(item, 'type', path, 160),
+      confidence: optionalConfidence(item.confidence, `${path}.confidence`) ?? 0,
+      sourceRefs: stringList(item.sourceRefs, `${path}.sourceRefs`), decision: parseDecision(item.decision, path),
+    }
+  })
+  const relationshipCandidates = array(candidates.relationships, 'candidates.relationships', MAX_SEMANTIC_CANDIDATES).map((raw, index): V2SemanticWorkspaceSnapshot['candidates']['relationships'][number] => {
+    const path = `candidates.relationships[${String(index)}]`
+    const item = asRecord(raw)
+    if (item === undefined) throw new Error(`${path} 必须是 JSON 对象。`)
+    const label = optionalBoundedText(item, 'label', path, 300)
+    return {
+      id: boundedText(item, 'id', path, 200), source: boundedText(item, 'source', path, 200), target: boundedText(item, 'target', path, 200),
+      type: boundedText(item, 'type', path, 160), ...(label === undefined ? {} : { label }),
+      confidence: optionalConfidence(item.confidence, `${path}.confidence`) ?? 0,
+      sourceRefs: stringList(item.sourceRefs, `${path}.sourceRefs`), decision: parseDecision(item.decision, path),
+    }
+  })
+  const runKinds = new Set(['extract', 'propose-schema', 'publish-schema', 'build', 'validate', 'context', 'slice'])
+  const runStatuses = new Set(['waiting', 'running', 'succeeded', 'failed', 'cancelled', 'stale'])
+  const runs = array(record.runs, 'runs', MAX_SEMANTIC_RUNS).map((raw, index): V2SemanticWorkspaceSnapshot['runs'][number] => {
+    const path = `runs[${String(index)}]`
+    const item = asRecord(raw)
+    if (item === undefined || typeof item.kind !== 'string' || !runKinds.has(item.kind) || typeof item.status !== 'string' || !runStatuses.has(item.status)) {
+      throw new Error(`${path} 类型或状态无效。`)
+    }
+    const completedAt = optionalDate(item, 'completedAt', path)
+    const runProviderVersion = optionalBoundedText(item, 'providerVersion', path, 80)
+    const definitionVersion = optionalBoundedText(item, 'definitionVersion', path, 80)
+    const definitionDigest = optionalBoundedText(item, 'definitionDigest', path, 160)
+    const summary = optionalBoundedText(item, 'summary', path, 2_000)
+    return {
+      id: boundedText(item, 'id', path, 200),
+      kind: item.kind as V2SemanticWorkspaceSnapshot['runs'][number]['kind'],
+      status: item.status as V2SemanticWorkspaceSnapshot['runs'][number]['status'],
+      startedAt: dateText(item, 'startedAt', path),
+      ...(completedAt === undefined ? {} : { completedAt }),
+      ...(runProviderVersion === undefined ? {} : { providerVersion: runProviderVersion }),
+      ...(definitionVersion === undefined ? {} : { definitionVersion }),
+      ...(definitionDigest === undefined ? {} : { definitionDigest }),
+      sourceDigests: stringList(item.sourceDigests, `${path}.sourceDigests`, MAX_SEMANTIC_SOURCES),
+      ...(summary === undefined ? {} : { summary }),
+      evidencePaths: stringList(item.evidencePaths, `${path}.evidencePaths`, 40),
+      diagnostics: stringList(item.diagnostics, `${path}.diagnostics`, 40),
+    }
+  }).slice(-30)
+
+  const validationRecord = asRecord(record.validation)
+  const validation: V2SemanticWorkspaceSnapshot['validation'] = validationRecord === undefined ? undefined : (() => {
+    if (validationRecord.status !== 'passed' && validationRecord.status !== 'failed'
+      && validationRecord.status !== 'unavailable' && validationRecord.status !== 'stale') throw new Error('validation.status 无效。')
+    return {
+      runId: boundedText(validationRecord, 'runId', 'validation', 200), status: validationRecord.status,
+      checkedAt: dateText(validationRecord, 'checkedAt', 'validation'),
+      graphRevision: boundedText(validationRecord, 'graphRevision', 'validation', 160),
+      definitionDigest: boundedText(validationRecord, 'definitionDigest', 'validation', 160),
+      structuralValid: validationRecord.structuralValid === true,
+      issues: array(validationRecord.issues, 'validation.issues', 200).map((raw, index) => {
+        const path = `validation.issues[${String(index)}]`; const item = asRecord(raw)
+        if (item === undefined) throw new Error(`${path} 必须是 JSON 对象。`)
+        return { code: boundedText(item, 'code', path, 160), severity: boundedText(item, 'severity', path, 80), message: boundedText(item, 'message', path, 1_000) }
+      }),
+      questions: array(validationRecord.questions, 'validation.questions', 100).map((raw, index) => {
+        const path = `validation.questions[${String(index)}]`; const item = asRecord(raw)
+        if (item === undefined || (item.status !== 'passed' && item.status !== 'failed' && item.status !== 'unavailable')) throw new Error(`${path}.status 无效。`)
+        return {
+          questionId: boundedText(item, 'questionId', path, 80), status: item.status,
+          answerCount: integer(item.answerCount, `${path}.answerCount`, 100_000), sourceRefs: stringList(item.sourceRefs, `${path}.sourceRefs`, 40),
+          message: boundedText(item, 'message', path, 1_000),
+        }
+      }),
+    }
+  })()
+  const contextRecord = asRecord(record.context)
+  const context: V2SemanticWorkspaceSnapshot['context'] = contextRecord === undefined ? undefined : (() => {
+    if (contextRecord.status !== 'ready' && contextRecord.status !== 'failed' && contextRecord.status !== 'stale') throw new Error('context.status 无效。')
+    return {
+      runId: boundedText(contextRecord, 'runId', 'context', 200), status: contextRecord.status,
+      createdAt: dateText(contextRecord, 'createdAt', 'context'), query: boundedText(contextRecord, 'query', 'context', 1_000),
+      schemaVersion: boundedText(contextRecord, 'schemaVersion', 'context', 80), graphRevision: boundedText(contextRecord, 'graphRevision', 'context', 160),
+      entityCount: array(contextRecord.entities, 'context.entities', MAX_SEMANTIC_CANDIDATES).length,
+      relationshipCount: array(contextRecord.relationships, 'context.relationships', MAX_SEMANTIC_CANDIDATES).length,
+      sources: stringList(contextRecord.sources, 'context.sources', 40), permissionScope: boundedText(contextRecord, 'permissionScope', 'context', 1_000),
+    }
+  })()
+  const sliceRecord = asRecord(record.slice)
+  const slice: V2SemanticWorkspaceSnapshot['slice'] = sliceRecord === undefined ? undefined : (() => {
+    if (sliceRecord.status !== 'succeeded' && sliceRecord.status !== 'failed' && sliceRecord.status !== 'stale') throw new Error('slice.status 无效。')
+    const contextRunId = optionalBoundedText(sliceRecord, 'contextRunId', 'slice', 200)
+    return {
+      runId: boundedText(sliceRecord, 'runId', 'slice', 200), status: sliceRecord.status,
+      createdAt: dateText(sliceRecord, 'createdAt', 'slice'), task: boundedText(sliceRecord, 'task', 'slice', 2_000),
+      result: boundedText(sliceRecord, 'result', 'slice', 4_000), ...(contextRunId === undefined ? {} : { contextRunId }),
+      evidenceRefs: stringList(sliceRecord.evidenceRefs, 'slice.evidenceRefs', 32), diagnostics: stringList(sliceRecord.diagnostics, 'slice.diagnostics', 32),
+    }
+  })()
+  const decisionRecord = asRecord(record.decision)
+  const workspaceRevision = integer(record.revision, 'revision')
+  const evidenceDigest = optionalBoundedText(record, 'evidenceDigest', '语义工作区', 160)
+  const decision: V2SemanticWorkspaceSnapshot['decision'] = decisionRecord === undefined ? undefined : (() => {
+    if (decisionRecord.outcome !== 'go' && decisionRecord.outcome !== 'revise'
+      && decisionRecord.outcome !== 'narrow' && decisionRecord.outcome !== 'stop') throw new Error('decision.outcome 无效。')
+    if (decisionRecord.routeConclusion !== 'pending' && decisionRecord.routeConclusion !== 'not_required'
+      && decisionRecord.routeConclusion !== 'validated' && decisionRecord.routeConclusion !== 'validation_failed'
+      && decisionRecord.routeConclusion !== 'insufficient_evidence') throw new Error('decision.routeConclusion 无效。')
+    if (decisionRecord.semanticMode !== 'schema' && decisionRecord.semanticMode !== 'ontology') throw new Error('decision.semanticMode 无效。')
+    const definitionDigest = optionalBoundedText(decisionRecord, 'definitionDigest', 'decision', 160)
+    const graphRevision = optionalBoundedText(decisionRecord, 'graphRevision', 'decision', 160)
+    const sliceRunId = optionalBoundedText(decisionRecord, 'sliceRunId', 'decision', 200)
+    const decisionWorkspaceRevision = integer(decisionRecord.workspaceRevision, 'decision.workspaceRevision')
+    const decisionEvidenceDigest = boundedText(decisionRecord, 'evidenceDigest', 'decision', 160)
+    return {
+      id: boundedText(decisionRecord, 'id', 'decision', 200), outcome: decisionRecord.outcome,
+      rationale: boundedText(decisionRecord, 'rationale', 'decision', 2_000),
+      decidedAt: dateText(decisionRecord, 'decidedAt', 'decision'), workspaceRevision: decisionWorkspaceRevision,
+      evidenceDigest: decisionEvidenceDigest,
+      status: evidenceDigest !== undefined && decisionEvidenceDigest === evidenceDigest ? 'current' : 'stale',
+      routeConclusion: decisionRecord.routeConclusion, semanticMode: decisionRecord.semanticMode,
+      ...(definitionDigest === undefined ? {} : { definitionDigest }),
+      ...(graphRevision === undefined ? {} : { graphRevision }),
+      ...(sliceRunId === undefined ? {} : { sliceRunId }),
+    }
+  })()
+  const updatedAt = dateText(record, 'updatedAt', '语义工作区')
+  return {
+    status: 'ready', path: SEMANTIC_WORKSPACE_PATH, revision: workspaceRevision, updatedAt,
+    ...(evidenceDigest === undefined ? {} : { evidenceDigest }),
+    provider: {
+      id: 'semantica', expectedVersion: '0.6.7', status: providerStatus,
+      ...(providerVersion === undefined ? {} : { version: providerVersion }),
+      ...(providerConfigDigest === undefined ? {} : { configDigest: providerConfigDigest }),
+      ...(checkedAt === undefined ? {} : { checkedAt }),
+      ...(providerMessage === undefined ? {} : { message: providerMessage }),
+    },
+    ...(route === undefined ? {} : { route }),
+    sources,
+    definition: {
+      status: definitionStatus,
+      version: boundedText(definition, 'version', 'definition', 80),
+      revision: integer(definition.revision, 'definition.revision'),
+      ...(definitionDigest === undefined ? {} : { digest: definitionDigest }),
+      ...(definitionUpdatedAt === undefined ? {} : { updatedAt: definitionUpdatedAt }),
+      competencyQuestions: questions, classes, relationships,
+      provenanceRules: array(definition.provenanceRules, 'definition.provenanceRules', 100).map((item, index) => parseRule(item, `definition.provenanceRules[${String(index)}]`)),
+      temporalRules: array(definition.temporalRules, 'definition.temporalRules', 100).map((item, index) => parseRule(item, `definition.temporalRules[${String(index)}]`)),
+      confidenceThreshold, shaclSeverity: definition.shaclSeverity,
+    },
+    candidates: {
+      status: candidateStatus, ...(candidateUpdatedAt === undefined ? {} : { updatedAt: candidateUpdatedAt }),
+      entities, relationships: relationshipCandidates, warnings: stringList(candidates.warnings, 'candidates.warnings', 100),
+    },
+    runs,
+    ...(validation === undefined ? {} : { validation }),
+    ...(context === undefined ? {} : { context }),
+    ...(slice === undefined ? {} : { slice }),
+    ...(decision === undefined ? {} : { decision }),
+  }
+}
+
+async function loadSemanticWorkspace(root: string): Promise<V2SemanticWorkspaceSnapshot> {
+  try {
+    const canonicalRoot = await realpath(resolve(root))
+    const candidate = await realpath(join(root, SEMANTIC_WORKSPACE_PATH))
+    if (!isInside(canonicalRoot, candidate)) throw new Error('语义工作区状态越过项目目录。')
+    const info = await stat(candidate)
+    if (!info.isFile() || info.size > MAX_SEMANTIC_WORKSPACE_BYTES) throw new Error('语义工作区状态不是普通 JSON，或超过 4 MiB。')
+    return parseSemanticWorkspace(JSON.parse(await readFile(candidate, 'utf8')) as unknown)
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return emptySemanticWorkspace('missing')
+    return emptySemanticWorkspace('invalid', error instanceof Error ? error.message : String(error))
+  }
+}
+
+async function loadDesign(root: string, value: unknown): Promise<V2DesignSnapshot | undefined> {
+  const design = parseDesign(value)
+  if (design === undefined) return undefined
+  const { graphBuildStatus, graphBuildMessage, ...state } = design
+  const workspace = await loadSemanticWorkspace(root)
+  if (design.semantics.mode !== 'ontology') {
+    return { ...state, graph: { path: DESIGN_GRAPH_PATH, status: 'not_applicable', buildStatus: 'not_applicable' }, workspace }
+  }
+  const graph = await loadKnowledgeGraph(root, graphBuildStatus)
+  return {
+    ...state,
+    graph: graphBuildMessage === undefined || graph.message !== undefined ? graph : { ...graph, message: graphBuildMessage },
+    workspace,
+  }
+}
+
 /** Load one V2 stage without mutating project files or trusting declared artifact presence. */
 export async function loadV2StageSurface(root: string, stageId: V2LifecycleStageId): Promise<V2StageSurfaceSnapshot> {
   const definition = V2_STAGE_DEFINITIONS.find(item => item.id === stageId)
@@ -370,18 +1057,93 @@ export async function loadV2StageSurface(root: string, stageId: V2LifecycleStage
     return [{
       id: typeof record.id === 'string' ? record.id : `blocker-${String(index + 1)}`,
       title: record.title,
-      severity: severity as 'low' | 'medium' | 'high' | 'critical',
-      status: status as 'open' | 'resolved',
+      severity: severity,
+      status: status,
     }]
   })
   const investigation = definition.id === 'investigation'
     ? parseInvestigation(state.value?.investigation)
+    : undefined
+  const design = definition.id === 'design'
+    ? await loadDesign(root, state.value?.design)
     : undefined
   const reviewBlockers: string[] = []
   if (state.status === 'missing') reviewBlockers.push(`尚未生成阶段状态文件 ${definition.statePath}`)
   if (state.status === 'invalid') reviewBlockers.push(`阶段状态文件无法读取：${state.message ?? '结构无效'}`)
   if (definition.id === 'investigation' && state.status === 'ready' && investigation === undefined) {
     reviewBlockers.push('环境调查驾驶舱尚未形成结构化记录')
+  }
+  if (definition.id === 'design' && state.status === 'ready' && design === undefined) {
+    reviewBlockers.push('第四阶段方案路线尚未形成结构化记录')
+  }
+  if (design !== undefined) {
+    if (design.execution.status !== 'selected') reviewBlockers.push('执行机制尚未选定')
+    if (design.semantics.mode === 'undecided') reviewBlockers.push('语义基础尚未决定')
+    if (design.workspace.status === 'missing') reviewBlockers.push('第四阶段真实运行工作区尚未建立')
+    if (design.workspace.status === 'invalid') reviewBlockers.push(`第四阶段真实运行工作区无法读取：${design.workspace.message ?? '结构无效'}`)
+    const workspaceRoute = design.workspace.route
+    if (design.semantics.mode !== 'undecided' && workspaceRoute === undefined) {
+      reviewBlockers.push('第四阶段路线没有对应的真实工作区记录')
+    } else if (workspaceRoute !== undefined && (
+      workspaceRoute.execution.mechanism !== design.execution.mechanism
+      || workspaceRoute.execution.label !== design.execution.label
+      || workspaceRoute.execution.rationale !== design.execution.rationale
+      || workspaceRoute.semantics.mode !== design.semantics.mode
+      || workspaceRoute.semantics.rationale !== design.semantics.rationale
+      || workspaceRoute.conclusion !== design.semantics.conclusion
+    )) {
+      reviewBlockers.push('阶段路线与当前真实运行工作区版本不一致')
+    }
+    if (design.semantics.mode === 'schema' && design.semantics.conclusion !== 'not_required') {
+      reviewBlockers.push('普通 Schema 路线尚未形成不采用本体的候选结论')
+    }
+    if (design.semantics.mode === 'schema') {
+      const sliceRun = design.workspace.slice === undefined
+        ? undefined
+        : design.workspace.runs.find(item => item.id === design.workspace.slice?.runId && item.kind === 'slice')
+      if (design.workspace.slice?.status !== 'succeeded' || sliceRun?.status !== 'succeeded') {
+        reviewBlockers.push('轻量路线尚未形成带项目证据的真实纵向切片')
+      }
+    }
+    if (design.semantics.mode === 'ontology') {
+      if (design.workspace.provider.status !== 'ready' || design.workspace.provider.version !== design.workspace.provider.expectedVersion) {
+        reviewBlockers.push('Semantica Provider 尚未通过固定版本检查')
+      }
+      if (design.workspace.sources.length === 0) reviewBlockers.push('尚未绑定当前项目获准使用的代表材料')
+      if (design.ontology.status !== 'published' || design.workspace.definition.status !== 'published' || design.workspace.definition.digest === undefined) {
+        reviewBlockers.push('当前 Ontology Schema 尚未发布')
+      }
+      if (design.graph.status === 'missing') reviewBlockers.push('项目知识图谱尚未形成')
+      if (design.graph.status === 'invalid') reviewBlockers.push(`项目知识图谱无法读取：${design.graph.message ?? '结构无效'}`)
+      const buildRun = [...design.workspace.runs].reverse().find(item => item.kind === 'build')
+      const currentSourceDigests = design.workspace.sources.map(item => item.digest)
+      const currentBuild = buildRun?.status === 'succeeded'
+        && buildRun.definitionDigest === design.workspace.definition.digest
+        && buildRun.sourceDigests.length === currentSourceDigests.length
+        && buildRun.sourceDigests.every((item, index) => item === currentSourceDigests[index])
+      if (design.graph.buildStatus !== 'succeeded' || !currentBuild) reviewBlockers.push('当前图谱构建尚未成功完成，或引用版本已经变化')
+      const validation = design.workspace.validation
+      if (validation?.status !== 'passed'
+        || validation.definitionDigest !== design.workspace.definition.digest
+        || validation.graphRevision !== design.graph.snapshot?.revision) {
+        reviewBlockers.push('当前 Schema 与图谱尚未通过同版本独立验证')
+      }
+      const context = design.workspace.context
+      if (context?.status !== 'ready'
+        || context.schemaVersion !== design.workspace.definition.version
+        || context.graphRevision !== design.graph.snapshot?.revision) {
+        reviewBlockers.push('当前验证版本尚未形成受控 Agent 上下文')
+      }
+      const sliceRun = design.workspace.slice === undefined
+        ? undefined
+        : design.workspace.runs.find(item => item.id === design.workspace.slice?.runId && item.kind === 'slice')
+      if (design.workspace.slice?.status !== 'succeeded'
+        || sliceRun?.status !== 'succeeded'
+        || design.workspace.slice.contextRunId !== context?.runId) {
+        reviewBlockers.push('尚未用当前受控上下文跑通带证据的真实纵向切片')
+      }
+      if (design.semantics.conclusion !== 'validated') reviewBlockers.push('当前本体机制尚未形成验证通过的候选结论')
+    }
   }
   for (const artifact of artifacts.filter(item => item.required && item.status !== 'present')) reviewBlockers.push(`${artifact.title}尚未形成`)
   for (const blocker of blockers.filter(item => item.status === 'open' && (item.severity === 'high' || item.severity === 'critical'))) reviewBlockers.push(blocker.title)
@@ -408,6 +1170,7 @@ export async function loadV2StageSurface(root: string, stageId: V2LifecycleStage
     reviewReady: reviewBlockers.length === 0 && status === 'review-ready',
     reviewBlockers,
     ...(definition.id !== 'investigation' || investigation === undefined ? {} : { investigation }),
+    ...(definition.id !== 'design' || design === undefined ? {} : { design }),
     ...(state.message === undefined ? {} : { message: state.message }),
   }
 }

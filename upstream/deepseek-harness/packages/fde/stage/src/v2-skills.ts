@@ -465,9 +465,20 @@ function contentFor(definition: V2StageSkillDefinition): string {
         governanceReviews: [],
       },
     }),
+    ...(definition.stage !== 'design' ? {} : {
+      design: {
+        execution: { status: 'undecided' },
+        semantics: { mode: 'undecided', conclusion: 'pending' },
+        ontology: { status: 'not_applicable' },
+        graphBuild: { status: 'not_applicable' },
+      },
+    }),
   }, null, 2)
+  // oxlint-disable @stylistic/quotes -- Multiline stage contracts require template literals.
   const investigationRules = definition.stage !== 'investigation' ? '' : `\n\n## 环境调查驾驶舱\n\n为了让工作台展示真实环境，而不是写死示例，调查后同步维护 \`investigation\`。五组数组中每个元素必须严格使用以下字段，不能用近义字段替代：\n\n- \`systems[]\`：\`{ id, label, kind, status, owner?, note? }\`；\`kind\` 只能是 \`data\`、\`system\`、\`external\` 或 \`actor\`，\`status\` 只能是 \`confirmed\`、\`conditional\`、\`pending\` 或 \`blocked\`。\n- \`connections[]\`：\`{ from, to, label? }\`；\`from\` 和 \`to\` 只能引用 \`systems\` 中已有的稳定 \`id\`。\n- \`actionBoundaries[]\`：\`{ target, read, suggest, draft, execute }\`；对象字段必须叫 \`target\`，四种动作状态只能是 \`allowed\`、\`conditional\`、\`pending\`、\`denied\` 或 \`not-applicable\`。\n- \`dataFindings[]\`：\`{ label, value, status }\`；不要写成 \`id/note/source\`，\`status\` 只能是 \`confirmed\`、\`warning\`、\`pending\` 或 \`blocked\`。来源证据保留在固定产物中。\n- \`governanceReviews[]\`：\`{ area, status, owner?, note? }\`；\`area\` 只能是 \`security\`、\`privacy\`、\`legal\`、\`procurement\`、\`finance\` 或 \`business\`，\`status\` 只能是 \`confirmed\`、\`conditional\`、\`pending\` 或 \`blocked\`。不要使用 \`partial\`、\`unconfirmed\` 或 \`confirmed-in-simulation\` 等自定义状态，应归一为允许值并在 \`note\` 保留原始限定。\n\n没有证据时使用空数组或 pending，不得填入演示数据。写完后必须重新读取状态文件，逐项核对字段名和枚举；任一结构无效时不得把阶段写成 review-ready。\n\n第三阶段只调查真实环境与动作边界，不构建本体、不设计架构、不选择模型，也不开始开发。`
-  return `# ${definition.label}\n\n${definition.instructions}\n\n## 固定产物\n\n${artifactList}\n\n状态文件：\`${definition.statePath}\`；其中根对象 \`stage\` 必须固定写为 \`${definition.stage}\`，不能写成产物目录名或中文阶段名。固定工作项 ID：${workItemList}。\n\n## 状态文件结构\n\n下面只示范固定 JSON 结构；各项状态、阻塞和建议必须依据本轮事实填写：\n\n\`\`\`json\n${stateExample}\n\`\`\`${investigationRules}\n\n${COMMON_V2_STAGE_RULES}`
+  const designRules = definition.stage !== 'design' ? '' : `\n\n## 第四阶段双轴路线与图谱快照\n\n先分别记录“采用什么执行机制”和“是否需要本体”，不能因已集成 Semantica 就默认选择知识图谱：\n\n- \`design.execution\`：\`status\` 只能是 \`undecided\`、\`candidate\` 或 \`selected\`；形成候选后必须填写 \`mechanism\`，其值只能是 \`manual\`、\`rules\`、\`software\`、\`retrieval\`、\`model\`、\`agent\` 或 \`hybrid\`，并可用 \`label/rationale\` 记录业务名称与证据理由。\n- \`design.semantics\`：\`mode\` 只能是 \`undecided\`、\`schema\` 或 \`ontology\`；\`conclusion\` 只能是 \`pending\`、\`not_required\`、\`validated\`、\`validation_failed\` 或 \`insufficient_evidence\`。\`schema\` 路线只能记录 \`pending/not_required\`。\n- \`design.ontology\`：非本体路线固定为 \`{ status: "not_applicable" }\`；本体路线的 \`status\` 只能是 \`not_started\`、\`draft\`、\`review\`、\`published\` 或 \`stale\`，可记录 \`schemaVersion/classCount/relationshipTypeCount\`。\n- \`design.graphBuild\`：非本体路线固定为 \`{ status: "not_applicable" }\`；本体路线只能记录 \`waiting\`、\`running\`、\`succeeded\`、\`failed\`、\`cancelled\` 或 \`stale\`，可用 \`message\` 说明真实运行状态。\n\n只有本体路线才能由项目隔离的 Semantica Provider 在 \`.fde/design/knowledge-graph.json\` 写入真实快照。普通 Schema 路线不得生成图谱占位文件；不得用演示节点、示例关系或 Semantica 的全局 Demo 图填充项目工作台。快照根对象固定为 \`{ schemaVersion: 1, provider, graphId, revision, ontologyVersion, updatedAt, nodes, edges, communities }\`：\n\n- \`provider\`：\`{ id, version? }\`，记录实际构建 Provider。\n- \`nodes[]\`：\`{ id, label, type, summary?, communityId?, confidence?, validFrom?, validUntil?, sourceRefs }\`。\n- \`edges[]\`：\`{ id, source, target, type, label?, weight, confidence?, validFrom?, validUntil?, sourceRefs }\`；起止节点必须已经登记。\n- \`communities[]\`：\`{ id, label, level, nodeIds }\`；只能引用快照中的真实节点。\n\n每个实体和关系的来源、时间与置信度都来自本轮构建证据；工作台只负责渲染该快照。图谱构建成功不等于 Schema 验证、能力问题或纵向切片已经通过，最终结论和阶段推进仍由 FDE 人工确认。`
+  // oxlint-enable @stylistic/quotes
+  return `# ${definition.label}\n\n${definition.instructions}\n\n## 固定产物\n\n${artifactList}\n\n状态文件：\`${definition.statePath}\`；其中根对象 \`stage\` 必须固定写为 \`${definition.stage}\`，不能写成产物目录名或中文阶段名。固定工作项 ID：${workItemList}。\n\n## 状态文件结构\n\n下面只示范固定 JSON 结构；各项状态、阻塞和建议必须依据本轮事实填写：\n\n\`\`\`json\n${stateExample}\n\`\`\`${investigationRules}${designRules}\n\n${COMMON_V2_STAGE_RULES}`
 }
 
 function registeredSkill(definition: V2StageSkillDefinition) {
@@ -539,6 +550,10 @@ export function v2StagePrompt(stage: FdeV2StageId): string {
   const required = definitions.filter(item => item.group === 'required').map(item => `\`${item.name}\``).join('、')
   const conditional = definitions.filter(item => item.group === 'conditional').map(item => `\`${item.name}\``).join('、')
   const statePath = firstDefinition.statePath
-  const stageBoundary = stage === 'investigation' ? '同步维护 investigation 的真实系统节点、连接、动作边界、数据发现和独立治理审查；字段必须严格使用 systems 的 id/label/kind/status、connections 的 from/to/label、actionBoundaries 的 target/read/suggest/draft/execute、dataFindings 的 label/value/status，以及 governanceReviews 的 area/status/owner/note，不能用 object、id/note/source 或自定义状态替代；没有证据时保持空数组或 pending。第三阶段不得设计架构、选择模型或开始开发。' : ''
+  const stageBoundary = stage === 'investigation'
+    ? '同步维护 investigation 的真实系统节点、连接、动作边界、数据发现和独立治理审查；字段必须严格使用 systems 的 id/label/kind/status、connections 的 from/to/label、actionBoundaries 的 target/read/suggest/draft/execute、dataFindings 的 label/value/status，以及 governanceReviews 的 area/status/owner/note，不能用 object、id/note/source 或自定义状态替代；没有证据时保持空数组或 pending。第三阶段不得设计架构、选择模型或开始开发。'
+    : stage === 'design'
+      ? '同步维护 design 的执行机制与语义基础双轴判断；不能因已接入 Semantica 就默认采用本体。只有 ontology 路线才能由项目隔离的 Provider 写入 `.fde/design/knowledge-graph.json` 真实快照；schema 路线不得生成图谱占位，任何路线都不得填入演示节点。图谱构建成功不等于纵向切片或阶段评审通过。'
+      : ''
   return `当前 FDE 项目处于“${stageDefinition.label}”。本阶段必做方法：${required}；只有出现对应业务条件时才使用：${conditional}。先判断当前任务和缺口，再加载最少必要的 Skill；不得为了显得完整一次加载全部。严格维护固定产物与状态文件；\`${statePath}\` 根对象的 \`stage\` 必须固定写为 \`${stage}\`；\`workItems\` 必须是逐项包含 \`id\` 与 \`status\` 的数组，不能写成对象映射。${stageBoundary}只记录真实来源和执行证据；你不能代替 FDE 确认客户结论、执行未授权外部动作或推进项目阶段。`
 }

@@ -31,7 +31,7 @@ import {
   SOLUTION_DESIGN_SKILL, solutionDesignPrompt,
   STAKEHOLDER_BRIEF_SKILL,
   VALIDATION_SKILL, validationPrompt,
-  V2_STAGE_SKILL_CATALOG, V2_STAGE_SKILLS, v2StagePrompt,
+  V2_STAGE_SKILL_CATALOG, V2_STAGE_SKILLS, v2StageCompletionReadiness, v2StagePrompt,
 } from '../src/index.ts'
 import type { ProjectStageRecord } from '../src/spec.ts'
 import { FdeStageState } from '../src/state.ts'
@@ -315,6 +315,13 @@ describe('requirement-research model guidance', () => {
       .toContain('第三阶段只调查真实环境与动作边界，不构建本体、不设计架构、不选择模型，也不开始开发')
     expect(v2StagePrompt('investigation')).toContain('同步维护 investigation 的真实系统节点')
     expect(v2StagePrompt('investigation')).toContain('actionBoundaries 的 target/read/suggest/draft/execute')
+    expect(v2StagePrompt('design')).toContain('执行机制与语义基础双轴判断')
+    expect(v2StagePrompt('design')).toContain('.fde/design/knowledge-graph.json')
+    expect(v2StagePrompt('design')).toContain('不得填入演示节点')
+    expect(V2_STAGE_SKILLS.find(skill => skill.name === 'contract-design')?.content)
+      .toContain('"design"')
+    expect(V2_STAGE_SKILLS.find(skill => skill.name === 'contract-design')?.content)
+      .toContain('普通 Schema 路线不得生成图谱占位文件')
   })
 
   it('uses a method-first stage-one route with separate conditional engineering skills', () => {
@@ -559,6 +566,28 @@ describe('project-stage route', () => {
     await returnHandler(request({ workspaceId: 'w-1', expectedRevision: 3, reason: '现场权限发生变化' }), returned.value)
     expect(returned.snapshot()).toMatchObject({ status: 200, body: { value: { v2Stage: 'definition', revision: 4 } } })
     expect(returnToPrevious).toHaveBeenCalledWith('w-1', 3, '现场权限发生变化')
+  })
+
+  it('requires a current evidence-bound FDE Go decision before completing stage four', () => {
+    const base = { reviewReady: true, reviewBlockers: [] as readonly string[] }
+
+    expect(v2StageCompletionReadiness('definition', base)).toEqual(base)
+    expect(v2StageCompletionReadiness('design', base)).toEqual({
+      reviewReady: false,
+      reviewBlockers: ['第四阶段尚未保存与当前证据一致的 FDE Go 决定。'],
+    })
+    expect(v2StageCompletionReadiness('design', {
+      ...base,
+      design: { workspace: { decision: { outcome: 'revise', status: 'current' } } },
+    } as never)).toMatchObject({ reviewReady: false })
+    expect(v2StageCompletionReadiness('design', {
+      ...base,
+      design: { workspace: { decision: { outcome: 'go', status: 'stale' } } },
+    } as never)).toMatchObject({ reviewReady: false })
+    expect(v2StageCompletionReadiness('design', {
+      ...base,
+      design: { workspace: { decision: { outcome: 'go', status: 'current' } } },
+    } as never)).toEqual(base)
   })
 
   it('requires five solution documents and a confirmed architecture before project development', async () => {

@@ -96,7 +96,7 @@ export function apply(ctx: ClientContext): void {
   }
 
   const activateProjectWorkbenchLayout = (): void => {
-    ctx.layout.openSidebar(291)
+    ctx.layout.openSidebar(396)
     ctx.layout.closeDetails()
     if (typeof document === 'undefined') return
     let attempts = 0
@@ -372,6 +372,24 @@ export function apply(ctx: ClientContext): void {
       else input.notify('info', '输入框已有内容，已为你保留。请补充完整后再发送。')
       enterProjectAgentConversation(sessionId)
       focusNativeComposer()
+    },
+    configureDesignRoute: async (workspaceId, input) => {
+      await surfaces.configureDesignRoute(workspaceId, input)
+    },
+    bindDesignSources: async (workspaceId, sourceIds, permissionScope, authority) => {
+      await surfaces.bindDesignSources(workspaceId, sourceIds, permissionScope, authority)
+    },
+    saveDesignDefinition: async (workspaceId, expectedRevision, definition) => {
+      await surfaces.saveDesignDefinition(workspaceId, expectedRevision, definition)
+    },
+    reviewDesignCandidates: async (workspaceId, decisions) => {
+      await surfaces.reviewDesignCandidates(workspaceId, decisions)
+    },
+    runDesignSemantica: async (workspaceId, action, input) => {
+      await surfaces.runDesignSemantica(workspaceId, action, input)
+    },
+    recordDesignDecision: async (workspaceId, expectedRevision, outcome, rationale) => {
+      await surfaces.recordDesignDecision(workspaceId, expectedRevision, outcome, rationale)
     },
     openProjectFile: async (sessionId, workspacePath, relativePath, title) => {
       if (projectSidebar === undefined) throw new Error('右侧项目文件面板暂时不可用。')

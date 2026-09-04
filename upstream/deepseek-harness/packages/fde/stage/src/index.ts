@@ -14,6 +14,7 @@ import {
   loadV2StageSurface,
   readProjectArchitecture,
 } from '@deepseek-ai/dsh-fde-project'
+import type { V2StageSurfaceSnapshot } from '@deepseek-ai/dsh-fde-project'
 import type {} from '@deepseek-ai/dsh-host-webserver'
 import type {} from '@deepseek-ai/dsh-skill'
 import type {} from '@deepseek-ai/dsh-storage-domain'
@@ -33,7 +34,7 @@ import {
   createStageRoute,
   type StageSkillCatalogValue,
 } from './http.ts'
-import { fdeStageDomainSpec, type FdeProjectState } from './spec.ts'
+import { fdeStageDomainSpec, type FdeProjectState, type FdeV2StageId } from './spec.ts'
 import { FdeStageState } from './state.ts'
 import { DEFINITION_STAGE_SKILL_CATALOG_METHODS, V2_STAGE_SKILL_CATALOG, V2_STAGE_SKILLS, v2StagePrompt } from './v2-skills.ts'
 
@@ -70,6 +71,36 @@ export const FDE_STAGE_SKILL_CATALOG_PATH = '/api/fde-stage/skills'
 export const name = 'fde-stage'
 /** Required durable Workspace, model guidance, and same-origin Web services. */
 export const inject = ['skills', 'storageDomain', 'systemPrompt', 'workspaceRegistry', 'webServer']
+
+/**
+ * Applies the stage-four human-decision gate on top of evidence readiness.
+ *
+ * The project surface deliberately reports whether the evidence is ready for an
+ * FDE decision. Advancing stage four is stricter: the FDE must also have saved a
+ * current Go decision bound to that same evidence digest.
+ */
+export function v2StageCompletionReadiness(
+  stage: FdeV2StageId,
+  surface: Pick<V2StageSurfaceSnapshot, 'reviewReady' | 'reviewBlockers' | 'design'>,
+): { readonly reviewReady: boolean; readonly reviewBlockers: readonly string[] } {
+  if (stage !== 'design') {
+    return { reviewReady: surface.reviewReady, reviewBlockers: surface.reviewBlockers }
+  }
+
+  const decision = surface.design?.workspace.decision
+  const hasCurrentGoDecision = decision?.status === 'current' && decision.outcome === 'go'
+  if (surface.reviewReady && hasCurrentGoDecision) {
+    return { reviewReady: true, reviewBlockers: surface.reviewBlockers }
+  }
+
+  return {
+    reviewReady: false,
+    reviewBlockers: [
+      ...surface.reviewBlockers,
+      ...(hasCurrentGoDecision ? [] : ['第四阶段尚未保存与当前证据一致的 FDE Go 决定。']),
+    ],
+  }
+}
 
 const DISCOVERY_METHOD_SOURCE = 'davidahmann/fde-guide@060ef0f3b67743b2e1fc3705763d423eae980236'
 const DISCOVERY_ENGINEERING_SOURCE = 'rpraharaj/forward-deployed-engineer@ee045a66db5242617ccea9e5e33139a2980ab55e'
@@ -772,7 +803,8 @@ export async function apply(ctx: Context): Promise<void> {
         const discovery = await loadDiscoveryStage(workspace.path, artifacts)
         return { reviewReady: discovery.reviewReady, reviewBlockers: discovery.blockers }
       }
-      return await loadV2StageSurface(workspace.path, stage)
+      const surface = await loadV2StageSurface(workspace.path, stage)
+      return v2StageCompletionReadiness(stage, surface)
     },
     complete: async (workspaceId, expectedRevision, stage) => await state.completeV2(workspaceId, expectedRevision, stage),
     reportFailure: (error) => { ctx.logger.warn(error instanceof Error ? error : new Error(String(error))) },
