@@ -110,6 +110,9 @@ describe('ProjectContextSidebar stage methods', () => {
     expect(within(dialog).getByText('工程能力')).toBeTruthy()
     expect(within(dialog).getByRole('button', { name: '概览' }).getAttribute('aria-current')).toBe('page')
     expect(within(dialog).getByText('什么时候会用')).toBeTruthy()
+    expect(dialog.querySelector('[data-template="engineering"]')).toBeTruthy()
+    expect(within(dialog).getByRole('heading', { name: '这项能力在阶段中负责什么' })).toBeTruthy()
+    expect(within(dialog).getByText('不会独立推进项目阶段')).toBeTruthy()
     expect(within(dialog).queryByText('这是完整方法定义。')).toBeNull()
     fireEvent.click(within(dialog).getByRole('button', { name: '完整定义' }))
     expect(within(dialog).getByRole('heading', { name: '项目启动与方向确认', level: 1 })).toBeTruthy()
@@ -121,6 +124,12 @@ describe('ProjectContextSidebar stage methods', () => {
 
     fireEvent.click(within(dialog).getByRole('button', { name: '关闭工作方法详情' }))
     expect(screen.queryByRole('dialog')).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: /核对冲突并调整项目范围/ }))
+    const conditionalDialog = screen.getByRole('dialog', { name: '核对冲突并调整项目范围' })
+    expect(conditionalDialog.querySelector('[data-template="conditional"]')).toBeTruthy()
+    expect(within(conditionalDialog).getByRole('heading', { name: '发生冲突后，怎样形成新的边界候选' })).toBeTruthy()
+    expect(within(conditionalDialog).getByText('不会直接改写项目边界')).toBeTruthy()
   })
 
   it('explains the core method, opens related capabilities, and exposes typed references', async () => {
@@ -135,7 +144,13 @@ describe('ProjectContextSidebar stage methods', () => {
             description: '判断真实工作流是否值得继续研究。', whenToUse: '第一阶段优先使用。',
             source: 'davidahmann/fde-guide@commit', sourceUrl: 'https://example.com/source',
             sourceLanguage: 'en', adapterLanguage: 'zh-CN', license: 'Apache-2.0', content: '# 资格判断',
-            answers: ['客户描述的是不是真实流程？'], workflow: ['保留客户原始说法', '等待 FDE 人工决定'],
+            answers: ['客户描述的是不是真实流程？', '正常路径是什么？', '当前基线是否已测量？'],
+            answerGroups: [
+              { label: '事实与责任', tone: 'identity', answers: ['客户描述的是不是真实流程？'] },
+              { label: '流程与证据', tone: 'flow', answers: ['正常路径是什么？'] },
+              { label: '价值与止损', tone: 'value', answers: ['当前基线是否已测量？'] },
+            ],
+            workflow: ['保留客户原始说法', '等待 FDE 人工决定'],
             artifacts: [{ label: '客户现状记录', path: 'deliverable.md', purpose: '记录来源事实。', required: true }],
             collaborators: [{ id: 'fde-orient', label: '建立项目定向', condition: '项目刚开始', contribution: '原始诉求与调查顺序', role: 'engineering' }],
             example: { title: '智修协同', summary: '示例说明。', steps: [{ batch: '第一批', input: '客户简报', finding: '缺少案例', skills: ['资格判断'], output: '候选工作流' }] },
@@ -157,6 +172,11 @@ describe('ProjectContextSidebar stage methods', () => {
     let dialog = screen.getByRole('dialog', { name: '判断问题是否值得继续投入' })
     expect(within(dialog).getByText('核心方法')).toBeTruthy()
     expect(within(dialog).getByText('客户描述的是不是真实流程？')).toBeTruthy()
+    expect(within(dialog).getByText('A · 事实与责任')).toBeTruthy()
+    expect(within(dialog).getByText('B · 流程与证据')).toBeTruthy()
+    expect(within(dialog).getByText('C · 价值与止损')).toBeTruthy()
+    expect(within(dialog).getByText('这些判断只形成候选结论')).toBeTruthy()
+    expect(within(dialog).getByRole('heading', { name: '最终形成 1 份候选记录' })).toBeTruthy()
     expect(within(dialog).getByText('客户现状记录')).toBeTruthy()
 
     fireEvent.click(within(dialog).getByRole('button', { name: '协同关系' }))

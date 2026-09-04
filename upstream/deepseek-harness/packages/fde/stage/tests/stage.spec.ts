@@ -305,6 +305,7 @@ describe('requirement-research model guidance', () => {
     expect(QUALIFY_AI_WORKFLOW_SKILL.content).toContain('schemaVersion":2')
     expect(QUALIFY_AI_WORKFLOW_SKILL.content).toContain('evidenceRefs')
     expect(QUALIFY_AI_WORKFLOW_SKILL.content).toContain('.fde/discovery/artifacts.json')
+    expect(QUALIFY_AI_WORKFLOW_SKILL.content).toContain('不得作为新 id 加入 Artifact Catalog')
     expect(REFRAME_AI_ENGAGEMENT_SKILL.name).toBe('reframe-ai-engagement')
     expect(REFRAME_AI_ENGAGEMENT_SKILL.content).toContain('engagement-reframe.md')
     const stageOneEngineeringSkills = [

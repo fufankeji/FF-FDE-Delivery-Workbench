@@ -283,6 +283,19 @@ export function apply(ctx: ClientContext): void {
     if (action === 'reframe-engagement') {
       return '客户原先的说法和现场情况可能存在不一致。请帮我核对具体哪里不一致、会影响哪些已约定内容，以及需要由谁确认。暂时不要修改项目范围或讨论解决方案。'
     }
+    if (action === 'restore-workflow') {
+      const materials = sourcePaths.map(path => `- ${path}`).join('\n')
+      return `请继续还原当前候选业务流程：明确真实执行人、触发条件、正常步骤、重要异常、人工回退和责任边界。只补当前仍缺的事实，不讨论技术方案。${materials === '' ? '' : `\n\n本次可核对资料：\n${materials}`}`
+    }
+    if (action === 'qualify-value') {
+      return '请基于当前已经还原的业务流程，继续核对问题影响、业务结果、当前基线、结果验证人、风险上限和停止条件。请明确区分已确认事实、合理推断和仍需谁来核对的未知项，不推进项目阶段。'
+    }
+    if (action === 'form-conclusion') {
+      return '请核对第一阶段三项必备记录和候选业务流程，整理当前已确认事实、未解决阻塞和 Go、Revise、Narrow 或 Stop 候选建议。不要代替 FDE 作出决定，也不要推进项目阶段。'
+    }
+    if (action === 'repair-stage-records') {
+      return '请检查第一阶段 `.fde/discovery/artifacts.json` 与固定阶段记录合同，修复无效 ID、固定路径、来源版本、结构状态或证据引用。Catalog 只能登记 research-report、confirmation-checklist、requirement-baseline 和条件性的 engagement-reframe；其他补充文件可以保留，但不要登记进该 Catalog。不要改变业务结论或推进项目阶段。'
+    }
     if (action === 'narrow-workflow') {
       return '我准备把当前问题缩小到：____。请根据已经确认的事实，保留原始范围和调整原因，更新优先处理的业务流程、暂不处理的部分、成功标准、停止条件和项目调整记录。不要推进项目阶段。'
     }

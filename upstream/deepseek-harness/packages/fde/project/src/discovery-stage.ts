@@ -325,7 +325,17 @@ async function loadArtifactCatalog(
     const parsed = await readDiscoveryJson(projectRoot, ARTIFACT_CATALOG_PATH)
     if (parsed.schemaVersion !== 1 || !Array.isArray(parsed.artifacts)) throw new Error('Artifact Catalog 不符合 schemaVersion 1。')
     if (parsed.artifacts.length > 20) throw new Error('Artifact Catalog 不能超过 20 项。')
-    const items = parsed.artifacts.map((item, index) => artifactCatalogItem(item, index, referencedEvidence))
+    const fixedEntries = parsed.artifacts.flatMap((item, index) => {
+      const candidate = record(item)
+      if (candidate === undefined) throw new Error(`artifacts[${String(index)}] 必须是对象。`)
+      const rawId = candidate.id
+      if (typeof rawId !== 'string') throw new Error(`artifacts[${String(index)}].id 无效。`)
+      const id = DISCOVERY_ARTIFACT_ID_ALIASES[rawId] ?? rawId
+      // Supplemental files may coexist with the fixed stage contract, but
+      // they neither count toward readiness nor invalidate valid fixed rows.
+      return id in ARTIFACT_DEFINITIONS ? [{ item, index }] : []
+    })
+    const items = fixedEntries.map(({ item, index }) => artifactCatalogItem(item, index, referencedEvidence))
     if (new Set(items.map(item => item.id)).size !== items.length) throw new Error('Artifact Catalog 的 id 不能重复。')
     return { status: 'ready', items: new Map(items.map(item => [item.id, item])) }
   } catch (error) {

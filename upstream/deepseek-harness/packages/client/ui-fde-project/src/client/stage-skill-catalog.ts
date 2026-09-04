@@ -14,6 +14,7 @@ export interface StageSkillCatalogMethod {
   readonly group?: 'required' | 'conditional'
   readonly role?: 'core' | 'conditional' | 'engineering'
   readonly answers?: readonly string[]
+  readonly answerGroups?: readonly StageSkillCatalogAnswerGroup[]
   readonly workflow?: readonly string[]
   readonly artifacts?: readonly StageSkillCatalogArtifact[]
   readonly collaborators?: readonly StageSkillCatalogCollaborator[]
@@ -23,6 +24,12 @@ export interface StageSkillCatalogMethod {
   readonly sourceLanguage?: 'en'
   readonly adapterLanguage?: 'zh-CN'
   readonly license?: string
+}
+
+export interface StageSkillCatalogAnswerGroup {
+  readonly label: string
+  readonly tone: 'identity' | 'flow' | 'value'
+  readonly answers: readonly string[]
 }
 
 export interface StageSkillCatalogArtifact {
@@ -92,6 +99,13 @@ function isArtifact(value: unknown): value is StageSkillCatalogArtifact {
     && typeof value.required === 'boolean'
 }
 
+function isAnswerGroup(value: unknown): value is StageSkillCatalogAnswerGroup {
+  return isRecord(value)
+    && isNonEmptyString(value.label)
+    && (value.tone === 'identity' || value.tone === 'flow' || value.tone === 'value')
+    && isStringArray(value.answers)
+}
+
 function isCollaborator(value: unknown): value is StageSkillCatalogCollaborator {
   return isRecord(value)
     && ['id', 'label', 'condition', 'contribution'].every(key => isNonEmptyString(value[key]))
@@ -124,6 +138,7 @@ function isMethod(value: unknown): value is StageSkillCatalogMethod {
     && (group === undefined || group === 'required' || group === 'conditional')
     && (role === undefined || role === 'core' || role === 'conditional' || role === 'engineering')
     && (value.answers === undefined || isStringArray(value.answers))
+    && (value.answerGroups === undefined || (Array.isArray(value.answerGroups) && value.answerGroups.every(isAnswerGroup)))
     && (value.workflow === undefined || isStringArray(value.workflow))
     && (value.artifacts === undefined || (Array.isArray(value.artifacts) && value.artifacts.every(isArtifact)))
     && (value.collaborators === undefined || (Array.isArray(value.collaborators) && value.collaborators.every(isCollaborator)))

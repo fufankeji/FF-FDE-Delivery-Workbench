@@ -1741,7 +1741,6 @@
 .historicalEvidenceChain[data-active-stage] .historicalDecision[data-ready='true'] { background: linear-gradient(120deg, #e4f9ef, #eefbf6); }
 .historicalDecisionLink { margin-top: 14px; color: var(--dsw-alias-state-business-primary); font-size: 12px; font-weight: 650; text-align: center; }
 .historicalDecisionLink span { margin-left: 8px; }
-.historicalDecisionAction { display: flex; width: 100%; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; padding: 8px 10px; border: 0; border-radius: 8px; color: #fff; background: var(--dsw-alias-state-business-primary); font: inherit; font-size: 11px; font-weight: 680; }
 
 .historicalMilestones { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin: 14px 0 10px; padding: 0; list-style: none; }
 .historicalMilestones li { position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 0; color: #078f58; font-size: 12px; font-weight: 620; }
@@ -1806,6 +1805,42 @@
   color: var(--dsw-alias-state-business-primary);
   font: inherit;
   font-size: 11px;
+}
+
+/* The active stage owns the remaining workbench height. Historical review
+   keeps compact fixed cards; live inputs and outputs stretch, then scroll
+   inside their own columns so the milestone rail and actions stay visible. */
+.currentDiscoveryStage .historicalEvidenceChain .historicalStageGrid {
+  height: 100%;
+  min-height: 276px;
+}
+
+.currentDiscoveryStage .historicalEvidenceChain .historicalStageGrid > section {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.currentDiscoveryStage .historicalEvidenceChain .historicalFactList {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding-right: 3px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: color-mix(in srgb, var(--dsw-alias-label-caption) 45%, transparent) transparent;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
+
+.currentDiscoveryStage .historicalEvidenceChain .historicalFactList::-webkit-scrollbar { width: 6px; }
+.currentDiscoveryStage .historicalEvidenceChain .historicalFactList::-webkit-scrollbar-track { background: transparent; }
+.currentDiscoveryStage .historicalEvidenceChain .historicalFactList::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--dsw-alias-label-caption) 45%, transparent);
+  background-clip: padding-box;
 }
 
 .unregisteredFact {
@@ -2777,6 +2812,34 @@
   white-space: nowrap;
 }
 
+.pendingReviewSummary {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 9px;
+}
+
+.pendingReviewSummary > b,
+.pendingReviewSummary > span {
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.pendingReviewSummary > b {
+  background: var(--dsw-alias-state-warning-tertiary);
+  color: var(--dsw-alias-state-warning-primary);
+}
+
+.pendingReviewSummary > span {
+  border: 1px solid var(--dsw-alias-border-l2);
+  color: var(--dsw-alias-label-secondary);
+}
+
 .genericGateActions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
 
 .genericReview {
@@ -3175,7 +3238,7 @@
 }
 
 .genericStageRoot[data-stage='definition'] .workflowsPanel > header { align-items: center; }
-.reviewHeading { display: flex; min-width: 0; align-items: center; gap: 29px; }
+.reviewHeading { display: flex; min-width: 0; align-items: center; gap: 12px; }
 .genericStageRoot[data-stage='definition'] .reviewHeading > span { display: grid; width: 36px; height: 36px; flex: none; place-items: center; border-radius: 9px; background: #fff0dc; color: #f18113; }
 .genericStageRoot[data-stage='definition'] .reviewHeading > span svg { width: 22px; height: 22px; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.5; }
 .reviewHeading > div { display: grid; min-width: 0; }
@@ -3189,6 +3252,69 @@
 .reviewSummary > b[data-kind='manual'] { border-color: #d9e4ff; background: #f0f4ff; color: #215bd3; }
 .reviewSummary > button { display: inline-flex; min-height: 28px; align-items: center; gap: 7px; padding: 0 4px; border: 0; background: transparent; color: #34405b; font: inherit; font-size: 11px; font-weight: 700; cursor: pointer; }
 .reviewSummary > button > span { color: #203d78; font-size: 14px; }
+
+.genericStageRoot[data-stage='definition'] .pendingReviewSummary > b {
+  background: #fff0dc;
+  color: #d96f08;
+}
+
+.genericStageRoot[data-stage='definition'] .pendingReviewSummary > span {
+  border-color: #dce4f2;
+  background: rgba(255, 255, 255, .72);
+  color: #66738b;
+}
+
+.genericStageRoot[data-stage='definition'] .reviewReadinessGrid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 11px;
+}
+
+.genericStageRoot[data-stage='definition'] .reviewReadinessGrid > article {
+  position: relative;
+  min-height: 91px;
+  grid-template-columns: 27px minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  align-content: start;
+  gap: 7px 9px;
+  padding: 10px 11px;
+  border-color: #d9e3f3;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .74);
+}
+
+.genericStageRoot[data-stage='definition'] .reviewReadinessGrid > article[data-kind='progress'] {
+  border-color: #f2c98f;
+  background: rgba(255, 248, 236, .92);
+}
+
+.genericStageRoot[data-stage='definition'] .reviewReadinessGrid > article > i {
+  width: 27px;
+  height: 27px;
+  grid-column: 1;
+  grid-row: 1;
+  border-radius: 50%;
+  background: #edf3ff;
+  color: #3566bd;
+  font-family: var(--ds-font-family-code);
+  font-size: 9px;
+}
+
+.genericStageRoot[data-stage='definition'] .reviewReadinessGrid > article[data-kind='progress'] > i {
+  background: #ffe8c8;
+  color: #d96f08;
+}
+
+.genericStageRoot[data-stage='definition'] .reviewReadinessGrid > article > span {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  gap: 1px;
+}
+
+.genericStageRoot[data-stage='definition'] .reviewReadinessGrid > article small { font-size: 10.5px; }
+.genericStageRoot[data-stage='definition'] .reviewReadinessGrid > article strong { padding-right: 54px; font-size: 14px; line-height: 1.35; }
+.genericStageRoot[data-stage='definition'] .reviewReadinessGrid > article p { display: -webkit-box; overflow: hidden; font-size: 11.5px; line-height: 1.42; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.genericStageRoot[data-stage='definition'] .reviewReadinessGrid > article > b { position: absolute; top: 9px; right: 9px; padding: 3px 6px; background: #f3f6fb; font-size: 10px; }
 
 .stageReviewArtifacts {
   display: grid;
@@ -3270,6 +3396,8 @@
   .genericStageRoot[data-stage='definition'] .stageUpdateStatus { gap: 5px; margin-left: 0; font-size: 10.5px; }
   .genericStageRoot[data-stage='definition'] .reviewSummary { gap: 6px; }
   .genericStageRoot[data-stage='definition'] .reviewSummary > b { padding-right: 8px; padding-left: 8px; }
+  .genericStageRoot[data-stage='definition'] .reviewReadinessGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .genericStageRoot[data-stage='definition'] .workflowsPanel { height: auto; min-height: 257px; }
   .genericStageRoot[data-stage='definition'] .stageReviewArtifacts > article {
     grid-template-columns: 20px 34px 150px minmax(0, 1fr) 64px auto;
     gap: 6px;
@@ -3284,7 +3412,8 @@
 }
 
 @media (max-width: 720px) {
-  .reviewReadinessGrid { grid-template-columns: 1fr; }
+  .reviewReadinessGrid,
+  .genericStageRoot[data-stage='definition'] .reviewReadinessGrid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 980px) {

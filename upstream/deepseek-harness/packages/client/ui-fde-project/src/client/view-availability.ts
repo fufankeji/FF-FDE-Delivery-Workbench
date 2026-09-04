@@ -7,7 +7,7 @@ import type { ProjectSurfaceSnapshot } from './controller.ts'
 export type FdeProjectViewId = 'fde-api-docs' | 'fde-architecture' | 'fde-observability' | 'fde-evaluation'
 
 const MINIMUM_STAGE: Readonly<Record<FdeProjectViewId, FdeStageId>> = {
-  'fde-architecture': 'solution',
+  'fde-architecture': 'development',
   'fde-api-docs': 'development',
   'fde-observability': 'development',
   'fde-evaluation': 'validation',

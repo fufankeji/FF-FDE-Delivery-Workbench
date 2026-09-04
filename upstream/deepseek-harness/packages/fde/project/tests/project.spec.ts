@@ -263,6 +263,19 @@ describe('FDE project surface snapshot', () => {
     expect(ready.discovery.route.primaryMethod).toMatchObject({ skill: 'qualify-ai-workflow', layer: 'method' })
     expect(ready.discovery.route.engineering.map(item => item.skill)).toEqual(['fde-orient', 'knowledge-interview', 'ownership-map', 'repo-recon', 'stakeholder-brief'])
 
+    await writeFile(join(state, 'artifacts.json'), JSON.stringify({
+      schemaVersion: 1,
+      artifacts: [...records, {
+        id: 'scope-decision-brief',
+        contentPath: 'fde-deliverables/01-requirement-research/scope-decision-brief.md',
+        structureState: 'starter_valid',
+      }],
+    }))
+    const withSupplementalFile = await loadProjectSurfaceSnapshot({ workspaceId: 'w1', title: '发现项目', path: root })
+    expect(withSupplementalFile.discovery).toMatchObject({
+      status: 'ready-for-review', presentCount: 3, reviewReady: true, blockers: [],
+    })
+
     const compatibleRecords = records.map((item, index) => ({
       ...item,
       ...(index === 0 ? { id: 'requirement-research-report' } : {}),

@@ -30,7 +30,7 @@ describe('project delivery view availability', () => {
   it('reveals only the views whose business stage has started', () => {
     expect(visible(undefined)).toEqual([])
     expect(visible('requirements')).toEqual([])
-    expect(visible('solution')).toEqual(['fde-architecture'])
+    expect(visible('solution')).toEqual([])
     expect(visible('development')).toEqual(['fde-architecture', 'fde-observability'])
     expect(visible('validation')).toEqual(['fde-architecture', 'fde-observability', 'fde-evaluation'])
     expect(visible('handoff')).toEqual(['fde-architecture', 'fde-observability', 'fde-evaluation'])

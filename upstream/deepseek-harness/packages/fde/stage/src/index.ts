@@ -117,6 +117,8 @@ const DISCOVERY_STRUCTURED_OUTPUT_CONTRACT = `## 阶段 1 持久化合同
 
 三项必备产物的 id 固定为 \`research-report\`、\`confirmation-checklist\`、\`requirement-baseline\`；条件产物固定为 \`engagement-reframe\`。\`inputRefs\`、\`decisionRefs\` 和 \`supersedes\` 必须使用字符串数组；没有引用或被替代版本时写 \`[]\`，不要写 null。
 
+\`artifacts.json\` 只登记以上四种固定阶段记录。决策简报、访谈整理、分析附录等补充文件可以保留在项目目录，但不得作为新 id 加入 Artifact Catalog，也不得改变三项必备记录的完成分母。
+
 固定来源适配器如下，字段和值必须完整保留：
 
 - 现场观察记录：\`{"id":"davidahmann/fde-guide","version":"060ef0f3","commit":"060ef0f3b67743b2e1fc3705763d423eae980236","license":"Apache-2.0","artifact":"field-observation-log"}\`
@@ -246,6 +248,27 @@ export const DISCOVERY_STAGE_SKILL_CATALOG = {
           '业务结果是什么，当前基线已经测量还是未知？',
           '哪些风险要求收窄、暂缓或停止项目？',
           '现有事实是否足以进入下一阶段的价值工程？',
+        ],
+        answerGroups: [
+          {
+            label: '事实与责任', tone: 'identity', answers: [
+              '客户描述的是不是真实、稳定的业务流程？',
+              '谁实际执行流程，谁负责结果，谁有权决定？',
+            ],
+          },
+          {
+            label: '流程与证据', tone: 'flow', answers: [
+              '正常路径和重要异常路径分别是什么？',
+              '当前问题有没有能够追溯的可信证据？',
+            ],
+          },
+          {
+            label: '价值与止损', tone: 'value', answers: [
+              '业务结果是什么，当前基线已经测量还是未知？',
+              '哪些风险要求收窄、暂缓或停止项目？',
+              '现有事实是否足以进入下一阶段的价值工程？',
+            ],
+          },
         ],
         workflow: [
           '保留客户原始说法和显式引用来源',

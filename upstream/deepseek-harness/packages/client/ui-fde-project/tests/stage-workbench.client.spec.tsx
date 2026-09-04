@@ -193,6 +193,86 @@ describe('ProjectStageWorkbenchHero', () => {
 
     expect(screen.getByText('当前工作 · 第 2/4 步')).toBeTruthy()
     expect(screen.getByRole('heading', { name: '还原实际流程' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: '开始梳理真实流程' })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: '继续还原实际流程' }))
+    expect(input.prepareDiscoveryDraft).toHaveBeenLastCalledWith(
+      'session-1', 'restore-workflow', ['fde-resources/客户访谈纪要.docx'],
+    )
+
+    surfaces = {
+      byWorkspace: {
+        'workspace-1': {
+          status: 'ready',
+          value: {
+            requirements: { artifacts: [] },
+            discovery: {
+              presentCount: 2, reviewReady: false,
+              artifacts: [
+                { id: 'research-report', title: '现场观察记录', path: 'one.md', purpose: '', required: true, status: 'present', structureState: 'starter_valid', evidenceState: 'unverified', version: 1, evidenceRefs: [] },
+                { id: 'confirmation-checklist', title: '事实确认清单', path: 'two.md', purpose: '', required: true, status: 'present', structureState: 'starter_valid', evidenceState: 'unverified', version: 1, evidenceRefs: [] },
+              ],
+            },
+          },
+        },
+      },
+    }
+    view.rerender(<ProjectStageWorkbenchHero {...input} />)
+    expect(screen.getByText('当前工作 · 第 3/4 步')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '核对问题价值与责任' }))
+    expect(input.prepareDiscoveryDraft).toHaveBeenLastCalledWith('session-1', 'qualify-value', [])
+
+    surfaces = {
+      byWorkspace: {
+        'workspace-1': {
+          status: 'ready',
+          value: {
+            requirements: { artifacts: [] },
+            discovery: {
+              presentCount: 3, reviewReady: false,
+              artifacts: [
+                { id: 'research-report', title: '现场观察记录', path: 'one.md', purpose: '', required: true, status: 'present', structureState: 'starter_valid', evidenceState: 'unverified', version: 1, evidenceRefs: [] },
+                { id: 'confirmation-checklist', title: '事实确认清单', path: 'two.md', purpose: '', required: true, status: 'present', structureState: 'starter_valid', evidenceState: 'unverified', version: 1, evidenceRefs: [] },
+                { id: 'requirement-baseline', title: '工作流章程', path: 'three.md', purpose: '', required: true, status: 'present', structureState: 'starter_valid', evidenceState: 'unverified', version: 1, evidenceRefs: [] },
+              ],
+            },
+          },
+        },
+      },
+    }
+    view.rerender(<ProjectStageWorkbenchHero {...input} />)
+    expect(screen.getByText('当前工作 · 第 4/4 步')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '整理阶段候选结论' }))
+    expect(input.prepareDiscoveryDraft).toHaveBeenLastCalledWith('session-1', 'form-conclusion', [])
+  })
+
+  it('replaces ordinary stage actions with record repair when the fixed catalog is invalid', () => {
+    const input = props({
+      useProjectSurfaces: hook({
+        byWorkspace: {
+          'workspace-1': {
+            status: 'ready',
+            value: {
+              requirements: { artifacts: [] },
+              discovery: {
+                presentCount: 0, reviewReady: false,
+                artifacts: [{
+                  id: 'research-report', title: '现场观察记录', path: 'one.md', purpose: '', required: true,
+                  status: 'present', structureState: 'invalid', evidenceState: 'unverified', evidenceRefs: [],
+                  message: 'Artifact Catalog 无效：固定来源版本不匹配。',
+                }],
+              },
+            },
+          },
+        },
+      }),
+    })
+    render(<ProjectStageWorkbenchHero {...input} />)
+
+    expect(screen.getByRole('heading', { name: '修复无效的阶段记录' })).toBeTruthy()
+    expect(screen.getByText('阶段记录未通过校验')).toBeTruthy()
+    expect(screen.queryByRole('button', { name: '开始梳理真实流程' })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: '修复阶段记录' }))
+    expect(input.prepareDiscoveryDraft).toHaveBeenCalledWith('session-1', 'repair-stage-records', [])
   })
 
   it('reviews persisted evidence inside the project and advances only after a second FDE confirmation', async () => {
@@ -248,7 +328,9 @@ describe('ProjectStageWorkbenchHero', () => {
     expect(screen.getByText('退款申请复核')).toBeTruthy()
     expect(screen.getByText('已确认 3 · 待核对 2')).toBeTruthy()
     expect(screen.getAllByText(/已有初稿 · v1 ·/).length).toBe(4)
-    expect(screen.getByRole('button', { name: '继续核对说法不一致' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: '继续核对未确认事项' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: '继续核对范围冲突' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: '开始梳理真实流程' })).toBeNull()
     expect(document.querySelector('[data-active-stage]')?.contains(document.querySelector('[data-stage-review-action]'))).toBe(true)
     fireEvent.click(screen.getByRole('button', { name: '预览阶段记录：客户现状记录' }))
     expect(input.openProjectFile).toHaveBeenCalledWith(
@@ -407,7 +489,9 @@ describe('ProjectStageWorkbenchHero', () => {
     render(<ProjectStageWorkbenchHero {...input} />)
 
     expect(screen.getByText('评审准备')).toBeTruthy()
-    expect(screen.getByRole('heading', { name: '本阶段还差 4 项才能评审' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: '本阶段尚未达到评审条件' })).toBeTruthy()
+    expect(screen.getByText('4 项待完成')).toBeTruthy()
+    expect(screen.getByText('0/3 份必备记录')).toBeTruthy()
     expect(screen.getByText('阶段进度尚未保存')).toBeTruthy()
     expect(screen.getAllByText('业务结果与范围约定')).toHaveLength(1)
     expect(screen.getAllByText('价值测算记录')).toHaveLength(1)

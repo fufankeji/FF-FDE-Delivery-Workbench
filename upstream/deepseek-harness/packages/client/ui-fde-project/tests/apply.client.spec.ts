@@ -197,14 +197,18 @@ describe('ui-fde-project apply', () => {
     expect(openProjectCreation).toHaveBeenCalledTimes(1)
     window.removeEventListener('fde:project-create-open', openProjectCreation)
     await injected.completeRequirements('workspace-1', 1)
-    await vi.waitFor(() => { expect(slots.entries('conversation.view')).toHaveLength(2) })
+    await vi.waitFor(() => { expect(slots.entries('conversation.view')).toHaveLength(1) })
+    expect(slots.entries('conversation.view').map(view => view.component)).toEqual([ProjectStageWorkbenchView])
+
+    await injected.completeSolution('workspace-1', 2)
+    await vi.waitFor(() => { expect(slots.entries('conversation.view')).toHaveLength(3) })
     const views = slots.entries('conversation.view')
-    expect(views.map(view => view.component)).toEqual([ProjectStageWorkbenchView, ArchitectureView])
-    expect(views.map(view => view.options.id)).toEqual(['fde-stage-workbench', 'fde-architecture'])
+    expect(views.map(view => view.component)).toEqual([ProjectStageWorkbenchView, ArchitectureView, ObservabilityView])
+    expect(views.map(view => view.options.id)).toEqual(['fde-stage-workbench', 'fde-architecture', 'fde-observability'])
     expect(views.map((view) => {
       const label = view.options.label
       return typeof label === 'function' ? label() : label
-    })).toEqual(['项目工作台', '系统架构'])
+    })).toEqual(['项目工作台', '系统架构', '用量分析'])
     expect(views[0]?.options.order).toBe(-1000)
     const architectureInjected = (views[1]!.inject as unknown as (sessionId: string) => ProjectViewInjected)('session-1')
     await architectureInjected.requestArchitectureDraft(4)
@@ -215,12 +219,6 @@ describe('ui-fde-project apply', () => {
     expect(architectureInstruction).toContain('关键运行时、数据流、控制流或依赖关系')
     expect(architectureInstruction).toContain('页面当前显示的 revision 是 4')
     prompt.mockClear()
-
-    await injected.completeSolution('workspace-1', 2)
-    await vi.waitFor(() => { expect(slots.entries('conversation.view')).toHaveLength(3) })
-    expect(slots.entries('conversation.view').map(view => view.component)).toEqual([
-      ProjectStageWorkbenchView, ArchitectureView, ObservabilityView,
-    ])
 
     const runtimeEntry = slots.entries('conversation.session.header.utilities')[0]
     expect(runtimeEntry?.component).toBe(ProjectRuntimeHeader)

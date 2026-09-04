@@ -122,6 +122,10 @@ export interface ProjectRuntimeHeaderInjected {
 export type DiscoveryAction =
   | 'qualify-workflow'
   | 'prepare-interview'
+  | 'restore-workflow'
+  | 'qualify-value'
+  | 'form-conclusion'
+  | 'repair-stage-records'
   | 'reframe-engagement'
   | 'narrow-workflow'
   | 'pause-workflow'

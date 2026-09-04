@@ -39,6 +39,11 @@ export interface StageSkillCatalogMethod {
   readonly group?: 'required' | 'conditional'
   readonly role?: 'core' | 'conditional' | 'engineering'
   readonly answers?: readonly string[]
+  readonly answerGroups?: readonly {
+    readonly label: string
+    readonly tone: 'identity' | 'flow' | 'value'
+    readonly answers: readonly string[]
+  }[]
   readonly workflow?: readonly string[]
   readonly artifacts?: readonly {
     readonly label: string

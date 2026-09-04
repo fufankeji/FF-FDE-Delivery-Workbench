@@ -128,13 +128,43 @@ function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage,
     !isStageRecordBlocker(item)
     && !surface.artifacts.some(artifact => matchesArtifactBlocker(item, artifact.title))
   ))
+  const reviewReadinessItems = [
+    ...(stageRecordBlocker === undefined ? [] : [{
+      id: 'stage-progress',
+      kind: 'progress',
+      category: '阶段进度',
+      title: stageRecordBlocker.includes('无法读取') ? '阶段进度读取失败' : '阶段进度尚未保存',
+      purpose: stageRecordBlocker.includes('无法读取') ? '请修复阶段记录后刷新工作台。' : '完成第一次梳理后，系统会保存本阶段进度。',
+      status: stageRecordBlocker.includes('无法读取') ? '需修复' : '待建立',
+    }]),
+    ...missingRequiredArtifacts.map(artifact => ({
+      id: `artifact-${artifact.id}`,
+      kind: 'artifact',
+      category: '必备记录',
+      title: artifact.title,
+      purpose: artifact.status === 'error' ? '文件无法读取，请修复后刷新。' : artifact.purpose,
+      status: artifact.status === 'error' ? '需修复' : '待整理',
+    })),
+    ...otherReviewBlockers.map((item, itemIndex) => ({
+      id: `decision-${String(itemIndex)}`,
+      kind: 'decision',
+      category: '还需确认',
+      title: item,
+      purpose: '请继续核对事实，并把处理结果写入本阶段记录。',
+      status: '待处理',
+    })),
+  ]
+  if (!surface.reviewReady && reviewReadinessItems.length === 0) reviewReadinessItems.push({
+    id: 'stage-in-progress',
+    kind: 'progress',
+    category: '阶段进度',
+    title: '本阶段尚未进入可评审状态',
+    purpose: '继续完成当前工作并刷新阶段记录。',
+    status: '进行中',
+  })
   const unresolvedReviewCount = surface.reviewReady
     ? 0
-    : Math.max(
-      surface.reviewBlockers.length,
-      missingRequiredArtifacts.length + (stageRecordBlocker === undefined ? 0 : 1) + otherReviewBlockers.length,
-      1,
-    )
+    : reviewReadinessItems.length
   const openFile = (path: string, title: string): void => {
     setError(null)
     void props.openProjectFile(sessionId, workspace.path, path, title).catch((cause: unknown) => {
@@ -225,7 +255,7 @@ function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage,
           <header>
             <div className={css.reviewHeading}>
               <span aria-hidden="true"><svg viewBox="0 0 20 20" fill="none"><path d="M6.5 4.5h7A1.5 1.5 0 0 1 15 6v10H5V6a1.5 1.5 0 0 1 1.5-1.5Z" /><path d="M8 4V2.75h4V4M7.5 9h5M7.5 12h5" /></svg></span>
-              <div><small>评审准备</small><h2>{surface.reviewReady ? '材料已具备，请逐项核对' : `本阶段还差 ${String(unresolvedReviewCount)} 项才能评审`}</h2><p>{surface.reviewReady ? '文件齐备只代表可以开始评审，是否进入下一阶段仍由 FDE 决定。' : '先把阶段进度和必备记录整理完整；文件生成后刷新，仍由 FDE 人工判断。'}</p></div>
+              <div><small>评审准备</small><h2>{surface.reviewReady ? '材料已具备，请逐项核对' : '本阶段尚未达到评审条件'}</h2><p>{surface.reviewReady ? '文件齐备只代表可以开始评审，是否进入下一阶段仍由 FDE 决定。' : '还需保存阶段进度并补齐必备记录；材料齐备后仍由 FDE 人工判断。'}</p></div>
             </div>
             {surface.reviewReady
               ? <div className={css.reviewSummary} data-definition-review-summary={stage === 'definition' ? '' : undefined}>
@@ -233,7 +263,7 @@ function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage,
                 <b data-kind="manual"><i>⊕</i>人工核对 {reviewedCount}/{requiredArtifacts.length}</b>
                 <button type="button" onClick={() => { setReviewCollapsed(value => !value) }}><span aria-hidden="true">⌃</span>{reviewCollapsed ? '展开清单' : '收起清单'}</button>
               </div>
-              : <b>{surface.presentCount}/{surface.requiredCount} 份记录</b>}
+              : <div className={css.pendingReviewSummary}><b>{unresolvedReviewCount} 项待完成</b><span>{surface.presentCount}/{surface.requiredCount} 份必备记录</span></div>}
           </header>
           {surface.reviewReady
             ? !reviewCollapsed && <div className={css.stageReviewArtifacts}>
@@ -250,10 +280,11 @@ function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage,
               })}
             </div>
             : <div className={css.reviewReadinessGrid}>
-              {stageRecordBlocker !== undefined && <article data-kind="progress"><i>进</i><span><small>阶段进度</small><strong>{stageRecordBlocker.includes('无法读取') ? '阶段进度读取失败' : '阶段进度尚未保存'}</strong><p>{stageRecordBlocker.includes('无法读取') ? '请修复阶段记录后刷新工作台。' : '完成第一次梳理后，系统会保存本阶段进度。'}</p></span><b>{stageRecordBlocker.includes('无法读取') ? '需修复' : '待建立'}</b></article>}
-              {missingRequiredArtifacts.map(artifact => <article key={artifact.id} data-kind="artifact"><i>记</i><span><small>必备记录</small><strong>{artifact.title}</strong><p>{artifact.status === 'error' ? '文件无法读取，请修复后刷新。' : artifact.purpose}</p></span><b>{artifact.status === 'error' ? '需修复' : '待整理'}</b></article>)}
-              {otherReviewBlockers.map(item => <article key={item} data-kind="decision"><i>核</i><span><small>还需确认</small><strong>{item}</strong><p>请继续核对事实，并把处理结果写入本阶段记录。</p></span><b>待处理</b></article>)}
-              {surface.reviewBlockers.length === 0 && missingRequiredArtifacts.length === 0 && <article data-kind="progress"><i>进</i><span><small>阶段进度</small><strong>本阶段尚未进入可评审状态</strong><p>继续完成当前工作并刷新阶段记录。</p></span><b>进行中</b></article>}
+              {reviewReadinessItems.map((item, itemIndex) => <article key={item.id} data-kind={item.kind}>
+                <i>{String(itemIndex + 1).padStart(2, '0')}</i>
+                <span><small>{item.category}</small><strong>{item.title}</strong><p>{item.purpose}</p></span>
+                <b>{item.status}</b>
+              </article>)}
             </div>}
           {surface.reviewReady && !reviewCollapsed && <button type="button" className={css.reviewAllRecords} onClick={() => { setArtifactsCollapsed(false) }}>查看全部记录 ({requiredArtifacts.length}) <span aria-hidden="true">›</span></button>}
           <div className={css.genericGateActions} data-definition-review-actions={stage === 'definition' ? '' : undefined}>
@@ -789,7 +820,7 @@ function StageWorkbenchPanel({ props, workspace, sessionId, view }: {
   const presentCount = discovery?.presentCount ?? requiredArtifacts.filter(artifact => artifact.status === 'present').length
   const reviewReady = discovery?.reviewReady ?? presentCount === requiredArtifacts.length
   const hasEngagementReframe = artifacts.some(artifact => artifact.id === 'engagement-reframe' && artifact.status === 'present')
-  const fallbackWorkIndex = presentCount === 0 ? 0 : presentCount === 1 ? 1 : 3
+  const fallbackWorkIndex = Math.min(FALLBACK_WORK.length - 1, Math.max(0, presentCount))
   const fallbackWork = FALLBACK_WORK[fallbackWorkIndex]
   const currentWorkId = discovery?.currentWorkId ?? fallbackWork.id
   const workItems = discovery?.workItems ?? FALLBACK_WORK.map((item, index) => ({
@@ -808,6 +839,7 @@ function StageWorkbenchPanel({ props, workspace, sessionId, view }: {
     ?? workflowCatalog.items[0]
   const workflowEvidence = selectedWorkflow?.evidence ?? { confirmed: 0, inferred: 0, unverified: 0 }
   const artifactEvidenceCount = artifacts.reduce((total, artifact) => total + (artifact.evidenceRefs?.length ?? 0), 0)
+  const artifactCatalogError = artifacts.find(artifact => artifact.message?.includes('Artifact Catalog 无效'))?.message
 
   const openFile = (relativePath: string, title: string): void => {
     setFileError(null)
@@ -848,6 +880,43 @@ function StageWorkbenchPanel({ props, workspace, sessionId, view }: {
     } finally {
       setReviewSubmitting(false)
     }
+  }
+
+  const discoveryActions = () => {
+    if (artifactCatalogError !== undefined) {
+      return <button type="button" className={css.primaryButton} onClick={() => { prepareDraft('repair-stage-records') }}>修复阶段记录</button>
+    }
+    if (reviewReady) {
+      return <>
+        <button type="button" className={css.primaryButton} data-stage-review-action="" onClick={() => { setReviewError(null); setReviewConfirming(false); setReviewMode(true) }}>提交 FDE 评审</button>
+        <button type="button" className={css.secondaryButton} onClick={() => { prepareDraft('form-conclusion') }}>继续核对未确认事项</button>
+        {hasEngagementReframe && <button type="button" className={css.tertiaryButton} onClick={() => { prepareDraft('reframe-engagement') }}>继续核对范围冲突</button>}
+      </>
+    }
+    if (currentWorkId === 'restore-workflow') {
+      return <>
+        <button type="button" className={css.primaryButton} onClick={() => { prepareDraft('restore-workflow', files.map(file => file.relativePath)) }}>继续还原实际流程</button>
+        <button type="button" className={css.secondaryButton} onClick={() => { prepareDraft('prepare-interview') }}>补充流程访谈</button>
+        {hasEngagementReframe && <button type="button" className={css.tertiaryButton} onClick={() => { prepareDraft('reframe-engagement') }}>继续核对范围冲突</button>}
+      </>
+    }
+    if (currentWorkId === 'qualify-value') {
+      return <>
+        <button type="button" className={css.primaryButton} onClick={() => { prepareDraft('qualify-value') }}>核对问题价值与责任</button>
+        {hasEngagementReframe && <button type="button" className={css.secondaryButton} onClick={() => { prepareDraft('reframe-engagement') }}>核对冲突并调整候选边界</button>}
+      </>
+    }
+    if (currentWorkId === 'form-conclusion') {
+      return <>
+        <button type="button" className={css.primaryButton} onClick={() => { prepareDraft('form-conclusion') }}>整理阶段候选结论</button>
+        {hasEngagementReframe && <button type="button" className={css.secondaryButton} onClick={() => { prepareDraft('reframe-engagement') }}>继续处理未决范围冲突</button>}
+      </>
+    }
+    return <>
+      <button type="button" className={css.primaryButton} onClick={() => { prepareDraft('prepare-interview') }}>开始梳理真实流程</button>
+      {files.length > 0 && <button type="button" className={css.secondaryButton} onClick={() => { prepareDraft('qualify-workflow', files.map(file => file.relativePath)) }}>{`根据客户资料开始梳理（${String(files.length)}）`}</button>}
+      {hasEngagementReframe && <button type="button" className={css.tertiaryButton} onClick={() => { prepareDraft('reframe-engagement') }}>继续核对范围冲突</button>}
+    </>
   }
 
   if (stageState?.status === 'error') {
@@ -981,7 +1050,7 @@ function StageWorkbenchPanel({ props, workspace, sessionId, view }: {
 
       <section className={css.historicalEvidenceChain} data-evidence-chain="" data-active-stage="">
         <header className={css.historicalEvidenceHeader}>
-          <div><span>当前工作 · 第 {String(currentWorkIndex + 1)}/{String(workItems.length)} 步</span><h2 data-evidence-title="">{reviewReady ? '核对已经整理的记录' : currentWorkIndex === 0 ? '从一个最近发生的案例开始' : (FALLBACK_WORK[currentWorkIndex]?.title ?? currentWork.title)}</h2><p>{reviewReady ? '候选记录已经齐备，请回到依据逐项核对后再作出人工决定。' : (FALLBACK_WORK[currentWorkIndex]?.purpose ?? currentWork.purpose)}</p></div>
+          <div><span>当前工作 · 第 {String(currentWorkIndex + 1)}/{String(workItems.length)} 步</span><h2 data-evidence-title="">{artifactCatalogError !== undefined ? '修复无效的阶段记录' : reviewReady ? '核对已经整理的记录' : currentWorkIndex === 0 ? '从一个最近发生的案例开始' : (FALLBACK_WORK[currentWorkIndex]?.title ?? currentWork.title)}</h2><p>{artifactCatalogError ?? (reviewReady ? '候选记录已经齐备，请回到依据逐项核对后再作出人工决定。' : (FALLBACK_WORK[currentWorkIndex]?.purpose ?? currentWork.purpose))}</p></div>
           <div className={css.historicalEvidenceDirection} aria-hidden="true"><strong>01</strong><i /><strong>03</strong></div>
         </header>
         <div className={css.historicalStageGrid}>
@@ -1004,9 +1073,8 @@ function StageWorkbenchPanel({ props, workspace, sessionId, view }: {
           </section>
           <section data-evidence-decision="">
             <header><span>人工结论</span><h2>接下来如何决定</h2></header>
-            <div className={css.historicalDecision} data-ready={reviewReady ? 'true' : undefined}><EvidenceShieldIcon ready={reviewReady} /><span><strong>{reviewReady ? '候选材料已齐备' : '等待 FDE 完成本阶段判断'}</strong><small>{reviewReady ? '核对记录后可提交人工阶段门。' : '继续补齐事实与阶段记录。'}</small></span></div>
+            <div className={css.historicalDecision} data-ready={reviewReady ? 'true' : undefined}><EvidenceShieldIcon ready={reviewReady} /><span><strong>{artifactCatalogError !== undefined ? '阶段记录未通过校验' : reviewReady ? '候选材料已齐备' : '等待 FDE 完成本阶段判断'}</strong><small>{artifactCatalogError !== undefined ? '先修复固定记录合同，再继续阶段判断。' : reviewReady ? '核对记录后可提交人工阶段门。' : '继续补齐事实与阶段记录。'}</small></span></div>
             <dl><dt>当前工作</dt><dd>{FALLBACK_WORK[currentWorkIndex]?.title ?? currentWork.title}</dd><dt>待确认流程</dt><dd>{selectedWorkflow?.title ?? `${String(workflowCatalog.items.length)} 项`}</dd><dt>事实状态</dt><dd>已确认 {workflowEvidence.confirmed} · 待核对 {workflowEvidence.unverified}</dd><dt>遗留阻塞</dt><dd>{(discovery?.blockers ?? []).length} 项</dd></dl>
-            {reviewReady && <button type="button" className={css.historicalDecisionAction} data-stage-review-action="" onClick={() => { setReviewError(null); setReviewConfirming(false); setReviewMode(true) }}>提交 FDE 评审 <span aria-hidden="true">→</span></button>}
           </section>
         </div>
         <ol className={css.historicalMilestones} data-stage-milestones="" aria-label="第一阶段工作路径">
@@ -1019,9 +1087,7 @@ function StageWorkbenchPanel({ props, workspace, sessionId, view }: {
         <footer className={css.historicalArchiveFooter}>
           <span><HistoricalArchiveIcon />当前阶段记录会随对话与资料持续更新。</span>
           <div className={css.activeStageActions}>
-            <button type="button" className={css.primaryButton} onClick={() => { prepareDraft('prepare-interview') }}>开始梳理真实流程</button>
-            {files.length > 0 && <button type="button" className={css.secondaryButton} onClick={() => { prepareDraft('qualify-workflow', files.map(file => file.relativePath)) }}>{`根据客户资料开始梳理（${String(files.length)}）`}</button>}
-            {hasEngagementReframe && <button type="button" className={css.tertiaryButton} onClick={() => { prepareDraft('reframe-engagement') }}>继续核对说法不一致</button>}
+            {discoveryActions()}
           </div>
         </footer>
       </section>
