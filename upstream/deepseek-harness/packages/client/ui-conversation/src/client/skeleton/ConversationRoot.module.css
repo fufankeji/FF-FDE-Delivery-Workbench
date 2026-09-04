@@ -345,6 +345,29 @@
   bottom: 16px;
 }
 
+/* Completed investigation records are a dense, read-only evidence surface.
+   The stage owns the full viewport and cannot accept input, so the resident
+   composer must not cover the archive table or create an artificial crop. */
+.scrollBody:has([data-hide-stage-composer='true'][data-conversation-composer-overlay]) > .composerSeat {
+  display: none;
+}
+
+.root:has([data-hide-stage-composer='true'][data-conversation-composer-overlay]) .header {
+  box-sizing: border-box;
+  min-height: 90px;
+  padding-top: 9px;
+}
+
+.root:has([data-hide-stage-composer='true'][data-conversation-composer-overlay]) .crumbCurrent {
+  max-width: 320px;
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 24px;
+}
+
+.root:has([data-hide-stage-composer='true'][data-conversation-composer-overlay]) .tabs { margin-top: 13px; }
+.root:has([data-hide-stage-composer='true'][data-conversation-composer-overlay]) .tab { font-size: 14px; line-height: 18px; }
+
 @media (max-width: 980px) {
   .scrollBody:has([data-conversation-composer-layout='stage-execution'][data-conversation-composer-overlay]) > .composerSeat {
     right: var(--dsh-scrollbar-width);

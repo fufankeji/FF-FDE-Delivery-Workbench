@@ -5,7 +5,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type {} from '@deepseek-ai/dsh-client-ui-layout/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
 import type {} from '@deepseek-ai/dsh-client-ui-workspace/client'
-import type { AcceptanceHandoverDecision, FdeProjectSurfaceController } from './controller.ts'
+import type { AcceptanceHandoverDecision, DesignExecutionMechanism, FdeProjectSurfaceController, SemanticDefinitionInput } from './controller.ts'
 import type { ProjectPageController } from './page-controller.ts'
 import type { FdeV2StageId, ProjectStageController } from './stage-controller.ts'
 import type { ProjectStageViewController } from './stage-view-controller.ts'
@@ -152,6 +152,32 @@ export interface ProjectStageWorkbenchInjected {
     sourcePaths: readonly string[],
   ) => void
   prepareStageDraft: (sessionId: string, prompt: string) => void
+  configureDesignRoute: (workspaceId: string, input: {
+    readonly execution: { readonly mechanism: DesignExecutionMechanism; readonly label: string; readonly rationale: string }
+    readonly semantics: { readonly mode: 'schema' | 'ontology'; readonly rationale: string }
+  }) => Promise<void>
+  bindDesignSources: (
+    workspaceId: string,
+    sourceIds: readonly string[],
+    permissionScope: string,
+    authority: 'primary' | 'supporting',
+  ) => Promise<void>
+  saveDesignDefinition: (workspaceId: string, expectedRevision: number, definition: SemanticDefinitionInput) => Promise<void>
+  reviewDesignCandidates: (
+    workspaceId: string,
+    decisions: readonly { readonly id: string; readonly decision: 'accepted' | 'rejected' }[],
+  ) => Promise<void>
+  runDesignSemantica: (
+    workspaceId: string,
+    action: 'health' | 'extract' | 'propose-schema' | 'publish-schema' | 'build' | 'validate' | 'context',
+    input?: Readonly<Record<string, unknown>>,
+  ) => Promise<void>
+  recordDesignDecision: (
+    workspaceId: string,
+    expectedRevision: number,
+    outcome: 'go' | 'revise' | 'narrow' | 'stop',
+    rationale: string,
+  ) => Promise<void>
   openProjectFile: (sessionId: string, workspacePath: string, relativePath: string, title: string) => Promise<void>
   openProjectConversation: (sessionId: string) => void
   resolveProjectWorkspace: (sessionId: string) => {

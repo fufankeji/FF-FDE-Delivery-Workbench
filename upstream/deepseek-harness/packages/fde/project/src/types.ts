@@ -641,6 +641,257 @@ export interface V2InvestigationSnapshot {
   }[]
 }
 
+/** Bounded, project-owned graph payload rendered by the stage-four workbench. */
+export interface V2KnowledgeGraphSnapshot {
+  readonly schemaVersion: 1
+  readonly provider: {
+    readonly id: string
+    readonly version?: string
+  }
+  readonly graphId: string
+  readonly revision: string
+  readonly ontologyVersion: string
+  readonly updatedAt: string
+  readonly nodes: readonly {
+    readonly id: string
+    readonly label: string
+    readonly type: string
+    readonly summary?: string
+    readonly communityId?: string
+    readonly confidence?: number
+    readonly validFrom?: string
+    readonly validUntil?: string
+    readonly sourceRefs: readonly string[]
+  }[]
+  readonly edges: readonly {
+    readonly id: string
+    readonly source: string
+    readonly target: string
+    readonly type: string
+    readonly label?: string
+    readonly weight: number
+    readonly confidence?: number
+    readonly validFrom?: string
+    readonly validUntil?: string
+    readonly sourceRefs: readonly string[]
+  }[]
+  readonly communities: readonly {
+    readonly id: string
+    readonly label: string
+    readonly level: number
+    readonly nodeIds: readonly string[]
+  }[]
+}
+
+/** Browser-safe project-scoped state produced by the stage-four Semantica Provider. */
+export interface V2SemanticWorkspaceSnapshot {
+  readonly status: 'missing' | 'ready' | 'invalid'
+  readonly path: '.fde/design/semantica/workspace.json'
+  readonly revision?: number
+  readonly updatedAt?: string
+  readonly evidenceDigest?: string
+  readonly provider: {
+    readonly id: 'semantica'
+    readonly expectedVersion: '0.6.7'
+    readonly status: 'unchecked' | 'ready' | 'unavailable' | 'invalid'
+    readonly version?: string
+    readonly configDigest?: string
+    readonly checkedAt?: string
+    readonly message?: string
+  }
+  readonly route?: {
+    readonly execution: {
+      readonly mechanism: 'manual' | 'rules' | 'software' | 'retrieval' | 'model' | 'agent' | 'hybrid'
+      readonly label: string
+      readonly rationale: string
+    }
+    readonly semantics: {
+      readonly mode: 'schema' | 'ontology'
+      readonly rationale: string
+    }
+    readonly conclusion: 'pending' | 'not_required' | 'validated' | 'validation_failed' | 'insufficient_evidence'
+  }
+  readonly sources: readonly {
+    readonly sourceId: string
+    readonly name: string
+    readonly relativePath: string
+    readonly digest: string
+    readonly bytes: number
+    readonly modifiedAt: string
+    readonly parseStatus: string
+    readonly permissionScope: string
+    readonly authority: 'primary' | 'supporting'
+  }[]
+  readonly definition: {
+    readonly status: 'missing' | 'draft' | 'review' | 'published' | 'stale'
+    readonly version: string
+    readonly revision: number
+    readonly digest?: string
+    readonly updatedAt?: string
+    readonly competencyQuestions: readonly {
+      readonly id: string
+      readonly text: string
+      readonly required: boolean
+      readonly query: {
+        readonly kind: 'lookup' | 'edge' | 'path'
+        readonly sourceType?: string
+        readonly relationshipType?: string
+        readonly targetType?: string
+        readonly maxDepth: number
+        readonly minAnswers: number
+      }
+    }[]
+    readonly classes: readonly {
+      readonly id: string
+      readonly label: string
+      readonly description?: string
+      readonly aliases: readonly string[]
+      readonly identityKeys: readonly string[]
+      readonly properties: readonly {
+        readonly id: string
+        readonly label: string
+        readonly dataType: 'string' | 'number' | 'boolean' | 'date' | 'datetime'
+        readonly required: boolean
+        readonly unique: boolean
+      }[]
+      readonly fieldMappings: readonly { readonly sourceField: string; readonly targetProperty: string }[]
+      readonly extractionPatterns: readonly string[]
+    }[]
+    readonly relationships: readonly {
+      readonly id: string
+      readonly label: string
+      readonly domain: string
+      readonly range: string
+      readonly description?: string
+      readonly cardinality: 'one-to-one' | 'one-to-many' | 'many-to-one' | 'many-to-many'
+      readonly extractionPatterns: readonly string[]
+    }[]
+    readonly provenanceRules: readonly { readonly id: string; readonly label: string; readonly description: string }[]
+    readonly temporalRules: readonly { readonly id: string; readonly label: string; readonly description: string }[]
+    readonly confidenceThreshold: number
+    readonly shaclSeverity: 'Violation' | 'Warning' | 'Info'
+  }
+  readonly candidates: {
+    readonly status: 'not_run' | 'ready' | 'failed' | 'stale'
+    readonly updatedAt?: string
+    readonly entities: readonly {
+      readonly id: string
+      readonly label: string
+      readonly type: string
+      readonly confidence: number
+      readonly sourceRefs: readonly string[]
+      readonly decision: 'pending' | 'accepted' | 'rejected'
+    }[]
+    readonly relationships: readonly {
+      readonly id: string
+      readonly source: string
+      readonly target: string
+      readonly type: string
+      readonly label?: string
+      readonly confidence: number
+      readonly sourceRefs: readonly string[]
+      readonly decision: 'pending' | 'accepted' | 'rejected'
+    }[]
+    readonly warnings: readonly string[]
+  }
+  readonly runs: readonly {
+    readonly id: string
+    readonly kind: 'extract' | 'propose-schema' | 'publish-schema' | 'build' | 'validate' | 'context' | 'slice'
+    readonly status: 'waiting' | 'running' | 'succeeded' | 'failed' | 'cancelled' | 'stale'
+    readonly startedAt: string
+    readonly completedAt?: string
+    readonly providerVersion?: string
+    readonly definitionVersion?: string
+    readonly definitionDigest?: string
+    readonly sourceDigests: readonly string[]
+    readonly summary?: string
+    readonly evidencePaths: readonly string[]
+    readonly diagnostics: readonly string[]
+  }[]
+  readonly validation?: {
+    readonly runId: string
+    readonly status: 'passed' | 'failed' | 'unavailable' | 'stale'
+    readonly checkedAt: string
+    readonly graphRevision: string
+    readonly definitionDigest: string
+    readonly structuralValid: boolean
+    readonly issues: readonly { readonly code: string; readonly severity: string; readonly message: string }[]
+    readonly questions: readonly {
+      readonly questionId: string
+      readonly status: 'passed' | 'failed' | 'unavailable'
+      readonly answerCount: number
+      readonly sourceRefs: readonly string[]
+      readonly message: string
+    }[]
+  }
+  readonly context?: {
+    readonly runId: string
+    readonly status: 'ready' | 'failed' | 'stale'
+    readonly createdAt: string
+    readonly query: string
+    readonly schemaVersion: string
+    readonly graphRevision: string
+    readonly entityCount: number
+    readonly relationshipCount: number
+    readonly sources: readonly string[]
+    readonly permissionScope: string
+  }
+  readonly slice?: {
+    readonly runId: string
+    readonly status: 'succeeded' | 'failed' | 'stale'
+    readonly createdAt: string
+    readonly task: string
+    readonly result: string
+    readonly contextRunId?: string
+    readonly evidenceRefs: readonly string[]
+    readonly diagnostics: readonly string[]
+  }
+  readonly decision?: {
+    readonly id: string
+    readonly outcome: 'go' | 'revise' | 'narrow' | 'stop'
+    readonly rationale: string
+    readonly decidedAt: string
+    readonly workspaceRevision: number
+    readonly evidenceDigest: string
+    readonly status: 'current' | 'stale'
+    readonly routeConclusion: 'pending' | 'not_required' | 'validated' | 'validation_failed' | 'insufficient_evidence'
+    readonly semanticMode: 'schema' | 'ontology'
+    readonly definitionDigest?: string
+    readonly graphRevision?: string
+    readonly sliceRunId?: string
+  }
+  readonly message?: string
+}
+
+/** Evidence-backed mechanism route and semantic assets for stage four. */
+export interface V2DesignSnapshot {
+  readonly execution: {
+    readonly status: 'undecided' | 'candidate' | 'selected'
+    readonly mechanism?: 'manual' | 'rules' | 'software' | 'retrieval' | 'model' | 'agent' | 'hybrid'
+    readonly label?: string
+    readonly rationale?: string
+  }
+  readonly semantics: {
+    readonly mode: 'undecided' | 'schema' | 'ontology'
+    readonly rationale?: string
+    readonly conclusion: 'pending' | 'not_required' | 'validated' | 'validation_failed' | 'insufficient_evidence'
+  }
+  readonly ontology: {
+    readonly status: 'not_applicable' | 'not_started' | 'draft' | 'review' | 'published' | 'stale'
+    readonly schemaVersion?: string
+    readonly classCount?: number
+    readonly relationshipTypeCount?: number
+  }
+  readonly graph: {
+    readonly path: '.fde/design/knowledge-graph.json'
+    readonly status: 'not_applicable' | 'missing' | 'ready' | 'invalid'
+    readonly buildStatus: 'not_applicable' | 'waiting' | 'running' | 'succeeded' | 'failed' | 'cancelled' | 'stale'
+    readonly snapshot?: V2KnowledgeGraphSnapshot
+    readonly message?: string
+  }
+  readonly workspace: V2SemanticWorkspaceSnapshot
+}
+
 /** Host-derived business state for one post-discovery V2 stage. */
 export interface V2StageSurfaceSnapshot {
   readonly id: V2LifecycleStageId
@@ -671,6 +922,7 @@ export interface V2StageSurfaceSnapshot {
   readonly reviewReady: boolean
   readonly reviewBlockers: readonly string[]
   readonly investigation?: V2InvestigationSnapshot
+  readonly design?: V2DesignSnapshot
   readonly prompt: string
   readonly skill: string
   readonly message?: string

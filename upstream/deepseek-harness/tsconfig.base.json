@@ -230,6 +230,7 @@
       "@deepseek-ai/dsh-client-ui-fde-stage": ["./packages/client/ui-fde-stage/src"],
       "@deepseek-ai/dsh-client-ui-fde-sources": ["./packages/client/ui-fde-sources/src"],
       "@deepseek-ai/dsh-fde-project": ["./packages/fde/project/src"],
+      "@deepseek-ai/dsh-fde-semantica": ["./packages/fde/semantica/src"],
       "@deepseek-ai/dsh-fde-stage": ["./packages/fde/stage/src"],
       "@deepseek-ai/dsh-fde-source": ["./packages/fde/source/src"],
       "@deepseek-ai/dsh-client-ui-theme": ["./packages/client/ui-theme/src"],

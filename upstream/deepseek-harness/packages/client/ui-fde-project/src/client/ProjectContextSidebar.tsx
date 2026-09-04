@@ -147,7 +147,12 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
         <div className={css.projectStageNavHeader}>
           <span>交付路径</span>
           <div className={css.projectStageNavActions}>
-            {viewed !== active && <button type="button" className={css.projectStageReturn} onClick={() => { props.returnToCurrentStage(workspaceId) }}>返回当前阶段</button>}
+            {viewed !== active && (
+              <button type="button" className={css.projectStageReturn} onClick={() => { props.returnToCurrentStage(workspaceId) }}>
+                返回当前阶段
+                <svg aria-hidden="true" viewBox="0 0 16 16"><path d="M6.5 4 3 7.5 6.5 11" /><path d="M3.5 7.5h5.25a3.75 3.75 0 0 1 0 7.5H7" /></svg>
+              </button>
+            )}
             <button
               type="button"
               className={css.projectStageNavControl}
@@ -175,6 +180,7 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
         {V2_STAGE_NAMES.map((name, index) => {
           const current = index === active
           const viewing = index === viewed
+          const complete = index < active
           const stage = FDE_V2_STAGE_IDS[index]
           if (stage === undefined) return null
           return (
@@ -193,8 +199,17 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
                   }
                 }}
               >
-                <i>{index < active ? '✓' : String(index + 1).padStart(2, '0')}</i>
-                <span><strong>{name}</strong>{current && <small>当前阶段</small>}{viewing && !current && <small>正在查看</small>}</span>
+                <i>{complete ? '✓' : String(index + 1).padStart(2, '0')}</i>
+                <span>
+                  <strong>{name}</strong>
+                  {current && <small>当前阶段</small>}
+                  {viewing && !current && (
+                    <small className={css.projectStageViewingStatus}>
+                      <span><svg aria-hidden="true" viewBox="0 0 16 16"><path d="M1.5 8s2.4-4 6.5-4 6.5 4 6.5 4-2.4 4-6.5 4S1.5 8 1.5 8Z" /><circle cx="8" cy="8" r="1.75" /></svg>正在查看</span>
+                      <em>· 已完成</em>
+                    </small>
+                  )}
+                </span>
                 <svg aria-hidden="true" viewBox="0 0 16 16">{viewing && stageDetailsOpen ? <path d="m3 10.5 5-5 5 5" /> : <path d="m5.5 3 5 5-5 5" />}</svg>
               </button>
               {viewing && stageDetailsOpen && (

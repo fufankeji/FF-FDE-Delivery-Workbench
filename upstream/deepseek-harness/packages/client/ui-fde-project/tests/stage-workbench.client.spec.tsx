@@ -53,6 +53,12 @@ function props(overrides: Record<string, unknown> = {}) {
     openProjectSourceUpload: vi.fn(),
     prepareDiscoveryDraft: vi.fn(),
     prepareStageDraft: vi.fn(),
+    configureDesignRoute: vi.fn(async () => {}),
+    bindDesignSources: vi.fn(async () => {}),
+    saveDesignDefinition: vi.fn(async () => {}),
+    reviewDesignCandidates: vi.fn(async () => {}),
+    runDesignSemantica: vi.fn(async () => {}),
+    recordDesignDecision: vi.fn(async () => {}),
     openProjectFile: vi.fn(async () => {}),
     openProjectConversation: vi.fn(),
     viewProjectStage: vi.fn(),
@@ -564,7 +570,7 @@ describe('ProjectStageWorkbenchHero', () => {
     })
     const view = render(<ProjectStageWorkbenchHero {...input} />)
 
-    expect(screen.getByRole('heading', { name: '四个现场条件必须分别有证据' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: '四个现场条件，分别留下证据' })).toBeTruthy()
     expect(screen.getByRole('heading', { name: '真实环境中的对象和连接' })).toBeTruthy()
     expect(screen.getByRole('heading', { name: '读取、建议、草稿和执行不能混淆' })).toBeTruthy()
     expect(screen.getAllByText('历史工单')).toHaveLength(2)
@@ -583,6 +589,239 @@ describe('ProjectStageWorkbenchHero', () => {
       'session-1', '/isolated/project',
       'fde-deliverables/03-environment/system-access-map.md', '系统与访问清单',
     )
+    fireEvent.click(screen.getByRole('button', { name: '查看调查工作项：检查数据条件（数据可用性评估）' }))
+    expect(input.openProjectFile).toHaveBeenLastCalledWith(
+      'session-1', '/isolated/project',
+      'fde-deliverables/03-environment/data-readiness.md', '数据可用性评估',
+    )
+    fireEvent.click(screen.getByRole('button', { name: '查看系统调查记录：工单 Sandbox（系统与访问清单）' }))
+    fireEvent.click(screen.getByRole('button', { name: '查看系统连接记录：历史工单到工单 Sandbox（系统与访问清单）' }))
+    fireEvent.keyDown(screen.getByRole('button', { name: '查看动作边界：工单 Sandbox（系统与访问清单）' }), { key: 'Enter' })
+    expect(input.openProjectFile).toHaveBeenLastCalledWith(
+      'session-1', '/isolated/project',
+      'fde-deliverables/03-environment/system-access-map.md', '系统与访问清单',
+    )
+    fireEvent.keyDown(screen.getByRole('button', { name: '查看数据发现：设备 ID 缺失率（数据可用性评估）' }), { key: ' ' })
+    expect(input.openProjectFile).toHaveBeenLastCalledWith(
+      'session-1', '/isolated/project',
+      'fde-deliverables/03-environment/data-readiness.md', '数据可用性评估',
+    )
+    expect(screen.queryByRole('button', { name: /查看治理记录：安全/ })).toBeNull()
+  })
+
+  it('renders the active ontology route from the project graph snapshot without a generic record rail', () => {
+    const design = {
+      id: 'design', index: 4, title: '设计方案并完成端到端纵向切片',
+      objective: '选择最合适的实现方式，并先走通一条可以验证的完整业务链路。',
+      explanation: '比较实现方式，明确系统边界、失败回退并完成最小纵向切片。',
+      statePath: '.fde/stages/design.json', skill: 'fde-design-vertical-slice',
+      prompt: '请基于前三阶段事实完成第四阶段双轴机制判断。',
+      stateStatus: 'ready', status: 'working', currentWorkId: 'slice',
+      requiredCount: 3, presentCount: 2, reviewReady: false,
+      reviewBlockers: ['纵向切片验证记录尚未形成'], recommendation: 'pending',
+      workItems: [
+        { id: 'mechanism', title: '选择实现方式', purpose: '比较实现机制。', status: 'complete' },
+        { id: 'architecture', title: '明确系统边界', purpose: '明确工具与权限。', status: 'complete' },
+        { id: 'slice', title: '走通纵向切片', purpose: '运行一条真实业务链路。', status: 'current' },
+        { id: 'decision', title: '核对方案决定', purpose: '形成候选结论。', status: 'waiting' },
+      ],
+      blockers: [],
+      artifacts: [
+        { id: 'mechanism-selection', title: '实现方式选择记录', path: 'fde-deliverables/04-solution-design/mechanism-selection.md', purpose: '记录机制选择。', required: true, status: 'present' },
+        { id: 'solution-design', title: '生产方案设计', path: 'fde-deliverables/04-solution-design/solution-design.md', purpose: '记录方案合同。', required: true, status: 'present' },
+        { id: 'vertical-slice-record', title: '纵向切片验证记录', path: 'fde-deliverables/04-solution-design/vertical-slice-record.md', purpose: '记录真实运行结果。', required: true, status: 'missing' },
+      ],
+      design: {
+        execution: { status: 'selected', mechanism: 'agent', label: '受控 Agent 工作流', rationale: '需要组合读取和候选生成。' },
+        semantics: { mode: 'ontology', conclusion: 'pending', rationale: '需要实体消歧、来源时间与多跳关系。' },
+        ontology: { status: 'published', schemaVersion: '0.1.0', classCount: 3, relationshipTypeCount: 2 },
+        graph: {
+          path: '.fde/design/knowledge-graph.json', status: 'ready', buildStatus: 'succeeded',
+          snapshot: {
+            schemaVersion: 1, provider: { id: 'semantica', version: '0.6.7' }, graphId: 'fde-project-graph',
+            revision: 'build-17', ontologyVersion: '0.1.0', updatedAt: '2026-09-04T08:30:00.000Z',
+            nodes: [
+              { id: 'workflow', label: '报修业务流程', type: 'Workflow', communityId: 'delivery', confidence: 0.98, sourceRefs: ['outcome-contract.md'] },
+              { id: 'system', label: '工单系统', type: 'System', communityId: 'delivery', confidence: 0.92, sourceRefs: ['system-access-map.md'] },
+            ],
+            edges: [{ id: 'uses', source: 'workflow', target: 'system', type: 'USES', label: '使用', weight: 1, confidence: 0.9, sourceRefs: ['system-access-map.md'] }],
+            communities: [{ id: 'delivery', label: '交付闭环', level: 0, nodeIds: ['workflow', 'system'] }],
+          },
+        },
+        workspace: {
+          status: 'ready', path: '.fde/design/semantica/workspace.json', revision: 8,
+          updatedAt: '2026-09-04T08:31:00.000Z', evidenceDigest: 'sha256:ontology-current',
+          provider: { id: 'semantica', expectedVersion: '0.6.7', status: 'ready', version: '0.6.7' },
+          route: {
+            execution: { mechanism: 'agent', label: '受控 Agent 工作流', rationale: '需要组合读取和候选生成。' },
+            semantics: { mode: 'ontology', rationale: '需要实体消歧、来源时间与多跳关系。' }, conclusion: 'pending',
+          },
+          sources: [],
+          definition: {
+            status: 'published', version: '0.1.0', revision: 2, digest: 'sha256:definition', updatedAt: '2026-09-04T08:10:00.000Z',
+            competencyQuestions: [{ id: 'cq-workflow-system', text: '业务流程依赖哪个系统？', required: true, query: { kind: 'edge', sourceType: 'Workflow', relationshipType: 'USES', targetType: 'System', maxDepth: 1, minAnswers: 1 } }],
+            classes: [
+              { id: 'Workflow', label: '业务流程', aliases: ['流程'], identityKeys: ['name'], properties: [{ id: 'name', label: '名称', dataType: 'string', required: true, unique: true }], fieldMappings: [{ sourceField: '流程名称', targetProperty: 'name' }], extractionPatterns: [] },
+              { id: 'System', label: '系统', aliases: [], identityKeys: ['name'], properties: [], fieldMappings: [], extractionPatterns: [] },
+            ],
+            relationships: [{ id: 'USES', label: '使用', domain: 'Workflow', range: 'System', cardinality: 'many-to-many', extractionPatterns: [] }],
+            provenanceRules: [{ id: 'source-required', label: '来源必填', description: '每条事实必须保留来源。' }],
+            temporalRules: [{ id: 'valid-time', label: '有效时间', description: '事实必须区分有效时间。' }],
+            confidenceThreshold: 0.65, shaclSeverity: 'Violation',
+          },
+          candidates: { status: 'ready', entities: [], relationships: [], warnings: [] },
+          runs: [],
+        },
+      },
+    }
+    const input = props({
+      useStageProgress: hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: {
+        workspaceId: 'workspace-1', currentStage: 'development', revision: 7,
+        lifecycleVersion: 2, v2Stage: 'design', createdAt: '', updatedAt: '',
+      } } } }),
+      useProjectSurfaces: hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: {
+        requirements: { artifacts: [] }, v2Stages: { design },
+      } } } }),
+    })
+    const view = render(<ProjectStageWorkbenchHero {...input} />)
+
+    expect(screen.getByRole('heading', { name: '先决定怎么实现，再决定是否需要本体' })).toBeTruthy()
+    expect(screen.getAllByText('受控 Agent 工作流')).toHaveLength(2)
+    expect(screen.getAllByText('Ontology 与知识图谱')).toHaveLength(2)
+    expect(screen.getByRole('heading', { name: '从最小 Schema 到可查询的真实项目关系' })).toBeTruthy()
+    expect(screen.getByText('semantica · 0.6.7')).toBeTruthy()
+    expect(screen.getAllByText('2 个实体 · 1 条关系')).toHaveLength(2)
+    expect(screen.getByLabelText('项目知识图谱：2 个节点，1 条关系')).toBeTruthy()
+    expect(screen.getByText('当前环境无法启动三维图谱')).toBeTruthy()
+    expect(screen.queryByText('现在先做')).toBeNull()
+    expect(view.container.querySelector('[data-stage="design"]')?.getAttribute('data-conversation-composer-layout')).toBe('stage-execution')
+    expect(view.container.querySelector('[data-stage="design"] [data-stage-artifact-column]')).toBeNull()
+
+    expect(screen.queryByRole('button', { name: '开始本阶段工作' })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: '审阅与编辑定义' }))
+    expect(screen.getByRole('dialog', { name: '编辑 Ontology 定义' })).toBeTruthy()
+    expect(screen.getByText('类、属性、别名与字段映射')).toBeTruthy()
+    expect(screen.getByDisplayValue('流程')).toBeTruthy()
+    expect(screen.getByDisplayValue('流程名称')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '取消' }))
+    fireEvent.click(screen.getByRole('button', { name: '调整路线' }))
+    expect(screen.getByRole('dialog', { name: '双轴机制判断' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '取消' }))
+    fireEvent.click(screen.getAllByRole('button', { name: '查看' })[0]!)
+    expect(input.openProjectFile).toHaveBeenCalledWith(
+      'session-1', '/isolated/project',
+      'fde-deliverables/04-solution-design/mechanism-selection.md', '实现方式选择记录',
+    )
+  })
+
+  it('keeps the simple design route free of graph placeholders and demo nodes', () => {
+    const input = props({
+      useStageProgress: hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: {
+        workspaceId: 'workspace-1', currentStage: 'development', revision: 7,
+        lifecycleVersion: 2, v2Stage: 'design', createdAt: '', updatedAt: '',
+      } } } }),
+      useProjectSurfaces: hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: {
+        requirements: { artifacts: [] },
+        v2Stages: { design: {
+          id: 'design', index: 4, title: '设计方案并完成端到端纵向切片',
+          objective: '选择最合适的实现方式，并走通最小闭环。', explanation: '不默认采用本体。',
+          statePath: '.fde/stages/design.json', skill: 'fde-design-vertical-slice', prompt: '开始第四阶段。',
+          stateStatus: 'ready', status: 'working', currentWorkId: 'architecture', requiredCount: 3, presentCount: 1,
+          reviewReady: false, reviewBlockers: ['生产方案设计尚未形成'], recommendation: 'pending', blockers: [],
+          workItems: [
+            { id: 'mechanism', title: '选择实现方式', purpose: '比较机制。', status: 'complete' },
+            { id: 'architecture', title: '明确系统边界', purpose: '形成开发 Spec。', status: 'current' },
+            { id: 'slice', title: '走通纵向切片', purpose: '运行闭环。', status: 'waiting' },
+            { id: 'decision', title: '核对方案决定', purpose: '形成决定。', status: 'waiting' },
+          ],
+          artifacts: [
+            { id: 'mechanism-selection', title: '实现方式选择记录', path: 'mechanism-selection.md', purpose: '记录机制。', required: true, status: 'present' },
+            { id: 'solution-design', title: '生产方案设计', path: 'solution-design.md', purpose: '记录 Spec。', required: true, status: 'missing' },
+            { id: 'vertical-slice-record', title: '纵向切片验证记录', path: 'vertical-slice-record.md', purpose: '记录运行。', required: true, status: 'missing' },
+          ],
+          design: {
+            execution: { status: 'selected', mechanism: 'software', label: '普通软件与规则' },
+            semantics: { mode: 'schema', conclusion: 'not_required', rationale: '普通数据合同足以回答当前问题。' },
+            ontology: { status: 'not_applicable' },
+            graph: { path: '.fde/design/knowledge-graph.json', status: 'not_applicable', buildStatus: 'not_applicable' },
+          },
+        } },
+      } } } }),
+    })
+    render(<ProjectStageWorkbenchHero {...input} />)
+
+    expect(screen.getByRole('heading', { name: '用开发 Spec 与普通 Schema 跑通最小闭环' })).toBeTruthy()
+    expect(screen.getAllByText('不需要图谱').length).toBeGreaterThan(0)
+    expect(screen.queryByRole('heading', { name: '从最小 Schema 到可查询的真实项目关系' })).toBeNull()
+    expect(screen.queryByLabelText(/项目知识图谱/)).toBeNull()
+    expect(screen.queryByText('尚未形成项目知识图谱快照')).toBeNull()
+    expect(screen.queryByText('示例节点')).toBeNull()
+  })
+
+  it('records an explicit version-bound FDE decision and advances only for Go', async () => {
+    const recordDesignDecision = vi.fn(async () => {})
+    const completeV2Stage = vi.fn(async () => {})
+    const semanticWorkspace = {
+      status: 'ready', path: '.fde/design/semantica/workspace.json', revision: 12,
+      updatedAt: '2026-09-04T10:00:00.000Z', evidenceDigest: 'sha256:current',
+      provider: { id: 'semantica', expectedVersion: '0.6.7', status: 'unchecked' },
+      route: {
+        execution: { mechanism: 'software', label: '普通软件与规则', rationale: '确定性合同足够。' },
+        semantics: { mode: 'schema', rationale: '不需要图推理。' }, conclusion: 'not_required',
+      },
+      sources: [],
+      definition: { status: 'missing', version: '0.1.0', revision: 0, competencyQuestions: [], classes: [], relationships: [], provenanceRules: [], temporalRules: [], confidenceThreshold: 0.65, shaclSeverity: 'Violation' },
+      candidates: { status: 'not_run', entities: [], relationships: [], warnings: [] },
+      runs: [{ id: 'slice-1', kind: 'slice', status: 'succeeded', startedAt: '2026-09-04T09:50:00.000Z', completedAt: '2026-09-04T09:50:00.000Z', sourceDigests: [], summary: '真实切片已通过', evidencePaths: ['evidence/slice.log'], diagnostics: [] }],
+      slice: { runId: 'slice-1', status: 'succeeded', createdAt: '2026-09-04T09:50:00.000Z', task: '运行最窄链路', result: '得到可验证结果', evidenceRefs: ['evidence/slice.log'], diagnostics: [] },
+    }
+    const design = {
+      id: 'design', index: 4, title: '设计方案并完成端到端纵向切片', objective: '走通最小闭环。', explanation: '验证真实方案。',
+      statePath: '.fde/stages/design.json', skill: 'fde-design-vertical-slice', prompt: '开始第四阶段。',
+      stateStatus: 'ready', status: 'review-ready', currentWorkId: 'decision', requiredCount: 3, presentCount: 3,
+      reviewReady: true, reviewBlockers: [], recommendation: 'go', blockers: [],
+      workItems: [{ id: 'decision', title: '核对方案决定', purpose: '形成决定。', status: 'current' }],
+      artifacts: [
+        { id: 'mechanism-selection', title: '实现方式选择记录', path: 'mechanism-selection.md', purpose: '记录机制。', required: true, status: 'present' },
+        { id: 'solution-design', title: '生产方案设计', path: 'solution-design.md', purpose: '记录 Spec。', required: true, status: 'present' },
+        { id: 'vertical-slice-record', title: '纵向切片验证记录', path: 'vertical-slice-record.md', purpose: '记录运行。', required: true, status: 'present' },
+      ],
+      design: {
+        execution: { status: 'selected', mechanism: 'software', label: '普通软件与规则', rationale: '确定性合同足够。' },
+        semantics: { mode: 'schema', conclusion: 'not_required', rationale: '不需要图推理。' },
+        ontology: { status: 'not_applicable' }, graph: { path: '.fde/design/knowledge-graph.json', status: 'not_applicable', buildStatus: 'not_applicable' },
+        workspace: semanticWorkspace,
+      },
+    }
+    const input = props({
+      recordDesignDecision, completeV2Stage,
+      useStageProgress: hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: {
+        workspaceId: 'workspace-1', currentStage: 'development', revision: 7,
+        lifecycleVersion: 2, v2Stage: 'design', createdAt: '', updatedAt: '',
+      } } } }),
+      useProjectSurfaces: hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: {
+        requirements: { artifacts: [] }, v2Stages: { design },
+      } } } }),
+    })
+    render(<ProjectStageWorkbenchHero {...input} />)
+
+    fireEvent.click(screen.getByRole('button', { name: '提交 FDE 决定' }))
+    fireEvent.click(screen.getByRole('button', { name: /Revise/ }))
+    fireEvent.change(screen.getByLabelText('决定依据'), { target: { value: '当前接口合同仍需修订，暂不推进。' } })
+    fireEvent.click(screen.getByRole('button', { name: /保存 Revise/ }))
+    await waitFor(() => {
+      expect(recordDesignDecision).toHaveBeenCalledWith('workspace-1', 12, 'revise', '当前接口合同仍需修订，暂不推进。')
+    })
+    expect(completeV2Stage).not.toHaveBeenCalled()
+
+    fireEvent.click(screen.getByRole('button', { name: '提交 FDE 决定' }))
+    fireEvent.click(screen.getByRole('button', { name: /^Go/ }))
+    fireEvent.change(screen.getByLabelText('决定依据'), { target: { value: '当前证据齐备，同意进入 PoC 与 Eval。' } })
+    fireEvent.click(screen.getByRole('button', { name: '保存 Go 并进入下一阶段' }))
+    await waitFor(() => {
+      expect(recordDesignDecision).toHaveBeenLastCalledWith('workspace-1', 12, 'go', '当前证据齐备，同意进入 PoC 与 Eval。')
+      expect(completeV2Stage).toHaveBeenCalledWith('workspace-1', 7, 'design')
+    })
   })
 
   it('keeps the completed investigation cockpit visible as a read-only historical stage', () => {
@@ -618,7 +857,12 @@ describe('ProjectStageWorkbenchHero', () => {
                   workItems: [
                     { id: 'systems', title: '梳理系统与接口', purpose: '确认真实系统和接口。', status: 'complete' },
                   ],
-                  blockers: [],
+                  blockers: [{
+                    id: 'store-net-read',
+                    title: 'StoreNet 告警读取未批（AR-304，~5 工作日）——不阻塞当前只读调查，阻塞下一阶段网络告警读回',
+                    severity: 'high',
+                    status: 'open',
+                  }],
                   artifacts: [
                     { id: 'system-access-map', title: '系统与访问清单', path: 'fde-deliverables/03-environment/system-access-map.md', purpose: '记录系统和权限。', required: true, status: 'present' },
                   ],
@@ -640,17 +884,30 @@ describe('ProjectStageWorkbenchHero', () => {
 
     const workbench = view.container.querySelector('[data-stage="investigation"]')
     expect(workbench?.getAttribute('data-historical')).toBe('true')
+    expect(workbench?.getAttribute('data-hide-stage-composer')).toBe('true')
     expect(workbench?.getAttribute('data-conversation-composer-layout')).toBe('stage-history')
     expect(screen.getByText('阶段完成记录')).toBeTruthy()
-    expect(screen.getByRole('heading', { name: '四个现场条件必须分别有证据' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: '四个现场条件，分别留下证据' })).toBeTruthy()
     expect(screen.getByRole('heading', { name: '真实环境中的对象和连接' })).toBeTruthy()
     expect(screen.getByText('WorkOrder Pro 7')).toBeTruthy()
     expect(screen.getByText('环境证据已确认，阶段记录已封存')).toBeTruthy()
+    expect(screen.queryByText('4 项待确认事项 · 保留影响边界')).toBeNull()
+    expect(screen.getByText('1 项待确认事项 · 保留影响边界')).toBeTruthy()
+    expect(screen.getByText('StoreNet 告警读取未批')).toBeTruthy()
+    expect(screen.getByText('AR-304 · 约 5 工作日')).toBeTruthy()
+    expect(screen.getByText('不阻塞当前只读调查，阻塞下一阶段网络告警读回')).toBeTruthy()
     expect(screen.queryByText('从输入依据到人工结论')).toBeNull()
     expect(screen.queryByRole('button', { name: '开始环境调查' })).toBeNull()
     expect(screen.queryByRole('button', { name: '刷新调查记录' })).toBeNull()
     expect(screen.queryByRole('button', { name: '提交 FDE 评审' })).toBeNull()
     expect(screen.queryByRole('button', { name: '返回上一阶段' })).toBeNull()
+    expect(screen.queryByRole('button', { name: '只读记录' })).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: '梳理系统与接口' }))
+    expect(input.openProjectFile).toHaveBeenLastCalledWith(
+      'session-1', '/isolated/project',
+      'fde-deliverables/03-environment/system-access-map.md', '系统与访问清单',
+    )
 
     fireEvent.click(screen.getByRole('button', { name: /返回当前阶段/ }))
     expect(input.returnToCurrentStage).toHaveBeenCalledWith('workspace-1')

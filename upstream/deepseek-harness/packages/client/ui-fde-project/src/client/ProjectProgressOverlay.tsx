@@ -998,7 +998,7 @@ function ProjectList({ rows, showProject, labels, enterProject }: {
               <tr key={row.workspaceId} className={css.projectListRow} data-stage={stageId} data-palette={palette}>
                 <td>
                   <div className={css.projectListIdentity}>
-                    <ProjectMark title={row.title} palette={palette} className={css.projectListMark} />
+                    <ProjectMark title={row.title ?? '未命名项目'} palette={palette} className={css.projectListMark!} />
                     <span>
                       <strong>{row.title}</strong>
                       <small>{row.companyName || labels.companyMissing}</small>
@@ -1071,7 +1071,7 @@ function ProjectAttentionCard({ row, showProject, enterProject }: {
     <article className={css.projectAttentionCard} data-stage={stageId} data-palette={palette}>
       <header>
         <div className={css.projectIdentity}>
-          <ProjectMark title={row.title} palette={palette} className={css.projectMark} />
+          <ProjectMark title={row.title ?? '未命名项目'} palette={palette} className={css.projectMark!} />
           <div><h2>{row.title}</h2><p>{row.companyName || '未填写所属企业'} · {schedule}</p></div>
         </div>
         <span className={css.projectAttentionStage}>{stageIndex < 0 ? stage : `${String(stageIndex + 1)}/8 · ${stage}`}</span>

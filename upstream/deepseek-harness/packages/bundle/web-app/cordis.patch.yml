@@ -95,6 +95,18 @@
         maxOperations: 1000
         artifactPreviewMaxBytes: 2097152
 
+    # Stage-four conditional ontology / knowledge-graph provider. The Python
+    # executable and optional source checkout are deployment configuration;
+    # neither is written into a project or fixed to one developer machine.
+    - id: fde-semantica
+      name: '@deepseek-ai/dsh-fde-semantica'
+      config:
+        pythonCommand: !!js process.env.FDE_SEMANTICA_PYTHON ?? 'python3'
+        semanticaSource: !!js process.env.FDE_SEMANTICA_SOURCE ?? ''
+        operationTimeoutMs: 60000
+        maxSourceBytes: 2097152
+        maxSources: 12
+
     # DSH-native evaluation tools. The UI never calls these automatically;
     # an explicit user action asks the current Agent to run project cases.
     - id: fde-evaluation-tools

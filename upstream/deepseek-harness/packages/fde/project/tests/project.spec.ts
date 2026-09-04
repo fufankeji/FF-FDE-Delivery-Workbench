@@ -236,6 +236,150 @@ describe('FDE project surface snapshot', () => {
     })
   })
 
+  it('loads only a project-owned knowledge graph for the selected ontology route', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'fde-v2-design-'))
+    const outputs = join(root, 'fde-deliverables', '04-solution-design')
+    const states = join(root, '.fde', 'stages')
+    const designRoot = join(root, '.fde', 'design')
+    await mkdir(outputs, { recursive: true })
+    await mkdir(states, { recursive: true })
+    await mkdir(designRoot, { recursive: true })
+    await mkdir(join(designRoot, 'semantica'), { recursive: true })
+    for (const name of ['mechanism-selection.md', 'solution-design.md', 'vertical-slice-record.md']) {
+      await writeFile(join(outputs, name), `# ${name}\n`)
+    }
+    const state = {
+      schemaVersion: 1,
+      stage: 'design',
+      status: 'review-ready',
+      workItems: [
+        { id: 'mechanism', status: 'complete' }, { id: 'architecture', status: 'complete' },
+        { id: 'slice', status: 'complete' }, { id: 'decision', status: 'complete' },
+      ],
+      blockers: [],
+      recommendation: 'go',
+      design: {
+        execution: { status: 'selected', mechanism: 'agent', label: '受控 Agent 工作流', rationale: '需要跨系统读取并生成候选。' },
+        semantics: { mode: 'ontology', conclusion: 'validated', rationale: '需要跨文档实体消歧与来源追踪。' },
+        ontology: { status: 'published', schemaVersion: '0.1.0', classCount: 2, relationshipTypeCount: 1 },
+        graphBuild: { status: 'succeeded' },
+      },
+    }
+    await writeFile(join(states, 'design.json'), JSON.stringify(state))
+    await writeFile(join(designRoot, 'knowledge-graph.json'), JSON.stringify({
+      schemaVersion: 1,
+      provider: { id: 'semantica', version: '0.3.0' },
+      graphId: 'project-design-graph',
+      revision: 'build-17',
+      ontologyVersion: '0.1.0',
+      updatedAt: '2026-09-04T08:30:00.000Z',
+      nodes: [
+        { id: 'workflow', label: '候选业务流程', type: 'Workflow', communityId: 'delivery', confidence: 0.98, sourceRefs: ['fde-deliverables/02-outcome-scope/outcome-contract.md'] },
+        { id: 'system', label: '客户业务系统', type: 'System', communityId: 'delivery', confidence: 0.91, sourceRefs: ['fde-deliverables/03-environment/system-access-map.md'] },
+      ],
+      edges: [{ id: 'uses', source: 'workflow', target: 'system', type: 'USES', label: '使用', weight: 1, confidence: 0.9, sourceRefs: ['fde-deliverables/03-environment/system-access-map.md'] }],
+      communities: [{ id: 'delivery', label: '交付闭环', level: 0, nodeIds: ['workflow', 'system'] }],
+    }))
+    await writeFile(join(designRoot, 'semantica', 'workspace.json'), JSON.stringify({
+      schemaVersion: 1,
+      revision: 9,
+      updatedAt: '2026-09-04T08:35:00.000Z',
+      provider: { id: 'semantica', expectedVersion: '0.6.7', status: 'ready', version: '0.6.7', checkedAt: '2026-09-04T08:00:00.000Z' },
+      route: {
+        execution: { mechanism: 'agent', label: '受控 Agent 工作流', rationale: '需要跨系统读取并生成候选。' },
+        semantics: { mode: 'ontology', rationale: '需要跨文档实体消歧与来源追踪。' },
+        conclusion: 'validated',
+      },
+      sources: [{
+        sourceId: 'source-1', name: '现场记录.md', relativePath: '.fde/sources/source-1/original.md', digest: 'sha256:source-1', bytes: 120,
+        modifiedAt: '2026-09-04T07:00:00.000Z', parseStatus: 'ready', permissionScope: '仅限当前项目第四阶段', authority: 'primary',
+      }],
+      definition: {
+        status: 'published', version: '0.1.0', revision: 2, digest: 'sha256:definition-1', updatedAt: '2026-09-04T08:05:00.000Z',
+        competencyQuestions: [{ id: 'cq-1', text: '候选流程使用哪个系统？', required: true, query: { kind: 'edge', sourceType: 'Workflow', relationshipType: 'USES', targetType: 'System', maxDepth: 1, minAnswers: 1 } }],
+        classes: [
+          { id: 'Workflow', label: '业务流程', identityKeys: ['name'], properties: [], extractionPatterns: [] },
+          { id: 'System', label: '系统', identityKeys: ['name'], properties: [], extractionPatterns: [] },
+        ],
+        relationships: [{ id: 'USES', label: '使用', domain: 'Workflow', range: 'System', cardinality: 'many-to-many', extractionPatterns: [] }],
+        provenanceRules: [{ id: 'source-required', label: '来源必填', description: '每条事实必须回指项目材料。' }],
+        temporalRules: [], confidenceThreshold: 0.65, shaclSeverity: 'Violation',
+      },
+      candidates: { status: 'ready', updatedAt: '2026-09-04T08:10:00.000Z', entities: [], relationships: [], warnings: [] },
+      runs: [
+        { id: 'build-run', kind: 'build', status: 'succeeded', startedAt: '2026-09-04T08:20:00.000Z', completedAt: '2026-09-04T08:21:00.000Z', definitionDigest: 'sha256:definition-1', sourceDigests: ['sha256:source-1'], evidencePaths: ['.fde/design/knowledge-graph.json'], diagnostics: [] },
+        { id: 'slice-run', kind: 'slice', status: 'succeeded', startedAt: '2026-09-04T08:30:00.000Z', completedAt: '2026-09-04T08:31:00.000Z', definitionDigest: 'sha256:definition-1', sourceDigests: ['sha256:source-1'], evidencePaths: ['evidence/slice.log'], diagnostics: [] },
+      ],
+      validation: { runId: 'validate-run', status: 'passed', checkedAt: '2026-09-04T08:25:00.000Z', graphRevision: 'build-17', definitionDigest: 'sha256:definition-1', structuralValid: true, issues: [], questions: [{ questionId: 'cq-1', status: 'passed', answerCount: 1, sourceRefs: ['source-1'], message: '查询通过。' }] },
+      context: { runId: 'context-run', status: 'ready', createdAt: '2026-09-04T08:27:00.000Z', query: '查询当前切片所需事实', schemaVersion: '0.1.0', graphRevision: 'build-17', entities: [{ id: 'workflow' }], relationships: [{ id: 'uses' }], sources: ['source-1'], permissionScope: '仅限当前项目第四阶段' },
+      slice: { runId: 'slice-run', status: 'succeeded', createdAt: '2026-09-04T08:31:00.000Z', task: '运行最窄纵向切片', result: '真实任务通过', contextRunId: 'context-run', evidenceRefs: ['evidence/slice.log'], diagnostics: [] },
+    }))
+
+    await expect(loadV2StageSurface(root, 'design')).resolves.toMatchObject({
+      stateStatus: 'ready', status: 'review-ready', reviewReady: true, reviewBlockers: [],
+      design: {
+        execution: { status: 'selected', mechanism: 'agent', label: '受控 Agent 工作流' },
+        semantics: { mode: 'ontology', conclusion: 'validated' },
+        ontology: { status: 'published', schemaVersion: '0.1.0', classCount: 2, relationshipTypeCount: 1 },
+        graph: {
+          path: '.fde/design/knowledge-graph.json', status: 'ready', buildStatus: 'succeeded',
+          snapshot: {
+            provider: { id: 'semantica', version: '0.3.0' }, graphId: 'project-design-graph',
+            nodes: [{ id: 'workflow' }, { id: 'system' }], edges: [{ id: 'uses', source: 'workflow', target: 'system' }],
+          },
+        },
+      },
+    })
+
+    await writeFile(join(designRoot, 'knowledge-graph.json'), JSON.stringify({
+      schemaVersion: 1,
+      provider: { id: 'semantica' }, graphId: 'invalid', revision: 'build-18', ontologyVersion: '0.1.0',
+      updatedAt: '2026-09-04T08:40:00.000Z',
+      nodes: [{ id: 'workflow', label: '候选业务流程', type: 'Workflow', sourceRefs: [] }],
+      edges: [{ id: 'broken', source: 'workflow', target: 'missing', type: 'USES', weight: 1, sourceRefs: [] }],
+      communities: [],
+    }))
+    const invalid = await loadV2StageSurface(root, 'design')
+    expect(invalid).toMatchObject({
+      stateStatus: 'ready', status: 'blocked', reviewReady: false,
+      design: { graph: { status: 'invalid', buildStatus: 'succeeded' } },
+    })
+    expect(invalid.reviewBlockers.some(item => item.includes('项目知识图谱无法读取'))).toBe(true)
+
+    await writeFile(join(states, 'design.json'), JSON.stringify({
+      ...state,
+      design: {
+        execution: { status: 'selected', mechanism: 'software', label: '传统软件', rationale: '普通数据合同足以支撑当前闭环。' },
+        semantics: { mode: 'schema', conclusion: 'not_required', rationale: '普通数据合同足以支撑当前闭环。' },
+        ontology: { status: 'not_applicable' },
+        graphBuild: { status: 'not_applicable' },
+      },
+    }))
+    await writeFile(join(designRoot, 'semantica', 'workspace.json'), JSON.stringify({
+      schemaVersion: 1,
+      revision: 10,
+      updatedAt: '2026-09-04T08:50:00.000Z',
+      provider: { id: 'semantica', expectedVersion: '0.6.7', status: 'unchecked' },
+      route: {
+        execution: { mechanism: 'software', label: '传统软件', rationale: '普通数据合同足以支撑当前闭环。' },
+        semantics: { mode: 'schema', rationale: '普通数据合同足以支撑当前闭环。' },
+        conclusion: 'not_required',
+      },
+      sources: [],
+      definition: { status: 'missing', version: '0.1.0', revision: 0, competencyQuestions: [], classes: [], relationships: [], provenanceRules: [], temporalRules: [], confidenceThreshold: 0.65, shaclSeverity: 'Violation' },
+      candidates: { status: 'not_run', entities: [], relationships: [], warnings: [] },
+      runs: [{ id: 'simple-slice', kind: 'slice', status: 'succeeded', startedAt: '2026-09-04T08:48:00.000Z', completedAt: '2026-09-04T08:49:00.000Z', sourceDigests: [], evidencePaths: ['evidence/simple-slice.log'], diagnostics: [] }],
+      slice: { runId: 'simple-slice', status: 'succeeded', createdAt: '2026-09-04T08:49:00.000Z', task: '运行简单纵向切片', result: '真实任务通过', evidenceRefs: ['evidence/simple-slice.log'], diagnostics: [] },
+    }))
+    await expect(loadV2StageSurface(root, 'design')).resolves.toMatchObject({
+      status: 'review-ready', reviewReady: true,
+      design: {
+        semantics: { mode: 'schema', conclusion: 'not_required' },
+        graph: { status: 'not_applicable', buildStatus: 'not_applicable' },
+      },
+    })
+  })
+
   it('reports only real requirement-research files as present', async () => {
     const root = await mkdtemp(join(tmpdir(), 'fde-requirements-'))
     const output = join(root, 'fde-deliverables', '01-requirement-research')
