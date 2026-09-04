@@ -1,0 +1,49 @@
+schema_version: 1
+source_id: SRC-SIM-0313
+source_type: simulation
+snapshot_at: "2026-09-03T18:10:00+08:00"
+authority: 门店主数据团队提供的仿真跨系统映射快照
+rules:
+  canonical_key: canonical_store_id
+  display_name_is_identity: false
+  missing_mapping_action: manual_review
+  cross_region_default: deny
+stores:
+  - canonical_store_id: NJ-003
+    display_name: 南京新街口店
+    region: east-1
+    system_ids:
+      work_order_pro: NJ-003
+      asset_book: NJ-003
+      enterprise_chat: STORE-NANJING-XJK
+      store_net: node-320102-NJ003
+    aliases:
+      - 新街口店
+      - 南京三店
+    status: active
+  - canonical_store_id: NJ-010
+    display_name: 南京河西店
+    region: east-1
+    system_ids:
+      work_order_pro: NJ-010
+      asset_book: NJ-010
+      enterprise_chat: STORE-NANJING-HX
+      store_net: node-320105-NJ010
+    aliases:
+      - 河西店
+    status: active
+  - canonical_store_id: HZ-021
+    display_name: 杭州城西店
+    region: east-1
+    system_ids:
+      work_order_pro: HZ-021
+      asset_book: HZ-021
+      enterprise_chat: STORE-HANGZHOU-CX
+      store_net: node-330106-HZ021
+    aliases:
+      - 城西店
+    status: active
+limitations:
+  - 本文件只覆盖三个代表门店，不代表 80 家门店完整映射。
+  - 别名只能用于产生匹配候选，不能单独建立确定关系。
+  - 来源系统出现未知门店 ID 时必须保留原值并转人工确认。

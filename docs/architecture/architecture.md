@@ -1,7 +1,7 @@
 ---
 document: architecture
 status: draft
-updated: "2026-08-27"
+updated: "2026-09-04"
 prd: docs/PRD.md
 product_spec: docs/specs/product-spec.md
 ---
@@ -64,6 +64,7 @@ FF - FDE Web Profile / Bundle
 │   ├── fde-observability            Workspace 级本地运行聚合与外部详情配置
 │   ├── dsh-observe                  固定公开插件；脱敏 Langfuse/OTLP 导出
 │   ├── fde-evaluation               用例/候选版本/报告/Baseline 与隔离编排
+│   ├── Semantica Provider Adapter   阶段 4 条件本体／知识图谱构建、验证与受控查询
 │   ├── dsh-eval-harness             固定公开插件；真实 Headless Agent 回归
 │   ├── fde-context                  项目基线进入 Agent 上下文
 │   ├── fde-execution                工程运行与验证投影
@@ -250,6 +251,36 @@ FDE Project (= Harness Workspace)
 - `fde-project` 只索引当前项目的有界报告，并且只允许把 reports 目录中的有效 JSON 通过带锁原子写入批准为 Baseline；Client 按同名用例只读比较，Candidate 不自动改写 Baseline。
 - 候选源码版本与正式阶段证据的绑定由 F005/F006 后续消费；F015 页面自身不推进阶段。
 
+### 5.10 第四阶段条件本体与 Semantica Provider
+
+第四阶段的权威目标仍是选择最小充分机制、形成生产方案并跑通端到端纵向切片；正式本体／知识图谱只是条件路线。所有项目都要定义最小领域语义与数据／接口合同，但只有能力问题确实要求跨来源实体统一、复杂关系、时间有效性、来源追溯、冲突处理或图推理时，才加载 Semantica Provider。
+
+已选定 [`semantica-agi/semantica`](https://github.com/semantica-agi/semantica) 作为该条件路线的本地能力来源；当前评审基线为 `0.6.7 / 3acf8012733e`、MIT。它不替代 FDE 项目、阶段、Artifact、证据或人工决定，也不成为工作台的目录事实源。当前开发机已有的启动脚本、绝对源码路径、匿名 Explorer 和单一演示图谱只属于本地验证环境，不进入产品默认配置。
+
+```text
+FDE Workspace 与阶段 2/3 证据
+  → 机制必要性判断
+  ├─ 不需要正式图谱
+  │    → 开发 Spec／合同／NFR
+  │    → 最窄纵向切片
+  └─ 需要正式图谱
+       → 能力问题集
+       → 最小 Schema／关系
+       → 来源、时间与置信度规则
+       → Semantica Provider 分步摄取、构建和验证
+       → 受控项目查询
+       → 最窄纵向切片
+  → 运行证据
+  → FDE 人工决定
+```
+
+- 产品状态按 WorkspaceId 归属；每个项目拥有隔离的 Provider 工作目录、图、缓存和运行身份，不读取或写入其他项目图谱。
+- 定义类对象独立版本化；构建、验证和纵向切片保存为不同的可重复运行记录。每次运行引用输入、Schema、规则、Provider 版本与配置，并保存结构化输出、诊断和适用边界。
+- “构建命令成功”“已有节点与边”“Explorer 可打开”“能力问题验证通过”和“FDE 同意进入下一阶段”是不同事实，不能相互代替。
+- 本体机制结论使用 `not_required`、`validated`、`validation_failed`、`insufficient_evidence`；FDE 提交后仍然只有 `Go`、`Revise`、`Narrow`、`Stop` 四类决定，未提交时保持无决定并显示等待人工评审。
+- Agent 不直接装载整个图谱。项目上下文通过受控查询返回最小必要子图或答案，并携带来源、有效时间、置信度和权限边界；查询能力不得扩大阶段 3 已确认的读取或动作授权。
+- Provider 载体仍需用最小 Spike 在 Python API、本地服务 API 与现有 MCP 能力之间验证。选择以完整覆盖本体构建、独立验证、结构化运行证据和项目隔离为准，而不是以调用路径最短为准。
+
 ## 6. Agent 组成与上下文
 
 ### 6.1 一个项目的会话使用一致 FDE Preset
@@ -421,6 +452,7 @@ FDE Project (= Harness Workspace)
 | 系统架构 | `dsh-planchart@e63a635…` framework 能力＋FDE Workspace 级版本存储 | 方案设计架构、自然语言更新、确认、SVG/PNG 导出 | 自动布局和导出已经存在；去掉 Session/steps 语义后更符合项目级 FDE 产物，第一版不引入重型手动画布 |
 | 项目用量分析 | `dsh-observe@64791ff…`＋官方 Workspace/Session/Stats＋FDE View | 多会话运行汇总、Token/成本/错误、可选 Langfuse/OTLP | 精确支持当前 rc.2，119 项测试、先脱敏、有界缓冲和失败隔离；默认关闭外发 |
 | 项目评估优化 | `dsh-eval-harness@2f59376…`＋FDE Workspace/候选版本守卫＋报告 View | YAML 用例、真实 Headless Trial、Trace 断言、Baseline 与 PASS/WARN/FAIL | DSH 原生、关注度较高，避免每项目重写 runner；补齐路径、版本、许可和 UI 边界 |
+| 条件本体／知识图谱 | `semantica-agi/semantica@3acf8012733e`（`0.6.7`、MIT）＋项目级 FDE Host Provider | 按机制必要性完成本体、图谱、来源／时间规则、验证和受控查询 | 复用完整语义能力但保持 Workspace 隔离、分步运行证据和 FDE 状态权威；非图谱方案不加载或创建占位对象 |
 | 工作台界面主题 | 官方 `ui-theme` ThemeRuntime＋独立 `ui-fde-appearance`＋Studio 固定 WebP 资源 | 六套内置皮肤、自定义背景、焦点/玻璃层和浏览器本地恢复 | 保留官方明暗主题与插件生命周期，复用用户已有皮肤资源，不引入 Electron bridge、Host 存储或新的 UI 框架 |
 | 项目文件 | 官方 Workspace/FS＋项目 `fde-resources/`/`.fde/sources`/`.fde/derived` | 客户原件、稳定来源身份、本地派生、工程产物和交付文件 | 原件只保存一份并对两个入口可见；派生可再生成且不覆盖原件 |
 | 图片 | 官方 Attachment Store | 对话图片与持久引用 | 官方已有内容寻址、限制、恢复和模型适配 |
@@ -494,5 +526,6 @@ Stop project
 - [ ] FDE 项目上下文进入 Agent 的日志可重建性与 token 成本。
 - [ ] Better Sidebar 与官方 Workspace FS/权限之间的保存、Git Diff、File Review、项目/会话切换行为；本阶段完成构建后交由用户人工验证。
 - [ ] Evals、部署和交付包在第一个真实项目类型中的最小闭环。
+- [ ] Semantica Provider 的载体 Spike、固定配置、逐项目隔离、构建／验证分离、受控 Agent 查询和双路线纵向切片。
 
 以上项目完成前，本文保持 `status: draft`，不得把源码可编译或 UI 可展示误报为架构确认。

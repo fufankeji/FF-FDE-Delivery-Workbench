@@ -35,6 +35,9 @@ smart-maintenance-work-orders/
 ├── STAGE-02-FILE-MANIFEST.json 第二阶段输入文件大小、哈希和预期状态
 ├── STAGE-03-RUNBOOK.md       第三阶段数据、系统、访问与治理调查操作
 ├── STAGE-03-FILE-MANIFEST.json 第三阶段输入文件大小、哈希和预期状态
+├── STAGE-04-RUNBOOK.md       第四阶段双轴机制、本体、图谱与业务切片操作
+├── STAGE-04-FILE-MANIFEST.json 第四阶段新增输入与复用 SourceId 清单
+├── STAGE-04-EXPECTED-EVIDENCE.md 第四阶段操作者验收基准，禁止上传
 ├── materials/                按项目创建与八阶段分批释放的客户素材
 ├── prompts/                  可直接复制到工作台的自然语言提示词
 └── records/
@@ -68,6 +71,8 @@ smart-maintenance-work-orders/
 阶段 2 必须继续使用阶段 1 的同一个项目，并按 [`STAGE-02-RUNBOOK.md`](STAGE-02-RUNBOOK.md) 分批输入基线、成本、责任、范围和依赖证据。前两批分别驱动价值合同与可验收范围，第三步不上传新文件而完成估算和风险计划，最后一批用于确认责任与准备人工阶段门。文件核对见 `STAGE-02-FILE-MANIFEST.json`。
 
 阶段 3 按 [`STAGE-03-RUNBOOK.md`](STAGE-03-RUNBOOK.md) 分三批调查账号与数据事实、南京案例真实链路和分领域治理边界。素材刻意区分接口文档、Sandbox 已观察行为与未验证的生产能力；文件核对见 `STAGE-03-FILE-MANIFEST.json`。
+
+阶段 4 按 [`STAGE-04-RUNBOOK.md`](STAGE-04-RUNBOOK.md) 先判断“执行机制 × 语义基础”，再按证据进入条件本体路线。前三阶段材料通过已有 SourceId 绑定，不重复上传；候选 Ontology 必须人工审阅后才能由 Semantica 构建、独立验证并通过受控查询提供给 Agent。操作者最后使用 `STAGE-04-EXPECTED-EVIDENCE.md` 核对，但不能把它上传或交给 Agent。
 
 ## 完成标准
 

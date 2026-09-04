@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "caseId": "CASE-SMWO-001",
+  "stage": "design",
+  "operatorOnly": true,
+  "instruction": "本清单用于核对阶段四新增输入，不上传到案例项目。前三阶段材料通过已有 SourceId 绑定，不重复上传；STAGE-04-EXPECTED-EVIDENCE.md 也禁止上传。",
+  "files": [
+    {
+      "step": 1,
+      "caseSourceId": "SRC-SIM-0401",
+      "path": "materials/04-design/01-solution-constraints.md",
+      "bytes": 3475,
+      "sha256": "42f10bd886cd98082b9d2b8e997f364d2176458a7b4b986153a35a7913eb3f0f",
+      "evidenceRole": "执行机制、语义基础和纵向切片约束",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "step": 2,
+      "caseSourceId": "SRC-SIM-0402",
+      "path": "materials/04-design/upload-pack/02-semantic-capability-workshop.md",
+      "bytes": 2688,
+      "sha256": "39ce56db847fc34ef6321eb76b873292bdd84f9da84975eb9b8e1e18aec50005",
+      "evidenceRole": "六个必答能力问题和本体审阅边界",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    }
+  ],
+  "bindExistingSourceIds": [
+    "SRC-SIM-0104",
+    "SRC-SIM-0105",
+    "SRC-SIM-0106",
+    "SRC-SIM-0107",
+    "SRC-SIM-0109",
+    "SRC-SIM-0302",
+    "SRC-SIM-0305",
+    "SRC-SIM-0307",
+    "SRC-SIM-0311",
+    "SRC-SIM-0313",
+    "SRC-SIM-0314",
+    "SRC-SIM-0401",
+    "SRC-SIM-0402"
+  ]
+}

@@ -18,13 +18,14 @@ updated: "2026-09-04"
 
 ## 第一步：账号、访问和数据事实
 
-上传以下 5 个文件：
+上传以下 6 个文件：
 
 1. `materials/03-investigation/01-systems-access-and-ownership.md`
 2. `materials/03-investigation/02-data-sample-and-dictionary.md`
 3. `materials/03-investigation/upload-pack/04-access-request-register.json`
 4. `materials/03-investigation/upload-pack/05-field-dictionary.xml`
 5. `materials/03-investigation/upload-pack/06-data-profile.yaml`
+6. `materials/03-investigation/upload-pack/13-store-system-identity-crosswalk.yaml`
 
 上传后发送 `prompts/03-stage-03-investigation.md` 的 Prompt A。
 
@@ -32,6 +33,7 @@ updated: "2026-09-04"
 
 - 是否把“能认证、能读取、获准用于当前调查、能写、能执行正式动作”分开。
 - 是否识别 `report_id`、`message_id`、候选事件、`asset_id` 和 `work_order_id` 不是同一身份。
+- 是否使用门店主数据映射统一跨系统 ID，而不是用显示名称直接合并。
 - 是否使用 1246 条总体剖析，而没有把 12 条样本外推为总体比例。
 - 是否明确 `final_domain`、`final_priority` 只能用于独立评估，不能泄漏进候选生成。
 - 是否把“忽略政策”等报修文本当作不可信数据，而不是指令。
@@ -57,11 +59,12 @@ updated: "2026-09-04"
 
 ## 第三步：分领域治理收口
 
-上传以下 3 个文件：
+上传以下 4 个文件：
 
 1. `materials/03-investigation/03-policy-security-and-governance.md`
 2. `materials/03-investigation/upload-pack/11-access-boundary-matrix.xml`
 3. `materials/03-investigation/upload-pack/12-governance-review-notes.txt`
+4. `materials/03-investigation/upload-pack/14-contract-coverage-snapshot.json`
 
 上传后发送同一提示词文件中的 Prompt C。
 
@@ -70,6 +73,7 @@ updated: "2026-09-04"
 - 信息安全、隐私、法务、采购、财务、区域运营和设备运维是否分别记录。
 - 是否没有用“隐私通过”替代安全、法务或采购批准。
 - 是否保留 P0 人工升级、设备不确定时人工接管和正式派单禁止边界。
+- 是否按事件时间、区域、门店和设备类别判断合同候选，并识别 HVAC 合同正文过期而元数据仍 active 的冲突。
 - 是否区分“影响当前调查／下一阶段设计”的阻塞与“未来生产上线前才必须解决”的条件。
 - 是否只形成阶段 3 固定产物和状态，没有提前写阶段 4 方案。
 
@@ -105,4 +109,4 @@ fde-deliverables/03-environment/governance-review.md
 
 ## 文件核对
 
-`STAGE-03-FILE-MANIFEST.json` 记录本阶段 12 个输入文件的大小和 SHA-256，只供操作者核对，不上传到项目。
+`STAGE-03-FILE-MANIFEST.json` 记录本阶段 14 个输入文件的大小和 SHA-256，只供操作者核对，不上传到项目。

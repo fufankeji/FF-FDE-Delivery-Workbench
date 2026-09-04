@@ -1,7 +1,7 @@
 ---
 document: fde-skill-routing
 status: confirmed
-updated: "2026-09-01"
+updated: "2026-09-04"
 primary_method_source: davidahmann/fde-guide@060ef0f3b67743b2e1fc3705763d423eae980236
 engineering_source: rpraharaj/forward-deployed-engineer@ee045a66db5242617ccea9e5e33139a2980ab55e
 ---
@@ -165,11 +165,12 @@ engineering_source: rpraharaj/forward-deployed-engineer@ee045a66db5242617ccea9e5
 - 方法 Skill：核心 `select-ai-mechanism`、`design-production-ai-system`；存在模型可见读取或真实效果时组合 `secure-ai-action-boundary`。
 - 工程 Skill：`solution-design`、`contract-design`、`nfr-baseline`、`verification-plan`、`characterization-tests`、`safe-change`、`integration-adapter`、`test-data-strategy`；重构、依赖、数据库、数据管线或商业软件由明确条件触发对应 Skill。
 - 最小输入：阶段 2 价值和范围合同、阶段 3 数据与系统事实、治理约束和真实工程环境。
-- 核心 Artifact：Intelligence Selection Record、ADR、Operational Ontology、系统设计、接口／Tool Contract、Threat Model、NFR、验证计划和纵向切片。
-- 条件 Artifact：只有选择模型或 Agent 时才建立 Agent System、Behavior Bundle、Capability Manifest；确定性或传统 ML 系统不创建占位 Agent Artifact。
+- 核心 Artifact：Intelligence Selection Record、ADR、最小领域语义／数据合同、系统设计、接口／Tool Contract、Threat Model、NFR、验证计划和纵向切片。
+- 本体条件 Artifact：只有机制证据要求跨来源实体统一、复杂关系、时间有效性、来源追溯、冲突处理或图推理时，才建立正式 Ontology Schema、来源／时间／置信度规则、知识图谱构建与独立验证运行；不需要时记录 `not_required`，不得创建空图谱 Artifact。
+- 模型条件 Artifact：只有选择模型或 Agent 时才建立 Agent System、Behavior Bundle、Capability Manifest；确定性或传统 ML 系统不创建占位 Agent Artifact。
 - 人工决定：纵向切片是否能进入最高风险假设验证，或返回机制、数据、范围和实施。
 
-运行时工作方法目录拆为 7 项：实现方式选择、生产级方案、方案决策、接口合同、非功能指标为必做；陌生系统安全改动和外部系统适配按实际实现条件加载。不得再用一个 `fde-design-vertical-slice` 覆盖整个阶段。
+运行时工作方法目录拆为 7 项：实现方式选择、生产级方案、方案决策、接口合同、非功能指标为必做；陌生系统安全改动、外部系统适配和本体／知识图谱能力按实际实现条件加载。正式图谱路线由项目级 Semantica Provider 分步执行构建、验证和受控查询，Provider 调用成功不写入 FDE 阶段决定。不得再用一个 `fde-design-vertical-slice` 覆盖整个阶段。
 
 ### 阶段 5 · 运行 PoC 与 Eval
 

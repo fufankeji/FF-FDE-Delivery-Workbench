@@ -1,27 +1,35 @@
-# 阶段 4 手动测试：设计方案并完成端到端纵向切片
+# 阶段 4 手动测试：双轴机制与纵向切片
 
-测试项目：本地知识库。目标是选出最合适的机制并证明最窄链路能真实运行。
+目标是验证第四阶段不会默认选择 Agent 或知识图谱，并且两条路线都能按真实证据收口。
 
-## 1. 比较可行机制
+## 路线 A：不需要正式本体
 
-```text
-进入第四阶段。请基于结果合同和现场调查，比较规则、普通软件、全文检索、向量检索、RAG、LLM 或 Agent 等方案，也保留“不构建”的选项。把选择依据和淘汰理由写入 fde-deliverables/04-solution-design/mechanism-selection.md，并更新 .fde/stages/design.json 的第一步状态。
-```
-
-## 2. 设计系统边界和合同
+使用一个字段稳定、单来源、无需多跳关系和时间推理的本地配置查询项目。
 
 ```text
-请为选中的本地知识库方案整理组件、数据流、接口、身份权限、人工确认、失败处理、降级和回滚方式。写入 fde-deliverables/04-solution-design/solution-design.md，并更新 design.json 的第二步状态。方案不得扩大第三阶段确认的权限。
+进入第四阶段。请分别比较执行机制和语义基础。当前资料来自单一受控配置文件，字段稳定，只需按唯一键查询并返回来源，不涉及跨来源实体统一、复杂关系、时间有效性、来源冲突或共享图谱上下文。请判断是否需要正式本体／知识图谱，并形成最小实现与纵向切片；不要为了展示能力创建空图谱 Artifact。
 ```
 
-## 3. 跑通最窄纵向切片
+预期：语义基础为普通 Schema，本体机制结论候选为 `not_required`；仍需真实运行简单纵向切片，最后等待 FDE 决定。
 
-```text
-请只实现或验证一条最窄链路：选择一份允许使用的文档，完成导入、检索、回答和来源引用，并保存实际命令、结果和失败点。把运行记录写入 fde-deliverables/04-solution-design/vertical-slice-record.md，并更新 design.json 的第三步状态；没有真实运行就标为未完成。
-```
+## 路线 B：需要验证正式本体
 
-## 4. 整理给 FDE 评审
+使用 `docs/case-studies/smart-maintenance-work-orders/STAGE-04-RUNBOOK.md`，继续前三阶段的同一个“智修协同”项目。该路线必须完成：
 
-```text
-请核对 mechanism-selection.md、solution-design.md 和 vertical-slice-record.md 是否对应同一方案与范围，列出未知合同、未跑通链路和新增风险。材料齐备时把 .fde/stages/design.json 更新为待 FDE 评审，不要自动进入下一阶段。
-```
+1. 执行机制与语义基础双轴判断；
+2. 能力问题和候选 Ontology；
+3. FDE 人工审阅并发布当前 Ontology 版本；
+4. 项目隔离的 Semantica 构建和独立验证；
+5. 六个能力问题真实查询；
+6. 受控 Agent 上下文和本地工单草稿纵向切片；
+7. 本体机制结论与 FDE 阶段决定分开。
+
+如果 Provider 或查询能力尚未实现，正确结果是显示不可用并保持 `insufficient_evidence` 或 `validation_failed`，不能用预制图谱或说明文字代替真实运行。
+
+## 两条路线共同检查
+
+- 三份固定产物都引用同一批输入、机制和版本。
+- `.fde/stages/design.json` 的 `workItems` 是完整数组，包含 `mechanism`、`architecture`、`slice`、`decision`。
+- 未选择的路线不生成空对象、固定案例节点或 `0/0` 占位。
+- 构建成功、验证通过、纵向切片通过和 FDE 决定是四种不同事实。
+- 没有真实运行就保持未完成，不自动进入阶段 5。

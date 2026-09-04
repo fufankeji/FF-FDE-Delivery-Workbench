@@ -59,8 +59,8 @@
       "batch": 2,
       "caseSourceId": "SRC-SIM-0307",
       "path": "materials/03-investigation/upload-pack/07-nanjing-incident-timeline.json",
-      "bytes": 3921,
-      "sha256": "12689c3c80a2a9cc27b14fcfc7c386c97190e459b709bf355780830bcaf6262c",
+      "bytes": 5606,
+      "sha256": "50ad963242b07999ab514da7240c8af5bf5098bb2ea172ee3d68b355aaa10852",
       "evidenceRole": "南京案例跨系统事件链与证据状态",
       "expectedPreview": "text",
       "expectedParse": "ready"
@@ -122,6 +122,26 @@
       "bytes": 2795,
       "sha256": "bb60ba13b4236c9ea029a8dae954f5ebb093d78013c90e217682734d34337ba1",
       "evidenceRole": "七个治理领域的范围、状态、条件和未决项",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 1,
+      "caseSourceId": "SRC-SIM-0313",
+      "path": "materials/03-investigation/upload-pack/13-store-system-identity-crosswalk.yaml",
+      "bytes": 1448,
+      "sha256": "aaf4c6ef10f0debe9e54ed76fea1692e79c761e9f6a59477aa8293dd3fdb0382",
+      "evidenceRole": "门店主数据与跨系统身份映射",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 3,
+      "caseSourceId": "SRC-SIM-0314",
+      "path": "materials/03-investigation/upload-pack/14-contract-coverage-snapshot.json",
+      "bytes": 3966,
+      "sha256": "24091b07da683535034a043536eb8df8dd59eee255003753d0b95f91147aa7cc",
+      "evidenceRole": "合同覆盖、有效时间和元数据冲突",
       "expectedPreview": "text",
       "expectedParse": "ready"
     }

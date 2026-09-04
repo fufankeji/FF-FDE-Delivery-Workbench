@@ -3,100 +3,135 @@
   "source_id": "SRC-SIM-0307",
   "source_type": "simulation",
   "case_name": "南京新街口店收银中断",
-  "incident_candidate_id": "INC-CAND-NJXJK-20260821-01",
+  "incident_candidate_id": "INC-CAND-NJ003-20260821-01",
   "authoritative_incident_id": null,
   "identity_warning": "incident_candidate_id 是调查用派生标识；消息、报修、设备、告警和工单均保留各自主键。",
   "events": [
     {
-      "time": "2026-08-21T18:08:41+08:00",
-      "system": "StoreNet Monitor",
-      "event_type": "network_alert",
-      "identity": "ALERT-NJXJK-68102",
-      "detail": "收银 VLAN 丢包率超过阈值",
-      "evidence_state": "unverified",
-      "reason": "生产只读申请 AR-304 尚未批准，仅来自运维访谈转述"
-    },
-    {
-      "time": "2026-08-21T18:10:03+08:00",
+      "time": "2026-08-21T18:07:00+08:00",
       "system": "企业消息平台脱敏导出",
       "event_type": "repair_message",
-      "identity": "MSG-WECOM-908811",
-      "report_id": "R1002",
-      "store_id": "S-NJ-011",
-      "asset_text": "一号收银机",
+      "identity": "CHAT-20260821-1807",
+      "report_id": "R-1002",
+      "store_id": "NJ-003",
+      "asset_text": "两台收银机",
       "detail": "顾客排队，收银无法联网",
-      "evidence_state": "confirmed_in_simulated_export"
+      "evidence_state": "confirmed_in_simulated_export",
+      "evidence_refs": ["SRC-SIM-0104", "SRC-SIM-0302"]
     },
     {
-      "time": "2026-08-21T18:11:26+08:00",
+      "time": "2026-08-21T18:09:00+08:00",
+      "system": "电话补录",
+      "event_type": "manual_escalation",
+      "identity": "PHONE-20260821-1809",
+      "store_id": "NJ-003",
+      "detail": "店长电话联系区域经理，说明全店不能交易",
+      "evidence_state": "confirmed_in_simulated_chat",
+      "evidence_refs": ["SRC-SIM-0104"]
+    },
+    {
+      "time": "2026-08-21T18:10:00+08:00",
       "system": "WorkOrder Pro 7",
       "event_type": "work_order_created_by_human",
       "identity": "WO-88419",
-      "linked_report_id": "R1002",
-      "asset_id": "POS-NJXJK-01",
-      "detail": "值班人员创建网络/收银故障工单，优先级 P0",
-      "evidence_state": "confirmed_in_simulated_export"
+      "linked_report_id": "R-1002",
+      "store_id": "NJ-003",
+      "asset_id": null,
+      "asset_candidates": ["POS-NJ003-01", "POS-NJ003-02", "NET-NJ003-01"],
+      "detail": "值班人员创建工单并标记 P0；设备身份尚未确认，关闭时最终归因为网络",
+      "evidence_state": "confirmed_in_simulated_export",
+      "evidence_refs": ["SRC-SIM-0105", "SRC-SIM-0106"]
     },
     {
-      "time": "2026-08-21T18:12:19+08:00",
+      "time": "2026-08-21T18:11:00+08:00",
       "system": "企业消息平台脱敏导出",
       "event_type": "repair_message",
-      "identity": "MSG-WECOM-908827",
-      "report_id": "R1003",
-      "store_id": "S-NJ-011",
-      "asset_text": "收银台网络",
+      "identity": "CHAT-20260821-1811",
+      "report_id": "R-1003",
+      "store_id": "NJ-003",
+      "asset_text": "收银机",
       "detail": "另一名店员重复上报同一营业影响",
-      "evidence_state": "confirmed_in_simulated_export"
+      "evidence_state": "confirmed_in_simulated_export",
+      "evidence_refs": ["SRC-SIM-0104", "SRC-SIM-0302"]
     },
     {
-      "time": "2026-08-21T18:12:54+08:00",
+      "time": "2026-08-21T18:12:00+08:00",
       "system": "WorkOrder Pro 7",
       "event_type": "duplicate_work_order_created_by_legacy_bot",
       "identity": "WO-88422",
-      "linked_report_id": "R1003",
+      "linked_report_id": "R-1003",
+      "store_id": "NJ-003",
       "asset_id": null,
       "detail": "旧机器人创建第二张工单；没有 operation_id，也未发现重复拦截",
-      "evidence_state": "confirmed_in_simulated_export"
+      "evidence_state": "confirmed_in_simulated_export",
+      "evidence_refs": ["SRC-SIM-0104", "SRC-SIM-0105"]
     },
     {
-      "time": "2026-08-21T18:14:08+08:00",
-      "system": "WorkOrder Pro 7",
-      "event_type": "human_duplicate_link",
+      "time": "2026-08-21T18:13:00+08:00",
+      "system": "人工流程",
+      "event_type": "duplicate_check_started",
       "identity": "WO-88422",
-      "duplicate_of": "WO-88419",
-      "detail": "区域运维人工核对门店、时间和症状后标记重复",
-      "evidence_state": "confirmed_in_simulated_export"
+      "detail": "总部运维开始核对 WO-88422 是否与 WO-88419 重复",
+      "evidence_state": "confirmed_in_simulated_chat",
+      "evidence_refs": ["SRC-SIM-0104"]
     },
     {
-      "time": "2026-08-21T18:43:12+08:00",
+      "time": "2026-08-21T18:16:00+08:00",
       "system": "StoreNet Monitor",
-      "event_type": "network_recovery",
-      "identity": "ALERT-NJXJK-68102",
-      "detail": "告警恢复时间由运维访谈提供",
-      "evidence_state": "unverified",
+      "event_type": "network_alert_reported",
+      "identity": "ALERT-NJ003-68102",
+      "store_id": "NJ-003",
+      "detail": "网络平台主管在聊天中报告主线路断开、备用 4G 未接管",
+      "evidence_state": "unverified_system_readback",
+      "evidence_refs": ["SRC-SIM-0104"],
+      "reason": "生产只读申请 AR-304 尚未批准，没有 StoreNet 权威读回"
+    },
+    {
+      "time": "2026-08-21T18:46:00+08:00",
+      "system": "StoreNet Monitor",
+      "event_type": "network_recovery_reported",
+      "identity": "ALERT-NJ003-68102",
+      "store_id": "NJ-003",
+      "detail": "网络平台主管在聊天中报告备用线路配置恢复，门店可交易",
+      "evidence_state": "unverified_system_readback",
+      "evidence_refs": ["SRC-SIM-0104"],
       "reason": "尚未获得 StoreNet 权威读回"
     },
     {
-      "time": "2026-08-21T18:46:27+08:00",
+      "time": "2026-08-21T18:46:00+08:00",
       "system": "WorkOrder Pro 7",
       "event_type": "work_order_closed",
       "identity": "WO-88419",
-      "detail": "人工确认收银恢复后关闭；根因字段填写为网络抖动",
-      "evidence_state": "confirmed_in_simulated_export"
+      "store_id": "NJ-003",
+      "detail": "工单记录人工关闭；最终故障域为网络，关闭原因是备用 4G 配置恢复",
+      "evidence_state": "confirmed_in_simulated_export",
+      "evidence_refs": ["SRC-SIM-0105"]
     },
     {
-      "time": "2026-08-21T18:48:03+08:00",
+      "time": "2026-08-21T18:48:00+08:00",
+      "system": "人工流程",
+      "event_type": "duplicate_and_wrong_vendor_confirmed",
+      "identity": "WO-88422",
+      "duplicate_of": "WO-88419",
+      "detail": "总部运维确认重复且联系了错误服务商，要求保留两条原消息",
+      "evidence_state": "confirmed_in_simulated_chat",
+      "evidence_refs": ["SRC-SIM-0104"]
+    },
+    {
+      "time": "2026-08-21T19:03:00+08:00",
       "system": "WorkOrder Pro 7",
       "event_type": "duplicate_work_order_cancelled",
       "identity": "WO-88422",
-      "detail": "人工取消重复工单",
-      "evidence_state": "confirmed_in_simulated_export"
+      "duplicate_of": "WO-88419",
+      "detail": "工单记录在联系错误服务商后取消重复工单",
+      "evidence_state": "confirmed_in_simulated_export",
+      "evidence_refs": ["SRC-SIM-0105"]
     }
   ],
   "open_questions": [
-    "18:08 告警是否为首个可观察信号，需 StoreNet 只读证据确认",
+    "18:16 网络告警是否为首次系统信号，需 StoreNet 只读证据确认",
+    "R-1002 的 POS-NJ003-01 来自人工匹配样例，而 WO-88419 创建时 asset_id 为空；正式关联仍需人工确认",
     "旧机器人为何绕过重复检测，没有提供源码或配置可核对",
-    "网络恢复与人工关闭之间是否还有电话确认，目前无录音或结构化记录",
-    "WO-88419 的根因是操作员填写结果，不等同于独立根因分析"
+    "WO-88419 的最终故障域和关闭原因来自操作员字段，不等同于独立根因分析"
   ]
 }
