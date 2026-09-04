@@ -128,13 +128,14 @@ function governanceAreaLabel(area: 'security' | 'privacy' | 'legal' | 'procureme
   }[area]
 }
 
-function InvestigationStagePanel({ props, workspace, sessionId, view, stageState, surface }: {
+function InvestigationStagePanel({ props, workspace, sessionId, view, stageState, surface, historicalActualStage }: {
   readonly props: WorkbenchProps
   readonly workspace: { readonly workspaceId: string; readonly title: string; readonly path: string }
   readonly sessionId: string
   readonly view: boolean
   readonly stageState: ProjectStageValue
   readonly surface: V2StageSurfaceSnapshot | undefined
+  readonly historicalActualStage?: FdeV2StageId
 }) {
   const [reviewing, setReviewing] = useState(false)
   const [returning, setReturning] = useState(false)
@@ -156,6 +157,8 @@ function InvestigationStagePanel({ props, workspace, sessionId, view, stageState
   const actionBoundaries = investigation?.actionBoundaries ?? []
   const dataFindings = investigation?.dataFindings ?? []
   const governanceReviews = investigation?.governanceReviews ?? []
+  const historical = historicalActualStage !== undefined
+  const actualStageIndex = historicalActualStage === undefined ? -1 : FDE_V2_STAGE_IDS.indexOf(historicalActualStage)
 
   const openFile = (path: string, title: string): void => {
     setError(null)
@@ -178,28 +181,34 @@ function InvestigationStagePanel({ props, workspace, sessionId, view, stageState
   }
 
   return <section
-    className={`${css.root} ${css.investigationStageRoot}`}
+    className={`${css.root} ${css.investigationStageRoot} ${historical ? css.browsedStage : ''}`}
     data-fde-stage-workbench=""
     data-conversation-hero-project=""
     data-stage="investigation"
-    data-conversation-composer-layout="stage-investigation"
+    data-historical={historical ? 'true' : undefined}
+    data-conversation-composer-layout={historical ? 'stage-history' : 'stage-investigation'}
     data-conversation-composer-overlay={view ? '' : undefined}
-    aria-label="项目阶段工作台：调查数据、系统、接口、安全与组织"
+    aria-label={historical ? '历史阶段：调查数据、系统、接口、安全与组织' : '项目阶段工作台：调查数据、系统、接口、安全与组织'}
   >
+    {historical && <header className={css.browsedStageNotice}>
+      <HistoricalNoticeIcon />
+      <div><span>阶段完成记录</span><strong>正在查看第 3 阶段，项目当前在“{V2_STAGE_NAMES[actualStageIndex]}”</strong><p>保留第三阶段的环境调查驾驶舱与真实记录，当前为只读查看。</p></div>
+      <button type="button" className={css.secondaryButton} onClick={() => { props.returnToCurrentStage(workspace.workspaceId) }}>返回当前阶段 <span aria-hidden="true">→</span></button>
+    </header>}
     <div className={css.investigationShell}>
       <main>
         <section className={css.investigationHero}>
           <div>
-            <span>第 3/8 阶段 · 真实环境尽职调查</span>
+            <span>第 3/8 阶段 · {historical ? '已完成' : '真实环境尽职调查'}</span>
             <h1>{surface.objective}</h1>
             <p>{surface.explanation}</p>
             <div className={css.investigationHeroFacts}>
               <b>{surface.presentCount}/{surface.requiredCount} 份固定记录</b>
               <b>{openBlockers.length} 项未解决事项</b>
-              <b>{surface.reviewReady ? '可提交 FDE 评审' : '尚未进入方案设计'}</b>
+              <b>{historical ? '已通过 FDE 人工阶段门' : surface.reviewReady ? '可提交 FDE 评审' : '尚未进入方案设计'}</b>
             </div>
           </div>
-          <div className={css.investigationStageRing} aria-label="当前处于第 3 阶段，共 8 个阶段"><strong>3<small>/8</small></strong><span>{surface.reviewReady ? '待评审' : '调查中'}</span></div>
+          <div className={css.investigationStageRing} aria-label={historical ? '第 3/8 阶段已完成' : '当前处于第 3 阶段，共 8 个阶段'}><strong>3<small>/8</small></strong><span>{historical ? '已完成' : surface.reviewReady ? '待评审' : '调查中'}</span></div>
           <img src="/fde-dashboard/stage-evidence-stack-3d.webp" alt="" aria-hidden="true" />
         </section>
 
@@ -250,10 +259,12 @@ function InvestigationStagePanel({ props, workspace, sessionId, view, stageState
         </div>
 
         <section className={css.investigationGate}>
-          <header><div><span>阻塞、固定产物与 FDE 阶段门</span><h2>{surface.reviewReady ? '环境证据已齐备，等待人工决定' : '还不能进入方案设计'}</h2><p>{structured ? '以下状态来自当前调查记录。' : '当前只有阶段骨架；结构化环境事实尚未写入状态文件。'}</p></div><b>{surface.presentCount}/{surface.requiredCount} 份记录</b></header>
+          <header><div><span>阻塞、固定产物与 FDE 阶段门</span><h2>{historical ? '环境证据已确认，阶段记录已封存' : surface.reviewReady ? '环境证据已齐备，等待人工决定' : '还不能进入方案设计'}</h2><p>{historical ? '以下状态来自第三阶段最终保存的调查记录。' : structured ? '以下状态来自当前调查记录。' : '当前只有阶段骨架；结构化环境事实尚未写入状态文件。'}</p></div><b>{surface.presentCount}/{surface.requiredCount} 份记录</b></header>
           <div className={css.investigationArtifacts}>{surface.artifacts.map(artifact => <article key={artifact.id} data-status={artifact.status}><i><EvidenceDocumentIcon /></i><span><strong>{artifact.title}</strong><small>{artifact.purpose}</small></span><b>{artifact.status === 'present' ? '已形成' : artifact.status === 'error' ? '读取失败' : '待形成'}</b>{artifact.status === 'present' && <button type="button" onClick={() => { openFile(artifact.path, artifact.title) }}>查看</button>}</article>)}</div>
           {openBlockers.length > 0 && <div className={css.investigationBlockers}>{openBlockers.map(blocker => <span key={blocker.id} data-severity={blocker.severity}><b>{blocker.severity === 'critical' ? '严重' : blocker.severity === 'high' ? '高风险' : '待确认'}</b>{blocker.title}</span>)}</div>}
-          <div className={css.investigationActions}>
+          {historical
+            ? <footer className={css.historicalArchiveFooter}><span><HistoricalArchiveIcon />阶段已封存；可继续查看当时的调查事实和固定记录。</span><strong>只读记录</strong></footer>
+            : <><div className={css.investigationActions}>
             <button type="button" className={css.primaryButton} onClick={() => { props.prepareStageDraft(sessionId, surface.prompt) }}>开始环境调查</button>
             <button type="button" className={css.secondaryButton} onClick={() => { props.refreshProjectSurface(workspace.workspaceId) }}>刷新调查记录</button>
             {surface.reviewReady && <button type="button" className={css.primaryButton} onClick={() => { setReviewing(value => !value) }}>{reviewing ? '收起人工评审' : '提交 FDE 评审'}</button>}
@@ -261,6 +272,7 @@ function InvestigationStagePanel({ props, workspace, sessionId, view, stageState
           </div>
           {reviewing && <div className={css.genericReview}><strong>确认环境证据和动作边界已经核对？</strong><p>确认后进入“设计方案并完成端到端纵向切片”。未授权能力仍不能被视为可执行。</p><button type="button" className={css.primaryButton} disabled={submitting} onClick={() => { void complete() }}>{submitting ? '正在提交…' : '确认并继续'}</button></div>}
           {returning && <div className={css.genericReview}><label htmlFor="investigation-return-reason">返回原因</label><textarea id="investigation-return-reason" value={returnReason} onChange={(event) => { setReturnReason(event.target.value) }} placeholder="例如：客户补充了新的业务边界，需要回到第二阶段重新核对。" /><button type="button" className={css.secondaryButton} disabled={submitting} onClick={() => { void returnStage() }}>保留现有材料并返回</button></div>}
+          </>}
           {error !== null && <p className={css.inlineError} role="alert">{error}</p>}
         </section>
       </main>
@@ -1097,6 +1109,15 @@ function StageWorkbenchPanel({ props, workspace, sessionId, view }: {
   }
 
   if (v2Stage !== undefined && viewedStage !== undefined && viewedStage !== v2Stage) {
+    const historicalInvestigation = viewedStage === 'investigation'
+      && FDE_V2_STAGE_IDS.indexOf(viewedStage) < FDE_V2_STAGE_IDS.indexOf(v2Stage)
+    if (historicalInvestigation && stageState?.status === 'ready') {
+      return <InvestigationStagePanel
+        props={props} workspace={workspace} sessionId={sessionId} view={view}
+        stageState={stageState.value} surface={surface?.v2Stages.investigation}
+        historicalActualStage={v2Stage}
+      />
+    }
     return <BrowsedStagePanel
       props={props} workspace={workspace} sessionId={sessionId} view={view}
       actualStage={v2Stage} viewedStage={viewedStage} surface={surface} sourceFiles={files}

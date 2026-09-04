@@ -585,6 +585,79 @@ describe('ProjectStageWorkbenchHero', () => {
     )
   })
 
+  it('keeps the completed investigation cockpit visible as a read-only historical stage', () => {
+    const input = props({
+      useStageProgress: hook({
+        byWorkspace: {
+          'workspace-1': {
+            status: 'ready',
+            value: {
+              workspaceId: 'workspace-1', currentStage: 'development', revision: 6,
+              lifecycleVersion: 2, v2Stage: 'design', createdAt: '', updatedAt: '',
+            },
+          },
+        },
+      }),
+      useStageView: hook({ byWorkspace: { 'workspace-1': 'investigation' } }),
+      useProjectSurfaces: hook({
+        byWorkspace: {
+          'workspace-1': {
+            status: 'ready',
+            value: {
+              requirements: { artifacts: [] },
+              v2Stages: {
+                investigation: {
+                  id: 'investigation', index: 3, title: '调查数据、系统、接口、安全与组织',
+                  objective: '判断客户问题真实性的关键信息是否齐全。',
+                  explanation: '核对数据质量、系统边界、接口能力和现场责任人。',
+                  statePath: '.fde/stages/investigation.json', skill: 'access-and-onboarding',
+                  prompt: '请开始最小范围的环境调查。',
+                  stateStatus: 'ready', status: 'review-ready', currentWorkId: 'systems',
+                  requiredCount: 1, presentCount: 1, reviewReady: true,
+                  reviewBlockers: [], recommendation: 'go',
+                  workItems: [
+                    { id: 'systems', title: '梳理系统与接口', purpose: '确认真实系统和接口。', status: 'complete' },
+                  ],
+                  blockers: [],
+                  artifacts: [
+                    { id: 'system-access-map', title: '系统与访问清单', path: 'fde-deliverables/03-environment/system-access-map.md', purpose: '记录系统和权限。', required: true, status: 'present' },
+                  ],
+                  investigation: {
+                    systems: [{ id: 'tickets', label: 'WorkOrder Pro 7', kind: 'system', status: 'confirmed', owner: '林哲' }],
+                    connections: [],
+                    actionBoundaries: [{ target: 'WorkOrder 历史工单导出', read: 'allowed', suggest: 'not-applicable', draft: 'not-applicable', execute: 'denied' }],
+                    dataFindings: [{ label: '评估标签隔离', value: 'final_domain 不进入候选上下文', status: 'confirmed' }],
+                    governanceReviews: [{ area: 'security', status: 'confirmed', owner: '信息安全团队' }],
+                  },
+                },
+              },
+            },
+          },
+        },
+      }),
+    })
+    const view = render(<ProjectStageWorkbenchHero {...input} />)
+
+    const workbench = view.container.querySelector('[data-stage="investigation"]')
+    expect(workbench?.getAttribute('data-historical')).toBe('true')
+    expect(workbench?.getAttribute('data-conversation-composer-layout')).toBe('stage-history')
+    expect(screen.getByText('阶段完成记录')).toBeTruthy()
+    expect(screen.getByRole('heading', { name: '四个现场条件必须分别有证据' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: '真实环境中的对象和连接' })).toBeTruthy()
+    expect(screen.getByText('WorkOrder Pro 7')).toBeTruthy()
+    expect(screen.getByText('环境证据已确认，阶段记录已封存')).toBeTruthy()
+    expect(screen.queryByText('从输入依据到人工结论')).toBeNull()
+    expect(screen.queryByRole('button', { name: '开始环境调查' })).toBeNull()
+    expect(screen.queryByRole('button', { name: '刷新调查记录' })).toBeNull()
+    expect(screen.queryByRole('button', { name: '提交 FDE 评审' })).toBeNull()
+    expect(screen.queryByRole('button', { name: '返回上一阶段' })).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: /返回当前阶段/ }))
+    expect(input.returnToCurrentStage).toHaveBeenCalledWith('workspace-1')
+    expect(input.completeV2Stage).not.toHaveBeenCalled()
+    expect(input.returnV2Stage).not.toHaveBeenCalled()
+  })
+
   it('shows a future stage as not started without presenting planned work as completed activity', () => {
     const input = props({
       useStageView: hook({ byWorkspace: { 'workspace-1': 'investigation' } }),
