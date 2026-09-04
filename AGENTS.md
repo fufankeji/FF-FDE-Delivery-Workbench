@@ -102,6 +102,14 @@ FDEDeliveryWorkbench/
 - Feature 验证通过后，从干净 worktree 合并回 `main`。主线是 Feature 祖先时优先使用 `--ff-only`，随后核对目标分支与 Feature 提交 SHA；构建包中出现功能不代表已经完成合并。
 - 清理前检查 tracked 与 untracked 状态，确认全部 Feature 提交已包含于 `main`，并保存任何独有交付物；先删除 Feature worktree，再安全删除 Feature 分支。
 
+### FDE-Agent 运行数据同步
+
+- Git 的 merge、rebase、fast-forward 只同步受控源码；被忽略的 `.runtime/`、Workspace 项目文件和 Session 日志不会随代码自动同步。用户要求“合并回 main 再拉取最新”、“同步 main”或“同步 FDE-Agent 数据”时，在重启预览前必须分别核对代码基线和运行数据基线，不得仅根据 Git SHA 宣称同步完成。
+- FDE-Agent 测试项目的业务数据事实源是 `/Users/muyu/FDE-Agent/fde-agent`；主运行区中该项目的 Session 事实源是根仓库 `.runtime/dsh-home/` 内该 Workspace 对应的会话记录。Feature worktree 必须把它们复制到自己的 `.runtime/workspaces/fde-agent` 和 `.runtime/dsh-home/sessions/`，并保持 `workspace.json` 的 Workspace ID 与 Session ID 一致；不得让隔离预览直接写入事实源。
+- 同步 Workspace 文件时必须同时保留原始字节和高精度修改时间，并在完成后对比相对路径、文件数、内容 hash 与 `mtimeMs`。当系统自带 `rsync -a` 会把修改时间截断到整秒时不得使用它复制该数据；应使用能保留时间精度的 `ditto` 或等价方式，否则已识别 Source 会因原件 `mtimeMs` 不匹配被误判为 `stale`。
+- Session 日志不得解压后整体重新压成单个 Zstandard frame。迁移会话工作目录时，必须把改写后的唯一 Session header 保持为第一个独立 frame，后续事件保持在后续 frame，且 header 中的 `cwd` 必须指向该 worktree 的隔离 Workspace；否则 Harness 会以 `first frame is not exactly one header line` 拒绝启动。
+- 数据同步后的最小验证是：目标 Workspace 与事实源的文件集、内容和修改时间一致；没有因复制新增的 `stale` Source；Session 数量和 ID 与 `workspace.json` 一致；所有 Session header 指向隔离 Workspace；服务使用当前 worktree 的显式 `DSH_HOME` 成功启动并返回 HTTP 200。
+
 ## 开发规则
 
 - 只实现 Feature Map 中已确认且由当前请求授权的 Feature；保持 PRD、Product Spec、Feature Map、三件套、架构和实现一致。
