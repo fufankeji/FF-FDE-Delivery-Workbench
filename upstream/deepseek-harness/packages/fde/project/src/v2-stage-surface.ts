@@ -268,7 +268,7 @@ function parseInvestigation(value: unknown): V2InvestigationSnapshot | undefined
   }
 
   const systemIds = new Set<string>()
-  const systems = (record.systems as unknown[]).map((raw, index) => {
+  const systems = (record.systems as unknown[]).map((raw, index): V2InvestigationSnapshot['systems'][number] => {
     const path = `investigation.systems[${String(index)}]`
     const item = asRecord(raw)
     if (item === undefined) throw new Error(`${path} 必须是 JSON 对象。`)
@@ -313,7 +313,7 @@ function parseInvestigation(value: unknown): V2InvestigationSnapshot | undefined
     return { target: requiredText(item, 'target', path), read, suggest, draft, execute }
   })
 
-  const dataFindings = (record.dataFindings as unknown[]).map((raw, index) => {
+  const dataFindings = (record.dataFindings as unknown[]).map((raw, index): V2InvestigationSnapshot['dataFindings'][number] => {
     const path = `investigation.dataFindings[${String(index)}]`
     const item = asRecord(raw)
     if (item === undefined) throw new Error(`${path} 必须是 JSON 对象。`)
@@ -322,7 +322,7 @@ function parseInvestigation(value: unknown): V2InvestigationSnapshot | undefined
     return { label: requiredText(item, 'label', path), value: requiredText(item, 'value', path), status }
   })
 
-  const governanceReviews = (record.governanceReviews as unknown[]).map((raw, index) => {
+  const governanceReviews = (record.governanceReviews as unknown[]).map((raw, index): V2InvestigationSnapshot['governanceReviews'][number] => {
     const path = `investigation.governanceReviews[${String(index)}]`
     const item = asRecord(raw)
     if (item === undefined) throw new Error(`${path} 必须是 JSON 对象。`)
@@ -407,7 +407,7 @@ export async function loadV2StageSurface(root: string, stageId: V2LifecycleStage
     presentCount,
     reviewReady: reviewBlockers.length === 0 && status === 'review-ready',
     reviewBlockers,
-    ...(definition.id !== 'investigation' ? {} : { investigation }),
+    ...(definition.id !== 'investigation' || investigation === undefined ? {} : { investigation }),
     ...(state.message === undefined ? {} : { message: state.message }),
   }
 }

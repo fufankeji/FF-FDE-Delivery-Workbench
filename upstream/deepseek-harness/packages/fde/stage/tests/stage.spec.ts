@@ -305,9 +305,16 @@ describe('requirement-research model guidance', () => {
     expect(v2StagePrompt('evaluation')).toContain('`stage` 必须固定写为 `evaluation`')
     expect(V2_STAGE_SKILLS.find(skill => skill.name === 'access-and-onboarding')?.content)
       .toContain('"actionBoundaries": []')
+    expect(V2_STAGE_SKILLS.find(skill => skill.name === 'access-and-onboarding')?.content)
+      .toContain('对象字段必须叫 `target`')
+    expect(V2_STAGE_SKILLS.find(skill => skill.name === 'access-and-onboarding')?.content)
+      .toContain('不要写成 `id/note/source`')
+    expect(V2_STAGE_SKILLS.find(skill => skill.name === 'access-and-onboarding')?.content)
+      .toContain('不要使用 `partial`、`unconfirmed` 或 `confirmed-in-simulation` 等自定义状态')
     expect(V2_STAGE_SKILLS.find(skill => skill.name === 'secure-ai-action-boundary')?.content)
       .toContain('第三阶段只调查真实环境与动作边界，不构建本体、不设计架构、不选择模型，也不开始开发')
     expect(v2StagePrompt('investigation')).toContain('同步维护 investigation 的真实系统节点')
+    expect(v2StagePrompt('investigation')).toContain('actionBoundaries 的 target/read/suggest/draft/execute')
   })
 
   it('uses a method-first stage-one route with separate conditional engineering skills', () => {
