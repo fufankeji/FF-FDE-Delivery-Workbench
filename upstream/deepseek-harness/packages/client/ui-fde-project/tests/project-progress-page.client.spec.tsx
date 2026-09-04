@@ -12,6 +12,11 @@ beforeEach(() => {
     observe(): void {}
     disconnect(): void {}
   })
+  vi.stubGlobal('IntersectionObserver', class {
+    observe(): void {}
+    unobserve(): void {}
+    disconnect(): void {}
+  })
 })
 
 afterEach(() => { cleanup(); localStorage.clear(); vi.unstubAllGlobals(); delete document.body.dataset.fdePage })
@@ -42,10 +47,32 @@ describe('ProjectProgressOverlay standalone page', () => {
 
     render(<ProjectProgressOverlay {...props} />)
     expect(screen.getByRole('region', { name: 'FF-FDE工作台产品首页' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: /进入工作台/ })).toBeTruthy()
     expect(screen.getByRole('button', { name: /进入交付工作台 · 1 个项目/ })).toBeTruthy()
+    expect(screen.getByRole('link', { name: /查看交付生命周期/ }).getAttribute('href')).toBe('#fde-lifecycle')
+    expect(screen.getByRole('region', { name: '示例项目动态交付窗口' })).toBeTruthy()
+    expect(screen.getByText('证据驱动的 FDE 交付系统')).toBeTruthy()
+    expect(screen.getAllByText('15 / 15').length).toBeGreaterThan(0)
+    expect(screen.getByText('92%')).toBeTruthy()
+    expect(document.querySelectorAll('[data-delivery-signal]')).toHaveLength(2)
+    expect(document.querySelector('[data-delivery-lifecycle-ribbon]')).toBeNull()
+    expect(document.querySelector('[data-delivery-hero-bridge]')?.textContent).toContain('不是交付一个 Demo，而是交付一套客户能持续运行的结果。')
+    expect(document.querySelectorAll('[data-delivery-lifecycle-map] [data-lifecycle-node]')).toHaveLength(6)
+    expect(screen.getByText('需求与现场')).toBeTruthy()
+    expect(screen.getByText('调整方案')).toBeTruthy()
+    expect(document.querySelectorAll('[data-delivery-lifecycle-notes] [data-lifecycle-principle]')).toHaveLength(3)
+    expect(document.querySelector('[data-delivery-lifecycle-map] iframe')).toBeNull()
+    expect(screen.getByRole('region', { name: '交付方法核心表达' })).toBeTruthy()
+    expect(screen.getByText('模型与算力只是投入，自主程度需要设计；')).toBeTruthy()
+    expect(screen.queryByRole('link', { name: /交付方法指南/ })).toBeNull()
+    expect(screen.getByRole('button', { name: /开始一次真实交付/ })).toBeTruthy()
     expect(loadStage).not.toHaveBeenCalled()
-    fireEvent.click(screen.getByRole('button', { name: /进入交付工作台 · 1 个项目/ }))
+    fireEvent.click(screen.getByRole('button', { name: /进入工作台/ }))
     expect(showProjectOverview).toHaveBeenCalledTimes(1)
+    fireEvent.click(screen.getByRole('button', { name: /进入交付工作台 · 1 个项目/ }))
+    expect(showProjectOverview).toHaveBeenCalledTimes(2)
+    fireEvent.click(screen.getByRole('button', { name: /开始一次真实交付/ }))
+    expect(showProjectOverview).toHaveBeenCalledTimes(3)
   })
 
   it('hides the center/details work surfaces while open and restores them on close', () => {
@@ -80,6 +107,55 @@ describe('ProjectProgressOverlay standalone page', () => {
     expect(center.style.visibility).toBe('')
     expect(details.style.visibility).toBe('')
     frame.remove()
+  })
+
+  it('renders the V2 project detail from real stage, source, work-item, and artifact values', () => {
+    const enterProject = vi.fn()
+    const retryStage = vi.fn()
+    const props = {
+      useProjectPage: hook({ open: true, view: 'project' as const, workspaceId: 'workspace-1' }),
+      useStageProgress: hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: {
+        workspaceId: 'workspace-1', currentStage: 'requirements', lifecycleVersion: 2, v2Stage: 'discovery',
+        revision: 1, createdAt: '2026-09-03T00:00:00.000Z', updatedAt: '2026-09-03T00:00:00.000Z',
+      } } } }),
+      useProjectSurfaces: hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: {
+        workspaceId: 'workspace-1', title: '真实项目',
+        requirements: { requiredCount: 3, presentCount: 1 },
+        discovery: {
+          status: 'understanding', currentWorkId: 'restore-workflow', requiredCount: 3, presentCount: 1,
+          reviewReady: false, blockers: ['仍需确认负责人'],
+          workItems: [{ id: 'restore-workflow', title: '还原实际流程', purpose: '核对真实工作方式。', status: 'current' }],
+          artifacts: [{ id: 'research-report', title: '需求调研报告', path: 'fde-deliverables/report.md', purpose: '记录现场事实。', required: true, status: 'present', structureState: 'complete_valid', evidenceState: 'confirmed', evidenceRefs: [] }],
+        },
+        v2Stages: Object.fromEntries(['definition', 'investigation', 'design', 'evaluation', 'pilot', 'production', 'improvement'].map((id, index) => [id, {
+          id, index: index + 2, title: id, objective: '', explanation: '', statePath: '', skill: '', prompt: '',
+          stateStatus: 'missing', status: 'working', currentWorkId: '', workItems: [], blockers: [], recommendation: 'pending',
+          artifacts: [], requiredCount: 0, presentCount: 0, reviewReady: false, reviewBlockers: [],
+        }])),
+      } } } }),
+      useProjectSources: hook({ byWorkspace: { 'workspace-1': { status: 'ready', files: [] } } }),
+      useWorkspaces: hook({ items: [{ workspaceId: 'workspace-1', title: '真实项目', path: '/project/one', sessionIds: ['session-1'], createdAt: '2026-09-03T00:00:00.000Z', updatedAt: '2026-09-03T00:00:00.000Z' }] }),
+      useSessions: hook({ byId: { 'session-1': { id: 'session-1', displayTitle: '会话', running: false, blank: true, updatedAt: 1 } } }),
+      loadStage: vi.fn(), retryStage, loadProjectSurface: vi.fn(), refreshProjectSurface: vi.fn(),
+      completeRequirements: vi.fn(), completeSolution: vi.fn(), completeDevelopment: vi.fn(), completeValidation: vi.fn(), completePilot: vi.fn(), completeHandoff: vi.fn(), returnToPrevious: vi.fn(),
+      acceptValidationMetric: vi.fn(), waiveValidationIssue: vi.fn(), acceptDeploymentTrialIssue: vi.fn(), confirmDeploymentTrialReadiness: vi.fn(), recordAcceptanceHandoverDecision: vi.fn(),
+      loadProjectSources: vi.fn(), parseProjectSource: vi.fn(), openProjectCreation: vi.fn(), enterProject,
+      reviewProjectArchitecture: vi.fn(), closeProjectPage: vi.fn(), showProjectOverview: vi.fn(), showProjectTimeline: vi.fn(), showProjectDetail: vi.fn(), renderSlot: vi.fn(() => null), t: makeTranslate(zh),
+    } as unknown as ProjectProgressOverlayProps
+
+    render(<ProjectProgressOverlay {...props} />)
+    expect(retryStage).toHaveBeenCalledWith('workspace-1')
+    expect(document.querySelector('[data-v2-project-detail]')).toBeTruthy()
+    expect(screen.getByRole('region', { name: '项目关键状态' })).toBeTruthy()
+    const navigation = screen.getByRole('navigation', { name: '八阶段交付地图' })
+    expect(within(navigation).getAllByRole('button')).toHaveLength(8)
+    expect(screen.getAllByText('还原实际流程').length).toBeGreaterThan(0)
+    expect(screen.getByText('需求调研报告')).toBeTruthy()
+    expect(screen.getAllByText('仍需确认负责人').length).toBeGreaterThan(0)
+    fireEvent.click(within(navigation).getByRole('button', { name: '查看阶段 2：定义结果、范围与责任' }))
+    expect(screen.getByRole('heading', { name: '定义结果、范围与责任' })).toBeTruthy()
+    fireEvent.click(screen.getAllByRole('button', { name: /进入项目交付/ })[0] as HTMLElement)
+    expect(enterProject).toHaveBeenCalledWith('workspace-1')
   })
 
   it('shows every real project by default and keeps decision filtering separate from portfolio summaries', () => {
@@ -227,6 +303,13 @@ describe('ProjectProgressOverlay standalone page', () => {
     } as unknown as ProjectProgressOverlayProps
 
     render(<ProjectProgressOverlay {...props} />)
+    expect(screen.getByText('八阶段证据成熟度')).toBeTruthy()
+    const currentFocus = screen.getByRole('region', { name: '当前阶段重点' })
+    expect(within(currentFocus).getByRole('heading', { name: '发现高价值问题' })).toBeTruthy()
+    expect(within(currentFocus).getByRole('list', { name: '项目八阶段位置' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: '阶段输入尚未建立' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: /进入项目交付并添加资料/ })).toBeTruthy()
+    expect(screen.queryByText('六阶段工作区')).toBeNull()
     expect(screen.getByRole('button', { name: /阶段输入/ })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: /阶段产出/ }))
     expect(screen.getByText('需求调研报告')).toBeTruthy()
@@ -372,9 +455,9 @@ describe('ProjectProgressOverlay standalone page', () => {
     render(<ProjectProgressOverlay {...props} />)
     expect(screen.getByRole('region', { name: '项目交付数据总览' })).toBeTruthy()
     expect(screen.getByRole('region', { name: '研发证据图谱' })).toBeTruthy()
-    expect(screen.getByRole('button', { name: '查看阶段 3：项目开发' }).getAttribute('aria-current')).toBe('step')
-    expect(screen.getByRole('button', { name: '查看阶段 1：需求调研' })).toBeTruthy()
-    expect(screen.getByRole('button', { name: '查看阶段 6：验收移交' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: '查看阶段 4：设计方案与纵向切片' }).getAttribute('aria-current')).toBe('step')
+    expect(screen.getByRole('button', { name: '查看阶段 1：发现高价值问题' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: '查看阶段 8：持续改进与能力沉淀' })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: /阶段产出/ }))
     expect(screen.getByText('Feature 研发进度')).toBeTruthy()
     expect(screen.getByText('F001')).toBeTruthy()
@@ -388,13 +471,13 @@ describe('ProjectProgressOverlay standalone page', () => {
     expect(screen.getByText('研发文档正文')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: '关闭' }))
     expect(screen.queryByRole('dialog', { name: '预览项目 PRD' })).toBeNull()
-    expect(screen.getByRole('button', { name: '查看阶段 3：项目开发' }).getAttribute('aria-current')).toBe('step')
-    fireEvent.click(screen.getByRole('button', { name: '查看阶段 4：验证评估' }))
+    expect(screen.getByRole('button', { name: '查看阶段 4：设计方案与纵向切片' }).getAttribute('aria-current')).toBe('step')
+    fireEvent.click(screen.getByRole('button', { name: '查看阶段 5：运行 PoC 与 Eval' }))
     expect(screen.getByRole('region', { name: '验证证据矩阵' })).toBeTruthy()
     expect(screen.getAllByText('尚未开始').length).toBeGreaterThan(0)
-    expect(screen.getByText('项目当前处于 项目开发')).toBeTruthy()
+    expect(screen.getByText('项目当前处于 设计方案与纵向切片')).toBeTruthy()
     expect(completeDevelopment).not.toHaveBeenCalled()
-    fireEvent.click(screen.getByRole('button', { name: '查看阶段 3：项目开发' }))
+    fireEvent.click(screen.getByRole('button', { name: '查看阶段 4：设计方案与纵向切片' }))
     fireEvent.click(screen.getByRole('button', { name: '完成项目开发' }))
     expect(screen.getByText(/我已核对实施报告、运行手册、研发基线/)).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: '确认并进入验证评估' }))

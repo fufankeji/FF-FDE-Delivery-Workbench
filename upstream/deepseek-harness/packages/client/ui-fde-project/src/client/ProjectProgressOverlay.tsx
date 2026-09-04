@@ -369,30 +369,41 @@ function ProjectStagePath({ stage }: { readonly stage: ProjectStageLoadState | u
   )
 }
 
+const V2_TO_ARCHIVE_STAGE: Readonly<Record<FdeV2StageId, FdeStageId>> = {
+  discovery: 'requirements',
+  definition: 'solution',
+  investigation: 'development',
+  design: 'development',
+  evaluation: 'validation',
+  pilot: 'pilot',
+  production: 'handoff',
+  improvement: 'handoff',
+}
+
 function StageNavigator({ stage, viewedStage, selectStage }: {
   readonly stage: ProjectStageLoadState | undefined
-  readonly viewedStage: FdeStageId
-  readonly selectStage: (stage: FdeStageId) => void
+  readonly viewedStage: FdeV2StageId
+  readonly selectStage: (stage: FdeV2StageId) => void
 }) {
   return (
-    <nav className={css.stageNavigator} aria-label="六阶段交付地图">
-      {FDE_STAGES.map((definition, index) => {
-        const state = stagePositionState(stage, index)
-        const active = viewedStage === definition.id
+    <nav className={css.stageNavigator} aria-label="八阶段交付地图">
+      {FDE_V2_STAGE_IDS.map((stageId, index) => {
+        const state = v2StagePositionState(stage, index)
+        const active = viewedStage === stageId
         return (
           <button
-            key={definition.id}
+            key={stageId}
             type="button"
-            data-stage={definition.id}
+            data-stage={stageId}
             data-state={state}
             data-active={active || undefined}
             aria-current={state === 'current' ? 'step' : undefined}
-            aria-label={`查看阶段 ${String(index + 1)}：${STAGE_NAMES[definition.id]}`}
-            onClick={() => { selectStage(definition.id) }}
+            aria-label={`查看阶段 ${String(index + 1)}：${V2_STAGE_NAMES[stageId]}`}
+            onClick={() => { selectStage(stageId) }}
           >
             <span className={css.stageNavigatorNumber}>{index + 1}</span>
             <span className={css.stageNavigatorText}>
-              <strong>{STAGE_NAMES[definition.id]}</strong>
+              <strong>{V2_STAGE_NAMES[stageId]}</strong>
               <small>{stageStateLabel(state)}</small>
             </span>
           </button>
@@ -414,50 +425,41 @@ function ProjectDeliverySummary({ row, sourceState, surfaceState }: {
   readonly surfaceState: ProjectSurfaceLoadState | undefined
 }) {
   const snapshot = surfaceState?.status === 'ready' ? surfaceState.value : undefined
-  const development = snapshot?.development
-  const featureArtifacts = development?.features.flatMap(feature => feature.artifacts) ?? []
-  const taskTotal = development?.features.reduce((total, feature) => total + feature.taskTotal, 0) ?? 0
-  const taskCompleted = development?.features.reduce((total, feature) => total + feature.taskCompleted, 0) ?? 0
-  const architectureTotal = snapshot?.solution === undefined ? 0 : 1
-  const compatibleSnapshot = snapshot as Partial<NonNullable<typeof snapshot>> | undefined
+  const discovery = snapshot === undefined
+    ? undefined
+    : (snapshot as { readonly discovery?: typeof snapshot.discovery }).discovery
+  const v2Stages = snapshot === undefined
+    ? undefined
+    : (snapshot as { readonly v2Stages?: typeof snapshot.v2Stages }).v2Stages
   const evidenceGroups = [
     {
-      id: 'requirements', label: '需求调研',
-      present: snapshot?.requirements.presentCount ?? 0,
-      total: snapshot?.requirements.requiredCount ?? 0,
+      id: 'discovery', label: V2_STAGE_NAMES.discovery,
+      present: discovery?.presentCount ?? snapshot?.requirements.presentCount ?? 0,
+      total: discovery?.requiredCount ?? snapshot?.requirements.requiredCount ?? 0,
     },
     {
-      id: 'solution', label: '方案设计',
-      present: (snapshot?.solution?.presentCount ?? 0) + (snapshot?.architecture === null || snapshot?.architecture === undefined ? 0 : 1),
-      total: (snapshot?.solution?.requiredCount ?? 0) + architectureTotal,
+      id: 'definition', label: V2_STAGE_NAMES.definition,
+      present: v2Stages?.definition.presentCount ?? snapshot?.solution?.presentCount ?? 0,
+      total: v2Stages?.definition.requiredCount ?? snapshot?.solution?.requiredCount ?? 0,
     },
-    {
-      id: 'development', label: '项目开发',
-      present: (development?.core.presentCount ?? 0)
-        + featureArtifacts.filter(artifact => artifact.status === 'present').length
-        + (development?.closure.presentCount ?? 0),
-      total: (development?.core.requiredCount ?? 0) + featureArtifacts.length + (development?.closure.requiredCount ?? 0),
-    },
-    {
-      id: 'validation', label: '验证评估',
-      present: compatibleSnapshot?.validation?.artifacts.presentCount ?? 0,
-      total: compatibleSnapshot?.validation?.artifacts.requiredCount ?? 0,
-    },
-    {
-      id: 'pilot', label: '部署试运行',
-      present: compatibleSnapshot?.deploymentTrial?.artifacts.presentCount ?? 0,
-      total: compatibleSnapshot?.deploymentTrial?.artifacts.requiredCount ?? 0,
-    },
-    {
-      id: 'handoff', label: '验收移交',
-      present: compatibleSnapshot?.acceptanceHandover?.artifacts.presentCount ?? 0,
-      total: compatibleSnapshot?.acceptanceHandover?.artifacts.requiredCount ?? 0,
-    },
+    ...(['investigation', 'design', 'evaluation', 'pilot', 'production', 'improvement'] as const).map(stageId => ({
+      id: stageId,
+      label: V2_STAGE_NAMES[stageId],
+      present: v2Stages?.[stageId].presentCount ?? 0,
+      total: v2Stages?.[stageId].requiredCount ?? 0,
+    })),
   ] as const
   const evidencePresent = evidenceGroups.reduce((total, group) => total + group.present, 0)
   const evidenceTotal = evidenceGroups.reduce((total, group) => total + group.total, 0)
   const sources = sourceState?.files ?? []
   const parsedSources = sources.filter(source => source.parse.status === 'ready').length
+  const current = currentV2Stage(row.stage)
+  const currentSurface = current === undefined || current === 'discovery' ? undefined : v2Stages?.[current]
+  const currentPresent = current === 'discovery' ? discovery?.presentCount ?? snapshot?.requirements.presentCount ?? 0 : currentSurface?.presentCount ?? 0
+  const currentRequired = current === 'discovery' ? discovery?.requiredCount ?? snapshot?.requirements.requiredCount ?? 0 : currentSurface?.requiredCount ?? 0
+  const openBlockers = current === 'discovery'
+    ? discovery?.blockers.length ?? 0
+    : currentSurface?.blockers.filter(blocker => blocker.status === 'open').length ?? 0
   const scheduled = row.schedule.status === 'estimated'
   const startTime = scheduled ? new Date(`${row.schedule.startDate}T00:00:00`).getTime() : 0
   const endTime = scheduled ? new Date(`${row.schedule.endDate}T23:59:59`).getTime() : 0
@@ -486,7 +488,7 @@ function ProjectDeliverySummary({ row, sourceState, surfaceState }: {
       </section>
       <section className={css.projectEvidencePanel}>
         <header>
-          <div><span>交付证据</span><h2>已接入产物构成</h2></div>
+          <div><span>交付证据</span><h2>八阶段证据成熟度</h2></div>
           <strong>{evidencePresent}<small> / {evidenceTotal}</small></strong>
         </header>
         <div className={css.projectEvidenceGroups}>
@@ -499,17 +501,264 @@ function ProjectDeliverySummary({ row, sourceState, surfaceState }: {
         </div>
       </section>
       <section className={css.projectDataPanel}>
-        <header><div><span>项目数据</span><h2>资料与研发证据</h2></div></header>
+        <header><div><span>当前证据</span><h2>输入、Artifact 与人工门</h2></div></header>
         <dl>
           <div><dt>客户资料</dt><dd>{sources.length}</dd></div>
           <div><dt>已识别</dt><dd>{parsedSources}</dd></div>
-          <div><dt>Feature</dt><dd>{development?.features.length ?? 0}</dd></div>
-          <div><dt>任务证据</dt><dd>{taskCompleted}<small> / {taskTotal}</small></dd></div>
+          <div><dt>本阶段记录</dt><dd>{currentPresent}<small> / {currentRequired}</small></dd></div>
+          <div><dt>未决阻塞</dt><dd>{openBlockers}</dd></div>
           <div><dt>评估用例</dt><dd>{snapshot?.evaluation.casesCount ?? 0}</dd></div>
           <div><dt>评估报告</dt><dd>{snapshot?.evaluation.reports.length ?? 0}</dd></div>
         </dl>
       </section>
     </section>
+  )
+}
+
+function ProjectCurrentFocus({ row, sourceState, surfaceState, enterProject }: {
+  readonly row: ProjectRow
+  readonly sourceState: ProjectSourceLoadState | undefined
+  readonly surfaceState: ProjectSurfaceLoadState | undefined
+  readonly enterProject: () => void
+}) {
+  const snapshot = surfaceState?.status === 'ready' ? surfaceState.value : undefined
+  const discovery = snapshot === undefined
+    ? undefined
+    : (snapshot as { readonly discovery?: typeof snapshot.discovery }).discovery
+  const v2Stages = snapshot === undefined
+    ? undefined
+    : (snapshot as { readonly v2Stages?: typeof snapshot.v2Stages }).v2Stages
+  const stage = currentV2Stage(row.stage)
+  const stageIndex = stage === undefined ? -1 : FDE_V2_STAGE_IDS.indexOf(stage)
+  const later = stage === undefined || stage === 'discovery' ? undefined : v2Stages?.[stage]
+  const workItems = stage === 'discovery' ? discovery?.workItems : later?.workItems
+  const currentWork = workItems?.find(item => item.status === 'current') ?? workItems?.find(item => item.status === 'waiting')
+  const present = stage === 'discovery' ? discovery?.presentCount ?? snapshot?.requirements.presentCount ?? 0 : later?.presentCount ?? 0
+  const required = stage === 'discovery' ? discovery?.requiredCount ?? snapshot?.requirements.requiredCount ?? 0 : later?.requiredCount ?? 0
+  const blockers = stage === 'discovery'
+    ? discovery?.blockers.length ?? 0
+    : later?.blockers.filter(blocker => blocker.status === 'open').length ?? 0
+  const reviewReady = stage === 'discovery' ? discovery?.reviewReady ?? false : later?.reviewReady ?? false
+  const sources = sourceState?.files ?? []
+  const parsedSources = sources.filter(source => source.parse.status === 'ready').length
+  const action = projectNextAction(row)
+  return (
+    <section className={css.projectCurrentFocus} aria-label="当前阶段重点">
+      <header>
+        <div><span>当前阶段重点</span><h2>{stage === undefined ? '正在读取项目阶段' : V2_STAGE_NAMES[stage]}</h2></div>
+        <strong>{stageIndex < 0 ? '—' : `${String(stageIndex + 1).padStart(2, '0')} / 08`}</strong>
+      </header>
+      <div className={css.projectCurrentFocusMain}>
+        <p>{stage === undefined ? '完成阶段读取后再显示当前责任。' : V2_STAGE_SUMMARIES[stage]}</p>
+        <ProjectStagePath stage={row.stage} />
+        <dl>
+          <div><dt>阶段输入</dt><dd>{sources.length} 份资料 · {parsedSources} 份已识别</dd></div>
+          <div><dt>固定记录</dt><dd>{present}/{required}</dd></div>
+          <div><dt>未决阻塞</dt><dd>{blockers === 0 ? '未登记' : `${String(blockers)} 项`}</dd></div>
+          <div><dt>人工阶段门</dt><dd>{reviewReady ? '可申请评审' : '继续补齐证据'}</dd></div>
+        </dl>
+      </div>
+      <aside>
+        <span>建议下一步</span>
+        <h3>{currentWork?.title ?? action.action}</h3>
+        <p>{currentWork?.purpose ?? action.reason}</p>
+        <button type="button" onClick={enterProject}>进入项目交付 <span aria-hidden="true">→</span></button>
+      </aside>
+    </section>
+  )
+}
+
+function ProjectDetailMetricIcon({ type }: { readonly type: 'stage' | 'schedule' | 'evidence' | 'sources' | 'records' }) {
+  return <svg className={css.projectV2MetricIcon} viewBox="0 0 32 32" fill="none" aria-hidden="true">
+    {type === 'stage' && <><circle cx="16" cy="16" r="10" /><circle cx="16" cy="16" r="4" /><path d="m20 12 6-6M22 6h4v4" /></>}
+    {type === 'schedule' && <><rect x="5" y="7" width="22" height="20" rx="3" /><path d="M10 4v6M22 4v6M5 13h22" /></>}
+    {type === 'evidence' && <><path d="M16 3 27 7v8c0 7-4 11-11 14C9 26 5 22 5 15V7l11-4Z" /><path d="m11 16 3 3 7-7" /></>}
+    {type === 'sources' && <><path d="M4 10h9l3 3h12v13H4V10Z" /><path d="M6 7h8l3 3" /></>}
+    {type === 'records' && <><path d="M8 3h12l5 5v21H8V3Z" /><path d="M20 3v6h5M12 15h9M12 20h9M12 25h6" /></>}
+  </svg>
+}
+
+function ProjectDetailDocumentArt() {
+  return <svg className={css.projectV2DocumentArt} viewBox="0 0 150 150" fill="none" aria-hidden="true">
+    <g transform="rotate(9 76 72)">
+      <rect x="43" y="20" width="64" height="94" rx="9" fill="currentColor" opacity=".09" />
+      <rect x="35" y="14" width="64" height="94" rx="9" fill="currentColor" opacity=".16" />
+      <path d="M49 36h35M49 49h27M49 62h31M49 78h13v16H49zM67 85h17" stroke="currentColor" strokeWidth="5" strokeLinecap="round" opacity=".42" />
+    </g>
+    <g stroke="currentColor" opacity=".12"><ellipse cx="76" cy="122" rx="69" ry="20" /><ellipse cx="76" cy="122" rx="46" ry="12" /></g>
+  </svg>
+}
+
+function ProjectStageFactIcon({ type }: { readonly type: 'input' | 'record' | 'blocker' | 'gate' }) {
+  return <svg className={css.projectV2StageFactIcon} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    {type === 'input' && <><path d="M5 18V8h5l2 3h7v7H5Z" /><path d="M5 14h14M8 5h6l2 3" /></>}
+    {type === 'record' && <><rect x="6" y="5" width="13" height="15" rx="2" /><path d="M9 3h7v5H9zM10 12h5M10 16h5" /></>}
+    {type === 'blocker' && <><path d="M12 3 21 20H3L12 3Z" /><path d="M12 9v5M12 17h.01" /></>}
+    {type === 'gate' && <><circle cx="12" cy="8" r="4" /><path d="M4 21c.7-4.6 3.4-7 8-7s7.3 2.4 8 7M18 8h3M19.5 6.5v3" /></>}
+  </svg>
+}
+
+function ProjectV2Detail({ row, sourceState, surfaceState, returnToPrevious, enterProject, back }: {
+  readonly row: ProjectRow
+  readonly sourceState: ProjectSourceLoadState | undefined
+  readonly surfaceState: ProjectSurfaceLoadState | undefined
+  readonly returnToPrevious: (revision: number, reason: string) => Promise<void>
+  readonly enterProject: () => void
+  readonly back: () => void
+}) {
+  const stageValue = row.stage?.status === 'ready' ? row.stage.value : undefined
+  const currentStage = currentV2Stage(row.stage) ?? 'discovery'
+  const currentStageIndex = FDE_V2_STAGE_IDS.indexOf(currentStage)
+  const [viewedStage, setViewedStage] = useState<FdeV2StageId>(currentStage)
+  const [returnOpen, setReturnOpen] = useState(false)
+  const [returnReason, setReturnReason] = useState('')
+  const [returnError, setReturnError] = useState<string>()
+  const [returnSubmitting, setReturnSubmitting] = useState(false)
+  useEffect(() => {
+    setViewedStage(currentStage)
+    setReturnOpen(false)
+    setReturnReason('')
+    setReturnError(undefined)
+  }, [currentStage, row.workspaceId])
+  const snapshot = surfaceState?.status === 'ready' ? surfaceState.value : undefined
+  const discovery = snapshot?.discovery
+  const v2Stages = snapshot?.v2Stages
+  const later = viewedStage === 'discovery' ? undefined : v2Stages?.[viewedStage]
+  const workItems: readonly { readonly id: string; readonly title: string; readonly purpose: string; readonly status: string }[] = viewedStage === 'discovery' ? discovery?.workItems ?? [] : later?.workItems ?? []
+  const artifacts: readonly { readonly id: string; readonly title: string; readonly path: string; readonly purpose: string; readonly required: boolean; readonly status: 'missing' | 'present' | 'error' }[] = viewedStage === 'discovery' ? discovery?.artifacts ?? [] : later?.artifacts ?? []
+  const blockers = viewedStage === 'discovery' ? discovery?.blockers ?? [] : later?.blockers.filter(blocker => blocker.status === 'open').map(blocker => blocker.title) ?? []
+  const reviewBlockers = viewedStage === 'discovery' ? discovery?.blockers ?? [] : later?.reviewBlockers ?? []
+  const presentCount = viewedStage === 'discovery' ? discovery?.presentCount ?? snapshot?.requirements.presentCount ?? 0 : later?.presentCount ?? 0
+  const requiredCount = viewedStage === 'discovery' ? discovery?.requiredCount ?? snapshot?.requirements.requiredCount ?? 0 : later?.requiredCount ?? 0
+  const reviewReady = viewedStage === 'discovery' ? discovery?.reviewReady ?? false : later?.reviewReady ?? false
+  const recommendation = viewedStage === 'discovery' ? 'pending' : later?.recommendation ?? 'pending'
+  const currentWork = workItems.find(item => item.status === 'current') ?? workItems.find(item => item.status === 'waiting')
+  const completedWork = workItems.filter(item => item.status === 'complete').length
+  const sources = sourceState?.files ?? []
+  const parsedSources = sources.filter(source => source.parse.status === 'ready').length
+  const allStageRecords = (discovery?.presentCount ?? snapshot?.requirements.presentCount ?? 0)
+    + Object.values(v2Stages ?? {}).reduce((total, stage) => total + stage.presentCount, 0)
+  const allRequiredRecords = (discovery?.requiredCount ?? snapshot?.requirements.requiredCount ?? 0)
+    + Object.values(v2Stages ?? {}).reduce((total, stage) => total + stage.requiredCount, 0)
+  const previousStageId = FDE_V2_STAGE_IDS[Math.max(0, FDE_V2_STAGE_IDS.indexOf(viewedStage) - 1)]
+  const previousStage = previousStageId === 'discovery' ? discovery : previousStageId === undefined ? undefined : v2Stages?.[previousStageId]
+  const inputCount = viewedStage === 'discovery' ? sources.length : previousStage?.presentCount ?? 0
+  const schedule = row.schedule.status === 'estimated'
+    ? `${formatDate(row.schedule.startDate)} — ${formatDate(row.schedule.endDate)}`
+    : '待确认'
+  const action = projectNextAction(row)
+  const latestV2Return = stageValue?.v2Returns?.at(-1)
+  const latestLegacyReturn = stageValue?.returns?.at(-1)
+  const viewedIndex = FDE_V2_STAGE_IDS.indexOf(viewedStage)
+  const viewedState = v2StagePositionState(row.stage, viewedIndex)
+  const projectCompleted = stageValue?.currentStage === 'completed'
+  const historical = viewedIndex < currentStageIndex
+  const gateTitle = projectCompleted && viewedStage === currentStage
+    ? '项目交付已由 FDE 确认'
+    : historical ? '阶段记录已由 FDE 确认' : reviewReady ? '本阶段已具备 FDE 评审条件' : '本阶段仍需补齐证据'
+  const gateDetail = projectCompleted && viewedStage === currentStage
+    ? '项目状态为“项目已完成”；已有证据仍可用于后续改进。'
+    : historical ? '该阶段已通过人工阶段门，记录保持可追溯。' : reviewReady ? '固定记录和阻塞条件已满足，等待 FDE 最终决定。' : `${String(reviewBlockers.length)} 项条件仍待处理。`
+  const returnLabel = stageValue?.currentStage === 'completed' ? '重新打开项目' : '返回上一阶段'
+  const canReturn = stageValue !== undefined && stageValue.currentStage !== 'requirements'
+  return (
+    <main className={css.projectV2Detail} data-v2-project-detail="">
+      <header className={css.projectV2Hero} data-v2-detail-hero="">
+        <button type="button" className={css.projectV2Back} onClick={back}>←&nbsp; 全部项目</button>
+        <div className={css.projectV2HeroMain}>
+          <div className={css.projectV2Identity}>
+            <span>单项目交付全景</span>
+            <h1 data-v2-project-title="">{row.title}</h1>
+            <p>{row.companyName || '未填写所属企业'}</p>
+          </div>
+          <dl className={css.projectV2HeroFacts} data-v2-hero-facts="">
+            <div><dt>当前阶段</dt><dd>第 {String(currentStageIndex + 1)}/8 阶段 · {V2_STAGE_NAMES[currentStage]}</dd></div>
+            <div><dt>交付周期</dt><dd>{schedule}</dd></div>
+            <div><dt>项目会话</dt><dd>{row.sessions} 个{row.runningSessions > 0 ? ` · ${String(row.runningSessions)} 个运行中` : ''}</dd></div>
+          </dl>
+        </div>
+        {latestV2Return !== undefined
+          ? <p className={css.projectV2LatestReturn}>最近一次阶段调整：{V2_STAGE_NAMES[latestV2Return.from]} → {V2_STAGE_NAMES[latestV2Return.to]}</p>
+          : latestLegacyReturn !== undefined && <p className={css.projectV2LatestReturn}>最近一次阶段调整：{latestLegacyReturn.from === 'completed' ? '项目完成' : STAGE_NAMES[latestLegacyReturn.from]} → {STAGE_NAMES[latestLegacyReturn.to]}</p>}
+        <div className={css.projectV2Actions} data-v2-detail-actions="">
+          {canReturn && <button type="button" onClick={() => { setReturnOpen(true) }}>{returnLabel}</button>}
+          <button type="button" onClick={enterProject}>进入项目交付 <span aria-hidden="true">→</span></button>
+        </div>
+      </header>
+
+      <section className={css.projectV2Metrics} data-v2-detail-metrics="" aria-label="项目关键状态">
+        <article><ProjectDetailMetricIcon type="stage" /><div><span>当前阶段</span><strong>{String(currentStageIndex + 1).padStart(2, '0')} <small>/ 08</small></strong><p>{V2_STAGE_NAMES[currentStage]}</p></div></article>
+        <article><ProjectDetailMetricIcon type="schedule" /><div><span>交付周期</span><strong>{schedule}</strong></div></article>
+        <article><ProjectDetailMetricIcon type="evidence" /><div><span>交付证据</span><strong>{allStageRecords} <small>/ {allRequiredRecords}</small></strong><p>{allRequiredRecords === 0 ? '阶段合同读取中' : '固定记录真实汇总'}</p></div></article>
+        <article><ProjectDetailMetricIcon type="sources" /><div><span>项目资料</span><strong>{sources.length} <small>份</small></strong><p>已识别 {parsedSources}</p></div></article>
+        <article><ProjectDetailMetricIcon type="records" /><div><span>阶段记录</span><strong>{presentCount} <small>/ {requiredCount}</small></strong><p>未决阻塞 {blockers.length}</p></div></article>
+      </section>
+
+      {returnOpen && stageValue !== undefined && <section className={css.projectV2ReturnPanel} aria-label={returnLabel}>
+        <label><span>返回原因</span><textarea value={returnReason} maxLength={1000} placeholder="说明为什么需要重新打开或返回阶段。" onChange={event => { setReturnReason(event.currentTarget.value); setReturnError(undefined) }} /></label>
+        <div><button type="button" onClick={() => { setReturnOpen(false); setReturnReason('') }}>取消</button><button type="button" disabled={returnSubmitting || returnReason.trim() === ''} onClick={() => {
+          setReturnSubmitting(true)
+          void returnToPrevious(stageValue.revision, returnReason.trim()).catch(error => { setReturnError(error instanceof Error ? error.message : String(error)) }).finally(() => { setReturnSubmitting(false) })
+        }}>{returnSubmitting ? '正在提交…' : `确认${returnLabel}`}</button></div>
+        {returnError !== undefined && <p role="alert">{returnError}</p>}
+      </section>}
+
+      <div className={css.projectV2Main} data-v2-detail-main="">
+        <aside className={css.projectV2StageRail} data-v2-stage-rail="">
+          <header><span>阶段产物档案</span><h2>八阶段交付路径</h2><p>选择阶段，查看该阶段的真实记录与人工决定。</p></header>
+          <StageNavigator stage={row.stage} viewedStage={viewedStage} selectStage={setViewedStage} />
+        </aside>
+
+        <section className={css.projectV2Workspace} data-v2-stage-workspace="">
+          <header>
+            <div><span>当前阶段里程碑 · {String(viewedIndex + 1).padStart(2, '0')} / 08</span><h2>{V2_STAGE_NAMES[viewedStage]}</h2><p>{V2_STAGE_SUMMARIES[viewedStage]}</p></div>
+            <strong data-state={viewedState}>{stageStateLabel(viewedState)}</strong>
+            <dl className={css.projectV2StageFacts} data-v2-stage-facts="">
+              <div><dt><ProjectStageFactIcon type="input" />阶段输入</dt><dd>{inputCount} 项</dd><small>{viewedStage === 'discovery' ? `${String(parsedSources)} 份已识别` : '来自上一阶段固定记录'}</small></div>
+              <div><dt><ProjectStageFactIcon type="record" />固定记录</dt><dd>{presentCount} / {requiredCount}</dd><small>只统计可读取 Artifact</small></div>
+              <div><dt><ProjectStageFactIcon type="blocker" />未决阻塞</dt><dd>{blockers.length}</dd><small>{blockers.length === 0 ? '当前未登记阻塞' : '等待处理或人工决定'}</small></div>
+              <div><dt><ProjectStageFactIcon type="gate" />人工阶段门</dt><dd>{historical ? '已通过' : reviewReady ? '可评审' : '待补证据'}</dd><small>只有 FDE 可以改变阶段</small></div>
+            </dl>
+          </header>
+          <section className={css.projectV2EvidenceCard}>
+            <header><span>阶段证据门</span><h3>{currentWork?.title ?? `${V2_STAGE_NAMES[viewedStage]}记录`}</h3></header>
+            <div className={css.projectV2GateKpis}>
+              <div><span>STATUS</span><strong>{later?.status ?? discovery?.status ?? '读取中'}</strong></div>
+              <div><span>ARTIFACT</span><strong>{presentCount}/{requiredCount}</strong></div>
+              <div><span>BLOCKER</span><strong>{blockers.length}</strong></div>
+              <div><span>RECOMMEND</span><strong>{recommendation}</strong></div>
+            </div>
+            <div className={css.projectV2Conditions}>
+              <header><h3>阶段条件</h3><span>{reviewBlockers.length} 项待处理</span></header>
+              <ul>{(reviewBlockers.length > 0 ? reviewBlockers : workItems.map(item => `${item.title}：${item.purpose}`)).slice(0, 5).map((item, index) => <li key={`${String(index)}-${item}`}><span>TERM</span><p>{item}</p><strong>{reviewBlockers.length > 0 ? '待处理' : '已登记'}</strong></li>)}</ul>
+              {reviewBlockers.length === 0 && workItems.length === 0 && <p className={css.projectV2EmptyLine}>当前阶段尚未登记工作项或评审条件。</p>}
+            </div>
+          </section>
+        </section>
+
+        <aside className={css.projectV2ActionColumn} data-v2-action-column="">
+          <section className={css.projectV2NextAction}>
+            <ProjectDetailDocumentArt />
+            <span>建议下一步</span><h2>{currentWork?.title ?? action.action}</h2><p>{currentWork?.purpose ?? action.reason}</p>
+            <button type="button" onClick={enterProject}>进入项目交付 <span aria-hidden="true">→</span></button>
+          </section>
+          <section className={css.projectV2WorkItems}>
+            <header><h3>本阶段工作项</h3><strong>{completedWork} / {workItems.length}</strong></header>
+            <ul>{workItems.slice(0, 3).map(item => <li key={item.id} data-status={item.status}><i><svg viewBox="0 0 16 16" fill="none" aria-hidden="true">{item.status === 'complete' ? <path d="m3.5 8 3 3 6-6" /> : <circle cx="8" cy="8" r="2" fill="currentColor" stroke="none" />}</svg></i><span>{item.title}</span></li>)}</ul>
+            {workItems.length === 0 && <p>尚未读取到阶段工作项。</p>}
+          </section>
+          <section className={css.projectV2Artifacts}>
+            <header><h3>阶段产物</h3><strong>{presentCount} / {requiredCount}</strong></header>
+            <div>{artifacts.slice(0, 4).map(artifact => <article key={artifact.id} data-status={artifact.status}><i><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 2.5h7l4 4v11H5v-15Z" /><path d="M12 2.5v4h4M8 11h5M8 14h5" /></svg></i><span><strong>{artifact.title}</strong><small>{artifact.status === 'present' ? '已有文件' : artifact.required ? '待形成' : '按需形成'}</small></span>{artifact.status === 'present' && <b aria-label="已有文件">✓</b>}</article>)}</div>
+            {artifacts.length === 0 && <p>当前阶段尚未登记固定产物。</p>}
+          </section>
+        </aside>
+      </div>
+
+      <footer className={css.projectV2GateBanner} data-v2-gate-banner="" data-state={projectCompleted || historical ? 'complete' : reviewReady ? 'ready' : 'pending'}>
+        <i aria-hidden="true">✓</i><div><strong>{gateTitle}</strong><span>{gateDetail}</span></div><button type="button" onClick={enterProject}>查看并继续 <span aria-hidden="true">→</span></button>
+      </footer>
+    </main>
   )
 }
 
@@ -2353,6 +2602,9 @@ function ProjectDetail({
   readonly renderPreview: (source: ProjectPreviewFile) => React.ReactNode
 }) {
   const currentStage = row.stage?.status === 'ready' ? row.stage.value.currentStage : undefined
+  const currentProjectStage = currentV2Stage(row.stage)
+  const currentProjectStageIndex = currentProjectStage === undefined ? -1 : FDE_V2_STAGE_IDS.indexOf(currentProjectStage)
+  const [viewedProjectStage, setViewedProjectStage] = useState<FdeV2StageId>(currentProjectStage ?? 'discovery')
   const [viewedStage, setViewedStage] = useState<FdeStageId>(currentStage === 'completed' ? 'handoff' : currentStage ?? 'requirements')
   const [section, setSection] = useState<'inputs' | 'outputs'>('inputs')
   const [returnOpen, setReturnOpen] = useState(false)
@@ -2361,15 +2613,16 @@ function ProjectDetail({
   const [returnSubmitting, setReturnSubmitting] = useState(false)
   useEffect(() => {
     const nextStage = currentStage === 'completed' ? 'handoff' : currentStage ?? 'requirements'
+    setViewedProjectStage(currentProjectStage ?? 'discovery')
     setViewedStage(nextStage)
     setSection(nextStage === 'requirements' ? 'inputs' : 'outputs')
     setReturnOpen(false)
     setReturnReason('')
     setReturnError(undefined)
-  }, [currentStage, row.workspaceId])
+  }, [currentProjectStage, currentStage, row.workspaceId])
   const canParse = selectedSource !== undefined && ['pending', 'error', 'stale'].includes(selectedSource.parse.status)
-  const viewedIndex = FDE_STAGES.findIndex(item => item.id === viewedStage)
-  const viewedState = stagePositionState(row.stage, viewedIndex)
+  const viewedProjectIndex = FDE_V2_STAGE_IDS.indexOf(viewedProjectStage)
+  const viewedProjectState = v2StagePositionState(row.stage, viewedProjectIndex)
   const validationReached = stageReached(currentStage, 'validation')
   const schedule = row.schedule.status === 'estimated'
     ? `${formatDate(row.schedule.startDate)} — ${formatDate(row.schedule.endDate)}`
@@ -2393,6 +2646,11 @@ function ProjectDetail({
     setViewedStage(nextStage)
     setSection(nextStage === 'requirements' ? 'inputs' : 'outputs')
   }
+  const selectViewedProjectStage = (nextStage: FdeV2StageId): void => {
+    const archiveStage = V2_TO_ARCHIVE_STAGE[nextStage]
+    setViewedProjectStage(nextStage)
+    selectViewedStage(archiveStage)
+  }
   const stageValue = row.stage?.status === 'ready' ? row.stage.value : undefined
   const returnTarget = currentStage === undefined ? undefined : previousStageOf(currentStage)
   const returnLabel = currentStage === 'completed' ? '重新打开项目' : '返回上一阶段'
@@ -2408,7 +2666,7 @@ function ProjectDetail({
           </div>
         </div>
         <dl className={css.detailFacts}>
-          <div><dt>项目当前阶段</dt><dd>{currentStage === undefined ? stageLabel(row.stage, '读取中', '读取失败') : currentStage === 'completed' ? '六阶段已完成 · 项目已交付' : `第 ${String(currentStageIndex(row.stage) + 1)}/6 阶段 · ${STAGE_NAMES[currentStage]}`}</dd></div>
+          <div><dt>项目当前阶段</dt><dd>{currentProjectStage === undefined ? stageLabel(row.stage, '读取中', '读取失败') : `第 ${String(currentProjectStageIndex + 1)}/8 阶段 · ${V2_STAGE_NAMES[currentProjectStage]}`}</dd></div>
           <div><dt>交付周期</dt><dd>{schedule}</dd></div>
           <div><dt>项目会话</dt><dd>{row.sessions} 个{row.runningSessions > 0 ? ` · ${String(row.runningSessions)} 个运行中` : ''}</dd></div>
         </dl>
@@ -2463,22 +2721,23 @@ function ProjectDetail({
         <time dateTime={latestReturn.returnedAt}>{formatAuditTime(latestReturn.returnedAt)}</time>
       </aside>}
       <ProjectDeliverySummary row={row} sourceState={sourceState} surfaceState={surfaceState} />
+      <ProjectCurrentFocus row={row} sourceState={sourceState} surfaceState={surfaceState} enterProject={enterProject} />
       <div className={css.stageExperience}>
         <aside className={css.stageRail}>
-          <header><span>交付阶段</span><h2>六阶段工作区</h2><p>选择阶段后，在右侧查看对应数据与产物。</p></header>
-          <StageNavigator stage={row.stage} viewedStage={viewedStage} selectStage={selectViewedStage} />
+          <header><span>交付档案</span><h2>阶段产物档案</h2><p>按已接入的产物类型查看资料、记录与人工确认。</p></header>
+          <StageNavigator stage={row.stage} viewedStage={viewedProjectStage} selectStage={selectViewedProjectStage} />
         </aside>
         <div className={css.stageCanvas}>
-          <section className={css.stageWorkspaceHeader} data-state={viewedState}>
-            <span className={css.stageWorkspaceOrdinal} aria-hidden="true">{String(viewedIndex + 1).padStart(2, '0')}</span>
+          <section className={css.stageWorkspaceHeader} data-state={viewedProjectState}>
+            <span className={css.stageWorkspaceOrdinal} aria-hidden="true">{String(viewedProjectIndex + 1).padStart(2, '0')}</span>
             <div className={css.stageWorkspaceCopy}>
-              <span>正在查看 · 阶段 {String(viewedIndex + 1)}/6</span>
-              <h2>{STAGE_NAMES[viewedStage]}</h2>
-              <p>{STAGE_SUMMARIES[viewedStage]}</p>
+              <span>正在查看 · 阶段产物</span>
+              <h2>{V2_STAGE_NAMES[viewedProjectStage]}</h2>
+              <p>{V2_STAGE_SUMMARIES[viewedProjectStage]}</p>
             </div>
             <div className={css.stageWorkspaceState}>
-              <strong>{stageStateLabel(viewedState)}</strong>
-              {viewedStage !== currentStage && currentStage !== undefined && <small>项目当前处于 {STAGE_NAMES[currentStage]}</small>}
+              <strong>{stageStateLabel(viewedProjectState)}</strong>
+              {viewedProjectStage !== currentProjectStage && currentProjectStage !== undefined && <small>项目当前处于 {V2_STAGE_NAMES[currentProjectStage]}</small>}
             </div>
           </section>
           <StageVisualSummary
@@ -2512,7 +2771,13 @@ function ProjectDetail({
             reviewArchitecture={reviewArchitecture}
             renderPreview={renderPreview}
           />}
-          {viewedStage === 'requirements' && section === 'inputs' && <div className={css.detailLayout}>
+          {viewedStage === 'requirements' && section === 'inputs' && (sourceState?.status === 'ready' && sourceState.files.length === 0
+            ? <section className={css.projectSourceEmpty}>
+              <div><span>阶段输入</span><h2>阶段输入尚未建立</h2><p>先从当前阶段允许使用的客户原始材料开始，保留来源与识别状态，再让 Agent 形成候选记录。</p></div>
+              <dl><div><dt>项目资料</dt><dd>0</dd></div><div><dt>已识别</dt><dd>0</dd></div><div><dt>阶段记录</dt><dd>{surfaceState?.status === 'ready' ? `${String(surfaceState.value.requirements.presentCount)}/${String(surfaceState.value.requirements.requiredCount)}` : '读取中'}</dd></div></dl>
+              <button type="button" onClick={enterProject}>进入项目交付并添加资料 <span aria-hidden="true">→</span></button>
+            </section>
+            : <div className={css.detailLayout}>
             <aside className={css.sourcePanel}>
               <div className={css.sourcePanelHeader}>
                 <div><h2>项目资料</h2><span>客户原始文件与本地识别状态</span></div>
@@ -2558,7 +2823,7 @@ function ProjectDetail({
                   })}</div>
                 </>}
             </section>
-          </div>}
+            </div>)}
         </div>
       </div>
     </main>
@@ -2601,9 +2866,10 @@ export function ProjectProgressOverlay({
   useEffect(() => {
     if (page.view !== 'project' || page.workspaceId === undefined) return
     setSelectedSourceId(undefined)
+    retryStage(page.workspaceId)
     refreshProjectSurface(page.workspaceId)
     loadProjectSources(page.workspaceId)
-  }, [loadProjectSources, page.view, page.workspaceId, refreshProjectSurface])
+  }, [loadProjectSources, page.view, page.workspaceId, refreshProjectSurface, retryStage])
 
   useEffect(() => {
     if (page.view !== 'project' || page.workspaceId === undefined || selectedSourceId !== undefined) return
@@ -2666,8 +2932,7 @@ export function ProjectProgressOverlay({
     return (
       <div
         ref={rootRef}
-        className={css.pageOverlay}
-        style={{ left: sidebarOffset, width: `calc(100% - ${String(sidebarOffset)}px)` }}
+        className={`${css.pageOverlay} ${css.deliveryHomeOverlay}`}
         data-testid="fde-delivery-home"
       >
         <main className={`${css.pageBody} ${css.homeBody}`}>
@@ -2677,15 +2942,36 @@ export function ProjectProgressOverlay({
     )
   }
 
+  const legacyDetailOpen = page.view === 'project'
+    && detailRow?.stage?.status === 'ready'
+    && detailRow.stage.value.lifecycleVersion !== 2
+  const v2DetailOpen = page.view === 'project' && detailRow !== undefined && !legacyDetailOpen
+
   return (
     <div
       ref={rootRef}
-      className={`${css.pageOverlay} ${page.view === 'project' ? '' : css.projectCenterOverlay}`}
-      style={page.view === 'project' ? { left: sidebarOffset, width: `calc(100% - ${String(sidebarOffset)}px)` } : undefined}
+      className={`${css.pageOverlay} ${page.view === 'project' && !v2DetailOpen ? '' : css.projectCenterOverlay}`}
+      style={page.view === 'project' && !v2DetailOpen ? { left: sidebarOffset, width: `calc(100% - ${String(sidebarOffset)}px)` } : undefined}
       data-testid="fde-project-progress"
     >
       {page.view === 'project' && detailRow !== undefined
-        ? <ProjectDetail
+        ? v2DetailOpen
+          ? <ProjectV2Detail
+            row={detailRow}
+            sourceState={sourceState}
+            surfaceState={surfaceState}
+            returnToPrevious={async (revision, reason) => {
+              try {
+                await returnToPrevious(detailRow.workspaceId, revision, reason)
+              } catch (error) {
+                retryStage(detailRow.workspaceId)
+                throw error
+              }
+            }}
+            enterProject={() => { void enterProject(detailRow.workspaceId) }}
+            back={showProjectOverview}
+          />
+          : <ProjectDetail
           row={detailRow}
           sourceState={sourceState}
           surfaceState={surfaceState}
