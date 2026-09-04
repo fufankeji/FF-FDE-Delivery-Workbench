@@ -3466,6 +3466,7 @@
 
 .genericStageRoot[data-stage='definition'] .projectRecordRail {
   position: relative;
+  grid-template-rows: auto minmax(0, 1fr);
   height: 287px;
   gap: 0;
   padding: 17px 21px 14px;
@@ -3490,11 +3491,20 @@
 .genericStageRoot[data-stage='definition'] .projectRecordNodes {
   position: relative;
   display: grid;
+  min-height: 0;
   gap: 16px;
-  max-height: none;
-  padding: 0 0 0 60px;
-  overflow: visible;
+  max-height: 100%;
+  padding: 0 5px 0 60px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: #b8c8e4 transparent;
+  scrollbar-width: thin;
 }
+
+.genericStageRoot[data-stage='definition'] .projectRecordNodes::-webkit-scrollbar { display: block; width: 5px; }
+.genericStageRoot[data-stage='definition'] .projectRecordNodes::-webkit-scrollbar-track { background: transparent; }
+.genericStageRoot[data-stage='definition'] .projectRecordNodes::-webkit-scrollbar-thumb { border-radius: 999px; background: #b8c8e4; }
 
 .genericStageRoot[data-stage='definition'] .projectRecordNodes::before {
   position: absolute;
