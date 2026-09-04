@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { FDE_V2_STAGE_IDS, type FdeProjectState } from './stage-controller.ts'
-import { fetchStageSkillCatalog, type StageSkillCatalogMethod } from './stage-skill-catalog.ts'
+import {
+  fetchStageSkillCatalog, type StageSkillCatalogMethod, type StageSkillCatalogValue,
+} from './stage-skill-catalog.ts'
 import type { ProjectContextSidebarProps } from './slots.ts'
 import { StageMethodDialog } from './StageMethodDialog.tsx'
 import { V2_STAGE_NAMES } from './StageWorkbench.tsx'
@@ -24,14 +26,13 @@ function projectMonogram(title: string): string {
 
 type SkillCatalogState =
   | { readonly status: 'idle' | 'loading' }
-  | { readonly status: 'ready'; readonly methods: readonly StageSkillCatalogMethod[] }
+  | { readonly status: 'ready'; readonly catalog: StageSkillCatalogValue }
   | { readonly status: 'error'; readonly message: string }
 
 export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
   const [expandedStage, setExpandedStage] = useState<number>()
   const [catalogState, setCatalogState] = useState<SkillCatalogState>({ status: 'idle' })
   const [catalogRequestRevision, setCatalogRequestRevision] = useState(0)
-  const catalogLoaded = useRef(false)
   const [selectedMethod, setSelectedMethod] = useState<StageSkillCatalogMethod>()
   const workspaceId = String(props.workspaceId)
   const stageState = props.useStageProgress(snapshot => snapshot.byWorkspace[workspaceId])
@@ -60,24 +61,26 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
   const surface = surfaceState?.status === 'ready' ? surfaceState.value : undefined
   const artifacts = surface?.requirements.presentCount ?? 0
   useEffect(() => {
-    if (!stageDetailsOpen || catalogLoaded.current) return
     const abort = new AbortController()
     setCatalogState({ status: 'loading' })
     void fetchStageSkillCatalog(abort.signal).then((catalog) => {
-      const selected = catalog.stages.find(item => (
-        item.index === viewed && (item.id === viewedStageId || (viewed === 0 && item.id === 'requirements'))
-      ))
-      if (selected === undefined || selected.methods.length === 0) {
-        throw new Error('当前阶段工作方法未完整注册。')
-      }
-      catalogLoaded.current = true
-      setCatalogState({ status: 'ready', methods: selected.methods })
+      setCatalogState({ status: 'ready', catalog })
     }).catch((error: unknown) => {
       if (abort.signal.aborted) return
       setCatalogState({ status: 'error', message: error instanceof Error ? error.message : String(error) })
     })
     return () => { abort.abort() }
-  }, [catalogRequestRevision, stageDetailsOpen, viewed, viewedStageId])
+  }, [catalogRequestRevision])
+  const catalogMethods = catalogState.status === 'ready'
+    ? catalogState.catalog.stages.find(item => (
+      item.index === viewed && (item.id === viewedStageId || (viewed === 0 && item.id === 'requirements'))
+    ))?.methods ?? []
+    : []
+  const catalogMessage = catalogState.status === 'error'
+    ? catalogState.message
+    : catalogState.status === 'ready' && catalogMethods.length === 0
+      ? '当前阶段工作方法未完整注册。'
+      : undefined
   useEffect(() => {
     if (selectedMethod === undefined) return
     const closeOnEscape = (event: KeyboardEvent): void => {
@@ -87,13 +90,10 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
     return () => { window.removeEventListener('keydown', closeOnEscape) }
   }, [selectedMethod])
   useEffect(() => {
-    catalogLoaded.current = false
-    setCatalogState({ status: 'idle' })
     setSelectedMethod(undefined)
   }, [viewed])
 
   const retryCatalog = (): void => {
-    catalogLoaded.current = false
     setCatalogState({ status: 'idle' })
     setCatalogRequestRevision(value => value + 1)
   }
@@ -113,17 +113,17 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
 
   const renderCatalogMethods = () => {
     if (catalogState.status !== 'ready') return null
-    if (!catalogState.methods.some(method => method.group !== undefined)) {
-      return catalogState.methods.map(renderMethod)
+    if (!catalogMethods.some(method => method.group !== undefined)) {
+      return catalogMethods.map(renderMethod)
     }
     return (['required', 'conditional'] as const).map((group) => {
-      const methods = catalogState.methods.filter(method => method.group === group)
+      const methods = catalogMethods.filter(method => method.group === group)
       if (methods.length === 0) return null
       const label = group === 'required' ? '必做工作' : '按需处理'
       return (
         <section className={css.stageMethodGroup} key={group} aria-label={label}>
           <div className={css.stageMethodGroupLabel}><span>{label}</span><b>{methods.length}</b></div>
-          {methods.map(method => renderMethod(method, catalogState.methods.indexOf(method)))}
+          {methods.map(method => renderMethod(method, catalogMethods.indexOf(method)))}
         </section>
       )
     })
@@ -201,9 +201,9 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
                 <div className={css.stageMethodTree} data-stage-method-tree="">
                   <div className={css.stageMethodList} aria-label={`第 ${String(index + 1)} 阶段工作方法`}>
                     {catalogState.status === 'loading' && <span className={css.stageMethodMessage}>正在读取工作方法…</span>}
-                    {catalogState.status === 'error' && (
+                    {catalogMessage !== undefined && (
                       <div className={css.stageMethodMessage} role="alert">
-                        <span>{catalogState.message}</span>
+                        <span>{catalogMessage}</span>
                         <button type="button" onClick={retryCatalog}>重试</button>
                       </div>
                     )}
@@ -220,7 +220,7 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
         <StageMethodDialog
           key={selectedMethod.id}
           method={selectedMethod}
-          methods={catalogState.status === 'ready' ? catalogState.methods : []}
+          methods={catalogMethods}
           stageIndex={viewed}
           onClose={() => { setSelectedMethod(undefined) }}
           onSelectMethod={setSelectedMethod}

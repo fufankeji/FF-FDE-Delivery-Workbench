@@ -1,0 +1,51 @@
+schema_version: 1
+source_id: SRC-SIM-0306
+source_type: simulation
+snapshot_window:
+  start: "2026-06-01"
+  end: "2026-08-31"
+  description: WorkOrder Pro 脱敏历史工单与已获批报修导出的仿真剖析结果
+population:
+  work_orders: 1246
+  repair_messages_linked_to_work_orders: 885
+  stores_in_scope: 80
+identity_quality:
+  store_id:
+    missing_count: 25
+    missing_rate: 0.0201
+  asset_id_at_first_match:
+    missing_count: 212
+    missing_rate: 0.1701
+  unified_incident_id:
+    exists: false
+    note: 当前只有报修消息、候选事件、设备和工单等不同标识
+content_quality:
+  impact:
+    missing_count: 386
+    missing_rate: 0.3098
+  duplicate_candidates:
+    count: 92
+    definition: 同门店、相近设备文本且 30 分钟内出现多条报修或工单
+    confirmed_by_human_count: 41
+  suspicious_instruction_text:
+    count: 3
+    note: 包含“忽略政策”等文本，只能作为不可信业务数据
+label_boundary:
+  final_domain:
+    role: independent_evaluation_label
+    allowed_in_candidate_generation: false
+  final_priority:
+    role: independent_evaluation_label
+    allowed_in_candidate_generation: false
+  duplicate_of:
+    role: partial_operator_label
+    absence_means_not_duplicate: false
+timeliness:
+  work_order_export_lag_hours: 24
+  asset_snapshot_age_days: 9
+  contract_simulation_pack_age_days: 2
+limitations:
+  - 885 条可关联记录不是全部报修总体，不能把关联率当作未来覆盖率
+  - 本剖析不包含消息平台在线数据和 StoreNet 生产告警
+  - 6 份合同摘要只能用于发现字段，不能证明维修商覆盖有效
+  - 所有数值均为案例仿真输入，仍需 Agent 保留 SourceId 和证据等级

@@ -313,6 +313,40 @@ export interface AcceptanceHandoverDecision {
 export type V2LifecycleStageId = 'definition' | 'investigation' | 'design' | 'evaluation' | 'pilot' | 'production' | 'improvement'
 
 /** Browser-safe guided surface for one V2 stage. */
+export interface V2InvestigationSnapshot {
+  readonly systems: readonly {
+    readonly id: string
+    readonly label: string
+    readonly kind: 'data' | 'system' | 'external' | 'actor'
+    readonly status: 'confirmed' | 'conditional' | 'pending' | 'blocked'
+    readonly owner?: string
+    readonly note?: string
+  }[]
+  readonly connections: readonly {
+    readonly from: string
+    readonly to: string
+    readonly label?: string
+  }[]
+  readonly actionBoundaries: readonly {
+    readonly target: string
+    readonly read: 'allowed' | 'conditional' | 'pending' | 'denied' | 'not-applicable'
+    readonly suggest: 'allowed' | 'conditional' | 'pending' | 'denied' | 'not-applicable'
+    readonly draft: 'allowed' | 'conditional' | 'pending' | 'denied' | 'not-applicable'
+    readonly execute: 'allowed' | 'conditional' | 'pending' | 'denied' | 'not-applicable'
+  }[]
+  readonly dataFindings: readonly {
+    readonly label: string
+    readonly value: string
+    readonly status: 'confirmed' | 'warning' | 'pending' | 'blocked'
+  }[]
+  readonly governanceReviews: readonly {
+    readonly area: 'security' | 'privacy' | 'legal' | 'procurement' | 'finance' | 'business'
+    readonly status: 'confirmed' | 'conditional' | 'pending' | 'blocked'
+    readonly owner?: string
+    readonly note?: string
+  }[]
+}
+
 export interface V2StageSurfaceSnapshot {
   readonly id: V2LifecycleStageId
   readonly index: number
@@ -353,6 +387,7 @@ export interface V2StageSurfaceSnapshot {
   readonly presentCount: number
   readonly reviewReady: boolean
   readonly reviewBlockers: readonly string[]
+  readonly investigation?: V2InvestigationSnapshot
   readonly message?: string
 }
 

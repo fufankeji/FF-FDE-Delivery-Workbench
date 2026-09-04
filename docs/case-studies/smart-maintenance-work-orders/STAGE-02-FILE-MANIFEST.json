@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "caseId": "CASE-SMWO-001",
+  "stage": "definition",
+  "operatorOnly": true,
+  "instruction": "本清单用于核对阶段二测试输入，不上传到案例项目。阶段一资料保留原 SourceId，不重复上传。",
+  "files": [
+    {
+      "batch": 1,
+      "caseSourceId": "SRC-SIM-0201",
+      "path": "materials/02-definition/01-baseline-and-target-discussion.md",
+      "bytes": 2257,
+      "sha256": "d648563b0fe031fcc199bc0e1b7dfad86ae5630674906f30dc3e8baf75493249",
+      "evidenceRole": "业务分析和候选目标汇总",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 1,
+      "caseSourceId": "SRC-SIM-0203",
+      "path": "materials/02-definition/upload-pack/03-baseline-metric-export.json",
+      "bytes": 2565,
+      "sha256": "ac0bbd16754f258255d5ce8fd5808760c546b83b12c1c684120edd99c5d42f74",
+      "evidenceRole": "三个月基线明细、分母和统计限制",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 1,
+      "caseSourceId": "SRC-SIM-0204",
+      "path": "materials/02-definition/upload-pack/04-triage-workload-observation.xml",
+      "bytes": 1956,
+      "sha256": "0b1f1d06fdeda10ad7f589ba111cd2352aa5d9a988a87a6ae2b4bc2d42b003af",
+      "evidenceRole": "人工分诊工作量观察与月度外推",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 1,
+      "caseSourceId": "SRC-SIM-0205",
+      "path": "materials/02-definition/upload-pack/05-cost-assumptions.yaml",
+      "bytes": 1324,
+      "sha256": "fe86b1e8f5e288815ff2be563c52685ab26e005708c9cd73d424e99582b4964a",
+      "evidenceRole": "候选成本、证据等级和未知成本",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 1,
+      "caseSourceId": "SRC-SIM-0206",
+      "path": "materials/02-definition/upload-pack/06-owner-verifier-workshop.txt",
+      "bytes": 1926,
+      "sha256": "ecc9a8256f25cc611c6567ed3d519d5b54be4e312650fb04c97a1f151666ee0f",
+      "evidenceRole": "Owner 与独立验证者候选讨论",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 2,
+      "caseSourceId": "SRC-SIM-0202",
+      "path": "materials/02-definition/02-scope-constraints-and-dependencies.md",
+      "bytes": 1979,
+      "sha256": "6d9fa077aa3f9216d012c36b1f5be213536c3e43a6c75e09fb890d23898fe88c",
+      "evidenceRole": "首期范围、非目标和依赖汇总",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 2,
+      "caseSourceId": "SRC-SIM-0207",
+      "path": "materials/02-definition/upload-pack/07-first-phase-scope.json",
+      "bytes": 1343,
+      "sha256": "5b7b4165b08bab0eea75dccd3a7ab9abf150a74d9d333f3d6744203c16af8277",
+      "evidenceRole": "首期允许输入、候选输出和禁止动作",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 2,
+      "caseSourceId": "SRC-SIM-0208",
+      "path": "materials/02-definition/upload-pack/08-resource-and-dependency-register.xml",
+      "bytes": 2171,
+      "sha256": "cc85a1f6f732351e03fe4f30c08c0e8e43246707658ed15107f3647f6ccce041",
+      "evidenceRole": "客户资源、等待时间和外部依赖",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 2,
+      "caseSourceId": "SRC-SIM-0209",
+      "path": "materials/02-definition/upload-pack/09-current-system-consumption-notes.txt",
+      "bytes": 1416,
+      "sha256": "620b2d34e07e09000630e6a0063c8f4f065896547abc311664e65c54cb1c1e96",
+      "evidenceRole": "工单草稿的人工流程落点与未知接口",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 4,
+      "caseSourceId": "SRC-SIM-0210",
+      "path": "materials/02-definition/upload-pack/10-role-and-boundary-confirmation.md",
+      "bytes": 2635,
+      "sha256": "5271bcb1e3e6f6e65af254f03a6d7e70b0fb228936212da5c9b149f14422f964",
+      "evidenceRole": "责任、动作边界和停止权限确认",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    }
+  ]
+}

@@ -2,6 +2,7 @@
 case_source_id: SRC-SIM-0102
 evidence_kind: simulation
 available_from: stage-01-discovery
+usage: facilitator-reference
 ---
 
 # 近期代表案例

@@ -18,6 +18,7 @@
 - 第一阶段三项固定记录仍可预览；
 - 继续使用第一阶段的同一个项目，建议新建一个 Agent 会话进行第二阶段测试。
 - 第二阶段状态文件固定为 `.fde/stages/definition.json`，其根对象 `stage` 必须始终为 `definition`，不能写成产物目录名 `outcome-scope`。
+- `workItems` 必须是数组，每项写为 `{ "id": "固定工作项 ID", "status": "真实状态" }`；四个固定 ID 必须各出现一次，不能写成对象映射。
 
 ## 使用顺序
 

@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "caseId": "CASE-SMWO-001",
+  "stage": "discovery",
+  "operatorOnly": true,
+  "instruction": "本清单用于核对测试输入，不上传到案例项目。工作台实际 SourceId 必须在上传后记录。",
+  "files": [
+    {
+      "batch": 1,
+      "caseSourceId": "SRC-SIM-0101",
+      "path": "materials/01-discovery/01-customer-original-brief.md",
+      "bytes": 1378,
+      "sha256": "7ee5194201e7b74e25ef6a6dd034f8009b0879d9125d515053257862ad056eb8",
+      "evidenceRole": "项目发起人原始陈述",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 2,
+      "caseSourceId": "SRC-SIM-0104",
+      "path": "materials/01-discovery/upload-pack/02-wecom-repair-chat.txt",
+      "bytes": 3295,
+      "sha256": "1f632800efbe4bd803739d82c2a8473535f81c679232b937dba03640712ca6d5",
+      "evidenceRole": "现场消息与时间顺序",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 2,
+      "caseSourceId": "SRC-SIM-0105",
+      "path": "materials/01-discovery/upload-pack/03-work-order-export.json",
+      "bytes": 6412,
+      "sha256": "07dd0c8db0b36dd0ccd8d1b7d1973fbe021dabe1bc4e4b8e6273c5495b323c8f",
+      "evidenceRole": "工单系统代表性抽样",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 2,
+      "caseSourceId": "SRC-SIM-0106",
+      "path": "materials/01-discovery/upload-pack/04-device-register.xml",
+      "bytes": 3062,
+      "sha256": "1ccaac3c4926cdb5c8c29b7e229470ddac1a10060f58620acb6f27e355bf0559",
+      "evidenceRole": "设备台账快照",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 2,
+      "caseSourceId": "SRC-SIM-0107",
+      "path": "materials/01-discovery/upload-pack/05-vendor-duty-roster.yaml",
+      "bytes": 1601,
+      "sha256": "a3c4ba0b00896568628deff031456e2f930f7f55fd9162654dcf7be03fffaaed",
+      "evidenceRole": "人工维修商值班候选",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 2,
+      "caseSourceId": "SRC-SIM-0109",
+      "path": "materials/01-discovery/upload-pack/06-maintenance-priority-and-approval-policy.pdf",
+      "bytes": 11286,
+      "sha256": "92b2d863100e23254ed524039821421932958eb5b21d17f06647b7103cb13f51",
+      "evidenceRole": "分级、费用、派单与治理政策",
+      "expectedPreview": "pdf",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 2,
+      "caseSourceId": "SRC-SIM-0110",
+      "path": "materials/01-discovery/upload-pack/07-equipment-label-photo.png",
+      "bytes": 318833,
+      "sha256": "f2501b3b7fa7fc14cf735af9703ead276ef958810698462e884a2d3142f0426f",
+      "evidenceRole": "旧标签现场图片",
+      "expectedPreview": "image",
+      "expectedParse": "needs-ocr"
+    },
+    {
+      "batch": 2,
+      "caseSourceId": "SRC-SIM-0108",
+      "path": "materials/01-discovery/upload-pack/08-escalation-email.eml",
+      "bytes": 1245,
+      "sha256": "da1b310bb028234a97c911f5ec30ff2e8c9c8c0121b0ae181f9c2318f45b618a",
+      "evidenceRole": "管理者范围澄清与格式负向样例",
+      "expectedPreview": "unsupported",
+      "expectedParse": "unsupported"
+    },
+    {
+      "batch": 2,
+      "caseSourceId": "SRC-SIM-0111",
+      "path": "materials/01-discovery/upload-pack/09-store-equipment-layout.svg",
+      "bytes": 2536,
+      "sha256": "1862d0d02a909ee6914c6b6b8c1d0b0a6d8678abb97df26bc071ea89127e098d",
+      "evidenceRole": "店长整理的设备位置草图",
+      "expectedPreview": "image",
+      "expectedParse": "needs-ocr"
+    },
+    {
+      "batch": 3,
+      "caseSourceId": "SRC-SIM-0103",
+      "path": "materials/01-discovery/03-first-interview-notes.md",
+      "bytes": 2501,
+      "sha256": "db0aa7e1e6b834b32b809a222d7b3df11fc8c984d59345659a0557280294910d",
+      "evidenceRole": "流程知情者与区域负责人访谈",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    }
+  ]
+}

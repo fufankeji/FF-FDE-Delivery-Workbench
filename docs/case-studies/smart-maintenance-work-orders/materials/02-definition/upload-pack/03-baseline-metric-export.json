@@ -1,0 +1,74 @@
+{
+  "case_source_id": "SRC-SIM-0203",
+  "evidence_kind": "simulation",
+  "available_from": "stage-02-definition",
+  "export_metadata": {
+    "source": "总部分析人员一次性离线整理",
+    "period_start": "2026-05-01",
+    "period_end": "2026-07-31",
+    "reported_events": 1246,
+    "message_to_work_order_matched_events": 885,
+    "message_to_work_order_match_rate": 0.7103,
+    "continuous_monitoring": false
+  },
+  "periods": [
+    {
+      "month": "2026-05",
+      "reported_events": 398,
+      "matched_events": 279,
+      "initial_triage_median_minutes": 49,
+      "initial_triage_p90_minutes": 252,
+      "obvious_duplicate_count": 31,
+      "closed_orders_checked": 385,
+      "first_wrong_assignment_count": 25,
+      "sla_eligible_orders": 382,
+      "sla_breach_count": 51,
+      "missing_initial_information_count": 130,
+      "manual_triage_hours": 94
+    },
+    {
+      "month": "2026-06",
+      "reported_events": 423,
+      "matched_events": 301,
+      "initial_triage_median_minutes": 46,
+      "initial_triage_p90_minutes": 231,
+      "obvious_duplicate_count": 30,
+      "closed_orders_checked": 402,
+      "first_wrong_assignment_count": 22,
+      "sla_eligible_orders": 388,
+      "sla_breach_count": 49,
+      "missing_initial_information_count": 129,
+      "manual_triage_hours": 97
+    },
+    {
+      "month": "2026-07",
+      "reported_events": 425,
+      "matched_events": 305,
+      "initial_triage_median_minutes": 43,
+      "initial_triage_p90_minutes": 216,
+      "obvious_duplicate_count": 31,
+      "closed_orders_checked": 381,
+      "first_wrong_assignment_count": 21,
+      "sla_eligible_orders": 380,
+      "sla_breach_count": 45,
+      "missing_initial_information_count": 127,
+      "manual_triage_hours": 95
+    }
+  ],
+  "reported_rollup": {
+    "initial_triage_median_minutes": 46,
+    "initial_triage_p90_minutes": 228,
+    "obvious_duplicate_rate": 0.0738,
+    "first_wrong_assignment_rate": 0.0582,
+    "sla_breach_rate": 0.1261,
+    "missing_initial_information_rate": 0.3098,
+    "manual_triage_hours": 286
+  },
+  "limitations": [
+    "时间指标只覆盖能够完成消息与工单匹配的 885 条事件。",
+    "重复事件按同门店、同设备、两小时内重复的人工规则识别。",
+    "首次错误派单以最终关闭原因反推，分母是完成关闭核对的 1168 张工单。",
+    "不同合同的 SLA 口径尚未完全统一，SLA 分母只含被标记为可判断的 1150 张工单。",
+    "这是一份一次性离线分析，不代表已经建立持续监控能力。"
+  ]
+}

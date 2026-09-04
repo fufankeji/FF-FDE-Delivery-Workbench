@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workloadObservation
+  caseSourceId="SRC-SIM-0204"
+  evidenceKind="simulation"
+  availableFrom="stage-02-definition"
+  observedWeek="2026-07-13/2026-07-17">
+  <method>
+    <description>两名总部运维专员在一个完整工作周内记录实际用于接收、补问、查台账、查合同、选择维修商和创建工单草稿的时间。</description>
+    <limitations>
+      <limitation>仅观察一个普通工作周，没有覆盖节假日、促销高峰和极端天气。</limitation>
+      <limitation>并行处理和临时电话可能造成五分钟以内的记录误差。</limitation>
+      <limitation>月度外推采用 4.24 周，不是财务正式工时口径。</limitation>
+    </limitations>
+  </method>
+  <shifts>
+    <shift date="2026-07-13" analyst="OPS-A01" triageMinutes="405" interruptions="11" />
+    <shift date="2026-07-13" analyst="OPS-A02" triageMinutes="396" interruptions="9" />
+    <shift date="2026-07-14" analyst="OPS-A01" triageMinutes="420" interruptions="13" />
+    <shift date="2026-07-14" analyst="OPS-A02" triageMinutes="414" interruptions="12" />
+    <shift date="2026-07-15" analyst="OPS-A01" triageMinutes="411" interruptions="10" />
+    <shift date="2026-07-15" analyst="OPS-A02" triageMinutes="398" interruptions="8" />
+    <shift date="2026-07-16" analyst="OPS-A01" triageMinutes="406" interruptions="12" />
+    <shift date="2026-07-16" analyst="OPS-A02" triageMinutes="401" interruptions="10" />
+    <shift date="2026-07-17" analyst="OPS-A01" triageMinutes="395" interruptions="9" />
+    <shift date="2026-07-17" analyst="OPS-A02" triageMinutes="404" interruptions="11" />
+  </shifts>
+  <rollup>
+    <observedMinutes>4050</observedMinutes>
+    <observedHours>67.5</observedHours>
+    <monthlyExpansionFactor>4.24</monthlyExpansionFactor>
+    <estimatedMonthlyHours>286.2</estimatedMonthlyHours>
+    <status>hand-estimated</status>
+  </rollup>
+</workloadObservation>

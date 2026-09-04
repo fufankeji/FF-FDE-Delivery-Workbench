@@ -2,7 +2,7 @@
 document: case-study-readme
 case_id: CASE-SMWO-001
 status: ready-to-start
-updated: "2026-09-03"
+updated: "2026-09-04"
 ---
 
 # 智修协同：连锁门店设备故障智能分诊案例
@@ -29,6 +29,12 @@ updated: "2026-09-03"
 smart-maintenance-work-orders/
 ├── README.md                 使用说明和案例边界
 ├── CASE-MANIFEST.md          素材释放顺序、来源 ID 和预期路由
+├── STAGE-01-RUNBOOK.md       第一阶段逐批上传、提示词和验收操作
+├── STAGE-01-FILE-MANIFEST.json 第一阶段输入文件大小、哈希和预期状态
+├── STAGE-02-RUNBOOK.md       第二阶段价值、范围、责任与计划操作
+├── STAGE-02-FILE-MANIFEST.json 第二阶段输入文件大小、哈希和预期状态
+├── STAGE-03-RUNBOOK.md       第三阶段数据、系统、访问与治理调查操作
+├── STAGE-03-FILE-MANIFEST.json 第三阶段输入文件大小、哈希和预期状态
 ├── materials/                按项目创建与八阶段分批释放的客户素材
 ├── prompts/                  可直接复制到工作台的自然语言提示词
 └── records/
@@ -56,6 +62,12 @@ smart-maintenance-work-orders/
 6. Agent 生成文件、给出建议或测试通过，都不能自动推进阶段。只有 FDE 在工作台人工评审后才能 Go、Revise、Narrow 或 Stop。
 7. 预期 Skill 只用于学习对照，不是通过条件。若实际路由不同，先记录原因，不为了匹配答案强行调用 Skill。
 8. 不预先创建工作台应生成的 `fde-deliverables/` 或 `.fde/` 文件；它们必须来自后续真实运行。
+
+阶段 1 开始时，直接按 [`STAGE-01-RUNBOOK.md`](STAGE-01-RUNBOOK.md) 操作。它列出了每一批要上传的具体文件、顺序、预期保存／预览／识别状态、对应提示词和人工检查点。文件大小和 SHA-256 见 `STAGE-01-FILE-MANIFEST.json`；该清单只供操作者核对，不上传到案例项目。
+
+阶段 2 必须继续使用阶段 1 的同一个项目，并按 [`STAGE-02-RUNBOOK.md`](STAGE-02-RUNBOOK.md) 分批输入基线、成本、责任、范围和依赖证据。前两批分别驱动价值合同与可验收范围，第三步不上传新文件而完成估算和风险计划，最后一批用于确认责任与准备人工阶段门。文件核对见 `STAGE-02-FILE-MANIFEST.json`。
+
+阶段 3 按 [`STAGE-03-RUNBOOK.md`](STAGE-03-RUNBOOK.md) 分三批调查账号与数据事实、南京案例真实链路和分领域治理边界。素材刻意区分接口文档、Sandbox 已观察行为与未验证的生产能力；文件核对见 `STAGE-03-FILE-MANIFEST.json`。
 
 ## 完成标准
 

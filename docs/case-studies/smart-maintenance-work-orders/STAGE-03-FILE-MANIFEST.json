@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "caseId": "CASE-SMWO-001",
+  "stage": "investigation",
+  "operatorOnly": true,
+  "instruction": "本清单用于核对阶段三测试输入，不上传到案例项目。前两阶段资料保留原 SourceId，不重复上传。",
+  "files": [
+    {
+      "batch": 1,
+      "caseSourceId": "SRC-SIM-0301",
+      "path": "materials/03-investigation/01-systems-access-and-ownership.md",
+      "bytes": 2935,
+      "sha256": "850a7fddb0d8291c6afe87ac6106646c73fd447cbd5363f5cc6e2d3baee01fb2",
+      "evidenceRole": "系统、访问、owner 与等待状态汇总",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 1,
+      "caseSourceId": "SRC-SIM-0302",
+      "path": "materials/03-investigation/02-data-sample-and-dictionary.md",
+      "bytes": 3199,
+      "sha256": "5d780714e4835ec34808ef832895781e0c66dde56c3ef5670bfb873be6e2d2c2",
+      "evidenceRole": "12 条代表样本与初始字段口径",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 1,
+      "caseSourceId": "SRC-SIM-0304",
+      "path": "materials/03-investigation/upload-pack/04-access-request-register.json",
+      "bytes": 4087,
+      "sha256": "1bd376cbbead7b3d5d5c376b761bac7a802c928f92768ad2baf4548e38d9222a",
+      "evidenceRole": "认证、读取、使用和动作权限登记",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 1,
+      "caseSourceId": "SRC-SIM-0305",
+      "path": "materials/03-investigation/upload-pack/05-field-dictionary.xml",
+      "bytes": 5188,
+      "sha256": "6315a2786c982ca521ed5583f68096ee26d8590bdb9140471eba9d65d2ee5e5b",
+      "evidenceRole": "字段语义、身份边界和允许用途",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 1,
+      "caseSourceId": "SRC-SIM-0306",
+      "path": "materials/03-investigation/upload-pack/06-data-profile.yaml",
+      "bytes": 1717,
+      "sha256": "e02b3ab892fb2edde91507747c80d539be483f16b013be0e86e957a1e5a56237",
+      "evidenceRole": "1246 条总体数据质量剖析与标签隔离",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 2,
+      "caseSourceId": "SRC-SIM-0307",
+      "path": "materials/03-investigation/upload-pack/07-nanjing-incident-timeline.json",
+      "bytes": 3921,
+      "sha256": "12689c3c80a2a9cc27b14fcfc7c386c97190e459b709bf355780830bcaf6262c",
+      "evidenceRole": "南京案例跨系统事件链与证据状态",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 2,
+      "caseSourceId": "SRC-SIM-0308",
+      "path": "materials/03-investigation/upload-pack/08-workorder-api-openapi.yaml",
+      "bytes": 3775,
+      "sha256": "b67f58115d898470917f8dcf42d992cd32cffae75b1ecdd87a9946287a8e7948",
+      "evidenceRole": "7.4 文档声明的 Sandbox API 合同",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 2,
+      "caseSourceId": "SRC-SIM-0309",
+      "path": "materials/03-investigation/upload-pack/09-sandbox-readback-log.txt",
+      "bytes": 2057,
+      "sha256": "02b00bad852f1d7ea13862ffb2433fec50b7e9aee31b8363521b03fe7aed3f43",
+      "evidenceRole": "7.3.1 Sandbox 只读成功、写入拒绝与未执行动作",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 2,
+      "caseSourceId": "SRC-SIM-0310",
+      "path": "materials/03-investigation/upload-pack/10-system-version-difference.md",
+      "bytes": 2076,
+      "sha256": "79a6e127dd36c7d633b1ce0947d492063e8af1059859b9357546814afdaa5f2e",
+      "evidenceRole": "文档、Sandbox 和生产能力的差异解释",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 3,
+      "caseSourceId": "SRC-SIM-0303",
+      "path": "materials/03-investigation/03-policy-security-and-governance.md",
+      "bytes": 2606,
+      "sha256": "2bbb2887f887cc201a0fe1f1838bda3ca787082050b713175e075acdce44bf10",
+      "evidenceRole": "政策、安全、合同和治理汇总",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 3,
+      "caseSourceId": "SRC-SIM-0311",
+      "path": "materials/03-investigation/upload-pack/11-access-boundary-matrix.xml",
+      "bytes": 3075,
+      "sha256": "281de7dbae71dae59cbf86bb5d9832a53d16b397f2efd73775619e78c4eb6737",
+      "evidenceRole": "主体、资源、动作和独立读回边界",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    },
+    {
+      "batch": 3,
+      "caseSourceId": "SRC-SIM-0312",
+      "path": "materials/03-investigation/upload-pack/12-governance-review-notes.txt",
+      "bytes": 2795,
+      "sha256": "bb60ba13b4236c9ea029a8dae954f5ebb093d78013c90e217682734d34337ba1",
+      "evidenceRole": "七个治理领域的范围、状态、条件和未决项",
+      "expectedPreview": "text",
+      "expectedParse": "ready"
+    }
+  ]
+}

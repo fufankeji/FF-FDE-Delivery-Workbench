@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import type { ComponentProps } from 'react'
 import { ProjectContextSidebar } from '../src/client/ProjectContextSidebar.tsx'
@@ -8,6 +8,12 @@ import { ProjectContextSidebar } from '../src/client/ProjectContextSidebar.tsx'
 afterEach(() => {
   cleanup()
   vi.unstubAllGlobals()
+})
+
+beforeEach(() => {
+  vi.stubGlobal('fetch', vi.fn((_input: RequestInfo | URL, init?: RequestInit) => new Promise<Response>((_resolve, reject) => {
+    init?.signal?.addEventListener('abort', () => { reject(new DOMException('Aborted', 'AbortError')) })
+  })))
 })
 
 const hook = <T,>(snapshot: T) => <S,>(selector: (state: T) => S): S => selector(snapshot)
@@ -50,7 +56,7 @@ const methodNames = [
 ] as const
 
 describe('ProjectContextSidebar stage methods', () => {
-  it('keeps an in-flight catalog request alive while the tree remains open', async () => {
+  it('preloads the catalog before the tree opens and keeps the request alive', async () => {
     let requestSignal: AbortSignal | undefined
     const fetchMock = vi.fn((_input: RequestInfo | URL, init?: RequestInit) => {
       requestSignal = init?.signal ?? undefined
@@ -61,9 +67,10 @@ describe('ProjectContextSidebar stage methods', () => {
     vi.stubGlobal('fetch', fetchMock)
 
     render(<ProjectContextSidebar {...sidebarProps()} />)
-    fireEvent.click(screen.getByRole('button', { name: /发现高价值问题/ }))
-
     await waitFor(() => { expect(fetchMock).toHaveBeenCalledTimes(1) })
+    expect(screen.queryByText('正在读取工作方法…')).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: /发现高价值问题/ }))
     expect(screen.getByText('正在读取工作方法…')).toBeTruthy()
     expect(requestSignal?.aborted).toBe(false)
   })
@@ -96,12 +103,13 @@ describe('ProjectContextSidebar stage methods', () => {
     const toggle = screen.getByRole('button', { name: /发现高价值问题/ })
     expect(toggle.getAttribute('aria-expanded')).toBe('false')
     expect(screen.queryByText('项目启动与方向确认')).toBeNull()
-    expect(fetchMock).not.toHaveBeenCalled()
+    await waitFor(() => { expect(fetchMock).toHaveBeenCalledTimes(1) })
 
     fireEvent.click(toggle)
     expect(toggle.getAttribute('aria-expanded')).toBe('true')
     await waitFor(() => { expect(screen.getByText('项目启动与方向确认')).toBeTruthy() })
     expect(fetchMock).toHaveBeenCalledWith('/api/fde-stage/skills', expect.objectContaining({ method: 'GET' }))
+    expect(fetchMock).toHaveBeenCalledTimes(1)
     expect(screen.getAllByRole('button').filter(button => methodNames.some(([, label]) => button.textContent?.includes(label)))).toHaveLength(7)
 
     fireEvent.click(screen.getByRole('button', { name: /项目启动与方向确认/ }))
@@ -258,6 +266,35 @@ describe('ProjectContextSidebar stage methods', () => {
 
     expect(input.viewProjectStage).toHaveBeenCalledWith('workspace-1', 'investigation')
     expect(input.returnToCurrentStage).not.toHaveBeenCalled()
+  })
+
+  it('reuses the preloaded catalog when switching the viewed stage', async () => {
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify({
+      ok: true,
+      value: {
+        schemaVersion: 1,
+        stages: [{
+          id: 'requirements', index: 0,
+          methods: [{ id: 'qualify-ai-workflow', label: '判断问题是否值得继续投入', description: '阶段一。', whenToUse: '阶段一。', source: 'fixed/source@commit', content: '# 阶段一' }],
+        }, {
+          id: 'investigation', index: 2,
+          methods: [{ id: 'repo-recon', label: '盘点真实环境', description: '阶段三。', whenToUse: '阶段三。', source: 'fixed/source@commit', content: '# 阶段三' }],
+        }],
+      },
+    }), { status: 200, headers: { 'content-type': 'application/json' } }))
+    vi.stubGlobal('fetch', fetchMock)
+    const input = sidebarProps()
+    const { rerender } = render(<ProjectContextSidebar {...input} />)
+    await waitFor(() => { expect(fetchMock).toHaveBeenCalledTimes(1) })
+
+    fireEvent.click(screen.getByRole('button', { name: /发现高价值问题/ }))
+    await waitFor(() => { expect(screen.getByRole('button', { name: /判断问题是否值得继续投入/ })).toBeTruthy() })
+    input.useStageView = hook({ byWorkspace: { 'workspace-1': 'investigation' } }) as typeof input.useStageView
+    rerender(<ProjectContextSidebar {...input} />)
+    fireEvent.click(screen.getByRole('button', { name: /调查数据、系统、接口、安全与组织/ }))
+
+    expect(screen.getByRole('button', { name: /盘点真实环境/ })).toBeTruthy()
+    expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 
   it('collapses and restores the viewed stage details without changing the stage', () => {
