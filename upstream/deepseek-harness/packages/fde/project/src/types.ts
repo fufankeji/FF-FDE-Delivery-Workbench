@@ -929,6 +929,52 @@ export interface V2EvaluationFile {
   readonly message?: string
 }
 
+/** Version-bound delivery facts shared by the final three stage surfaces. */
+export interface V2DeliverySnapshot {
+  readonly status: 'missing' | 'ready' | 'invalid'
+  readonly message?: string
+  readonly version: string
+  readonly versionCurrent: boolean
+  readonly versionFiles: readonly V2DeliveryEvidence[]
+  readonly environment: { readonly kind: V2DeliveryScope; readonly label: string }
+  readonly semantic?: {
+    readonly mode: 'snapshot' | 'runtime'
+    readonly schemaVersion: string
+    readonly graphRevision: string
+    readonly summary: string
+    readonly evidence: readonly V2DeliveryEvidence[]
+  }
+  readonly items: readonly V2DeliveryItem[]
+  readonly reviewBlockers: readonly string[]
+}
+
+/** Evidence scope is independent of the current lifecycle stage. */
+export type V2DeliveryScope = 'local' | 'sandbox' | 'pilot' | 'production' | 'prior'
+/** Only Host inspection may promote declared results to effective results. */
+export type V2DeliveryStatus = 'unknown' | 'pending' | 'running' | 'passed' | 'failed' | 'blocked' | 'not_applicable' | 'stale'
+/** Project-local evidence pinned to the original file contents. */
+export interface V2DeliveryEvidence extends V2EvaluationFile {
+  readonly expectedSha256: string
+  readonly current: boolean
+}
+/** A sourced observation, criterion, delivery responsibility or change record. */
+export interface V2DeliveryItem {
+  readonly id: string
+  readonly category: string
+  readonly title: string
+  readonly declaredStatus: Exclude<V2DeliveryStatus, 'stale'>
+  readonly status: V2DeliveryStatus
+  readonly scope: V2DeliveryScope
+  readonly version: string
+  readonly summary: string
+  readonly owner?: string
+  readonly nextAction?: string
+  readonly observedAt?: string
+  readonly criterion?: string
+  readonly required: boolean
+  readonly evidence: readonly V2DeliveryEvidence[]
+}
+
 export interface V2StageSurfaceSnapshot {
   readonly id: V2LifecycleStageId
   readonly index: number
@@ -960,6 +1006,7 @@ export interface V2StageSurfaceSnapshot {
   readonly investigation?: V2InvestigationSnapshot
   readonly design?: V2DesignSnapshot
   readonly evaluation?: V2EvaluationSnapshot
+  readonly delivery?: V2DeliverySnapshot
   readonly prompt: string
   readonly skill: string
   readonly message?: string

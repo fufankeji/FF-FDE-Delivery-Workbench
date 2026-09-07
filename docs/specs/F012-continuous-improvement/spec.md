@@ -2,7 +2,7 @@
 document: feature-spec
 feature: F012
 status: ready
-updated: "2026-08-31"
+updated: "2026-09-07"
 ---
 
 # F012 · 阶段 8：持续改进与能力沉淀规格
@@ -14,18 +14,20 @@ FDE 将生产结果、事故、用户反馈、成本、漂移和现场差异转�
 ## 来源与范围
 
 - 来源需求：REQ-003, REQ-006, REQ-007, REQ-024, REQ-025, REQ-026, REQ-028, NFR-002, NFR-004, NFR-011, NFR-012, NFR-013, NFR-014
-- 来源总规格：PSC-003, PSC-005, PSC-006, PSC-020, PSC-021, PSC-022, PSC-023, PSC-024
+- 来源总规格：PSC-003, PSC-005, PSC-006, PSC-020, PSC-021, PSC-022, PSC-023, PSC-024, PSC-025
 - 本 Feature 包含：生产复盘、问题与机会归因、改进候选、影响分析、回归案例、复测、审批、受控发布、回滚和现场能力沉淀。
 - 本 Feature 不包含：自动在生产自我修改、未经客户授权跨项目复用数据、把所有反馈变成需求或未经验证发布。
 
 ## 阶段能力与 Skills
 
-| 层级 | 能力 | 使用条件 | 预期结果 |
-|---|---|---|---|
-| 方法核心 | `operate-ai-service`、`productize-field-learning` | 持续运行、事故、反馈或可复用学习 | Production Service Review、Field Learning Register 与复用建议 |
-| 方法条件 | `engineer-ai-value`、`reframe-ai-engagement` | 价值基线变化或现场事实改变原合同 | 更新价值边界或重新定义项目 |
-| 工程核心 | `incident-triage`、`observability-gap`、`post-deploy-watch`、`stakeholder-brief`、`escalation-and-renegotiation` | 分析生产信号和组织决定 | 根因、观测缺口、趋势、决策简报和重谈记录 |
-| 工程条件 | `safe-change`、`verification-plan`、`nfr-validation`、`security-compliance-check`、`release-readiness`、`deploy-runbook` | 改进进入实现与发布 | 受控变更、复测、门禁、发布与回滚证据 |
+当前执行适配以 `packages/fde/stage/src/v2-skills.ts` 实际注册内容为准，不把参考项目有同名模块当作已接通执行器。
+
+| 层级 | 实际注册方法 | 使用方式 |
+|---|---|---|
+| 核心 | `production-evidence-review`、`improvement-prioritization`、`improvement-validation`、`productize-field-learning` | 根据当前缺口按需加载，维护候选记录与来源 |
+| 条件 | `incident-triage`、`observability-gap`、`improvement-release-control` | 只有出现对应问题且具备操作授权时加载 |
+
+这些方法描述和组织工作；部署、监控采集、生产查询、客户签收仍需各自真实执行与证据。前三阶段资料只能作为前序依据，不能冒充本阶段批准或运行结果。
 
 ## 阶段主视图与数据投影
 
@@ -86,6 +88,27 @@ FDE 将生产结果、事故、用户反馈、成本、漂移和现场差异转�
 - When 有权人员审批并由 FDE 决定受控发布或沉淀复用
 - Then 候选回指生产证据、复测、审查、批准、范围和回滚；未完成任一门禁不得发布，复用资产保留适用与禁止边界
 
+## 本轮工作台与数据范围
+
+页面组织为 信号与发现、改进事项、影响与验证、发布与复用，围绕 信号、改进、影响、验证、发布、复用边界 展示真实记录。共享规则遵循 PSC-025；未来／历史只读查看，不自动执行或推进。当前阶段保留原人工评审和返回入口，状态仍由 Host 文件检查产生。没有接入复杂企业环境的简单项目可明确记录不适用及依据，但不能豁免真实结果、批准或接收责任。
+
+### AC-F012-003 · 专用工作面读取真实版本化证据
+
+- 来源：REQ-025, REQ-028, NFR-002, NFR-013, PSC-025
+- 对应 PRD 验收：AC-020, AC-021, AC-022, AC-025
+- Given 项目存在本地成果、前序资料或本阶段记录
+- When 用户查看本阶段各页签、详情和固定产物，或查看未来／历史阶段
+- Then 展示本项目真实版本、范围、来源、责任和缺口；没有证据不显示通过，文件失效使当前结果失效；预览保持只读且不推进；短视口末尾内容与操作可滚动到达
+
 ## 开放问题
+
+### AC-F012-004 · 项目阶段数据与交付闭环
+
+- 来源：REQ-028, NFR-002, PSC-025
+- 对应 PRD 验收：AC-025
+- Given 用户明确要求用当前验证项目的数据跑通阶段交付
+- When 加载阶段记录、提交已授权的阶段决定或回看历史
+- Then 只展示项目原有阶段数据和统一交付进度，不显示独立演示入口；推进走原接口与阶段门，回看不推进；联调记录注明来源，不能冒充实际客户签收或部署
+
 
 - 复用资产中心不在首个 V2 验证切片；本 Feature 先定义 Artifact 与边界，具体组合视图在实施前再确认。

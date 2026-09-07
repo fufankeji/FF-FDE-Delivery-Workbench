@@ -33,7 +33,7 @@ export class ProjectStageViewController {
   dispose(): void { this.listeners.clear() }
 
   private replace(byWorkspace: Readonly<Record<string, FdeV2StageId>>): void {
-    this.snapshot = { byWorkspace }
+    this.snapshot = { ...this.snapshot, byWorkspace }
     for (const listener of this.listeners) listener()
   }
 }

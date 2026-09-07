@@ -227,11 +227,7 @@ export function apply(ctx: Context, config: Config): void {
     snapshot: async (workspaceId) => {
       const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
       if (workspace === undefined) return undefined
-      return await loadProjectSurfaceSnapshot({
-        workspaceId,
-        title: workspace.title,
-        path: workspace.path,
-      })
+      return loadProjectSurfaceSnapshot({ workspaceId, title: workspace.title, path: workspace.path })
     },
     reportFailure,
   })

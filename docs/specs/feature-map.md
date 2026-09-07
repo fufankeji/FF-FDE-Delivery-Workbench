@@ -31,9 +31,9 @@ updated: "2026-09-07"
 | F007 | F007-investigate-environment | 阶段 3：调查现场环境 | FDE 看见数据、系统、接口、权限、组织和治理的真实边界与缺口 | REQ-003, REQ-006, REQ-007, REQ-020, REQ-021, REQ-025, REQ-026, REQ-028, NFR-002, NFR-004, NFR-011, NFR-012, NFR-013, NFR-014, PSC-003, PSC-005, PSC-006, PSC-016, PSC-017, PSC-021, PSC-022, PSC-023, PSC-024 | F006 | P0 | in-progress |
 | F008 | F008-design-vertical-slice | 阶段 4：方案与纵向切片 | FDE 获得有真实系统依据的方案、合同、NFR 和最窄可运行业务链 | REQ-003, REQ-006, REQ-007, REQ-014, REQ-015, REQ-020, REQ-025, REQ-026, REQ-028, NFR-002, NFR-004, NFR-009, NFR-011, NFR-013, NFR-014, PSC-003, PSC-005, PSC-006, PSC-013, PSC-016, PSC-021, PSC-022, PSC-023, PSC-024 | F007 | P0 | in-progress |
 | F009 | F009-poc-eval | 阶段 5：PoC 与 Eval | FDE 在 DSH 开发目标项目，工作台展示运行情况、候选版本、测试指标与证据，测试后人工决定是否进入下一阶段 | REQ-003, REQ-006, REQ-007, REQ-022, REQ-025, REQ-026, REQ-028, NFR-002, NFR-004, NFR-011, NFR-013, NFR-014, PSC-003, PSC-005, PSC-006, PSC-018, PSC-021, PSC-022, PSC-023, PSC-024 | F008 | P0 | in-progress |
-| F010 | F010-integration-pilot | 阶段 6：企业集成与受控 Pilot | FDE 在限定用户、数据、周期和动作权限内运行并观察真实 Pilot | REQ-003, REQ-006, REQ-007, REQ-023, REQ-025, REQ-026, REQ-028, NFR-002, NFR-004, NFR-011, NFR-012, NFR-013, NFR-014, PSC-003, PSC-005, PSC-006, PSC-019, PSC-021, PSC-022, PSC-023, PSC-024 | F009 | P0 | in-progress |
-| F011 | F011-production-adoption-handover | 阶段 7：生产、采用与验收交接 | FDE 看见生产结果、采用、验收、交付物和责任移交是否真实成立 | REQ-003, REQ-006, REQ-007, REQ-023, REQ-025, REQ-026, REQ-028, NFR-002, NFR-004, NFR-011, NFR-012, NFR-013, NFR-014, PSC-003, PSC-005, PSC-006, PSC-019, PSC-021, PSC-022, PSC-023, PSC-024 | F010 | P0 | in-progress |
-| F012 | F012-continuous-improvement | 阶段 8：持续改进与能力沉淀 | FDE 把生产证据转成经复测、审批、可回滚的改进和有边界的复用资产 | REQ-003, REQ-006, REQ-007, REQ-024, REQ-025, REQ-026, REQ-028, NFR-002, NFR-004, NFR-011, NFR-012, NFR-013, NFR-014, PSC-003, PSC-005, PSC-006, PSC-020, PSC-021, PSC-022, PSC-023, PSC-024 | F011 | P1 | in-progress |
+| F010 | F010-integration-pilot | 阶段 6：企业集成与受控 Pilot | FDE 在限定用户、数据、周期和动作权限内运行并观察真实 Pilot | REQ-003, REQ-006, REQ-007, REQ-023, REQ-025, REQ-026, REQ-028, NFR-002, NFR-004, NFR-011, NFR-012, NFR-013, NFR-014, PSC-003, PSC-005, PSC-006, PSC-019, PSC-021, PSC-022, PSC-023, PSC-024, PSC-025 | F009 | P0 | in-progress |
+| F011 | F011-production-adoption-handover | 阶段 7：生产、采用与验收交接 | FDE 看见生产结果、采用、验收、交付物和责任移交是否真实成立 | REQ-003, REQ-006, REQ-007, REQ-023, REQ-025, REQ-026, REQ-028, NFR-002, NFR-004, NFR-011, NFR-012, NFR-013, NFR-014, PSC-003, PSC-005, PSC-006, PSC-019, PSC-021, PSC-022, PSC-023, PSC-024, PSC-025 | F010 | P0 | in-progress |
+| F012 | F012-continuous-improvement | 阶段 8：持续改进与能力沉淀 | FDE 把生产证据转成经复测、审批、可回滚的改进和有边界的复用资产 | REQ-003, REQ-006, REQ-007, REQ-024, REQ-025, REQ-026, REQ-028, NFR-002, NFR-004, NFR-011, NFR-012, NFR-013, NFR-014, PSC-003, PSC-005, PSC-006, PSC-020, PSC-021, PSC-022, PSC-023, PSC-024, PSC-025 | F011 | P1 | in-progress |
 
 ## 首个验证切片
 
@@ -42,7 +42,7 @@ F001～F004 建立共享能力，F005 用“发现高价值问题”完成第一
 ## 范围外与延期项
 
 - V1 六阶段项目到 V2 的自动或批量迁移不在当前 Feature Map；既有项目由 F001 继续保护。
-- 项目组合中生产里程碑与持续改进资产的最终图表形态留到 F011、F012 实施前确认。
+- 阶段 6–8 已确认专用页签、版本化证据和未来只读预览；实际部署、外部观测和生产语义查询执行器仍需后续授权接入。
 - 外部 Skill 源码接入、翻译和许可审查在对应阶段实施前逐项完成，不因路由目录确认而批量安装。
 
 ## 变更记录

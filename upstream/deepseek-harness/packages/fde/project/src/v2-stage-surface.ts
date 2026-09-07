@@ -3,6 +3,7 @@
 import { readFile, realpath, stat } from 'node:fs/promises'
 import { join, relative, resolve, sep } from 'node:path'
 import { loadEvaluationWorkbench } from './evaluation-workbench.ts'
+import { loadDeliveryWorkbench } from './delivery-workbench.ts'
 import type {
   V2DesignSnapshot,
   V2InvestigationSnapshot,
@@ -123,7 +124,7 @@ export const V2_STAGE_DEFINITIONS: readonly StageDefinition[] = [
     id: 'pilot', index: 6, title: '企业集成、可靠性改造与受控 Pilot',
     objective: '把已验证能力接入客户现场，在有限范围内稳定运行。',
     explanation: '完成真实系统集成、权限与审计、可靠性改造、运行手册和回滚准备，再经授权进入受控试点。',
-    statePath: '.fde/stages/pilot.json', skill: 'fde-integration-pilot',
+    statePath: '.fde/stages/pilot.json', skill: 'review-ai-production-readiness',
     prompt: '请基于已通过的 PoC 与 Eval，规划并记录企业系统集成、权限审计、可靠性改造和受控 Pilot。任何真实部署或外部写入都必须等待 FDE 明确授权，并保存运行与回滚证据。',
     workItems: [
       { id: 'integration', title: '完成企业集成', purpose: '接入真实系统、数据、身份和审批链路。' },
@@ -141,7 +142,7 @@ export const V2_STAGE_DEFINITIONS: readonly StageDefinition[] = [
     id: 'production', index: 7, title: '进入生产、推动采用并验收交接',
     objective: '让系统在生产环境持续产生业务结果，并把责任真正交给客户团队。',
     explanation: '完成生产就绪审查、受控发布、观察期、用户采用、客户验收、培训和运维责任移交。',
-    statePath: '.fde/stages/production.json', skill: 'fde-production-handover',
+    statePath: '.fde/stages/production.json', skill: 'release-readiness',
     prompt: '请根据试点结果准备生产发布、观察期、用户采用、客户验收和责任移交材料。只记录已有证据；客户接受、生产授权、培训完成和责任转移必须由 FDE 人工记录。',
     workItems: [
       { id: 'readiness', title: '审查生产就绪', purpose: '核对发布、监控、容量、安全、回滚和责任人。' },
@@ -159,7 +160,7 @@ export const V2_STAGE_DEFINITIONS: readonly StageDefinition[] = [
     id: 'improvement', index: 8, title: '持续改进并沉淀可复用能力',
     objective: '把生产证据转成经过验证的改进，并沉淀下一次可复用的能力。',
     explanation: '根据业务指标、运行事件、用户反馈和成本证据选择改进项，受控发布并判断哪些现场经验值得复用。',
-    statePath: '.fde/stages/improvement.json', skill: 'fde-continuous-improvement',
+    statePath: '.fde/stages/improvement.json', skill: 'production-evidence-review',
     prompt: '请根据生产运行证据、业务指标、事故、用户反馈和成本记录，选择本轮最值得做的改进，说明验证方法与发布边界，并记录哪些现场经验可以沉淀为可复用能力。',
     workItems: [
       { id: 'evidence', title: '汇总生产证据', purpose: '汇总业务结果、运行指标、问题、反馈和成本。' },
@@ -1072,6 +1073,10 @@ export async function loadV2StageSurface(root: string, stageId: V2LifecycleStage
     ? await loadEvaluationWorkbench(root, state.value?.evaluation)
     : undefined
   const reviewBlockers: string[] = []
+  const delivery = definition.id === 'pilot' || definition.id === 'production' || definition.id === 'improvement'
+    ? await loadDeliveryWorkbench(root, definition.id, state.value?.delivery)
+    : undefined
+  if (delivery !== undefined) reviewBlockers.push(...delivery.reviewBlockers)
   if (evaluation !== undefined) reviewBlockers.push(...evaluation.reviewBlockers)
   if (state.status === 'missing') reviewBlockers.push(`尚未生成阶段状态文件 ${definition.statePath}`)
   if (state.status === 'invalid') reviewBlockers.push(`阶段状态文件无法读取：${state.message ?? '结构无效'}`)
@@ -1177,6 +1182,7 @@ export async function loadV2StageSurface(root: string, stageId: V2LifecycleStage
     ...(definition.id !== 'investigation' || investigation === undefined ? {} : { investigation }),
     ...(definition.id !== 'design' || design === undefined ? {} : { design }),
     ...(evaluation === undefined ? {} : { evaluation }),
+    ...(delivery === undefined ? {} : { delivery }),
     ...(state.message === undefined ? {} : { message: state.message }),
   }
 }

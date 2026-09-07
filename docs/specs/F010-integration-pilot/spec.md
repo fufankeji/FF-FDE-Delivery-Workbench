@@ -2,7 +2,7 @@
 document: feature-spec
 feature: F010
 status: ready
-updated: "2026-08-31"
+updated: "2026-09-07"
 ---
 
 # F010 · 阶段 6：企业集成与受控 Pilot 规格
@@ -14,18 +14,20 @@ FDE 将通过验证的候选版本连接到限定的企业环境，在明确用�
 ## 来源与范围
 
 - 来源需求：REQ-003, REQ-006, REQ-007, REQ-023, REQ-025, REQ-026, REQ-028, NFR-002, NFR-004, NFR-011, NFR-012, NFR-013, NFR-014
-- 来源总规格：PSC-003, PSC-005, PSC-006, PSC-019, PSC-021, PSC-022, PSC-023, PSC-024
+- 来源总规格：PSC-003, PSC-005, PSC-006, PSC-019, PSC-021, PSC-022, PSC-023, PSC-024, PSC-025
 - 本 Feature 包含：生产就绪预审、集成、Pilot 范围与授权、发布、监控、人工接管、回滚演练、采用准备和真实结果记录。
 - 本 Feature 不包含：无限范围生产、最终客户验收、责任完全移交或用技术健康替代业务结果。
 
 ## 阶段能力与 Skills
 
-| 层级 | 能力 | 使用条件 | 预期结果 |
-|---|---|---|---|
-| 方法核心 | `review-ai-production-readiness`、`secure-ai-action-boundary` | 候选版本准备连接企业环境 | Production Service Readiness 与受控动作边界 |
-| 方法协作 | `transfer-ai-service` | Pilot 需要企业人员接管、操作或反馈 | 初始 Delivery and Adoption Plan 与责任练习 |
-| 工程核心 | `integration-adapter`、`release-readiness`、`deploy-runbook`、`post-deploy-watch` | 所有企业 Pilot | 集成适配、发布门、部署／回滚和观察计划 |
-| 工程条件 | `safe-change`、`nfr-validation`、`security-compliance-check`、`change-control-navigation` 及对应 BUILD／SHIP Skills | 需修改现有系统、专项复验或变更审批 | 可审查变更、复验证据和发布窗口 |
+当前执行适配以 `packages/fde/stage/src/v2-skills.ts` 实际注册内容为准，不把参考项目有同名模块当作已接通执行器。
+
+| 层级 | 实际注册方法 | 使用方式 |
+|---|---|---|
+| 核心 | `review-ai-production-readiness`、`pilot-scope-and-authority`、`enterprise-integration-readiness`、`reliability-and-recovery`、`pilot-evidence-review` | 根据当前缺口按需加载，维护候选记录与来源 |
+| 条件 | `change-control-navigation`、`deploy-runbook` | 只有出现对应问题且具备操作授权时加载 |
+
+这些方法描述和组织工作；部署、监控采集、生产查询、客户签收仍需各自真实执行与证据。前三阶段资料只能作为前序依据，不能冒充本阶段批准或运行结果。
 
 ## 阶段主视图与数据投影
 
@@ -86,6 +88,27 @@ Pilot 页面必须把技术健康、业务结果和授权范围并列呈现；�
 - When 系统形成运行证据包并由 FDE 评审
 - Then 授权、范围、监控、接管、回滚和业务结果分别有证据，技术可访问不等于通过，只有 FDE 决定进入下一阶段
 
+## 本轮工作台与数据范围
+
+页面组织为 概览、接入与准备、运行与问题、试点评审，围绕 授权、接入、恢复、技术、业务结果 展示真实记录。共享规则遵循 PSC-025；未来／历史只读查看，不自动执行或推进。当前阶段保留原人工评审和返回入口，状态仍由 Host 文件检查产生。没有接入复杂企业环境的简单项目可明确记录不适用及依据，但不能豁免真实结果、批准或接收责任。
+
+### AC-F010-003 · 专用工作面读取真实版本化证据
+
+- 来源：REQ-025, REQ-028, NFR-002, NFR-013, PSC-025
+- 对应 PRD 验收：AC-020, AC-021, AC-022, AC-025
+- Given 项目存在本地成果、前序资料或本阶段记录
+- When 用户查看本阶段各页签、详情和固定产物，或查看未来／历史阶段
+- Then 展示本项目真实版本、范围、来源、责任和缺口；没有证据不显示通过，文件失效使当前结果失效；预览保持只读且不推进；短视口末尾内容与操作可滚动到达
+
 ## 开放问题
+
+### AC-F010-004 · 项目阶段数据与交付闭环
+
+- 来源：REQ-028, NFR-002, PSC-025
+- 对应 PRD 验收：AC-025
+- Given 用户明确要求用当前验证项目的数据跑通阶段交付
+- When 加载阶段记录、提交已授权的阶段决定或回看历史
+- Then 只展示项目原有阶段数据和统一交付进度，不显示独立演示入口；推进走原接口与阶段门，回看不推进；联调记录注明来源，不能冒充实际客户签收或部署
+
 
 - 首轮只支持 Shadow、Canary 和 Bounded Segment 三类受控范围；其他企业发布模式需在实现对应 Adapter 前确认。

@@ -158,6 +158,23 @@ const EVALUATION_WORKBENCH_RULES = `
 
 所有路径只允许当前项目内相对路径；模型按需读取，不把整仓库或整张图谱加入上下文。启动、预览、停止沿工作台已有运行操作；未明确授权不启动服务、不发起付费调用、不操作生产系统。`
 
+
+const DELIVERY_WORKBENCH_RULES = `
+## 第六至八阶段：交付证据记录
+
+保留根对象 schemaVersion、stage、status、workItems、blockers、recommendation 和三份固定产物。在状态文件新增 delivery：
+{ schemaVersion: 1, version: "实际候选版本", versionFiles: [{ path: "项目相对路径", sha256: "原文件64位小写SHA256" }], environment: { kind: "local", label: "真实环境名称" }, items: [] }。
+versionFiles 固定本轮实现与依赖文件摘要，不能只给版本名。证据变化后要重测／重核，不可仅替换摘要继续宣称通过。
+
+items 每项必须包含 id、category、title、status、scope、version、summary、required（布尔）、evidence（同样的 path/sha256 数组）；可补 owner、nextAction、observedAt（ISO时间）、criterion。status 只能是 unknown/pending/running/passed/failed/blocked/not_applicable；scope 与 environment.kind 只能是 local/sandbox/pilot/production/prior。已运行、通过、失败或不适用必须有当前版本文件、来源、观察时间与实际记录责任人；否则 Host 标记证据待重核。owner 不得虚构，更不代表平台验证过其批准权。
+
+第六阶段 category：authorization/integration/recovery/technical/business/issue；第七阶段：release/adoption/acceptance/deliverable/handover；第八阶段：signal/change/impact/validation/release/reuse。各阶段必备评审类别：六 authorization/integration/recovery/technical/business；七 release/adoption/acceptance/deliverable/handover；八 change/impact/validation/release。必备项目 required=true，必须是同版本、本阶段真实试点或生产范围的证据，不能用本地测试替代。简单项目 integration 可以有依据地标记 not_applicable，授权、结果与责任不能因此免除。
+
+仅本体项目可新增 delivery.semantic：{ mode: "snapshot" 或 "runtime", schemaVersion, graphRevision, summary, evidence }。读取图谱快照不等于在线 Semantica 查询接通；不要把第四阶段的上下文构建动作当成生产查询服务。编制／验证工作区和已发布查询版本分离。
+
+未接入时保留未知；本地健康仅是观察，开发问题不是生产事故，文档不是客户签收或恢复演练。打开工作台只读资料，不执行部署、生产修改或自动推进。审批和 FDE 阶段决定必须由有权人员显式作出。
+`
+
 const PILOT_STAGE_SHARED = {
   stage: 'pilot', index: 5, statePath: '.fde/stages/pilot.json',
   artifacts: [
@@ -493,7 +510,7 @@ function contentFor(definition: V2StageSkillDefinition): string {
   const investigationRules = definition.stage !== 'investigation' ? '' : `\n\n## 环境调查驾驶舱\n\n为了让工作台展示真实环境，而不是写死示例，调查后同步维护 \`investigation\`。五组数组中每个元素必须严格使用以下字段，不能用近义字段替代：\n\n- \`systems[]\`：\`{ id, label, kind, status, owner?, note? }\`；\`kind\` 只能是 \`data\`、\`system\`、\`external\` 或 \`actor\`，\`status\` 只能是 \`confirmed\`、\`conditional\`、\`pending\` 或 \`blocked\`。\n- \`connections[]\`：\`{ from, to, label? }\`；\`from\` 和 \`to\` 只能引用 \`systems\` 中已有的稳定 \`id\`。\n- \`actionBoundaries[]\`：\`{ target, read, suggest, draft, execute }\`；对象字段必须叫 \`target\`，四种动作状态只能是 \`allowed\`、\`conditional\`、\`pending\`、\`denied\` 或 \`not-applicable\`。\n- \`dataFindings[]\`：\`{ label, value, status }\`；不要写成 \`id/note/source\`，\`status\` 只能是 \`confirmed\`、\`warning\`、\`pending\` 或 \`blocked\`。来源证据保留在固定产物中。\n- \`governanceReviews[]\`：\`{ area, status, owner?, note? }\`；\`area\` 只能是 \`security\`、\`privacy\`、\`legal\`、\`procurement\`、\`finance\` 或 \`business\`，\`status\` 只能是 \`confirmed\`、\`conditional\`、\`pending\` 或 \`blocked\`。不要使用 \`partial\`、\`unconfirmed\` 或 \`confirmed-in-simulation\` 等自定义状态，应归一为允许值并在 \`note\` 保留原始限定。\n\n没有证据时使用空数组或 pending，不得填入演示数据。写完后必须重新读取状态文件，逐项核对字段名和枚举；任一结构无效时不得把阶段写成 review-ready。\n\n第三阶段只调查真实环境与动作边界，不构建本体、不设计架构、不选择模型，也不开始开发。`
   const designRules = definition.stage !== 'design' ? '' : `\n\n## 第四阶段双轴路线与图谱快照\n\n先分别记录“采用什么执行机制”和“是否需要本体”，不能因已集成 Semantica 就默认选择知识图谱：\n\n- \`design.execution\`：\`status\` 只能是 \`undecided\`、\`candidate\` 或 \`selected\`；形成候选后必须填写 \`mechanism\`，其值只能是 \`manual\`、\`rules\`、\`software\`、\`retrieval\`、\`model\`、\`agent\` 或 \`hybrid\`，并可用 \`label/rationale\` 记录业务名称与证据理由。\n- \`design.semantics\`：\`mode\` 只能是 \`undecided\`、\`schema\` 或 \`ontology\`；\`conclusion\` 只能是 \`pending\`、\`not_required\`、\`validated\`、\`validation_failed\` 或 \`insufficient_evidence\`。\`schema\` 路线只能记录 \`pending/not_required\`。\n- \`design.ontology\`：非本体路线固定为 \`{ status: "not_applicable" }\`；本体路线的 \`status\` 只能是 \`not_started\`、\`draft\`、\`review\`、\`published\` 或 \`stale\`，可记录 \`schemaVersion/classCount/relationshipTypeCount\`。\n- \`design.graphBuild\`：非本体路线固定为 \`{ status: "not_applicable" }\`；本体路线只能记录 \`waiting\`、\`running\`、\`succeeded\`、\`failed\`、\`cancelled\` 或 \`stale\`，可用 \`message\` 说明真实运行状态。\n\n只有本体路线才能由项目隔离的 Semantica Provider 在 \`.fde/design/knowledge-graph.json\` 写入真实快照。普通 Schema 路线不得生成图谱占位文件；不得用演示节点、示例关系或 Semantica 的全局 Demo 图填充项目工作台。快照根对象固定为 \`{ schemaVersion: 1, provider, graphId, revision, ontologyVersion, updatedAt, nodes, edges, communities }\`：\n\n- \`provider\`：\`{ id, version? }\`，记录实际构建 Provider。\n- \`nodes[]\`：\`{ id, label, type, summary?, communityId?, confidence?, validFrom?, validUntil?, sourceRefs }\`。\n- \`edges[]\`：\`{ id, source, target, type, label?, weight, confidence?, validFrom?, validUntil?, sourceRefs }\`；起止节点必须已经登记。\n- \`communities[]\`：\`{ id, label, level, nodeIds }\`；只能引用快照中的真实节点。\n\n每个实体和关系的来源、时间与置信度都来自本轮构建证据；工作台只负责渲染该快照。图谱构建成功不等于 Schema 验证、能力问题或纵向切片已经通过，最终结论和阶段推进仍由 FDE 人工确认。`
   // oxlint-enable @stylistic/quotes
-  return `# ${definition.label}\n\n${definition.instructions}\n\n## 固定产物\n\n${artifactList}\n\n状态文件：\`${definition.statePath}\`；其中根对象 \`stage\` 必须固定写为 \`${definition.stage}\`，不能写成产物目录名或中文阶段名。固定工作项 ID：${workItemList}。\n\n## 状态文件结构\n\n下面只示范固定 JSON 结构；各项状态、阻塞和建议必须依据本轮事实填写：\n\n\`\`\`json\n${stateExample}\n\`\`\`${investigationRules}${designRules}\n\n${COMMON_V2_STAGE_RULES}${definition.stage === 'evaluation' ? EVALUATION_WORKBENCH_RULES : ''}`
+  return `# ${definition.label}\n\n${definition.instructions}\n\n## 固定产物\n\n${artifactList}\n\n状态文件：\`${definition.statePath}\`；其中根对象 \`stage\` 必须固定写为 \`${definition.stage}\`，不能写成产物目录名或中文阶段名。固定工作项 ID：${workItemList}。\n\n## 状态文件结构\n\n下面只示范固定 JSON 结构；各项状态、阻塞和建议必须依据本轮事实填写：\n\n\`\`\`json\n${stateExample}\n\`\`\`${investigationRules}${designRules}\n\n${COMMON_V2_STAGE_RULES}${definition.stage === 'evaluation' ? EVALUATION_WORKBENCH_RULES : ''}${definition.stage === 'pilot' || definition.stage === 'production' || definition.stage === 'improvement' ? DELIVERY_WORKBENCH_RULES : ''}`
 }
 
 function registeredSkill(definition: V2StageSkillDefinition) {

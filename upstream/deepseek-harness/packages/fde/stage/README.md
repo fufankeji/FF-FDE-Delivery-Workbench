@@ -8,6 +8,11 @@ For stage one the package registers separate method Skills (`qualify-ai-workflow
 
 The trusted same-origin read-only `GET /api/fde-stage/skills` route returns only the methods fixed in the product, including business-facing labels, required-or-conditional grouping where applicable, usage guidance, full Markdown definitions, and source metadata. It never enumerates the operator's machine, global Skill directories, or other projects, and exposes no execution or mutation capability. The client uses this projection to render an explainable method tree beneath the current stage.
 
+## V2 delivery records
+
+The selected methods for V2 stages six through eight describe the delivery record format, file digests, evidence scope and optional semantic dependencies. Legacy six-stage records and earlier V2 method instructions are unchanged. The actual stage gate consumes the Host projection, not file counts or an Agent recommendation.
+
+
 ## Model Experience
 
 While an Agent belongs to a registered project in any active delivery stage, the model sees one short section naming the current stage, fixed output directory, available method routes, and prohibition on confirming or advancing the project. The complete bodies of only the selected Skills are loaded when the existing skill tool is invoked. The terminal `completed` state contributes no stage instruction. No stage-transition tool is registered.
