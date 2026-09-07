@@ -54,11 +54,11 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
     ? FDE_V2_STAGE_IDS.indexOf(stageState.value.v2Stage)
     : stage === undefined ? 0 : LEGACY_TO_V2_STAGE[stage]
   const activeStageId = FDE_V2_STAGE_IDS[active] ?? 'discovery'
+  const surface = surfaceState?.status === 'ready' ? surfaceState.value : undefined
   const viewedStageId = selectedStage ?? activeStageId
   const viewed = Math.max(0, FDE_V2_STAGE_IDS.indexOf(viewedStageId))
   const stageDetailsOpen = expandedStage === viewed
   const files = sourceState?.files.length ?? 0
-  const surface = surfaceState?.status === 'ready' ? surfaceState.value : undefined
   const artifacts = surface?.requirements.presentCount ?? 0
   useEffect(() => {
     const abort = new AbortController()
@@ -180,16 +180,16 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
         {V2_STAGE_NAMES.map((name, index) => {
           const current = index === active
           const viewing = index === viewed
-          const complete = index < active
           const stage = FDE_V2_STAGE_IDS[index]
           if (stage === undefined) return null
+          const complete = index < active
           return (
-            <div className={css.projectStageBranch} key={name} data-active={current ? 'true' : 'false'} data-viewing={viewing ? 'true' : 'false'} data-complete={index < active ? 'true' : 'false'}>
+            <div className={css.projectStageBranch} key={name} data-active={current ? 'true' : 'false'} data-viewing={viewing ? 'true' : 'false'} data-complete={complete ? 'true' : 'false'}>
               {viewing && stageDetailsOpen && <span className={css.projectStageFocusSurface} aria-hidden="true" />}
               <button
                 type="button"
                 className={css.projectStageRow}
-                aria-current={current ? 'step' : undefined}
+                aria-current={viewing && !current ? 'page' : current ? 'step' : undefined}
                 aria-expanded={viewing ? stageDetailsOpen : undefined}
                 onClick={() => {
                   if (viewing) toggleStageDetails()
@@ -202,11 +202,11 @@ export function ProjectContextSidebar(props: ProjectContextSidebarProps) {
                 <i>{complete ? '✓' : String(index + 1).padStart(2, '0')}</i>
                 <span>
                   <strong>{name}</strong>
-                  {current && <small>当前阶段</small>}
+                  {current && <small>{stage === 'improvement' && stageState?.status === 'ready' && (stageState.value.improvementCycles ?? 0) > 0 ? `当前阶段 · 已完成 ${stageState.value.improvementCycles} 轮` : '当前阶段'}</small>}
                   {viewing && !current && (
                     <small className={css.projectStageViewingStatus}>
                       <span><svg aria-hidden="true" viewBox="0 0 16 16"><path d="M1.5 8s2.4-4 6.5-4 6.5 4 6.5 4-2.4 4-6.5 4S1.5 8 1.5 8Z" /><circle cx="8" cy="8" r="1.75" /></svg>正在查看</span>
-                      <em>· 已完成</em>
+                      <em>· {complete ? '已完成' : '尚未进入'}</em>
                     </small>
                   )}
                 </span>

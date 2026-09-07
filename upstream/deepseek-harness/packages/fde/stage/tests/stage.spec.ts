@@ -324,6 +324,17 @@ describe('requirement-research model guidance', () => {
       .toContain('普通 Schema 路线不得生成图谱占位文件')
   })
 
+  it('gives final-stage methods the versioned delivery format without changing earlier skills', () => {
+    for (const name of ['review-ai-production-readiness', 'release-readiness', 'production-evidence-review']) {
+      const skill = V2_STAGE_SKILLS.find(item => item.name === name)
+      expect(skill?.content).toContain('versionFiles')
+      expect(skill?.content).toContain('delivery.semantic')
+      expect(skill?.content).toContain('本地健康仅是观察')
+      expect(skill?.content).toContain('不可仅替换摘要')
+    }
+    expect(V2_STAGE_SKILLS.find(item => item.name === 'verification-plan')?.content).not.toContain('delivery.semantic')
+  })
+
   it('keeps stage-five development in DSH and exposes candidate-bound verification instructions', () => {
     const plan = V2_STAGE_SKILLS.find(skill => skill.name === 'verification-plan')
     expect(plan?.content).toContain('evaluation.candidate')

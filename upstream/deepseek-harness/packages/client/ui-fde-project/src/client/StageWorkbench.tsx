@@ -7,6 +7,7 @@ import { FDE_V2_STAGE_IDS, type FdeProjectState, type FdeV2StageId, type Project
 import type { DiscoveryAction, ProjectStageWorkbenchHeroProps, ProjectStageWorkbenchViewProps } from './slots.ts'
 import { KnowledgeGraphExplorer } from './KnowledgeGraphExplorer.tsx'
 import { EvaluationStagePanel } from './EvaluationStagePanel.tsx'
+import { DeliveryStagePanel } from './DeliveryStagePanel.tsx'
 import css from './StageWorkbench.module.css'
 
 export const V2_STAGE_NAMES = [
@@ -2091,8 +2092,17 @@ function StageWorkbenchPanel({ props, workspace, sessionId, view }: {
     return <section className={css.state} role="alert"><strong>当前阶段读取失败</strong><span>{stageState.message}</span></section>
   }
 
-  if (viewedStage === 'evaluation' && surfaceState?.status === 'error') {
-    return <section className={css.state} role="alert"><strong>第五阶段记录读取失败</strong><span>{surfaceState.message}</span><button type="button" onClick={() => { props.refreshProjectSurface(workspace.workspaceId) }}>重新读取阶段记录</button></section>
+  if ((viewedStage === 'evaluation' || viewedStage === 'pilot' || viewedStage === 'production' || viewedStage === 'improvement') && surfaceState?.status === 'error') {
+    return <section className={css.state} role="alert"><strong>{viewedStage === 'evaluation' ? '第五阶段记录读取失败' : '交付阶段记录读取失败'}</strong><span>{surfaceState.message}</span><button type="button" onClick={() => { props.refreshProjectSurface(workspace.workspaceId) }}>重新读取阶段记录</button></section>
+  }
+
+  if (v2Stage !== undefined && (viewedStage === 'pilot' || viewedStage === 'production' || viewedStage === 'improvement') && stageState?.status === 'ready') {
+    return <DeliveryStagePanel
+      key={`${workspace.workspaceId}-${viewedStage}-${v2Stage}`}
+      props={props} workspace={workspace} sessionId={sessionId} view={view}
+      stage={viewedStage} actualStage={v2Stage} stageState={stageState.value}
+      surface={surface?.v2Stages[viewedStage]}
+    />
   }
 
   if (v2Stage !== undefined && viewedStage !== undefined && viewedStage !== v2Stage) {

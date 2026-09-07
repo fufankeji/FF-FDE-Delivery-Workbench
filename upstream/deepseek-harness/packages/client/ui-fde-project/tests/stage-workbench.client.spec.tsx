@@ -1,9 +1,8 @@
 // @vitest-environment jsdom
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import type { ComponentProps } from 'react'
 import { ProjectStageWorkbenchHero } from '../src/client/StageWorkbench.tsx'
-
 afterEach(cleanup)
 
 const hook = <T,>(snapshot: T) => <S,>(selector: (state: T) => S): S => selector(snapshot)
@@ -99,6 +98,29 @@ function evaluationProps(options: { historical?: boolean; empty?: boolean; statu
     } } } }),
   })
 }
+
+describe('final-stage routing from the current project', () => {
+  beforeAll(() => {
+    HTMLDialogElement.prototype.showModal = function () { this.setAttribute('open', '') }
+    HTMLDialogElement.prototype.close = function () { this.removeAttribute('open') }
+  })
+  it.each([
+    ['pilot', '试点运行与交付'],
+    ['production', '生产与验收交接'],
+    ['improvement', '运行反馈与持续改进'],
+  ] as const)('opens %s as a read-only future workbench without changing stage five', (stage, title) => {
+    const input = evaluationProps()
+    const future = { id: stage, statePath: `.fde/stages/${stage}.json`, presentCount: 0, requiredCount: 3, reviewReady: false, reviewBlockers: ['尚无交付记录'], artifacts: [] }
+    render(<ProjectStageWorkbenchHero {...input}
+      useStageView={hook({ byWorkspace: { 'workspace-1': stage } })}
+      useProjectSurfaces={hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: { requirements: { artifacts: [] }, v2Stages: { [stage]: future } } } } }) as typeof input.useProjectSurfaces}
+    />)
+    expect(screen.getByRole('heading', { level: 1, name: title })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: '提交 FDE 评审' })).toBeNull()
+    expect(input.completeV2Stage).not.toHaveBeenCalled()
+    expect(input.prepareStageDraft).not.toHaveBeenCalled()
+  })
+})
 
 describe('stage-five information workbench', () => {
   it('shows useful empty information without a developer panel, fake progress or a record rail', () => {

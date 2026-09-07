@@ -66,6 +66,13 @@ fde-deliverables/06-acceptance-handover/operations-and-maintenance-guide.md
 fde-deliverables/06-acceptance-handover/handover-record.md
 ```
 
+## V2 交付工作台
+
+侧栏和正文默认跟随项目实际阶段，显式回看时只改变浏览位置，返回当前阶段只清除浏览选择。不提供演示横幅、独立入口、额外数据源或第二条生命周期；第八阶段已完成轮数与最近评审时间来自持久化项目状态。
+
+V2 第六至八阶段分别展示试点准备与结果、生产验收交接、证据驱动改进。页签读取 Host 核验的 delivery 事实，详情从右侧打开，固定记录保留，不再出现窄记录轴。未来和历史阶段只读预览，不推进生命周期。执行仍在 Agent 对话；不以页面存在表示已经接通部署、监控或生产查询执行器。
+
+
 ## 模型体验
 
 ### 项目启动与停止指令

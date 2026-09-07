@@ -24,6 +24,12 @@ The deployment-trial projection parses schema-v1 `.fde/deployment-trial.json`, v
 
 The acceptance-handover projection parses schema-v1 `.fde/acceptance-handover.json`, accepts up to forty project-relative enterprise-acceptance evidence files, verifies project-relative evidence and deliverable files, records external HTTP(S) deliverables without fetching them, and indexes four fixed Markdown outputs under `fde-deliverables/06-acceptance-handover/`. One exact-contract, file-locked FDE action may update only the acceptance conclusion and evidence, each declared deliverable's availability, condition decisions, and the three responsibility-transfer facts plus evidence; it rejects stale digests and changed item sets while preserving deliverable identity, location, version, and checksum. Project-completion readiness requires an accepted or conditionally accepted conclusion with evidence, a readable deployment-trial baseline, at least one available deliverable, no open condition, complete reasons and ownership for accepted conditions, completed training/access/operations responsibility transfer with project evidence, and all four outputs. Recording these facts does not complete the project: the fixed Host stage route remains a separate final confirmation. Neither projection deploys, uploads or downloads artifacts, authenticates customers, signs acceptance, or advances a project by itself.
 
+## V2 delivery workbenches
+
+Project snapshots read only the registered workspace records. No alternate demonstration payload or lifecycle is returned. User-authorized integration fixtures use the same stage files, evidence validation, and completion endpoints; fixture provenance belongs in the source records, not a second product mode.
+
+The V2 Pilot, production and improvement snapshots include a read-only delivery projection. Version manifests and evidence pin project-local files by SHA-256; absent or changed evidence cannot satisfy the stage gate. Local, sandbox, Pilot, production and prior-source scopes remain distinct. Optional semantic references describe snapshot versus runtime integration, not automatic Semantica deployment. No projection runs services, approves customers, or modifies project data.
+
 ## Model Experience
 
 ### V2 stage-five evidence reader

@@ -332,6 +332,8 @@ describe('ProjectContextSidebar stage methods', () => {
     expect(screen.getByText('调查数据、系统、接口、安全与组织').closest('[data-viewing="true"]')).toBeTruthy()
     expect(screen.getByText('当前阶段')).toBeTruthy()
     expect(screen.getByText('正在查看')).toBeTruthy()
+    expect(screen.getByText('· 尚未进入')).toBeTruthy()
+    expect(screen.queryByText('· 已完成')).toBeNull()
 
     fireEvent.click(screen.getByRole('button', { name: '返回当前阶段' }))
     expect(input.returnToCurrentStage).toHaveBeenCalledWith('workspace-1')

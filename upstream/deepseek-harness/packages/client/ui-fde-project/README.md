@@ -66,6 +66,13 @@ fde-deliverables/06-acceptance-handover/operations-and-maintenance-guide.md
 fde-deliverables/06-acceptance-handover/handover-record.md
 ```
 
+## V2 delivery workbenches
+
+The sidebar and body follow the actual project stage unless a stage is explicitly being viewed. Returning clears only the browsing selection. There is no demonstration banner, alternate entry, data source, or lifecycle. Improvement completion counts and review time come from the persisted project stage.
+
+The final three V2 stages have distinct delivery workbenches: Pilot readiness and results, production acceptance and handover, and evidence-led improvement. Tabs use Host-checked delivery facts; details open on the right and fixed artifacts remain accessible without a narrow record rail. Future and historical previews are read-only and do not advance lifecycle state. Execution remains in the Agent conversation; no deployment, monitoring or production-query adapter is implied.
+
+
 ## Model Experience
 
 ### Project start and stop instructions
