@@ -609,7 +609,7 @@ describe('ProjectStageWorkbenchHero', () => {
     expect(screen.queryByRole('button', { name: /查看治理记录：安全/ })).toBeNull()
   })
 
-  it('renders the active ontology route from the project graph snapshot without a generic record rail', () => {
+  it('renders the active ontology route and keeps preparation and run actions bound to project state', async () => {
     const design = {
       id: 'design', index: 4, title: '设计方案并完成端到端纵向切片',
       objective: '选择最合适的实现方式，并先走通一条可以验证的完整业务链路。',
@@ -664,13 +664,21 @@ describe('ProjectStageWorkbenchHero', () => {
               { id: 'Workflow', label: '业务流程', aliases: ['流程'], identityKeys: ['name'], properties: [{ id: 'name', label: '名称', dataType: 'string', required: true, unique: true }], fieldMappings: [{ sourceField: '流程名称', targetProperty: 'name' }], extractionPatterns: [] },
               { id: 'System', label: '系统', aliases: [], identityKeys: ['name'], properties: [], fieldMappings: [], extractionPatterns: [] },
             ],
-            relationships: [{ id: 'USES', label: '使用', domain: 'Workflow', range: 'System', cardinality: 'many-to-many', extractionPatterns: [] }],
+            relationships: [
+              { id: 'USES', label: '使用', domain: 'Workflow', range: 'System', cardinality: 'many-to-many', extractionPatterns: [] },
+              ...Array.from({ length: 5 }, (_, index) => ({ id: `DEPENDS_${index + 1}`, label: `依赖 ${index + 1}`, domain: 'Workflow', range: 'System', cardinality: 'many-to-many', extractionPatterns: [] })),
+            ],
             provenanceRules: [{ id: 'source-required', label: '来源必填', description: '每条事实必须保留来源。' }],
             temporalRules: [{ id: 'valid-time', label: '有效时间', description: '事实必须区分有效时间。' }],
             confidenceThreshold: 0.65, shaclSeverity: 'Violation',
           },
           candidates: { status: 'ready', entities: [], relationships: [], warnings: [] },
-          runs: [],
+          runs: [
+            ...Array.from({ length: 6 }, (_, index) => ({ id: `health-${index}`, kind: 'health', status: 'succeeded', startedAt: `2026-09-04T06:0${index}:00.000Z`, summary: `服务检查记录 ${index}`, sourceDigests: [], evidencePaths: [`evidence/health-${index}.json`], diagnostics: [] })),
+            { id: 'extract-old', kind: 'extract', status: 'succeeded', startedAt: '2026-09-04T07:00:00.000Z', summary: '上次抽取完成', sourceDigests: [], evidencePaths: [], diagnostics: [] },
+            { id: 'extract-current', kind: 'extract', status: 'failed', startedAt: '2026-09-04T08:00:00.000Z', summary: '当前材料无法解析', sourceDigests: [], evidencePaths: [], diagnostics: [] },
+            { id: 'publish-current', kind: 'publish-schema', status: 'stale', startedAt: '2026-09-04T08:10:00.000Z', summary: '定义变化后需要重新发布', sourceDigests: [], evidencePaths: [], diagnostics: [] },
+          ],
         },
       },
     }
@@ -680,7 +688,15 @@ describe('ProjectStageWorkbenchHero', () => {
         lifecycleVersion: 2, v2Stage: 'design', createdAt: '', updatedAt: '',
       } } } }),
       useProjectSurfaces: hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: {
-        requirements: { artifacts: [] }, v2Stages: { design },
+        requirements: { artifacts: [] }, v2Stages: {
+          definition: { artifacts: [
+            { id: 'outcome-contract', title: '业务结果与范围约定', path: 'fde-deliverables/02-outcome-scope/outcome-contract.md', status: 'present' },
+          ] },
+          investigation: { artifacts: [
+            { id: 'data-readiness', title: '数据可用性评估', path: 'fde-deliverables/03-environment/data-readiness.md', status: 'present' },
+          ] },
+          design,
+        },
       } } } }),
     })
     const view = render(<ProjectStageWorkbenchHero {...input} />)
@@ -688,6 +704,9 @@ describe('ProjectStageWorkbenchHero', () => {
     expect(screen.getByRole('heading', { name: '先决定怎么实现，再决定是否需要本体' })).toBeTruthy()
     expect(screen.getAllByText('受控 Agent 工作流')).toHaveLength(2)
     expect(screen.getAllByText('Ontology 与知识图谱')).toHaveLength(2)
+    expect(screen.getByText('阶段 02 · 业务与交付约定')).toBeTruthy()
+    expect(screen.getByText('阶段 03 · 环境与访问边界')).toBeTruthy()
+    expect(screen.getByText('outcome-contract.md')).toBeTruthy()
     expect(screen.getByRole('heading', { name: '从最小 Schema 到可查询的真实项目关系' })).toBeTruthy()
     expect(screen.getByText('semantica · 0.6.7')).toBeTruthy()
     expect(screen.getAllByText('2 个实体 · 1 条关系')).toHaveLength(2)
@@ -696,6 +715,53 @@ describe('ProjectStageWorkbenchHero', () => {
     expect(screen.queryByText('现在先做')).toBeNull()
     expect(view.container.querySelector('[data-stage="design"]')?.getAttribute('data-conversation-composer-layout')).toBe('stage-execution')
     expect(view.container.querySelector('[data-stage="design"] [data-stage-artifact-column]')).toBeNull()
+
+    const preparation = screen.getByRole('region', { name: '构建准备' })
+    expect(within(preparation).getByText('尚未绑定代表材料')).toBeTruthy()
+    expect(within(preparation).getByText('0 项已接受')).toBeTruthy()
+    expect(within(preparation).queryByText('103')).toBeNull()
+    const pipeline = within(screen.getByRole('region', { name: 'Semantica 分步运行' })).getByRole('table')
+    expect(within(pipeline).getAllByRole('row')).toHaveLength(6)
+    expect(within(pipeline).getByText('当前材料无法解析')).toBeTruthy()
+    expect(within(pipeline).queryByText('上次抽取完成')).toBeNull()
+    expect(within(pipeline).getByText('失败')).toBeTruthy()
+    expect(within(pipeline).getByText('待重评')).toBeTruthy()
+    expect(within(pipeline).getByRole('button', { name: '运行：抽取候选' }).hasAttribute('disabled')).toBe(true)
+    expect(within(pipeline).getByRole('button', { name: '运行：构建项目图谱' }).hasAttribute('disabled')).toBe(true)
+    const relations = screen.getByRole('table', { name: '关系定义' })
+    expect(within(relations).getAllByRole('row')).toHaveLength(6)
+    expect(within(relations).queryByText('DEPENDS_5')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: '查看全部关系定义' }))
+    expect(within(relations).getAllByRole('row')).toHaveLength(7)
+    expect(within(relations).getByText('DEPENDS_5')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '收起关系定义' }))
+    expect(within(relations).getAllByRole('row')).toHaveLength(6)
+    const evidence = screen.getByRole('table', { name: '运行证据' })
+    expect(within(evidence).getAllByRole('row')).toHaveLength(9)
+    expect(within(evidence).queryByText('服务检查记录 0')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: '查看全部 9 次运行' }))
+    expect(within(evidence).getAllByRole('row')).toHaveLength(10)
+    const oldestRun = within(evidence).getByText('服务检查记录 0').closest('tr')!
+    fireEvent.click(within(oldestRun).getByRole('button', { name: /证据 1/ }))
+    expect(input.openProjectFile).toHaveBeenCalledWith('session-1', '/isolated/project', 'evidence/health-0.json', expect.any(String))
+    fireEvent.click(screen.getByRole('button', { name: '收起，显示最近 8 次运行' }))
+    expect(within(evidence).getAllByRole('row')).toHaveLength(9)
+    expect(screen.getByRole('button', { name: '选择问题并查询' }).hasAttribute('disabled')).toBe(true)
+    expect(screen.getByRole('button', { name: '交给 Agent 实现并运行' }).hasAttribute('disabled')).toBe(true)
+    expect(input.runDesignSemantica).not.toHaveBeenCalled()
+    expect(input.completeV2Stage).not.toHaveBeenCalled()
+    fireEvent.click(within(pipeline).getByRole('button', { name: '运行：发布 Ontology' }))
+    await waitFor(() => expect(input.runDesignSemantica).toHaveBeenCalledWith('workspace-1', 'publish-schema', undefined))
+    await waitFor(() => expect(within(preparation).getByRole('button', { name: '检查本地服务' }).hasAttribute('disabled')).toBe(false))
+    fireEvent.click(within(preparation).getByRole('button', { name: '检查本地服务' }))
+    await waitFor(() => expect(input.runDesignSemantica).toHaveBeenCalledWith('workspace-1', 'health', undefined))
+    await waitFor(() => expect(within(preparation).getByRole('button', { name: '检查本地服务' }).hasAttribute('disabled')).toBe(false))
+    fireEvent.click(within(preparation).getByRole('button', { name: '选择项目材料' }))
+    expect(screen.getByRole('dialog', { name: '绑定项目材料' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '取消' }))
+    fireEvent.click(within(preparation).getByRole('button', { name: '查看候选与来源' }))
+    expect(screen.getByRole('dialog', { name: '审核候选知识' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '取消' }))
 
     expect(screen.queryByRole('button', { name: '开始本阶段工作' })).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: '审阅与编辑定义' }))
@@ -707,6 +773,11 @@ describe('ProjectStageWorkbenchHero', () => {
     fireEvent.click(screen.getByRole('button', { name: '调整路线' }))
     expect(screen.getByRole('dialog', { name: '双轴机制判断' })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: '取消' }))
+    fireEvent.click(screen.getByRole('button', { name: '查看前序记录：业务结果与范围约定' }))
+    expect(input.openProjectFile).toHaveBeenCalledWith(
+      'session-1', '/isolated/project',
+      'fde-deliverables/02-outcome-scope/outcome-contract.md', '业务结果与范围约定',
+    )
     fireEvent.click(screen.getAllByRole('button', { name: '查看' })[0]!)
     expect(input.openProjectFile).toHaveBeenCalledWith(
       'session-1', '/isolated/project',
