@@ -72,6 +72,12 @@ The sidebar and body follow the actual project stage unless a stage is explicitl
 
 The final three V2 stages have distinct delivery workbenches: Pilot readiness and results, production acceptance and handover, and evidence-led improvement. Tabs use Host-checked delivery facts; details open on the right and fixed artifacts remain accessible without a narrow record rail. Future and historical previews are read-only and do not advance lifecycle state. Execution remains in the Agent conversation; no deployment, monitoring or production-query adapter is implied.
 
+Pilot uses a dark illustrated header, four evidence totals, three equal overview columns, a semantic-dependency panel, fixed records and an explicit human-review section. Its content scrolls above the current-stage composer; history keeps the existing read-only composer behavior. Graph counts and recovery duration are display extracts from the recorded summary, not fresh measurements; absent counts stay unregistered. File details and revision copying use the actual record paths and revision. The illustration is decorative and contains no project facts.
+
+Production uses a light header, a dark evidence-total strip, release-sequence and adoption views, and a two-column delivery archive. Charts only display recognizable values from the source summary; unrecognized summaries remain text, and missing values are not replaced with examples. Test or simulated observations retain their source qualifiers and complete summaries. Acceptance and handover shortcuts select the existing tabs; file access, read-only history, and explicit human review retain their existing behavior.
+
+Improvement uses a navy illustrated header, grouped evidence counts, source-grounded signal rows, fixed-record cards and a compact graph-dependency panel. The complete summary and simulation qualifiers remain available in details; missing evidence never becomes a successful example. File and Agent shortcuts reuse the existing callbacks. Human review still requires confirmation, records one improvement cycle and does not execute release. The page scrolls above the existing composer.
+
 
 ## Model Experience
 

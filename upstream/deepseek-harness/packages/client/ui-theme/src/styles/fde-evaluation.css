@@ -6,6 +6,93 @@
   --dsw-alias-evaluation-canvas: var(--dsw-alias-bg-base);
 }
 
+/* Improvement keeps its navy hero and amber human-review action stage-local. */
+[data-delivery-workbench][data-stage='improvement'] {
+  --dsw-alias-evaluation-canvas: var(--dsw-alias-bg-base);
+  --dsw-alias-evaluation-on-accent: #fff;
+  --dsw-alias-improvement-hero: linear-gradient(105deg, #092958, #0b3066);
+  --dsw-alias-improvement-hero-number: #dceeff;
+  --dsw-alias-improvement-hero-border: #7692bb;
+  --dsw-alias-improvement-gate: var(--dsw-alias-bg-layer-1);
+  --dsw-alias-improvement-gate-border: #bb792f;
+  --dsw-alias-improvement-review: #df8100;
+}
+body:not([data-ds-dark-theme]) [data-delivery-workbench][data-stage='improvement'] {
+  --dsw-alias-evaluation-canvas: #fbfcff;
+  --dsw-alias-improvement-gate: #fffdf9;
+  --dsw-alias-improvement-gate-border: #f5d1a2;
+  --dsw-alias-state-business-primary: #164bf2;
+  --dsw-alias-state-business-tertiary: #eaf0ff;
+  --dsw-alias-bg-layer-1: #fff;
+  --dsw-alias-bg-layer-2: #f4f7fe;
+  --dsw-alias-border-l2: #d5dff9;
+  --dsw-alias-label-primary: #101a3e;
+  --dsw-alias-label-secondary: #505b7b;
+  --dsw-alias-label-caption: #7d869c;
+  --dsw-alias-state-success-primary: #229568;
+  --dsw-alias-state-success-tertiary: #e3f7ed;
+  --dsw-alias-state-warn-label: #cf721b;
+  --dsw-alias-state-warn-tertiary: #fff8ef;
+}
+
+/* Production reference roles stay scoped to the delivery and acceptance view. */
+[data-delivery-workbench][data-stage='production'] {
+  --dsw-alias-evaluation-canvas: var(--dsw-alias-bg-base);
+  --dsw-alias-production-hero: linear-gradient(115deg, var(--dsw-alias-bg-layer-1), var(--dsw-alias-bg-layer-2));
+  --dsw-alias-production-stats: #1d293f;
+  --dsw-alias-production-nav: #142952;
+  --dsw-alias-production-on-dark: #fff;
+  --dsw-alias-production-muted: #c3cad8;
+  --dsw-alias-production-icon: #82b8ff;
+  --dsw-alias-production-divider: #586073;
+  --dsw-alias-production-archive-bar: #1a367c;
+  --dsw-alias-production-card-header: var(--dsw-alias-bg-layer-2);
+  --dsw-alias-production-gate: var(--dsw-alias-bg-layer-2);
+  --dsw-alias-production-gate-border: var(--dsw-alias-border-l2);
+}
+body:not([data-ds-dark-theme]) [data-delivery-workbench][data-stage='production'] {
+  --dsw-alias-evaluation-canvas: #fbfcff;
+  --dsw-alias-production-hero: linear-gradient(115deg, #fff, #f6f8fd);
+  --dsw-alias-production-card-header: #f0f6fe;
+  --dsw-alias-production-gate: #f5f3ff;
+  --dsw-alias-production-gate-border: #c4bcff;
+  --dsw-alias-state-business-primary: #2852dd;
+  --dsw-alias-state-business-tertiary: #eaf0ff;
+  --dsw-alias-bg-layer-1: #fff;
+  --dsw-alias-bg-layer-2: #f4f7fd;
+  --dsw-alias-border-l2: #d5def3;
+  --dsw-alias-label-primary: #19263f;
+  --dsw-alias-label-secondary: #5c677f;
+  --dsw-alias-label-caption: #8790a4;
+  --dsw-alias-state-success-primary: #249b62;
+  --dsw-alias-state-success-tertiary: #e5f7eb;
+  --dsw-alias-state-warn-label: #d66b00;
+  --dsw-alias-state-warn-tertiary: #fff8ed;
+}
+
+/* Pilot references use the same blue evidence vocabulary without recoloring other stages. */
+[data-delivery-workbench][data-stage='pilot'] {
+  --dsw-alias-evaluation-on-accent: #fff;
+  --dsw-alias-pilot-hero: linear-gradient(105deg, #05233f, #042345 56%, #075174);
+  --dsw-alias-pilot-hero-muted: #dceaff;
+  --dsw-alias-evaluation-canvas: var(--dsw-alias-bg-base);
+}
+body:not([data-ds-dark-theme]) [data-delivery-workbench][data-stage='pilot'] {
+  --dsw-alias-evaluation-canvas: #fafcff;
+  --dsw-alias-state-business-primary: #004cff;
+  --dsw-alias-state-business-tertiary: #f0f4ff;
+  --dsw-alias-bg-layer-1: #fff;
+  --dsw-alias-bg-layer-2: #f4f6fc;
+  --dsw-alias-border-l2: #d3defa;
+  --dsw-alias-label-primary: #111d3b;
+  --dsw-alias-label-secondary: #4f5973;
+  --dsw-alias-label-caption: #8991a3;
+  --dsw-alias-state-success-primary: #22944a;
+  --dsw-alias-state-success-tertiary: #e7f7eb;
+  --dsw-alias-state-warn-label: #cf6b00;
+  --dsw-alias-state-warn-tertiary: #fff9ec;
+}
+
 body:not([data-ds-dark-theme]) [data-fde-stage-workbench][data-stage='evaluation'] {
   --dsw-alias-evaluation-canvas: #f6f8fd;
   --dsw-alias-state-business-primary: #004cff;

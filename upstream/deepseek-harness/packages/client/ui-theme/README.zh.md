@@ -10,6 +10,12 @@
 
 `fde-evaluation.css` 将用户确认的第五阶段参考配色限定在 `[data-fde-stage-workbench][data-stage='evaluation']`：不透明浅色表面、亮蓝操作，以及 `--dsw-alias-evaluation-*` 横幅和画布角色。不改其他阶段或外壳；深色模式保留基础表面配色，深色横幅使用显式浅色前景。
 
+同一文件另将第六阶段参考配色限定在 `[data-delivery-workbench][data-stage='pilot']`：不透明浅色卡片、亮蓝控件、深蓝至青蓝横幅和浅色文字。深色模式保留基础表面 token，不改变生产、持续改进阶段或应用外壳的配色。
+
+第七阶段另有 `[data-stage='production']` 交付配色：浅色横幅、深蓝证据统计条、蓝色描边图表与浅紫评审区。深色模式保留基础表面 token，深色统计条使用显式浅色文字。试点与持续改进阶段不消费这些角色。
+
+第八阶段将深蓝插画横幅、白色证据面板、钴蓝导航与橙色人工评审操作限定在 `[data-stage='improvement']`。浅色模式使用不透明画布；应用壳和其他阶段仍使用各自角色。
+
 滚动条重新绑定约定：`scrollbar.css` 在 `body` 上把 `--dsh-scrollbar-thumb` 与 `--dsh-scrollbar-thumb-hover` 绑定到 l1（基础表面）token，两条渲染路径都读取这一组变量。高层级表面（菜单、浮层、对话框）在自己的容器上设置 `--dsh-scrollbar-thumb: var(--dsw-alias-scrollbar-bg-l2)` 与 `--dsh-scrollbar-thumb-hover: var(--dsw-alias-scrollbar-hover-l2)`；一次重新绑定即可为引擎实际走的那条路径换色。这组变量的另一个合法目标是 `transparent`，即完全不绘制滑块——[ui-sidebar](../ui-sidebar/README.zh.md) 在指针不在栏内时就这样重新绑定自己的列。绑回 l1 那组不算重新绑定，它只是重述基础表面的默认值。`--dsh-scrollbar-width` 镜像 WebKit 滚动条的布局宽度，供需要与占布局宽度的滚动条对齐的表面使用——[ui-conversation](../ui-conversation/README.zh.md) 用它作为覆盖 composer 座位 `right` 偏移——scrollbar-styles 规格把它与镜像规则及消费者配对检查。
 
 两条路径在构造上互斥。`scrollbar-width`／`scrollbar-color` 写在 `@supports not selector(::-webkit-scrollbar)` 之内，因为这两个属性中的任一个只要取非 `auto` 值，Chromium 与 Safari 就会丢弃该元素上的全部 `::-webkit-scrollbar*` 规则，`::-webkit-scrollbar-thumb:hover` 也在其中——若无条件地同时声明，`--dsh-scrollbar-thumb-hover` 在任何引擎上都不会被渲染。因此 Firefox 走标准属性，WebKit 系引擎走伪元素，hover token 只经由伪元素这条路径渲染。相关原理与实测计算值见[滚动条 Agent Note](../../../.agents/notes/implemented/bug-fix/2026-07-28-themed-scrollbars-and-reserved-gutter.zh.md)。
