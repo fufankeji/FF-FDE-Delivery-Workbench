@@ -6,6 +6,7 @@ import type { ProjectSourceItem } from './source-controller.ts'
 import { FDE_V2_STAGE_IDS, type FdeProjectState, type FdeV2StageId, type ProjectStageValue } from './stage-controller.ts'
 import type { DiscoveryAction, ProjectStageWorkbenchHeroProps, ProjectStageWorkbenchViewProps } from './slots.ts'
 import { KnowledgeGraphExplorer } from './KnowledgeGraphExplorer.tsx'
+import { EvaluationStagePanel } from './EvaluationStagePanel.tsx'
 import css from './StageWorkbench.module.css'
 
 export const V2_STAGE_NAMES = [
@@ -1237,6 +1238,14 @@ function DesignStagePanel({ props, workspace, sessionId, view, stageState, surfa
   </section>
 }
 
+function EvaluationWorkbench(input: Omit<Parameters<typeof LaterStagePanel>[0], 'stage'>) {
+  return <EvaluationStagePanel {...input} records={openFile => <ProjectRecordPanel
+    actualStage="evaluation" collapsed={false} hideCollapse
+    projectSurface={input.projectSurface} sourceFiles={input.sourceFiles}
+    openFile={openFile} onCollapsedChange={() => {}}
+  />} />
+}
+
 function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage, surface, projectSurface, sourceFiles, historicalActualStage }: {
   readonly props: WorkbenchProps
   readonly workspace: { readonly workspaceId: string; readonly title: string; readonly path: string }
@@ -1593,7 +1602,7 @@ function recordStageInputs(surface: ProjectSurfaceSnapshot | undefined, index: n
 }
 
 function ProjectRecordPanel({
-  actualStage, collapsed, projectSurface, sourceFiles, openFile, onCollapsedChange, onStartReview, reviewReady = false,
+  actualStage, collapsed, projectSurface, sourceFiles, openFile, onCollapsedChange, onStartReview, reviewReady = false, hideCollapse = false,
 }: {
   readonly actualStage: FdeV2StageId
   readonly collapsed: boolean
@@ -1603,6 +1612,7 @@ function ProjectRecordPanel({
   readonly onCollapsedChange: (collapsed: boolean) => void
   readonly onStartReview?: () => void
   readonly reviewReady?: boolean
+  readonly hideCollapse?: boolean
 }) {
   const actualIndex = Math.max(0, FDE_V2_STAGE_IDS.indexOf(actualStage))
   const [selectedIndex, setSelectedIndex] = useState(actualIndex)
@@ -1657,7 +1667,7 @@ function ProjectRecordPanel({
   return <section className={css.artifactsPanel} data-project-record-panel="">
     <header>
       <div><span>项目记录</span><h2>{showAll ? '全部已有记录' : selectedTitle}</h2><p>{showAll ? '按阶段查看项目已经留下的依据、产物和人工决定。' : selectedIsCurrent ? '当前阶段的输入和记录会随工作持续更新。' : '这是已经由 FDE 确认并推进的历史记录。'}</p></div>
-      <div className={css.artifactHeaderActions}><b>{showAll ? `${String(recordIndexes.length)} 个阶段` : `${String(selectedPresent)}/${String(selectedRequired.length)}`}</b><button type="button" aria-expanded="true" aria-label="收起项目记录" title="收起项目记录" onClick={() => { onCollapsedChange(true) }}>收起</button></div>
+      <div className={css.artifactHeaderActions}><b>{showAll ? `${String(recordIndexes.length)} 个阶段` : `${String(selectedPresent)}/${String(selectedRequired.length)}`}</b>{!hideCollapse && <button type="button" aria-expanded="true" aria-label="收起项目记录" title="收起项目记录" onClick={() => { onCollapsedChange(true) }}>收起</button>}</div>
     </header>
 
     {showAll
@@ -2081,6 +2091,10 @@ function StageWorkbenchPanel({ props, workspace, sessionId, view }: {
     return <section className={css.state} role="alert"><strong>当前阶段读取失败</strong><span>{stageState.message}</span></section>
   }
 
+  if (viewedStage === 'evaluation' && surfaceState?.status === 'error') {
+    return <section className={css.state} role="alert"><strong>第五阶段记录读取失败</strong><span>{surfaceState.message}</span><button type="button" onClick={() => { props.refreshProjectSurface(workspace.workspaceId) }}>重新读取阶段记录</button></section>
+  }
+
   if (v2Stage !== undefined && viewedStage !== undefined && viewedStage !== v2Stage) {
     const historicalInvestigation = viewedStage === 'investigation'
       && FDE_V2_STAGE_IDS.indexOf(viewedStage) < FDE_V2_STAGE_IDS.indexOf(v2Stage)
@@ -2111,6 +2125,12 @@ function StageWorkbenchPanel({ props, workspace, sessionId, view }: {
     const hasDedicatedHistoricalSurface = Array.isArray(historicalLaterSurface?.workItems)
       && Array.isArray(historicalLaterSurface?.artifacts)
     if (historicalLaterStage && hasDedicatedHistoricalSurface && stageState?.status === 'ready') {
+      if (viewedStage === 'evaluation') return <EvaluationWorkbench
+        key={`${workspace.workspaceId}-evaluation-history`}
+        props={props} workspace={workspace} sessionId={sessionId} view={view}
+        stageState={stageState.value} surface={historicalLaterSurface}
+        projectSurface={surface} sourceFiles={files} historicalActualStage={v2Stage}
+      />
       return <LaterStagePanel
         props={props} workspace={workspace} sessionId={sessionId} view={view}
         stageState={stageState.value} stage={viewedStage}
@@ -2139,6 +2159,12 @@ function StageWorkbenchPanel({ props, workspace, sessionId, view }: {
         projectSurface={surface} sourceFiles={files}
       />
     }
+    if (v2Stage === 'evaluation') return <EvaluationWorkbench
+      key={`${workspace.workspaceId}-evaluation`}
+      props={props} workspace={workspace} sessionId={sessionId} view={view}
+      stageState={stageState.value} surface={surface?.v2Stages.evaluation}
+      projectSurface={surface} sourceFiles={files}
+    />
     return <LaterStagePanel
       props={props} workspace={workspace} sessionId={sessionId} view={view}
       stageState={stageState.value} stage={v2Stage}

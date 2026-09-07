@@ -1,7 +1,7 @@
 ---
 document: architecture
 status: draft
-updated: "2026-09-04"
+updated: "2026-09-07"
 prd: docs/PRD.md
 product_spec: docs/specs/product-spec.md
 ---
@@ -515,6 +515,12 @@ Stop project
 - 浏览器自定义背景：只在当前 Origin 本地处理和保存，不进入 Host、模型、观测后端或项目目录；浏览器清理站点数据会清除该个人偏好。
 
 ## 17. 待验证与确认
+
+### 第五阶段开发与验证承接（2026-09-07）
+
+第五阶段沿用 DSH 的当前 Workspace、Session、文件与终端工具执行客户项目开发；FDE 项目插件只解析 `.fde/stages/evaluation.json` 的版本与测试记录并生成快照。只读 `project_evaluation_get` 返回候选文件、环境和指标定义的当前指纹，执行与结果记录仍在 DSH 中完成。阶段门重新检查同一投影，不以页面状态、文件计数或项目运行成功放行。候选指纹覆盖显式文件清单，不进行客户目录全扫描。
+
+客户端使用第五阶段信息工作台，复用页头的运行操作和同一快照；验证操作先预填原生输入框，开发完全留在既有 Agent 对话，不增加任务看板。现有系统架构、Agent Trial、项目预览和终端入口保留；不建立第二套开发或评估执行引擎，也不改写旧 V1 验证合同。用户未提交开发请求时不会操作客户项目。
 
 - [x] 实际官方提交与可重复启动命令。证据：`docs/verification/2026-08-26-official-harness-baseline.md`。
 - [ ] Better Sidebar 右侧 Dock、File Review Tab 与当前 FDE 项目/会话的运行验证；构建通过不代替用户布局验收。

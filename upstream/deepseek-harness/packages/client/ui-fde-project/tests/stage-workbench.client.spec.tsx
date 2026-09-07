@@ -46,6 +46,9 @@ function props(overrides: Record<string, unknown> = {}) {
     loadStage: vi.fn(),
     loadProjectSurface: vi.fn(),
     refreshProjectSurface: vi.fn(),
+    pollProjectSurface: vi.fn(),
+    runProjectAction: vi.fn(async () => {}),
+    openProjectCapability: vi.fn(async () => {}),
     loadProjectSources: vi.fn(),
     completeRequirements: vi.fn(async () => {}),
     completeV2Stage: vi.fn(async () => {}),
@@ -68,6 +71,117 @@ function props(overrides: Record<string, unknown> = {}) {
     ...overrides,
   } as unknown as ComponentProps<typeof ProjectStageWorkbenchHero>
 }
+
+function evaluationProps(options: { historical?: boolean; empty?: boolean; status?: 'PASS' | 'FAIL' | 'STALE'; runtime?: 'running' | 'blocked' } = {}) {
+  const ready = !options.empty && (options.status === undefined || options.status === 'PASS')
+  const reviewBlockers = ready ? [] : ['当前版本缺少有效验证证据']
+  const stage = {
+    id: 'evaluation', index: 5, title: '运行 PoC 与 Eval', stateStatus: 'ready', statePath: '.fde/stages/evaluation.json',
+    objective: 'Project evidence', explanation: '', prompt: '只准备验证记录，不开发项目、不运行测试。',
+    status: ready ? 'review-ready' : 'working', recommendation: 'pending', currentWorkId: 'plan',
+    requiredCount: 3, presentCount: 3, reviewReady: ready, reviewBlockers, blockers: [],
+    workItems: ['plan', 'cases', 'run', 'conclusion'].map(id => ({ id, title: id, purpose: '', status: 'complete' })),
+    artifacts: [{ id: 'evaluation-report', title: '验证报告', path: 'report.md', purpose: '', required: true, status: 'present' }],
+    evaluation: {
+      status: options.empty ? 'missing' : 'ready', reviewBlockers,
+      candidate: { version: options.empty ? '' : 'candidate-r7', summary: '本轮受测业务链', sourceFiles: [{ path: 'app.ts', status: 'present' }] },
+      testing: { environment: options.empty ? '' : 'local sandbox', current: ready, fingerprint: options.empty ? undefined : 'sha256:current', metrics: options.empty ? [] : [
+        { id: 'latency', title: '接口响应', kind: '性能', required: true, criterion: 'P95 < 300ms', sources: [{ path: 'contract.md', status: 'present' }], status: options.status ?? 'PASS', value: '210ms', evidence: [{ path: 'evidence.txt', status: 'present' }] },
+      ] },
+    },
+  }
+  return props({
+    useStageProgress: hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: { workspaceId: 'workspace-1', lifecycleVersion: 2, currentStage: options.historical ? 'pilot' : 'validation', v2Stage: options.historical ? 'pilot' : 'evaluation', revision: 5 } } } }),
+    useStageView: hook({ byWorkspace: options.historical ? { 'workspace-1': 'evaluation' } : {} }),
+    useProjectSurfaces: hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: {
+      requirements: { artifacts: [] }, v2Stages: { evaluation: stage },
+      runtime: { status: options.runtime ?? 'stopped', action: 'start', revision: 2, terminalTitle: 'test terminal', previewUrl: options.runtime === 'running' ? 'http://127.0.0.1:9000' : undefined },
+    } } } }),
+  })
+}
+
+describe('stage-five information workbench', () => {
+  it('shows useful empty information without a developer panel, fake progress or a record rail', () => {
+    const input = evaluationProps({ empty: true })
+    const view = render(<ProjectStageWorkbenchHero {...input} />)
+    expect(screen.getByRole('heading', { name: '项目运行与验证' })).toBeTruthy()
+    expect(screen.getByText('尚未登记受测版本')).toBeTruthy()
+    expect(screen.getByText('尚无可展示的测试指标')).toBeTruthy()
+    expect(screen.queryByRole('button', { name: '开始本阶段工作' })).toBeNull()
+    expect(screen.queryByRole('button', { name: '开始开发' })).toBeNull()
+    expect(screen.queryByText('0%')).toBeNull()
+    expect(view.container.querySelector('[aria-label="项目记录轴"]')).toBeNull()
+    expect(screen.getByRole('button', { name: '提交 FDE 阶段验收' }).hasAttribute('disabled')).toBe(true)
+    expect(input.prepareStageDraft).not.toHaveBeenCalled()
+    expect(input.runProjectAction).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: '准备验证范围与指标' }))
+    expect(input.prepareStageDraft).toHaveBeenCalledWith('session-1', '只准备验证记录，不开发项目、不运行测试。')
+  })
+
+  it('renders actual metrics and uses the existing file, runtime and capability actions', async () => {
+    const input = evaluationProps({ runtime: 'running' })
+    render(<ProjectStageWorkbenchHero {...input} />)
+    expect(screen.getByText('candidate-r7')).toBeTruthy()
+    expect(screen.getByText('P95 < 300ms')).toBeTruthy()
+    expect(screen.getByText('210ms')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'evidence.txt' }))
+    await waitFor(() => { expect(input.openProjectFile).toHaveBeenCalledWith('session-1', '/isolated/project', 'evidence.txt', 'evidence.txt') })
+    await waitFor(() => { expect(screen.getByRole('button', { name: '预览项目' }).hasAttribute('disabled')).toBe(false) })
+    fireEvent.click(screen.getByRole('button', { name: '预览项目' }))
+    await waitFor(() => { expect(input.runProjectAction).toHaveBeenCalledWith('openProjectPreview', 'workspace-1', 'session-1', '/isolated/project') })
+    await waitFor(() => { expect(screen.getByRole('button', { name: '停止项目' }).hasAttribute('disabled')).toBe(false) })
+    fireEvent.click(screen.getByRole('button', { name: '停止项目' }))
+    await waitFor(() => { expect(input.runProjectAction).toHaveBeenCalledWith('stopProject', 'workspace-1', 'session-1', '/isolated/project') })
+    await waitFor(() => { expect(screen.getByRole('button', { name: '系统架构' }).hasAttribute('disabled')).toBe(false) })
+    fireEvent.click(screen.getByRole('button', { name: '系统架构' }))
+    await waitFor(() => { expect(input.openProjectCapability).toHaveBeenCalledWith('workspace-1', 'fde-architecture') })
+    fireEvent.click(screen.getByRole('button', { name: '在对话中验证' }))
+    expect(input.prepareStageDraft).toHaveBeenCalledWith('session-1', expect.stringContaining('latency'))
+    expect(input.completeV2Stage).not.toHaveBeenCalled()
+  })
+
+  it.each(['FAIL', 'STALE'] as const)('keeps %s evidence visible and prevents stage approval', (status) => {
+    render(<ProjectStageWorkbenchHero {...evaluationProps({ status })} />)
+    expect(screen.getByText(status === 'FAIL' ? '失败' : '结果已过期')).toBeTruthy()
+    expect(screen.getByText('210ms')).toBeTruthy()
+    expect(screen.getByRole('button', { name: '提交 FDE 阶段验收' }).hasAttribute('disabled')).toBe(true)
+  })
+
+  it('requires explicit confirmation and preserves the reasoned return path', async () => {
+    const input = evaluationProps()
+    render(<ProjectStageWorkbenchHero {...input} />)
+    fireEvent.click(screen.getByRole('button', { name: '提交 FDE 阶段验收' }))
+    expect(input.completeV2Stage).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: '确认并进入下一阶段' }))
+    await waitFor(() => { expect(input.completeV2Stage).toHaveBeenCalledWith('workspace-1', 5, 'evaluation') })
+    await waitFor(() => { expect(screen.getByRole('button', { name: '返回上一阶段' }).hasAttribute('disabled')).toBe(false) })
+    fireEvent.click(screen.getByRole('button', { name: '返回上一阶段' }))
+    fireEvent.change(screen.getByLabelText('返回方案阶段的原因'), { target: { value: '范围需要收窄' } })
+    fireEvent.click(screen.getByRole('button', { name: '确认返回上一阶段' }))
+    await waitFor(() => { expect(input.returnV2Stage).toHaveBeenCalledWith('workspace-1', 5, '范围需要收窄') })
+  })
+
+  it('keeps historical evidence readable without live runtime or approval actions', () => {
+    const input = evaluationProps({ historical: true })
+    const view = render(<ProjectStageWorkbenchHero {...input} />)
+    expect(view.container.querySelector('[data-stage="evaluation"]')?.getAttribute('data-historical')).toBe('true')
+    expect(screen.getByText('210ms')).toBeTruthy()
+    expect(screen.queryByRole('button', { name: '启动项目' })).toBeNull()
+    expect(screen.queryByRole('button', { name: '在对话中验证' })).toBeNull()
+    expect(screen.queryByRole('button', { name: '提交 FDE 阶段验收' })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: '返回当前阶段' }))
+    expect(input.returnToCurrentStage).toHaveBeenCalledWith('workspace-1')
+  })
+
+  it('reports existing operation errors without claiming a successful start', async () => {
+    const input = evaluationProps()
+    input.runProjectAction = vi.fn(async () => { throw new Error('运行会话暂不可用') })
+    render(<ProjectStageWorkbenchHero {...input} />)
+    fireEvent.click(screen.getByRole('button', { name: '启动项目' }))
+    await waitFor(() => { expect(screen.getByRole('alert').textContent).toBe('运行会话暂不可用') })
+    expect(screen.getByRole('heading', { name: '未启动' })).toBeTruthy()
+  })
+})
 
 describe('ProjectStageWorkbenchHero', () => {
   it('keeps the official hero outside a registered project', () => {

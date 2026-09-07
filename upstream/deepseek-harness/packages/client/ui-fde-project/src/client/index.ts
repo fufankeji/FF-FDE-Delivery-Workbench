@@ -327,6 +327,12 @@ export function apply(ctx: ClientContext): void {
   }
 
   const stageWorkbenchInjected = (): ProjectStageWorkbenchInjected => ({
+    runProjectAction: async (action, workspaceId, sessionId, workspacePath) => {
+      if (projectSidebar === undefined) throw new Error('项目运行工作区暂时不可用。')
+      await runtimeHeaderInjected(projectSidebar)[action](workspaceId, sessionId, workspacePath)
+    },
+    openProjectCapability: async (workspaceId, capability) => { await enterProject(workspaceId, capability) },
+    pollProjectSurface: (workspaceId) => { surfaces.poll(workspaceId) },
     hooks: { stageProgress: stages, projectSurfaces: surfaces, projectSources: sources, stageView },
     loadStage: (workspaceId) => { stages.load(workspaceId) },
     loadProjectSurface: (workspaceId) => { surfaces.load(workspaceId) },

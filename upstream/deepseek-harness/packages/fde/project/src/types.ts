@@ -893,6 +893,42 @@ export interface V2DesignSnapshot {
 }
 
 /** Host-derived business state for one post-discovery V2 stage. */
+/** Project development and test evidence reported by DSH for stage five. */
+export interface V2EvaluationSnapshot {
+  readonly status: 'missing' | 'ready' | 'invalid'
+  readonly message?: string
+  readonly candidate: {
+    readonly summary: string
+    readonly version: string
+    readonly sourceFiles: readonly V2EvaluationFile[]
+  }
+  readonly testing: {
+    readonly environment: string
+    readonly fingerprint?: string
+    readonly current: boolean
+    readonly metrics: readonly {
+      readonly id: string
+      readonly title: string
+      readonly kind: string
+      readonly required: boolean
+      readonly criterion: string
+      readonly sources: readonly V2EvaluationFile[]
+      readonly status: 'NOT_RUN' | 'RUNNING' | 'PASS' | 'WARN' | 'FAIL' | 'STALE'
+      readonly value: string
+      readonly evidence: readonly V2EvaluationFile[]
+    }[]
+  }
+  readonly reviewBlockers: readonly string[]
+}
+
+/** A bounded project-local reference checked by the Host without exposing file contents. */
+export interface V2EvaluationFile {
+  readonly path: string
+  readonly status: 'present' | 'missing' | 'error'
+  readonly sha256?: string
+  readonly message?: string
+}
+
 export interface V2StageSurfaceSnapshot {
   readonly id: V2LifecycleStageId
   readonly index: number
@@ -923,6 +959,7 @@ export interface V2StageSurfaceSnapshot {
   readonly reviewBlockers: readonly string[]
   readonly investigation?: V2InvestigationSnapshot
   readonly design?: V2DesignSnapshot
+  readonly evaluation?: V2EvaluationSnapshot
   readonly prompt: string
   readonly skill: string
   readonly message?: string

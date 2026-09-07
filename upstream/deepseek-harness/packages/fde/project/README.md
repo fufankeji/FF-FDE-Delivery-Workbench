@@ -24,6 +24,10 @@ The acceptance-handover projection parses schema-v1 `.fde/acceptance-handover.js
 
 ## Model Experience
 
+### V2 stage-five evidence reader
+
+The stable, argument-free `project_evaluation_get` tool resolves the calling Session's registered Workspace and returns its stage-five candidate, metrics, evidence gaps and current testing fingerprint without writing files or running tests. `.fde/stages/evaluation.json` stores `evaluation.candidate` (`summary`, `version`, `sourceFiles`) and `evaluation.testing` (`environment`, `metrics`, optional `run`). Metrics use `id/title/kind/required/criterion/sourceRefs`; run results use `metricId/status/value/evidenceRefs` and the fingerprint captured before execution. Results retain NOT_RUN/RUNNING/PASS/WARN/FAIL; a changed candidate file, version, environment, metric or source produces STALE. Required non-PASS results, missing values/evidence, malformed records and unreadable files prevent stage acceptance. Paths must resolve inside the project; the reader permits 100 paths per list, 256 distinct files, 8 MiB per file and 32 MiB total. There is no development-task gate or whole-project scan. This V2 record is separate from the legacy validation contract above. The fixed schema adds input tokens; bounded metadata enters context only after a call, leaving the schema cache prefix stable. File presence is checked, not the truth of the reported test, which still requires FDE review.
+
 ### Project OpenAPI and architecture tools
 
 #### What the model sees

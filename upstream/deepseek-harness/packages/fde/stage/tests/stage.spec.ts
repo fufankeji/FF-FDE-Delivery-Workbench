@@ -324,6 +324,17 @@ describe('requirement-research model guidance', () => {
       .toContain('普通 Schema 路线不得生成图谱占位文件')
   })
 
+  it('keeps stage-five development in DSH and exposes candidate-bound verification instructions', () => {
+    const plan = V2_STAGE_SKILLS.find(skill => skill.name === 'verification-plan')
+    expect(plan?.content).toContain('evaluation.candidate')
+    expect(plan?.content).toContain('project_evaluation_get')
+    expect(plan?.content).toContain('不要求开发任务清单')
+    expect(plan?.content).toContain('未运行不填 PASS')
+    expect(plan?.content).not.toContain('evaluation.development')
+    expect(v2StagePrompt('evaluation')).toContain('已有 Agent 对话')
+    expect(v2StagePrompt('evaluation')).toContain('不自动推进阶段')
+  })
+
   it('uses a method-first stage-one route with separate conditional engineering skills', () => {
     expect(QUALIFY_AI_WORKFLOW_SKILL.name).toBe('qualify-ai-workflow')
     expect(QUALIFY_AI_WORKFLOW_SKILL.content).toContain('schemaVersion":2')

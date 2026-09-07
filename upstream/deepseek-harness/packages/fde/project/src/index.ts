@@ -7,6 +7,7 @@ import type {} from '@deepseek-ai/dsh-host-webserver'
 import { WorkspaceId } from '@deepseek-ai/dsh-workspace'
 import { registerProjectArchitectureTools } from './architecture-tools.ts'
 import { registerProjectEvaluationGuard } from './evaluation-guard.ts'
+import { registerEvaluationWorkbenchTools } from './evaluation-workbench-tools.ts'
 import {
   createArchitectureConfirmRoute,
   createAcceptanceHandoverDecisionRoute,
@@ -219,6 +220,7 @@ export function apply(ctx: Context, config: Config): void {
   registerProjectArchitectureTools(ctx)
   registerProjectRuntimeTools(ctx)
   registerProjectEvaluationGuard(ctx)
+  registerEvaluationWorkbenchTools(ctx)
   const reportFailure = (error: unknown): void => { ctx.logger.warn(error instanceof Error ? error : new Error(String(error))) }
   const handler = createProjectSnapshotRoute({
     trusted: request => isTrustedApiRequest(request, []),

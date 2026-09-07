@@ -2,6 +2,7 @@
 
 import { readFile, realpath, stat } from 'node:fs/promises'
 import { join, relative, resolve, sep } from 'node:path'
+import { loadEvaluationWorkbench } from './evaluation-workbench.ts'
 import type {
   V2DesignSnapshot,
   V2InvestigationSnapshot,
@@ -102,10 +103,10 @@ export const V2_STAGE_DEFINITIONS: readonly StageDefinition[] = [
   },
   {
     id: 'evaluation', index: 5, title: '运行 PoC 与 Eval',
-    objective: '用真实案例和明确指标，证明关键假设是否成立。',
-    explanation: '把成功标准映射成测试用例、数据集、阈值和证据，运行验证并如实记录通过、警告和失败。',
-    statePath: '.fde/stages/evaluation.json', skill: 'fde-run-poc-eval',
-    prompt: '请根据已确认的成功标准和当前候选方案，设计并运行最小 PoC 与 Eval。建立真实案例、边界案例、指标、阈值和证据关系，如实记录未运行、失败和需要人工确认的项目。',
+    objective: '把已确认的方案开发成可运行项目，再用真实任务验证。',
+    explanation: '在 DSH 中完成项目开发与联调，开发在现有 Agent 对话完成；工作台展示受测版本、运行情况、测试指标与证据，最后由 FDE 决定是否进入下一阶段。',
+    statePath: '.fde/stages/evaluation.json', skill: 'verification-plan',
+    prompt: '请加载 verification-plan，依据已确认的业务验收条件、第四阶段方案和当前项目实现，整理本轮受测范围、版本与文件清单、测试环境和实际需要的指标。同步 .fde/stages/evaluation.json 的 evaluation.candidate 与 evaluation.testing，调用 project_evaluation_get 查看缺口。这里只准备或更新验证记录，不开发项目、不运行测试、不启动服务；没有证据时保持缺失或未运行，不代替 FDE 验收或推进阶段。',
     workItems: [
       { id: 'plan', title: '制定验证计划', purpose: '把每条成功标准映射到用例、数据和证据。' },
       { id: 'cases', title: '准备测试案例', purpose: '准备真实、边界、对抗和失败回退案例。' },
@@ -1067,7 +1068,11 @@ export async function loadV2StageSurface(root: string, stageId: V2LifecycleStage
   const design = definition.id === 'design'
     ? await loadDesign(root, state.value?.design)
     : undefined
+  const evaluation = definition.id === 'evaluation'
+    ? await loadEvaluationWorkbench(root, state.value?.evaluation)
+    : undefined
   const reviewBlockers: string[] = []
+  if (evaluation !== undefined) reviewBlockers.push(...evaluation.reviewBlockers)
   if (state.status === 'missing') reviewBlockers.push(`尚未生成阶段状态文件 ${definition.statePath}`)
   if (state.status === 'invalid') reviewBlockers.push(`阶段状态文件无法读取：${state.message ?? '结构无效'}`)
   if (definition.id === 'investigation' && state.status === 'ready' && investigation === undefined) {
@@ -1171,6 +1176,7 @@ export async function loadV2StageSurface(root: string, stageId: V2LifecycleStage
     reviewBlockers,
     ...(definition.id !== 'investigation' || investigation === undefined ? {} : { investigation }),
     ...(definition.id !== 'design' || design === undefined ? {} : { design }),
+    ...(evaluation === undefined ? {} : { evaluation }),
     ...(state.message === undefined ? {} : { message: state.message }),
   }
 }

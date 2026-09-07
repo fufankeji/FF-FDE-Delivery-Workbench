@@ -2,7 +2,7 @@
 document: feature-plan
 feature: F009
 status: ready
-updated: "2026-08-31"
+updated: "2026-09-07"
 ---
 
 # F009 · 阶段 5：PoC 与 Eval 实施计划
@@ -26,7 +26,17 @@ updated: "2026-08-31"
 
 ## 实现方案
 
-以 EvaluationRun 关联固定 CandidateSnapshot、EvaluationCase 和 ResultEvidence。生成方案与运行验证是两个显式动作；每项执行独立持久化。阶段工作台沿用统一骨架，中心区域专门投影候选版本、案例矩阵、运行进度、结果分布、失败分类、阈值、UAT 与版本对比，且所有汇总可下钻到真实证据。非 AI 项目通过等价 Adapter 进入同一验证门禁。
+以 EvaluationRun 关联固定 CandidateSnapshot、EvaluationCase 和 ResultEvidence。生成方案与运行验证是两个显式动作；每项执行独立持久化。第五阶段使用专属工作台，首页展示受测范围／版本、运行情况、指标证据、待解决问题和阶段验收，不设开发区；状态读取同一项目事实。非 AI 项目的验证由 DSH 调用项目自身测试命令，不另建执行引擎。
+
+### 2026-09-07 本轮承接适配
+
+- `packages/fde/project/src/evaluation-workbench.ts` 解析 `.fde/stages/evaluation.json` 中新增的 `evaluation` 对象；`v2-stage-surface.ts` 继续负责固定产物、状态读取和统一阶段门。原有 `plan/cases/run/conclusion` 工作项 ID 与三个固定产物路径保留，不静默迁移 V1 数据。
+- `evaluation.candidate` 包含 `summary`（本轮受测范围）、`version` 和 `sourceFiles`（本轮代码、配置与数据依赖的相对文件清单）；不采集开发任务、不推算开发进度。
+- `evaluation.testing` 包含 `environment`、`metrics`（`id/title/kind/required/criterion/sourceRefs`）和可选 `run`。`run` 包含 `fingerprint` 与 `results`（`metricId/status/value/evidenceRefs`）；结果状态为 `NOT_RUN/RUNNING/PASS/WARN/FAIL`，运行前缺省保持未运行。
+- Host 对候选文件的真实字节、版本、环境和指标定义生成 SHA-256 指纹；`project_evaluation_get` 只读工具返回当前投影和指纹，DSH 执行真实检查后记录对应结果。版本不匹配显示 `STALE`；路径越界、文件不可读、必测项缺证据／非 PASS 阻止阶段门。指纹只覆盖显式清单，DSH 必须列全本轮实现、配置和数据依赖，工作台不扫描整个客户目录。
+- 工作台复用 `ProjectRuntimeHeaderInjected` 的四个运行回调与既有快照，保留运行期轮询。进入架构／评估页通过既有视图导航；准备方案／执行指标只调用 `prepareStageDraft`，不会自动发送消息。
+- `EvaluationStagePanel` 接收现有 StageWorkbench 共享 props，提供受测版本、运行情况、测试表、证据预览、问题与验收、按需展开的项目记录；CSS 使用容器宽度适配、内部表格滚动及末尾输入框安全间距。
+- 本轮不实现新的自动评估引擎、客户项目、指标豁免或生产权限；既有 Agent Trial 页面继续可用并明确其作用范围。F009 其他尚未完成的广义执行器／UAT 任务继续保持未完成。
 
 ## 实施顺序
 
@@ -55,3 +65,5 @@ updated: "2026-08-31"
 |---|---|---|---|
 | AC-F009-001 | 方案确认后对固定候选逐项真实运行 | 运行评估流程定向集成测试 | 计划、执行、结果、失败和恢复状态一致 |
 | AC-F009-002 | 报告与人工决定只读取真实证据 | 运行结果聚合、过期和阶段决定测试 | 未运行不通过、旧版本过期、非人工事件不推进 |
+| AC-F009-003 | 有效信息主页面、运行复用、DSH 指令与历史只读 | 定向组件测试 | 空态、动态指标、运行按钮、返回入口一致 |
+| AC-F009-004 | 版本与指标投影及真实文件指纹门禁 | 定向 Host 测试 | 无结果／旧版本／越界／缺失证据拒绝，完整证据可评审 |

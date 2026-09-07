@@ -143,6 +143,21 @@ const EVALUATION_STAGE_SHARED = {
   workItems: ['plan', 'cases', 'run', 'conclusion'],
 } as const
 
+const EVALUATION_WORKBENCH_RULES = `
+## 第五阶段：受测版本与验证记录
+
+阶段仍叫“运行 PoC 与 Eval”，但先在 DSH 当前项目中完成用户授权的项目开发，再对目标系统测试和阶段验收。不要把工作台 Agent 的一次回答或 Headless Trial 当作整个业务系统已通过。
+
+在 .fde/stages/evaluation.json 根对象新增 evaluation，保留原有 schemaVersion=1、stage=evaluation、workItems 的 plan/cases/run/conclusion 和三份固定产物。受测版本与测试结果分开保存；开发留在已有 Agent 对话，工作台不采集开发任务或展示开发进度：
+
+- evaluation.candidate：summary（本轮受测范围）、version（明确版本）、sourceFiles（本轮代码／配置／数据依赖的项目相对文件路径数组）。尚无可运行版本时保持缺失，不虚构版本或范围；缺少 summary/version 时省略字段，不写空字符串。不要求开发任务清单。
+- evaluation.testing：environment（实际测试环境）、metrics（动态数组，每项 id/title/kind/required/criterion/sourceRefs）。kind 使用业务、接口、界面、AI、性能或安全等真实测试分类；criterion 写明验收条件、方法和阈值，sourceRefs 指向当前项目中约定该条件的文件。required 必须是布尔值，不能为通过门禁而把关键项目改成可选。
+- 准备好定义后调用 project_evaluation_get，读取 testing.fingerprint。它由候选文件真实内容、版本、环境、指标和依据生成；不得自行编造。sourceFiles 必须列全本轮受测实现与依赖，不包含阶段状态自身；当前读取支持最多 100 个候选文件、单文件 8 MiB、全部引用 32 MiB，超限要明确收窄验证范围，不可隐瞒未覆盖内容。
+- 用户要求测试后，执行项目自身的真实命令／操作，先保存原始证据，再写 evaluation.testing.run={fingerprint,results}；results 每项 metricId/status/value/evidenceRefs，status 只能 NOT_RUN/RUNNING/PASS/WARN/FAIL。未运行不填 PASS；缺证据不填通过；修复后使用新指纹重跑，旧运行报告保留在各自文件内。
+- 只有受测版本明确、当前版本必测项 PASS、有实际结果与可读证据、固定产物齐全且无关键阻塞，才可写 review-ready，并完成四个固定工作项；conclusion 指候选测试结论，不是 FDE 人工决定。使用 project_evaluation_get 重读缺口。不得更改生命周期或伪造 FDE 批准。
+
+所有路径只允许当前项目内相对路径；模型按需读取，不把整仓库或整张图谱加入上下文。启动、预览、停止沿工作台已有运行操作；未明确授权不启动服务、不发起付费调用、不操作生产系统。`
+
 const PILOT_STAGE_SHARED = {
   stage: 'pilot', index: 5, statePath: '.fde/stages/pilot.json',
   artifacts: [
@@ -478,7 +493,7 @@ function contentFor(definition: V2StageSkillDefinition): string {
   const investigationRules = definition.stage !== 'investigation' ? '' : `\n\n## 环境调查驾驶舱\n\n为了让工作台展示真实环境，而不是写死示例，调查后同步维护 \`investigation\`。五组数组中每个元素必须严格使用以下字段，不能用近义字段替代：\n\n- \`systems[]\`：\`{ id, label, kind, status, owner?, note? }\`；\`kind\` 只能是 \`data\`、\`system\`、\`external\` 或 \`actor\`，\`status\` 只能是 \`confirmed\`、\`conditional\`、\`pending\` 或 \`blocked\`。\n- \`connections[]\`：\`{ from, to, label? }\`；\`from\` 和 \`to\` 只能引用 \`systems\` 中已有的稳定 \`id\`。\n- \`actionBoundaries[]\`：\`{ target, read, suggest, draft, execute }\`；对象字段必须叫 \`target\`，四种动作状态只能是 \`allowed\`、\`conditional\`、\`pending\`、\`denied\` 或 \`not-applicable\`。\n- \`dataFindings[]\`：\`{ label, value, status }\`；不要写成 \`id/note/source\`，\`status\` 只能是 \`confirmed\`、\`warning\`、\`pending\` 或 \`blocked\`。来源证据保留在固定产物中。\n- \`governanceReviews[]\`：\`{ area, status, owner?, note? }\`；\`area\` 只能是 \`security\`、\`privacy\`、\`legal\`、\`procurement\`、\`finance\` 或 \`business\`，\`status\` 只能是 \`confirmed\`、\`conditional\`、\`pending\` 或 \`blocked\`。不要使用 \`partial\`、\`unconfirmed\` 或 \`confirmed-in-simulation\` 等自定义状态，应归一为允许值并在 \`note\` 保留原始限定。\n\n没有证据时使用空数组或 pending，不得填入演示数据。写完后必须重新读取状态文件，逐项核对字段名和枚举；任一结构无效时不得把阶段写成 review-ready。\n\n第三阶段只调查真实环境与动作边界，不构建本体、不设计架构、不选择模型，也不开始开发。`
   const designRules = definition.stage !== 'design' ? '' : `\n\n## 第四阶段双轴路线与图谱快照\n\n先分别记录“采用什么执行机制”和“是否需要本体”，不能因已集成 Semantica 就默认选择知识图谱：\n\n- \`design.execution\`：\`status\` 只能是 \`undecided\`、\`candidate\` 或 \`selected\`；形成候选后必须填写 \`mechanism\`，其值只能是 \`manual\`、\`rules\`、\`software\`、\`retrieval\`、\`model\`、\`agent\` 或 \`hybrid\`，并可用 \`label/rationale\` 记录业务名称与证据理由。\n- \`design.semantics\`：\`mode\` 只能是 \`undecided\`、\`schema\` 或 \`ontology\`；\`conclusion\` 只能是 \`pending\`、\`not_required\`、\`validated\`、\`validation_failed\` 或 \`insufficient_evidence\`。\`schema\` 路线只能记录 \`pending/not_required\`。\n- \`design.ontology\`：非本体路线固定为 \`{ status: "not_applicable" }\`；本体路线的 \`status\` 只能是 \`not_started\`、\`draft\`、\`review\`、\`published\` 或 \`stale\`，可记录 \`schemaVersion/classCount/relationshipTypeCount\`。\n- \`design.graphBuild\`：非本体路线固定为 \`{ status: "not_applicable" }\`；本体路线只能记录 \`waiting\`、\`running\`、\`succeeded\`、\`failed\`、\`cancelled\` 或 \`stale\`，可用 \`message\` 说明真实运行状态。\n\n只有本体路线才能由项目隔离的 Semantica Provider 在 \`.fde/design/knowledge-graph.json\` 写入真实快照。普通 Schema 路线不得生成图谱占位文件；不得用演示节点、示例关系或 Semantica 的全局 Demo 图填充项目工作台。快照根对象固定为 \`{ schemaVersion: 1, provider, graphId, revision, ontologyVersion, updatedAt, nodes, edges, communities }\`：\n\n- \`provider\`：\`{ id, version? }\`，记录实际构建 Provider。\n- \`nodes[]\`：\`{ id, label, type, summary?, communityId?, confidence?, validFrom?, validUntil?, sourceRefs }\`。\n- \`edges[]\`：\`{ id, source, target, type, label?, weight, confidence?, validFrom?, validUntil?, sourceRefs }\`；起止节点必须已经登记。\n- \`communities[]\`：\`{ id, label, level, nodeIds }\`；只能引用快照中的真实节点。\n\n每个实体和关系的来源、时间与置信度都来自本轮构建证据；工作台只负责渲染该快照。图谱构建成功不等于 Schema 验证、能力问题或纵向切片已经通过，最终结论和阶段推进仍由 FDE 人工确认。`
   // oxlint-enable @stylistic/quotes
-  return `# ${definition.label}\n\n${definition.instructions}\n\n## 固定产物\n\n${artifactList}\n\n状态文件：\`${definition.statePath}\`；其中根对象 \`stage\` 必须固定写为 \`${definition.stage}\`，不能写成产物目录名或中文阶段名。固定工作项 ID：${workItemList}。\n\n## 状态文件结构\n\n下面只示范固定 JSON 结构；各项状态、阻塞和建议必须依据本轮事实填写：\n\n\`\`\`json\n${stateExample}\n\`\`\`${investigationRules}${designRules}\n\n${COMMON_V2_STAGE_RULES}`
+  return `# ${definition.label}\n\n${definition.instructions}\n\n## 固定产物\n\n${artifactList}\n\n状态文件：\`${definition.statePath}\`；其中根对象 \`stage\` 必须固定写为 \`${definition.stage}\`，不能写成产物目录名或中文阶段名。固定工作项 ID：${workItemList}。\n\n## 状态文件结构\n\n下面只示范固定 JSON 结构；各项状态、阻塞和建议必须依据本轮事实填写：\n\n\`\`\`json\n${stateExample}\n\`\`\`${investigationRules}${designRules}\n\n${COMMON_V2_STAGE_RULES}${definition.stage === 'evaluation' ? EVALUATION_WORKBENCH_RULES : ''}`
 }
 
 function registeredSkill(definition: V2StageSkillDefinition) {
@@ -540,6 +555,7 @@ export const V2_STAGE_SKILL_CATALOG = V2_POST_DEFINITION_STAGES.map(stage => ({
 
 /** Return short model guidance for the current authoritative V2 stage. */
 export function v2StagePrompt(stage: FdeV2StageId): string {
+  if (stage === 'evaluation') return '当前 FDE 项目处于“运行 PoC 与 Eval”。依据第四阶段已确认方案，在 DSH 当前项目与已有 Agent 对话中完成用户授权的开发和联调；不要一进入阶段就跳过开发去生成报告。工作台只展示有效信息，不要求开发任务清单。准备或执行验证时按需加载 `verification-plan` 等既有方法；模型或 Agent 验证按需使用 `build-ai-evaluation`，CI 故障按需使用 `ci-forensics`，不得为了显得完整一次加载全部，同步 .fde/stages/evaluation.json 中 evaluation.candidate 与 evaluation.testing，根对象 `stage` 必须固定写为 `evaluation`，保留 plan/cases/run/conclusion 固定工作项；通过 project_evaluation_get 获取当前版本指纹，真实执行后才记录结果。复用已有架构、启动、预览、终端与停止能力；项目开发与运行均需用户明确请求。测试按目标系统选用，Agent Trial 不能替代整个系统验证；不自动推进阶段。'
   if (stage === 'definition') {
     return '当前 FDE 项目处于“定义结果、范围与责任”。用户开展本阶段工作时，先按任务加载必要方法：通常从 `engineer-ai-value` 开始，再根据当前缺口使用 `requirements-to-spec`、`feasibility-probe`、`estimation` 或 `delivery-plan`；信息不足、现场事实变化、需要负责人决定或范围周期资源冲突时，才分别使用 `qualify-ai-workflow`、`reframe-ai-engagement`、`stakeholder-brief` 或 `escalation-and-renegotiation`。不得为了显得完整一次加载全部。严格维护固定产物与状态文件；`.fde/stages/definition.json` 根对象的 `stage` 必须固定写为 `definition`，不能写成 `outcome-scope`；`workItems` 必须是逐项包含 `id` 与 `status` 的数组，不能写成对象映射。只记录真实来源和执行证据；你不能代替 FDE 确认客户结论、执行未授权外部动作或推进项目阶段。'
   }

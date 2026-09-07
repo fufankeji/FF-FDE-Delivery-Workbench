@@ -132,6 +132,9 @@ export type DiscoveryAction =
 
 /** Shared project-stage workbench data and actions. */
 export interface ProjectStageWorkbenchInjected {
+  runProjectAction: (action: 'startProject' | 'stopProject' | 'openProjectPreview' | 'showProjectTerminal', workspaceId: string, sessionId: string, workspacePath: string) => Promise<void>
+  openProjectCapability: (workspaceId: string, capability: 'fde-architecture' | 'fde-evaluation') => Promise<void>
+  pollProjectSurface: (workspaceId: string) => void
   hooks: {
     stageProgress: ProjectStageController
     projectSurfaces: FdeProjectSurfaceController

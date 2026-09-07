@@ -24,6 +24,10 @@ FDE 项目交付页面使用的可信 Host 支持。它只解析显式 Harness W
 
 ## 模型体验
 
+### V2 第五阶段证据读取
+
+稳定、无参数的 `project_evaluation_get` 工具按调用 Session 解析已注册 Workspace，返回第五阶段受测版本、指标、证据缺口与当前验证指纹，不写文件或运行测试。`.fde/stages/evaluation.json` 保存 `evaluation.candidate`（`summary`、`version`、`sourceFiles`）与 `evaluation.testing`（`environment`、`metrics`、可选 `run`）。指标使用 `id/title/kind/required/criterion/sourceRefs`；运行结果使用 `metricId/status/value/evidenceRefs` 和执行前取得的指纹。结果保留 NOT_RUN/RUNNING/PASS/WARN/FAIL；候选文件、版本、环境、指标或来源变化时标为 STALE。必测项非 PASS、缺少数值或证据、记录结构错误和文件不可读均阻止阶段验收。路径必须位于项目内；每份路径清单最多 100 项，最多 256 个不同文件，单文件 8 MiB，总计 32 MiB。不设置开发任务门槛，也不扫描整个项目。该 V2 记录与上文旧验证合同独立。固定 Schema 增加输入 Token；有界元数据只在调用后进入上下文，不改变 Schema 缓存前缀。工具检查文件存在性，不证明测试报告的真实性，仍需 FDE 核对。
+
 ### 项目 OpenAPI 与系统架构工具
 
 #### 模型看到什么
