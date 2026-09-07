@@ -144,7 +144,7 @@ export function EvaluationStagePanel({
       <header><div><span className={css.eyebrow}><EvaluationIcon kind="shield" />03 / 验证结果</span><h2>测试指标与证据</h2><p>按项目实际需要设置验证指标，通过记录仍需人工核对。</p></div>
         {!historical && <div className={css.actions}><button type="button" className={css.primary} onClick={() => { prepare(surface.prompt) }}><EvaluationIcon kind="target" />{metrics.length ? '更新验证范围与指标' : '准备验证范围与指标'}</button><button type="button" disabled={busy} onClick={() => { void perform(() => props.openProjectCapability(workspace.workspaceId, 'fde-evaluation')) }}><EvaluationIcon kind="chart" />评估优化</button></div>}
       </header>
-      {metrics.length === 0 ? <div className={css.empty}><span className={css.emptyIcon}><EvaluationIcon kind="clipboard" /><EvaluationIcon kind="target" /></span><div><div className={css.emptyTitle}><strong>尚无可展示的测试指标</strong><span className={css.badge}>未运行</span></div><p>根据业务验收条件和当前实现准备指标；结果产生前保持“未运行”。</p></div></div> : <div className={css.tableScroll} tabIndex={0} aria-label="测试指标表格，可横向滚动"><table>
+      {metrics.length === 0 ? <div className={css.empty}><span className={css.emptyIcon}><EvaluationIcon kind="clipboard" /><EvaluationIcon kind="target" /></span><div><div className={css.emptyTitle}><strong>尚无可展示的测试指标</strong><span className={css.badge}>未运行</span></div><p>根据业务验收条件和当前实现准备指标；结果产生前保持“未运行”。</p></div></div> : <div className={css.tableScroll} role="region" tabIndex={0} aria-label="测试指标表格，可上下和左右滚动"><table>
         <thead><tr><th>验证项目</th><th>验收标准与依据</th><th>实际结果</th><th>状态与证据</th>{!historical && <th>操作</th>}</tr></thead>
         <tbody>{metrics.map(metric => <tr key={metric.id}>
           <td><strong>{metric.title}</strong><small>{metric.kind} · {metric.required ? '必测' : '补充验证'}</small></td>

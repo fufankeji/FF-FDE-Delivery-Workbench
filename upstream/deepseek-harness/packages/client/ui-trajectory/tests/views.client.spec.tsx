@@ -263,6 +263,7 @@ function mount(slots: SlotRegistry, nodes: ConversationSnapshot['nodes'] = NODES
   return render(
     <>
       <ConversationSessionHeader
+        showWhenBlank={false}
         sessionId={SID}
         SessionProvider={({ children }) => children(SID)}
         useSession={useSession}

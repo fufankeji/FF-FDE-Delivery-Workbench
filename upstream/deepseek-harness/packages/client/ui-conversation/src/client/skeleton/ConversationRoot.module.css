@@ -345,10 +345,15 @@
   bottom: 16px;
 }
 
-/* Completed investigation records are a dense, read-only evidence surface.
-   The stage owns the full viewport and cannot accept input, so the resident
-   composer must not cover the archive table or create an artificial crop. */
+/* Read-only stages own the full viewport and cannot accept input. */
 .scrollBody:has([data-hide-stage-composer='true'][data-conversation-composer-overlay]) > .composerSeat {
+  display: none;
+}
+
+/* A blank session nests its workbench in the composer seat. Keep that
+   workbench mounted and hide only the input slots, preserving the draft. */
+.composerHero:has([data-hide-stage-composer='true']) > :global([data-slot='conversation.composer.bar']) > *,
+.composerHero:has([data-hide-stage-composer='true']) > :global([data-slot='conversation.input.dock']) > * {
   display: none;
 }
 
