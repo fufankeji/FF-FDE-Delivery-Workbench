@@ -3351,6 +3351,8 @@
 .designStageRoot[data-conversation-composer-overlay] {
   height: calc(100% - var(--dsh-composer-height, 132px) - 16px);
   padding: 18px 20px 18px 18px;
+  overflow-x: hidden;
+  overflow-y: auto;
   overscroll-behavior: contain;
 }
 

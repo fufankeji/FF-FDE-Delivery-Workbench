@@ -111,7 +111,7 @@ const ADAPTED_SOURCE = [
     copyright: 'Copyright (c) 2026 Lyon Industries (Christopher Lyon)',
     repo: 'https://github.com/lyon-industries/graphrag-workbench',
     revision: '066727de7457f2226eb93b2c8ccbff9a498b2e12',
-    role: '3D knowledge-graph scene, community-aware force layout, progressive reveal, camera focus, and bloom treatment adapted in `packages/client/ui-fde-project/src/client/KnowledgeGraphExplorer.tsx` and `knowledge-graph-layout.ts`',
+    role: 'community-aware deterministic seed layout adapted in `packages/client/ui-fde-project/src/client/knowledge-graph-layout.ts`',
   },
 ] as const
 
