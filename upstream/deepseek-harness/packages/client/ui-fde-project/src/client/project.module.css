@@ -4536,3 +4536,179 @@
   .deliveryManifestoAction > button { width: 100%; min-height: 74px; padding-inline: 22px; border-radius: 15px; font-size: 20px; }
   .deliveryFinalOrbit { top: 47%; right: -260px; width: 560px; opacity: .45; }
 }
+
+/* Project-center collection: bounded rendering, document-level scrolling. */
+.projectCenterRefresh {
+  display: flex;
+  flex-direction: column;
+  container: project-center / inline-size;
+  padding: 18px 34px 20px;
+  color: var(--dsw-alias-label-primary);
+  background: radial-gradient(ellipse at 80% 0%, color-mix(in srgb, var(--fde-stage-solution) 9%, transparent), transparent 48%), var(--dsw-alias-bg-layer-1);
+}
+.projectCenterRefresh > .projectCenterHeader,
+.projectCenterRefresh > .projectCenterSummary,
+.projectCenterRefresh > .projectCollectionSurface,
+.projectCenterRefresh > .projectManagementDetails { left: auto; width: 100%; max-width: none; margin-inline: 0; }
+.projectCenterRefresh .projectCenterHeader { flex: none; height: 82px; min-height: 82px; padding: 0 5px; margin-bottom: 16px; }
+.projectCenterRefresh .projectCenterBreadcrumb { font-size: 13px; line-height: 20px; font-weight: 400; }
+.projectCenterRefresh .projectCenterHeader h1 { display: inline-block; margin: 16px 18px 0 0; color: var(--dsw-alias-label-primary); font-size: 28px; line-height: 36px; font-weight: 700; letter-spacing: 0; }
+.projectCenterRefresh .projectCenterHeader > div:first-child > p:not(.projectCenterBreadcrumb) { display: inline-block; margin: 0; color: var(--dsw-alias-label-secondary); font-size: 13px; line-height: 20px; font-weight: 400; }
+.projectCenterRefresh .projectCenterHeader .projectCreateAction { position: absolute; right: 0; bottom: 0; min-width: 144px; min-height: 40px; margin: 0; padding: 9px 18px; border: 1px solid var(--project-dashboard-blue); border-radius: 9px; color: var(--dsw-alias-label-primary-inverted); background: linear-gradient(180deg, color-mix(in srgb, var(--project-dashboard-blue) 80%, var(--dsw-alias-bg-layer-1)), var(--project-dashboard-blue)); font-size: 14px; line-height: 20px; font-weight: 600; box-shadow: none; }
+.projectCenterUtilities { position: absolute; right: 0; top: -10px; display: flex; align-items: center; gap: 27px; height: 40px; }
+.projectCenterUtilities > button, .projectCenterHelp > summary { display: grid; place-items: center; width: 34px; height: 36px; padding: 0; border: 0; background: transparent; color: var(--dsw-alias-label-primary); cursor: pointer; list-style: none; }
+.projectCenterHelp > summary::-webkit-details-marker { display: none; }
+.projectCenterUtilities svg { width: 25px; height: 25px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.projectCenterHelp > div { position: absolute; z-index: 5; top: 46px; right: 0; width: min(340px, 70vw); box-sizing: border-box; padding: 18px; border: 1px solid var(--dsw-alias-border-l2); border-radius: 12px; background: var(--dsw-alias-bg-layer-1); box-shadow: 0 8px 28px color-mix(in srgb, var(--dsw-alias-shadow-color) 18%, transparent); font-size: 14px; line-height: 23px; }
+.projectCenterHelp p { margin: 8px 0 0; color: var(--dsw-alias-label-secondary); }
+.projectLocalIdentity { display: flex; align-items: center; gap: 8px; color: var(--dsw-alias-label-secondary); font-size: 12px; }
+.projectLocalIdentity img { width: 34px; height: 34px; border-radius: 8px; }
+.projectCenterRefresh .projectCenterSummary { grid-template-columns: minmax(0, 1.38fr) minmax(0, 1fr); align-items: stretch; gap: 18px; flex: .7 0 auto; height: auto; min-height: 232px; }
+.projectCenterRefresh .projectCenterMetrics { grid-column: 2; grid-row: 1; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 16px; height: auto; min-height: 232px; border: 0; border-radius: 0; overflow: visible; background: transparent; box-shadow: none; }
+.projectCenterRefresh .projectCenterMetrics > div { gap: 22px; padding: 18px 22px; border: 1px solid var(--dsw-alias-border-l1); border-radius: 11px; background: var(--dsw-alias-bg-layer-1); box-shadow: 0 3px 7px color-mix(in srgb, var(--project-dashboard-navy) 6%, transparent); }
+.projectCenterRefresh .projectMetricIcon { width: 56px; height: 56px; border-radius: 15px; }
+.projectCenterRefresh .projectMetricIcon svg { width: 28px; height: 28px; }
+.projectCenterRefresh .projectCenterMetrics dt { color: var(--dsw-alias-label-secondary); font-size: 13px; line-height: 20px; }
+.projectCenterRefresh .projectCenterMetrics dd { position: relative; margin-top: 4px; padding-bottom: 5px; color: var(--dsw-alias-label-primary); font-size: 32px; line-height: 38px; font-weight: 700; }
+.projectCenterMetrics dd::after { position: absolute; bottom: 0; left: 0; width: 32px; height: 2px; background: var(--project-dashboard-blue); content: ''; }
+.projectCenterMetrics [data-kind='decisions'] dd::after { background: var(--dsw-alias-state-warn-primary); }
+.projectCenterMetrics [data-kind='sessions'] dd::after { background: var(--dsw-alias-state-success-primary); }
+.projectCenterMetrics [data-kind='schedule'] dd::after { background: var(--fde-stage-solution); }
+.projectCenterRefresh .projectCenterPriority { grid-column: 1; grid-row: 1; height: auto; min-height: 232px; padding: 18px 26px 16px; border-radius: 10px; background: radial-gradient(ellipse at 65% 0%, color-mix(in srgb, var(--project-dashboard-blue) 28%, transparent), transparent 66%), linear-gradient(120deg, color-mix(in srgb, var(--project-dashboard-navy) 46%, var(--dsw-static-neutral-1000)), color-mix(in srgb, var(--project-dashboard-navy) 23%, var(--dsw-static-neutral-1000))); box-shadow: 0 4px 8px color-mix(in srgb, var(--project-dashboard-navy) 15%, transparent); }
+.projectCenterRefresh .projectPriorityCopy { z-index: 2; padding-right: 40%; box-sizing: border-box; }
+.projectCenterRefresh .projectPriorityCopy > span { font-size: 13px; line-height: 20px; font-weight: 500; }
+.projectCenterRefresh .projectPriorityCopy > strong { display: -webkit-box; max-width: none; margin-top: 9px; font-size: 23px; line-height: 30px; font-weight: 650; white-space: normal; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.projectPriorityStage { align-self: start; margin-top: 7px; max-width: 100%; box-sizing: border-box; padding: 3px 10px; border: 1px solid color-mix(in srgb, var(--dsw-alias-label-primary-inverted) 42%, transparent); border-radius: 6px; color: var(--dsw-alias-label-primary-inverted); font-size: 13px; line-height: 20px; font-weight: 400; }
+.projectCenterRefresh .projectPriorityCopy > p { max-width: none; margin-top: 10px; font-size: 14px; line-height: 22px; }
+.projectCenterRefresh .projectPriorityCopy > div { margin-top: auto; padding-top: 4px; }
+.projectCenterRefresh .projectPriorityCopy > div > span { display: block; font-size: 13px; line-height: 20px; color: var(--dsw-alias-label-primary-inverted); opacity: .8; }
+.projectCenterRefresh .projectPriorityCopy button { position: static; min-width: 157px; width: auto; min-height: 36px; margin-top: 12px; padding: 7px 20px; border: 1px solid var(--dsw-alias-border-l1); border-radius: 7px; color: var(--project-dashboard-navy); background: var(--dsw-alias-bg-layer-1); font-size: 14px; line-height: 20px; font-weight: 600; }
+.projectPriorityFacts { position: absolute; bottom: 4px; left: 185px; display: flex; gap: 30px; width: max-content; max-width: calc(100% - 185px); color: var(--dsw-alias-label-primary-inverted); pointer-events: none; }
+.projectPriorityFacts > span { display: inline-flex; gap: 10px; align-items: center; font-size: 13px; line-height: 20px; white-space: nowrap; }
+.projectPriorityFacts svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+.projectCenterRefresh .projectPriorityArt { width: 47%; color: color-mix(in srgb, var(--project-dashboard-blue) 55%, var(--dsw-alias-label-primary-inverted)); }
+.projectCenterRefresh .projectPriorityArt::before, .projectCenterRefresh .projectPriorityArt::after { display: none; }
+.projectPriorityArt > svg { width: 100%; height: 100%; }
+.projectCenterRefresh .projectCollectionSurface { flex: 1 0 auto; height: auto; min-height: 0; margin-top: 16px; padding: 8px 10px 10px; overflow: visible; border-radius: 14px; background: color-mix(in srgb, var(--dsw-alias-bg-layer-1) 90%, transparent); box-shadow: 0 3px 8px color-mix(in srgb, var(--project-dashboard-navy) 5%, transparent); }
+.projectCenterRefresh .projectCollectionHeader { align-items: center; min-height: 50px; padding: 0 4px 10px; gap: 16px; }
+.projectCenterRefresh .projectCollectionTitle h2 { margin: 0; color: var(--dsw-alias-label-primary); font-size: 18px; line-height: 24px; font-weight: 600; }
+.projectCollectionTitle h2 > b { display: inline-block; margin-left: 6px; padding: 0 10px; border-radius: 20px; background: var(--dsw-alias-state-business-tertiary); color: var(--project-dashboard-blue); font-size: 14px; line-height: 26px; vertical-align: middle; font-weight: 400; }
+.projectCenterRefresh .projectCollectionTitle p { margin: 0; font-size: 13px; line-height: 20px; }
+.projectCenterRefresh .projectViewControls { gap: 24px; }
+.projectCenterRefresh .collectionViewSwitch { padding: 0; border-radius: 6px; overflow: hidden; }
+.projectCenterRefresh .collectionViewSwitch button { min-width: 84px; height: 36px; border-radius: 0; font-size: 13px; line-height: 20px; }
+.projectCenterRefresh .collectionViewSwitch button[data-active] { background: linear-gradient(180deg, color-mix(in srgb, var(--project-dashboard-blue) 80%, var(--dsw-alias-bg-layer-1)), var(--project-dashboard-blue)); color: var(--dsw-alias-label-primary-inverted); }
+.projectCenterRefresh .projectToolButton { min-width: 100px; height: 36px; border-radius: 6px; font-size: 13px; line-height: 20px; }
+.projectCenterRefresh .projectViewControls svg { width: 18px; height: 18px; }
+.projectCenterRefresh .projectCenterContent { display: flex; flex-direction: column; padding: 0; flex: 1 0 auto; overflow: visible; scrollbar-gutter: auto; }
+.projectCenterRefresh .projectAttentionCards { flex: 1 0 auto; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.projectCenterRefresh .projectCompactCard { position: relative; display: flex; flex-direction: column; justify-content: space-between; row-gap: 6px; min-height: 258px; padding: 16px 20px 13px; border-radius: 13px; background: linear-gradient(135deg, color-mix(in srgb, var(--project-accent) 3%, var(--dsw-alias-bg-layer-1)), var(--dsw-alias-bg-layer-1)); overflow: visible; }
+.projectCenterRefresh .projectCompactCard > header { padding: 0; border: 0; background: transparent; }
+.projectCenterRefresh .projectIdentity { gap: 16px; align-items: center; }
+.projectCenterRefresh .projectIdentity h2 { display: -webkit-box; font-size: 17px; line-height: 24px; font-weight: 600; white-space: normal; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.projectCenterRefresh .projectIdentity p { margin-top: 3px; font-size: 13px; line-height: 20px; }
+.projectCenterRefresh .projectMark { width: 44px; height: 44px; border-radius: 10px; font-size: 25px; line-height: 32px; }
+.projectCenterRefresh .projectMark svg { width: 26px; height: 26px; stroke-width: 4; }
+.projectPriorityRibbon { position: absolute; top: 1px; right: 1px; padding: 2px 17px; border-radius: 0 12px 0 16px; background: var(--dsw-alias-state-warn-primary); color: var(--dsw-alias-label-primary-inverted); font-size: 12px; line-height: 20px; }
+.projectCompactCard:has(.projectPriorityRibbon) > header { padding-top: 3px; padding-right: 38px; }
+.projectCompactMeta { display: flex; flex-wrap: wrap; gap: 8px 22px; padding: 11px 0 8px; border-bottom: 1px solid var(--dsw-alias-border-l1); }
+.projectCompactMeta > span { display: inline-flex; align-items: center; gap: 8px; color: var(--dsw-alias-label-secondary); font-size: 13px; line-height: 20px; white-space: nowrap; }
+.projectCompactMeta svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+.projectCompactProgress { position: relative; padding: 6px 82px 0 0; min-height: 72px; }
+.projectCompactProgress > div { display: flex; align-items: baseline; flex-wrap: wrap; gap: 5px 12px; }
+.projectCompactProgress > div > span, .projectCompactSession > span { color: var(--dsw-alias-label-caption); font-size: 12px; line-height: 20px; }
+.projectCompactProgress b { padding: 0 8px; border-radius: 12px; color: var(--project-dashboard-blue); background: var(--dsw-alias-state-business-tertiary); font-size: 12px; line-height: 20px; font-weight: 500; }
+.projectCompactProgress b[data-error] { color: var(--dsw-alias-state-error-primary); }
+.projectCompactProgress > strong { display: -webkit-box; margin-top: 2px; overflow: hidden; font-size: 14px; line-height: 22px; font-weight: 600; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.projectCompactProgress > p { margin: 0; color: var(--dsw-alias-label-caption); font-size: 12px; line-height: 20px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.projectCompactProgress > svg { position: absolute; right: -11px; top: -33px; width: 98px; height: 110px; color: var(--project-accent); opacity: .55; pointer-events: none; }
+.projectCompactSession { margin-top: 4px; }
+.projectCompactSession p { margin: 0; overflow: hidden; color: var(--dsw-alias-label-secondary); font-size: 13px; line-height: 20px; text-overflow: ellipsis; white-space: nowrap; }
+.projectCompactFooter { display: flex; align-items: end; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-top: 0; padding-top: 5px; }
+.projectCompactFooter > time { color: var(--dsw-alias-label-caption); font-size: 12px; line-height: 20px; }
+.projectCenterRefresh .projectAttentionActions { margin-left: auto; gap: 10px; }
+.projectCenterRefresh .projectAttentionActions button { min-width: 100px; height: 35px; padding: 5px 12px; border-radius: 6px; font-size: 13px; line-height: 20px; }
+.projectCenterRefresh .projectAttentionActions button:last-child { color: var(--dsw-alias-label-primary-inverted); border-color: var(--project-dashboard-blue); background: linear-gradient(180deg, color-mix(in srgb, var(--project-dashboard-blue) 80%, var(--dsw-alias-bg-layer-1)), var(--project-dashboard-blue)); box-shadow: none; }
+.projectSearchRow { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin: 0 4px 14px; color: var(--dsw-alias-label-secondary); font-size: 13px; line-height: 20px; }
+.projectSearchRow > label { display: flex; align-items: center; gap: 8px; width: min(360px, 100%); box-sizing: border-box; min-width: 0; padding: 7px 10px; border: 1px solid var(--dsw-alias-border-l2); border-radius: 7px; background: var(--dsw-alias-bg-layer-1); }
+.projectSearchRow svg { flex: none; width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+.projectSearchRow input { width: 100%; min-width: 0; border: 0; outline: 0; color: var(--dsw-alias-label-primary); background: transparent; font: inherit; }
+.projectSearchRow label:focus-within { outline: 2px solid var(--project-dashboard-blue); outline-offset: 2px; }
+.projectSearchRow button { padding: 5px 8px; border: 0; color: var(--project-dashboard-blue); background: transparent; font: inherit; cursor: pointer; }
+.projectPagination { display: flex; align-items: center; justify-content: end; gap: 14px; padding: 14px 4px 2px; color: var(--dsw-alias-label-secondary); font-size: 13px; line-height: 22px; }
+.projectPagination > span:first-child { margin-right: auto; }
+.projectPagination button { min-height: 34px; padding: 5px 13px; border: 1px solid var(--dsw-alias-border-l2); border-radius: 6px; color: var(--project-dashboard-blue); background: var(--dsw-alias-bg-layer-1); font: inherit; cursor: pointer; }
+.projectPagination button:disabled { opacity: .4; cursor: not-allowed; }
+.projectCenterRefresh .projectListFrame { overflow-x: auto; }
+.projectCenterRefresh .projectList { min-width: 1020px; }
+.projectCenterRefresh .projectManagementDetails { grid-template-columns: minmax(0, 1.02fr) minmax(0, 1fr); gap: 26px; flex: .7 0 200px; height: auto; min-height: 200px; margin-top: 14px; }
+.projectCenterRefresh .projectManagementDetails > section { padding: 10px 14px; border-color: var(--dsw-alias-border-l2); background: var(--dsw-alias-bg-layer-1); box-shadow: 0 3px 7px color-mix(in srgb, var(--project-dashboard-navy) 6%, transparent); }
+.projectCenterRefresh .projectManagementDetails > section:last-child { background: linear-gradient(115deg, color-mix(in srgb, var(--fde-stage-solution) 7%, var(--dsw-alias-bg-layer-1)), var(--dsw-alias-bg-layer-1)); }
+.projectCenterRefresh .projectManagementDetails header { display: flex; align-items: center; gap: 16px; padding: 0 6px 8px; border-bottom: 1px solid var(--dsw-alias-border-l1); }
+.projectCenterRefresh .projectManagementDetails header > div { display: flex; align-items: center; gap: 12px; margin-right: auto; }
+.projectCenterRefresh .projectManagementDetails header svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+.projectCenterRefresh .projectManagementDetails h3 { margin: 0; font-size: 16px; line-height: 24px; font-weight: 600; }
+.projectCenterRefresh .projectManagementDetails header > small { color: var(--dsw-alias-label-secondary); font-size: 13px; }
+.projectCenterRefresh .projectManagementDetails header button, .projectAllSchedules { border: 0; background: transparent; color: var(--project-dashboard-blue); font-size: 13px; line-height: 22px; white-space: nowrap; cursor: pointer; }
+.projectCenterRefresh .projectManagementDetails ul { flex: 1; scrollbar-gutter: auto; }
+.projectCenterRefresh .projectManagementDetails li { gap: 18px; min-height: 52px; padding: 7px 8px; box-sizing: border-box; }
+.projectCenterRefresh .projectManagementDetails li > div:not(.projectScheduleDates) { flex: 1; }
+.projectCenterRefresh .projectManagementDetails li strong { font-size: 13px; line-height: 20px; }
+.projectCenterRefresh .projectManagementDetails li small { font-size: 11px; line-height: 16px; }
+.projectCenterRefresh .projectManagementDetails li time { font-size: 12px; line-height: 20px; }
+.projectCenterRefresh .projectManagementDetails li button { border: 0; padding: 0 8px; color: var(--project-dashboard-blue); font-size: 12px; }
+.projectCenterRefresh .projectActivityMark { width: 36px; height: 36px; border-radius: 8px; font-size: 22px; }
+.projectCenterRefresh .projectManagementDetails > section:last-child li { margin-top: 7px; border: 1px solid var(--dsw-alias-border-l1); border-radius: 7px; background: color-mix(in srgb, var(--dsw-alias-bg-layer-1) 85%, transparent); }
+.projectCenterRefresh .projectScheduleDates { display: flex; flex: 1.4; align-items: center; gap: 16px; font-size: 13px; line-height: 20px; }
+.projectScheduleDates > span { flex: none; }
+.projectScheduleDates > i { flex: 1; height: 1px; min-width: 20px; background: var(--dsw-alias-border-l3); }
+.projectScheduleDates > i::before, .projectScheduleDates > i::after { display: block; width: 6px; height: 6px; margin-top: -2px; border-radius: 50%; background: var(--dsw-alias-border-l3); content: ''; }
+.projectScheduleDates > i::after { float: right; margin-top: -6px; }
+.projectAllSchedules { align-self: center; margin-top: 7px; }
+.projectCenterFootnote { flex: none; margin-top: 12px; color: var(--dsw-alias-label-caption); font-size: 12px; line-height: 20px; text-align: center; }
+.projectCenterRefresh button:focus-visible, .projectCenterHelp summary:focus-visible { outline: 2px solid var(--project-dashboard-blue); outline-offset: 3px; }
+.projectCenterRefresh .projectAttention { display: flex; flex: 1 0 auto; flex-direction: column; }
+.projectCenterRefresh .projectManagementDetails ul:not(:has(> li:nth-child(4))) { display: flex; flex-direction: column; }
+.projectCenterRefresh .projectManagementDetails ul:not(:has(> li:nth-child(4))) > li { flex: 1; }
+.projectCenterRefresh .projectManagementDetails ul:empty { display: none; }
+.projectCenterRefresh .projectManagementDetails > section > p { display: grid; flex: 1; place-items: center; margin: 0; }
+@container project-center (max-width: 1150px) {
+  .projectCenterRefresh .projectCenterSummary,
+  .projectCenterRefresh .projectCollectionSurface,
+  .projectCenterRefresh .projectManagementDetails { flex: none; }
+  .projectCenterRefresh .projectCenterFootnote { margin-top: auto; padding-top: 12px; }
+  .projectCenterRefresh .projectCenterMetrics > div { gap: 14px; padding-inline: 16px; }
+  .projectCenterRefresh .projectMetricIcon { width: 48px; height: 48px; }
+  .projectCenterRefresh .projectAttentionCards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .projectCenterRefresh .projectCenterHeader > div:first-child > p:not(.projectCenterBreadcrumb) { display: block; margin-top: 4px; }
+  .projectCenterRefresh .projectCenterHeader { height: 104px; }
+  .projectPriorityFacts { position: static; flex-wrap: wrap; max-width: none; margin-top: 14px; gap: 10px; }
+  .projectCenterRefresh .projectPriorityCopy { padding-right: 22%; }
+  .projectCenterRefresh .projectPriorityArt { width: 38%; opacity: .75; }
+  .projectCenterRefresh .projectViewControls { gap: 8px; }
+  .projectCenterRefresh .projectManagementDetails { height: auto; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .projectCenterRefresh .projectManagementDetails > section { height: 220px; }
+}
+@container project-center (max-width: 760px) {
+  .projectCenterRefresh .projectCenterSummary { grid-template-columns: minmax(0, 1fr); }
+  .projectCenterRefresh .projectCenterPriority { grid-row: 1; grid-column: 1; }
+  .projectCenterRefresh .projectCenterMetrics { grid-row: 2; grid-column: 1; min-height: 0; }
+  .projectCenterRefresh .projectCenterMetrics > div { padding: 14px; }
+  .projectCenterRefresh .projectCenterMetrics dd { font-size: 30px; line-height: 36px; }
+  .projectCenterRefresh .projectCollectionHeader { flex-wrap: wrap; }
+  .projectCenterRefresh .projectViewControls { flex-wrap: wrap; }
+  .projectLocalIdentity > span { display: none; }
+  .projectCenterUtilities { gap: 8px; }
+  .projectCenterRefresh .projectCenterHeader > div:first-child > p:not(.projectCenterBreadcrumb) { max-width: calc(100% - 160px); font-size: 12px; }
+}
+@container project-center (max-width: 540px) {
+  .projectCenterRefresh .projectAttentionCards { grid-template-columns: minmax(0, 1fr); }
+  .projectCenterRefresh .projectCenterHeader h1 { font-size: 28px; }
+  .projectCenterRefresh .projectCenterHeader .projectCreateAction { min-width: 120px; padding-inline: 12px; }
+  .projectCenterRefresh .projectCenterHeader > div:first-child > p:not(.projectCenterBreadcrumb) { max-width: calc(100% - 126px); }
+  .projectCenterRefresh .projectManagementDetails li { gap: 8px; }
+  .projectCenterRefresh .projectScheduleDates { gap: 8px; }
+  .projectCenterRefresh .projectManagementDetails li time { max-width: 78px; white-space: normal; }
+  .projectPagination { flex-wrap: wrap; gap: 10px; }
+  .projectPagination > span:first-child { flex-basis: 100%; }
+}

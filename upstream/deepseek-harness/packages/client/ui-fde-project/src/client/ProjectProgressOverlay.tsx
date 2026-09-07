@@ -1,6 +1,6 @@
 /** Full Project Progress page beside the persistent project/session sidebar. */
 
-import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { CSSProperties, RefObject } from 'react'
 import type {
   AcceptanceHandoverDecision,
@@ -1051,8 +1051,35 @@ function ProjectList({ rows, showProject, labels, enterProject }: {
   )
 }
 
-function ProjectAttentionCard({ row, showProject, enterProject }: {
+function ProjectArtwork({ hero = false, palette = 'blue' }: { readonly hero?: boolean; readonly palette?: ProjectPalette }) {
+  const id = useId()
+  return <svg viewBox={hero ? '0 0 380 240' : '0 0 120 126'} aria-hidden="true" data-project-art="" fill="none">
+    <defs>
+      <linearGradient id={`${id}-glass`} x1="0" y1="0" x2="1" y2="1"><stop stopColor="currentColor" stopOpacity=".05" /><stop offset=".55" stopColor="currentColor" stopOpacity=".22" /><stop offset="1" stopColor="currentColor" stopOpacity=".65" /></linearGradient>
+      <linearGradient id={`${id}-edge`} x1="0" y1="0" x2="1" y2="1"><stop stopColor="currentColor" stopOpacity=".95" /><stop offset="1" stopColor="currentColor" stopOpacity=".15" /></linearGradient>
+      <filter id={`${id}-glow`} x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="5" /></filter>
+    </defs>
+    {hero ? <>
+      <path d="m22 163 165-77 173 83-156 66Z" stroke="currentColor" strokeOpacity=".4" fill={`url(#${id}-glass)`} />
+      {[0,1,2,3,4].map(i => <path key={i} d={`M${42+i*29} ${154-i*14}l174 83M${53+i*33} ${178+i*15}l155-77`} stroke="currentColor" strokeOpacity=".15" />)}
+      {[{x:185,y:19},{x:139,y:30},{x:83,y:54}].map(({x,y},i)=><g key={x}>
+        <path d={`M${x} ${y+5}q0-10 10-6l104 42q8 3 8 12v126q0 10-9 6l-106-43q-7-3-7-11Z`} fill={`url(#${id}-glass)`} stroke={`url(#${id}-edge)`} strokeWidth="1.3" />
+        <path d={`m${x+15} ${y+30} 68 28m-68-12 49 20m-49-3 60 24`} stroke="currentColor" strokeOpacity={.24+i*.1} strokeWidth="4" />
+      </g>)}
+      <path d="m109 103 37 15 17 22v44l-54-22Z" fill="currentColor" fillOpacity=".16" stroke="currentColor" strokeOpacity=".5" />
+      <path d="m121 128 29 12m-29-2 24 10m-24 0 29 12" stroke="currentColor" strokeOpacity=".65" strokeWidth="4" />
+      {[{x:51,y:186},{x:97,y:61},{x:305,y:195},{x:343,y:166}].map(p=><g key={p.x}><circle {...{cx:p.x,cy:p.y}} r="8" fill="currentColor" filter={`url(#${id}-glow)`} /><circle cx={p.x} cy={p.y} r="3" fill="currentColor" /></g>)}
+    </> : <>
+      <ellipse cx="61" cy="113" rx="42" ry="8" fill="currentColor" opacity=".1" />
+      {[{x:43,y:10},{x:33,y:16},{x:22,y:24}].map(({x,y})=><path key={x} d={`M${x} ${y+7}q0-6 7-5l44 6q7 1 7 8v69q0 8-7 7l-44-7q-7-1-7-8Z`} fill={`url(#${id}-glass)`} stroke={`url(#${id}-edge)`} strokeWidth="2" />)}
+      {palette==='green' ? <g fill="currentColor" opacity=".75"><rect x="34" y="70" width="7" height="15" rx="1" /><rect x="46" y="55" width="7" height="32" rx="1" /><rect x="58" y="42" width="7" height="47" rx="1" /></g> : palette==='violet' ? <g stroke="currentColor" strokeWidth="3"><path d="m35 45 29 4m-29 6 21 3" opacity=".5" /><circle cx="47" cy="73" r="11" /><path d="m55 82 11 13" strokeWidth="5" /></g> : <path d="m34 45 31 5m-31 7 31 5m-31 7 23 4m-23 7 27 4" stroke="currentColor" strokeOpacity=".65" strokeWidth="3" />}
+    </>}
+  </svg>
+}
+
+function ProjectAttentionCard({ row, priority, showProject, enterProject }: {
   readonly row: ProjectRow
+  readonly priority: boolean
   readonly showProject: (workspaceId: string) => void
   readonly enterProject: (workspaceId: string) => void
 }) {
@@ -1061,46 +1088,29 @@ function ProjectAttentionCard({ row, showProject, enterProject }: {
   const stageId = portfolioStageId(row) ?? 'discovery'
   const stage = stageLabel(row.stage, '阶段读取中', '阶段读取失败')
   const stageIndex = currentV2StageIndex(row.stage)
-  const currentStage = currentV2Stage(row.stage)
   const schedule = row.schedule.status === 'estimated'
     ? `${formatDate(row.schedule.startDate)} — ${formatDate(row.schedule.endDate)}`
     : '交付周期待确认'
-  const runtime = row.surface?.status === 'ready' && row.surface.value.runtime.status === 'running' ? '运行中' : '未运行'
   const palette = projectPalette(row.title)
   return (
-    <article className={css.projectAttentionCard} data-stage={stageId} data-palette={palette}>
+    <article className={`${css.projectAttentionCard} ${css.projectCompactCard}`} data-project-card="" data-stage={stageId} data-palette={palette}>
+      {priority && <span className={css.projectPriorityRibbon}>★ 优先关注</span>}
       <header>
         <div className={css.projectIdentity}>
           <ProjectMark title={row.title ?? '未命名项目'} palette={palette} className={css.projectMark!} />
-          <div><h2>{row.title}</h2><p>{row.companyName || '未填写所属企业'} · {schedule}</p></div>
+          <div><h2 title={row.title}>{row.title}</h2><p>{row.companyName || '未填写所属企业'}</p></div>
         </div>
-        <span className={css.projectAttentionStage}>{stageIndex < 0 ? stage : `${String(stageIndex + 1)}/8 · ${stage}`}</span>
       </header>
-      <div className={css.projectAttentionJourney}>
-        <ProjectStagePath stage={row.stage} />
+      <div className={css.projectCompactMeta}><span><DashboardIcon kind="schedule" />{schedule}</span><span><DashboardIcon kind="sessions" />{row.sessions} 个会话{row.runningSessions > 0 && ` · ${row.runningSessions} 运行中`}</span></div>
+      <div className={css.projectCompactProgress}>
+        <div><span>当前阶段</span><b data-error={row.stage?.status === 'error' || undefined}>{stageIndex < 0 ? stage : `${stageIndex + 1}/8 · ${stage}`}</b></div>
+        <strong title={`${progress.status}；${progress.evidence}；${progress.detail}`}>{progress.status}</strong>
+        <p title={`${action.reason}；${action.action}`}>{action.action}</p>
+        <ProjectArtwork palette={palette} />
       </div>
-      <div className={css.projectAttentionBody}>
-        <section className={css.projectWorkStatus}>
-          <span>最近进展</span>
-          <h3>{progress.status}</h3>
-          <p>{progress.evidence}</p>
-          <small>{currentStage === undefined ? '正在读取当前阶段的工作内容。' : V2_STAGE_SUMMARIES[currentStage]}</small>
-        </section>
-        <aside className={css.projectDecisionPanel}>
-          <span>需要你决定</span>
-          <h3>{action.reason}</h3>
-          <p>{action.action}</p>
-          <small>由 {action.decisionOwner} 根据现有事实决定。</small>
-        </aside>
-      </div>
-      <footer className={css.projectActivityFacts}>
-        <div className={css.projectAttentionMeta}>
-          <span title={row.latestSessionTitle ?? '暂无项目会话'}>最近：{row.latestSessionTitle ?? '暂无项目会话'}</span>
-          <span>{row.sessions} 个会话{row.runningSessions > 0 ? ` · ${String(row.runningSessions)} 个运行中` : ''}</span>
-          <span>{runtime}</span>
-          <span>{schedule}</span>
-          {row.latestActivityAt === undefined ? null : <span>{formatActivityTime(row.latestActivityAt)}</span>}
-        </div>
+      <div className={css.projectCompactSession}><span>最近会话</span><p title={row.latestSessionTitle}>{row.latestSessionTitle ?? '暂无项目会话'}</p></div>
+      <footer className={css.projectCompactFooter}>
+        <time>{row.latestActivityAt === undefined ? '暂无会话更新' : `${formatActivityTime(row.latestActivityAt)} 更新`}</time>
         <div className={css.projectAttentionActions}>
           <button type="button" onClick={() => { showProject(row.workspaceId) }}>查看产物</button>
           <button type="button" onClick={() => { enterProject(row.workspaceId) }}>进入项目 <span aria-hidden="true">→</span></button>
@@ -1110,17 +1120,18 @@ function ProjectAttentionCard({ row, showProject, enterProject }: {
   )
 }
 
-function ProjectAttentionList({ rows, showProject, enterProject }: {
+function ProjectAttentionList({ rows, priorityId, showProject, enterProject }: {
   readonly rows: readonly ProjectRow[]
+  readonly priorityId: string | undefined
   readonly showProject: (workspaceId: string) => void
   readonly enterProject: (workspaceId: string) => void
 }) {
   return (
-    <section className={css.projectAttention} aria-label="待我处理的项目">
+    <section className={css.projectAttention} aria-label="项目卡片">
       {rows.length === 0
         ? <div className={css.projectCenterEmpty}>所有真实项目当前都没有待处理动作，可切换到“全部项目”查看。</div>
         : <div className={css.projectAttentionCards}>{rows.map(row => (
-          <ProjectAttentionCard key={row.workspaceId} row={row} showProject={showProject} enterProject={enterProject} />
+          <ProjectAttentionCard key={row.workspaceId} row={row} priority={row.workspaceId === priorityId} showProject={showProject} enterProject={enterProject} />
         ))}</div>}
     </section>
   )
@@ -2851,6 +2862,9 @@ export function ProjectProgressOverlay({
   const [projectScope, setProjectScope] = useState<'attention' | 'all'>('all')
   const [projectCollectionView, setProjectCollectionView] = useState<'card' | 'list'>('card')
   const [projectSort, setProjectSort] = useState<'priority' | 'activity'>('priority')
+  const [projectQuery, setProjectQuery] = useState('')
+  const [projectPage, setProjectPage] = useState(1)
+  const [allActivity, setAllActivity] = useState(false)
   const [rootRef, sidebarOffset] = useSidebarOffset(page.open)
   useStandalonePage(page.open, rootRef)
 
@@ -2913,20 +2927,24 @@ export function ProjectProgressOverlay({
     view: t('progress.viewProject'), created: date => t('progress.createdAt', { date }),
     loading: t('progress.stageLoading'), failed: t('progress.stageError'),
   }
-  const visibleRows = (projectScope === 'attention' ? attentionRows : rows).toSorted((left, right) => {
+  const query = projectQuery.trim().toLocaleLowerCase()
+  const visibleRows = (projectScope === 'attention' ? attentionRows : rows).filter(row => !query || `${row.title} ${row.companyName}`.toLocaleLowerCase().includes(query)).toSorted((left, right) => {
     if (projectSort === 'activity') return (right.latestActivityAt ?? 0) - (left.latestActivityAt ?? 0)
     return compareProjectPriority(left, right)
   })
-  const visibleActivityRows = rows
+  const pageCount = Math.max(1, Math.ceil(visibleRows.length / 6))
+  const currentProjectPage = Math.min(projectPage, pageCount)
+  const pagedRows = visibleRows.slice((currentProjectPage - 1) * 6, currentProjectPage * 6)
+  const activityRows = rows
     .filter(row => row.latestActivityAt !== undefined)
     .toSorted((left, right) => (right.latestActivityAt ?? 0) - (left.latestActivityAt ?? 0))
-    .slice(0, 4)
-  const visibleScheduleRows = rows.toSorted((left, right) => {
+  const visibleActivityRows = activityRows.slice(0, allActivity ? undefined : 3)
+  const visibleScheduleRows = rows.filter(row => row.schedule.status === 'estimated').toSorted((left, right) => {
     if (left.schedule.status === 'estimated' && right.schedule.status === 'estimated') return left.schedule.endDate.localeCompare(right.schedule.endDate)
     if (left.schedule.status === 'estimated') return -1
     if (right.schedule.status === 'estimated') return 1
     return left.title.localeCompare(right.title, 'zh-CN')
-  }).slice(0, 4)
+  }).slice(0, 2)
 
   if (page.view === 'home') {
     return (
@@ -3057,29 +3075,26 @@ export function ProjectProgressOverlay({
           back={showProjectOverview}
           renderPreview={source => renderSlot('fde.project.source.preview', { source })}
         />
-        : <main className={`${css.pageBody} ${css.projectCenterBody}`}>
-          <header className={css.projectCenterHeader}>
+        : <main className={`${css.pageBody} ${css.projectCenterBody} ${css.projectCenterRefresh}`} data-project-center="">
+          <header className={css.projectCenterHeader} data-project-center-header="">
             <div>
-              <p className={css.projectCenterBreadcrumb}><span>项目交付</span><i>/</i><strong>项目中心</strong></p>
+              <p className={css.projectCenterBreadcrumb} data-project-breadcrumb=""><span>项目交付</span><i>/</i><strong>项目中心</strong></p>
               <h1>项目中心</h1>
-              <p>先处理需要人工决定的事项，再进入项目继续交付。</p>
-              <button type="button" className={css.projectCreateAction} onClick={openProjectCreation}>
+              <p data-project-center-copy="">掌握交付进展，处理需要你决定的事项。</p>
+              <button type="button" className={css.projectCreateAction} data-project-create="" onClick={openProjectCreation}>
                 <span aria-hidden="true">＋</span>新建项目
               </button>
             </div>
-            <div className={css.projectDemoAccount} aria-label="当前用户">
-              <span className={css.projectNotification} title="通知" aria-label="3 条通知">
+            <div className={css.projectCenterUtilities} aria-label="本地工作区">
+              <button type="button" className={css.projectNotification} title={`${attentionRows.length} 个项目待处理`} aria-label={`查看 ${attentionRows.length} 个待处理项目`} onClick={() => { setProjectScope('attention'); setProjectPage(1); setProjectQuery(''); showProjectOverview() }}>
                 <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6.5 9.5a5.5 5.5 0 0 1 11 0c0 6 2.5 6 2.5 7H4c0-1 2.5-1 2.5-7ZM10 19h4" /></svg>
-                <b>3</b>
-              </span>
-              <span title="帮助" aria-label="帮助"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" /><path d="M9.8 9a2.4 2.4 0 1 1 3.15 2.28c-.67.28-.95.72-.95 1.47v.25M12 16.5h.01" /></svg></span>
-              <span className={css.projectAvatar} aria-hidden="true"><img src="/fde-dashboard/demo-avatar.png" alt="" /></span>
-              <strong>赋范</strong>
-              <svg className={css.projectAccountChevron} aria-hidden="true" viewBox="0 0 14 14"><path d="m4 5.5 3 3 3-3" /></svg>
+              </button>
+              <details className={css.projectCenterHelp}><summary aria-label="项目中心帮助"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" /><path d="M9.8 9a2.4 2.4 0 1 1 3.15 2.28c-.67.28-.95.72-.95 1.47v.25M12 16.5h.01" /></svg></summary><div><strong>项目中心帮助</strong><p>查看产物可审阅项目记录；进入项目可继续交付。项目超过 6 个时支持搜索与分页，筛选和排序不会修改项目数据。</p></div></details>
+              <span className={css.projectLocalIdentity} title="本地工作区"><img src="/ff-brand/ff-logo.png" alt="FF - FDE 交付工作台 Logo" /><span>本地工作区</span></span>
             </div>
           </header>
 
-          <section className={css.projectCenterSummary} aria-label="项目概览">
+          <section className={css.projectCenterSummary} data-project-summary="" aria-label="项目概览">
             <dl className={css.projectCenterMetrics}>
               <div data-kind="projects"><span className={css.projectMetricIcon}><DashboardIcon kind="projects" /></span><div><dt>真实项目</dt><dd>{rows.length}</dd></div></div>
               <div data-kind="decisions"><span className={css.projectMetricIcon}><DashboardIcon kind="decisions" /></span><div><dt>待人工决定</dt><dd>{attentionRows.length}</dd></div></div>
@@ -3092,77 +3107,76 @@ export function ProjectProgressOverlay({
                 {primaryAttentionRow === undefined || primaryAttentionAction === undefined
                   ? <><strong>目前没有待处理事项</strong><p>可以查看全部项目，或创建新的交付项目。</p></>
                   : <>
-                    <strong>{primaryAttentionRow.title}</strong>
+                    <strong title={primaryAttentionRow.title}>{primaryAttentionRow.title}</strong>
+                    <b className={css.projectPriorityStage}>{stageLabel(primaryAttentionRow.stage, '阶段读取中', '阶段读取失败')}</b>
                     <p>{primaryAttentionAction.reason}</p>
                     <div>
-                      <span>⚠ {primaryAttentionAction.action}</span>
+                      <span>{primaryAttentionAction.action}</span>
                       <button type="button" onClick={() => { showProjectDetail(primaryAttentionRow.workspaceId) }}>查看并处理 <span aria-hidden="true">→</span></button>
                     </div>
+                    <footer className={css.projectPriorityFacts}><span><DashboardIcon kind="sessions" />{primaryAttentionRow.sessions} 个会话</span><span><DashboardIcon kind="schedule" />{primaryAttentionRow.schedule.status === 'estimated' ? `${formatDate(primaryAttentionRow.schedule.startDate)} — ${formatDate(primaryAttentionRow.schedule.endDate)}` : '交付周期待确认'}</span></footer>
                   </>}
               </div>
               <div className={css.projectPriorityArt} aria-hidden="true">
-                <img src="/fde-dashboard/project-priority-stack.png" alt="" />
+                <ProjectArtwork hero />
               </div>
             </aside>
           </section>
 
-          <section className={css.projectCollectionSurface} aria-label="项目集合">
+          <section className={css.projectCollectionSurface} data-project-collection="" aria-label="项目集合">
             <div className={css.projectCollectionHeader}>
               <div className={css.projectCollectionTitle}>
-                <span className={css.projectCollectionIcon}><DashboardIcon kind="attention" /></span>
                 <div>
-                  <span>{projectScope === 'attention' ? '待我处理' : '全部项目'}</span>
-                  <h2>{projectScope === 'attention'
-                    ? attentionRows.length === 0 ? '当前没有待决定事项' : `${String(attentionRows.length)} 个项目需要你决定下一步`
-                    : `${String(rows.length)} 个项目正在管理中`}</h2>
-                  <p>{projectScope === 'attention'
-                    ? '先看最近进展和待决定事项，再进入项目执行或确认。'
-                    : '查看当前隔离工作区中登记的全部真实项目。'}</p>
+                  <h2 data-project-collection-title="">{page.view === 'timeline' ? '交付时间轴' : projectScope === 'attention' ? '待我处理' : '全部项目'} <b>{visibleRows.length}</b></h2>
+                  <p>{query ? `“${projectQuery.trim()}”的搜索结果` : '项目进展与下一步'}</p>
                 </div>
               </div>
               <div className={css.projectViewControls}>
                 <div className={css.collectionViewSwitch} role="group" aria-label="项目展示方式">
-                  <button type="button" aria-pressed={page.view === 'overview' && projectCollectionView === 'card'} data-active={(page.view === 'overview' && projectCollectionView === 'card') || undefined} onClick={() => { setProjectCollectionView('card'); showProjectOverview() }}>
+                  <button type="button" aria-pressed={page.view === 'overview' && projectCollectionView === 'card'} data-active={(page.view === 'overview' && projectCollectionView === 'card') || undefined} onClick={() => { setProjectCollectionView('card'); setProjectPage(1); showProjectOverview() }}>
                     <svg aria-hidden="true" viewBox="0 0 14 14"><rect x="1.5" y="1.5" width="4" height="4" rx="0.8" /><rect x="8.5" y="1.5" width="4" height="4" rx="0.8" /><rect x="1.5" y="8.5" width="4" height="4" rx="0.8" /><rect x="8.5" y="8.5" width="4" height="4" rx="0.8" /></svg>卡片
                   </button>
-                  <button type="button" aria-pressed={page.view === 'overview' && projectCollectionView === 'list'} data-active={(page.view === 'overview' && projectCollectionView === 'list') || undefined} onClick={() => { setProjectCollectionView('list'); showProjectOverview() }}>
+                  <button type="button" aria-pressed={page.view === 'overview' && projectCollectionView === 'list'} data-active={(page.view === 'overview' && projectCollectionView === 'list') || undefined} onClick={() => { setProjectCollectionView('list'); setProjectPage(1); showProjectOverview() }}>
                     <svg aria-hidden="true" viewBox="0 0 14 14"><circle cx="2.2" cy="3" r="0.9" /><circle cx="2.2" cy="7" r="0.9" /><circle cx="2.2" cy="11" r="0.9" /><path d="M5 3h7M5 7h7M5 11h7" /></svg>列表
                   </button>
                 </div>
-                <button type="button" className={css.projectToolButton} data-active={projectScope === 'all' || undefined} aria-label={`筛选项目，当前：${projectScope === 'attention' ? '待我处理' : '全部项目'}`} onClick={() => { setProjectScope(current => current === 'attention' ? 'all' : 'attention'); showProjectOverview() }}>
-                  <DashboardIcon kind="filter" />筛选
+                <button type="button" className={css.projectToolButton} data-project-filter="" data-active={projectScope === 'attention' || undefined} aria-label={`筛选项目，当前：${projectScope === 'attention' ? '待我处理' : '全部项目'}`} onClick={() => { setProjectScope(current => current === 'attention' ? 'all' : 'attention'); setProjectPage(1); showProjectOverview() }}>
+                  <DashboardIcon kind="filter" />{projectScope === 'attention' ? '待我处理' : '筛选'}
                 </button>
-                <button type="button" className={css.projectToolButton} data-active={projectSort === 'activity' || undefined} aria-label={`项目排序，当前：${projectSort === 'priority' ? '优先事项' : '最近更新'}`} onClick={() => { setProjectSort(current => current === 'priority' ? 'activity' : 'priority') }}>
-                  <DashboardIcon kind="sort" />排序
+                <button type="button" className={css.projectToolButton} data-project-sort="" data-active={projectSort === 'activity' || undefined} aria-label={`项目排序，当前：${projectSort === 'priority' ? '优先事项' : '最近更新'}`} onClick={() => { setProjectSort(current => current === 'priority' ? 'activity' : 'priority'); setProjectPage(1) }}>
+                  <DashboardIcon kind="sort" />{projectSort === 'activity' ? '最近更新' : '排序'}
                 </button>
               </div>
             </div>
+            {(rows.length > 6 || projectQuery !== '') && <div className={css.projectSearchRow}><label><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6" /><path d="m15 15 5 5" /></svg><input type="search" aria-label="搜索项目或企业" placeholder="搜索项目名称或所属企业" value={projectQuery} onChange={event => { setProjectQuery(event.target.value); setProjectPage(1) }} /></label><span>共 {visibleRows.length} 个项目{page.view !== 'timeline' && ' · 每页 6 个'}</span>{projectQuery !== '' && <button type="button" onClick={() => { setProjectQuery(''); setProjectPage(1) }}>清除搜索</button>}</div>}
             <div className={css.projectCenterContent}>
               {visibleRows.length === 0
-                ? <div className={css.projectCenterEmpty}>{projectScope === 'attention' ? '当前没有需要人工决定的项目。' : t('progress.empty')}</div>
+                ? <div className={css.projectCenterEmpty}>{query ? '没有匹配的项目，请调整搜索条件。' : projectScope === 'attention' ? '当前没有需要人工决定的项目。' : t('progress.empty')}</div>
                 : page.view === 'timeline'
                   ? <Timeline rows={visibleRows} showProject={showProjectDetail} todayLabel={t('progress.today')} />
                   : projectCollectionView === 'list'
                     ? <ProjectList
-                      rows={visibleRows} showProject={showProjectDetail} labels={projectRowLabels}
+                      rows={pagedRows} showProject={showProjectDetail} labels={projectRowLabels}
                       enterProject={(workspaceId) => { void enterProject(workspaceId) }}
                     />
                     : <ProjectAttentionList
-                      rows={visibleRows} showProject={showProjectDetail}
+                      rows={pagedRows} priorityId={primaryAttentionRow?.workspaceId} showProject={showProjectDetail}
                       enterProject={(workspaceId) => { void enterProject(workspaceId) }}
                     />}
               {Object.values(stages).some(stage => stage.status === 'error') && (
                 <button type="button" className={css.retryAll} onClick={() => { for (const row of rows) if (row.stage?.status === 'error') retryStage(row.workspaceId) }}>重新读取失败的项目阶段</button>
               )}
             </div>
+            {page.view !== 'timeline' && pageCount > 1 && <nav className={css.projectPagination} aria-label="项目分页"><span>第 {(currentProjectPage - 1) * 6 + 1}–{Math.min(currentProjectPage * 6, visibleRows.length)} 个，共 {visibleRows.length} 个</span><button type="button" disabled={currentProjectPage === 1} onClick={() => { setProjectPage(currentProjectPage - 1) }}>上一页</button><span aria-live="polite">{currentProjectPage} / {pageCount}</span><button type="button" disabled={currentProjectPage === pageCount} onClick={() => { setProjectPage(currentProjectPage + 1) }}>下一页</button></nav>}
           </section>
 
-          {page.view === 'overview' && visibleRows.length > 0 && (
+          {page.view === 'overview' && rows.length > 0 && (
             <div className={css.projectManagementDetails}>
               <section aria-labelledby="recent-project-activity-title">
                 <header>
-                  <div><span>项目动态</span><h3 id="recent-project-activity-title">最近发生了什么</h3></div>
-                  <small>{visibleActivityRows.length} 条</small>
+                  <div><DashboardIcon kind="attention" /><h3 id="recent-project-activity-title">最近动态</h3></div>
+                  <small>{activityRows.length} 条</small>
+                  {activityRows.length > 3 && <button type="button" aria-expanded={allActivity} onClick={() => { setAllActivity(value => !value) }}>{allActivity ? '收起动态' : '查看全部动态'} <span aria-hidden="true">→</span></button>}
                 </header>
                 {visibleActivityRows.length === 0
                   ? <p>项目产生会话活动后，会在这里按时间显示。</p>
@@ -3177,8 +3191,8 @@ export function ProjectProgressOverlay({
               </section>
               <section aria-labelledby="project-delivery-schedule-title">
                 <header>
-                  <div><span>交付周期</span><h3 id="project-delivery-schedule-title">近期需要关注的日期</h3></div>
-                  <button type="button" className={css.projectTimelineAction} onClick={showProjectTimeline}>{scheduledProjectCount}/{rows.length} 已登记 <span aria-hidden="true">→</span></button>
+                  <div><DashboardIcon kind="schedule" /><h3 id="project-delivery-schedule-title">交付周期</h3></div>
+                  <button type="button" className={css.projectTimelineAction} onClick={() => { setProjectScope('all'); setProjectQuery(''); showProjectTimeline() }}>{scheduledProjectCount}/{rows.length} 已登记 <span aria-hidden="true">→</span></button>
                 </header>
                 <ul>{visibleScheduleRows.map(row => (
                   <li key={row.workspaceId} data-pending={row.schedule.status !== 'estimated' || undefined}>
@@ -3187,14 +3201,14 @@ export function ProjectProgressOverlay({
                       <strong>{row.title}</strong>
                       <small>{stageLabel(row.stage, projectRowLabels.loading, projectRowLabels.failed)}</small>
                     </div>
-                    <span>{row.schedule.status === 'estimated'
-                      ? `${formatDate(row.schedule.startDate)} — ${formatDate(row.schedule.endDate)}`
-                      : '周期待确认'}</span>
+                    {row.schedule.status === 'estimated' && <div className={css.projectScheduleDates}><span><small>开始</small>{formatDate(row.schedule.startDate)}</span><i aria-hidden="true" /><span><small>结束</small>{formatDate(row.schedule.endDate)}</span></div>}
                   </li>
                 ))}</ul>
+                {visibleScheduleRows.length === 0 ? <p>还没有已登记的交付周期。</p> : <button type="button" className={css.projectAllSchedules} onClick={() => { setProjectScope('all'); setProjectQuery(''); showProjectTimeline() }}>查看全部 {scheduledProjectCount} 个周期 <span aria-hidden="true">→</span></button>}
               </section>
             </div>
           )}
+          <footer className={css.projectCenterFootnote}>@赋范空间 独家研发</footer>
         </main>}
     </div>
   )

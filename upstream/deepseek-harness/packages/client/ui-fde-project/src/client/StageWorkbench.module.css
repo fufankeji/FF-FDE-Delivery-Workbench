@@ -1807,8 +1807,7 @@
   font-size: 11px;
 }
 
-/* The active stage owns the remaining workbench height. Historical review
-   keeps compact fixed cards; live inputs and outputs stretch, then scroll
+/* The active stage owns the remaining workbench height. Live inputs and outputs stretch, then scroll
    inside their own columns so the milestone rail and actions stay visible. */
 .currentDiscoveryStage .historicalEvidenceChain .historicalStageGrid {
   height: 100%;
@@ -1841,6 +1840,54 @@
   border-radius: 999px;
   background: color-mix(in srgb, var(--dsw-alias-label-caption) 45%, transparent);
   background-clip: padding-box;
+}
+
+/* Center completed discovery within the space above the resident composer.
+   Give real evidence the extra room before centering; short screens scroll. */
+.browsedStage[data-historical='true'][data-stage='discovery'][data-conversation-composer-overlay] {
+  container: discovery-history / inline-size;
+  display: flex;
+  flex-direction: column;
+  justify-content: safe center;
+  width: min(1440px, 100%);
+  padding-inline: 24px;
+}
+
+.browsedStage[data-historical='true'][data-stage='discovery'] > .browsedStageNotice,
+.browsedStage[data-historical='true'][data-stage='discovery'] > .browsedStageGoal { flex: none; }
+
+.browsedStage[data-historical='true'][data-stage='discovery'][data-conversation-composer-overlay] .historicalEvidenceChain {
+  display: grid;
+  flex: 1 0 472px;
+  grid-template-rows: 78px minmax(276px, 1fr) auto auto;
+  height: auto;
+  min-height: 472px;
+  max-height: 620px;
+  margin-top: 0;
+}
+
+.browsedStage[data-historical='true'][data-stage='discovery'] .historicalStageGrid { height: 100%; min-height: 0; }
+.browsedStage[data-historical='true'][data-stage='discovery'] .historicalStageGrid > section { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.browsedStage[data-historical='true'][data-stage='discovery'] .historicalStageGrid > section > header,
+.browsedStage[data-historical='true'][data-stage='discovery'] .evidenceGroupLabel { flex: none; }
+.browsedStage[data-historical='true'][data-stage='discovery'] .historicalFactList {
+  flex: 1;
+  min-height: 0;
+  grid-auto-rows: max-content;
+  align-content: start;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
+.browsedStage[data-historical='true'][data-stage='discovery'] .historicalStageGrid > section:last-child { overflow-y: auto; }
+
+@container discovery-history (max-width: 960px) {
+  .browsedStage[data-historical='true'][data-stage='discovery'][data-conversation-composer-overlay] .historicalEvidenceChain { flex: none; grid-template-rows: auto auto auto auto; max-height: none; }
+  .browsedStage[data-historical='true'][data-stage='discovery'] .historicalStageGrid { grid-template-columns: minmax(0, 1fr); height: auto; gap: 12px; }
+  .browsedStage[data-historical='true'][data-stage='discovery'] .historicalStageGrid > section { height: 280px; }
+  .browsedStage[data-historical='true'][data-stage='discovery'] .historicalStageGrid > section:last-child { grid-column: auto; height: auto; min-height: 200px; }
+  .browsedStage[data-historical='true'][data-stage='discovery'] .historicalEvidenceDirection { display: none; }
 }
 
 .unregisteredFact {
