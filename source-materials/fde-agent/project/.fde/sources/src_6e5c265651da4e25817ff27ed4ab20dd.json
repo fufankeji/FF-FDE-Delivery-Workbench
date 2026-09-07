@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_6e5c265651da4e25817ff27ed4ab20dd",
+  "originalName": "04-access-request-register.json",
+  "storedName": "04-access-request-register.json",
+  "relativePath": "fde-resources/04-access-request-register.json",
+  "mimeType": "application/json; charset=utf-8",
+  "extension": "json",
+  "bytes": 4087,
+  "createdAt": "2026-09-04T04:20:16.747Z",
+  "modifiedAt": "2026-09-04T04:20:16.748Z",
+  "mtimeMs": 1788495616747.5154,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 4087,
+    "sourceMtimeMs": 1788495616747.5154,
+    "derivedPath": ".fde/derived/src_6e5c265651da4e25817ff27ed4ab20dd.md",
+    "updatedAt": "2026-09-04T04:20:16.774Z"
+  }
+}

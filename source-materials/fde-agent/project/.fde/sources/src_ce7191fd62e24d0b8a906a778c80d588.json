@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_ce7191fd62e24d0b8a906a778c80d588",
+  "originalName": "08-resource-and-dependency-register.xml",
+  "storedName": "08-resource-and-dependency-register.xml",
+  "relativePath": "fde-resources/08-resource-and-dependency-register.xml",
+  "mimeType": "application/xml; charset=utf-8",
+  "extension": "xml",
+  "bytes": 2171,
+  "createdAt": "2026-09-04T02:54:37.767Z",
+  "modifiedAt": "2026-09-04T02:54:37.767Z",
+  "mtimeMs": 1788490477767.0872,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 2171,
+    "sourceMtimeMs": 1788490477767.0872,
+    "derivedPath": ".fde/derived/src_ce7191fd62e24d0b8a906a778c80d588.md",
+    "updatedAt": "2026-09-04T02:54:37.834Z"
+  }
+}

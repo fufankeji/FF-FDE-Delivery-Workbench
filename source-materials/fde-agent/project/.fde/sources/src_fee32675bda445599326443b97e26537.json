@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_fee32675bda445599326443b97e26537",
+  "originalName": "06-maintenance-priority-and-approval-policy.pdf",
+  "storedName": "06-maintenance-priority-and-approval-policy.pdf",
+  "relativePath": "fde-resources/06-maintenance-priority-and-approval-policy.pdf",
+  "mimeType": "application/pdf",
+  "extension": "pdf",
+  "bytes": 11286,
+  "createdAt": "2026-09-03T10:23:37.277Z",
+  "modifiedAt": "2026-09-03T10:23:37.278Z",
+  "mtimeMs": 1788431017278.1902,
+  "previewKind": "pdf",
+  "parse": {
+    "status": "needs-ocr",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 11286,
+    "sourceMtimeMs": 1788431017278.1902,
+    "updatedAt": "2026-09-03T10:23:37.475Z",
+    "message": "all 3 pages contain no extractable text (pages needing OCR: 1-3)"
+  }
+}

@@ -1,0 +1,267 @@
+{
+  "schemaVersion": 1,
+  "stage": "improvement",
+  "status": "review-ready",
+  "workItems": [
+    {
+      "id": "evidence",
+      "status": "complete"
+    },
+    {
+      "id": "prioritize",
+      "status": "complete"
+    },
+    {
+      "id": "validate",
+      "status": "complete"
+    },
+    {
+      "id": "productize",
+      "status": "complete"
+    }
+  ],
+  "blockers": [],
+  "recommendation": "go",
+  "delivery": {
+    "schemaVersion": 1,
+    "version": "local-delivery-flow-r1",
+    "versionFiles": [
+      {
+        "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+        "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+      }
+    ],
+    "environment": {
+      "kind": "production",
+      "label": "生产与交付范围"
+    },
+    "semantic": {
+      "mode": "snapshot",
+      "schemaVersion": "0.1.1-preview",
+      "graphRevision": "sha256:58ee663b62eec5cc338b7570616aaea479eea99e31baf545e5069442dea076a6",
+      "summary": "本地应用通过 backend/catalog.mjs 读取既有 56 实体 / 56 关系快照并查询相关子图。尚未接入独立 Semantica 在线查询、生产权限或更新流水线；DSH 中有 Semantica 工具不代表本应用已接通。",
+      "evidence": [
+        {
+          "path": "backend/catalog.mjs",
+          "sha256": "06802a58c1f4523b51d3ab37f496851dde3c3d0ad28f7038ccfbd352be427bd2"
+        },
+        {
+          "path": "docs/architecture/architecture.md",
+          "sha256": "2e669fae199d50759d12962398f22dc0ca03d1d764174bc41cac2f54d3f891bf"
+        },
+        {
+          "path": ".fde/design/knowledge-graph.json",
+          "sha256": "960a8b029c76ccb9c50d38c2ab1aa6f9852c1df3e781d6356e692fef6f4adec2"
+        }
+      ]
+    },
+    "items": [
+      {
+        "id": "improvement-1",
+        "category": "signal",
+        "title": "IMP-001 · 长名称导出可读性反馈",
+        "summary": "接续 PILOT-002：模拟两周内 8 条用户反馈，长名称在导出中换行不合理；属于展示问题，不需改 Ontology。",
+        "criterion": "反馈有案例与范围；不把 UI 问题转成无关语义改造",
+        "owner": "产品负责人",
+        "status": "passed",
+        "required": true,
+        "version": "local-delivery-flow-r1",
+        "scope": "production",
+        "observedAt": "2026-09-07T10:06:28.424Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      },
+      {
+        "id": "improvement-2",
+        "category": "signal",
+        "title": "IMP-002 · 来源说明查询耗时",
+        "summary": "联调监测 500 次来源查询，P95 为 1,480 ms；分析显示重复读取快照与来源说明。",
+        "criterion": "基线采样数、窗口和查询范围明确",
+        "owner": "技术负责人",
+        "status": "passed",
+        "required": true,
+        "version": "local-delivery-flow-r1",
+        "scope": "production",
+        "observedAt": "2026-09-07T10:06:28.425Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      },
+      {
+        "id": "improvement-3",
+        "category": "change",
+        "title": "本轮改进范围与优先级",
+        "summary": "优先修复导出可读性和重复查询；不增加正式写入权限、不改变业务范围，不重构完整系统。",
+        "criterion": "每个改动关联信号、收益、验收和回退",
+        "owner": "FDE",
+        "status": "passed",
+        "required": true,
+        "version": "local-delivery-flow-r1",
+        "scope": "production",
+        "observedAt": "2026-09-07T10:06:28.425Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      },
+      {
+        "id": "improvement-4",
+        "category": "change",
+        "title": "更大范围自动执行暂不纳入",
+        "summary": "测试建议将正式派单列为后续独立评估；当前没有相关批准，不包含在本轮发布。",
+        "criterion": "权限扩张必须回到范围与授权评审",
+        "owner": "业务负责人",
+        "status": "not_applicable",
+        "required": false,
+        "version": "local-delivery-flow-r1",
+        "scope": "production",
+        "observedAt": "2026-09-07T10:06:28.425Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      },
+      {
+        "id": "improvement-5",
+        "category": "impact",
+        "title": "代码与业务影响",
+        "summary": "联调影响仅涉及导出样式和只读缓存；人工确认、草稿保存、接管路径保持不变。",
+        "criterion": "直接受影响路径清楚，原有效业务链路保留",
+        "owner": "开发负责人",
+        "status": "passed",
+        "required": true,
+        "version": "local-delivery-flow-r1",
+        "scope": "production",
+        "observedAt": "2026-09-07T10:06:28.425Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      },
+      {
+        "id": "improvement-6",
+        "category": "impact",
+        "title": "Schema 与图谱影响",
+        "summary": "Schema 保持 preview-0.1.1，图谱快照修订不变；缓存按版本隔离，来源更新时旧缓存失效。",
+        "criterion": "不混用不同快照；业务关系不充当代码依赖",
+        "owner": "语义维护人",
+        "status": "passed",
+        "required": true,
+        "version": "local-delivery-flow-r1",
+        "scope": "production",
+        "observedAt": "2026-09-07T10:06:28.425Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      },
+      {
+        "id": "improvement-7",
+        "category": "validation",
+        "title": "改进前后对照",
+        "summary": "模拟同一组 500 次查询：P95 从 1,480 ms 降至 690 ms，降低 53.4%；24 种长名称导出全部可读。",
+        "criterion": "P95 ≤1,000 ms；24/24 导出检查通过",
+        "owner": "验证负责人",
+        "status": "passed",
+        "required": true,
+        "version": "local-delivery-flow-r1",
+        "scope": "production",
+        "observedAt": "2026-09-07T10:06:28.425Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      },
+      {
+        "id": "improvement-8",
+        "category": "validation",
+        "title": "回归与异常验证",
+        "summary": "联调 36/36 回归用例通过；另测快照变化后缓存失效、来源缺失提示与越权阻断，均符合期望。",
+        "criterion": "核心闭环、数据隔离和接管路径不回退",
+        "owner": "测试负责人",
+        "status": "passed",
+        "required": true,
+        "version": "local-delivery-flow-r1",
+        "scope": "production",
+        "observedAt": "2026-09-07T10:06:28.425Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      },
+      {
+        "id": "improvement-9",
+        "category": "release",
+        "title": "改进版本受控发布",
+        "summary": "测试 DEMO-REL-002 从 demo-r1 更新至 demo-r2；分批观察、保留旧版本，停止阈值与回退路径不变。",
+        "criterion": "变更与验证同版本；每批可停止、可回退",
+        "owner": "发布负责人",
+        "status": "passed",
+        "required": true,
+        "version": "local-delivery-flow-r1",
+        "scope": "production",
+        "observedAt": "2026-09-07T10:06:28.425Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      },
+      {
+        "id": "improvement-10",
+        "category": "reuse",
+        "title": "可复用能力候选",
+        "summary": "沉淀通用长文本导出组件、按快照版本的只读缓存规则及测试样例；不携带客户文件、密钥或业务实体。",
+        "criterion": "只记录复用候选；跨项目发布另行授权",
+        "owner": "产品化负责人",
+        "status": "passed",
+        "required": false,
+        "version": "local-delivery-flow-r1",
+        "scope": "production",
+        "observedAt": "2026-09-07T10:06:28.425Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      }
+    ]
+  },
+  "dataProvenance": {
+    "kind": "integration-fixture",
+    "source": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+    "authorizedBy": "用户明确要求直接通过数据走项目原交付链",
+    "note": "人工构造的联调输入，不表示实际生产上线、客户签收或人工页面验收"
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "contextRunId": "run_f5c64296-09cd-450e-a74a-e4b4d94dd443",
+  "input": {
+    "inputText": "收银全挂了！请马上派收银机维修师傅！",
+    "reportId": "R1003",
+    "sourceRef": "src_a44e36460acd45eea1820367c61d0c8c",
+    "at": "2026-08-21T18:12:19+08:00",
+    "storeId": "NJ-003",
+    "msgId": "MSG-WECOM-908827"
+  },
+  "gate": {
+    "p0": false,
+    "safetyOrWholeStore": true
+  },
+  "dup": {
+    "sameStore": true,
+    "withinWindowMinutes": 2,
+    "possibleDuplicate": true
+  },
+  "dispatch": {
+    "dispatchAllowed": false,
+    "reason": "AR-306 not authorized / no production write"
+  },
+  "retrieved": [
+    {
+      "type": "Report",
+      "id": "R1003",
+      "source": "src_aa42…/src_a44e…",
+      "conf": 0.82
+    },
+    {
+      "type": "Incident",
+      "id": "INC-CAND-NJXJK-20260821-01",
+      "conf": 0.82
+    },
+    {
+      "type": "WorkOrder",
+      "id": "WO-88419",
+      "conf": 0.82
+    },
+    {
+      "type": "Store",
+      "id": "S-NJ-011 / NJ-003",
+      "conf": 0.82
+    }
+  ],
+  "suggestion": {
+    "candidateFaultDomain": "network",
+    "candidatePriority": "P0",
+    "duplicateCandidateOf": "WO-88419/R1002",
+    "humanConfirmRequired": true,
+    "localDraft": null
+  },
+  "localDraft": {
+    "operationId": "OP-SLICE-NJXJK-001",
+    "storeId": "NJ-003",
+    "assetId": "POS-NJXJK-01",
+    "symptom": "收银全挂了！请马上派收银机维修师傅！",
+    "status": "local_pending_human",
+    "evidenceRefs": [
+      "src_a44e36460acd45eea1820367c61d0c8c",
+      "src_aa4217d373de4543abc6cf718540becb",
+      "run_f5c64296-09cd-450e-a74a-e4b4d94dd443"
+    ],
+    "createdAt": "2026-08-21T18:12:00+08:00"
+  },
+  "readback": {
+    "operationId": "OP-SLICE-NJXJK-001",
+    "storeId": "NJ-003",
+    "assetId": "POS-NJXJK-01",
+    "symptom": "收银全挂了！请马上派收银机维修师傅！",
+    "status": "local_pending_human",
+    "evidenceRefs": [
+      "src_a44e36460acd45eea1820367c61d0c8c",
+      "src_aa4217d373de4543abc6cf718540becb",
+      "run_f5c64296-09cd-450e-a74a-e4b4d94dd443"
+    ],
+    "createdAt": "2026-08-21T18:12:00+08:00",
+    "readBack": {
+      "by": "independent-assert",
+      "matchesWrite": true
+    }
+  },
+  "checks": [
+    [
+      "duplicate candidate detected",
+      true
+    ],
+    [
+      "P0 whole-store gate flags manual escalation",
+      true
+    ],
+    [
+      "dispatch denied",
+      true
+    ],
+    [
+      "no fee committed",
+      true
+    ],
+    [
+      "suggestion excludes final_* fields",
+      true
+    ],
+    [
+      "draft is local & not dispatched",
+      true
+    ],
+    [
+      "independent readback matches write",
+      true
+    ],
+    [
+      "operation_id idempotency key present",
+      true
+    ]
+  ],
+  "allPass": true,
+  "note": "切片终点=本地草稿，未执行任何外部写入/派单/通知/费用；contract 覆盖因 input 未命中标 unknown→人工。"
+}

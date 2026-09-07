@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_ffdb0d3c652741fcb960e7324bcd08a1",
+  "originalName": "03-work-order-export.json",
+  "storedName": "03-work-order-export.json",
+  "relativePath": "fde-resources/03-work-order-export.json",
+  "mimeType": "application/json; charset=utf-8",
+  "extension": "json",
+  "bytes": 6412,
+  "createdAt": "2026-09-03T10:23:37.299Z",
+  "modifiedAt": "2026-09-03T10:23:37.300Z",
+  "mtimeMs": 1788431017299.5593,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 6412,
+    "sourceMtimeMs": 1788431017299.5593,
+    "derivedPath": ".fde/derived/src_ffdb0d3c652741fcb960e7324bcd08a1.md",
+    "updatedAt": "2026-09-03T10:23:37.342Z"
+  }
+}

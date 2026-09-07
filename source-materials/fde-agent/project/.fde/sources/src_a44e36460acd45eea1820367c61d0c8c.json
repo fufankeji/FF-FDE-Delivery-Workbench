@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_a44e36460acd45eea1820367c61d0c8c",
+  "originalName": "02-wecom-repair-chat.txt",
+  "storedName": "02-wecom-repair-chat.txt",
+  "relativePath": "fde-resources/02-wecom-repair-chat.txt",
+  "mimeType": "text/plain; charset=utf-8",
+  "extension": "txt",
+  "bytes": 3295,
+  "createdAt": "2026-09-03T10:23:37.303Z",
+  "modifiedAt": "2026-09-03T10:23:37.304Z",
+  "mtimeMs": 1788431017303.8264,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 3295,
+    "sourceMtimeMs": 1788431017303.8264,
+    "derivedPath": ".fde/derived/src_a44e36460acd45eea1820367c61d0c8c.md",
+    "updatedAt": "2026-09-03T10:23:37.347Z"
+  }
+}

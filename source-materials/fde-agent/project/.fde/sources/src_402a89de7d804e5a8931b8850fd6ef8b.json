@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_402a89de7d804e5a8931b8850fd6ef8b",
+  "originalName": "04-triage-workload-observation.xml",
+  "storedName": "04-triage-workload-observation.xml",
+  "relativePath": "fde-resources/04-triage-workload-observation.xml",
+  "mimeType": "application/xml; charset=utf-8",
+  "extension": "xml",
+  "bytes": 1956,
+  "createdAt": "2026-09-04T02:54:37.787Z",
+  "modifiedAt": "2026-09-04T02:54:37.787Z",
+  "mtimeMs": 1788490477787.0542,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 1956,
+    "sourceMtimeMs": 1788490477787.0542,
+    "derivedPath": ".fde/derived/src_402a89de7d804e5a8931b8850fd6ef8b.md",
+    "updatedAt": "2026-09-04T02:54:37.864Z"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_55833bfdb3484e19ba19253f4e0f539c",
+  "originalName": "05-cost-assumptions.yaml",
+  "storedName": "05-cost-assumptions.yaml",
+  "relativePath": "fde-resources/05-cost-assumptions.yaml",
+  "mimeType": "application/yaml; charset=utf-8",
+  "extension": "yaml",
+  "bytes": 1324,
+  "createdAt": "2026-09-04T02:54:37.782Z",
+  "modifiedAt": "2026-09-04T02:54:37.782Z",
+  "mtimeMs": 1788490477781.862,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 1324,
+    "sourceMtimeMs": 1788490477781.862,
+    "derivedPath": ".fde/derived/src_55833bfdb3484e19ba19253f4e0f539c.md",
+    "updatedAt": "2026-09-04T02:54:37.863Z"
+  }
+}

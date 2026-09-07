@@ -1,0 +1,525 @@
+{
+  "schemaVersion": 1,
+  "stage": "pilot",
+  "status": "working",
+  "workItems": [
+    {
+      "id": "integration",
+      "status": "current"
+    },
+    {
+      "id": "reliability",
+      "status": "waiting"
+    },
+    {
+      "id": "readiness",
+      "status": "waiting"
+    },
+    {
+      "id": "pilot",
+      "status": "waiting"
+    }
+  ],
+  "blockers": [],
+  "recommendation": "pending",
+  "delivery": {
+    "schemaVersion": 1,
+    "version": "local-repair-v0.2-ui",
+    "versionFiles": [
+      {
+        "path": "backend/catalog.mjs",
+        "sha256": "06802a58c1f4523b51d3ab37f496851dde3c3d0ad28f7038ccfbd352be427bd2"
+      },
+      {
+        "path": "backend/workflow.mjs",
+        "sha256": "c7a1902c25fcfe6672b5143b8386fc3dabd66c235b27cd44fe88a894bcce990c"
+      },
+      {
+        "path": "backend/server.mjs",
+        "sha256": "d3a9c5862b500908c44ea7207e42330c98bde9860f4416fced8605a28f1592f0"
+      },
+      {
+        "path": "backend/tests/workflow.test.mjs",
+        "sha256": "e16f1f5ffaa727a86739d1775556a4e48720abb9a769407af01fdeea0e93191e"
+      },
+      {
+        "path": "frontend/index.html",
+        "sha256": "56d20830f1abb046581343ca8137f74fe681635982cab52b06be28166b11f338"
+      },
+      {
+        "path": "frontend/app.js",
+        "sha256": "b18dd15058e52e8d76277bfa28252a2b532383ce53d96bb271778f122de02c94"
+      },
+      {
+        "path": "frontend/style.css",
+        "sha256": "084d740af8c900598be431a5934d16be100cb66b00bd816b2a5e21ea08274e90"
+      },
+      {
+        "path": "frontend/public/brand/ff-logo.png",
+        "sha256": "522944bbaee48d98190c8c5a0a0ac80f05b71b1975838807742a782e2aeceedc"
+      },
+      {
+        "path": ".fde/design/knowledge-graph.json",
+        "sha256": "960a8b029c76ccb9c50d38c2ab1aa6f9852c1df3e781d6356e692fef6f4adec2"
+      },
+      {
+        "path": "fde-resources/01-baseline-and-target-discussion.md",
+        "sha256": "d648563b0fe031fcc199bc0e1b7dfad86ae5630674906f30dc3e8baf75493249"
+      },
+      {
+        "path": "fde-resources/01-customer-original-brief.md",
+        "sha256": "7ee5194201e7b74e25ef6a6dd034f8009b0879d9125d515053257862ad056eb8"
+      },
+      {
+        "path": "fde-resources/01-solution-constraints-1.md",
+        "sha256": "42f10bd886cd98082b9d2b8e997f364d2176458a7b4b986153a35a7913eb3f0f"
+      },
+      {
+        "path": "fde-resources/01-solution-constraints.md",
+        "sha256": "42f10bd886cd98082b9d2b8e997f364d2176458a7b4b986153a35a7913eb3f0f"
+      },
+      {
+        "path": "fde-resources/01-systems-access-and-ownership.md",
+        "sha256": "850a7fddb0d8291c6afe87ac6106646c73fd447cbd5363f5cc6e2d3baee01fb2"
+      },
+      {
+        "path": "fde-resources/02-data-sample-and-dictionary.md",
+        "sha256": "5d780714e4835ec34808ef832895781e0c66dde56c3ef5670bfb873be6e2d2c2"
+      },
+      {
+        "path": "fde-resources/02-representative-cases.md",
+        "sha256": "887c918918fe00735df8a0e0e8f64ea783e24fffc426bc6197453df9b6ba9f41"
+      },
+      {
+        "path": "fde-resources/02-scope-constraints-and-dependencies.md",
+        "sha256": "6d9fa077aa3f9216d012c36b1f5be213536c3e43a6c75e09fb890d23898fe88c"
+      },
+      {
+        "path": "fde-resources/02-semantic-capability-workshop.md",
+        "sha256": "39ce56db847fc34ef6321eb76b873292bdd84f9da84975eb9b8e1e18aec50005"
+      },
+      {
+        "path": "fde-resources/02-wecom-repair-chat.txt",
+        "sha256": "1f632800efbe4bd803739d82c2a8473535f81c679232b937dba03640712ca6d5"
+      },
+      {
+        "path": "fde-resources/03-baseline-metric-export.json",
+        "sha256": "ac0bbd16754f258255d5ce8fd5808760c546b83b12c1c684120edd99c5d42f74"
+      },
+      {
+        "path": "fde-resources/03-first-interview-notes.md",
+        "sha256": "db0aa7e1e6b834b32b809a222d7b3df11fc8c984d59345659a0557280294910d"
+      },
+      {
+        "path": "fde-resources/03-policy-security-and-governance.md",
+        "sha256": "2bbb2887f887cc201a0fe1f1838bda3ca787082050b713175e075acdce44bf10"
+      },
+      {
+        "path": "fde-resources/03-work-order-export.json",
+        "sha256": "07dd0c8db0b36dd0ccd8d1b7d1973fbe021dabe1bc4e4b8e6273c5495b323c8f"
+      },
+      {
+        "path": "fde-resources/04-access-request-register.json",
+        "sha256": "1bd376cbbead7b3d5d5c376b761bac7a802c928f92768ad2baf4548e38d9222a"
+      },
+      {
+        "path": "fde-resources/04-device-register.xml",
+        "sha256": "1ccaac3c4926cdb5c8c29b7e229470ddac1a10060f58620acb6f27e355bf0559"
+      },
+      {
+        "path": "fde-resources/04-triage-workload-observation.xml",
+        "sha256": "0b1f1d06fdeda10ad7f589ba111cd2352aa5d9a988a87a6ae2b4bc2d42b003af"
+      },
+      {
+        "path": "fde-resources/05-cost-assumptions.yaml",
+        "sha256": "fe86b1e8f5e288815ff2be563c52685ab26e005708c9cd73d424e99582b4964a"
+      },
+      {
+        "path": "fde-resources/05-field-dictionary.xml",
+        "sha256": "6315a2786c982ca521ed5583f68096ee26d8590bdb9140471eba9d65d2ee5e5b"
+      },
+      {
+        "path": "fde-resources/05-vendor-duty-roster.yaml",
+        "sha256": "a3c4ba0b00896568628deff031456e2f930f7f55fd9162654dcf7be03fffaaed"
+      },
+      {
+        "path": "fde-resources/06-maintenance-priority-and-approval-policy.pdf",
+        "sha256": "92b2d863100e23254ed524039821421932958eb5b21d17f06647b7103cb13f51"
+      },
+      {
+        "path": "fde-resources/06-owner-verifier-workshop.txt",
+        "sha256": "ecc9a8256f25cc611c6567ed3d519d5b54be4e312650fb04c97a1f151666ee0f"
+      },
+      {
+        "path": "fde-resources/07-equipment-label-photo.png",
+        "sha256": "f2501b3b7fa7fc14cf735af9703ead276ef958810698462e884a2d3142f0426f"
+      },
+      {
+        "path": "fde-resources/07-first-phase-scope.json",
+        "sha256": "5b7b4165b08bab0eea75dccd3a7ab9abf150a74d9d333f3d6744203c16af8277"
+      },
+      {
+        "path": "fde-resources/07-nanjing-incident-timeline.json",
+        "sha256": "12689c3c80a2a9cc27b14fcfc7c386c97190e459b709bf355780830bcaf6262c"
+      },
+      {
+        "path": "fde-resources/08-escalation-email.eml",
+        "sha256": "da1b310bb028234a97c911f5ec30ff2e8c9c8c0121b0ae181f9c2318f45b618a"
+      },
+      {
+        "path": "fde-resources/08-resource-and-dependency-register.xml",
+        "sha256": "cc85a1f6f732351e03fe4f30c08c0e8e43246707658ed15107f3647f6ccce041"
+      },
+      {
+        "path": "fde-resources/08-workorder-api-openapi.yaml",
+        "sha256": "b67f58115d898470917f8dcf42d992cd32cffae75b1ecdd87a9946287a8e7948"
+      },
+      {
+        "path": "fde-resources/09-current-system-consumption-notes.txt",
+        "sha256": "620b2d34e07e09000630e6a0063c8f4f065896547abc311664e65c54cb1c1e96"
+      },
+      {
+        "path": "fde-resources/09-sandbox-readback-log.txt",
+        "sha256": "02b00bad852f1d7ea13862ffb2433fec50b7e9aee31b8363521b03fe7aed3f43"
+      },
+      {
+        "path": "fde-resources/09-store-equipment-layout.svg",
+        "sha256": "1862d0d02a909ee6914c6b6b8c1d0b0a6d8678abb97df26bc071ea89127e098d"
+      },
+      {
+        "path": "fde-resources/10-role-and-boundary-confirmation.md",
+        "sha256": "5271bcb1e3e6f6e65af254f03a6d7e70b0fb228936212da5c9b149f14422f964"
+      },
+      {
+        "path": "fde-resources/10-system-version-difference.md",
+        "sha256": "79a6e127dd36c7d633b1ce0947d492063e8af1059859b9357546814afdaa5f2e"
+      },
+      {
+        "path": "fde-resources/11-access-boundary-matrix.xml",
+        "sha256": "281de7dbae71dae59cbf86bb5d9832a53d16b397f2efd73775619e78c4eb6737"
+      },
+      {
+        "path": "fde-resources/12-governance-review-notes.txt",
+        "sha256": "bb60ba13b4236c9ea029a8dae954f5ebb093d78013c90e217682734d34337ba1"
+      },
+      {
+        "path": ".fde/sources/src_05cdac2d9cce41cebf65b0cb218303ef.json",
+        "sha256": "e79dae8d9523acbf14405d3212e8bac088654b160118c2d39eb3ccd9f1bc4088"
+      },
+      {
+        "path": ".fde/sources/src_0b7bb9068a09492dae83b5432fad81c5.json",
+        "sha256": "3af5f875761c86ebb11df619347328d9844da63367a39884c79117a04ba1a7a6"
+      },
+      {
+        "path": ".fde/sources/src_0dda7ab0e0094b299d3435a2a15a74d9.json",
+        "sha256": "c061ae1c4d90068669d126fb4132f1f860b347f8252d4b69e2a05bd9b105d44e"
+      },
+      {
+        "path": ".fde/sources/src_1acfac3bc13a469c95eff2249d358721.json",
+        "sha256": "ba27dfecbcfbe0e32265c78685c51612c8de324e0a6b10bc24a942789def4ce0"
+      },
+      {
+        "path": ".fde/sources/src_20cf7dfd3c0c48018e4594a5caeea056.json",
+        "sha256": "857835f4771ed616b3b6cd5f6610ba7bc28f59dab6dd177c25c5945895ed590b"
+      },
+      {
+        "path": ".fde/sources/src_215eaf333ea648db985d9921b86a1a6e.json",
+        "sha256": "15dc9239c5baadcaf481adbeb6dd7f9cebceb2a5d42b1b154cdff309936e3b18"
+      },
+      {
+        "path": ".fde/sources/src_37c94954b7054116a749d61aad514936.json",
+        "sha256": "d314b24dafdacb3ae56be2033faace4d02963b81982bb42635fca31003078726"
+      },
+      {
+        "path": ".fde/sources/src_3b35d1130b0148659ec7e6591c671391.json",
+        "sha256": "dbbb186f5c3c9c083addf6abfe5bfb6e7da8a230ed07ea77cb87a0be1e9cf688"
+      },
+      {
+        "path": ".fde/sources/src_402a89de7d804e5a8931b8850fd6ef8b.json",
+        "sha256": "b48309995a175b96b284b84af5377c3fc630ee8501443ce937449a4c9fb6efc3"
+      },
+      {
+        "path": ".fde/sources/src_4ff12a75c65844b593cbee89209d6a8b.json",
+        "sha256": "fc63ea2449739c402648fdb12234a2d4ff05808c2d46a83cd97cf7f3c4764e6d"
+      },
+      {
+        "path": ".fde/sources/src_50532fd88c1f438b84e2955b28f10f0e.json",
+        "sha256": "bbca76ff3e8254257d056115e9f52d77e5ba00f32c5f04f2847ae36694d4c1ed"
+      },
+      {
+        "path": ".fde/sources/src_55833bfdb3484e19ba19253f4e0f539c.json",
+        "sha256": "519e3d1a7733961f19abd1633cd387f61d9c29124e3576d8ad830ca49eb9a877"
+      },
+      {
+        "path": ".fde/sources/src_5cffed03145649f5bec95f69e4188407.json",
+        "sha256": "145d95bcc0bfc9b8e9c12c1109f9e00eb08c061fd01316e449b379d7b152685b"
+      },
+      {
+        "path": ".fde/sources/src_60b74192ffd345e1958b5c8f12f4b8d9.json",
+        "sha256": "5d4a4c5bf3d97f767707353f143e4e4312ec7f2f31347f58d485515b980ef27b"
+      },
+      {
+        "path": ".fde/sources/src_6e5c265651da4e25817ff27ed4ab20dd.json",
+        "sha256": "144ae6073da2e820afe606c79188d19d3ab8162719c2d2d336c5a40d8dec5e23"
+      },
+      {
+        "path": ".fde/sources/src_701f85b610e049e0ac2a9698b000cc01.json",
+        "sha256": "7105f4511697efe7774798c6dd9ceebdac7f37922014e2245d67f2ef40502582"
+      },
+      {
+        "path": ".fde/sources/src_87942e91c58e4325b10b5786beaac9ac.json",
+        "sha256": "6ebe4f3682163be59f9bd5cb585900bb50b2fdf25a16e89796e127b94afe38b5"
+      },
+      {
+        "path": ".fde/sources/src_92b10c4384124443b14abd40be2a866f.json",
+        "sha256": "02f32da28b00d5e2f5fbc49db8bbeb9a5ef0a726bc69d2b7da488396025f19c9"
+      },
+      {
+        "path": ".fde/sources/src_99c9f3bcca9a4b1aa7fff5922132f786.json",
+        "sha256": "b1de115e8496fb2f2fdb7b4924c34f37c03ce97e105170cd4622e5d1ecd195c9"
+      },
+      {
+        "path": ".fde/sources/src_a44e36460acd45eea1820367c61d0c8c.json",
+        "sha256": "23ed95039989e999b1a61aa8163e529bb4f6017303d2c4aa01c6970de28418e9"
+      },
+      {
+        "path": ".fde/sources/src_aa4217d373de4543abc6cf718540becb.json",
+        "sha256": "661bf373e90bc9c8584af23c3dbff469e0426eaf63795fea79fe170d82fbdee4"
+      },
+      {
+        "path": ".fde/sources/src_afb39cee4d30447892570e9db6c65aad.json",
+        "sha256": "64ec2ecccc187739aeb9a7932007ccfd956817c6ab884ce1b7617036bb585627"
+      },
+      {
+        "path": ".fde/sources/src_b8d462d759af48b5879648e2540cd4db.json",
+        "sha256": "d7e536e8ea25f5f9ddfb5b4e986c4c5ea9cc719090166c7526626bf5787d3d03"
+      },
+      {
+        "path": ".fde/sources/src_bfd4d218aa2a42ccb77ce4f70141f1ba.json",
+        "sha256": "ab5a5058dccf783d109bfbd73253563e6abd90f8146cffd92d343390b0cd5e5d"
+      },
+      {
+        "path": ".fde/sources/src_ce7191fd62e24d0b8a906a778c80d588.json",
+        "sha256": "8f3cbb1406a5b963af97aa30434f3639a5378f24eb150772526e92472d34b183"
+      },
+      {
+        "path": ".fde/sources/src_daa34f3441d04e86913e82f5d42143d9.json",
+        "sha256": "49c57520b90927e97a3ccc1320fd0d817da8b048f5767cb8be4e392c1829f59e"
+      },
+      {
+        "path": ".fde/sources/src_dbbb6884c1d64a09b63f023fe51ceeae.json",
+        "sha256": "e388f708a1cb2285ac86115352387d98932c547983b442f5c84939840796974c"
+      },
+      {
+        "path": ".fde/sources/src_dc1d16dac2084a2ca5defd47cac1939c.json",
+        "sha256": "da9b08f21b369c8f83f7b89e5e28dfaff4905ea42f0a453b62f53c89e135b4c0"
+      },
+      {
+        "path": ".fde/sources/src_dccfff3339674d0ba9b5c0b33f6bda15.json",
+        "sha256": "63a73d8d6b35903516fc1074817a546d4e8fe3298755b279da4f58c0b12f6240"
+      },
+      {
+        "path": ".fde/sources/src_e199f4268fba4f8ba63ce144c6988442.json",
+        "sha256": "dc4ebdfc3e6d054abee2a37ba4ccf1a10ca33937404ec4a74b9c3be3c417dee1"
+      },
+      {
+        "path": ".fde/sources/src_fae9a0cb144b4cd39fb58c13f1a40363.json",
+        "sha256": "d5ec346463c3b345a86674b29378a5e0a6b253ef0de5f94619a7e7cb5c44b894"
+      },
+      {
+        "path": ".fde/sources/src_fbbac6cf20034a0191dfd44573d4ffd1.json",
+        "sha256": "efe7518c13c784d0dcf3335f362e710b45df548ee0a46d8a0cf954d2262164c9"
+      },
+      {
+        "path": ".fde/sources/src_fdc5c72379834e6e97971a3d5736d21b.json",
+        "sha256": "51ea05c0cd814e4116c2b3260c475cca48972ce36ff54986ed66e5fba8c6ca00"
+      },
+      {
+        "path": ".fde/sources/src_fee32675bda445599326443b97e26537.json",
+        "sha256": "96e795825375013bd6ff2941912182aca4e2c51d062eb572bb4e609c6d4fa3c3"
+      },
+      {
+        "path": ".fde/sources/src_ffdb0d3c652741fcb960e7324bcd08a1.json",
+        "sha256": "58481d5ddf88520757a3c62190a4071a89da1866975624815de6b89a265c3ebe"
+      }
+    ],
+    "environment": {
+      "kind": "local",
+      "label": "本地验证环境 · 127.0.0.1:4177（非 Pilot / 生产）"
+    },
+    "semantic": {
+      "mode": "snapshot",
+      "schemaVersion": "0.1.1-preview",
+      "graphRevision": "sha256:58ee663b62eec5cc338b7570616aaea479eea99e31baf545e5069442dea076a6",
+      "summary": "本地应用通过 backend/catalog.mjs 读取既有 56 实体 / 56 关系快照并查询相关子图。尚未接入独立 Semantica 在线查询、生产权限或更新流水线；DSH 中有 Semantica 工具不代表本应用已接通。",
+      "evidence": [
+        {
+          "path": "backend/catalog.mjs",
+          "sha256": "06802a58c1f4523b51d3ab37f496851dde3c3d0ad28f7038ccfbd352be427bd2"
+        },
+        {
+          "path": "docs/architecture/architecture.md",
+          "sha256": "2e669fae199d50759d12962398f22dc0ca03d1d764174bc41cac2f54d3f891bf"
+        },
+        {
+          "path": ".fde/design/knowledge-graph.json",
+          "sha256": "960a8b029c76ccb9c50d38c2ab1aa6f9852c1df3e781d6356e692fef6f4adec2"
+        }
+      ]
+    },
+    "items": [
+      {
+        "id": "pilot-authority",
+        "category": "authorization",
+        "title": "试点范围与批准待确定",
+        "summary": "现有第三阶段治理材料可作筹备输入；未取得针对本轮项目的试点用户、周期、动作范围和批准记录。",
+        "status": "pending",
+        "scope": "pilot",
+        "version": "local-repair-v0.2-ui",
+        "required": true,
+        "evidence": [
+          {
+            "path": "fde-deliverables/03-environment/governance-review.md",
+            "sha256": "97745a4b311212ceb4ec3caed9118181827410de8c7df363a6be3de0e43f979f"
+          }
+        ],
+        "nextAction": "请有权责任人核定试点用户、数据、周期、停止条件与动作权限。"
+      },
+      {
+        "id": "local-input",
+        "category": "integration",
+        "title": "本地资料与真实图谱已接入",
+        "summary": "代码只读既有来源和 Semantica 图谱快照；这是本地可用性证据，不是企业账号和接口已经获准上线。",
+        "status": "passed",
+        "scope": "local",
+        "version": "local-repair-v0.2-ui",
+        "required": false,
+        "evidence": [
+          {
+            "path": "backend/catalog.mjs",
+            "sha256": "06802a58c1f4523b51d3ab37f496851dde3c3d0ad28f7038ccfbd352be427bd2"
+          },
+          {
+            "path": "docs/verification/2026-09-07-stage5-run.json",
+            "sha256": "d78ded668863d4c1b3e0db424040825a4be6dc1dde67e78dd64691dd91979716"
+          }
+        ],
+        "observedAt": "2026-09-07T05:02:55.633Z",
+        "owner": "本地证据核对（非客户批准）",
+        "criterion": "使用本项目原始文件和真实节点关系，不构造示例数据。"
+      },
+      {
+        "id": "external-access",
+        "category": "integration",
+        "title": "实际试点环境尚未连接",
+        "summary": "第三阶段有系统与访问清单；当前应用只监听本机，不含企业账户系统或生产 API。",
+        "status": "pending",
+        "scope": "pilot",
+        "version": "local-repair-v0.2-ui",
+        "required": true,
+        "evidence": [
+          {
+            "path": "docs/architecture/architecture.md",
+            "sha256": "2e669fae199d50759d12962398f22dc0ca03d1d764174bc41cac2f54d3f891bf"
+          },
+          {
+            "path": "fde-deliverables/03-environment/system-access-map.md",
+            "sha256": "00d080d6ab0b00bb9c2eb49f7196670f8ba6f37b7a8667402326f7ab9e7f5048"
+          }
+        ],
+        "nextAction": "明确是否需要外部系统；如需要，逐项登记连通证据、Owner 和读取／建议／草稿／执行权限。"
+      },
+      {
+        "id": "restore-drill",
+        "category": "recovery",
+        "title": "接管与回滚仍需演练",
+        "summary": "测试证明本地草稿可重启读回，但不代表接收团队已完成服务恢复、人工接管和版本回滚。",
+        "status": "pending",
+        "scope": "pilot",
+        "version": "local-repair-v0.2-ui",
+        "required": true,
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-stage5-run.json",
+            "sha256": "d78ded668863d4c1b3e0db424040825a4be6dc1dde67e78dd64691dd91979716"
+          },
+          {
+            "path": "docs/architecture/architecture.md",
+            "sha256": "2e669fae199d50759d12962398f22dc0ca03d1d764174bc41cac2f54d3f891bf"
+          }
+        ],
+        "nextAction": "确定操作人与回滚触发条件，在获准环境执行并保存日志。"
+      },
+      {
+        "id": "local-test",
+        "category": "technical",
+        "title": "本地自动化验证已有通过证据",
+        "summary": "第五阶段保存 6 项后端定向测试及前端语法检查成功记录；浏览器完整流程人工验收仍未执行。",
+        "status": "passed",
+        "scope": "local",
+        "version": "local-repair-v0.2-ui",
+        "required": false,
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-stage5-run.json",
+            "sha256": "d78ded668863d4c1b3e0db424040825a4be6dc1dde67e78dd64691dd91979716"
+          }
+        ],
+        "observedAt": "2026-09-07T05:02:55.633Z",
+        "owner": "本地证据核对（非客户批准）",
+        "criterion": "6 项 Node 测试和前端语法检查退出码均为 0。"
+      },
+      {
+        "id": "pilot-monitoring",
+        "category": "technical",
+        "title": "试点监控尚无观测窗口",
+        "summary": "本地服务可访问不能替代真实试点持续监控；暂未登记错误率、延迟、恢复和停止条件的试点观测。",
+        "status": "unknown",
+        "scope": "pilot",
+        "version": "local-repair-v0.2-ui",
+        "required": true,
+        "evidence": [
+          {
+            "path": "docs/architecture/architecture.md",
+            "sha256": "2e669fae199d50759d12962398f22dc0ca03d1d764174bc41cac2f54d3f891bf"
+          }
+        ],
+        "nextAction": "获准运行后登记实际时间窗口、环境、指标口径与原始日志。"
+      },
+      {
+        "id": "pilot-business",
+        "category": "business",
+        "title": "试点业务结果待验证",
+        "summary": "本地规则、图谱检索与草稿闭环已有实现；没有真实用户试点的采用、节时或结果质量数据。",
+        "status": "unknown",
+        "scope": "pilot",
+        "version": "local-repair-v0.2-ui",
+        "required": true,
+        "evidence": [
+          {
+            "path": "fde-deliverables/05-poc-eval/evaluation-report.md",
+            "sha256": "05d87a37df8d68875c6399d7b678db9b9ba595fcc177b477290ef90b542c61f9"
+          }
+        ],
+        "nextAction": "对照阶段二成功标准，在批准范围内采集业务结果。"
+      },
+      {
+        "id": "manual-check",
+        "category": "issue",
+        "title": "第五阶段完整页面流程待人工确认",
+        "summary": "现有验证记录中 browserAcceptance 为 NOT_RUN，不应通过准备后续页面绕过。",
+        "status": "pending",
+        "scope": "local",
+        "version": "local-repair-v0.2-ui",
+        "required": true,
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-stage5-run.json",
+            "sha256": "d78ded668863d4c1b3e0db424040825a4be6dc1dde67e78dd64691dd91979716"
+          }
+        ],
+        "nextAction": "用户手动走一遍项目页面并记录实际结果；不自动替用户确认。"
+      }
+    ]
+  }
+}

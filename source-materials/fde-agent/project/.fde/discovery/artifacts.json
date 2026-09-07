@@ -1,0 +1,364 @@
+{
+  "schemaVersion": 1,
+  "artifacts": [
+    {
+      "id": "research-report",
+      "version": 1,
+      "contentPath": "fde-deliverables/01-requirement-research/requirement-research-report.md",
+      "sourceAdapter": {
+        "id": "davidahmann/fde-guide",
+        "version": "060ef0f3",
+        "commit": "060ef0f3b67743b2e1fc3705763d423eae980236",
+        "license": "Apache-2.0",
+        "artifact": "field-observation-log"
+      },
+      "structureState": "starter_valid",
+      "evidenceState": "inferred",
+      "evidenceRefs": [
+        {
+          "id": "ev-original-request",
+          "state": "inferred",
+          "kind": "project-file",
+          "ref": "fde-resources/01-customer-original-brief.md",
+          "summary": "发起人期望自动判断/找维修商/派单、三月上线、80% 自动处理。"
+        },
+        {
+          "id": "ev-problem-claims",
+          "state": "inferred",
+          "kind": "project-file",
+          "ref": "fde-resources/01-customer-original-brief.md",
+          "summary": "发起人对当前问题的四点说法：入口多易漏、总部重复询问、维修商靠经验、管理层看不到进度。"
+        },
+        {
+          "id": "ev-chat-src",
+          "state": "inferred",
+          "kind": "project-file",
+          "ref": "fde-resources/02-wecom-repair-chat.txt",
+          "summary": "群聊时间线：含系统机器人自动建 WO-88422、贺敏只批现场诊断等。"
+        },
+        {
+          "id": "ev-workorder-export",
+          "state": "inferred",
+          "kind": "system",
+          "ref": "fde-resources/03-work-order-export.json",
+          "summary": "工单导出12条：南京WO-88419/88422重复、杭州WO-88507仅诊断、应急与演练记录。声明不代表总体基线。"
+        },
+        {
+          "id": "ev-device-register",
+          "state": "inferred",
+          "kind": "system",
+          "ref": "fde-resources/04-device-register.xml",
+          "summary": "台账快照与设备身份冲突（HVAC-HZ021-02 active vs OLD retired）、保修候选值。"
+        },
+        {
+          "id": "ev-duty-roster",
+          "state": "inferred",
+          "kind": "system",
+          "ref": "fde-resources/05-vendor-duty-roster.yaml",
+          "summary": "值班表联系候选与 V-HVAC-02 合同到期 warning。"
+        },
+        {
+          "id": "ev-policy",
+          "state": "inferred",
+          "kind": "policy",
+          "ref": "fde-resources/06-maintenance-priority-and-approval-policy.pdf",
+          "summary": "政策：分级/费用授权/禁自动派单与承诺/来源冲突读回。"
+        },
+        {
+          "id": "ev-email-guning",
+          "state": "inferred",
+          "kind": "external",
+          "ref": "fde-resources/08-escalation-email.eml",
+          "summary": "顾宁邮件：保留提案但不作为已批准范围、需四方分别确认、三月为试点证据目标。"
+        },
+        {
+          "id": "ev-cases-limits",
+          "state": "inferred",
+          "kind": "project-file",
+          "ref": "fde-resources/02-representative-cases.md",
+          "summary": "代表案例人工整理局限。"
+        },
+        {
+          "id": "ev-interview-chen",
+          "state": "inferred",
+          "kind": "interview",
+          "ref": "fde-resources/03-first-interview-notes.md",
+          "summary": "陈涛关于去重、设备身份、草稿与费用授权的说法。"
+        },
+        {
+          "id": "ev-interview-song",
+          "state": "inferred",
+          "kind": "interview",
+          "ref": "fde-resources/03-first-interview-notes.md",
+          "summary": "宋洁关于入口、500元额度与可见性需求的说法。"
+        },
+        {
+          "id": "ev-interview-he",
+          "state": "inferred",
+          "kind": "interview",
+          "ref": "fde-resources/03-first-interview-notes.md",
+          "summary": "贺敏关于自动派单授权、应急先行与试点边界的说法。"
+        },
+        {
+          "id": "ev-conflict-note",
+          "state": "inferred",
+          "kind": "interview",
+          "ref": "fde-resources/03-first-interview-notes.md",
+          "summary": "原简报自动派单边界与现场授权的冲突。"
+        }
+      ],
+      "inputRefs": [],
+      "decisionRefs": [],
+      "supersedes": []
+    },
+    {
+      "id": "confirmation-checklist",
+      "version": 1,
+      "contentPath": "fde-deliverables/01-requirement-research/confirmation-checklist.md",
+      "sourceAdapter": {
+        "id": "ff-fde-workbench/discovery-contract",
+        "version": "F005-v2",
+        "commit": "product-spec/F005",
+        "license": "project",
+        "artifact": "fact-confirmation-list"
+      },
+      "structureState": "starter_valid",
+      "evidenceState": "unverified",
+      "evidenceRefs": [
+        {
+          "id": "ev-check-pending",
+          "state": "unverified",
+          "kind": "interview",
+          "ref": "fde-resources/03-first-interview-notes.md",
+          "summary": "访谈尚待核对项：业务结果/风险/最终处置负责人、500元额度范围、工单基线、草稿支持。"
+        },
+        {
+          "id": "ev-brief-unknowns",
+          "state": "unverified",
+          "kind": "project-file",
+          "ref": "fde-resources/01-customer-original-brief.md",
+          "summary": "简报尚未说明项：决定权人、基线、报修入口、系统访问、费用/合规责任、可共同接受的结果。"
+        },
+        {
+          "id": "ev-cases-limits",
+          "state": "inferred",
+          "kind": "project-file",
+          "ref": "fde-resources/02-representative-cases.md",
+          "summary": "案例需以工单系统导出与交叉验证确认真实基线。"
+        },
+        {
+          "id": "ev-policy",
+          "state": "inferred",
+          "kind": "policy",
+          "ref": "fde-resources/06-maintenance-priority-and-approval-policy.pdf",
+          "summary": "政策给出真实授权分级与禁用项，需确认现行版本与四方签发。"
+        },
+        {
+          "id": "ev-workorder-limits",
+          "state": "inferred",
+          "kind": "system",
+          "ref": "fde-resources/03-work-order-export.json",
+          "summary": "工单导出仅为代表性抽样，limitations 声明不可计算总体发生率。"
+        }
+      ],
+      "inputRefs": [],
+      "decisionRefs": [],
+      "supersedes": []
+    },
+    {
+      "id": "requirement-baseline",
+      "version": 1,
+      "contentPath": "fde-deliverables/01-requirement-research/requirement-baseline.md",
+      "sourceAdapter": {
+        "id": "davidahmann/fde-guide",
+        "version": "060ef0f3",
+        "commit": "060ef0f3b67743b2e1fc3705763d423eae980236",
+        "license": "Apache-2.0",
+        "artifact": "workflow-charter"
+      },
+      "structureState": "starter_valid",
+      "evidenceState": "inferred",
+      "evidenceRefs": [
+        {
+          "id": "ev-original-request",
+          "state": "inferred",
+          "kind": "project-file",
+          "ref": "fde-resources/01-customer-original-brief.md",
+          "summary": "发起人目标作为候选业务结果的源起。"
+        },
+        {
+          "id": "ev-case-b-nanjing",
+          "state": "inferred",
+          "kind": "project-file",
+          "ref": "fde-resources/02-representative-cases.md",
+          "summary": "南京案例：重复工单与错派的具体后果。"
+        },
+        {
+          "id": "ev-case-c-hangzhou",
+          "state": "inferred",
+          "kind": "project-file",
+          "ref": "fde-resources/02-representative-cases.md",
+          "summary": "杭州案例：设备身份冲突+超额度费用延迟派单。"
+        },
+        {
+          "id": "ev-policy",
+          "state": "inferred",
+          "kind": "policy",
+          "ref": "fde-resources/06-maintenance-priority-and-approval-policy.pdf",
+          "summary": "政策分级、费用授权与人工回退边界。"
+        },
+        {
+          "id": "ev-email-guning",
+          "state": "inferred",
+          "kind": "external",
+          "ref": "fde-resources/08-escalation-email.eml",
+          "summary": "顾宁邮件主张到草稿为止、四方分别确认、三月为试点证据目标。"
+        },
+        {
+          "id": "ev-workorder-export",
+          "state": "inferred",
+          "kind": "system",
+          "ref": "fde-resources/03-work-order-export.json",
+          "summary": "工单导出中的应急 manual_emergency 记录与抽样局限。"
+        },
+        {
+          "id": "ev-duty-roster",
+          "state": "inferred",
+          "kind": "system",
+          "ref": "fde-resources/05-vendor-duty-roster.yaml",
+          "summary": "值班表联系候选与合同状态 warning（人工回退触发）。"
+        }
+      ],
+      "inputRefs": [],
+      "decisionRefs": [],
+      "supersedes": []
+    },
+    {
+      "id": "engagement-reframe",
+      "version": 1,
+      "contentPath": "fde-deliverables/01-requirement-research/engagement-reframe.md",
+      "sourceAdapter": {
+        "id": "davidahmann/fde-guide",
+        "version": "060ef0f3",
+        "commit": "060ef0f3b67743b2e1fc3705763d423eae980236",
+        "license": "Apache-2.0",
+        "artifact": "engagement-reframe"
+      },
+      "structureState": "starter_valid",
+      "evidenceState": "inferred",
+      "evidenceRefs": [
+        {
+          "id": "ev-conflict-note",
+          "state": "inferred",
+          "kind": "interview",
+          "ref": "fde-resources/03-first-interview-notes.md",
+          "summary": "自动派单边界与现场授权的冲突被明确记录。"
+        },
+        {
+          "id": "ev-policy",
+          "state": "inferred",
+          "kind": "policy",
+          "ref": "fde-resources/06-maintenance-priority-and-approval-policy.pdf",
+          "summary": "政策明确禁自动派单/承诺/通知/关闭，限定到本地草稿。"
+        },
+        {
+          "id": "ev-email-guning",
+          "state": "inferred",
+          "kind": "external",
+          "ref": "fde-resources/08-escalation-email.eml",
+          "summary": "顾宁：保留提案但非已批准范围、四方分别确认、三个月为试点证据目标。"
+        },
+        {
+          "id": "ev-interview-he",
+          "state": "inferred",
+          "kind": "interview",
+          "ref": "fde-resources/03-first-interview-notes.md",
+          "summary": "贺敏：无自动派单授权；应急须人工先行；建议仅到草稿+人工确认。"
+        },
+        {
+          "id": "ev-interview-song",
+          "state": "inferred",
+          "kind": "interview",
+          "ref": "fde-resources/03-first-interview-notes.md",
+          "summary": "宋洁：500元内可确认、区域名单外维修商不可选。"
+        },
+        {
+          "id": "ev-original-request",
+          "state": "inferred",
+          "kind": "project-file",
+          "ref": "fde-resources/01-customer-original-brief.md",
+          "summary": "原始自动派单/80%/三月边界（需保留）。"
+        }
+      ],
+      "inputRefs": [],
+      "decisionRefs": [],
+      "supersedes": []
+    },
+    {
+      "id": "scope-decision-brief",
+      "version": 1,
+      "contentPath": "fde-deliverables/01-requirement-research/scope-decision-brief.md",
+      "sourceAdapter": {
+        "id": "davidahmann/fde-guide",
+        "version": "060ef0f3",
+        "commit": "060ef0f3b67743b2e1fc3705763d423eae980236",
+        "license": "Apache-2.0",
+        "artifact": "workflow-charter"
+      },
+      "structureState": "starter_valid",
+      "evidenceState": "inferred",
+      "evidenceRefs": [
+        {
+          "id": "ev-policy",
+          "state": "inferred",
+          "kind": "policy",
+          "ref": "fde-resources/06-maintenance-priority-and-approval-policy.pdf",
+          "summary": "政策禁正式派单/承诺/通知/关单，只能到本地草稿；P0应急先行。"
+        },
+        {
+          "id": "ev-email-guning",
+          "state": "inferred",
+          "kind": "external",
+          "ref": "fde-resources/08-escalation-email.eml",
+          "summary": "顾宁：保留提案但非已批准范围、需四方分别确认、三月为试点证据目标。"
+        },
+        {
+          "id": "ev-confirmed-autobuild-draft",
+          "state": "confirmed",
+          "kind": "conversation",
+          "ref": "conversation/2026-09-03",
+          "summary": "自动按第二消息建单是生产真实行为且可在草稿层阻止。"
+        },
+        {
+          "id": "ev-confirmed-procurement-verify",
+          "state": "confirmed",
+          "kind": "conversation",
+          "ref": "conversation/2026-09-03",
+          "summary": "设备身份/合同可在报修当下取得，核对责任在采购。"
+        },
+        {
+          "id": "ev-interview-he",
+          "state": "inferred",
+          "kind": "interview",
+          "ref": "fde-resources/03-first-interview-notes.md",
+          "summary": "贺敏无自动派单授权，只批现场诊断。"
+        },
+        {
+          "id": "ev-workorder-limits",
+          "state": "inferred",
+          "kind": "system",
+          "ref": "fde-resources/03-work-order-export.json",
+          "summary": "工单导出仅代表性抽样，不可用于计算总体发生率。"
+        }
+      ],
+      "inputRefs": [
+        "research-report",
+        "confirmation-checklist",
+        "requirement-baseline",
+        "engagement-reframe"
+      ],
+      "decisionRefs": [],
+      "supersedes": []
+    }
+  ]
+}

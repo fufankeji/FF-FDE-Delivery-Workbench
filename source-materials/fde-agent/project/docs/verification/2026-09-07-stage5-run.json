@@ -1,0 +1,584 @@
+{
+  "schemaVersion": 1,
+  "version": "local-repair-v0.2-ui",
+  "startedAt": "2026-09-07T05:02:55.394Z",
+  "finishedAt": "2026-09-07T05:02:55.633Z",
+  "node": "v24.16.0",
+  "fingerprint": "sha256:7b00d555eab26ab19a2c8096f09da3211b650a50aac767c0a77dd768492b9a27",
+  "postRunFingerprint": "sha256:7b00d555eab26ab19a2c8096f09da3211b650a50aac767c0a77dd768492b9a27",
+  "sourceFiles": [
+    {
+      "path": "backend/catalog.mjs",
+      "status": "present",
+      "sha256": "06802a58c1f4523b51d3ab37f496851dde3c3d0ad28f7038ccfbd352be427bd2"
+    },
+    {
+      "path": "backend/workflow.mjs",
+      "status": "present",
+      "sha256": "c7a1902c25fcfe6672b5143b8386fc3dabd66c235b27cd44fe88a894bcce990c"
+    },
+    {
+      "path": "backend/server.mjs",
+      "status": "present",
+      "sha256": "d3a9c5862b500908c44ea7207e42330c98bde9860f4416fced8605a28f1592f0"
+    },
+    {
+      "path": "backend/tests/workflow.test.mjs",
+      "status": "present",
+      "sha256": "e16f1f5ffaa727a86739d1775556a4e48720abb9a769407af01fdeea0e93191e"
+    },
+    {
+      "path": "frontend/index.html",
+      "status": "present",
+      "sha256": "56d20830f1abb046581343ca8137f74fe681635982cab52b06be28166b11f338"
+    },
+    {
+      "path": "frontend/app.js",
+      "status": "present",
+      "sha256": "b18dd15058e52e8d76277bfa28252a2b532383ce53d96bb271778f122de02c94"
+    },
+    {
+      "path": "frontend/style.css",
+      "status": "present",
+      "sha256": "084d740af8c900598be431a5934d16be100cb66b00bd816b2a5e21ea08274e90"
+    },
+    {
+      "path": "frontend/public/brand/ff-logo.png",
+      "status": "present",
+      "sha256": "522944bbaee48d98190c8c5a0a0ac80f05b71b1975838807742a782e2aeceedc"
+    },
+    {
+      "path": ".fde/design/knowledge-graph.json",
+      "status": "present",
+      "sha256": "960a8b029c76ccb9c50d38c2ab1aa6f9852c1df3e781d6356e692fef6f4adec2"
+    },
+    {
+      "path": "fde-resources/01-baseline-and-target-discussion.md",
+      "status": "present",
+      "sha256": "d648563b0fe031fcc199bc0e1b7dfad86ae5630674906f30dc3e8baf75493249"
+    },
+    {
+      "path": "fde-resources/01-customer-original-brief.md",
+      "status": "present",
+      "sha256": "7ee5194201e7b74e25ef6a6dd034f8009b0879d9125d515053257862ad056eb8"
+    },
+    {
+      "path": "fde-resources/01-solution-constraints-1.md",
+      "status": "present",
+      "sha256": "42f10bd886cd98082b9d2b8e997f364d2176458a7b4b986153a35a7913eb3f0f"
+    },
+    {
+      "path": "fde-resources/01-solution-constraints.md",
+      "status": "present",
+      "sha256": "42f10bd886cd98082b9d2b8e997f364d2176458a7b4b986153a35a7913eb3f0f"
+    },
+    {
+      "path": "fde-resources/01-systems-access-and-ownership.md",
+      "status": "present",
+      "sha256": "850a7fddb0d8291c6afe87ac6106646c73fd447cbd5363f5cc6e2d3baee01fb2"
+    },
+    {
+      "path": "fde-resources/02-data-sample-and-dictionary.md",
+      "status": "present",
+      "sha256": "5d780714e4835ec34808ef832895781e0c66dde56c3ef5670bfb873be6e2d2c2"
+    },
+    {
+      "path": "fde-resources/02-representative-cases.md",
+      "status": "present",
+      "sha256": "887c918918fe00735df8a0e0e8f64ea783e24fffc426bc6197453df9b6ba9f41"
+    },
+    {
+      "path": "fde-resources/02-scope-constraints-and-dependencies.md",
+      "status": "present",
+      "sha256": "6d9fa077aa3f9216d012c36b1f5be213536c3e43a6c75e09fb890d23898fe88c"
+    },
+    {
+      "path": "fde-resources/02-semantic-capability-workshop.md",
+      "status": "present",
+      "sha256": "39ce56db847fc34ef6321eb76b873292bdd84f9da84975eb9b8e1e18aec50005"
+    },
+    {
+      "path": "fde-resources/02-wecom-repair-chat.txt",
+      "status": "present",
+      "sha256": "1f632800efbe4bd803739d82c2a8473535f81c679232b937dba03640712ca6d5"
+    },
+    {
+      "path": "fde-resources/03-baseline-metric-export.json",
+      "status": "present",
+      "sha256": "ac0bbd16754f258255d5ce8fd5808760c546b83b12c1c684120edd99c5d42f74"
+    },
+    {
+      "path": "fde-resources/03-first-interview-notes.md",
+      "status": "present",
+      "sha256": "db0aa7e1e6b834b32b809a222d7b3df11fc8c984d59345659a0557280294910d"
+    },
+    {
+      "path": "fde-resources/03-policy-security-and-governance.md",
+      "status": "present",
+      "sha256": "2bbb2887f887cc201a0fe1f1838bda3ca787082050b713175e075acdce44bf10"
+    },
+    {
+      "path": "fde-resources/03-work-order-export.json",
+      "status": "present",
+      "sha256": "07dd0c8db0b36dd0ccd8d1b7d1973fbe021dabe1bc4e4b8e6273c5495b323c8f"
+    },
+    {
+      "path": "fde-resources/04-access-request-register.json",
+      "status": "present",
+      "sha256": "1bd376cbbead7b3d5d5c376b761bac7a802c928f92768ad2baf4548e38d9222a"
+    },
+    {
+      "path": "fde-resources/04-device-register.xml",
+      "status": "present",
+      "sha256": "1ccaac3c4926cdb5c8c29b7e229470ddac1a10060f58620acb6f27e355bf0559"
+    },
+    {
+      "path": "fde-resources/04-triage-workload-observation.xml",
+      "status": "present",
+      "sha256": "0b1f1d06fdeda10ad7f589ba111cd2352aa5d9a988a87a6ae2b4bc2d42b003af"
+    },
+    {
+      "path": "fde-resources/05-cost-assumptions.yaml",
+      "status": "present",
+      "sha256": "fe86b1e8f5e288815ff2be563c52685ab26e005708c9cd73d424e99582b4964a"
+    },
+    {
+      "path": "fde-resources/05-field-dictionary.xml",
+      "status": "present",
+      "sha256": "6315a2786c982ca521ed5583f68096ee26d8590bdb9140471eba9d65d2ee5e5b"
+    },
+    {
+      "path": "fde-resources/05-vendor-duty-roster.yaml",
+      "status": "present",
+      "sha256": "a3c4ba0b00896568628deff031456e2f930f7f55fd9162654dcf7be03fffaaed"
+    },
+    {
+      "path": "fde-resources/06-maintenance-priority-and-approval-policy.pdf",
+      "status": "present",
+      "sha256": "92b2d863100e23254ed524039821421932958eb5b21d17f06647b7103cb13f51"
+    },
+    {
+      "path": "fde-resources/06-owner-verifier-workshop.txt",
+      "status": "present",
+      "sha256": "ecc9a8256f25cc611c6567ed3d519d5b54be4e312650fb04c97a1f151666ee0f"
+    },
+    {
+      "path": "fde-resources/07-equipment-label-photo.png",
+      "status": "present",
+      "sha256": "f2501b3b7fa7fc14cf735af9703ead276ef958810698462e884a2d3142f0426f"
+    },
+    {
+      "path": "fde-resources/07-first-phase-scope.json",
+      "status": "present",
+      "sha256": "5b7b4165b08bab0eea75dccd3a7ab9abf150a74d9d333f3d6744203c16af8277"
+    },
+    {
+      "path": "fde-resources/07-nanjing-incident-timeline.json",
+      "status": "present",
+      "sha256": "12689c3c80a2a9cc27b14fcfc7c386c97190e459b709bf355780830bcaf6262c"
+    },
+    {
+      "path": "fde-resources/08-escalation-email.eml",
+      "status": "present",
+      "sha256": "da1b310bb028234a97c911f5ec30ff2e8c9c8c0121b0ae181f9c2318f45b618a"
+    },
+    {
+      "path": "fde-resources/08-resource-and-dependency-register.xml",
+      "status": "present",
+      "sha256": "cc85a1f6f732351e03fe4f30c08c0e8e43246707658ed15107f3647f6ccce041"
+    },
+    {
+      "path": "fde-resources/08-workorder-api-openapi.yaml",
+      "status": "present",
+      "sha256": "b67f58115d898470917f8dcf42d992cd32cffae75b1ecdd87a9946287a8e7948"
+    },
+    {
+      "path": "fde-resources/09-current-system-consumption-notes.txt",
+      "status": "present",
+      "sha256": "620b2d34e07e09000630e6a0063c8f4f065896547abc311664e65c54cb1c1e96"
+    },
+    {
+      "path": "fde-resources/09-sandbox-readback-log.txt",
+      "status": "present",
+      "sha256": "02b00bad852f1d7ea13862ffb2433fec50b7e9aee31b8363521b03fe7aed3f43"
+    },
+    {
+      "path": "fde-resources/09-store-equipment-layout.svg",
+      "status": "present",
+      "sha256": "1862d0d02a909ee6914c6b6b8c1d0b0a6d8678abb97df26bc071ea89127e098d"
+    },
+    {
+      "path": "fde-resources/10-role-and-boundary-confirmation.md",
+      "status": "present",
+      "sha256": "5271bcb1e3e6f6e65af254f03a6d7e70b0fb228936212da5c9b149f14422f964"
+    },
+    {
+      "path": "fde-resources/10-system-version-difference.md",
+      "status": "present",
+      "sha256": "79a6e127dd36c7d633b1ce0947d492063e8af1059859b9357546814afdaa5f2e"
+    },
+    {
+      "path": "fde-resources/11-access-boundary-matrix.xml",
+      "status": "present",
+      "sha256": "281de7dbae71dae59cbf86bb5d9832a53d16b397f2efd73775619e78c4eb6737"
+    },
+    {
+      "path": "fde-resources/12-governance-review-notes.txt",
+      "status": "present",
+      "sha256": "bb60ba13b4236c9ea029a8dae954f5ebb093d78013c90e217682734d34337ba1"
+    },
+    {
+      "path": ".fde/sources/src_05cdac2d9cce41cebf65b0cb218303ef.json",
+      "status": "present",
+      "sha256": "e79dae8d9523acbf14405d3212e8bac088654b160118c2d39eb3ccd9f1bc4088"
+    },
+    {
+      "path": ".fde/sources/src_0b7bb9068a09492dae83b5432fad81c5.json",
+      "status": "present",
+      "sha256": "3af5f875761c86ebb11df619347328d9844da63367a39884c79117a04ba1a7a6"
+    },
+    {
+      "path": ".fde/sources/src_0dda7ab0e0094b299d3435a2a15a74d9.json",
+      "status": "present",
+      "sha256": "c061ae1c4d90068669d126fb4132f1f860b347f8252d4b69e2a05bd9b105d44e"
+    },
+    {
+      "path": ".fde/sources/src_1acfac3bc13a469c95eff2249d358721.json",
+      "status": "present",
+      "sha256": "ba27dfecbcfbe0e32265c78685c51612c8de324e0a6b10bc24a942789def4ce0"
+    },
+    {
+      "path": ".fde/sources/src_20cf7dfd3c0c48018e4594a5caeea056.json",
+      "status": "present",
+      "sha256": "857835f4771ed616b3b6cd5f6610ba7bc28f59dab6dd177c25c5945895ed590b"
+    },
+    {
+      "path": ".fde/sources/src_215eaf333ea648db985d9921b86a1a6e.json",
+      "status": "present",
+      "sha256": "15dc9239c5baadcaf481adbeb6dd7f9cebceb2a5d42b1b154cdff309936e3b18"
+    },
+    {
+      "path": ".fde/sources/src_37c94954b7054116a749d61aad514936.json",
+      "status": "present",
+      "sha256": "d314b24dafdacb3ae56be2033faace4d02963b81982bb42635fca31003078726"
+    },
+    {
+      "path": ".fde/sources/src_3b35d1130b0148659ec7e6591c671391.json",
+      "status": "present",
+      "sha256": "dbbb186f5c3c9c083addf6abfe5bfb6e7da8a230ed07ea77cb87a0be1e9cf688"
+    },
+    {
+      "path": ".fde/sources/src_402a89de7d804e5a8931b8850fd6ef8b.json",
+      "status": "present",
+      "sha256": "b48309995a175b96b284b84af5377c3fc630ee8501443ce937449a4c9fb6efc3"
+    },
+    {
+      "path": ".fde/sources/src_4ff12a75c65844b593cbee89209d6a8b.json",
+      "status": "present",
+      "sha256": "fc63ea2449739c402648fdb12234a2d4ff05808c2d46a83cd97cf7f3c4764e6d"
+    },
+    {
+      "path": ".fde/sources/src_50532fd88c1f438b84e2955b28f10f0e.json",
+      "status": "present",
+      "sha256": "bbca76ff3e8254257d056115e9f52d77e5ba00f32c5f04f2847ae36694d4c1ed"
+    },
+    {
+      "path": ".fde/sources/src_55833bfdb3484e19ba19253f4e0f539c.json",
+      "status": "present",
+      "sha256": "519e3d1a7733961f19abd1633cd387f61d9c29124e3576d8ad830ca49eb9a877"
+    },
+    {
+      "path": ".fde/sources/src_5cffed03145649f5bec95f69e4188407.json",
+      "status": "present",
+      "sha256": "145d95bcc0bfc9b8e9c12c1109f9e00eb08c061fd01316e449b379d7b152685b"
+    },
+    {
+      "path": ".fde/sources/src_60b74192ffd345e1958b5c8f12f4b8d9.json",
+      "status": "present",
+      "sha256": "5d4a4c5bf3d97f767707353f143e4e4312ec7f2f31347f58d485515b980ef27b"
+    },
+    {
+      "path": ".fde/sources/src_6e5c265651da4e25817ff27ed4ab20dd.json",
+      "status": "present",
+      "sha256": "144ae6073da2e820afe606c79188d19d3ab8162719c2d2d336c5a40d8dec5e23"
+    },
+    {
+      "path": ".fde/sources/src_701f85b610e049e0ac2a9698b000cc01.json",
+      "status": "present",
+      "sha256": "7105f4511697efe7774798c6dd9ceebdac7f37922014e2245d67f2ef40502582"
+    },
+    {
+      "path": ".fde/sources/src_87942e91c58e4325b10b5786beaac9ac.json",
+      "status": "present",
+      "sha256": "6ebe4f3682163be59f9bd5cb585900bb50b2fdf25a16e89796e127b94afe38b5"
+    },
+    {
+      "path": ".fde/sources/src_92b10c4384124443b14abd40be2a866f.json",
+      "status": "present",
+      "sha256": "02f32da28b00d5e2f5fbc49db8bbeb9a5ef0a726bc69d2b7da488396025f19c9"
+    },
+    {
+      "path": ".fde/sources/src_99c9f3bcca9a4b1aa7fff5922132f786.json",
+      "status": "present",
+      "sha256": "b1de115e8496fb2f2fdb7b4924c34f37c03ce97e105170cd4622e5d1ecd195c9"
+    },
+    {
+      "path": ".fde/sources/src_a44e36460acd45eea1820367c61d0c8c.json",
+      "status": "present",
+      "sha256": "23ed95039989e999b1a61aa8163e529bb4f6017303d2c4aa01c6970de28418e9"
+    },
+    {
+      "path": ".fde/sources/src_aa4217d373de4543abc6cf718540becb.json",
+      "status": "present",
+      "sha256": "661bf373e90bc9c8584af23c3dbff469e0426eaf63795fea79fe170d82fbdee4"
+    },
+    {
+      "path": ".fde/sources/src_afb39cee4d30447892570e9db6c65aad.json",
+      "status": "present",
+      "sha256": "64ec2ecccc187739aeb9a7932007ccfd956817c6ab884ce1b7617036bb585627"
+    },
+    {
+      "path": ".fde/sources/src_b8d462d759af48b5879648e2540cd4db.json",
+      "status": "present",
+      "sha256": "d7e536e8ea25f5f9ddfb5b4e986c4c5ea9cc719090166c7526626bf5787d3d03"
+    },
+    {
+      "path": ".fde/sources/src_bfd4d218aa2a42ccb77ce4f70141f1ba.json",
+      "status": "present",
+      "sha256": "ab5a5058dccf783d109bfbd73253563e6abd90f8146cffd92d343390b0cd5e5d"
+    },
+    {
+      "path": ".fde/sources/src_ce7191fd62e24d0b8a906a778c80d588.json",
+      "status": "present",
+      "sha256": "8f3cbb1406a5b963af97aa30434f3639a5378f24eb150772526e92472d34b183"
+    },
+    {
+      "path": ".fde/sources/src_daa34f3441d04e86913e82f5d42143d9.json",
+      "status": "present",
+      "sha256": "49c57520b90927e97a3ccc1320fd0d817da8b048f5767cb8be4e392c1829f59e"
+    },
+    {
+      "path": ".fde/sources/src_dbbb6884c1d64a09b63f023fe51ceeae.json",
+      "status": "present",
+      "sha256": "e388f708a1cb2285ac86115352387d98932c547983b442f5c84939840796974c"
+    },
+    {
+      "path": ".fde/sources/src_dc1d16dac2084a2ca5defd47cac1939c.json",
+      "status": "present",
+      "sha256": "da9b08f21b369c8f83f7b89e5e28dfaff4905ea42f0a453b62f53c89e135b4c0"
+    },
+    {
+      "path": ".fde/sources/src_dccfff3339674d0ba9b5c0b33f6bda15.json",
+      "status": "present",
+      "sha256": "63a73d8d6b35903516fc1074817a546d4e8fe3298755b279da4f58c0b12f6240"
+    },
+    {
+      "path": ".fde/sources/src_e199f4268fba4f8ba63ce144c6988442.json",
+      "status": "present",
+      "sha256": "dc4ebdfc3e6d054abee2a37ba4ccf1a10ca33937404ec4a74b9c3be3c417dee1"
+    },
+    {
+      "path": ".fde/sources/src_fae9a0cb144b4cd39fb58c13f1a40363.json",
+      "status": "present",
+      "sha256": "d5ec346463c3b345a86674b29378a5e0a6b253ef0de5f94619a7e7cb5c44b894"
+    },
+    {
+      "path": ".fde/sources/src_fbbac6cf20034a0191dfd44573d4ffd1.json",
+      "status": "present",
+      "sha256": "efe7518c13c784d0dcf3335f362e710b45df548ee0a46d8a0cf954d2262164c9"
+    },
+    {
+      "path": ".fde/sources/src_fdc5c72379834e6e97971a3d5736d21b.json",
+      "status": "present",
+      "sha256": "51ea05c0cd814e4116c2b3260c475cca48972ce36ff54986ed66e5fba8c6ca00"
+    },
+    {
+      "path": ".fde/sources/src_fee32675bda445599326443b97e26537.json",
+      "status": "present",
+      "sha256": "96e795825375013bd6ff2941912182aca4e2c51d062eb572bb4e609c6d4fa3c3"
+    },
+    {
+      "path": ".fde/sources/src_ffdb0d3c652741fcb960e7324bcd08a1.json",
+      "status": "present",
+      "sha256": "58481d5ddf88520757a3c62190a4071a89da1866975624815de6b89a265c3ebe"
+    }
+  ],
+  "metricSources": [
+    {
+      "id": "input-integrity",
+      "sources": [
+        {
+          "path": "fde-deliverables/05-poc-eval/evaluation-plan.md",
+          "status": "present",
+          "sha256": "45ee7962e1ecee1ebdb106d43fa26e16843855fe6b07a0fe62952ef13fff3240"
+        },
+        {
+          "path": "docs/PRD.md",
+          "status": "present",
+          "sha256": "1c613ee208a1316d8fc8e30f2b23f3b3f32e4a62c73f9077a117088853c33977"
+        },
+        {
+          "path": "docs/TESTING.md",
+          "status": "present",
+          "sha256": "7d17dc36f2871922c476c01e24cabfdfcd5edfea028691d61f75decbeae78594"
+        }
+      ]
+    },
+    {
+      "id": "safety-boundaries",
+      "sources": [
+        {
+          "path": "fde-deliverables/05-poc-eval/evaluation-plan.md",
+          "status": "present",
+          "sha256": "45ee7962e1ecee1ebdb106d43fa26e16843855fe6b07a0fe62952ef13fff3240"
+        },
+        {
+          "path": "docs/PRD.md",
+          "status": "present",
+          "sha256": "1c613ee208a1316d8fc8e30f2b23f3b3f32e4a62c73f9077a117088853c33977"
+        },
+        {
+          "path": "docs/TESTING.md",
+          "status": "present",
+          "sha256": "7d17dc36f2871922c476c01e24cabfdfcd5edfea028691d61f75decbeae78594"
+        }
+      ]
+    },
+    {
+      "id": "duplicate-window",
+      "sources": [
+        {
+          "path": "fde-deliverables/05-poc-eval/evaluation-plan.md",
+          "status": "present",
+          "sha256": "45ee7962e1ecee1ebdb106d43fa26e16843855fe6b07a0fe62952ef13fff3240"
+        },
+        {
+          "path": "docs/PRD.md",
+          "status": "present",
+          "sha256": "1c613ee208a1316d8fc8e30f2b23f3b3f32e4a62c73f9077a117088853c33977"
+        },
+        {
+          "path": "docs/TESTING.md",
+          "status": "present",
+          "sha256": "7d17dc36f2871922c476c01e24cabfdfcd5edfea028691d61f75decbeae78594"
+        }
+      ]
+    },
+    {
+      "id": "graph-evidence",
+      "sources": [
+        {
+          "path": "fde-deliverables/05-poc-eval/evaluation-plan.md",
+          "status": "present",
+          "sha256": "45ee7962e1ecee1ebdb106d43fa26e16843855fe6b07a0fe62952ef13fff3240"
+        },
+        {
+          "path": "docs/PRD.md",
+          "status": "present",
+          "sha256": "1c613ee208a1316d8fc8e30f2b23f3b3f32e4a62c73f9077a117088853c33977"
+        },
+        {
+          "path": "docs/TESTING.md",
+          "status": "present",
+          "sha256": "7d17dc36f2871922c476c01e24cabfdfcd5edfea028691d61f75decbeae78594"
+        }
+      ]
+    },
+    {
+      "id": "human-idempotency",
+      "sources": [
+        {
+          "path": "fde-deliverables/05-poc-eval/evaluation-plan.md",
+          "status": "present",
+          "sha256": "45ee7962e1ecee1ebdb106d43fa26e16843855fe6b07a0fe62952ef13fff3240"
+        },
+        {
+          "path": "docs/PRD.md",
+          "status": "present",
+          "sha256": "1c613ee208a1316d8fc8e30f2b23f3b3f32e4a62c73f9077a117088853c33977"
+        },
+        {
+          "path": "docs/TESTING.md",
+          "status": "present",
+          "sha256": "7d17dc36f2871922c476c01e24cabfdfcd5edfea028691d61f75decbeae78594"
+        }
+      ]
+    },
+    {
+      "id": "http-persistence",
+      "sources": [
+        {
+          "path": "fde-deliverables/05-poc-eval/evaluation-plan.md",
+          "status": "present",
+          "sha256": "45ee7962e1ecee1ebdb106d43fa26e16843855fe6b07a0fe62952ef13fff3240"
+        },
+        {
+          "path": "docs/PRD.md",
+          "status": "present",
+          "sha256": "1c613ee208a1316d8fc8e30f2b23f3b3f32e4a62c73f9077a117088853c33977"
+        },
+        {
+          "path": "docs/TESTING.md",
+          "status": "present",
+          "sha256": "7d17dc36f2871922c476c01e24cabfdfcd5edfea028691d61f75decbeae78594"
+        }
+      ]
+    },
+    {
+      "id": "frontend-syntax",
+      "sources": [
+        {
+          "path": "fde-deliverables/05-poc-eval/evaluation-plan.md",
+          "status": "present",
+          "sha256": "45ee7962e1ecee1ebdb106d43fa26e16843855fe6b07a0fe62952ef13fff3240"
+        },
+        {
+          "path": "docs/PRD.md",
+          "status": "present",
+          "sha256": "1c613ee208a1316d8fc8e30f2b23f3b3f32e4a62c73f9077a117088853c33977"
+        },
+        {
+          "path": "docs/TESTING.md",
+          "status": "present",
+          "sha256": "7d17dc36f2871922c476c01e24cabfdfcd5edfea028691d61f75decbeae78594"
+        }
+      ]
+    },
+    {
+      "id": "manual-acceptance",
+      "sources": [
+        {
+          "path": "fde-deliverables/05-poc-eval/evaluation-plan.md",
+          "status": "present",
+          "sha256": "45ee7962e1ecee1ebdb106d43fa26e16843855fe6b07a0fe62952ef13fff3240"
+        },
+        {
+          "path": "docs/PRD.md",
+          "status": "present",
+          "sha256": "1c613ee208a1316d8fc8e30f2b23f3b3f32e4a62c73f9077a117088853c33977"
+        },
+        {
+          "path": "docs/TESTING.md",
+          "status": "present",
+          "sha256": "7d17dc36f2871922c476c01e24cabfdfcd5edfea028691d61f75decbeae78594"
+        }
+      ]
+    }
+  ],
+  "commands": [
+    {
+      "command": "node --test backend/tests/workflow.test.mjs",
+      "exitCode": 0,
+      "stdout": "✔ 原始样本只读取输入字段；篡改历史答案不改变分析结果 (2.33175ms)\n✔ 安全优先、缺失保持未知，不执行报修原文中的越权指令 (0.382125ms)\n✔ 重复规则核对两小时时间窗，不合并记录 (0.099292ms)\n✔ 图谱使用真实节点边和 SourceId，不凭空建立连线 (0.085042ms)\n✔ 人工确认、证据版本和幂等操作是本地草稿前置条件 (0.200458ms)\n✔ 真实 HTTP 闭环：新增 → 分析 → 并发幂等保存 → 重启读回；原件不变 (122.542292ms)\nℹ tests 6\nℹ suites 0\nℹ pass 6\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 172.679417\n",
+      "stderr": ""
+    },
+    {
+      "command": "node --check frontend/app.js",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "browserAcceptance": "NOT_RUN",
+  "note": "测试使用临时状态目录；未向用户正常运行区注入报告或草稿，未调用付费模型、生产系统或执行 FDE 决定。"
+}

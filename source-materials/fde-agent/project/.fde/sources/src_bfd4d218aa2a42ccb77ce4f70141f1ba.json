@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_bfd4d218aa2a42ccb77ce4f70141f1ba",
+  "originalName": "10-system-version-difference.md",
+  "storedName": "10-system-version-difference.md",
+  "relativePath": "fde-resources/10-system-version-difference.md",
+  "mimeType": "text/markdown; charset=utf-8",
+  "extension": "md",
+  "bytes": 2076,
+  "createdAt": "2026-09-04T04:24:02.748Z",
+  "modifiedAt": "2026-09-04T04:24:02.749Z",
+  "mtimeMs": 1788495842748.6067,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 2076,
+    "sourceMtimeMs": 1788495842748.6067,
+    "derivedPath": ".fde/derived/src_bfd4d218aa2a42ccb77ce4f70141f1ba.md",
+    "updatedAt": "2026-09-04T04:24:02.800Z"
+  }
+}

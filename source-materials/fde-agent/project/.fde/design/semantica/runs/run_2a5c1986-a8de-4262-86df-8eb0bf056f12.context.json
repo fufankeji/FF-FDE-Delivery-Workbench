@@ -1,0 +1,227 @@
+{
+  "runId": "run_2a5c1986-a8de-4262-86df-8eb0bf056f12",
+  "status": "ready",
+  "createdAt": "2026-09-07T02:44:36.016Z",
+  "questionId": "cq_01",
+  "seedNodeId": "ent_acc67ea2800b69fcefe06959",
+  "query": "为当前最窄纵向切片提供必要的项目事实与约束",
+  "schemaVersion": "0.1.1-preview",
+  "graphRevision": "sha256:58ee663b62eec5cc338b7570616aaea479eea99e31baf545e5069442dea076a6",
+  "entities": [
+    {
+      "id": "ent_acc67ea2800b69fcefe06959",
+      "name": "SZ-014",
+      "type": "Store",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_a44e36460acd45eea1820367c61d0c8c",
+        "src_afb39cee4d30447892570e9db6c65aad",
+        "src_ffdb0d3c652741fcb960e7324bcd08a1",
+        "src_701f85b610e049e0ac2a9698b000cc01",
+        "src_daa34f3441d04e86913e82f5d42143d9"
+      ],
+      "summary": "SZ-014",
+      "validFrom": null,
+      "validUntil": null,
+      "properties": {
+        "store_id": "SZ-014"
+      }
+    },
+    {
+      "id": "ent_fd34c84e9072e4b7feca91d8",
+      "name": "FR-SZ014-03",
+      "type": "Asset",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_a44e36460acd45eea1820367c61d0c8c",
+        "src_afb39cee4d30447892570e9db6c65aad",
+        "src_ffdb0d3c652741fcb960e7324bcd08a1",
+        "src_701f85b610e049e0ac2a9698b000cc01"
+      ],
+      "summary": "FR-SZ014-03",
+      "validFrom": null,
+      "validUntil": null,
+      "properties": {
+        "asset_id": "FR-SZ014-03"
+      }
+    },
+    {
+      "id": "ent_a3ce9a5469b6fee475ac3487",
+      "name": "WO-88422",
+      "type": "WorkOrder",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_a44e36460acd45eea1820367c61d0c8c",
+        "src_ffdb0d3c652741fcb960e7324bcd08a1",
+        "src_aa4217d373de4543abc6cf718540becb"
+      ],
+      "summary": "WO-88422",
+      "validFrom": null,
+      "validUntil": null,
+      "properties": {
+        "work_order_id": "WO-88422"
+      }
+    },
+    {
+      "id": "ent_073ccfcd1ff083b5d56d8356",
+      "name": "WO-88419",
+      "type": "WorkOrder",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_a44e36460acd45eea1820367c61d0c8c",
+        "src_ffdb0d3c652741fcb960e7324bcd08a1",
+        "src_aa4217d373de4543abc6cf718540becb"
+      ],
+      "summary": "WO-88419",
+      "validFrom": null,
+      "validUntil": null,
+      "properties": {
+        "work_order_id": "WO-88419"
+      }
+    },
+    {
+      "id": "ent_c0ad35e6232f43399f7c36c8",
+      "name": "WO-88371",
+      "type": "WorkOrder",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ],
+      "summary": "WO-88371",
+      "validFrom": null,
+      "validUntil": null,
+      "properties": {
+        "work_order_id": "WO-88371"
+      }
+    },
+    {
+      "id": "ent_fa21ce1141e0d19ecf3270ae",
+      "name": "WO-88648",
+      "type": "WorkOrder",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ],
+      "summary": "WO-88648",
+      "validFrom": null,
+      "validUntil": null,
+      "properties": {
+        "work_order_id": "WO-88648"
+      }
+    },
+    {
+      "id": "ent_bb259db0dee3a95402a15591",
+      "name": "R1002",
+      "type": "Report",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ],
+      "summary": "R1002",
+      "validFrom": null,
+      "validUntil": null,
+      "properties": {
+        "report_id": "R1002"
+      }
+    },
+    {
+      "id": "ent_33ca241f15038efee9de4447",
+      "name": "R1003",
+      "type": "Report",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ],
+      "summary": "R1003",
+      "validFrom": null,
+      "validUntil": null,
+      "properties": {
+        "report_id": "R1003"
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "id": "rel_390b96d56ffaafecf9a53929",
+      "source": "ent_c0ad35e6232f43399f7c36c8",
+      "target": "ent_acc67ea2800b69fcefe06959",
+      "type": "rel_workorder_store",
+      "label": "工单发生于门店",
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ],
+      "validFrom": null,
+      "validUntil": null
+    },
+    {
+      "id": "rel_bde74e0dc59b856d175e937b",
+      "source": "ent_fa21ce1141e0d19ecf3270ae",
+      "target": "ent_acc67ea2800b69fcefe06959",
+      "type": "rel_workorder_store",
+      "label": "工单发生于门店",
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ],
+      "validFrom": null,
+      "validUntil": null
+    },
+    {
+      "id": "rel_79da00010c0148e6e11b61c4",
+      "source": "ent_acc67ea2800b69fcefe06959",
+      "target": "ent_fd34c84e9072e4b7feca91d8",
+      "type": "rel_store_asset",
+      "label": "门店拥有设备",
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_701f85b610e049e0ac2a9698b000cc01"
+      ],
+      "validFrom": null,
+      "validUntil": null
+    },
+    {
+      "id": "rel_21b9b233b12a6bb4cedd7c14",
+      "source": "ent_bb259db0dee3a95402a15591",
+      "target": "ent_073ccfcd1ff083b5d56d8356",
+      "type": "rel_report_workorder",
+      "label": "报修关联工单",
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ],
+      "validFrom": null,
+      "validUntil": null
+    },
+    {
+      "id": "rel_38580c32b09d94cfe8fc4542",
+      "source": "ent_33ca241f15038efee9de4447",
+      "target": "ent_a3ce9a5469b6fee475ac3487",
+      "type": "rel_report_workorder",
+      "label": "报修关联工单",
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ],
+      "validFrom": null,
+      "validUntil": null
+    }
+  ],
+  "constraints": [
+    "每个实体和关系必须保留当前项目 SourceId，不以展示标签替代原始来源。",
+    "合同、设备身份和工单信息冲突时并列保留，不自动覆盖或合并。",
+    "final_domain、final_priority、final_owner、final_vendor、final_decision 不进入抽取和图谱。",
+    "消息、告警、报修和工单分别保留材料中的记录时间。",
+    "合同、值班和政策的生效时间与记录时间分开；无正文时只保留候选状态。"
+  ],
+  "derivedFacts": [],
+  "sources": [
+    "src_701f85b610e049e0ac2a9698b000cc01",
+    "src_a44e36460acd45eea1820367c61d0c8c",
+    "src_aa4217d373de4543abc6cf718540becb",
+    "src_afb39cee4d30447892570e9db6c65aad",
+    "src_daa34f3441d04e86913e82f5d42143d9",
+    "src_ffdb0d3c652741fcb960e7324bcd08a1"
+  ],
+  "permissionScope": "仅用于当前项目第四阶段的本体候选抽取、Schema 审阅、项目隔离图谱构建、只读验证和 Agent 有界上下文；禁止生产写入、正式派单、消息通知和费用承诺。\n\n  混合材料的权威性不完全相同，当前界面又只能统一选择一个级别，第一轮建议选择“辅助依据”，避免把所有文件误标为权威事实。"
+}

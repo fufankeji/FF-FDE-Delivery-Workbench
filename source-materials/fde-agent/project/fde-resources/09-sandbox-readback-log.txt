@@ -1,0 +1,41 @@
+SourceId: SRC-SIM-0309
+SourceType: simulation
+CapturedAt: 2026-09-03T16:40:00+08:00
+Environment: WorkOrder Pro 7 Sandbox 7.3.1
+Identity: fde-agent-service-account
+CredentialRecord: [REDACTED-NOT-INCLUDED]
+
+说明：这是预制的仿真 Sandbox 观察记录，不是本机刚刚执行的网络调用。它只证明案例
+Sandbox 中以下只读行为，不证明生产环境能力。Authorization、Cookie 和令牌均未保存。
+
+[16:32:11] GET /api/v1/tickets/SBX-1042
+HTTP 200
+{"ticket_id":"SBX-1042","status":"closed","store_id":"S-NJ-011","asset_id":"POS-NJXJK-01","operation_id":null,"updated_at":"2026-09-02T14:07:11+08:00"}
+观察：只读可用；响应没有 7.4 文档声明的 evidence_refs 字段。
+
+[16:34:02] GET /api/v1/assets/POS-NJXJK-01
+HTTP 200
+{"asset_id":"POS-NJXJK-01","store_id":"S-NJ-011","type":"POS","label_status":"legacy_alias_present"}
+观察：设备读回可用；旧标签别名仍需人工确认。
+
+[16:35:24] GET /api/v1/vendors?region=jiangsu&asset_type=POS
+HTTP 200
+{"items":[{"vendor_id":"V-JS-03","contract_status":"unknown","on_duty_status":"unknown"}]}
+观察：候选列表不是合同覆盖、当日值班或派单批准。
+
+[16:36:40] GET /api/v1/vendors?region=zhejiang&asset_type=POS
+HTTP 403
+{"error":"region_scope_denied"}
+观察：身份的区域读取边界生效。
+
+[16:38:05] POST /api/v1/ticket-drafts
+Request body: {"operation_id":"OP-SIM-0309-01","store_id":"S-NJ-011","asset_id":"POS-NJXJK-01","symptom":"sandbox permission probe","evidence_refs":["SRC-SIM-0309"]}
+HTTP 403
+{"error":"draft_write_permission_pending","request_id":"AR-305"}
+观察：仅验证写权限尚未批准；没有创建草稿，因此不存在可读回的新对象。
+
+[未执行] POST /api/v1/tickets/{ticket_id}/dispatch
+原因：正式派单未申请、当前阶段明确禁止。没有用预期的 403 代替真实执行结果。
+
+结论边界：当前身份在限定区域有 Sandbox 读取证据；草稿写被拒绝；生产读取、生产写入、
+消息发送和正式派单均没有通过此记录得到证明。

@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_fbbac6cf20034a0191dfd44573d4ffd1",
+  "originalName": "05-field-dictionary.xml",
+  "storedName": "05-field-dictionary.xml",
+  "relativePath": "fde-resources/05-field-dictionary.xml",
+  "mimeType": "application/xml; charset=utf-8",
+  "extension": "xml",
+  "bytes": 5188,
+  "createdAt": "2026-09-04T04:20:16.743Z",
+  "modifiedAt": "2026-09-04T04:20:16.744Z",
+  "mtimeMs": 1788495616743.5078,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 5188,
+    "sourceMtimeMs": 1788495616743.5078,
+    "derivedPath": ".fde/derived/src_fbbac6cf20034a0191dfd44573d4ffd1.md",
+    "updatedAt": "2026-09-04T04:20:16.774Z"
+  }
+}

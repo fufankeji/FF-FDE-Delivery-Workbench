@@ -1,0 +1,117 @@
+openapi: 3.0.3
+info:
+  title: WorkOrder Pro 7 Sandbox API（仿真合同）
+  version: 7.4-doc
+  description: >-
+    SRC-SIM-0308。仅用于调查接口形状；服务器域名无效，不包含凭据，
+    文档声明不等于当前 Sandbox 已实现或当前身份已获权。
+servers:
+  - url: https://sandbox.invalid.example/api/v1
+    description: 不可调用的仿真地址
+paths:
+  /tickets/{ticket_id}:
+    get:
+      operationId: getTicket
+      summary: 读取单张 Sandbox 工单
+      parameters:
+        - name: ticket_id
+          in: path
+          required: true
+          schema: {type: string}
+      responses:
+        "200":
+          description: 工单读回成功
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Ticket"}
+        "403": {description: 身份无读取权限或超出区域范围}
+  /assets/{asset_id}:
+    get:
+      operationId: getAsset
+      summary: 读取设备候选
+      parameters:
+        - name: asset_id
+          in: path
+          required: true
+          schema: {type: string}
+      responses:
+        "200": {description: 设备读回成功}
+        "404": {description: 未找到设备}
+  /vendors:
+    get:
+      operationId: listVendors
+      summary: 按区域和设备类型读取维修商候选
+      parameters:
+        - name: region
+          in: query
+          required: true
+          schema: {type: string}
+        - name: asset_type
+          in: query
+          required: true
+          schema: {type: string}
+      responses:
+        "200":
+          description: 返回候选；结果不证明合同覆盖、当日值班或派单授权
+        "403": {description: 超出身份区域范围}
+  /ticket-drafts:
+    post:
+      operationId: createTicketDraft
+      summary: 创建 Sandbox 工单草稿
+      description: 当前申请 AR-305 尚未批准；文档存在不表示可执行。
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema: {type: string}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [operation_id, store_id, symptom, evidence_refs]
+              properties:
+                operation_id: {type: string}
+                store_id: {type: string}
+                asset_id: {type: string, nullable: true}
+                symptom: {type: string}
+                evidence_refs:
+                  type: array
+                  items: {type: string}
+      responses:
+        "201": {description: 草稿创建成功，必须再调用 GET 独立读回}
+        "403": {description: 当前身份没有草稿写权限}
+        "409": {description: operation_id 或 Idempotency-Key 已存在}
+  /tickets/{ticket_id}/dispatch:
+    post:
+      operationId: dispatchTicket
+      summary: 正式派单
+      description: 当前阶段明确禁止；未申请生产权限，不得尝试。
+      parameters:
+        - name: ticket_id
+          in: path
+          required: true
+          schema: {type: string}
+      responses:
+        "403": {description: 禁止或无权执行}
+components:
+  schemas:
+    Ticket:
+      type: object
+      required: [ticket_id, status, store_id, updated_at]
+      properties:
+        ticket_id: {type: string}
+        status: {type: string}
+        store_id: {type: string}
+        asset_id: {type: string, nullable: true}
+        operation_id: {type: string, nullable: true}
+        evidence_refs:
+          type: array
+          items: {type: string}
+        updated_at: {type: string, format: date-time}
+x-investigation-notes:
+  documented_version: 7.4
+  observed_sandbox_version: 7.3.1
+  source_id: SRC-SIM-0308
+  source_type: simulation

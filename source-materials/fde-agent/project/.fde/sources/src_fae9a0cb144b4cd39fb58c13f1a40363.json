@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_fae9a0cb144b4cd39fb58c13f1a40363",
+  "originalName": "02-scope-constraints-and-dependencies.md",
+  "storedName": "02-scope-constraints-and-dependencies.md",
+  "relativePath": "fde-resources/02-scope-constraints-and-dependencies.md",
+  "mimeType": "text/markdown; charset=utf-8",
+  "extension": "md",
+  "bytes": 1979,
+  "createdAt": "2026-09-04T03:08:27.130Z",
+  "modifiedAt": "2026-09-04T03:08:27.131Z",
+  "mtimeMs": 1788491307130.5054,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 1979,
+    "sourceMtimeMs": 1788491307130.5054,
+    "derivedPath": ".fde/derived/src_fae9a0cb144b4cd39fb58c13f1a40363.md",
+    "updatedAt": "2026-09-04T03:08:27.158Z"
+  }
+}

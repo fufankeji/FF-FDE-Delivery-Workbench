@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 2,
+  "selectedWorkflowId": "wf-repair-fulfillment",
+  "workflows": [
+    {
+      "id": "wf-repair-fulfillment",
+      "title": "门店设备报修受理—去重—设备身份/故障域确认—维修商草稿—人工确认—派单—闭环催办",
+      "actor": "门店店员/店长（发起与≤500元临时确认）；总部设备运维（受理、去重、身份与故障域判断、草稿）；维修商/原厂（执行）；区域经理及采购/财务/信息安全（按费用与风险分级批准）；总部运营总监顾宁（范围预期）",
+      "trigger": "门店在企业群内发起设备报修；紧急情况经电话/区域值班升级",
+      "problem": "报修症状与真实故障域可分离（南京：症状收银、真故障网络）；重复消息≠重复事件——系统机器人自动按第二消息建单造成重复+错派（已确认生产真实行为且可在草稿层阻止）；设备身份/合同可冲突（杭州旧标签 vs 台账 retired、值班表合同元数据active但采购提示可能到期），报修当下核对责任在采购（已确认）；费用审批有分级授权（≤500店长+运维 / >500区域经理 / >5000采购+财务+区域经理 / P0应急先行）；系统只能建草稿，不得正式派单、承诺费用、通知供应商或关闭工单。",
+      "disposition": "selected",
+      "evidenceRefs": [
+        {
+          "id": "ev-confirmed-autobuild-draft",
+          "state": "confirmed",
+          "kind": "conversation",
+          "ref": "conversation/2026-09-03",
+          "summary": "用户确认：‘系统机器人按第二消息自动建单’是生产真实行为，且可在草稿层被阻止/修正。"
+        },
+        {
+          "id": "ev-confirmed-procurement-verify",
+          "state": "confirmed",
+          "kind": "conversation",
+          "ref": "conversation/2026-09-03",
+          "summary": "用户确认：设备身份与合同信息可在报修当下取得，报修当下核对责任在采购。"
+        },
+        {
+          "id": "ev-original-request",
+          "state": "inferred",
+          "kind": "project-file",
+          "ref": "fde-resources/01-customer-original-brief.md",
+          "summary": "发起人原话：AI 读群→自动判断/找维修商/派单，三月上线、80% 自动处理。属发起人期望。"
+        },
+        {
+          "id": "ev-chat-src",
+          "state": "inferred",
+          "kind": "project-file",
+          "ref": "fde-resources/02-wecom-repair-chat.txt",
+          "summary": "脱敏仿真群消息时间线（08-18/21/24/25），含陈涛去重与追问、系统机器人按赵奇消息自动建 WO-88422、区域维修商报价1800、贺敏只批现场诊断。"
+        },
+        {
+          "id": "ev-workorder-export",
+          "state": "inferred",
+          "kind": "system",
+          "ref": "fde-resources/03-work-order-export.json",
+          "summary": "WorkOrder Pro 7 Sandbox 导出12条代表性抽样：WO-88419(NJ 收银→network P0)、WO-88422(duplicateOf WO-88419, cancelled, vendor错误)、WO-88507(HZ hvac diagnostic_visit_only est1800 approved0)、多条 manual_emergency_handoff 与 no_fault_found 演练。声明不代表总体基线。"
+        },
+        {
+          "id": "ev-device-register",
+          "state": "inferred",
+          "kind": "system",
+          "ref": "fde-resources/04-device-register.xml",
+          "summary": "台账快照：FR-SZ014-03 active(保修候选至2027-03-31)；POS-NJ003-01/02 active；NET-NJ003-01 active；HVAC-HZ021-02 active(更新2026-08-26)；HVAC-HZ021-OLD retired(更新2024-12-01)；qualityNotes 提示旧标签仍现场可见、warrantyCandidateEnd 仅候选、设备与事件无统一事件ID。"
+        },
+        {
+          "id": "ev-duty-roster",
+          "state": "inferred",
+          "kind": "system",
+          "ref": "fde-resources/05-vendor-duty-roster.yaml",
+          "summary": "手工值班表：V-REF-01/V-NET-02/V-POS-03/V-HVAC-02 联系候选与 duty_window；V-HVAC-02 附带 warning：合同元数据 active 但采购口头提示正文可能已到期；文件自述值班表不能证明合同/价格/派单已获批。"
+        },
+        {
+          "id": "ev-policy",
+          "state": "inferred",
+          "kind": "policy",
+          "ref": "fde-resources/06-maintenance-priority-and-approval-policy.pdf",
+          "summary": "政策节选 OPS-MAINT-2026.4：分级 P0/P1/P2/未知、自动化边界（P0应急先行不得等模型；P1草稿+费用异常人工；P2草稿受限）、费用分级授权（≤500店长+运维；>500区域经理；>5000采购+财务+区域经理）、来源冲突读回安全行为、当前项目授权仅生成建议与本地草稿，明确禁止正式派单/供应商通知/费用承诺/工单关闭/跨区域读取/生产写入。"
+        },
+        {
+          "id": "ev-email-guning",
+          "state": "inferred",
+          "kind": "external",
+          "ref": "fde-resources/08-escalation-email.eml",
+          "summary": "总部运营总监顾宁(仿真)邮件：保留最初自动派单/80%提案但不写成已批准；支持先验证补信息时间、P0/安全/重复更早识别、可人工确认草稿；正式派单/费用/供应商通知需区域运营、采购、财务、信息安全分别确认；三个月是试点证据目标非生产承诺。"
+        },
+        {
+          "id": "ev-interview-chen",
+          "state": "inferred",
+          "kind": "interview",
+          "ref": "fde-resources/03-first-interview-notes.md",
+          "summary": "陈涛：先判重复、身份、故障域；编号/批次/位置不一致照片可能旧；约半数可自动成草稿但不支持系统直接承诺费用；P0/P1 需先给依据再人确认。"
+        },
+        {
+          "id": "ev-interview-he",
+          "state": "inferred",
+          "kind": "interview",
+          "ref": "fde-resources/03-first-interview-notes.md",
+          "summary": "贺敏：未授权自动派超500元；食安/全店无法交易/烟雾/漏电/漏水先人工应急；自动派单需采购财务信息安全区域运营共同确认现无批准；建议试点到草稿由人确认。"
+        },
+        {
+          "id": "ev-cases-limits",
+          "state": "inferred",
+          "kind": "project-file",
+          "ref": "fde-resources/02-representative-cases.md",
+          "summary": "案例文字整理的时间点与比例局限；现被工单导出/群聊等更细来源补充核对。"
+        }
+      ]
+    },
+    {
+      "id": "wf-auto-dispatch-as-originally-requested",
+      "title": "发起人原提案：自动读群—自动判故障—自动找维修商—自动派单（三月上线、80% 免人工）",
+      "actor": "发起人（期望来源）；实际执行/责任授权人待核对",
+      "trigger": "企业群内任意设备报修消息",
+      "problem": "政策与顾宁邮件均明确当前授权下不得正式派单/承诺费用/通知供应商；贺敏无自动派单授权；应急与费用责任人工归属；无工单总体基线。新边界未经有权人批准前不可推进。",
+      "disposition": "deferred",
+      "evidenceRefs": [
+        {
+          "id": "ev-original-request",
+          "state": "inferred",
+          "kind": "project-file",
+          "ref": "fde-resources/01-customer-original-brief.md",
+          "summary": "发起人原提案：自动判断故障/找维修商/派单，三月上线、80%自动。"
+        },
+        {
+          "id": "ev-policy",
+          "state": "inferred",
+          "kind": "policy",
+          "ref": "fde-resources/06-maintenance-priority-and-approval-policy.pdf",
+          "summary": "政策3.1当前项目授权：明确禁止正式派单、供应商通知、费用承诺、工单关闭、跨区域读取与生产写入；只能生成建议与本地草稿（草稿尚需沙盒写权限获批）。"
+        },
+        {
+          "id": "ev-email-guning",
+          "state": "inferred",
+          "kind": "external",
+          "ref": "fde-resources/08-escalation-email.eml",
+          "summary": "顾宁要求保留原提案但不作为已批准范围；正式派单需四方分别确认；三个月仅作试点证据目标。"
+        },
+        {
+          "id": "ev-interview-he",
+          "state": "inferred",
+          "kind": "interview",
+          "ref": "fde-resources/03-first-interview-notes.md",
+          "summary": "贺敏无自动派单授权、应急与费用人工责任，建议到草稿为止。"
+        },
+        {
+          "id": "ev-workorder-limits",
+          "state": "inferred",
+          "kind": "system",
+          "ref": "fde-resources/03-work-order-export.json",
+          "summary": "工单导出为代表性抽样，limitations 声明不可用于计算总体发生率，故无法支撑‘80%’基线主张。"
+        }
+      ]
+    },
+    {
+      "id": "wf-emergency-human-first",
+      "title": "重大/应急故障人工先行处置路径",
+      "actor": "门店店员/店长（现场升级）；区域值班人与应急责任人（人工接管）",
+      "trigger": "P0：全店无法交易、烟雾/焦味/漏电、食安、碎玻璃、快速扩散漏水",
+      "problem": "此类场景先执行门店应急预案并电话升级区域值班人；不得等待模型完整诊断或自动派单（政策明确）。工单导出含 WO-88531(electrical-safety)、WO-88703(physical-safety) 两例 manual_emergency_handoff。",
+      "disposition": "candidate",
+      "evidenceRefs": [
+        {
+          "id": "ev-policy",
+          "state": "inferred",
+          "kind": "policy",
+          "ref": "fde-resources/06-maintenance-priority-and-approval-policy.pdf",
+          "summary": "政策P0分级与第一动作：立即执行门店应急预案并电话升级区域值班人；固定提示优先，不得等待模型完整诊断或自动派单。"
+        },
+        {
+          "id": "ev-workorder-export",
+          "state": "inferred",
+          "kind": "system",
+          "ref": "fde-resources/03-work-order-export.json",
+          "summary": "WO-88531(SU-006 焦味插座发热→electrical-safety)与 WO-88703(SH-020 柜门破裂碎玻璃→physical-safety)均为 manual_emergency_handoff。"
+        }
+      ]
+    }
+  ]
+}

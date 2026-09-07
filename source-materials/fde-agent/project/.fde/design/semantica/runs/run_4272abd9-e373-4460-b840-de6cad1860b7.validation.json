@@ -1,0 +1,184 @@
+{
+  "runId": "run_4272abd9-e373-4460-b840-de6cad1860b7",
+  "status": "passed",
+  "checkedAt": "2026-09-04T10:26:29.175Z",
+  "graphRevision": "sha256:58ee663b62eec5cc338b7570616aaea479eea99e31baf545e5069442dea076a6",
+  "definitionDigest": "sha256:8e81402d47f636984f86e6843567d9535527c73b6edd9bcc11901a3e494cca70",
+  "structuralValid": true,
+  "issues": [
+    {
+      "code": "ORPHAN_NODES",
+      "message": "Found 4 orphan nodes (no relationships).",
+      "severity": "warning",
+      "element_id": null,
+      "element_type": null,
+      "details": {
+        "count": 4,
+        "ids": [
+          "ent_c71428e7107b90588c35f82b",
+          "ent_e24abea7ad26d2e77edc1917",
+          "ent_afa1215c9e95cf036130e9cd",
+          "ent_e9d041a99dea102dd21f22e0"
+        ]
+      }
+    }
+  ],
+  "questions": [
+    {
+      "questionId": "cq_01",
+      "status": "passed",
+      "answerCount": 2,
+      "nodeIds": [
+        "ent_073ccfcd1ff083b5d56d8356",
+        "ent_33ca241f15038efee9de4447",
+        "ent_a3ce9a5469b6fee475ac3487",
+        "ent_bb259db0dee3a95402a15591"
+      ],
+      "edgeIds": [
+        "rel_21b9b233b12a6bb4cedd7c14",
+        "rel_38580c32b09d94cfe8fc4542"
+      ],
+      "sourceRefs": [
+        "src_a44e36460acd45eea1820367c61d0c8c",
+        "src_aa4217d373de4543abc6cf718540becb",
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ],
+      "message": "真实查询返回 2 项，要求至少 2 项。"
+    },
+    {
+      "questionId": "cq_02",
+      "status": "passed",
+      "answerCount": 4,
+      "nodeIds": [
+        "ent_073ccfcd1ff083b5d56d8356",
+        "ent_a3ce9a5469b6fee475ac3487",
+        "ent_bd5b71f30a4d471281844c89"
+      ],
+      "edgeIds": [
+        "rel_21b9b233b12a6bb4cedd7c14",
+        "rel_38580c32b09d94cfe8fc4542",
+        "rel_56834954583621b56225bddd",
+        "rel_c6809bcd1b6afea8ce3d2a55"
+      ],
+      "sourceRefs": [
+        "src_a44e36460acd45eea1820367c61d0c8c",
+        "src_aa4217d373de4543abc6cf718540becb",
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ],
+      "message": "真实查询返回 4 项，要求至少 1 项。"
+    },
+    {
+      "questionId": "cq_03",
+      "status": "passed",
+      "answerCount": 7,
+      "nodeIds": [
+        "ent_21d54b5cd9c7f17d1da39302",
+        "ent_26c3bb3810318eafe7813674",
+        "ent_404f21668ee8305fd65b2e88",
+        "ent_63662e764427ec1c1dfb0557",
+        "ent_67955b94a94d3af8d91d3345",
+        "ent_7c27d2f5dd74020faa8b8a0b",
+        "ent_c5d535fc9bfa3d200aed1591",
+        "ent_e5cccee5e834e4e5c98e6f69",
+        "ent_e7f5b1b11ee8863de282f3cb",
+        "ent_e9c9d177fbebd40a7a687a96",
+        "ent_fd34c84e9072e4b7feca91d8"
+      ],
+      "edgeIds": [
+        "rel_2c44ea380e3a0802603a148b",
+        "rel_4466b08960a9a00ba2cb3189",
+        "rel_5c7b72f58f1c07546a5228a7",
+        "rel_90356d586a56a86d69139de7",
+        "rel_a3d8848ab1d06412a46b9102",
+        "rel_af3d3665da65d9b2b6a9fc89",
+        "rel_fdd1eabb7d577c9793d98a6f"
+      ],
+      "sourceRefs": [
+        "src_701f85b610e049e0ac2a9698b000cc01",
+        "src_a44e36460acd45eea1820367c61d0c8c",
+        "src_afb39cee4d30447892570e9db6c65aad",
+        "src_daa34f3441d04e86913e82f5d42143d9",
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ],
+      "message": "真实查询返回 7 项，要求至少 1 项。"
+    },
+    {
+      "questionId": "cq_04",
+      "status": "passed",
+      "answerCount": 4,
+      "nodeIds": [
+        "ent_1d919db979f30e8872fb38fe",
+        "ent_26c3bb3810318eafe7813674",
+        "ent_279b589c3ebc1c205cd8d879",
+        "ent_67955b94a94d3af8d91d3345",
+        "ent_7c27d2f5dd74020faa8b8a0b",
+        "ent_c0171164fd78d189f00c4923",
+        "ent_c5d535fc9bfa3d200aed1591",
+        "ent_e65d84312c9ba6144a13c00e"
+      ],
+      "edgeIds": [
+        "rel_602f7183d44fbbdf06336735",
+        "rel_65db652b6c21ec1be5593517",
+        "rel_a6b4ab1e83f87b0b6ecb620f",
+        "rel_ae6f49af4df0d62f456a13e7"
+      ],
+      "sourceRefs": [
+        "src_701f85b610e049e0ac2a9698b000cc01",
+        "src_daa34f3441d04e86913e82f5d42143d9",
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ],
+      "message": "真实查询返回 4 项，要求至少 1 项。"
+    },
+    {
+      "questionId": "cq_05",
+      "status": "passed",
+      "answerCount": 4,
+      "nodeIds": [
+        "ent_afa1215c9e95cf036130e9cd",
+        "ent_c71428e7107b90588c35f82b",
+        "ent_e24abea7ad26d2e77edc1917",
+        "ent_e9d041a99dea102dd21f22e0"
+      ],
+      "edgeIds": [],
+      "sourceRefs": [
+        "src_1acfac3bc13a469c95eff2249d358721"
+      ],
+      "message": "真实查询返回 4 项，要求至少 1 项。"
+    },
+    {
+      "questionId": "cq_06",
+      "status": "passed",
+      "answerCount": 10,
+      "nodeIds": [
+        "ent_26c3bb3810318eafe7813674",
+        "ent_67955b94a94d3af8d91d3345",
+        "ent_7c27d2f5dd74020faa8b8a0b",
+        "ent_8efe1b3b92f2898b005e2a31",
+        "ent_a75638df5ceadd291139213a",
+        "ent_acc67ea2800b69fcefe06959",
+        "ent_c5d535fc9bfa3d200aed1591",
+        "ent_d89aee53461879040fe8e67e"
+      ],
+      "edgeIds": [
+        "rel_11746e6243cad1538860c5d4",
+        "rel_12ea8264f56cc82845747f60",
+        "rel_2c44ea380e3a0802603a148b",
+        "rel_5c7b72f58f1c07546a5228a7",
+        "rel_79da00010c0148e6e11b61c4",
+        "rel_811c948436f86e58d9f99dda",
+        "rel_90356d586a56a86d69139de7",
+        "rel_a3d8848ab1d06412a46b9102",
+        "rel_af3d3665da65d9b2b6a9fc89",
+        "rel_c8ba3fea685b657aba75c2e7"
+      ],
+      "sourceRefs": [
+        "src_701f85b610e049e0ac2a9698b000cc01",
+        "src_a44e36460acd45eea1820367c61d0c8c",
+        "src_afb39cee4d30447892570e9db6c65aad",
+        "src_daa34f3441d04e86913e82f5d42143d9",
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ],
+      "message": "真实查询返回 10 项，要求至少 1 项。"
+    }
+  ]
+}

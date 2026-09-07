@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_05cdac2d9cce41cebf65b0cb218303ef",
+  "originalName": "01-customer-original-brief.md",
+  "storedName": "01-customer-original-brief.md",
+  "relativePath": "fde-resources/01-customer-original-brief.md",
+  "mimeType": "text/markdown; charset=utf-8",
+  "extension": "md",
+  "bytes": 1378,
+  "createdAt": "2026-09-03T10:16:26.007Z",
+  "modifiedAt": "2026-09-03T10:16:26.009Z",
+  "mtimeMs": 1788430586009.1082,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 1378,
+    "sourceMtimeMs": 1788430586009.1082,
+    "derivedPath": ".fde/derived/src_05cdac2d9cce41cebf65b0cb218303ef.md",
+    "updatedAt": "2026-09-03T10:16:26.037Z"
+  }
+}

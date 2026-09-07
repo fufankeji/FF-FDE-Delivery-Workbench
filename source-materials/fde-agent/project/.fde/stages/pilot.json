@@ -1,0 +1,247 @@
+{
+  "schemaVersion": 1,
+  "stage": "pilot",
+  "status": "review-ready",
+  "workItems": [
+    {
+      "id": "integration",
+      "status": "complete"
+    },
+    {
+      "id": "reliability",
+      "status": "complete"
+    },
+    {
+      "id": "readiness",
+      "status": "complete"
+    },
+    {
+      "id": "pilot",
+      "status": "complete"
+    }
+  ],
+  "blockers": [],
+  "recommendation": "go",
+  "delivery": {
+    "schemaVersion": 1,
+    "version": "local-delivery-flow-r1",
+    "versionFiles": [
+      {
+        "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+        "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+      }
+    ],
+    "environment": {
+      "kind": "pilot",
+      "label": "试点范围"
+    },
+    "semantic": {
+      "mode": "snapshot",
+      "schemaVersion": "0.1.1-preview",
+      "graphRevision": "sha256:58ee663b62eec5cc338b7570616aaea479eea99e31baf545e5069442dea076a6",
+      "summary": "本地应用通过 backend/catalog.mjs 读取既有 56 实体 / 56 关系快照并查询相关子图。尚未接入独立 Semantica 在线查询、生产权限或更新流水线；DSH 中有 Semantica 工具不代表本应用已接通。",
+      "evidence": [
+        {
+          "path": "backend/catalog.mjs",
+          "sha256": "06802a58c1f4523b51d3ab37f496851dde3c3d0ad28f7038ccfbd352be427bd2"
+        },
+        {
+          "path": "docs/architecture/architecture.md",
+          "sha256": "2e669fae199d50759d12962398f22dc0ca03d1d764174bc41cac2f54d3f891bf"
+        },
+        {
+          "path": ".fde/design/knowledge-graph.json",
+          "sha256": "960a8b029c76ccb9c50d38c2ab1aa6f9852c1df3e781d6356e692fef6f4adec2"
+        }
+      ]
+    },
+    "items": [
+      {
+        "id": "pilot-1",
+        "category": "authorization",
+        "title": "限定试点范围已明确",
+        "summary": "3 个联调门店、12 名联调操作者，连续 7 天；允许读取、生成建议和本地草稿，禁止正式派单与费用承诺。",
+        "criterion": "试点边界与动作白名单齐备",
+        "owner": "试点业务负责人",
+        "status": "passed",
+        "required": true,
+        "version": "local-delivery-flow-r1",
+        "scope": "pilot",
+        "observedAt": "2026-09-07T10:06:28.188Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      },
+      {
+        "id": "pilot-2",
+        "category": "authorization",
+        "title": "数据与动作授权",
+        "summary": "脱敏历史工单可读；草稿必须人工确认。越权动作进入人工接管，不向真实系统发请求。",
+        "criterion": "敏感字段不可见；正式执行请求必须被阻断",
+        "owner": "安全负责人",
+        "status": "passed",
+        "required": true,
+        "version": "local-delivery-flow-r1",
+        "scope": "pilot",
+        "observedAt": "2026-09-07T10:06:28.192Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      },
+      {
+        "id": "pilot-3",
+        "category": "integration",
+        "title": "工单读取与字段映射",
+        "summary": "联调 120 条工单全部映射；设备 ID、门店和来源可追溯，3 条旧编码已建立显式映射。",
+        "criterion": "字段映射覆盖率 100%，缺失来源为 0",
+        "owner": "系统 Owner",
+        "status": "passed",
+        "required": true,
+        "version": "local-delivery-flow-r1",
+        "scope": "pilot",
+        "observedAt": "2026-09-07T10:06:28.192Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      },
+      {
+        "id": "pilot-4",
+        "category": "integration",
+        "title": "外部正式派单未纳入范围",
+        "summary": "当前联调只联调候选建议与本地草稿，真实派单、通知、付款均不接入。",
+        "criterion": "本轮明确不适用，并保留收窄理由",
+        "owner": "FDE",
+        "status": "not_applicable",
+        "required": false,
+        "version": "local-delivery-flow-r1",
+        "scope": "pilot",
+        "observedAt": "2026-09-07T10:06:28.192Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      },
+      {
+        "id": "pilot-5",
+        "category": "recovery",
+        "title": "接管与恢复演练",
+        "summary": "联调中注入一次读取超时：切为人工处理，恢复用时 2 分 10 秒；未丢失已确认草稿。",
+        "criterion": "恢复不超过 5 分钟；草稿丢失为 0",
+        "owner": "运维负责人",
+        "status": "passed",
+        "required": true,
+        "version": "local-delivery-flow-r1",
+        "scope": "pilot",
+        "observedAt": "2026-09-07T10:06:28.192Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      },
+      {
+        "id": "pilot-6",
+        "category": "technical",
+        "title": "技术运行窗口汇总",
+        "summary": "模拟 1,200 次读取：成功 1,194 次，成功率 99.5%；P95 820 ms，6 次超时均进入人工处理。",
+        "criterion": "成功率 ≥99%；P95 ≤1,500 ms",
+        "owner": "技术负责人",
+        "status": "passed",
+        "required": true,
+        "version": "local-delivery-flow-r1",
+        "scope": "pilot",
+        "observedAt": "2026-09-07T10:06:28.192Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      },
+      {
+        "id": "pilot-7",
+        "category": "business",
+        "title": "业务效果对照",
+        "summary": "联调 120 个案例：人工准备中位时间由 12 分钟降至 7 分钟；102 条建议被采用，采用率 85%。",
+        "criterion": "准备时间降低 ≥30%；建议采用率 ≥80%",
+        "owner": "业务评审人",
+        "status": "passed",
+        "required": true,
+        "version": "local-delivery-flow-r1",
+        "scope": "pilot",
+        "observedAt": "2026-09-07T10:06:28.193Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      },
+      {
+        "id": "pilot-8",
+        "category": "issue",
+        "title": "PILOT-001 · 旧设备编码冲突已处理",
+        "summary": "联调中发现 3 条旧设备编码冲突，采用来源优先级和人工映射处理；补充 3 条回归用例通过。",
+        "criterion": "冲突不得静默合并；修复可追溯",
+        "owner": "数据 Owner",
+        "status": "passed",
+        "required": false,
+        "version": "local-delivery-flow-r1",
+        "scope": "pilot",
+        "observedAt": "2026-09-07T10:06:28.193Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      },
+      {
+        "id": "pilot-9",
+        "category": "issue",
+        "title": "PILOT-002 · 导出列宽体验待优化",
+        "summary": "非关键体验项：长设备名称导出换行不理想，列入第八阶段改进，不扩展试点权限。",
+        "criterion": "保留非阻塞问题及下一动作",
+        "owner": "产品负责人",
+        "status": "pending",
+        "required": false,
+        "version": "local-delivery-flow-r1",
+        "scope": "pilot",
+        "observedAt": "2026-09-07T10:06:28.193Z",
+        "nextAction": "在第八阶段示例中继续跟踪，不阻止浏览后续演示。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      }
+    ]
+  },
+  "dataProvenance": {
+    "kind": "integration-fixture",
+    "source": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+    "authorizedBy": "用户明确要求直接通过数据走项目原交付链",
+    "note": "人工构造的联调输入，不表示实际生产上线、客户签收或人工页面验收"
+  }
+}

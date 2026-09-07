@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_daa34f3441d04e86913e82f5d42143d9",
+  "originalName": "05-vendor-duty-roster.yaml",
+  "storedName": "05-vendor-duty-roster.yaml",
+  "relativePath": "fde-resources/05-vendor-duty-roster.yaml",
+  "mimeType": "application/yaml; charset=utf-8",
+  "extension": "yaml",
+  "bytes": 1601,
+  "createdAt": "2026-09-03T10:23:37.293Z",
+  "modifiedAt": "2026-09-03T10:23:37.294Z",
+  "mtimeMs": 1788431017293.9104,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 1601,
+    "sourceMtimeMs": 1788431017293.9104,
+    "derivedPath": ".fde/derived/src_daa34f3441d04e86913e82f5d42143d9.md",
+    "updatedAt": "2026-09-03T10:23:37.342Z"
+  }
+}

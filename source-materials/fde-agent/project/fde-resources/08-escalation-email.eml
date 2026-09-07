@@ -1,0 +1,28 @@
+From: g.ning@example.invalid
+To: z.lan@example.invalid, h.min@example.invalid
+Cc: l.zhe@example.invalid, s.yue@example.invalid
+Date: Wed, 26 Aug 2026 16:20:00 +0800
+Subject: Re: 华东门店设备报修自动化范围确认
+Message-ID: <sim-20260826-1620@example.invalid>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Case-Source-Id: SRC-SIM-0108
+X-Evidence-Kind: simulation
+
+各位，
+
+请保留最初“自动派单、80% 自动处理”的提案，但目前不要把它写成已批准范围。
+
+我支持先验证三件事：
+1. 能否减少门店和总部反复补信息的时间；
+2. 能否更早识别 P0、安全风险和重复事件；
+3. 能否生成有依据、可人工确认的工单草稿。
+
+正式派单、费用承诺和供应商通知仍需区域运营、采购、财务和信息安全分别确认。三个月可以作为看到试点证据的目标，不是生产上线承诺。
+
+请 FDE 先用近期案例还原真实流程，再提交一个可选择的范围调整建议。
+
+顾宁
+总部运营总监（仿真）
+
+说明：这是用于测试格式边界的仿真 EML。当前工作台可以保存该原件，但本地识别器预计会标记为不支持；不要把“不支持解析”误写成上传失败。

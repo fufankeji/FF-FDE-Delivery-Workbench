@@ -1,0 +1,4 @@
+# 项目证据按字节计算摘要；克隆时不能自动转换换行符。
+project/** -text
+project/**/*.pdf binary
+project/**/*.png binary

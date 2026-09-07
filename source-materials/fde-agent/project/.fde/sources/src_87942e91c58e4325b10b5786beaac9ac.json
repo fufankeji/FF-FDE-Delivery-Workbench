@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_87942e91c58e4325b10b5786beaac9ac",
+  "originalName": "08-workorder-api-openapi.yaml",
+  "storedName": "08-workorder-api-openapi.yaml",
+  "relativePath": "fde-resources/08-workorder-api-openapi.yaml",
+  "mimeType": "application/yaml; charset=utf-8",
+  "extension": "yaml",
+  "bytes": 3775,
+  "createdAt": "2026-09-04T04:24:02.758Z",
+  "modifiedAt": "2026-09-04T04:24:02.759Z",
+  "mtimeMs": 1788495842759.3108,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 3775,
+    "sourceMtimeMs": 1788495842759.3108,
+    "derivedPath": ".fde/derived/src_87942e91c58e4325b10b5786beaac9ac.md",
+    "updatedAt": "2026-09-04T04:24:02.801Z"
+  }
+}

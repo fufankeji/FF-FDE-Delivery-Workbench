@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_20cf7dfd3c0c48018e4594a5caeea056",
+  "originalName": "07-first-phase-scope.json",
+  "storedName": "07-first-phase-scope.json",
+  "relativePath": "fde-resources/07-first-phase-scope.json",
+  "mimeType": "application/json; charset=utf-8",
+  "extension": "json",
+  "bytes": 1343,
+  "createdAt": "2026-09-04T02:54:37.772Z",
+  "modifiedAt": "2026-09-04T02:54:37.772Z",
+  "mtimeMs": 1788490477771.9111,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 1343,
+    "sourceMtimeMs": 1788490477771.9111,
+    "derivedPath": ".fde/derived/src_20cf7dfd3c0c48018e4594a5caeea056.md",
+    "updatedAt": "2026-09-04T02:54:37.834Z"
+  }
+}

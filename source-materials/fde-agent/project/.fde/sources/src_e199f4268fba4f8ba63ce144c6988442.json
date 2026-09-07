@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_e199f4268fba4f8ba63ce144c6988442",
+  "originalName": "03-baseline-metric-export.json",
+  "storedName": "03-baseline-metric-export.json",
+  "relativePath": "fde-resources/03-baseline-metric-export.json",
+  "mimeType": "application/json; charset=utf-8",
+  "extension": "json",
+  "bytes": 2565,
+  "createdAt": "2026-09-04T02:54:37.792Z",
+  "modifiedAt": "2026-09-04T02:54:37.792Z",
+  "mtimeMs": 1788490477792.146,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 2565,
+    "sourceMtimeMs": 1788490477792.146,
+    "derivedPath": ".fde/derived/src_e199f4268fba4f8ba63ce144c6988442.md",
+    "updatedAt": "2026-09-04T02:54:37.863Z"
+  }
+}

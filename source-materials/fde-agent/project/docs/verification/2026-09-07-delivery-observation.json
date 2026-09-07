@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-09-07T05:48:47.062Z",
+  "environment": "local",
+  "health": {
+    "ok": true,
+    "name": "FF - 门店维修工作台",
+    "mode": "local",
+    "modelConnected": false
+  },
+  "overviewKeys": [
+    "reports",
+    "runs",
+    "drafts",
+    "sources",
+    "stores",
+    "graph",
+    "mode",
+    "modelConnected"
+  ],
+  "method": "GET http://127.0.0.1:4177/api/health; GET /api/overview（只读）",
+  "version": "local-repair-v0.2-ui",
+  "graph": {
+    "revision": "sha256:58ee663b62eec5cc338b7570616aaea479eea99e31baf545e5069442dea076a6",
+    "schemaVersion": "0.1.1-preview",
+    "nodes": 56,
+    "edges": 56
+  },
+  "sourceManifestUnchanged": true,
+  "note": "只读观测，不代表试点批准、生产验收或接收团队实操；未写应用运行数据。"
+}

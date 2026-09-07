@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "sourceId": "src_dc1d16dac2084a2ca5defd47cac1939c",
+  "originalName": "07-equipment-label-photo.png",
+  "storedName": "07-equipment-label-photo.png",
+  "relativePath": "fde-resources/07-equipment-label-photo.png",
+  "mimeType": "image/png",
+  "extension": "png",
+  "bytes": 318833,
+  "createdAt": "2026-09-03T10:23:37.272Z",
+  "modifiedAt": "2026-09-03T10:23:37.272Z",
+  "mtimeMs": 1788431017272.2466,
+  "previewKind": "image",
+  "parse": {
+    "status": "needs-ocr",
+    "message": "图片资料需要 OCR 才能生成文本。"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "stage": "design",
+  "status": "review-ready",
+  "workItems": [
+    {
+      "id": "mechanism",
+      "status": "complete"
+    },
+    {
+      "id": "architecture",
+      "status": "complete"
+    },
+    {
+      "id": "slice",
+      "status": "complete"
+    },
+    {
+      "id": "decision",
+      "status": "complete"
+    }
+  ],
+  "blockers": [
+    {
+      "id": "mechanism-not-confirmed",
+      "title": "机制选择（hybrid）已 selected；语义路线经 FDE 判定改为本体候选（此前 schema 结论被新证据 src_fdc5… 修正）",
+      "severity": "medium",
+      "status": "resolved"
+    },
+    {
+      "id": "ontology-candidate-review",
+      "title": "本体概念模型/六类问题为候选草稿，需 FDE 人工审阅后才可发布本体",
+      "severity": "medium",
+      "status": "resolved"
+    },
+    {
+      "id": "draft-write-pending",
+      "title": "WorkOrder Sandbox 草稿写权限未获批（AR-305）——纵向切片只到本地草稿+未执行外部写入",
+      "severity": "medium",
+      "status": "open"
+    }
+  ],
+  "recommendation": "go",
+  "design": {
+    "execution": {
+      "status": "selected",
+      "mechanism": "hybrid",
+      "label": "混合机制",
+      "rationale": "证据 src_3b35…/src_5cff…/src_1acf…：P0/费用/权限/重复为确定性硬门（规则），流程/审计为软件，建议依据用检索+SourceId，自由文本抽取用单有界模型；多 Agent 与纯人工本期不采用。已由 FDE 接受（2026-09-04）。"
+    },
+    "semantics": {
+      "mode": "ontology",
+      "rationale": "必须构建",
+      "conclusion": "validated"
+    },
+    "ontology": {
+      "status": "published",
+      "schemaVersion": "0.1.1-preview",
+      "classCount": 11,
+      "relationshipTypeCount": 12
+    },
+    "graphBuild": {
+      "status": "succeeded",
+      "message": "Semantica 已构建 56 个实体、56 条关系；结构验证仍需独立运行。"
+    }
+  }
+}

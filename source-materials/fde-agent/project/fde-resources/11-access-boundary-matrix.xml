@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<accessBoundaryMatrix sourceId="SRC-SIM-0311" sourceType="simulation" reviewedAt="2026-09-03">
+  <notice>允许读取、允许形成候选、允许写草稿、允许正式动作和允许批准是五种不同权限。</notice>
+  <principal id="fde-analyst" owner="FDE 项目负责人">
+    <permission resource="脱敏历史工单" action="read" environment="approved-export" state="approved" readback="文件哈希与工作台 SourceId" />
+    <permission resource="设备台账快照" action="read" environment="approved-export" state="approved" readback="文件哈希与工作台 SourceId" />
+    <permission resource="合同仿真摘要" action="read" environment="simulation-package" state="approved" readback="仅确认已给 6 份摘要" />
+    <permission resource="正式工单" action="modify-or-dispatch" environment="production" state="forbidden" readback="不适用，禁止尝试" />
+  </principal>
+  <principal id="fde-agent-service-account" owner="客户 IT 身份管理员">
+    <permission resource="Sandbox 工单、设备、维修商" action="read" environment="sandbox" state="approved-limited-region" readback="用独立 GET 和审计日志核对" />
+    <permission resource="Sandbox 工单草稿" action="create" environment="sandbox" state="pending" readback="获批后按 operation_id 独立 GET；当前 403" />
+    <permission resource="正式工单" action="create-modify-dispatch" environment="production" state="not-requested" readback="不适用" />
+    <permission resource="企业消息" action="read-or-send" environment="production" state="deferred" readback="不适用" />
+  </principal>
+  <principal id="operations-reviewer" owner="设备运维负责人">
+    <permission resource="分诊候选" action="review-correct-approve" environment="review-workbench" state="approved-for-simulation" readback="记录 reviewer、时间、原候选和最终决定" />
+    <permission resource="工单草稿" action="accept-or-reject" environment="sandbox" state="conditional-on-AR-305" readback="WorkOrder Pro 独立 GET" />
+  </principal>
+  <principal id="risk-owner" owner="区域运营经理">
+    <permission resource="P0 应急处置" action="decide-manual-escalation" environment="business-process" state="retained-human-authority" readback="应急登记和正式工单状态" />
+    <permission resource="项目阶段门" action="approve" environment="FDE workbench" state="not-authorized" readback="阶段门只由指定 FDE 操作" />
+  </principal>
+  <control name="leastPrivilege">首期不申请生产写入、正式派单或消息发送。</control>
+  <control name="promptInjection">报修正文、附件和合同文本均视为不可信数据，不得改变系统权限或政策。</control>
+  <control name="idempotency">未来获批草稿写入必须使用 operation_id 和 Idempotency-Key，并在权威系统读回。</control>
+  <control name="humanFallback">无法确认设备、优先级、合同覆盖或区域授权时交给人工，不自动补全。</control>
+</accessBoundaryMatrix>

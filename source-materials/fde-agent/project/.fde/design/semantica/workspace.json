@@ -1,0 +1,3741 @@
+{
+  "schemaVersion": 1,
+  "revision": 43,
+  "updatedAt": "2026-09-07T02:55:00.642Z",
+  "provider": {
+    "id": "semantica",
+    "expectedVersion": "0.6.7",
+    "status": "ready",
+    "version": "0.6.7",
+    "configDigest": "sha256:740b356cf8c6bf19a621abb49d3e0b5599b37dc710b39cecdf58ca437844860e",
+    "checkedAt": "2026-09-04T10:14:54.788Z"
+  },
+  "sources": [
+    {
+      "sourceId": "src_fdc5c72379834e6e97971a3d5736d21b",
+      "name": "02-semantic-capability-workshop.md",
+      "relativePath": "fde-resources/02-semantic-capability-workshop.md",
+      "contentPath": ".fde/derived/src_fdc5c72379834e6e97971a3d5736d21b.md",
+      "digest": "sha256:39ce56db847fc34ef6321eb76b873292bdd84f9da84975eb9b8e1e18aec50005",
+      "bytes": 2688,
+      "modifiedAt": "2026-09-04T09:40:25.676Z",
+      "parseStatus": "ready",
+      "permissionScope": "仅用于当前项目第四阶段的本体候选抽取、Schema 审阅、项目隔离图谱构建、只读验证和 Agent 有界上下文；禁止生产写入、正式派单、消息通知和费用承诺。\n\n  混合材料的权威性不完全相同，当前界面又只能统一选择一个级别，第一轮建议选择“辅助依据”，避免把所有文件误标为权威事实。",
+      "authority": "supporting",
+      "boundAt": "2026-09-04T10:16:45.342Z"
+    },
+    {
+      "sourceId": "src_a44e36460acd45eea1820367c61d0c8c",
+      "name": "02-wecom-repair-chat.txt",
+      "relativePath": "fde-resources/02-wecom-repair-chat.txt",
+      "contentPath": ".fde/derived/src_a44e36460acd45eea1820367c61d0c8c.md",
+      "digest": "sha256:1f632800efbe4bd803739d82c2a8473535f81c679232b937dba03640712ca6d5",
+      "bytes": 3295,
+      "modifiedAt": "2026-09-03T10:23:37.304Z",
+      "parseStatus": "ready",
+      "permissionScope": "仅用于当前项目第四阶段的本体候选抽取、Schema 审阅、项目隔离图谱构建、只读验证和 Agent 有界上下文；禁止生产写入、正式派单、消息通知和费用承诺。\n\n  混合材料的权威性不完全相同，当前界面又只能统一选择一个级别，第一轮建议选择“辅助依据”，避免把所有文件误标为权威事实。",
+      "authority": "supporting",
+      "boundAt": "2026-09-04T10:16:45.348Z"
+    },
+    {
+      "sourceId": "src_afb39cee4d30447892570e9db6c65aad",
+      "name": "02-representative-cases.md",
+      "relativePath": "fde-resources/02-representative-cases.md",
+      "contentPath": ".fde/derived/src_afb39cee4d30447892570e9db6c65aad.md",
+      "digest": "sha256:887c918918fe00735df8a0e0e8f64ea783e24fffc426bc6197453df9b6ba9f41",
+      "bytes": 2394,
+      "modifiedAt": "2026-09-03T10:19:59.586Z",
+      "parseStatus": "ready",
+      "permissionScope": "仅用于当前项目第四阶段的本体候选抽取、Schema 审阅、项目隔离图谱构建、只读验证和 Agent 有界上下文；禁止生产写入、正式派单、消息通知和费用承诺。\n\n  混合材料的权威性不完全相同，当前界面又只能统一选择一个级别，第一轮建议选择“辅助依据”，避免把所有文件误标为权威事实。",
+      "authority": "supporting",
+      "boundAt": "2026-09-04T10:16:45.352Z"
+    },
+    {
+      "sourceId": "src_ffdb0d3c652741fcb960e7324bcd08a1",
+      "name": "03-work-order-export.json",
+      "relativePath": "fde-resources/03-work-order-export.json",
+      "contentPath": ".fde/derived/src_ffdb0d3c652741fcb960e7324bcd08a1.md",
+      "digest": "sha256:07dd0c8db0b36dd0ccd8d1b7d1973fbe021dabe1bc4e4b8e6273c5495b323c8f",
+      "bytes": 6412,
+      "modifiedAt": "2026-09-03T10:23:37.300Z",
+      "parseStatus": "ready",
+      "permissionScope": "仅用于当前项目第四阶段的本体候选抽取、Schema 审阅、项目隔离图谱构建、只读验证和 Agent 有界上下文；禁止生产写入、正式派单、消息通知和费用承诺。\n\n  混合材料的权威性不完全相同，当前界面又只能统一选择一个级别，第一轮建议选择“辅助依据”，避免把所有文件误标为权威事实。",
+      "authority": "supporting",
+      "boundAt": "2026-09-04T10:16:45.356Z"
+    },
+    {
+      "sourceId": "src_701f85b610e049e0ac2a9698b000cc01",
+      "name": "04-device-register.xml",
+      "relativePath": "fde-resources/04-device-register.xml",
+      "contentPath": ".fde/derived/src_701f85b610e049e0ac2a9698b000cc01.md",
+      "digest": "sha256:1ccaac3c4926cdb5c8c29b7e229470ddac1a10060f58620acb6f27e355bf0559",
+      "bytes": 3062,
+      "modifiedAt": "2026-09-03T10:23:37.296Z",
+      "parseStatus": "ready",
+      "permissionScope": "仅用于当前项目第四阶段的本体候选抽取、Schema 审阅、项目隔离图谱构建、只读验证和 Agent 有界上下文；禁止生产写入、正式派单、消息通知和费用承诺。\n\n  混合材料的权威性不完全相同，当前界面又只能统一选择一个级别，第一轮建议选择“辅助依据”，避免把所有文件误标为权威事实。",
+      "authority": "supporting",
+      "boundAt": "2026-09-04T10:16:45.360Z"
+    },
+    {
+      "sourceId": "src_daa34f3441d04e86913e82f5d42143d9",
+      "name": "05-vendor-duty-roster.yaml",
+      "relativePath": "fde-resources/05-vendor-duty-roster.yaml",
+      "contentPath": ".fde/derived/src_daa34f3441d04e86913e82f5d42143d9.md",
+      "digest": "sha256:a3c4ba0b00896568628deff031456e2f930f7f55fd9162654dcf7be03fffaaed",
+      "bytes": 1601,
+      "modifiedAt": "2026-09-03T10:23:37.294Z",
+      "parseStatus": "ready",
+      "permissionScope": "仅用于当前项目第四阶段的本体候选抽取、Schema 审阅、项目隔离图谱构建、只读验证和 Agent 有界上下文；禁止生产写入、正式派单、消息通知和费用承诺。\n\n  混合材料的权威性不完全相同，当前界面又只能统一选择一个级别，第一轮建议选择“辅助依据”，避免把所有文件误标为权威事实。",
+      "authority": "supporting",
+      "boundAt": "2026-09-04T10:16:45.363Z"
+    },
+    {
+      "sourceId": "src_aa4217d373de4543abc6cf718540becb",
+      "name": "07-nanjing-incident-timeline.json",
+      "relativePath": "fde-resources/07-nanjing-incident-timeline.json",
+      "contentPath": ".fde/derived/src_aa4217d373de4543abc6cf718540becb.md",
+      "digest": "sha256:12689c3c80a2a9cc27b14fcfc7c386c97190e459b709bf355780830bcaf6262c",
+      "bytes": 3921,
+      "modifiedAt": "2026-09-04T04:24:02.741Z",
+      "parseStatus": "ready",
+      "permissionScope": "仅用于当前项目第四阶段的本体候选抽取、Schema 审阅、项目隔离图谱构建、只读验证和 Agent 有界上下文；禁止生产写入、正式派单、消息通知和费用承诺。\n\n  混合材料的权威性不完全相同，当前界面又只能统一选择一个级别，第一轮建议选择“辅助依据”，避免把所有文件误标为权威事实。",
+      "authority": "supporting",
+      "boundAt": "2026-09-04T10:16:45.367Z"
+    },
+    {
+      "sourceId": "src_1acfac3bc13a469c95eff2249d358721",
+      "name": "11-access-boundary-matrix.xml",
+      "relativePath": "fde-resources/11-access-boundary-matrix.xml",
+      "contentPath": ".fde/derived/src_1acfac3bc13a469c95eff2249d358721.md",
+      "digest": "sha256:281de7dbae71dae59cbf86bb5d9832a53d16b397f2efd73775619e78c4eb6737",
+      "bytes": 3075,
+      "modifiedAt": "2026-09-04T04:25:36.817Z",
+      "parseStatus": "ready",
+      "permissionScope": "仅用于当前项目第四阶段的本体候选抽取、Schema 审阅、项目隔离图谱构建、只读验证和 Agent 有界上下文；禁止生产写入、正式派单、消息通知和费用承诺。\n\n  混合材料的权威性不完全相同，当前界面又只能统一选择一个级别，第一轮建议选择“辅助依据”，避免把所有文件误标为权威事实。",
+      "authority": "supporting",
+      "boundAt": "2026-09-04T10:16:45.370Z"
+    },
+    {
+      "sourceId": "src_dccfff3339674d0ba9b5c0b33f6bda15",
+      "name": "12-governance-review-notes.txt",
+      "relativePath": "fde-resources/12-governance-review-notes.txt",
+      "contentPath": ".fde/derived/src_dccfff3339674d0ba9b5c0b33f6bda15.md",
+      "digest": "sha256:bb60ba13b4236c9ea029a8dae954f5ebb093d78013c90e217682734d34337ba1",
+      "bytes": 2795,
+      "modifiedAt": "2026-09-04T04:25:36.825Z",
+      "parseStatus": "ready",
+      "permissionScope": "仅用于当前项目第四阶段的本体候选抽取、Schema 审阅、项目隔离图谱构建、只读验证和 Agent 有界上下文；禁止生产写入、正式派单、消息通知和费用承诺。\n\n  混合材料的权威性不完全相同，当前界面又只能统一选择一个级别，第一轮建议选择“辅助依据”，避免把所有文件误标为权威事实。",
+      "authority": "supporting",
+      "boundAt": "2026-09-04T10:16:45.374Z"
+    }
+  ],
+  "definition": {
+    "status": "published",
+    "version": "0.1.1-preview",
+    "revision": 2,
+    "competencyQuestions": [
+      {
+        "id": "cq_01",
+        "text": "报修记录能否关联到实际创建的工单？",
+        "required": true,
+        "query": {
+          "kind": "edge",
+          "sourceType": "Report",
+          "relationshipType": "rel_report_workorder",
+          "targetType": "WorkOrder",
+          "maxDepth": 1,
+          "minAnswers": 2
+        }
+      },
+      {
+        "id": "cq_02",
+        "text": "故障候选能否经报修记录追踪到相关工单？",
+        "required": true,
+        "query": {
+          "kind": "path",
+          "sourceType": "Incident",
+          "targetType": "WorkOrder",
+          "maxDepth": 2,
+          "minAnswers": 1
+        }
+      },
+      {
+        "id": "cq_03",
+        "text": "设备能否关联到材料中记录的合同候选？",
+        "required": true,
+        "query": {
+          "kind": "edge",
+          "sourceType": "Asset",
+          "relationshipType": "rel_asset_contract",
+          "targetType": "Contract",
+          "maxDepth": 1,
+          "minAnswers": 1
+        }
+      },
+      {
+        "id": "cq_04",
+        "text": "维修商能否关联到其值班表记录的合同候选？",
+        "required": true,
+        "query": {
+          "kind": "edge",
+          "sourceType": "Vendor",
+          "relationshipType": "rel_vendor_contract",
+          "targetType": "Contract",
+          "maxDepth": 1,
+          "minAnswers": 1
+        }
+      },
+      {
+        "id": "cq_05",
+        "text": "当前材料中是否存在需要单独控制权限的执行主体？",
+        "required": true,
+        "query": {
+          "kind": "lookup",
+          "sourceType": "Principal",
+          "maxDepth": 1,
+          "minAnswers": 1
+        }
+      },
+      {
+        "id": "cq_06",
+        "text": "从门店能否通过设备关系取得相关合同上下文？",
+        "required": true,
+        "query": {
+          "kind": "path",
+          "sourceType": "Store",
+          "targetType": "Contract",
+          "maxDepth": 2,
+          "minAnswers": 1
+        }
+      }
+    ],
+    "classes": [
+      {
+        "id": "Store",
+        "label": "门店",
+        "aliases": [
+          "门店",
+          "store"
+        ],
+        "identityKeys": [
+          "store_id"
+        ],
+        "extractionPatterns": [
+          "(?<![A-Z]-)(?<label>[A-Z]{2}-\\d{3})",
+          "(?<label>S-[A-Z]{2}-\\d{3})"
+        ],
+        "properties": [
+          {
+            "id": "store_id",
+            "label": "门店编号",
+            "dataType": "string",
+            "required": true,
+            "unique": true
+          }
+        ],
+        "fieldMappings": [
+          {
+            "sourceField": "label",
+            "targetProperty": "store_id"
+          }
+        ]
+      },
+      {
+        "id": "Asset",
+        "label": "设备",
+        "aliases": [
+          "设备",
+          "收银终端",
+          "网络设备",
+          "空调",
+          "冷柜"
+        ],
+        "identityKeys": [
+          "asset_id"
+        ],
+        "extractionPatterns": [
+          "(?<label>(?:FR|POS|NET|HVAC)-[A-Z0-9]+-[A-Z0-9]+)"
+        ],
+        "properties": [
+          {
+            "id": "asset_id",
+            "label": "设备编号",
+            "dataType": "string",
+            "required": true,
+            "unique": true
+          }
+        ],
+        "fieldMappings": [
+          {
+            "sourceField": "label",
+            "targetProperty": "asset_id"
+          }
+        ]
+      },
+      {
+        "id": "Incident",
+        "label": "故障候选",
+        "aliases": [
+          "故障",
+          "事件",
+          "incident"
+        ],
+        "identityKeys": [
+          "incident_id"
+        ],
+        "extractionPatterns": [
+          "(?<label>INC-CAND-[A-Z0-9-]+)"
+        ],
+        "properties": [
+          {
+            "id": "incident_id",
+            "label": "故障候选编号",
+            "dataType": "string",
+            "required": true,
+            "unique": true
+          }
+        ],
+        "fieldMappings": [
+          {
+            "sourceField": "label",
+            "targetProperty": "incident_id"
+          }
+        ]
+      },
+      {
+        "id": "Alert",
+        "label": "告警",
+        "aliases": [
+          "告警",
+          "alert"
+        ],
+        "identityKeys": [
+          "alert_id"
+        ],
+        "extractionPatterns": [
+          "(?<label>ALERT-[A-Z0-9-]+)"
+        ],
+        "properties": [
+          {
+            "id": "alert_id",
+            "label": "告警编号",
+            "dataType": "string",
+            "required": true,
+            "unique": true
+          }
+        ],
+        "fieldMappings": [
+          {
+            "sourceField": "label",
+            "targetProperty": "alert_id"
+          }
+        ]
+      },
+      {
+        "id": "Report",
+        "label": "报修记录",
+        "aliases": [
+          "报修",
+          "report"
+        ],
+        "identityKeys": [
+          "report_id"
+        ],
+        "extractionPatterns": [
+          "(?<![A-Z0-9])(?<label>R-?\\d{4})(?!\\d)"
+        ],
+        "properties": [
+          {
+            "id": "report_id",
+            "label": "报修记录编号",
+            "dataType": "string",
+            "required": true,
+            "unique": true
+          }
+        ],
+        "fieldMappings": [
+          {
+            "sourceField": "label",
+            "targetProperty": "report_id"
+          }
+        ]
+      },
+      {
+        "id": "Message",
+        "label": "消息记录",
+        "aliases": [
+          "消息",
+          "聊天记录"
+        ],
+        "identityKeys": [
+          "message_id"
+        ],
+        "extractionPatterns": [
+          "(?<label>(?:MSG-WECOM|CHAT|PHONE)-\\d+(?:-\\d+)?)"
+        ],
+        "properties": [
+          {
+            "id": "message_id",
+            "label": "消息记录编号",
+            "dataType": "string",
+            "required": true,
+            "unique": true
+          }
+        ],
+        "fieldMappings": [
+          {
+            "sourceField": "label",
+            "targetProperty": "message_id"
+          }
+        ]
+      },
+      {
+        "id": "WorkOrder",
+        "label": "工单",
+        "aliases": [
+          "工单",
+          "work order"
+        ],
+        "identityKeys": [
+          "work_order_id"
+        ],
+        "extractionPatterns": [
+          "(?<label>WO-\\d{5})"
+        ],
+        "properties": [
+          {
+            "id": "work_order_id",
+            "label": "工单编号",
+            "dataType": "string",
+            "required": true,
+            "unique": true
+          }
+        ],
+        "fieldMappings": [
+          {
+            "sourceField": "label",
+            "targetProperty": "work_order_id"
+          }
+        ]
+      },
+      {
+        "id": "Contract",
+        "label": "合同候选",
+        "aliases": [
+          "合同",
+          "contract"
+        ],
+        "identityKeys": [
+          "contract_id"
+        ],
+        "extractionPatterns": [
+          "(?<label>CTR-[A-Z0-9-]+)"
+        ],
+        "properties": [
+          {
+            "id": "contract_id",
+            "label": "合同候选编号",
+            "dataType": "string",
+            "required": true,
+            "unique": true
+          }
+        ],
+        "fieldMappings": [
+          {
+            "sourceField": "label",
+            "targetProperty": "contract_id"
+          }
+        ]
+      },
+      {
+        "id": "Vendor",
+        "label": "维修商",
+        "aliases": [
+          "维修商",
+          "供应商",
+          "vendor"
+        ],
+        "identityKeys": [
+          "vendor_id"
+        ],
+        "extractionPatterns": [
+          "(?<![A-Z0-9])(?<label>V-[A-Z]+-\\d{2})(?![A-Z0-9])"
+        ],
+        "properties": [
+          {
+            "id": "vendor_id",
+            "label": "维修商编号",
+            "dataType": "string",
+            "required": true,
+            "unique": true
+          }
+        ],
+        "fieldMappings": [
+          {
+            "sourceField": "label",
+            "targetProperty": "vendor_id"
+          }
+        ]
+      },
+      {
+        "id": "Principal",
+        "label": "权限主体",
+        "aliases": [
+          "用户",
+          "Agent",
+          "执行主体"
+        ],
+        "identityKeys": [
+          "principal_id"
+        ],
+        "extractionPatterns": [
+          "<principal id=\"(?<label>[^\"]+)\""
+        ],
+        "properties": [
+          {
+            "id": "principal_id",
+            "label": "权限主体编号",
+            "dataType": "string",
+            "required": true,
+            "unique": true
+          }
+        ],
+        "fieldMappings": [
+          {
+            "sourceField": "label",
+            "targetProperty": "principal_id"
+          }
+        ]
+      },
+      {
+        "id": "DataSource",
+        "label": "证据来源",
+        "aliases": [
+          "数据来源",
+          "source"
+        ],
+        "identityKeys": [
+          "source_id"
+        ],
+        "extractionPatterns": [
+          "(?<label>SRC-SIM-\\d{4})"
+        ],
+        "properties": [
+          {
+            "id": "source_id",
+            "label": "证据来源编号",
+            "dataType": "string",
+            "required": true,
+            "unique": true
+          }
+        ],
+        "fieldMappings": [
+          {
+            "sourceField": "label",
+            "targetProperty": "source_id"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "rel_store_asset",
+        "label": "门店拥有设备",
+        "domain": "Store",
+        "range": "Asset",
+        "cardinality": "one-to-many",
+        "extractionPatterns": [
+          "<device id=\"(?<target>(?:FR|POS|NET|HVAC)-[A-Z0-9]+-[A-Z0-9]+)\" storeId=\"(?<source>[A-Z]{2}-\\d{3})\""
+        ]
+      },
+      {
+        "id": "rel_workorder_store",
+        "label": "工单发生于门店",
+        "domain": "WorkOrder",
+        "range": "Store",
+        "cardinality": "many-to-one",
+        "extractionPatterns": [
+          "\"ticketId\":\\s*\"(?<source>WO-\\d{5})\"[\\s\\S]{0,180}?\"storeId\":\\s*\"(?<target>[A-Z]{2}-\\d{3})\""
+        ]
+      },
+      {
+        "id": "rel_workorder_asset",
+        "label": "工单涉及设备",
+        "domain": "WorkOrder",
+        "range": "Asset",
+        "cardinality": "many-to-one",
+        "extractionPatterns": [
+          "\"ticketId\":\\s*\"(?<source>WO-\\d{5})\"[\\s\\S]{0,320}?\"assetId\":\\s*\"(?<target>(?:FR|POS|NET|HVAC)-[A-Z0-9]+-[A-Z0-9]+)\""
+        ]
+      },
+      {
+        "id": "rel_workorder_vendor",
+        "label": "工单关联维修商",
+        "domain": "WorkOrder",
+        "range": "Vendor",
+        "cardinality": "many-to-one",
+        "extractionPatterns": [
+          "\"ticketId\":\\s*\"(?<source>WO-\\d{5})\"[\\s\\S]{0,620}?\"vendorId\":\\s*\"(?<target>V-[A-Z]+-\\d{2})\""
+        ]
+      },
+      {
+        "id": "rel_asset_contract",
+        "label": "设备引用合同",
+        "domain": "Asset",
+        "range": "Contract",
+        "cardinality": "many-to-one",
+        "extractionPatterns": [
+          "<device id=\"(?<source>(?:FR|POS|NET|HVAC)-[A-Z0-9]+-[A-Z0-9]+)\"[\\s\\S]{0,520}?<contractRef>(?<target>CTR-[A-Z0-9-]+)</contractRef>"
+        ]
+      },
+      {
+        "id": "rel_vendor_contract",
+        "label": "维修商引用合同",
+        "domain": "Vendor",
+        "range": "Contract",
+        "cardinality": "many-to-one",
+        "extractionPatterns": [
+          "vendor_id:\\s*(?<source>V-[A-Z]+-\\d{2})[\\s\\S]{0,520}?contract_ref:\\s*(?<target>CTR-[A-Z0-9-]+)"
+        ]
+      },
+      {
+        "id": "rel_message_report",
+        "label": "消息形成报修",
+        "domain": "Message",
+        "range": "Report",
+        "cardinality": "many-to-one",
+        "extractionPatterns": [
+          "\"identity\":\\s*\"(?<source>MSG-WECOM-\\d+)\"[\\s\\S]{0,180}?\"report_id\":\\s*\"(?<target>R\\d{4})\""
+        ]
+      },
+      {
+        "id": "rel_report_workorder",
+        "label": "报修关联工单",
+        "domain": "Report",
+        "range": "WorkOrder",
+        "cardinality": "one-to-many",
+        "extractionPatterns": [
+          "\"identity\":\\s*\"(?<target>WO-\\d{5})\"[\\s\\S]{0,200}?\"linked_report_id\":\\s*\"(?<source>R\\d{4})\""
+        ]
+      },
+      {
+        "id": "rel_workorder_duplicate",
+        "label": "重复工单指向",
+        "domain": "WorkOrder",
+        "range": "WorkOrder",
+        "cardinality": "many-to-one",
+        "extractionPatterns": [
+          "\"identity\":\\s*\"(?<source>WO-\\d{5})\"[\\s\\S]{0,220}?\"duplicate_of\":\\s*\"(?<target>WO-\\d{5})\""
+        ]
+      },
+      {
+        "id": "rel_incident_report",
+        "label": "故障候选包含报修",
+        "domain": "Incident",
+        "range": "Report",
+        "cardinality": "one-to-many",
+        "extractionPatterns": [
+          "\"incident_candidate_id\":\\s*\"(?<source>INC-CAND-[A-Z0-9-]+)\"[\\s\\S]{0,1800}?\"report_id\":\\s*\"(?<target>R1002)\"",
+          "\"incident_candidate_id\":\\s*\"(?<source>INC-CAND-[A-Z0-9-]+)\"[\\s\\S]{0,4200}?\"report_id\":\\s*\"(?<target>R1003)\""
+        ]
+      },
+      {
+        "id": "rel_incident_alert",
+        "label": "故障候选包含告警",
+        "domain": "Incident",
+        "range": "Alert",
+        "cardinality": "one-to-many",
+        "extractionPatterns": [
+          "\"incident_candidate_id\":\\s*\"(?<source>INC-CAND-[A-Z0-9-]+)\"[\\s\\S]{0,1200}?\"identity\":\\s*\"(?<target>ALERT-[A-Z0-9-]+)\""
+        ]
+      },
+      {
+        "id": "rel_report_store",
+        "label": "报修发生于门店",
+        "domain": "Report",
+        "range": "Store",
+        "cardinality": "many-to-one",
+        "extractionPatterns": [
+          "\"report_id\":\\s*\"(?<source>R\\d{4})\"[\\s\\S]{0,180}?\"store_id\":\\s*\"(?<target>S-[A-Z]{2}-\\d{3})\""
+        ]
+      }
+    ],
+    "provenanceRules": [
+      {
+        "id": "prov_source_ref",
+        "label": "来源引用",
+        "description": "每个实体和关系必须保留当前项目 SourceId，不以展示标签替代原始来源。"
+      },
+      {
+        "id": "prov_conflict",
+        "label": "冲突并列",
+        "description": "合同、设备身份和工单信息冲突时并列保留，不自动覆盖或合并。"
+      },
+      {
+        "id": "prov_final_isolation",
+        "label": "历史答案隔离",
+        "description": "final_domain、final_priority、final_owner、final_vendor、final_decision 不进入抽取和图谱。"
+      }
+    ],
+    "temporalRules": [
+      {
+        "id": "time_recorded",
+        "label": "记录时间",
+        "description": "消息、告警、报修和工单分别保留材料中的记录时间。"
+      },
+      {
+        "id": "time_effective",
+        "label": "业务有效时间",
+        "description": "合同、值班和政策的生效时间与记录时间分开；无正文时只保留候选状态。"
+      }
+    ],
+    "confidenceThreshold": 0.65,
+    "shaclSeverity": "Violation",
+    "updatedAt": "2026-09-04T10:26:07.977Z",
+    "digest": "sha256:8e81402d47f636984f86e6843567d9535527c73b6edd9bcc11901a3e494cca70"
+  },
+  "candidates": {
+    "status": "ready",
+    "updatedAt": "2026-09-04T10:25:15.996Z",
+    "entities": [
+      {
+        "id": "ent_616b4f1c759c524e23ce2156",
+        "label": "IM-040",
+        "type": "Store",
+        "summary": "IM-040",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_fdc5c72379834e6e97971a3d5736d21b"
+        ],
+        "properties": {
+          "store_id": "IM-040"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_bec1b17903309a814b3eea4a",
+        "label": "SRC-SIM-0402",
+        "type": "DataSource",
+        "summary": "SRC-SIM-0402",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_fdc5c72379834e6e97971a3d5736d21b"
+        ],
+        "properties": {
+          "source_id": "SRC-SIM-0402"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_27fa787d8ff3b16cc8ab920d",
+        "label": "IM-010",
+        "type": "Store",
+        "summary": "IM-010",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_a44e36460acd45eea1820367c61d0c8c",
+          "src_afb39cee4d30447892570e9db6c65aad",
+          "src_ffdb0d3c652741fcb960e7324bcd08a1",
+          "src_701f85b610e049e0ac2a9698b000cc01",
+          "src_daa34f3441d04e86913e82f5d42143d9"
+        ],
+        "properties": {
+          "store_id": "IM-010"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_acc67ea2800b69fcefe06959",
+        "label": "SZ-014",
+        "type": "Store",
+        "summary": "SZ-014",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_a44e36460acd45eea1820367c61d0c8c",
+          "src_afb39cee4d30447892570e9db6c65aad",
+          "src_ffdb0d3c652741fcb960e7324bcd08a1",
+          "src_701f85b610e049e0ac2a9698b000cc01",
+          "src_daa34f3441d04e86913e82f5d42143d9"
+        ],
+        "properties": {
+          "store_id": "SZ-014"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_d89aee53461879040fe8e67e",
+        "label": "NJ-003",
+        "type": "Store",
+        "summary": "NJ-003",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_a44e36460acd45eea1820367c61d0c8c",
+          "src_afb39cee4d30447892570e9db6c65aad",
+          "src_ffdb0d3c652741fcb960e7324bcd08a1",
+          "src_701f85b610e049e0ac2a9698b000cc01",
+          "src_daa34f3441d04e86913e82f5d42143d9"
+        ],
+        "properties": {
+          "store_id": "NJ-003"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_9101f33d77c364940df72325",
+        "label": "WO-884",
+        "type": "Store",
+        "summary": "WO-884",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_a44e36460acd45eea1820367c61d0c8c",
+          "src_ffdb0d3c652741fcb960e7324bcd08a1",
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "properties": {
+          "store_id": "WO-884"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_a75638df5ceadd291139213a",
+        "label": "HZ-021",
+        "type": "Store",
+        "summary": "HZ-021",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_a44e36460acd45eea1820367c61d0c8c",
+          "src_afb39cee4d30447892570e9db6c65aad",
+          "src_ffdb0d3c652741fcb960e7324bcd08a1",
+          "src_701f85b610e049e0ac2a9698b000cc01",
+          "src_daa34f3441d04e86913e82f5d42143d9"
+        ],
+        "properties": {
+          "store_id": "HZ-021"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_fd34c84e9072e4b7feca91d8",
+        "label": "FR-SZ014-03",
+        "type": "Asset",
+        "summary": "FR-SZ014-03",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_a44e36460acd45eea1820367c61d0c8c",
+          "src_afb39cee4d30447892570e9db6c65aad",
+          "src_ffdb0d3c652741fcb960e7324bcd08a1",
+          "src_701f85b610e049e0ac2a9698b000cc01"
+        ],
+        "properties": {
+          "asset_id": "FR-SZ014-03"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_404f21668ee8305fd65b2e88",
+        "label": "HVAC-HZ021-OLD",
+        "type": "Asset",
+        "summary": "HVAC-HZ021-OLD",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_a44e36460acd45eea1820367c61d0c8c",
+          "src_701f85b610e049e0ac2a9698b000cc01"
+        ],
+        "properties": {
+          "asset_id": "HVAC-HZ021-OLD"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_a3ce9a5469b6fee475ac3487",
+        "label": "WO-88422",
+        "type": "WorkOrder",
+        "summary": "WO-88422",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_a44e36460acd45eea1820367c61d0c8c",
+          "src_ffdb0d3c652741fcb960e7324bcd08a1",
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "properties": {
+          "work_order_id": "WO-88422"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_073ccfcd1ff083b5d56d8356",
+        "label": "WO-88419",
+        "type": "WorkOrder",
+        "summary": "WO-88419",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_a44e36460acd45eea1820367c61d0c8c",
+          "src_ffdb0d3c652741fcb960e7324bcd08a1",
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "properties": {
+          "work_order_id": "WO-88419"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_0da41efb3aa2133c54b03f7d",
+        "label": "SRC-SIM-0104",
+        "type": "DataSource",
+        "summary": "SRC-SIM-0104",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_a44e36460acd45eea1820367c61d0c8c"
+        ],
+        "properties": {
+          "source_id": "SRC-SIM-0104"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_a4273368f53983f90d6e0771",
+        "label": "SRC-SIM-0102",
+        "type": "DataSource",
+        "summary": "SRC-SIM-0102",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_afb39cee4d30447892570e9db6c65aad"
+        ],
+        "properties": {
+          "source_id": "SRC-SIM-0102"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_6d55bcd12ebfea7831d87250",
+        "label": "WO-883",
+        "type": "Store",
+        "summary": "WO-883",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "store_id": "WO-883"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_d7a4f0e90d692709eabc7334",
+        "label": "AT-202",
+        "type": "Store",
+        "summary": "AT-202",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "store_id": "AT-202"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_9d15c5152e4156c748ed289b",
+        "label": "NE-202",
+        "type": "Store",
+        "summary": "NE-202",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "store_id": "NE-202"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_0c3d38552f83474003747ac5",
+        "label": "WO-885",
+        "type": "Store",
+        "summary": "WO-885",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "store_id": "WO-885"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_8efe1b3b92f2898b005e2a31",
+        "label": "SU-006",
+        "type": "Store",
+        "summary": "SU-006",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1",
+          "src_701f85b610e049e0ac2a9698b000cc01",
+          "src_daa34f3441d04e86913e82f5d42143d9"
+        ],
+        "properties": {
+          "store_id": "SU-006"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_16e145d2535e6980f2165d34",
+        "label": "SH-011",
+        "type": "Store",
+        "summary": "SH-011",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "store_id": "SH-011"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_f8a67a2c4937a09be2f85738",
+        "label": "WO-886",
+        "type": "Store",
+        "summary": "WO-886",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "store_id": "WO-886"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_aae3bba3dad5a99c5e47c6b3",
+        "label": "WX-004",
+        "type": "Store",
+        "summary": "WX-004",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "store_id": "WX-004"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_5bfecb3933f39b57522b39df",
+        "label": "NB-008",
+        "type": "Store",
+        "summary": "NB-008",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "store_id": "NB-008"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_fba15e5b8f919f4f46b36d25",
+        "label": "NJ-010",
+        "type": "Store",
+        "summary": "NJ-010",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1",
+          "src_daa34f3441d04e86913e82f5d42143d9"
+        ],
+        "properties": {
+          "store_id": "NJ-010"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_17ad351a705590e860f3aa28",
+        "label": "HZ-005",
+        "type": "Store",
+        "summary": "HZ-005",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "store_id": "HZ-005"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_5642da9eb17cf37421686bce",
+        "label": "WO-887",
+        "type": "Store",
+        "summary": "WO-887",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "store_id": "WO-887"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_a6d0fee15e1ca0d5fc3e6ec6",
+        "label": "SH-020",
+        "type": "Store",
+        "summary": "SH-020",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1",
+          "src_daa34f3441d04e86913e82f5d42143d9"
+        ],
+        "properties": {
+          "store_id": "SH-020"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_e7f5b1b11ee8863de282f3cb",
+        "label": "FR-SU006-02",
+        "type": "Asset",
+        "summary": "FR-SU006-02",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1",
+          "src_701f85b610e049e0ac2a9698b000cc01"
+        ],
+        "properties": {
+          "asset_id": "FR-SU006-02"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_cc288483d000a933e24d827e",
+        "label": "NET-SH011-01",
+        "type": "Asset",
+        "summary": "NET-SH011-01",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "asset_id": "NET-SH011-01"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_8ad056b45fe3ad75919f9f65",
+        "label": "HVAC-WX004-02",
+        "type": "Asset",
+        "summary": "HVAC-WX004-02",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "asset_id": "HVAC-WX004-02"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_339f4399c7e1a748bb7a8d8c",
+        "label": "FR-NB008-01",
+        "type": "Asset",
+        "summary": "FR-NB008-01",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "asset_id": "FR-NB008-01"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_dc18cd3613ba0ddc4144345b",
+        "label": "POS-HZ005-02",
+        "type": "Asset",
+        "summary": "POS-HZ005-02",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "asset_id": "POS-HZ005-02"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_575bfb35023ce86d72b5348d",
+        "label": "FR-SH020-04",
+        "type": "Asset",
+        "summary": "FR-SH020-04",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "asset_id": "FR-SH020-04"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_c45f124640c8d81643ff6163",
+        "label": "CHAT-20260818-0912",
+        "type": "Message",
+        "summary": "CHAT-20260818-0912",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "message_id": "CHAT-20260818-0912"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_a743728a22f10af083749268",
+        "label": "CHAT-20260821-1807",
+        "type": "Message",
+        "summary": "CHAT-20260821-1807",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "message_id": "CHAT-20260821-1807"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_2a20d16ba3ecc7c9bfa346eb",
+        "label": "PHONE-20260821-1809",
+        "type": "Message",
+        "summary": "PHONE-20260821-1809",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "message_id": "PHONE-20260821-1809"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_1842e6862e44c03a63265bec",
+        "label": "CHAT-20260821-1811",
+        "type": "Message",
+        "summary": "CHAT-20260821-1811",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "message_id": "CHAT-20260821-1811"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_806702673782f63abed357ed",
+        "label": "CHAT-20260824-1335",
+        "type": "Message",
+        "summary": "CHAT-20260824-1335",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "message_id": "CHAT-20260824-1335"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_fc87185c3a2dedea13e92764",
+        "label": "PHONE-20260825-0812",
+        "type": "Message",
+        "summary": "PHONE-20260825-0812",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "message_id": "PHONE-20260825-0812"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_280b3b05509b2dd48a77aade",
+        "label": "CHAT-20260825-1518",
+        "type": "Message",
+        "summary": "CHAT-20260825-1518",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "message_id": "CHAT-20260825-1518"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_06e79e13ea3dc51ca5ab016e",
+        "label": "CHAT-20260826-1058",
+        "type": "Message",
+        "summary": "CHAT-20260826-1058",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "message_id": "CHAT-20260826-1058"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_d34c1c66895bc5869f2ea35d",
+        "label": "CHAT-20260825-1002",
+        "type": "Message",
+        "summary": "CHAT-20260825-1002",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "message_id": "CHAT-20260825-1002"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_ff0ff81b8ed6f0493592de79",
+        "label": "CHAT-20260827-0928",
+        "type": "Message",
+        "summary": "CHAT-20260827-0928",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "message_id": "CHAT-20260827-0928"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_c4244a6507a17f4f5380f78d",
+        "label": "CHAT-20260827-1018",
+        "type": "Message",
+        "summary": "CHAT-20260827-1018",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "message_id": "CHAT-20260827-1018"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_9ef0e29ac0b52469d1d4dfe8",
+        "label": "CHAT-20260827-1302",
+        "type": "Message",
+        "summary": "CHAT-20260827-1302",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "message_id": "CHAT-20260827-1302"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_22b99be09d797a563244bcf0",
+        "label": "PHONE-20260827-1638",
+        "type": "Message",
+        "summary": "PHONE-20260827-1638",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "message_id": "PHONE-20260827-1638"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_c0ad35e6232f43399f7c36c8",
+        "label": "WO-88371",
+        "type": "WorkOrder",
+        "summary": "WO-88371",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "work_order_id": "WO-88371"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_9af642a4634f6e1c96dacb5f",
+        "label": "WO-88507",
+        "type": "WorkOrder",
+        "summary": "WO-88507",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "work_order_id": "WO-88507"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_eb59096e1bbf789a083de9dc",
+        "label": "WO-88531",
+        "type": "WorkOrder",
+        "summary": "WO-88531",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "work_order_id": "WO-88531"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_029fa3416b8734713df4fa19",
+        "label": "WO-88576",
+        "type": "WorkOrder",
+        "summary": "WO-88576",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "work_order_id": "WO-88576"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_86a864ca45add1017987da40",
+        "label": "WO-88602",
+        "type": "WorkOrder",
+        "summary": "WO-88602",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "work_order_id": "WO-88602"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_7769610b51a426d11788c89f",
+        "label": "WO-88615",
+        "type": "WorkOrder",
+        "summary": "WO-88615",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "work_order_id": "WO-88615"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_fa21ce1141e0d19ecf3270ae",
+        "label": "WO-88648",
+        "type": "WorkOrder",
+        "summary": "WO-88648",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "work_order_id": "WO-88648"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_231b46e230c191cb2e4589bf",
+        "label": "WO-88660",
+        "type": "WorkOrder",
+        "summary": "WO-88660",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "work_order_id": "WO-88660"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_ed29220766725afcb3f49588",
+        "label": "WO-88682",
+        "type": "WorkOrder",
+        "summary": "WO-88682",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "work_order_id": "WO-88682"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_544fa21463c7b81f59ab488f",
+        "label": "WO-88703",
+        "type": "WorkOrder",
+        "summary": "WO-88703",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "work_order_id": "WO-88703"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_279b589c3ebc1c205cd8d879",
+        "label": "V-REF-01",
+        "type": "Vendor",
+        "summary": "V-REF-01",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1",
+          "src_daa34f3441d04e86913e82f5d42143d9"
+        ],
+        "properties": {
+          "vendor_id": "V-REF-01"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_c0171164fd78d189f00c4923",
+        "label": "V-NET-02",
+        "type": "Vendor",
+        "summary": "V-NET-02",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1",
+          "src_daa34f3441d04e86913e82f5d42143d9"
+        ],
+        "properties": {
+          "vendor_id": "V-NET-02"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_e65d84312c9ba6144a13c00e",
+        "label": "V-POS-03",
+        "type": "Vendor",
+        "summary": "V-POS-03",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1",
+          "src_daa34f3441d04e86913e82f5d42143d9"
+        ],
+        "properties": {
+          "vendor_id": "V-POS-03"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_1d919db979f30e8872fb38fe",
+        "label": "V-HVAC-02",
+        "type": "Vendor",
+        "summary": "V-HVAC-02",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1",
+          "src_daa34f3441d04e86913e82f5d42143d9"
+        ],
+        "properties": {
+          "vendor_id": "V-HVAC-02"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_e5632a377c54158d97fff6f3",
+        "label": "V-NET-01",
+        "type": "Vendor",
+        "summary": "V-NET-01",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "vendor_id": "V-NET-01"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_7261f2975de57efe73919d62",
+        "label": "V-HVAC-01",
+        "type": "Vendor",
+        "summary": "V-HVAC-01",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "vendor_id": "V-HVAC-01"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_9e19083eb60ff4189a3f916c",
+        "label": "V-POS-01",
+        "type": "Vendor",
+        "summary": "V-POS-01",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "vendor_id": "V-POS-01"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_e2e73e6d9e38a3e6d0b1e776",
+        "label": "SRC-SIM-0105",
+        "type": "DataSource",
+        "summary": "SRC-SIM-0105",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "properties": {
+          "source_id": "SRC-SIM-0105"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_c180281f19d8f1bb418e5d06",
+        "label": "EF-202",
+        "type": "Store",
+        "summary": "EF-202",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01",
+          "src_daa34f3441d04e86913e82f5d42143d9"
+        ],
+        "properties": {
+          "store_id": "EF-202"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_34433ece96982665e7977b9d",
+        "label": "OS-202",
+        "type": "Store",
+        "summary": "OS-202",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01",
+          "src_daa34f3441d04e86913e82f5d42143d9"
+        ],
+        "properties": {
+          "store_id": "OS-202"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_a613395abf486e545da7653c",
+        "label": "ET-202",
+        "type": "Store",
+        "summary": "ET-202",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01",
+          "src_daa34f3441d04e86913e82f5d42143d9"
+        ],
+        "properties": {
+          "store_id": "ET-202"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_23c3770bfa824bd8d786f3fc",
+        "label": "AS-120",
+        "type": "Store",
+        "summary": "AS-120",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01"
+        ],
+        "properties": {
+          "store_id": "AS-120"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_a233d3fb938374521a3f7535",
+        "label": "AC-202",
+        "type": "Store",
+        "summary": "AC-202",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01",
+          "src_daa34f3441d04e86913e82f5d42143d9"
+        ],
+        "properties": {
+          "store_id": "AC-202"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_63662e764427ec1c1dfb0557",
+        "label": "POS-NJ003-01",
+        "type": "Asset",
+        "summary": "POS-NJ003-01",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01"
+        ],
+        "properties": {
+          "asset_id": "POS-NJ003-01"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_a9a3acbfac436bef201c8d86",
+        "label": "POS-2024-07",
+        "type": "Asset",
+        "summary": "POS-2024-07",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01",
+          "src_daa34f3441d04e86913e82f5d42143d9"
+        ],
+        "properties": {
+          "asset_id": "POS-2024-07"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_21d54b5cd9c7f17d1da39302",
+        "label": "POS-NJ003-02",
+        "type": "Asset",
+        "summary": "POS-NJ003-02",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01"
+        ],
+        "properties": {
+          "asset_id": "POS-NJ003-02"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_e9c9d177fbebd40a7a687a96",
+        "label": "NET-NJ003-01",
+        "type": "Asset",
+        "summary": "NET-NJ003-01",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01"
+        ],
+        "properties": {
+          "asset_id": "NET-NJ003-01"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_b4f466bf202415a63de847bf",
+        "label": "NET-2026-02",
+        "type": "Asset",
+        "summary": "NET-2026-02",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01",
+          "src_daa34f3441d04e86913e82f5d42143d9"
+        ],
+        "properties": {
+          "asset_id": "NET-2026-02"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_e5cccee5e834e4e5c98e6f69",
+        "label": "HVAC-HZ021-02",
+        "type": "Asset",
+        "summary": "HVAC-HZ021-02",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01"
+        ],
+        "properties": {
+          "asset_id": "HVAC-HZ021-02"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_dcd19e639d55af34b336f5a6",
+        "label": "HVAC-2023-09",
+        "type": "Asset",
+        "summary": "HVAC-2023-09",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01",
+          "src_daa34f3441d04e86913e82f5d42143d9"
+        ],
+        "properties": {
+          "asset_id": "HVAC-2023-09"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_7c27d2f5dd74020faa8b8a0b",
+        "label": "CTR-REF-2025-01",
+        "type": "Contract",
+        "summary": "CTR-REF-2025-01",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01",
+          "src_daa34f3441d04e86913e82f5d42143d9"
+        ],
+        "properties": {
+          "contract_id": "CTR-REF-2025-01"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_c5d535fc9bfa3d200aed1591",
+        "label": "CTR-POS-2024-07",
+        "type": "Contract",
+        "summary": "CTR-POS-2024-07",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01",
+          "src_daa34f3441d04e86913e82f5d42143d9"
+        ],
+        "properties": {
+          "contract_id": "CTR-POS-2024-07"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_26c3bb3810318eafe7813674",
+        "label": "CTR-NET-2026-02",
+        "type": "Contract",
+        "summary": "CTR-NET-2026-02",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01",
+          "src_daa34f3441d04e86913e82f5d42143d9"
+        ],
+        "properties": {
+          "contract_id": "CTR-NET-2026-02"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_67955b94a94d3af8d91d3345",
+        "label": "CTR-HVAC-2023-09",
+        "type": "Contract",
+        "summary": "CTR-HVAC-2023-09",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01",
+          "src_daa34f3441d04e86913e82f5d42143d9"
+        ],
+        "properties": {
+          "contract_id": "CTR-HVAC-2023-09"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_bd76a72e9b3a7b4d738d9e30",
+        "label": "SRC-SIM-0106",
+        "type": "DataSource",
+        "summary": "SRC-SIM-0106",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01"
+        ],
+        "properties": {
+          "source_id": "SRC-SIM-0106"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_98bc18e6e12614f2f61f0bb0",
+        "label": "SRC-SIM-0107",
+        "type": "DataSource",
+        "summary": "SRC-SIM-0107",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_daa34f3441d04e86913e82f5d42143d9"
+        ],
+        "properties": {
+          "source_id": "SRC-SIM-0107"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_60155ffc650945d22203e4b8",
+        "label": "IM-030",
+        "type": "Store",
+        "summary": "IM-030",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "properties": {
+          "store_id": "IM-030"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_fcb21f1739fc3feacb000cf2",
+        "label": "JK-202",
+        "type": "Store",
+        "summary": "JK-202",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "properties": {
+          "store_id": "JK-202"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_97319a7f34a21eab85396cab",
+        "label": "JK-681",
+        "type": "Store",
+        "summary": "JK-681",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "properties": {
+          "store_id": "JK-681"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_2a1a38b1f3d2886c0a12c874",
+        "label": "AR-304",
+        "type": "Store",
+        "summary": "AR-304",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "properties": {
+          "store_id": "AR-304"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_b614d2cd7c2cbd2b5765b5d8",
+        "label": "OM-908",
+        "type": "Store",
+        "summary": "OM-908",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "properties": {
+          "store_id": "OM-908"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_010d4d36c5c2372bc85cf199",
+        "label": "S-NJ-011",
+        "type": "Store",
+        "summary": "S-NJ-011",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "properties": {
+          "store_id": "S-NJ-011"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_26762aa111419855905460f7",
+        "label": "POS-NJXJK-01",
+        "type": "Asset",
+        "summary": "POS-NJXJK-01",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "properties": {
+          "asset_id": "POS-NJXJK-01"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_bd5b71f30a4d471281844c89",
+        "label": "INC-CAND-NJXJK-20260821-01",
+        "type": "Incident",
+        "summary": "INC-CAND-NJXJK-20260821-01",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "properties": {
+          "incident_id": "INC-CAND-NJXJK-20260821-01"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_7ad0bbaadf5aab86fcfa1db8",
+        "label": "ALERT-NJXJK-68102",
+        "type": "Alert",
+        "summary": "ALERT-NJXJK-68102",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "properties": {
+          "alert_id": "ALERT-NJXJK-68102"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_bb259db0dee3a95402a15591",
+        "label": "R1002",
+        "type": "Report",
+        "summary": "R1002",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "properties": {
+          "report_id": "R1002"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_33ca241f15038efee9de4447",
+        "label": "R1003",
+        "type": "Report",
+        "summary": "R1003",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "properties": {
+          "report_id": "R1003"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_42d8b46f93e0a6aaea6d2745",
+        "label": "MSG-WECOM-908811",
+        "type": "Message",
+        "summary": "MSG-WECOM-908811",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "properties": {
+          "message_id": "MSG-WECOM-908811"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_3a37da3f5299ebb929022501",
+        "label": "MSG-WECOM-908827",
+        "type": "Message",
+        "summary": "MSG-WECOM-908827",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "properties": {
+          "message_id": "MSG-WECOM-908827"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_9a947669e0a56cee89b03dde",
+        "label": "SRC-SIM-0307",
+        "type": "DataSource",
+        "summary": "SRC-SIM-0307",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "properties": {
+          "source_id": "SRC-SIM-0307"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_dd7ca3888df6f3220bbc15ed",
+        "label": "IM-031",
+        "type": "Store",
+        "summary": "IM-031",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_1acfac3bc13a469c95eff2249d358721",
+          "src_dccfff3339674d0ba9b5c0b33f6bda15"
+        ],
+        "properties": {
+          "store_id": "IM-031"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_89617e303e69fe52c6263c13",
+        "label": "AR-305",
+        "type": "Store",
+        "summary": "AR-305",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_1acfac3bc13a469c95eff2249d358721"
+        ],
+        "properties": {
+          "store_id": "AR-305"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_e24abea7ad26d2e77edc1917",
+        "label": "fde-analyst",
+        "type": "Principal",
+        "summary": "<principal id=\"fde-analyst\"",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_1acfac3bc13a469c95eff2249d358721"
+        ],
+        "properties": {
+          "principal_id": "fde-analyst"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_c71428e7107b90588c35f82b",
+        "label": "fde-agent-service-account",
+        "type": "Principal",
+        "summary": "<principal id=\"fde-agent-service-account\"",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_1acfac3bc13a469c95eff2249d358721"
+        ],
+        "properties": {
+          "principal_id": "fde-agent-service-account"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_afa1215c9e95cf036130e9cd",
+        "label": "operations-reviewer",
+        "type": "Principal",
+        "summary": "<principal id=\"operations-reviewer\"",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_1acfac3bc13a469c95eff2249d358721"
+        ],
+        "properties": {
+          "principal_id": "operations-reviewer"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_e9d041a99dea102dd21f22e0",
+        "label": "risk-owner",
+        "type": "Principal",
+        "summary": "<principal id=\"risk-owner\"",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_1acfac3bc13a469c95eff2249d358721"
+        ],
+        "properties": {
+          "principal_id": "risk-owner"
+        },
+        "decision": "accepted"
+      },
+      {
+        "id": "ent_b9ae7185dc719ebf07383fd1",
+        "label": "SRC-SIM-0311",
+        "type": "DataSource",
+        "summary": "SRC-SIM-0311",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_1acfac3bc13a469c95eff2249d358721"
+        ],
+        "properties": {
+          "source_id": "SRC-SIM-0311"
+        },
+        "decision": "rejected"
+      },
+      {
+        "id": "ent_7d5dd669a6dc9b525b63af99",
+        "label": "SRC-SIM-0312",
+        "type": "DataSource",
+        "summary": "SRC-SIM-0312",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_dccfff3339674d0ba9b5c0b33f6bda15"
+        ],
+        "properties": {
+          "source_id": "SRC-SIM-0312"
+        },
+        "decision": "rejected"
+      }
+    ],
+    "relationships": [
+      {
+        "id": "rel_390b96d56ffaafecf9a53929",
+        "source": "ent_c0ad35e6232f43399f7c36c8",
+        "target": "ent_acc67ea2800b69fcefe06959",
+        "type": "rel_workorder_store",
+        "label": "工单发生于门店",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_0c704ce68cc9a542ba9f0c81",
+        "source": "ent_073ccfcd1ff083b5d56d8356",
+        "target": "ent_d89aee53461879040fe8e67e",
+        "type": "rel_workorder_store",
+        "label": "工单发生于门店",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_5c98738159994d3878d7039a",
+        "source": "ent_a3ce9a5469b6fee475ac3487",
+        "target": "ent_d89aee53461879040fe8e67e",
+        "type": "rel_workorder_store",
+        "label": "工单发生于门店",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_d6410c4e38a0b4d0f8a3aaec",
+        "source": "ent_9af642a4634f6e1c96dacb5f",
+        "target": "ent_a75638df5ceadd291139213a",
+        "type": "rel_workorder_store",
+        "label": "工单发生于门店",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_a75f2d0c8aa95af06484447e",
+        "source": "ent_eb59096e1bbf789a083de9dc",
+        "target": "ent_8efe1b3b92f2898b005e2a31",
+        "type": "rel_workorder_store",
+        "label": "工单发生于门店",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_6b803ea7610992009ca3852b",
+        "source": "ent_029fa3416b8734713df4fa19",
+        "target": "ent_16e145d2535e6980f2165d34",
+        "type": "rel_workorder_store",
+        "label": "工单发生于门店",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_a78c6664d577c2aad9163996",
+        "source": "ent_86a864ca45add1017987da40",
+        "target": "ent_aae3bba3dad5a99c5e47c6b3",
+        "type": "rel_workorder_store",
+        "label": "工单发生于门店",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_df3653efcd2d929ea2c1f82e",
+        "source": "ent_7769610b51a426d11788c89f",
+        "target": "ent_5bfecb3933f39b57522b39df",
+        "type": "rel_workorder_store",
+        "label": "工单发生于门店",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_bde74e0dc59b856d175e937b",
+        "source": "ent_fa21ce1141e0d19ecf3270ae",
+        "target": "ent_acc67ea2800b69fcefe06959",
+        "type": "rel_workorder_store",
+        "label": "工单发生于门店",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_ff01b9b8f8601c6f89cb2671",
+        "source": "ent_231b46e230c191cb2e4589bf",
+        "target": "ent_fba15e5b8f919f4f46b36d25",
+        "type": "rel_workorder_store",
+        "label": "工单发生于门店",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_db1c39310db16fcc1ec8764d",
+        "source": "ent_ed29220766725afcb3f49588",
+        "target": "ent_17ad351a705590e860f3aa28",
+        "type": "rel_workorder_store",
+        "label": "工单发生于门店",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_09a904b2c962bea2afb690e8",
+        "source": "ent_544fa21463c7b81f59ab488f",
+        "target": "ent_a6d0fee15e1ca0d5fc3e6ec6",
+        "type": "rel_workorder_store",
+        "label": "工单发生于门店",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_57c2e6afc723078b5c27629f",
+        "source": "ent_c0ad35e6232f43399f7c36c8",
+        "target": "ent_fd34c84e9072e4b7feca91d8",
+        "type": "rel_workorder_asset",
+        "label": "工单涉及设备",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_90e3f309aa82844001a86f33",
+        "source": "ent_eb59096e1bbf789a083de9dc",
+        "target": "ent_e7f5b1b11ee8863de282f3cb",
+        "type": "rel_workorder_asset",
+        "label": "工单涉及设备",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_ed72a2f706c86fac50d44a0b",
+        "source": "ent_029fa3416b8734713df4fa19",
+        "target": "ent_cc288483d000a933e24d827e",
+        "type": "rel_workorder_asset",
+        "label": "工单涉及设备",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_79337f858a292888f21c5300",
+        "source": "ent_86a864ca45add1017987da40",
+        "target": "ent_8ad056b45fe3ad75919f9f65",
+        "type": "rel_workorder_asset",
+        "label": "工单涉及设备",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_5b76d1441d85ba996fbc6e46",
+        "source": "ent_7769610b51a426d11788c89f",
+        "target": "ent_339f4399c7e1a748bb7a8d8c",
+        "type": "rel_workorder_asset",
+        "label": "工单涉及设备",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_d7b7734daed41d8ae05766ff",
+        "source": "ent_fa21ce1141e0d19ecf3270ae",
+        "target": "ent_fd34c84e9072e4b7feca91d8",
+        "type": "rel_workorder_asset",
+        "label": "工单涉及设备",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_d63c18e0881d6aa8859a8d71",
+        "source": "ent_ed29220766725afcb3f49588",
+        "target": "ent_dc18cd3613ba0ddc4144345b",
+        "type": "rel_workorder_asset",
+        "label": "工单涉及设备",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_67fd96b3e236c4543115c572",
+        "source": "ent_544fa21463c7b81f59ab488f",
+        "target": "ent_575bfb35023ce86d72b5348d",
+        "type": "rel_workorder_asset",
+        "label": "工单涉及设备",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_d5634429086c39d5db67b664",
+        "source": "ent_c0ad35e6232f43399f7c36c8",
+        "target": "ent_279b589c3ebc1c205cd8d879",
+        "type": "rel_workorder_vendor",
+        "label": "工单关联维修商",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_b51916ee2985cde4c01c23c8",
+        "source": "ent_073ccfcd1ff083b5d56d8356",
+        "target": "ent_c0171164fd78d189f00c4923",
+        "type": "rel_workorder_vendor",
+        "label": "工单关联维修商",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_41a8a4a9d08a34534fe2bb85",
+        "source": "ent_a3ce9a5469b6fee475ac3487",
+        "target": "ent_e65d84312c9ba6144a13c00e",
+        "type": "rel_workorder_vendor",
+        "label": "工单关联维修商",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_4cb4466f0d0753184470b16d",
+        "source": "ent_9af642a4634f6e1c96dacb5f",
+        "target": "ent_1d919db979f30e8872fb38fe",
+        "type": "rel_workorder_vendor",
+        "label": "工单关联维修商",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_197cc9e1ea7400a4d1cca19f",
+        "source": "ent_029fa3416b8734713df4fa19",
+        "target": "ent_e5632a377c54158d97fff6f3",
+        "type": "rel_workorder_vendor",
+        "label": "工单关联维修商",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_69848d7f35b69bb737539982",
+        "source": "ent_86a864ca45add1017987da40",
+        "target": "ent_7261f2975de57efe73919d62",
+        "type": "rel_workorder_vendor",
+        "label": "工单关联维修商",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_ff70f4fe3d381e2cb48dc68b",
+        "source": "ent_fa21ce1141e0d19ecf3270ae",
+        "target": "ent_279b589c3ebc1c205cd8d879",
+        "type": "rel_workorder_vendor",
+        "label": "工单关联维修商",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_babe461946f5089587c75253",
+        "source": "ent_ed29220766725afcb3f49588",
+        "target": "ent_9e19083eb60ff4189a3f916c",
+        "type": "rel_workorder_vendor",
+        "label": "工单关联维修商",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_79da00010c0148e6e11b61c4",
+        "source": "ent_acc67ea2800b69fcefe06959",
+        "target": "ent_fd34c84e9072e4b7feca91d8",
+        "type": "rel_store_asset",
+        "label": "门店拥有设备",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_811c948436f86e58d9f99dda",
+        "source": "ent_d89aee53461879040fe8e67e",
+        "target": "ent_63662e764427ec1c1dfb0557",
+        "type": "rel_store_asset",
+        "label": "门店拥有设备",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_ebec932f216b0cf3e6859d0b",
+        "source": "ent_d89aee53461879040fe8e67e",
+        "target": "ent_21d54b5cd9c7f17d1da39302",
+        "type": "rel_store_asset",
+        "label": "门店拥有设备",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_12ea8264f56cc82845747f60",
+        "source": "ent_d89aee53461879040fe8e67e",
+        "target": "ent_e9c9d177fbebd40a7a687a96",
+        "type": "rel_store_asset",
+        "label": "门店拥有设备",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_11746e6243cad1538860c5d4",
+        "source": "ent_a75638df5ceadd291139213a",
+        "target": "ent_e5cccee5e834e4e5c98e6f69",
+        "type": "rel_store_asset",
+        "label": "门店拥有设备",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_1130d1472d59a4109da62350",
+        "source": "ent_a75638df5ceadd291139213a",
+        "target": "ent_404f21668ee8305fd65b2e88",
+        "type": "rel_store_asset",
+        "label": "门店拥有设备",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_c8ba3fea685b657aba75c2e7",
+        "source": "ent_8efe1b3b92f2898b005e2a31",
+        "target": "ent_e7f5b1b11ee8863de282f3cb",
+        "type": "rel_store_asset",
+        "label": "门店拥有设备",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_90356d586a56a86d69139de7",
+        "source": "ent_fd34c84e9072e4b7feca91d8",
+        "target": "ent_7c27d2f5dd74020faa8b8a0b",
+        "type": "rel_asset_contract",
+        "label": "设备引用合同",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_2c44ea380e3a0802603a148b",
+        "source": "ent_63662e764427ec1c1dfb0557",
+        "target": "ent_c5d535fc9bfa3d200aed1591",
+        "type": "rel_asset_contract",
+        "label": "设备引用合同",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_4466b08960a9a00ba2cb3189",
+        "source": "ent_21d54b5cd9c7f17d1da39302",
+        "target": "ent_c5d535fc9bfa3d200aed1591",
+        "type": "rel_asset_contract",
+        "label": "设备引用合同",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_af3d3665da65d9b2b6a9fc89",
+        "source": "ent_e9c9d177fbebd40a7a687a96",
+        "target": "ent_26c3bb3810318eafe7813674",
+        "type": "rel_asset_contract",
+        "label": "设备引用合同",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_a3d8848ab1d06412a46b9102",
+        "source": "ent_e5cccee5e834e4e5c98e6f69",
+        "target": "ent_67955b94a94d3af8d91d3345",
+        "type": "rel_asset_contract",
+        "label": "设备引用合同",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_fdd1eabb7d577c9793d98a6f",
+        "source": "ent_404f21668ee8305fd65b2e88",
+        "target": "ent_67955b94a94d3af8d91d3345",
+        "type": "rel_asset_contract",
+        "label": "设备引用合同",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_5c7b72f58f1c07546a5228a7",
+        "source": "ent_e7f5b1b11ee8863de282f3cb",
+        "target": "ent_7c27d2f5dd74020faa8b8a0b",
+        "type": "rel_asset_contract",
+        "label": "设备引用合同",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_602f7183d44fbbdf06336735",
+        "source": "ent_279b589c3ebc1c205cd8d879",
+        "target": "ent_7c27d2f5dd74020faa8b8a0b",
+        "type": "rel_vendor_contract",
+        "label": "维修商引用合同",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_daa34f3441d04e86913e82f5d42143d9"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_a6b4ab1e83f87b0b6ecb620f",
+        "source": "ent_c0171164fd78d189f00c4923",
+        "target": "ent_26c3bb3810318eafe7813674",
+        "type": "rel_vendor_contract",
+        "label": "维修商引用合同",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_daa34f3441d04e86913e82f5d42143d9"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_ae6f49af4df0d62f456a13e7",
+        "source": "ent_e65d84312c9ba6144a13c00e",
+        "target": "ent_c5d535fc9bfa3d200aed1591",
+        "type": "rel_vendor_contract",
+        "label": "维修商引用合同",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_daa34f3441d04e86913e82f5d42143d9"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_65db652b6c21ec1be5593517",
+        "source": "ent_1d919db979f30e8872fb38fe",
+        "target": "ent_67955b94a94d3af8d91d3345",
+        "type": "rel_vendor_contract",
+        "label": "维修商引用合同",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_daa34f3441d04e86913e82f5d42143d9"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_d97dc5babcfd6bb5e2c0e3ef",
+        "source": "ent_42d8b46f93e0a6aaea6d2745",
+        "target": "ent_bb259db0dee3a95402a15591",
+        "type": "rel_message_report",
+        "label": "消息形成报修",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_c692e15afb11dd36490a04ff",
+        "source": "ent_3a37da3f5299ebb929022501",
+        "target": "ent_33ca241f15038efee9de4447",
+        "type": "rel_message_report",
+        "label": "消息形成报修",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_21b9b233b12a6bb4cedd7c14",
+        "source": "ent_bb259db0dee3a95402a15591",
+        "target": "ent_073ccfcd1ff083b5d56d8356",
+        "type": "rel_report_workorder",
+        "label": "报修关联工单",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_38580c32b09d94cfe8fc4542",
+        "source": "ent_33ca241f15038efee9de4447",
+        "target": "ent_a3ce9a5469b6fee475ac3487",
+        "type": "rel_report_workorder",
+        "label": "报修关联工单",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_ec6ac62045f1a10458b3fdd2",
+        "source": "ent_a3ce9a5469b6fee475ac3487",
+        "target": "ent_073ccfcd1ff083b5d56d8356",
+        "type": "rel_workorder_duplicate",
+        "label": "重复工单指向",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_56834954583621b56225bddd",
+        "source": "ent_bd5b71f30a4d471281844c89",
+        "target": "ent_bb259db0dee3a95402a15591",
+        "type": "rel_incident_report",
+        "label": "故障候选包含报修",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_c6809bcd1b6afea8ce3d2a55",
+        "source": "ent_bd5b71f30a4d471281844c89",
+        "target": "ent_33ca241f15038efee9de4447",
+        "type": "rel_incident_report",
+        "label": "故障候选包含报修",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_6d8c377987d8563ba7368155",
+        "source": "ent_bd5b71f30a4d471281844c89",
+        "target": "ent_7ad0bbaadf5aab86fcfa1db8",
+        "type": "rel_incident_alert",
+        "label": "故障候选包含告警",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_d7a330d0591ad27a4f7d427a",
+        "source": "ent_bb259db0dee3a95402a15591",
+        "target": "ent_010d4d36c5c2372bc85cf199",
+        "type": "rel_report_store",
+        "label": "报修发生于门店",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "decision": "accepted"
+      },
+      {
+        "id": "rel_0956b6677c0c9577af4b4ba2",
+        "source": "ent_33ca241f15038efee9de4447",
+        "target": "ent_010d4d36c5c2372bc85cf199",
+        "type": "rel_report_store",
+        "label": "报修发生于门店",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "decision": "accepted"
+      }
+    ],
+    "warnings": []
+  },
+  "runs": [
+    {
+      "id": "run_561fefcb-bb00-44b1-af40-f27580cf1997",
+      "kind": "extract",
+      "status": "stale",
+      "startedAt": "2026-09-04T10:16:54.750Z",
+      "providerVersion": "0.6.7",
+      "sourceDigests": [
+        "sha256:39ce56db847fc34ef6321eb76b873292bdd84f9da84975eb9b8e1e18aec50005",
+        "sha256:1f632800efbe4bd803739d82c2a8473535f81c679232b937dba03640712ca6d5",
+        "sha256:887c918918fe00735df8a0e0e8f64ea783e24fffc426bc6197453df9b6ba9f41",
+        "sha256:07dd0c8db0b36dd0ccd8d1b7d1973fbe021dabe1bc4e4b8e6273c5495b323c8f",
+        "sha256:1ccaac3c4926cdb5c8c29b7e229470ddac1a10060f58620acb6f27e355bf0559",
+        "sha256:a3c4ba0b00896568628deff031456e2f930f7f55fd9162654dcf7be03fffaaed",
+        "sha256:12689c3c80a2a9cc27b14fcfc7c386c97190e459b709bf355780830bcaf6262c",
+        "sha256:281de7dbae71dae59cbf86bb5d9832a53d16b397f2efd73775619e78c4eb6737",
+        "sha256:bb60ba13b4236c9ea029a8dae954f5ebb093d78013c90e217682734d34337ba1"
+      ],
+      "evidencePaths": [],
+      "diagnostics": [],
+      "summary": "形成 29 个实体候选、0 条关系候选。",
+      "completedAt": "2026-09-04T10:16:57.479Z"
+    },
+    {
+      "id": "run_62b37e80-d8c9-4c06-921a-64aca6c9d39c",
+      "kind": "propose-schema",
+      "status": "stale",
+      "startedAt": "2026-09-04T10:16:59.652Z",
+      "providerVersion": "0.6.7",
+      "sourceDigests": [
+        "sha256:39ce56db847fc34ef6321eb76b873292bdd84f9da84975eb9b8e1e18aec50005",
+        "sha256:1f632800efbe4bd803739d82c2a8473535f81c679232b937dba03640712ca6d5",
+        "sha256:887c918918fe00735df8a0e0e8f64ea783e24fffc426bc6197453df9b6ba9f41",
+        "sha256:07dd0c8db0b36dd0ccd8d1b7d1973fbe021dabe1bc4e4b8e6273c5495b323c8f",
+        "sha256:1ccaac3c4926cdb5c8c29b7e229470ddac1a10060f58620acb6f27e355bf0559",
+        "sha256:a3c4ba0b00896568628deff031456e2f930f7f55fd9162654dcf7be03fffaaed",
+        "sha256:12689c3c80a2a9cc27b14fcfc7c386c97190e459b709bf355780830bcaf6262c",
+        "sha256:281de7dbae71dae59cbf86bb5d9832a53d16b397f2efd73775619e78c4eb6737",
+        "sha256:bb60ba13b4236c9ea029a8dae954f5ebb093d78013c90e217682734d34337ba1"
+      ],
+      "evidencePaths": [],
+      "diagnostics": [],
+      "summary": "Semantica 形成 1 个候选类、0 种候选关系。",
+      "completedAt": "2026-09-04T10:17:01.027Z"
+    },
+    {
+      "id": "run_149b6d10-49de-4834-975e-705a5aa4dcd1",
+      "kind": "publish-schema",
+      "status": "stale",
+      "startedAt": "2026-09-04T10:17:02.558Z",
+      "providerVersion": "0.6.7",
+      "definitionVersion": "0.1.0",
+      "definitionDigest": "sha256:25a656ea2ec24e1be2d75fe7803349087ca8cd988315f9fd891d5dcdd2489837",
+      "sourceDigests": [
+        "sha256:39ce56db847fc34ef6321eb76b873292bdd84f9da84975eb9b8e1e18aec50005",
+        "sha256:1f632800efbe4bd803739d82c2a8473535f81c679232b937dba03640712ca6d5",
+        "sha256:887c918918fe00735df8a0e0e8f64ea783e24fffc426bc6197453df9b6ba9f41",
+        "sha256:07dd0c8db0b36dd0ccd8d1b7d1973fbe021dabe1bc4e4b8e6273c5495b323c8f",
+        "sha256:1ccaac3c4926cdb5c8c29b7e229470ddac1a10060f58620acb6f27e355bf0559",
+        "sha256:a3c4ba0b00896568628deff031456e2f930f7f55fd9162654dcf7be03fffaaed",
+        "sha256:12689c3c80a2a9cc27b14fcfc7c386c97190e459b709bf355780830bcaf6262c",
+        "sha256:281de7dbae71dae59cbf86bb5d9832a53d16b397f2efd73775619e78c4eb6737",
+        "sha256:bb60ba13b4236c9ea029a8dae954f5ebb093d78013c90e217682734d34337ba1"
+      ],
+      "evidencePaths": [
+        ".fde/design/semantica/ontology.json",
+        ".fde/design/semantica/ontology.shacl.ttl"
+      ],
+      "diagnostics": [],
+      "summary": "已发布 Ontology 0.1.0，并生成 SHACL。",
+      "completedAt": "2026-09-04T10:17:03.907Z"
+    },
+    {
+      "id": "run_70f19735-7470-4249-ba61-d008f6d758f5",
+      "kind": "build",
+      "status": "stale",
+      "startedAt": "2026-09-04T10:19:34.398Z",
+      "providerVersion": "0.6.7",
+      "definitionVersion": "0.1.0",
+      "definitionDigest": "sha256:25a656ea2ec24e1be2d75fe7803349087ca8cd988315f9fd891d5dcdd2489837",
+      "sourceDigests": [
+        "sha256:39ce56db847fc34ef6321eb76b873292bdd84f9da84975eb9b8e1e18aec50005",
+        "sha256:1f632800efbe4bd803739d82c2a8473535f81c679232b937dba03640712ca6d5",
+        "sha256:887c918918fe00735df8a0e0e8f64ea783e24fffc426bc6197453df9b6ba9f41",
+        "sha256:07dd0c8db0b36dd0ccd8d1b7d1973fbe021dabe1bc4e4b8e6273c5495b323c8f",
+        "sha256:1ccaac3c4926cdb5c8c29b7e229470ddac1a10060f58620acb6f27e355bf0559",
+        "sha256:a3c4ba0b00896568628deff031456e2f930f7f55fd9162654dcf7be03fffaaed",
+        "sha256:12689c3c80a2a9cc27b14fcfc7c386c97190e459b709bf355780830bcaf6262c",
+        "sha256:281de7dbae71dae59cbf86bb5d9832a53d16b397f2efd73775619e78c4eb6737",
+        "sha256:bb60ba13b4236c9ea029a8dae954f5ebb093d78013c90e217682734d34337ba1"
+      ],
+      "evidencePaths": [
+        ".fde/design/semantica/graph.json",
+        ".fde/design/knowledge-graph.json"
+      ],
+      "diagnostics": [],
+      "summary": "Semantica 已构建 29 个实体、0 条关系；结构验证仍需独立运行。",
+      "completedAt": "2026-09-04T10:19:37.132Z"
+    },
+    {
+      "id": "run_de80ee94-4d37-4e79-8b89-ff21651ef3c8",
+      "kind": "validate",
+      "status": "stale",
+      "startedAt": "2026-09-04T10:19:38.722Z",
+      "providerVersion": "0.6.7",
+      "definitionVersion": "0.1.0",
+      "definitionDigest": "sha256:25a656ea2ec24e1be2d75fe7803349087ca8cd988315f9fd891d5dcdd2489837",
+      "sourceDigests": [
+        "sha256:39ce56db847fc34ef6321eb76b873292bdd84f9da84975eb9b8e1e18aec50005",
+        "sha256:1f632800efbe4bd803739d82c2a8473535f81c679232b937dba03640712ca6d5",
+        "sha256:887c918918fe00735df8a0e0e8f64ea783e24fffc426bc6197453df9b6ba9f41",
+        "sha256:07dd0c8db0b36dd0ccd8d1b7d1973fbe021dabe1bc4e4b8e6273c5495b323c8f",
+        "sha256:1ccaac3c4926cdb5c8c29b7e229470ddac1a10060f58620acb6f27e355bf0559",
+        "sha256:a3c4ba0b00896568628deff031456e2f930f7f55fd9162654dcf7be03fffaaed",
+        "sha256:12689c3c80a2a9cc27b14fcfc7c386c97190e459b709bf355780830bcaf6262c",
+        "sha256:281de7dbae71dae59cbf86bb5d9832a53d16b397f2efd73775619e78c4eb6737",
+        "sha256:bb60ba13b4236c9ea029a8dae954f5ebb093d78013c90e217682734d34337ba1"
+      ],
+      "evidencePaths": [
+        ".fde/design/semantica/runs/run_de80ee94-4d37-4e79-8b89-ff21651ef3c8.validation.json"
+      ],
+      "diagnostics": [
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Unknown entity type: DATE",
+        "Found 29 orphan nodes (no relationships)."
+      ],
+      "summary": "验证已执行，但存在结构问题或未通过的必答能力问题。",
+      "completedAt": "2026-09-04T10:19:40.092Z"
+    },
+    {
+      "id": "run_4c876b44-6901-4685-b4e8-4928e5e12905",
+      "kind": "extract",
+      "status": "succeeded",
+      "startedAt": "2026-09-04T10:25:12.537Z",
+      "providerVersion": "0.6.7",
+      "definitionVersion": "0.1.1-preview",
+      "definitionDigest": "sha256:8e81402d47f636984f86e6843567d9535527c73b6edd9bcc11901a3e494cca70",
+      "sourceDigests": [
+        "sha256:39ce56db847fc34ef6321eb76b873292bdd84f9da84975eb9b8e1e18aec50005",
+        "sha256:1f632800efbe4bd803739d82c2a8473535f81c679232b937dba03640712ca6d5",
+        "sha256:887c918918fe00735df8a0e0e8f64ea783e24fffc426bc6197453df9b6ba9f41",
+        "sha256:07dd0c8db0b36dd0ccd8d1b7d1973fbe021dabe1bc4e4b8e6273c5495b323c8f",
+        "sha256:1ccaac3c4926cdb5c8c29b7e229470ddac1a10060f58620acb6f27e355bf0559",
+        "sha256:a3c4ba0b00896568628deff031456e2f930f7f55fd9162654dcf7be03fffaaed",
+        "sha256:12689c3c80a2a9cc27b14fcfc7c386c97190e459b709bf355780830bcaf6262c",
+        "sha256:281de7dbae71dae59cbf86bb5d9832a53d16b397f2efd73775619e78c4eb6737",
+        "sha256:bb60ba13b4236c9ea029a8dae954f5ebb093d78013c90e217682734d34337ba1"
+      ],
+      "evidencePaths": [],
+      "diagnostics": [],
+      "summary": "形成 103 个实体候选、56 条关系候选。",
+      "completedAt": "2026-09-04T10:25:15.998Z"
+    },
+    {
+      "id": "run_13051c59-d6de-45a3-a794-dfff7d2a62ad",
+      "kind": "publish-schema",
+      "status": "succeeded",
+      "startedAt": "2026-09-04T10:26:05.189Z",
+      "providerVersion": "0.6.7",
+      "definitionVersion": "0.1.1-preview",
+      "definitionDigest": "sha256:8e81402d47f636984f86e6843567d9535527c73b6edd9bcc11901a3e494cca70",
+      "sourceDigests": [
+        "sha256:39ce56db847fc34ef6321eb76b873292bdd84f9da84975eb9b8e1e18aec50005",
+        "sha256:1f632800efbe4bd803739d82c2a8473535f81c679232b937dba03640712ca6d5",
+        "sha256:887c918918fe00735df8a0e0e8f64ea783e24fffc426bc6197453df9b6ba9f41",
+        "sha256:07dd0c8db0b36dd0ccd8d1b7d1973fbe021dabe1bc4e4b8e6273c5495b323c8f",
+        "sha256:1ccaac3c4926cdb5c8c29b7e229470ddac1a10060f58620acb6f27e355bf0559",
+        "sha256:a3c4ba0b00896568628deff031456e2f930f7f55fd9162654dcf7be03fffaaed",
+        "sha256:12689c3c80a2a9cc27b14fcfc7c386c97190e459b709bf355780830bcaf6262c",
+        "sha256:281de7dbae71dae59cbf86bb5d9832a53d16b397f2efd73775619e78c4eb6737",
+        "sha256:bb60ba13b4236c9ea029a8dae954f5ebb093d78013c90e217682734d34337ba1"
+      ],
+      "evidencePaths": [
+        ".fde/design/semantica/ontology.json",
+        ".fde/design/semantica/ontology.shacl.ttl"
+      ],
+      "diagnostics": [],
+      "summary": "已发布 Ontology 0.1.1-preview，并生成 SHACL。",
+      "completedAt": "2026-09-04T10:26:07.980Z"
+    },
+    {
+      "id": "run_198308c9-8f7b-4e79-b675-cca6417adf55",
+      "kind": "build",
+      "status": "succeeded",
+      "startedAt": "2026-09-04T10:26:07.989Z",
+      "providerVersion": "0.6.7",
+      "definitionVersion": "0.1.1-preview",
+      "definitionDigest": "sha256:8e81402d47f636984f86e6843567d9535527c73b6edd9bcc11901a3e494cca70",
+      "sourceDigests": [
+        "sha256:39ce56db847fc34ef6321eb76b873292bdd84f9da84975eb9b8e1e18aec50005",
+        "sha256:1f632800efbe4bd803739d82c2a8473535f81c679232b937dba03640712ca6d5",
+        "sha256:887c918918fe00735df8a0e0e8f64ea783e24fffc426bc6197453df9b6ba9f41",
+        "sha256:07dd0c8db0b36dd0ccd8d1b7d1973fbe021dabe1bc4e4b8e6273c5495b323c8f",
+        "sha256:1ccaac3c4926cdb5c8c29b7e229470ddac1a10060f58620acb6f27e355bf0559",
+        "sha256:a3c4ba0b00896568628deff031456e2f930f7f55fd9162654dcf7be03fffaaed",
+        "sha256:12689c3c80a2a9cc27b14fcfc7c386c97190e459b709bf355780830bcaf6262c",
+        "sha256:281de7dbae71dae59cbf86bb5d9832a53d16b397f2efd73775619e78c4eb6737",
+        "sha256:bb60ba13b4236c9ea029a8dae954f5ebb093d78013c90e217682734d34337ba1"
+      ],
+      "evidencePaths": [
+        ".fde/design/semantica/graph.json",
+        ".fde/design/knowledge-graph.json"
+      ],
+      "diagnostics": [],
+      "summary": "Semantica 已构建 56 个实体、56 条关系；结构验证仍需独立运行。",
+      "completedAt": "2026-09-04T10:26:09.351Z"
+    },
+    {
+      "id": "run_4272abd9-e373-4460-b840-de6cad1860b7",
+      "kind": "validate",
+      "status": "succeeded",
+      "startedAt": "2026-09-04T10:26:26.825Z",
+      "providerVersion": "0.6.7",
+      "definitionVersion": "0.1.1-preview",
+      "definitionDigest": "sha256:8e81402d47f636984f86e6843567d9535527c73b6edd9bcc11901a3e494cca70",
+      "sourceDigests": [
+        "sha256:39ce56db847fc34ef6321eb76b873292bdd84f9da84975eb9b8e1e18aec50005",
+        "sha256:1f632800efbe4bd803739d82c2a8473535f81c679232b937dba03640712ca6d5",
+        "sha256:887c918918fe00735df8a0e0e8f64ea783e24fffc426bc6197453df9b6ba9f41",
+        "sha256:07dd0c8db0b36dd0ccd8d1b7d1973fbe021dabe1bc4e4b8e6273c5495b323c8f",
+        "sha256:1ccaac3c4926cdb5c8c29b7e229470ddac1a10060f58620acb6f27e355bf0559",
+        "sha256:a3c4ba0b00896568628deff031456e2f930f7f55fd9162654dcf7be03fffaaed",
+        "sha256:12689c3c80a2a9cc27b14fcfc7c386c97190e459b709bf355780830bcaf6262c",
+        "sha256:281de7dbae71dae59cbf86bb5d9832a53d16b397f2efd73775619e78c4eb6737",
+        "sha256:bb60ba13b4236c9ea029a8dae954f5ebb093d78013c90e217682734d34337ba1"
+      ],
+      "evidencePaths": [
+        ".fde/design/semantica/runs/run_4272abd9-e373-4460-b840-de6cad1860b7.validation.json"
+      ],
+      "diagnostics": [
+        "Found 4 orphan nodes (no relationships)."
+      ],
+      "summary": "结构校验与全部必答能力问题查询已通过。",
+      "completedAt": "2026-09-04T10:26:29.179Z"
+    },
+    {
+      "id": "run_2a5c1986-a8de-4262-86df-8eb0bf056f12",
+      "kind": "context",
+      "status": "succeeded",
+      "startedAt": "2026-09-07T02:44:35.895Z",
+      "providerVersion": "0.6.7",
+      "definitionVersion": "0.1.1-preview",
+      "definitionDigest": "sha256:8e81402d47f636984f86e6843567d9535527c73b6edd9bcc11901a3e494cca70",
+      "sourceDigests": [
+        "sha256:39ce56db847fc34ef6321eb76b873292bdd84f9da84975eb9b8e1e18aec50005",
+        "sha256:1f632800efbe4bd803739d82c2a8473535f81c679232b937dba03640712ca6d5",
+        "sha256:887c918918fe00735df8a0e0e8f64ea783e24fffc426bc6197453df9b6ba9f41",
+        "sha256:07dd0c8db0b36dd0ccd8d1b7d1973fbe021dabe1bc4e4b8e6273c5495b323c8f",
+        "sha256:1ccaac3c4926cdb5c8c29b7e229470ddac1a10060f58620acb6f27e355bf0559",
+        "sha256:a3c4ba0b00896568628deff031456e2f930f7f55fd9162654dcf7be03fffaaed",
+        "sha256:12689c3c80a2a9cc27b14fcfc7c386c97190e459b709bf355780830bcaf6262c",
+        "sha256:281de7dbae71dae59cbf86bb5d9832a53d16b397f2efd73775619e78c4eb6737",
+        "sha256:bb60ba13b4236c9ea029a8dae954f5ebb093d78013c90e217682734d34337ba1"
+      ],
+      "evidencePaths": [
+        ".fde/design/semantica/runs/run_2a5c1986-a8de-4262-86df-8eb0bf056f12.context.json"
+      ],
+      "diagnostics": [],
+      "summary": "受控查询返回 8 个实体、5 条关系。",
+      "completedAt": "2026-09-07T02:44:36.022Z"
+    },
+    {
+      "id": "run_42baf985-142d-41da-ae9e-461d843106c9",
+      "kind": "context",
+      "status": "failed",
+      "startedAt": "2026-09-07T02:44:51.248Z",
+      "providerVersion": "0.6.7",
+      "definitionVersion": "0.1.1-preview",
+      "definitionDigest": "sha256:8e81402d47f636984f86e6843567d9535527c73b6edd9bcc11901a3e494cca70",
+      "sourceDigests": [
+        "sha256:39ce56db847fc34ef6321eb76b873292bdd84f9da84975eb9b8e1e18aec50005",
+        "sha256:1f632800efbe4bd803739d82c2a8473535f81c679232b937dba03640712ca6d5",
+        "sha256:887c918918fe00735df8a0e0e8f64ea783e24fffc426bc6197453df9b6ba9f41",
+        "sha256:07dd0c8db0b36dd0ccd8d1b7d1973fbe021dabe1bc4e4b8e6273c5495b323c8f",
+        "sha256:1ccaac3c4926cdb5c8c29b7e229470ddac1a10060f58620acb6f27e355bf0559",
+        "sha256:a3c4ba0b00896568628deff031456e2f930f7f55fd9162654dcf7be03fffaaed",
+        "sha256:12689c3c80a2a9cc27b14fcfc7c386c97190e459b709bf355780830bcaf6262c",
+        "sha256:281de7dbae71dae59cbf86bb5d9832a53d16b397f2efd73775619e78c4eb6737",
+        "sha256:bb60ba13b4236c9ea029a8dae954f5ebb093d78013c90e217682734d34337ba1"
+      ],
+      "evidencePaths": [],
+      "diagnostics": [
+        "当前受控查询没有返回满足权限和置信度边界的实体。"
+      ],
+      "summary": "当前受控查询没有返回满足权限和置信度边界的实体。",
+      "completedAt": "2026-09-07T02:44:51.309Z"
+    },
+    {
+      "id": "run_f5c64296-09cd-450e-a74a-e4b4d94dd443",
+      "kind": "context",
+      "status": "succeeded",
+      "startedAt": "2026-09-07T02:45:22.448Z",
+      "providerVersion": "0.6.7",
+      "definitionVersion": "0.1.1-preview",
+      "definitionDigest": "sha256:8e81402d47f636984f86e6843567d9535527c73b6edd9bcc11901a3e494cca70",
+      "sourceDigests": [
+        "sha256:39ce56db847fc34ef6321eb76b873292bdd84f9da84975eb9b8e1e18aec50005",
+        "sha256:1f632800efbe4bd803739d82c2a8473535f81c679232b937dba03640712ca6d5",
+        "sha256:887c918918fe00735df8a0e0e8f64ea783e24fffc426bc6197453df9b6ba9f41",
+        "sha256:07dd0c8db0b36dd0ccd8d1b7d1973fbe021dabe1bc4e4b8e6273c5495b323c8f",
+        "sha256:1ccaac3c4926cdb5c8c29b7e229470ddac1a10060f58620acb6f27e355bf0559",
+        "sha256:a3c4ba0b00896568628deff031456e2f930f7f55fd9162654dcf7be03fffaaed",
+        "sha256:12689c3c80a2a9cc27b14fcfc7c386c97190e459b709bf355780830bcaf6262c",
+        "sha256:281de7dbae71dae59cbf86bb5d9832a53d16b397f2efd73775619e78c4eb6737",
+        "sha256:bb60ba13b4236c9ea029a8dae954f5ebb093d78013c90e217682734d34337ba1"
+      ],
+      "evidencePaths": [
+        ".fde/design/semantica/runs/run_f5c64296-09cd-450e-a74a-e4b4d94dd443.context.json"
+      ],
+      "diagnostics": [],
+      "summary": "受控查询返回 9 个实体、9 条关系。",
+      "completedAt": "2026-09-07T02:45:22.516Z"
+    },
+    {
+      "id": "run_16349213-1635-4222-ba3d-d59d10efc5b1",
+      "kind": "slice",
+      "status": "succeeded",
+      "startedAt": "2026-09-07T02:45:57.413Z",
+      "completedAt": "2026-09-07T02:45:57.413Z",
+      "providerVersion": "0.6.7",
+      "definitionVersion": "0.1.1-preview",
+      "definitionDigest": "sha256:8e81402d47f636984f86e6843567d9535527c73b6edd9bcc11901a3e494cca70",
+      "sourceDigests": [
+        "sha256:39ce56db847fc34ef6321eb76b873292bdd84f9da84975eb9b8e1e18aec50005",
+        "sha256:1f632800efbe4bd803739d82c2a8473535f81c679232b937dba03640712ca6d5",
+        "sha256:887c918918fe00735df8a0e0e8f64ea783e24fffc426bc6197453df9b6ba9f41",
+        "sha256:07dd0c8db0b36dd0ccd8d1b7d1973fbe021dabe1bc4e4b8e6273c5495b323c8f",
+        "sha256:1ccaac3c4926cdb5c8c29b7e229470ddac1a10060f58620acb6f27e355bf0559",
+        "sha256:a3c4ba0b00896568628deff031456e2f930f7f55fd9162654dcf7be03fffaaed",
+        "sha256:12689c3c80a2a9cc27b14fcfc7c386c97190e459b709bf355780830bcaf6262c",
+        "sha256:281de7dbae71dae59cbf86bb5d9832a53d16b397f2efd73775619e78c4eb6737",
+        "sha256:bb60ba13b4236c9ea029a8dae954f5ebb093d78013c90e217682734d34337ba1"
+      ],
+      "summary": "脚本实际运行并 8 项断言全部通过(exit 0)：duplicateCandidate=true(同店 NJ-003、间隔 2 分钟、within 120min)；P0/全店人工升级门触发；dispatch=false(AR-306 未授权)；无费用承诺；候选不读取 final_domain/final_priority/final_owner/final_vendor/final_decision；草稿状态=local_pending_human(未派单、未写 WorkOrder、未发通知)；独立读回与写入一致；operation_id 幂等键存在。终点为本地草稿，未执行任何外部写入。",
+      "evidencePaths": [
+        "fde-deliverables/04-solution-design/vertical-slice/run_slice.js",
+        "fde-deliverables/04-solution-design/vertical-slice/slice-result.json"
+      ],
+      "diagnostics": []
+    }
+  ],
+  "evidenceDigest": "sha256:7aea2d85fc02ceca5bd1a85ba3ca9bc7f3462943a8a2da116df96e55a81173bd",
+  "route": {
+    "execution": {
+      "mechanism": "hybrid",
+      "label": "混合机制",
+      "rationale": "证据 src_3b35…/src_5cff…/src_1acf…：P0/费用/权限/重复为确定性硬门（规则），流程/审计为软件，建议依据用检索+SourceId，自由文本抽取用单有界模型；多 Agent 与纯人工本期不采用。已由 FDE 接受（2026-09-04）。"
+    },
+    "semantics": {
+      "mode": "ontology",
+      "rationale": "必须构建"
+    },
+    "conclusion": "validated"
+  },
+  "validation": {
+    "runId": "run_4272abd9-e373-4460-b840-de6cad1860b7",
+    "status": "passed",
+    "checkedAt": "2026-09-04T10:26:29.175Z",
+    "graphRevision": "sha256:58ee663b62eec5cc338b7570616aaea479eea99e31baf545e5069442dea076a6",
+    "definitionDigest": "sha256:8e81402d47f636984f86e6843567d9535527c73b6edd9bcc11901a3e494cca70",
+    "structuralValid": true,
+    "issues": [
+      {
+        "code": "ORPHAN_NODES",
+        "message": "Found 4 orphan nodes (no relationships).",
+        "severity": "warning",
+        "element_id": null,
+        "element_type": null,
+        "details": {
+          "count": 4,
+          "ids": [
+            "ent_c71428e7107b90588c35f82b",
+            "ent_e24abea7ad26d2e77edc1917",
+            "ent_afa1215c9e95cf036130e9cd",
+            "ent_e9d041a99dea102dd21f22e0"
+          ]
+        }
+      }
+    ],
+    "questions": [
+      {
+        "questionId": "cq_01",
+        "status": "passed",
+        "answerCount": 2,
+        "nodeIds": [
+          "ent_073ccfcd1ff083b5d56d8356",
+          "ent_33ca241f15038efee9de4447",
+          "ent_a3ce9a5469b6fee475ac3487",
+          "ent_bb259db0dee3a95402a15591"
+        ],
+        "edgeIds": [
+          "rel_21b9b233b12a6bb4cedd7c14",
+          "rel_38580c32b09d94cfe8fc4542"
+        ],
+        "sourceRefs": [
+          "src_a44e36460acd45eea1820367c61d0c8c",
+          "src_aa4217d373de4543abc6cf718540becb",
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "message": "真实查询返回 2 项，要求至少 2 项。"
+      },
+      {
+        "questionId": "cq_02",
+        "status": "passed",
+        "answerCount": 4,
+        "nodeIds": [
+          "ent_073ccfcd1ff083b5d56d8356",
+          "ent_a3ce9a5469b6fee475ac3487",
+          "ent_bd5b71f30a4d471281844c89"
+        ],
+        "edgeIds": [
+          "rel_21b9b233b12a6bb4cedd7c14",
+          "rel_38580c32b09d94cfe8fc4542",
+          "rel_56834954583621b56225bddd",
+          "rel_c6809bcd1b6afea8ce3d2a55"
+        ],
+        "sourceRefs": [
+          "src_a44e36460acd45eea1820367c61d0c8c",
+          "src_aa4217d373de4543abc6cf718540becb",
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "message": "真实查询返回 4 项，要求至少 1 项。"
+      },
+      {
+        "questionId": "cq_03",
+        "status": "passed",
+        "answerCount": 7,
+        "nodeIds": [
+          "ent_21d54b5cd9c7f17d1da39302",
+          "ent_26c3bb3810318eafe7813674",
+          "ent_404f21668ee8305fd65b2e88",
+          "ent_63662e764427ec1c1dfb0557",
+          "ent_67955b94a94d3af8d91d3345",
+          "ent_7c27d2f5dd74020faa8b8a0b",
+          "ent_c5d535fc9bfa3d200aed1591",
+          "ent_e5cccee5e834e4e5c98e6f69",
+          "ent_e7f5b1b11ee8863de282f3cb",
+          "ent_e9c9d177fbebd40a7a687a96",
+          "ent_fd34c84e9072e4b7feca91d8"
+        ],
+        "edgeIds": [
+          "rel_2c44ea380e3a0802603a148b",
+          "rel_4466b08960a9a00ba2cb3189",
+          "rel_5c7b72f58f1c07546a5228a7",
+          "rel_90356d586a56a86d69139de7",
+          "rel_a3d8848ab1d06412a46b9102",
+          "rel_af3d3665da65d9b2b6a9fc89",
+          "rel_fdd1eabb7d577c9793d98a6f"
+        ],
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01",
+          "src_a44e36460acd45eea1820367c61d0c8c",
+          "src_afb39cee4d30447892570e9db6c65aad",
+          "src_daa34f3441d04e86913e82f5d42143d9",
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "message": "真实查询返回 7 项，要求至少 1 项。"
+      },
+      {
+        "questionId": "cq_04",
+        "status": "passed",
+        "answerCount": 4,
+        "nodeIds": [
+          "ent_1d919db979f30e8872fb38fe",
+          "ent_26c3bb3810318eafe7813674",
+          "ent_279b589c3ebc1c205cd8d879",
+          "ent_67955b94a94d3af8d91d3345",
+          "ent_7c27d2f5dd74020faa8b8a0b",
+          "ent_c0171164fd78d189f00c4923",
+          "ent_c5d535fc9bfa3d200aed1591",
+          "ent_e65d84312c9ba6144a13c00e"
+        ],
+        "edgeIds": [
+          "rel_602f7183d44fbbdf06336735",
+          "rel_65db652b6c21ec1be5593517",
+          "rel_a6b4ab1e83f87b0b6ecb620f",
+          "rel_ae6f49af4df0d62f456a13e7"
+        ],
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01",
+          "src_daa34f3441d04e86913e82f5d42143d9",
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "message": "真实查询返回 4 项，要求至少 1 项。"
+      },
+      {
+        "questionId": "cq_05",
+        "status": "passed",
+        "answerCount": 4,
+        "nodeIds": [
+          "ent_afa1215c9e95cf036130e9cd",
+          "ent_c71428e7107b90588c35f82b",
+          "ent_e24abea7ad26d2e77edc1917",
+          "ent_e9d041a99dea102dd21f22e0"
+        ],
+        "edgeIds": [],
+        "sourceRefs": [
+          "src_1acfac3bc13a469c95eff2249d358721"
+        ],
+        "message": "真实查询返回 4 项，要求至少 1 项。"
+      },
+      {
+        "questionId": "cq_06",
+        "status": "passed",
+        "answerCount": 10,
+        "nodeIds": [
+          "ent_26c3bb3810318eafe7813674",
+          "ent_67955b94a94d3af8d91d3345",
+          "ent_7c27d2f5dd74020faa8b8a0b",
+          "ent_8efe1b3b92f2898b005e2a31",
+          "ent_a75638df5ceadd291139213a",
+          "ent_acc67ea2800b69fcefe06959",
+          "ent_c5d535fc9bfa3d200aed1591",
+          "ent_d89aee53461879040fe8e67e"
+        ],
+        "edgeIds": [
+          "rel_11746e6243cad1538860c5d4",
+          "rel_12ea8264f56cc82845747f60",
+          "rel_2c44ea380e3a0802603a148b",
+          "rel_5c7b72f58f1c07546a5228a7",
+          "rel_79da00010c0148e6e11b61c4",
+          "rel_811c948436f86e58d9f99dda",
+          "rel_90356d586a56a86d69139de7",
+          "rel_a3d8848ab1d06412a46b9102",
+          "rel_af3d3665da65d9b2b6a9fc89",
+          "rel_c8ba3fea685b657aba75c2e7"
+        ],
+        "sourceRefs": [
+          "src_701f85b610e049e0ac2a9698b000cc01",
+          "src_a44e36460acd45eea1820367c61d0c8c",
+          "src_afb39cee4d30447892570e9db6c65aad",
+          "src_daa34f3441d04e86913e82f5d42143d9",
+          "src_ffdb0d3c652741fcb960e7324bcd08a1"
+        ],
+        "message": "真实查询返回 10 项，要求至少 1 项。"
+      }
+    ]
+  },
+  "context": {
+    "runId": "run_f5c64296-09cd-450e-a74a-e4b4d94dd443",
+    "status": "ready",
+    "createdAt": "2026-09-07T02:45:22.511Z",
+    "seedNodeId": "ent_bd5b71f30a4d471281844c89",
+    "query": "南京新街口店 NJ-003 收银中断：Incident INC-CAND-NJXJK-20260821-01 关联的 R-1002/R-1003 报修、WO-88419/WO-88422 工单、网络告警与审批链",
+    "schemaVersion": "0.1.1-preview",
+    "graphRevision": "sha256:58ee663b62eec5cc338b7570616aaea479eea99e31baf545e5069442dea076a6",
+    "entities": [
+      {
+        "id": "ent_a3ce9a5469b6fee475ac3487",
+        "name": "WO-88422",
+        "type": "WorkOrder",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_a44e36460acd45eea1820367c61d0c8c",
+          "src_ffdb0d3c652741fcb960e7324bcd08a1",
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "summary": "WO-88422",
+        "validFrom": null,
+        "validUntil": null,
+        "properties": {
+          "work_order_id": "WO-88422"
+        }
+      },
+      {
+        "id": "ent_073ccfcd1ff083b5d56d8356",
+        "name": "WO-88419",
+        "type": "WorkOrder",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_a44e36460acd45eea1820367c61d0c8c",
+          "src_ffdb0d3c652741fcb960e7324bcd08a1",
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "summary": "WO-88419",
+        "validFrom": null,
+        "validUntil": null,
+        "properties": {
+          "work_order_id": "WO-88419"
+        }
+      },
+      {
+        "id": "ent_010d4d36c5c2372bc85cf199",
+        "name": "S-NJ-011",
+        "type": "Store",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "summary": "S-NJ-011",
+        "validFrom": null,
+        "validUntil": null,
+        "properties": {
+          "store_id": "S-NJ-011"
+        }
+      },
+      {
+        "id": "ent_bd5b71f30a4d471281844c89",
+        "name": "INC-CAND-NJXJK-20260821-01",
+        "type": "Incident",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "summary": "INC-CAND-NJXJK-20260821-01",
+        "validFrom": null,
+        "validUntil": null,
+        "properties": {
+          "incident_id": "INC-CAND-NJXJK-20260821-01"
+        }
+      },
+      {
+        "id": "ent_7ad0bbaadf5aab86fcfa1db8",
+        "name": "ALERT-NJXJK-68102",
+        "type": "Alert",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "summary": "ALERT-NJXJK-68102",
+        "validFrom": null,
+        "validUntil": null,
+        "properties": {
+          "alert_id": "ALERT-NJXJK-68102"
+        }
+      },
+      {
+        "id": "ent_bb259db0dee3a95402a15591",
+        "name": "R1002",
+        "type": "Report",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "summary": "R1002",
+        "validFrom": null,
+        "validUntil": null,
+        "properties": {
+          "report_id": "R1002"
+        }
+      },
+      {
+        "id": "ent_33ca241f15038efee9de4447",
+        "name": "R1003",
+        "type": "Report",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "summary": "R1003",
+        "validFrom": null,
+        "validUntil": null,
+        "properties": {
+          "report_id": "R1003"
+        }
+      },
+      {
+        "id": "ent_42d8b46f93e0a6aaea6d2745",
+        "name": "MSG-WECOM-908811",
+        "type": "Message",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "summary": "MSG-WECOM-908811",
+        "validFrom": null,
+        "validUntil": null,
+        "properties": {
+          "message_id": "MSG-WECOM-908811"
+        }
+      },
+      {
+        "id": "ent_3a37da3f5299ebb929022501",
+        "name": "MSG-WECOM-908827",
+        "type": "Message",
+        "confidence": 0.82,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "summary": "MSG-WECOM-908827",
+        "validFrom": null,
+        "validUntil": null,
+        "properties": {
+          "message_id": "MSG-WECOM-908827"
+        }
+      }
+    ],
+    "relationships": [
+      {
+        "id": "rel_d97dc5babcfd6bb5e2c0e3ef",
+        "source": "ent_42d8b46f93e0a6aaea6d2745",
+        "target": "ent_bb259db0dee3a95402a15591",
+        "type": "rel_message_report",
+        "label": "消息形成报修",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "validFrom": null,
+        "validUntil": null
+      },
+      {
+        "id": "rel_c692e15afb11dd36490a04ff",
+        "source": "ent_3a37da3f5299ebb929022501",
+        "target": "ent_33ca241f15038efee9de4447",
+        "type": "rel_message_report",
+        "label": "消息形成报修",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "validFrom": null,
+        "validUntil": null
+      },
+      {
+        "id": "rel_21b9b233b12a6bb4cedd7c14",
+        "source": "ent_bb259db0dee3a95402a15591",
+        "target": "ent_073ccfcd1ff083b5d56d8356",
+        "type": "rel_report_workorder",
+        "label": "报修关联工单",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "validFrom": null,
+        "validUntil": null
+      },
+      {
+        "id": "rel_38580c32b09d94cfe8fc4542",
+        "source": "ent_33ca241f15038efee9de4447",
+        "target": "ent_a3ce9a5469b6fee475ac3487",
+        "type": "rel_report_workorder",
+        "label": "报修关联工单",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "validFrom": null,
+        "validUntil": null
+      },
+      {
+        "id": "rel_56834954583621b56225bddd",
+        "source": "ent_bd5b71f30a4d471281844c89",
+        "target": "ent_bb259db0dee3a95402a15591",
+        "type": "rel_incident_report",
+        "label": "故障候选包含报修",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "validFrom": null,
+        "validUntil": null
+      },
+      {
+        "id": "rel_c6809bcd1b6afea8ce3d2a55",
+        "source": "ent_bd5b71f30a4d471281844c89",
+        "target": "ent_33ca241f15038efee9de4447",
+        "type": "rel_incident_report",
+        "label": "故障候选包含报修",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "validFrom": null,
+        "validUntil": null
+      },
+      {
+        "id": "rel_6d8c377987d8563ba7368155",
+        "source": "ent_bd5b71f30a4d471281844c89",
+        "target": "ent_7ad0bbaadf5aab86fcfa1db8",
+        "type": "rel_incident_alert",
+        "label": "故障候选包含告警",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "validFrom": null,
+        "validUntil": null
+      },
+      {
+        "id": "rel_d7a330d0591ad27a4f7d427a",
+        "source": "ent_bb259db0dee3a95402a15591",
+        "target": "ent_010d4d36c5c2372bc85cf199",
+        "type": "rel_report_store",
+        "label": "报修发生于门店",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "validFrom": null,
+        "validUntil": null
+      },
+      {
+        "id": "rel_0956b6677c0c9577af4b4ba2",
+        "source": "ent_33ca241f15038efee9de4447",
+        "target": "ent_010d4d36c5c2372bc85cf199",
+        "type": "rel_report_store",
+        "label": "报修发生于门店",
+        "confidence": 0.78,
+        "sourceRefs": [
+          "src_aa4217d373de4543abc6cf718540becb"
+        ],
+        "validFrom": null,
+        "validUntil": null
+      }
+    ],
+    "constraints": [
+      "每个实体和关系必须保留当前项目 SourceId，不以展示标签替代原始来源。",
+      "合同、设备身份和工单信息冲突时并列保留，不自动覆盖或合并。",
+      "final_domain、final_priority、final_owner、final_vendor、final_decision 不进入抽取和图谱。",
+      "消息、告警、报修和工单分别保留材料中的记录时间。",
+      "合同、值班和政策的生效时间与记录时间分开；无正文时只保留候选状态。"
+    ],
+    "derivedFacts": [],
+    "sources": [
+      "src_a44e36460acd45eea1820367c61d0c8c",
+      "src_aa4217d373de4543abc6cf718540becb",
+      "src_ffdb0d3c652741fcb960e7324bcd08a1"
+    ],
+    "permissionScope": "仅用于当前项目第四阶段的本体候选抽取、Schema 审阅、项目隔离图谱构建、只读验证和 Agent 有界上下文；禁止生产写入、正式派单、消息通知和费用承诺。\n\n  混合材料的权威性不完全相同，当前界面又只能统一选择一个级别，第一轮建议选择“辅助依据”，避免把所有文件误标为权威事实。"
+  },
+  "slice": {
+    "runId": "run_16349213-1635-4222-ba3d-d59d10efc5b1",
+    "status": "succeeded",
+    "createdAt": "2026-09-07T02:45:57.413Z",
+    "task": "华东一区南京新街口店(NJ-003/S-NJ-011) 2026-08-21 收银中断：从真实报修文本 R-1003 出发，经重复候选判定(→WO-88419/R1002)、P0/全店停业人工升级门、禁止派单门、校验图谱上下文检索、生成候选(故障域/优先级候选,不含 final_*)、本地草稿、独立读回，到达\"本地草稿+未执行外部写入\"的可验证结果。",
+    "result": "脚本实际运行并 8 项断言全部通过(exit 0)：duplicateCandidate=true(同店 NJ-003、间隔 2 分钟、within 120min)；P0/全店人工升级门触发；dispatch=false(AR-306 未授权)；无费用承诺；候选不读取 final_domain/final_priority/final_owner/final_vendor/final_decision；草稿状态=local_pending_human(未派单、未写 WorkOrder、未发通知)；独立读回与写入一致；operation_id 幂等键存在。终点为本地草稿，未执行任何外部写入。",
+    "contextRunId": "run_f5c64296-09cd-450e-a74a-e4b4d94dd443",
+    "evidenceRefs": [
+      "fde-deliverables/04-solution-design/vertical-slice/run_slice.js",
+      "fde-deliverables/04-solution-design/vertical-slice/slice-result.json"
+    ],
+    "diagnostics": []
+  },
+  "decision": {
+    "id": "decision_ab52f1e9-c9e0-47ef-ac85-c0ed1037aa34",
+    "outcome": "go",
+    "rationale": "开发验证用途：根据项目用户本轮明确要求“快速做下一阶段的开发和验证，帮我做一下数据让我过去”，代为提交限定范围的 Go。依据现有 Schema 0.1.1-preview、56 实体/56 关系图谱、同版本六项能力问题验证、受控上下文 run_f5c64296-09cd-450e-a74a-e4b4d94dd443，以及 slice-result.json 已记录的 8 项通过检查，进入第五阶段 PoC 与 Eval 做进一步开发验证。本次推进不代表客户正式验收或生产上线批准；仅认可当前本地草稿闭环。保留 AR-305 Sandbox 草稿写权限待批及 AR-306 正式派单未授权限制，禁止生产写入、正式派单、消息通知和费用承诺；未知证据及权限仍须后续核实。未补造验证结果，未修改获准动作边界。",
+    "decidedAt": "2026-09-07T02:55:00.642Z",
+    "workspaceRevision": 43,
+    "evidenceDigest": "sha256:7aea2d85fc02ceca5bd1a85ba3ca9bc7f3462943a8a2da116df96e55a81173bd",
+    "routeConclusion": "validated",
+    "semanticMode": "ontology",
+    "definitionDigest": "sha256:8e81402d47f636984f86e6843567d9535527c73b6edd9bcc11901a3e494cca70",
+    "graphRevision": "sha256:58ee663b62eec5cc338b7570616aaea479eea99e31baf545e5069442dea076a6",
+    "sliceRunId": "run_16349213-1635-4222-ba3d-d59d10efc5b1"
+  }
+}

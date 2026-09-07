@@ -1,0 +1,148 @@
+{
+  "version": 1,
+  "revision": 1,
+  "title": "门店维修工作台 · 本地闭环架构",
+  "summary": "依据当前 backend 与 frontend 源码发布的候选架构：只读已有资料和 Semantica 快照，规则分析后经人工确认保存本地草稿；不表示 Semantica 在线服务、LLM 或生产系统已接入。",
+  "status": "candidate",
+  "updatedAt": "2026-09-07T05:01:32.450Z",
+  "groups": [
+    {
+      "id": "interaction",
+      "label": "用户操作"
+    },
+    {
+      "id": "local",
+      "label": "本地服务"
+    },
+    {
+      "id": "evidence",
+      "label": "只读项目依据"
+    },
+    {
+      "id": "records",
+      "label": "本地结果"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "web",
+      "label": "维修工作台页面",
+      "kind": "entry",
+      "group": "interaction",
+      "note": "frontend/：报修、图谱、资料、草稿与运行记录"
+    },
+    {
+      "id": "human",
+      "label": "人工核对与确认",
+      "kind": "entry",
+      "group": "interaction",
+      "note": "填写操作人，核对分析版本；只确认本地草稿"
+    },
+    {
+      "id": "http",
+      "label": "同源 HTTP API",
+      "kind": "core",
+      "group": "local",
+      "note": "backend/server.mjs · 127.0.0.1:4177"
+    },
+    {
+      "id": "catalog",
+      "label": "资料白名单读取",
+      "kind": "core",
+      "group": "local",
+      "note": "backend/catalog.mjs · 文件与 SourceId 映射及指纹"
+    },
+    {
+      "id": "rules",
+      "label": "规则分析与两跳查询",
+      "kind": "core",
+      "group": "local",
+      "note": "backend/workflow.mjs 与 catalog.neighborhood；未知不补猜"
+    },
+    {
+      "id": "materials",
+      "label": "35 份原始资料",
+      "kind": "store",
+      "group": "evidence",
+      "note": "fde-resources/ 与 .fde/sources/；脱敏案例不读取历史答案"
+    },
+    {
+      "id": "graph",
+      "label": "现有 Semantica 图谱",
+      "kind": "store",
+      "group": "evidence",
+      "note": ".fde/design/knowledge-graph.json · 56 实体 / 56 关系，只读快照"
+    },
+    {
+      "id": "state",
+      "label": "本地运行记录",
+      "kind": "store",
+      "group": "records",
+      "note": ".runtime/maintenance/state.json · 原子保存报修、分析、草稿"
+    },
+    {
+      "id": "draft",
+      "label": "可读回的本地草稿",
+      "kind": "output",
+      "group": "records",
+      "note": "保留来源、图谱版本与操作人；externalWrite=false，无正式派单"
+    }
+  ],
+  "edges": [
+    {
+      "from": "web",
+      "to": "http",
+      "label": "同源 API 请求"
+    },
+    {
+      "from": "http",
+      "to": "catalog",
+      "label": "加载材料"
+    },
+    {
+      "from": "catalog",
+      "to": "materials",
+      "label": "只读"
+    },
+    {
+      "from": "catalog",
+      "to": "graph",
+      "label": "只读"
+    },
+    {
+      "from": "catalog",
+      "to": "rules",
+      "label": "输入与来源"
+    },
+    {
+      "from": "http",
+      "to": "rules",
+      "label": "运行分析"
+    },
+    {
+      "from": "rules",
+      "to": "state",
+      "label": "由服务保存分析"
+    },
+    {
+      "from": "web",
+      "to": "human",
+      "label": "核对建议和证据"
+    },
+    {
+      "from": "human",
+      "to": "http",
+      "label": "确认后保存草稿"
+    },
+    {
+      "from": "http",
+      "to": "state",
+      "label": "版本校验与幂等写入"
+    },
+    {
+      "from": "state",
+      "to": "draft",
+      "label": "独立读回 / 导出"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_1acfac3bc13a469c95eff2249d358721",
+  "originalName": "11-access-boundary-matrix.xml",
+  "storedName": "11-access-boundary-matrix.xml",
+  "relativePath": "fde-resources/11-access-boundary-matrix.xml",
+  "mimeType": "application/xml; charset=utf-8",
+  "extension": "xml",
+  "bytes": 3075,
+  "createdAt": "2026-09-04T04:25:36.816Z",
+  "modifiedAt": "2026-09-04T04:25:36.817Z",
+  "mtimeMs": 1788495936816.558,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 3075,
+    "sourceMtimeMs": 1788495936816.558,
+    "derivedPath": ".fde/derived/src_1acfac3bc13a469c95eff2249d358721.md",
+    "updatedAt": "2026-09-04T04:25:36.862Z"
+  }
+}

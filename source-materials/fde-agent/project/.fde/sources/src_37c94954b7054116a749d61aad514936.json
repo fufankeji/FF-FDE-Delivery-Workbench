@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_37c94954b7054116a749d61aad514936",
+  "originalName": "03-first-interview-notes.md",
+  "storedName": "03-first-interview-notes.md",
+  "relativePath": "fde-resources/03-first-interview-notes.md",
+  "mimeType": "text/markdown; charset=utf-8",
+  "extension": "md",
+  "bytes": 2501,
+  "createdAt": "2026-09-03T10:18:23.771Z",
+  "modifiedAt": "2026-09-03T10:18:23.771Z",
+  "mtimeMs": 1788430703771.0066,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 2501,
+    "sourceMtimeMs": 1788430703771.0066,
+    "derivedPath": ".fde/derived/src_37c94954b7054116a749d61aad514936.md",
+    "updatedAt": "2026-09-03T10:18:23.787Z"
+  }
+}

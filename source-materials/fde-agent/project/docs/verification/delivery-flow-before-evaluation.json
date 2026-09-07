@@ -1,0 +1,296 @@
+{
+  "schemaVersion": 1,
+  "stage": "evaluation",
+  "status": "working",
+  "workItems": [
+    {
+      "id": "plan",
+      "status": "complete"
+    },
+    {
+      "id": "cases",
+      "status": "complete"
+    },
+    {
+      "id": "run",
+      "status": "current"
+    },
+    {
+      "id": "conclusion",
+      "status": "waiting"
+    }
+  ],
+  "blockers": [
+    {
+      "id": "manual-flow-acceptance",
+      "title": "页面完整流程尚待人工验收；当前仅确认继续接入第五阶段数据。",
+      "severity": "medium",
+      "status": "open"
+    }
+  ],
+  "recommendation": "pending",
+  "evaluation": {
+    "candidate": {
+      "summary": "门店维修本地验证版：12 条脱敏案例、35 份材料和现有 56 实体 / 56 关系图谱，已实现报修 → 规则分析 → 证据查询 → 人工确认 → 本地草稿读回。使用 Apple 风格页面，不调用付费模型或生产系统。",
+      "version": "local-repair-v0.2-ui",
+      "sourceFiles": [
+        "backend/catalog.mjs",
+        "backend/workflow.mjs",
+        "backend/server.mjs",
+        "backend/tests/workflow.test.mjs",
+        "frontend/index.html",
+        "frontend/app.js",
+        "frontend/style.css",
+        "frontend/public/brand/ff-logo.png",
+        ".fde/design/knowledge-graph.json",
+        "fde-resources/01-baseline-and-target-discussion.md",
+        "fde-resources/01-customer-original-brief.md",
+        "fde-resources/01-solution-constraints-1.md",
+        "fde-resources/01-solution-constraints.md",
+        "fde-resources/01-systems-access-and-ownership.md",
+        "fde-resources/02-data-sample-and-dictionary.md",
+        "fde-resources/02-representative-cases.md",
+        "fde-resources/02-scope-constraints-and-dependencies.md",
+        "fde-resources/02-semantic-capability-workshop.md",
+        "fde-resources/02-wecom-repair-chat.txt",
+        "fde-resources/03-baseline-metric-export.json",
+        "fde-resources/03-first-interview-notes.md",
+        "fde-resources/03-policy-security-and-governance.md",
+        "fde-resources/03-work-order-export.json",
+        "fde-resources/04-access-request-register.json",
+        "fde-resources/04-device-register.xml",
+        "fde-resources/04-triage-workload-observation.xml",
+        "fde-resources/05-cost-assumptions.yaml",
+        "fde-resources/05-field-dictionary.xml",
+        "fde-resources/05-vendor-duty-roster.yaml",
+        "fde-resources/06-maintenance-priority-and-approval-policy.pdf",
+        "fde-resources/06-owner-verifier-workshop.txt",
+        "fde-resources/07-equipment-label-photo.png",
+        "fde-resources/07-first-phase-scope.json",
+        "fde-resources/07-nanjing-incident-timeline.json",
+        "fde-resources/08-escalation-email.eml",
+        "fde-resources/08-resource-and-dependency-register.xml",
+        "fde-resources/08-workorder-api-openapi.yaml",
+        "fde-resources/09-current-system-consumption-notes.txt",
+        "fde-resources/09-sandbox-readback-log.txt",
+        "fde-resources/09-store-equipment-layout.svg",
+        "fde-resources/10-role-and-boundary-confirmation.md",
+        "fde-resources/10-system-version-difference.md",
+        "fde-resources/11-access-boundary-matrix.xml",
+        "fde-resources/12-governance-review-notes.txt",
+        ".fde/sources/src_05cdac2d9cce41cebf65b0cb218303ef.json",
+        ".fde/sources/src_0b7bb9068a09492dae83b5432fad81c5.json",
+        ".fde/sources/src_0dda7ab0e0094b299d3435a2a15a74d9.json",
+        ".fde/sources/src_1acfac3bc13a469c95eff2249d358721.json",
+        ".fde/sources/src_20cf7dfd3c0c48018e4594a5caeea056.json",
+        ".fde/sources/src_215eaf333ea648db985d9921b86a1a6e.json",
+        ".fde/sources/src_37c94954b7054116a749d61aad514936.json",
+        ".fde/sources/src_3b35d1130b0148659ec7e6591c671391.json",
+        ".fde/sources/src_402a89de7d804e5a8931b8850fd6ef8b.json",
+        ".fde/sources/src_4ff12a75c65844b593cbee89209d6a8b.json",
+        ".fde/sources/src_50532fd88c1f438b84e2955b28f10f0e.json",
+        ".fde/sources/src_55833bfdb3484e19ba19253f4e0f539c.json",
+        ".fde/sources/src_5cffed03145649f5bec95f69e4188407.json",
+        ".fde/sources/src_60b74192ffd345e1958b5c8f12f4b8d9.json",
+        ".fde/sources/src_6e5c265651da4e25817ff27ed4ab20dd.json",
+        ".fde/sources/src_701f85b610e049e0ac2a9698b000cc01.json",
+        ".fde/sources/src_87942e91c58e4325b10b5786beaac9ac.json",
+        ".fde/sources/src_92b10c4384124443b14abd40be2a866f.json",
+        ".fde/sources/src_99c9f3bcca9a4b1aa7fff5922132f786.json",
+        ".fde/sources/src_a44e36460acd45eea1820367c61d0c8c.json",
+        ".fde/sources/src_aa4217d373de4543abc6cf718540becb.json",
+        ".fde/sources/src_afb39cee4d30447892570e9db6c65aad.json",
+        ".fde/sources/src_b8d462d759af48b5879648e2540cd4db.json",
+        ".fde/sources/src_bfd4d218aa2a42ccb77ce4f70141f1ba.json",
+        ".fde/sources/src_ce7191fd62e24d0b8a906a778c80d588.json",
+        ".fde/sources/src_daa34f3441d04e86913e82f5d42143d9.json",
+        ".fde/sources/src_dbbb6884c1d64a09b63f023fe51ceeae.json",
+        ".fde/sources/src_dc1d16dac2084a2ca5defd47cac1939c.json",
+        ".fde/sources/src_dccfff3339674d0ba9b5c0b33f6bda15.json",
+        ".fde/sources/src_e199f4268fba4f8ba63ce144c6988442.json",
+        ".fde/sources/src_fae9a0cb144b4cd39fb58c13f1a40363.json",
+        ".fde/sources/src_fbbac6cf20034a0191dfd44573d4ffd1.json",
+        ".fde/sources/src_fdc5c72379834e6e97971a3d5736d21b.json",
+        ".fde/sources/src_fee32675bda445599326443b97e26537.json",
+        ".fde/sources/src_ffdb0d3c652741fcb960e7324bcd08a1.json"
+      ]
+    },
+    "testing": {
+      "environment": "macOS / Node.js v24.16.0；项目预览 127.0.0.1:4177；自动测试使用临时状态目录与随机 loopback 端口，不写用户运行数据。",
+      "metrics": [
+        {
+          "id": "input-integrity",
+          "title": "样本与历史答案隔离",
+          "kind": "数据可靠性",
+          "required": true,
+          "criterion": "原始样本仅使用输入字段；改变 final_* 不改变分析，R-1002 保留双故障候选与未知时间。",
+          "sourceRefs": [
+            "fde-deliverables/05-poc-eval/evaluation-plan.md",
+            "docs/PRD.md",
+            "docs/TESTING.md"
+          ]
+        },
+        {
+          "id": "safety-boundaries",
+          "title": "安全提示与未知边界",
+          "kind": "安全",
+          "required": true,
+          "criterion": "P0 人工优先，缺失优先级保持待定，报修原文不能提升权限；拒绝跨区域与无效时间。",
+          "sourceRefs": [
+            "fde-deliverables/05-poc-eval/evaluation-plan.md",
+            "docs/PRD.md",
+            "docs/TESTING.md"
+          ]
+        },
+        {
+          "id": "duplicate-window",
+          "title": "重复候选与时间窗口",
+          "kind": "业务规则",
+          "required": true,
+          "criterion": "仅在已知时间相差不超过两小时时标记时间核实；候选不合并原记录。",
+          "sourceRefs": [
+            "fde-deliverables/05-poc-eval/evaluation-plan.md",
+            "docs/PRD.md",
+            "docs/TESTING.md"
+          ]
+        },
+        {
+          "id": "graph-evidence",
+          "title": "真实图谱与来源追踪",
+          "kind": "知识图谱",
+          "required": true,
+          "criterion": "查询返回原图真实节点、边和 SourceId，维修商匹配真实门店与类别；不凭空补关系。",
+          "sourceRefs": [
+            "fde-deliverables/05-poc-eval/evaluation-plan.md",
+            "docs/PRD.md",
+            "docs/TESTING.md"
+          ]
+        },
+        {
+          "id": "human-idempotency",
+          "title": "人工确认与幂等草稿",
+          "kind": "操作边界",
+          "required": true,
+          "criterion": "未确认或证据版本过期不得保存；同一操作不重复创建，冲突拒绝，externalWrite=false。",
+          "sourceRefs": [
+            "fde-deliverables/05-poc-eval/evaluation-plan.md",
+            "docs/PRD.md",
+            "docs/TESTING.md"
+          ]
+        },
+        {
+          "id": "http-persistence",
+          "title": "HTTP 闭环与重启读回",
+          "kind": "集成",
+          "required": true,
+          "criterion": "独立临时运行区完成新增、分析、并发幂等保存、读回与服务重启读回；拒绝跨站请求和越界资料路径，原件字节不变。",
+          "sourceRefs": [
+            "fde-deliverables/05-poc-eval/evaluation-plan.md",
+            "docs/PRD.md",
+            "docs/TESTING.md"
+          ]
+        },
+        {
+          "id": "frontend-syntax",
+          "title": "当前前端模块检查",
+          "kind": "前端",
+          "required": true,
+          "criterion": "当前 frontend/app.js 通过 Node 语法检查；该检查不代表浏览器布局或交互验收。",
+          "sourceRefs": [
+            "fde-deliverables/05-poc-eval/evaluation-plan.md",
+            "docs/PRD.md",
+            "docs/TESTING.md"
+          ]
+        },
+        {
+          "id": "manual-acceptance",
+          "title": "页面完整流程人工验收",
+          "kind": "人工验收",
+          "required": true,
+          "criterion": "依据 docs/TESTING.md，在实际浏览器完成分析、实体与来源查看、人工确认、草稿保存及刷新读回；确认桌面与窄屏可滚动、操作无遮挡。",
+          "sourceRefs": [
+            "fde-deliverables/05-poc-eval/evaluation-plan.md",
+            "docs/PRD.md",
+            "docs/TESTING.md"
+          ]
+        }
+      ],
+      "run": {
+        "fingerprint": "sha256:7b00d555eab26ab19a2c8096f09da3211b650a50aac767c0a77dd768492b9a27",
+        "results": [
+          {
+            "metricId": "input-integrity",
+            "status": "PASS",
+            "value": "通过：12 条样本仅读取输入字段；篡改历史答案后分析输入不变，R-1002 保留 POS / 网络候选。",
+            "evidenceRefs": [
+              "docs/verification/2026-09-07-stage5-run.json",
+              "fde-deliverables/05-poc-eval/evaluation-report.md"
+            ]
+          },
+          {
+            "metricId": "safety-boundaries",
+            "status": "PASS",
+            "value": "通过：P0 人工优先、未知保持待定；越权文本不改变权限，跨区域和无效时间被拒绝。",
+            "evidenceRefs": [
+              "docs/verification/2026-09-07-stage5-run.json",
+              "fde-deliverables/05-poc-eval/evaluation-report.md"
+            ]
+          },
+          {
+            "metricId": "duplicate-window",
+            "status": "PASS",
+            "value": "通过：两小时窗口仅返回 B，不纳入超时 C；保持独立原始记录。",
+            "evidenceRefs": [
+              "docs/verification/2026-09-07-stage5-run.json",
+              "fde-deliverables/05-poc-eval/evaluation-report.md"
+            ]
+          },
+          {
+            "metricId": "graph-evidence",
+            "status": "PASS",
+            "value": "通过：真实图谱节点、边及 SourceId 可查询；维修商匹配现有门店与类别。",
+            "evidenceRefs": [
+              "docs/verification/2026-09-07-stage5-run.json",
+              "fde-deliverables/05-poc-eval/evaluation-report.md"
+            ]
+          },
+          {
+            "metricId": "human-idempotency",
+            "status": "PASS",
+            "value": "通过：未确认或版本过期拒绝；幂等返回同一草稿，内容冲突拒绝，externalWrite=false。",
+            "evidenceRefs": [
+              "docs/verification/2026-09-07-stage5-run.json",
+              "fde-deliverables/05-poc-eval/evaluation-report.md"
+            ]
+          },
+          {
+            "metricId": "http-persistence",
+            "status": "PASS",
+            "value": "通过：真实 HTTP 新增、分析、并发幂等保存、重启读回、原件哈希及路径 / Origin 防护全部通过；测试未写入正常运行区。",
+            "evidenceRefs": [
+              "docs/verification/2026-09-07-stage5-run.json",
+              "fde-deliverables/05-poc-eval/evaluation-report.md"
+            ]
+          },
+          {
+            "metricId": "frontend-syntax",
+            "status": "PASS",
+            "value": "通过：node --check frontend/app.js 退出 0；仅为语法检查，不是浏览器验收。",
+            "evidenceRefs": [
+              "docs/verification/2026-09-07-stage5-run.json",
+              "fde-deliverables/05-poc-eval/evaluation-report.md"
+            ]
+          },
+          {
+            "metricId": "manual-acceptance",
+            "status": "NOT_RUN",
+            "value": "待人工操作：尚无完整页面流程验收记录。当前用户同意继续接入数据，不推断已逐项验收。",
+            "evidenceRefs": [
+              "fde-deliverables/05-poc-eval/evaluation-report.md"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

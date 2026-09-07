@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_92b10c4384124443b14abd40be2a866f",
+  "originalName": "09-current-system-consumption-notes.txt",
+  "storedName": "09-current-system-consumption-notes.txt",
+  "relativePath": "fde-resources/09-current-system-consumption-notes.txt",
+  "mimeType": "text/plain; charset=utf-8",
+  "extension": "txt",
+  "bytes": 1416,
+  "createdAt": "2026-09-04T02:54:37.762Z",
+  "modifiedAt": "2026-09-04T02:54:37.763Z",
+  "mtimeMs": 1788490477762.6655,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 1416,
+    "sourceMtimeMs": 1788490477762.6655,
+    "derivedPath": ".fde/derived/src_92b10c4384124443b14abd40be2a866f.md",
+    "updatedAt": "2026-09-04T02:54:37.834Z"
+  }
+}

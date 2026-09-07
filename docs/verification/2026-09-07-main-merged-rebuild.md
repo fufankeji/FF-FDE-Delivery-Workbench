@@ -34,3 +34,15 @@
 ## 待用户验收
 
 未执行浏览器自审、截图、全量 E2E 或计费模型调用。用户刷新 3080 验收合并后的页面及交互；编译与接口通过不代表所有新功能已完成产品验收。
+
+## 20:05 · 第六至第八阶段新代码合并后重建
+
+- 本次基线为 `main` 的 `75cc649771`；开始时工作区干净，合并内容主要为第六至第八阶段工作台、主题和两张页面素材。依赖与锁文件未变，沿用现有依赖，不修改业务源码。
+- `corepack pnpm run build` 退出 0：Host、Client 和 Web 全部构建成功，记录 228 个 Client 产物；仅有已有的大分块等非阻塞警告。
+- 定向运行 `delivery-stage-panel.client.spec.tsx` 与 `stage-workbench.client.spec.tsx`，筛选 `delivery stage workbenches|stage composer visibility`：40 项通过、30 项未选中，覆盖新交付页面与当前／历史／未来阶段输入框规则。
+- 用前述显式 `DSH_HOME` 命令重启主服务，监听 PID 为 `3727`，cwd 与环境变量均为主工作树隔离运行区。首页 HTTP 200，标题正确。
+- Boot Manifest 中在线 `ui-fde-project`（`7220306d374d`）、`ui-theme`（`3a83ebc4183d`）、`ui-conversation`（`11d61d4acdd7`）均返回 HTTP 200，并与本地最新包逐字节一致；新页面素材名与输入框显示标记均已包含在在线代码中。
+- `pilot-delivery-lab.png`（1,307,285 字节）和 `improvement-panels.png`（1,053,060 字节）在线请求均为 HTTP 200，字节摘要与主仓库素材一致。
+- 项目快照可信只读 POST 返回 HTTP 200、`ok: true`；业务项目仍为 `running`，第二至第八阶段数据均可读取。Workspace 注册表摘要与前述基线完全一致，三个项目和七个 Session 登记保留。
+- 3081 的 PID `95068`、4177 的 PID `54378` 保持不变；没有同步或覆盖任何项目运行数据，没有调用模型或阶段推进接口。
+- 最新构建日志复用 `.runtime/rebuild-main-20260907.log`，约 293 KB，被 Git 忽略，可通过完整构建重新生成；本次未提交 Git。仍由用户刷新 3080 手动验收，不以构建和接口检查替代视觉与产品验收。

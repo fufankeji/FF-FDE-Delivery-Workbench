@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deviceRegister caseSourceId="SRC-SIM-0106" evidenceKind="simulation" snapshotAt="2026-08-27T09:00:00+08:00">
+  <scope>华东一区代表设备快照，不是完整台账</scope>
+  <devices>
+    <device id="FR-SZ014-03" storeId="SZ-014" category="refrigeration" status="active">
+      <displayName>饮料冷藏柜 3 号</displayName>
+      <brand>CoolRiver</brand>
+      <model>CR-V800</model>
+      <location>饮料区北侧</location>
+      <warrantyCandidateEnd>2027-03-31</warrantyCandidateEnd>
+      <contractRef>CTR-REF-2025-01</contractRef>
+      <updatedAt>2026-07-02</updatedAt>
+    </device>
+    <device id="POS-NJ003-01" storeId="NJ-003" category="pos-hardware" status="active">
+      <displayName>收银终端 1 号</displayName>
+      <brand>FastTill</brand>
+      <model>FT-X2</model>
+      <location>前台左侧</location>
+      <contractRef>CTR-POS-2024-07</contractRef>
+      <updatedAt>2026-06-14</updatedAt>
+    </device>
+    <device id="POS-NJ003-02" storeId="NJ-003" category="pos-hardware" status="active">
+      <displayName>收银终端 2 号</displayName>
+      <brand>FastTill</brand>
+      <model>FT-X2</model>
+      <location>前台右侧</location>
+      <contractRef>CTR-POS-2024-07</contractRef>
+      <updatedAt>2026-06-14</updatedAt>
+    </device>
+    <device id="NET-NJ003-01" storeId="NJ-003" category="network" status="active">
+      <displayName>主线路网关</displayName>
+      <brand>NetBridge</brand>
+      <model>NB-GW4</model>
+      <location>弱电间</location>
+      <contractRef>CTR-NET-2026-02</contractRef>
+      <updatedAt>2026-08-22</updatedAt>
+    </device>
+    <device id="HVAC-HZ021-02" storeId="HZ-021" category="hvac" status="active">
+      <displayName>卖场空调 2 号</displayName>
+      <brand>AirSpring</brand>
+      <model>AS-120</model>
+      <location>卖场东区</location>
+      <contractRef>CTR-HVAC-2023-09</contractRef>
+      <updatedAt>2026-08-26</updatedAt>
+    </device>
+    <device id="HVAC-HZ021-OLD" storeId="HZ-021" category="hvac" status="retired">
+      <displayName>卖场旧空调标签</displayName>
+      <brand>AirSpring</brand>
+      <model>AS-90</model>
+      <location>位置记录缺失</location>
+      <contractRef>CTR-HVAC-2023-09</contractRef>
+      <updatedAt>2024-12-01</updatedAt>
+    </device>
+    <device id="FR-SU006-02" storeId="SU-006" category="refrigeration" status="active">
+      <displayName>冷冻柜 2 号</displayName>
+      <brand>CoolRiver</brand>
+      <model>CR-F600</model>
+      <location>冷冻食品区</location>
+      <contractRef>CTR-REF-2025-01</contractRef>
+      <updatedAt>2026-03-18</updatedAt>
+    </device>
+  </devices>
+  <qualityNotes>
+    <note severity="high">现场仍可见 HVAC-HZ021-OLD 标签，但台账已标记 retired。</note>
+    <note severity="medium">warrantyCandidateEnd 只是台账候选值，需以合同正文和采购确认为准。</note>
+    <note severity="medium">设备与业务故障事件之间没有统一事件 ID。</note>
+  </qualityNotes>
+</deviceRegister>

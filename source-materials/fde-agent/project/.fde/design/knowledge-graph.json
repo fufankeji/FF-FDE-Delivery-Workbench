@@ -1,0 +1,1464 @@
+{
+  "schemaVersion": 1,
+  "provider": {
+    "id": "semantica",
+    "version": "0.6.7"
+  },
+  "graphId": "workspace-179e16890c61",
+  "revision": "sha256:58ee663b62eec5cc338b7570616aaea479eea99e31baf545e5069442dea076a6",
+  "ontologyVersion": "0.1.1-preview",
+  "updatedAt": "2026-09-04T10:26:09.347Z",
+  "nodes": [
+    {
+      "id": "ent_acc67ea2800b69fcefe06959",
+      "label": "SZ-014",
+      "type": "Store",
+      "summary": "SZ-014",
+      "communityId": "type:Store",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_a44e36460acd45eea1820367c61d0c8c",
+        "src_afb39cee4d30447892570e9db6c65aad",
+        "src_ffdb0d3c652741fcb960e7324bcd08a1",
+        "src_701f85b610e049e0ac2a9698b000cc01",
+        "src_daa34f3441d04e86913e82f5d42143d9"
+      ]
+    },
+    {
+      "id": "ent_d89aee53461879040fe8e67e",
+      "label": "NJ-003",
+      "type": "Store",
+      "summary": "NJ-003",
+      "communityId": "type:Store",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_a44e36460acd45eea1820367c61d0c8c",
+        "src_afb39cee4d30447892570e9db6c65aad",
+        "src_ffdb0d3c652741fcb960e7324bcd08a1",
+        "src_701f85b610e049e0ac2a9698b000cc01",
+        "src_daa34f3441d04e86913e82f5d42143d9"
+      ]
+    },
+    {
+      "id": "ent_a75638df5ceadd291139213a",
+      "label": "HZ-021",
+      "type": "Store",
+      "summary": "HZ-021",
+      "communityId": "type:Store",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_a44e36460acd45eea1820367c61d0c8c",
+        "src_afb39cee4d30447892570e9db6c65aad",
+        "src_ffdb0d3c652741fcb960e7324bcd08a1",
+        "src_701f85b610e049e0ac2a9698b000cc01",
+        "src_daa34f3441d04e86913e82f5d42143d9"
+      ]
+    },
+    {
+      "id": "ent_fd34c84e9072e4b7feca91d8",
+      "label": "FR-SZ014-03",
+      "type": "Asset",
+      "summary": "FR-SZ014-03",
+      "communityId": "type:Asset",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_a44e36460acd45eea1820367c61d0c8c",
+        "src_afb39cee4d30447892570e9db6c65aad",
+        "src_ffdb0d3c652741fcb960e7324bcd08a1",
+        "src_701f85b610e049e0ac2a9698b000cc01"
+      ]
+    },
+    {
+      "id": "ent_404f21668ee8305fd65b2e88",
+      "label": "HVAC-HZ021-OLD",
+      "type": "Asset",
+      "summary": "HVAC-HZ021-OLD",
+      "communityId": "type:Asset",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_a44e36460acd45eea1820367c61d0c8c",
+        "src_701f85b610e049e0ac2a9698b000cc01"
+      ]
+    },
+    {
+      "id": "ent_a3ce9a5469b6fee475ac3487",
+      "label": "WO-88422",
+      "type": "WorkOrder",
+      "summary": "WO-88422",
+      "communityId": "type:WorkOrder",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_a44e36460acd45eea1820367c61d0c8c",
+        "src_ffdb0d3c652741fcb960e7324bcd08a1",
+        "src_aa4217d373de4543abc6cf718540becb"
+      ]
+    },
+    {
+      "id": "ent_073ccfcd1ff083b5d56d8356",
+      "label": "WO-88419",
+      "type": "WorkOrder",
+      "summary": "WO-88419",
+      "communityId": "type:WorkOrder",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_a44e36460acd45eea1820367c61d0c8c",
+        "src_ffdb0d3c652741fcb960e7324bcd08a1",
+        "src_aa4217d373de4543abc6cf718540becb"
+      ]
+    },
+    {
+      "id": "ent_8efe1b3b92f2898b005e2a31",
+      "label": "SU-006",
+      "type": "Store",
+      "summary": "SU-006",
+      "communityId": "type:Store",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1",
+        "src_701f85b610e049e0ac2a9698b000cc01",
+        "src_daa34f3441d04e86913e82f5d42143d9"
+      ]
+    },
+    {
+      "id": "ent_16e145d2535e6980f2165d34",
+      "label": "SH-011",
+      "type": "Store",
+      "summary": "SH-011",
+      "communityId": "type:Store",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "ent_aae3bba3dad5a99c5e47c6b3",
+      "label": "WX-004",
+      "type": "Store",
+      "summary": "WX-004",
+      "communityId": "type:Store",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "ent_5bfecb3933f39b57522b39df",
+      "label": "NB-008",
+      "type": "Store",
+      "summary": "NB-008",
+      "communityId": "type:Store",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "ent_fba15e5b8f919f4f46b36d25",
+      "label": "NJ-010",
+      "type": "Store",
+      "summary": "NJ-010",
+      "communityId": "type:Store",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1",
+        "src_daa34f3441d04e86913e82f5d42143d9"
+      ]
+    },
+    {
+      "id": "ent_17ad351a705590e860f3aa28",
+      "label": "HZ-005",
+      "type": "Store",
+      "summary": "HZ-005",
+      "communityId": "type:Store",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "ent_a6d0fee15e1ca0d5fc3e6ec6",
+      "label": "SH-020",
+      "type": "Store",
+      "summary": "SH-020",
+      "communityId": "type:Store",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1",
+        "src_daa34f3441d04e86913e82f5d42143d9"
+      ]
+    },
+    {
+      "id": "ent_e7f5b1b11ee8863de282f3cb",
+      "label": "FR-SU006-02",
+      "type": "Asset",
+      "summary": "FR-SU006-02",
+      "communityId": "type:Asset",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1",
+        "src_701f85b610e049e0ac2a9698b000cc01"
+      ]
+    },
+    {
+      "id": "ent_cc288483d000a933e24d827e",
+      "label": "NET-SH011-01",
+      "type": "Asset",
+      "summary": "NET-SH011-01",
+      "communityId": "type:Asset",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "ent_8ad056b45fe3ad75919f9f65",
+      "label": "HVAC-WX004-02",
+      "type": "Asset",
+      "summary": "HVAC-WX004-02",
+      "communityId": "type:Asset",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "ent_339f4399c7e1a748bb7a8d8c",
+      "label": "FR-NB008-01",
+      "type": "Asset",
+      "summary": "FR-NB008-01",
+      "communityId": "type:Asset",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "ent_dc18cd3613ba0ddc4144345b",
+      "label": "POS-HZ005-02",
+      "type": "Asset",
+      "summary": "POS-HZ005-02",
+      "communityId": "type:Asset",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "ent_575bfb35023ce86d72b5348d",
+      "label": "FR-SH020-04",
+      "type": "Asset",
+      "summary": "FR-SH020-04",
+      "communityId": "type:Asset",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "ent_c0ad35e6232f43399f7c36c8",
+      "label": "WO-88371",
+      "type": "WorkOrder",
+      "summary": "WO-88371",
+      "communityId": "type:WorkOrder",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "ent_9af642a4634f6e1c96dacb5f",
+      "label": "WO-88507",
+      "type": "WorkOrder",
+      "summary": "WO-88507",
+      "communityId": "type:WorkOrder",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "ent_eb59096e1bbf789a083de9dc",
+      "label": "WO-88531",
+      "type": "WorkOrder",
+      "summary": "WO-88531",
+      "communityId": "type:WorkOrder",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "ent_029fa3416b8734713df4fa19",
+      "label": "WO-88576",
+      "type": "WorkOrder",
+      "summary": "WO-88576",
+      "communityId": "type:WorkOrder",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "ent_86a864ca45add1017987da40",
+      "label": "WO-88602",
+      "type": "WorkOrder",
+      "summary": "WO-88602",
+      "communityId": "type:WorkOrder",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "ent_7769610b51a426d11788c89f",
+      "label": "WO-88615",
+      "type": "WorkOrder",
+      "summary": "WO-88615",
+      "communityId": "type:WorkOrder",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "ent_fa21ce1141e0d19ecf3270ae",
+      "label": "WO-88648",
+      "type": "WorkOrder",
+      "summary": "WO-88648",
+      "communityId": "type:WorkOrder",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "ent_231b46e230c191cb2e4589bf",
+      "label": "WO-88660",
+      "type": "WorkOrder",
+      "summary": "WO-88660",
+      "communityId": "type:WorkOrder",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "ent_ed29220766725afcb3f49588",
+      "label": "WO-88682",
+      "type": "WorkOrder",
+      "summary": "WO-88682",
+      "communityId": "type:WorkOrder",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "ent_544fa21463c7b81f59ab488f",
+      "label": "WO-88703",
+      "type": "WorkOrder",
+      "summary": "WO-88703",
+      "communityId": "type:WorkOrder",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "ent_279b589c3ebc1c205cd8d879",
+      "label": "V-REF-01",
+      "type": "Vendor",
+      "summary": "V-REF-01",
+      "communityId": "type:Vendor",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1",
+        "src_daa34f3441d04e86913e82f5d42143d9"
+      ]
+    },
+    {
+      "id": "ent_c0171164fd78d189f00c4923",
+      "label": "V-NET-02",
+      "type": "Vendor",
+      "summary": "V-NET-02",
+      "communityId": "type:Vendor",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1",
+        "src_daa34f3441d04e86913e82f5d42143d9"
+      ]
+    },
+    {
+      "id": "ent_e65d84312c9ba6144a13c00e",
+      "label": "V-POS-03",
+      "type": "Vendor",
+      "summary": "V-POS-03",
+      "communityId": "type:Vendor",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1",
+        "src_daa34f3441d04e86913e82f5d42143d9"
+      ]
+    },
+    {
+      "id": "ent_1d919db979f30e8872fb38fe",
+      "label": "V-HVAC-02",
+      "type": "Vendor",
+      "summary": "V-HVAC-02",
+      "communityId": "type:Vendor",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1",
+        "src_daa34f3441d04e86913e82f5d42143d9"
+      ]
+    },
+    {
+      "id": "ent_e5632a377c54158d97fff6f3",
+      "label": "V-NET-01",
+      "type": "Vendor",
+      "summary": "V-NET-01",
+      "communityId": "type:Vendor",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "ent_7261f2975de57efe73919d62",
+      "label": "V-HVAC-01",
+      "type": "Vendor",
+      "summary": "V-HVAC-01",
+      "communityId": "type:Vendor",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "ent_9e19083eb60ff4189a3f916c",
+      "label": "V-POS-01",
+      "type": "Vendor",
+      "summary": "V-POS-01",
+      "communityId": "type:Vendor",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "ent_63662e764427ec1c1dfb0557",
+      "label": "POS-NJ003-01",
+      "type": "Asset",
+      "summary": "POS-NJ003-01",
+      "communityId": "type:Asset",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_701f85b610e049e0ac2a9698b000cc01"
+      ]
+    },
+    {
+      "id": "ent_21d54b5cd9c7f17d1da39302",
+      "label": "POS-NJ003-02",
+      "type": "Asset",
+      "summary": "POS-NJ003-02",
+      "communityId": "type:Asset",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_701f85b610e049e0ac2a9698b000cc01"
+      ]
+    },
+    {
+      "id": "ent_e9c9d177fbebd40a7a687a96",
+      "label": "NET-NJ003-01",
+      "type": "Asset",
+      "summary": "NET-NJ003-01",
+      "communityId": "type:Asset",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_701f85b610e049e0ac2a9698b000cc01"
+      ]
+    },
+    {
+      "id": "ent_e5cccee5e834e4e5c98e6f69",
+      "label": "HVAC-HZ021-02",
+      "type": "Asset",
+      "summary": "HVAC-HZ021-02",
+      "communityId": "type:Asset",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_701f85b610e049e0ac2a9698b000cc01"
+      ]
+    },
+    {
+      "id": "ent_7c27d2f5dd74020faa8b8a0b",
+      "label": "CTR-REF-2025-01",
+      "type": "Contract",
+      "summary": "CTR-REF-2025-01",
+      "communityId": "type:Contract",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_701f85b610e049e0ac2a9698b000cc01",
+        "src_daa34f3441d04e86913e82f5d42143d9"
+      ]
+    },
+    {
+      "id": "ent_c5d535fc9bfa3d200aed1591",
+      "label": "CTR-POS-2024-07",
+      "type": "Contract",
+      "summary": "CTR-POS-2024-07",
+      "communityId": "type:Contract",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_701f85b610e049e0ac2a9698b000cc01",
+        "src_daa34f3441d04e86913e82f5d42143d9"
+      ]
+    },
+    {
+      "id": "ent_26c3bb3810318eafe7813674",
+      "label": "CTR-NET-2026-02",
+      "type": "Contract",
+      "summary": "CTR-NET-2026-02",
+      "communityId": "type:Contract",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_701f85b610e049e0ac2a9698b000cc01",
+        "src_daa34f3441d04e86913e82f5d42143d9"
+      ]
+    },
+    {
+      "id": "ent_67955b94a94d3af8d91d3345",
+      "label": "CTR-HVAC-2023-09",
+      "type": "Contract",
+      "summary": "CTR-HVAC-2023-09",
+      "communityId": "type:Contract",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_701f85b610e049e0ac2a9698b000cc01",
+        "src_daa34f3441d04e86913e82f5d42143d9"
+      ]
+    },
+    {
+      "id": "ent_010d4d36c5c2372bc85cf199",
+      "label": "S-NJ-011",
+      "type": "Store",
+      "summary": "S-NJ-011",
+      "communityId": "type:Store",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ]
+    },
+    {
+      "id": "ent_bd5b71f30a4d471281844c89",
+      "label": "INC-CAND-NJXJK-20260821-01",
+      "type": "Incident",
+      "summary": "INC-CAND-NJXJK-20260821-01",
+      "communityId": "type:Incident",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ]
+    },
+    {
+      "id": "ent_7ad0bbaadf5aab86fcfa1db8",
+      "label": "ALERT-NJXJK-68102",
+      "type": "Alert",
+      "summary": "ALERT-NJXJK-68102",
+      "communityId": "type:Alert",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ]
+    },
+    {
+      "id": "ent_bb259db0dee3a95402a15591",
+      "label": "R1002",
+      "type": "Report",
+      "summary": "R1002",
+      "communityId": "type:Report",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ]
+    },
+    {
+      "id": "ent_33ca241f15038efee9de4447",
+      "label": "R1003",
+      "type": "Report",
+      "summary": "R1003",
+      "communityId": "type:Report",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ]
+    },
+    {
+      "id": "ent_42d8b46f93e0a6aaea6d2745",
+      "label": "MSG-WECOM-908811",
+      "type": "Message",
+      "summary": "MSG-WECOM-908811",
+      "communityId": "type:Message",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ]
+    },
+    {
+      "id": "ent_3a37da3f5299ebb929022501",
+      "label": "MSG-WECOM-908827",
+      "type": "Message",
+      "summary": "MSG-WECOM-908827",
+      "communityId": "type:Message",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ]
+    },
+    {
+      "id": "ent_e24abea7ad26d2e77edc1917",
+      "label": "fde-analyst",
+      "type": "Principal",
+      "summary": "<principal id=\"fde-analyst\"",
+      "communityId": "type:Principal",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_1acfac3bc13a469c95eff2249d358721"
+      ]
+    },
+    {
+      "id": "ent_c71428e7107b90588c35f82b",
+      "label": "fde-agent-service-account",
+      "type": "Principal",
+      "summary": "<principal id=\"fde-agent-service-account\"",
+      "communityId": "type:Principal",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_1acfac3bc13a469c95eff2249d358721"
+      ]
+    },
+    {
+      "id": "ent_afa1215c9e95cf036130e9cd",
+      "label": "operations-reviewer",
+      "type": "Principal",
+      "summary": "<principal id=\"operations-reviewer\"",
+      "communityId": "type:Principal",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_1acfac3bc13a469c95eff2249d358721"
+      ]
+    },
+    {
+      "id": "ent_e9d041a99dea102dd21f22e0",
+      "label": "risk-owner",
+      "type": "Principal",
+      "summary": "<principal id=\"risk-owner\"",
+      "communityId": "type:Principal",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_1acfac3bc13a469c95eff2249d358721"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "rel_390b96d56ffaafecf9a53929",
+      "source": "ent_c0ad35e6232f43399f7c36c8",
+      "target": "ent_acc67ea2800b69fcefe06959",
+      "type": "rel_workorder_store",
+      "label": "工单发生于门店",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_0c704ce68cc9a542ba9f0c81",
+      "source": "ent_073ccfcd1ff083b5d56d8356",
+      "target": "ent_d89aee53461879040fe8e67e",
+      "type": "rel_workorder_store",
+      "label": "工单发生于门店",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_5c98738159994d3878d7039a",
+      "source": "ent_a3ce9a5469b6fee475ac3487",
+      "target": "ent_d89aee53461879040fe8e67e",
+      "type": "rel_workorder_store",
+      "label": "工单发生于门店",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_d6410c4e38a0b4d0f8a3aaec",
+      "source": "ent_9af642a4634f6e1c96dacb5f",
+      "target": "ent_a75638df5ceadd291139213a",
+      "type": "rel_workorder_store",
+      "label": "工单发生于门店",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_a75f2d0c8aa95af06484447e",
+      "source": "ent_eb59096e1bbf789a083de9dc",
+      "target": "ent_8efe1b3b92f2898b005e2a31",
+      "type": "rel_workorder_store",
+      "label": "工单发生于门店",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_6b803ea7610992009ca3852b",
+      "source": "ent_029fa3416b8734713df4fa19",
+      "target": "ent_16e145d2535e6980f2165d34",
+      "type": "rel_workorder_store",
+      "label": "工单发生于门店",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_a78c6664d577c2aad9163996",
+      "source": "ent_86a864ca45add1017987da40",
+      "target": "ent_aae3bba3dad5a99c5e47c6b3",
+      "type": "rel_workorder_store",
+      "label": "工单发生于门店",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_df3653efcd2d929ea2c1f82e",
+      "source": "ent_7769610b51a426d11788c89f",
+      "target": "ent_5bfecb3933f39b57522b39df",
+      "type": "rel_workorder_store",
+      "label": "工单发生于门店",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_bde74e0dc59b856d175e937b",
+      "source": "ent_fa21ce1141e0d19ecf3270ae",
+      "target": "ent_acc67ea2800b69fcefe06959",
+      "type": "rel_workorder_store",
+      "label": "工单发生于门店",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_ff01b9b8f8601c6f89cb2671",
+      "source": "ent_231b46e230c191cb2e4589bf",
+      "target": "ent_fba15e5b8f919f4f46b36d25",
+      "type": "rel_workorder_store",
+      "label": "工单发生于门店",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_db1c39310db16fcc1ec8764d",
+      "source": "ent_ed29220766725afcb3f49588",
+      "target": "ent_17ad351a705590e860f3aa28",
+      "type": "rel_workorder_store",
+      "label": "工单发生于门店",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_09a904b2c962bea2afb690e8",
+      "source": "ent_544fa21463c7b81f59ab488f",
+      "target": "ent_a6d0fee15e1ca0d5fc3e6ec6",
+      "type": "rel_workorder_store",
+      "label": "工单发生于门店",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_57c2e6afc723078b5c27629f",
+      "source": "ent_c0ad35e6232f43399f7c36c8",
+      "target": "ent_fd34c84e9072e4b7feca91d8",
+      "type": "rel_workorder_asset",
+      "label": "工单涉及设备",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_90e3f309aa82844001a86f33",
+      "source": "ent_eb59096e1bbf789a083de9dc",
+      "target": "ent_e7f5b1b11ee8863de282f3cb",
+      "type": "rel_workorder_asset",
+      "label": "工单涉及设备",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_ed72a2f706c86fac50d44a0b",
+      "source": "ent_029fa3416b8734713df4fa19",
+      "target": "ent_cc288483d000a933e24d827e",
+      "type": "rel_workorder_asset",
+      "label": "工单涉及设备",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_79337f858a292888f21c5300",
+      "source": "ent_86a864ca45add1017987da40",
+      "target": "ent_8ad056b45fe3ad75919f9f65",
+      "type": "rel_workorder_asset",
+      "label": "工单涉及设备",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_5b76d1441d85ba996fbc6e46",
+      "source": "ent_7769610b51a426d11788c89f",
+      "target": "ent_339f4399c7e1a748bb7a8d8c",
+      "type": "rel_workorder_asset",
+      "label": "工单涉及设备",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_d7b7734daed41d8ae05766ff",
+      "source": "ent_fa21ce1141e0d19ecf3270ae",
+      "target": "ent_fd34c84e9072e4b7feca91d8",
+      "type": "rel_workorder_asset",
+      "label": "工单涉及设备",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_d63c18e0881d6aa8859a8d71",
+      "source": "ent_ed29220766725afcb3f49588",
+      "target": "ent_dc18cd3613ba0ddc4144345b",
+      "type": "rel_workorder_asset",
+      "label": "工单涉及设备",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_67fd96b3e236c4543115c572",
+      "source": "ent_544fa21463c7b81f59ab488f",
+      "target": "ent_575bfb35023ce86d72b5348d",
+      "type": "rel_workorder_asset",
+      "label": "工单涉及设备",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_d5634429086c39d5db67b664",
+      "source": "ent_c0ad35e6232f43399f7c36c8",
+      "target": "ent_279b589c3ebc1c205cd8d879",
+      "type": "rel_workorder_vendor",
+      "label": "工单关联维修商",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_b51916ee2985cde4c01c23c8",
+      "source": "ent_073ccfcd1ff083b5d56d8356",
+      "target": "ent_c0171164fd78d189f00c4923",
+      "type": "rel_workorder_vendor",
+      "label": "工单关联维修商",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_41a8a4a9d08a34534fe2bb85",
+      "source": "ent_a3ce9a5469b6fee475ac3487",
+      "target": "ent_e65d84312c9ba6144a13c00e",
+      "type": "rel_workorder_vendor",
+      "label": "工单关联维修商",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_4cb4466f0d0753184470b16d",
+      "source": "ent_9af642a4634f6e1c96dacb5f",
+      "target": "ent_1d919db979f30e8872fb38fe",
+      "type": "rel_workorder_vendor",
+      "label": "工单关联维修商",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_197cc9e1ea7400a4d1cca19f",
+      "source": "ent_029fa3416b8734713df4fa19",
+      "target": "ent_e5632a377c54158d97fff6f3",
+      "type": "rel_workorder_vendor",
+      "label": "工单关联维修商",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_69848d7f35b69bb737539982",
+      "source": "ent_86a864ca45add1017987da40",
+      "target": "ent_7261f2975de57efe73919d62",
+      "type": "rel_workorder_vendor",
+      "label": "工单关联维修商",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_ff70f4fe3d381e2cb48dc68b",
+      "source": "ent_fa21ce1141e0d19ecf3270ae",
+      "target": "ent_279b589c3ebc1c205cd8d879",
+      "type": "rel_workorder_vendor",
+      "label": "工单关联维修商",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_babe461946f5089587c75253",
+      "source": "ent_ed29220766725afcb3f49588",
+      "target": "ent_9e19083eb60ff4189a3f916c",
+      "type": "rel_workorder_vendor",
+      "label": "工单关联维修商",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_ffdb0d3c652741fcb960e7324bcd08a1"
+      ]
+    },
+    {
+      "id": "rel_79da00010c0148e6e11b61c4",
+      "source": "ent_acc67ea2800b69fcefe06959",
+      "target": "ent_fd34c84e9072e4b7feca91d8",
+      "type": "rel_store_asset",
+      "label": "门店拥有设备",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_701f85b610e049e0ac2a9698b000cc01"
+      ]
+    },
+    {
+      "id": "rel_811c948436f86e58d9f99dda",
+      "source": "ent_d89aee53461879040fe8e67e",
+      "target": "ent_63662e764427ec1c1dfb0557",
+      "type": "rel_store_asset",
+      "label": "门店拥有设备",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_701f85b610e049e0ac2a9698b000cc01"
+      ]
+    },
+    {
+      "id": "rel_ebec932f216b0cf3e6859d0b",
+      "source": "ent_d89aee53461879040fe8e67e",
+      "target": "ent_21d54b5cd9c7f17d1da39302",
+      "type": "rel_store_asset",
+      "label": "门店拥有设备",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_701f85b610e049e0ac2a9698b000cc01"
+      ]
+    },
+    {
+      "id": "rel_12ea8264f56cc82845747f60",
+      "source": "ent_d89aee53461879040fe8e67e",
+      "target": "ent_e9c9d177fbebd40a7a687a96",
+      "type": "rel_store_asset",
+      "label": "门店拥有设备",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_701f85b610e049e0ac2a9698b000cc01"
+      ]
+    },
+    {
+      "id": "rel_11746e6243cad1538860c5d4",
+      "source": "ent_a75638df5ceadd291139213a",
+      "target": "ent_e5cccee5e834e4e5c98e6f69",
+      "type": "rel_store_asset",
+      "label": "门店拥有设备",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_701f85b610e049e0ac2a9698b000cc01"
+      ]
+    },
+    {
+      "id": "rel_1130d1472d59a4109da62350",
+      "source": "ent_a75638df5ceadd291139213a",
+      "target": "ent_404f21668ee8305fd65b2e88",
+      "type": "rel_store_asset",
+      "label": "门店拥有设备",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_701f85b610e049e0ac2a9698b000cc01"
+      ]
+    },
+    {
+      "id": "rel_c8ba3fea685b657aba75c2e7",
+      "source": "ent_8efe1b3b92f2898b005e2a31",
+      "target": "ent_e7f5b1b11ee8863de282f3cb",
+      "type": "rel_store_asset",
+      "label": "门店拥有设备",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_701f85b610e049e0ac2a9698b000cc01"
+      ]
+    },
+    {
+      "id": "rel_90356d586a56a86d69139de7",
+      "source": "ent_fd34c84e9072e4b7feca91d8",
+      "target": "ent_7c27d2f5dd74020faa8b8a0b",
+      "type": "rel_asset_contract",
+      "label": "设备引用合同",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_701f85b610e049e0ac2a9698b000cc01"
+      ]
+    },
+    {
+      "id": "rel_2c44ea380e3a0802603a148b",
+      "source": "ent_63662e764427ec1c1dfb0557",
+      "target": "ent_c5d535fc9bfa3d200aed1591",
+      "type": "rel_asset_contract",
+      "label": "设备引用合同",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_701f85b610e049e0ac2a9698b000cc01"
+      ]
+    },
+    {
+      "id": "rel_4466b08960a9a00ba2cb3189",
+      "source": "ent_21d54b5cd9c7f17d1da39302",
+      "target": "ent_c5d535fc9bfa3d200aed1591",
+      "type": "rel_asset_contract",
+      "label": "设备引用合同",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_701f85b610e049e0ac2a9698b000cc01"
+      ]
+    },
+    {
+      "id": "rel_af3d3665da65d9b2b6a9fc89",
+      "source": "ent_e9c9d177fbebd40a7a687a96",
+      "target": "ent_26c3bb3810318eafe7813674",
+      "type": "rel_asset_contract",
+      "label": "设备引用合同",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_701f85b610e049e0ac2a9698b000cc01"
+      ]
+    },
+    {
+      "id": "rel_a3d8848ab1d06412a46b9102",
+      "source": "ent_e5cccee5e834e4e5c98e6f69",
+      "target": "ent_67955b94a94d3af8d91d3345",
+      "type": "rel_asset_contract",
+      "label": "设备引用合同",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_701f85b610e049e0ac2a9698b000cc01"
+      ]
+    },
+    {
+      "id": "rel_fdd1eabb7d577c9793d98a6f",
+      "source": "ent_404f21668ee8305fd65b2e88",
+      "target": "ent_67955b94a94d3af8d91d3345",
+      "type": "rel_asset_contract",
+      "label": "设备引用合同",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_701f85b610e049e0ac2a9698b000cc01"
+      ]
+    },
+    {
+      "id": "rel_5c7b72f58f1c07546a5228a7",
+      "source": "ent_e7f5b1b11ee8863de282f3cb",
+      "target": "ent_7c27d2f5dd74020faa8b8a0b",
+      "type": "rel_asset_contract",
+      "label": "设备引用合同",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_701f85b610e049e0ac2a9698b000cc01"
+      ]
+    },
+    {
+      "id": "rel_602f7183d44fbbdf06336735",
+      "source": "ent_279b589c3ebc1c205cd8d879",
+      "target": "ent_7c27d2f5dd74020faa8b8a0b",
+      "type": "rel_vendor_contract",
+      "label": "维修商引用合同",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_daa34f3441d04e86913e82f5d42143d9"
+      ]
+    },
+    {
+      "id": "rel_a6b4ab1e83f87b0b6ecb620f",
+      "source": "ent_c0171164fd78d189f00c4923",
+      "target": "ent_26c3bb3810318eafe7813674",
+      "type": "rel_vendor_contract",
+      "label": "维修商引用合同",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_daa34f3441d04e86913e82f5d42143d9"
+      ]
+    },
+    {
+      "id": "rel_ae6f49af4df0d62f456a13e7",
+      "source": "ent_e65d84312c9ba6144a13c00e",
+      "target": "ent_c5d535fc9bfa3d200aed1591",
+      "type": "rel_vendor_contract",
+      "label": "维修商引用合同",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_daa34f3441d04e86913e82f5d42143d9"
+      ]
+    },
+    {
+      "id": "rel_65db652b6c21ec1be5593517",
+      "source": "ent_1d919db979f30e8872fb38fe",
+      "target": "ent_67955b94a94d3af8d91d3345",
+      "type": "rel_vendor_contract",
+      "label": "维修商引用合同",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_daa34f3441d04e86913e82f5d42143d9"
+      ]
+    },
+    {
+      "id": "rel_d97dc5babcfd6bb5e2c0e3ef",
+      "source": "ent_42d8b46f93e0a6aaea6d2745",
+      "target": "ent_bb259db0dee3a95402a15591",
+      "type": "rel_message_report",
+      "label": "消息形成报修",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ]
+    },
+    {
+      "id": "rel_c692e15afb11dd36490a04ff",
+      "source": "ent_3a37da3f5299ebb929022501",
+      "target": "ent_33ca241f15038efee9de4447",
+      "type": "rel_message_report",
+      "label": "消息形成报修",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ]
+    },
+    {
+      "id": "rel_21b9b233b12a6bb4cedd7c14",
+      "source": "ent_bb259db0dee3a95402a15591",
+      "target": "ent_073ccfcd1ff083b5d56d8356",
+      "type": "rel_report_workorder",
+      "label": "报修关联工单",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ]
+    },
+    {
+      "id": "rel_38580c32b09d94cfe8fc4542",
+      "source": "ent_33ca241f15038efee9de4447",
+      "target": "ent_a3ce9a5469b6fee475ac3487",
+      "type": "rel_report_workorder",
+      "label": "报修关联工单",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ]
+    },
+    {
+      "id": "rel_ec6ac62045f1a10458b3fdd2",
+      "source": "ent_a3ce9a5469b6fee475ac3487",
+      "target": "ent_073ccfcd1ff083b5d56d8356",
+      "type": "rel_workorder_duplicate",
+      "label": "重复工单指向",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ]
+    },
+    {
+      "id": "rel_56834954583621b56225bddd",
+      "source": "ent_bd5b71f30a4d471281844c89",
+      "target": "ent_bb259db0dee3a95402a15591",
+      "type": "rel_incident_report",
+      "label": "故障候选包含报修",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ]
+    },
+    {
+      "id": "rel_c6809bcd1b6afea8ce3d2a55",
+      "source": "ent_bd5b71f30a4d471281844c89",
+      "target": "ent_33ca241f15038efee9de4447",
+      "type": "rel_incident_report",
+      "label": "故障候选包含报修",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ]
+    },
+    {
+      "id": "rel_6d8c377987d8563ba7368155",
+      "source": "ent_bd5b71f30a4d471281844c89",
+      "target": "ent_7ad0bbaadf5aab86fcfa1db8",
+      "type": "rel_incident_alert",
+      "label": "故障候选包含告警",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ]
+    },
+    {
+      "id": "rel_d7a330d0591ad27a4f7d427a",
+      "source": "ent_bb259db0dee3a95402a15591",
+      "target": "ent_010d4d36c5c2372bc85cf199",
+      "type": "rel_report_store",
+      "label": "报修发生于门店",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ]
+    },
+    {
+      "id": "rel_0956b6677c0c9577af4b4ba2",
+      "source": "ent_33ca241f15038efee9de4447",
+      "target": "ent_010d4d36c5c2372bc85cf199",
+      "type": "rel_report_store",
+      "label": "报修发生于门店",
+      "weight": 1,
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ]
+    }
+  ],
+  "communities": [
+    {
+      "id": "type:Store",
+      "label": "门店",
+      "level": 1,
+      "nodeIds": [
+        "ent_acc67ea2800b69fcefe06959",
+        "ent_d89aee53461879040fe8e67e",
+        "ent_a75638df5ceadd291139213a",
+        "ent_8efe1b3b92f2898b005e2a31",
+        "ent_16e145d2535e6980f2165d34",
+        "ent_aae3bba3dad5a99c5e47c6b3",
+        "ent_5bfecb3933f39b57522b39df",
+        "ent_fba15e5b8f919f4f46b36d25",
+        "ent_17ad351a705590e860f3aa28",
+        "ent_a6d0fee15e1ca0d5fc3e6ec6",
+        "ent_010d4d36c5c2372bc85cf199"
+      ]
+    },
+    {
+      "id": "type:Asset",
+      "label": "设备",
+      "level": 1,
+      "nodeIds": [
+        "ent_fd34c84e9072e4b7feca91d8",
+        "ent_404f21668ee8305fd65b2e88",
+        "ent_e7f5b1b11ee8863de282f3cb",
+        "ent_cc288483d000a933e24d827e",
+        "ent_8ad056b45fe3ad75919f9f65",
+        "ent_339f4399c7e1a748bb7a8d8c",
+        "ent_dc18cd3613ba0ddc4144345b",
+        "ent_575bfb35023ce86d72b5348d",
+        "ent_63662e764427ec1c1dfb0557",
+        "ent_21d54b5cd9c7f17d1da39302",
+        "ent_e9c9d177fbebd40a7a687a96",
+        "ent_e5cccee5e834e4e5c98e6f69"
+      ]
+    },
+    {
+      "id": "type:Incident",
+      "label": "故障候选",
+      "level": 1,
+      "nodeIds": [
+        "ent_bd5b71f30a4d471281844c89"
+      ]
+    },
+    {
+      "id": "type:Alert",
+      "label": "告警",
+      "level": 1,
+      "nodeIds": [
+        "ent_7ad0bbaadf5aab86fcfa1db8"
+      ]
+    },
+    {
+      "id": "type:Report",
+      "label": "报修记录",
+      "level": 1,
+      "nodeIds": [
+        "ent_bb259db0dee3a95402a15591",
+        "ent_33ca241f15038efee9de4447"
+      ]
+    },
+    {
+      "id": "type:Message",
+      "label": "消息记录",
+      "level": 1,
+      "nodeIds": [
+        "ent_42d8b46f93e0a6aaea6d2745",
+        "ent_3a37da3f5299ebb929022501"
+      ]
+    },
+    {
+      "id": "type:WorkOrder",
+      "label": "工单",
+      "level": 1,
+      "nodeIds": [
+        "ent_a3ce9a5469b6fee475ac3487",
+        "ent_073ccfcd1ff083b5d56d8356",
+        "ent_c0ad35e6232f43399f7c36c8",
+        "ent_9af642a4634f6e1c96dacb5f",
+        "ent_eb59096e1bbf789a083de9dc",
+        "ent_029fa3416b8734713df4fa19",
+        "ent_86a864ca45add1017987da40",
+        "ent_7769610b51a426d11788c89f",
+        "ent_fa21ce1141e0d19ecf3270ae",
+        "ent_231b46e230c191cb2e4589bf",
+        "ent_ed29220766725afcb3f49588",
+        "ent_544fa21463c7b81f59ab488f"
+      ]
+    },
+    {
+      "id": "type:Contract",
+      "label": "合同候选",
+      "level": 1,
+      "nodeIds": [
+        "ent_7c27d2f5dd74020faa8b8a0b",
+        "ent_c5d535fc9bfa3d200aed1591",
+        "ent_26c3bb3810318eafe7813674",
+        "ent_67955b94a94d3af8d91d3345"
+      ]
+    },
+    {
+      "id": "type:Vendor",
+      "label": "维修商",
+      "level": 1,
+      "nodeIds": [
+        "ent_279b589c3ebc1c205cd8d879",
+        "ent_c0171164fd78d189f00c4923",
+        "ent_e65d84312c9ba6144a13c00e",
+        "ent_1d919db979f30e8872fb38fe",
+        "ent_e5632a377c54158d97fff6f3",
+        "ent_7261f2975de57efe73919d62",
+        "ent_9e19083eb60ff4189a3f916c"
+      ]
+    },
+    {
+      "id": "type:Principal",
+      "label": "权限主体",
+      "level": 1,
+      "nodeIds": [
+        "ent_e24abea7ad26d2e77edc1917",
+        "ent_c71428e7107b90588c35f82b",
+        "ent_afa1215c9e95cf036130e9cd",
+        "ent_e9d041a99dea102dd21f22e0"
+      ]
+    }
+  ]
+}

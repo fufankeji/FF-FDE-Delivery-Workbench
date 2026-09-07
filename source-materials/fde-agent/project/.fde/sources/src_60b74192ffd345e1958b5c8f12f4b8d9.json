@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_60b74192ffd345e1958b5c8f12f4b8d9",
+  "originalName": "02-data-sample-and-dictionary.md",
+  "storedName": "02-data-sample-and-dictionary.md",
+  "relativePath": "fde-resources/02-data-sample-and-dictionary.md",
+  "mimeType": "text/markdown; charset=utf-8",
+  "extension": "md",
+  "bytes": 3199,
+  "createdAt": "2026-09-04T04:20:03.233Z",
+  "modifiedAt": "2026-09-04T04:20:03.233Z",
+  "mtimeMs": 1788495603233.4355,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 3199,
+    "sourceMtimeMs": 1788495603233.4355,
+    "derivedPath": ".fde/derived/src_60b74192ffd345e1958b5c8f12f4b8d9.md",
+    "updatedAt": "2026-09-04T04:20:03.264Z"
+  }
+}

@@ -1,0 +1,283 @@
+{
+  "runId": "run_f5c64296-09cd-450e-a74a-e4b4d94dd443",
+  "status": "ready",
+  "createdAt": "2026-09-07T02:45:22.511Z",
+  "seedNodeId": "ent_bd5b71f30a4d471281844c89",
+  "query": "南京新街口店 NJ-003 收银中断：Incident INC-CAND-NJXJK-20260821-01 关联的 R-1002/R-1003 报修、WO-88419/WO-88422 工单、网络告警与审批链",
+  "schemaVersion": "0.1.1-preview",
+  "graphRevision": "sha256:58ee663b62eec5cc338b7570616aaea479eea99e31baf545e5069442dea076a6",
+  "entities": [
+    {
+      "id": "ent_a3ce9a5469b6fee475ac3487",
+      "name": "WO-88422",
+      "type": "WorkOrder",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_a44e36460acd45eea1820367c61d0c8c",
+        "src_ffdb0d3c652741fcb960e7324bcd08a1",
+        "src_aa4217d373de4543abc6cf718540becb"
+      ],
+      "summary": "WO-88422",
+      "validFrom": null,
+      "validUntil": null,
+      "properties": {
+        "work_order_id": "WO-88422"
+      }
+    },
+    {
+      "id": "ent_073ccfcd1ff083b5d56d8356",
+      "name": "WO-88419",
+      "type": "WorkOrder",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_a44e36460acd45eea1820367c61d0c8c",
+        "src_ffdb0d3c652741fcb960e7324bcd08a1",
+        "src_aa4217d373de4543abc6cf718540becb"
+      ],
+      "summary": "WO-88419",
+      "validFrom": null,
+      "validUntil": null,
+      "properties": {
+        "work_order_id": "WO-88419"
+      }
+    },
+    {
+      "id": "ent_010d4d36c5c2372bc85cf199",
+      "name": "S-NJ-011",
+      "type": "Store",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ],
+      "summary": "S-NJ-011",
+      "validFrom": null,
+      "validUntil": null,
+      "properties": {
+        "store_id": "S-NJ-011"
+      }
+    },
+    {
+      "id": "ent_bd5b71f30a4d471281844c89",
+      "name": "INC-CAND-NJXJK-20260821-01",
+      "type": "Incident",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ],
+      "summary": "INC-CAND-NJXJK-20260821-01",
+      "validFrom": null,
+      "validUntil": null,
+      "properties": {
+        "incident_id": "INC-CAND-NJXJK-20260821-01"
+      }
+    },
+    {
+      "id": "ent_7ad0bbaadf5aab86fcfa1db8",
+      "name": "ALERT-NJXJK-68102",
+      "type": "Alert",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ],
+      "summary": "ALERT-NJXJK-68102",
+      "validFrom": null,
+      "validUntil": null,
+      "properties": {
+        "alert_id": "ALERT-NJXJK-68102"
+      }
+    },
+    {
+      "id": "ent_bb259db0dee3a95402a15591",
+      "name": "R1002",
+      "type": "Report",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ],
+      "summary": "R1002",
+      "validFrom": null,
+      "validUntil": null,
+      "properties": {
+        "report_id": "R1002"
+      }
+    },
+    {
+      "id": "ent_33ca241f15038efee9de4447",
+      "name": "R1003",
+      "type": "Report",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ],
+      "summary": "R1003",
+      "validFrom": null,
+      "validUntil": null,
+      "properties": {
+        "report_id": "R1003"
+      }
+    },
+    {
+      "id": "ent_42d8b46f93e0a6aaea6d2745",
+      "name": "MSG-WECOM-908811",
+      "type": "Message",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ],
+      "summary": "MSG-WECOM-908811",
+      "validFrom": null,
+      "validUntil": null,
+      "properties": {
+        "message_id": "MSG-WECOM-908811"
+      }
+    },
+    {
+      "id": "ent_3a37da3f5299ebb929022501",
+      "name": "MSG-WECOM-908827",
+      "type": "Message",
+      "confidence": 0.82,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ],
+      "summary": "MSG-WECOM-908827",
+      "validFrom": null,
+      "validUntil": null,
+      "properties": {
+        "message_id": "MSG-WECOM-908827"
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "id": "rel_d97dc5babcfd6bb5e2c0e3ef",
+      "source": "ent_42d8b46f93e0a6aaea6d2745",
+      "target": "ent_bb259db0dee3a95402a15591",
+      "type": "rel_message_report",
+      "label": "消息形成报修",
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ],
+      "validFrom": null,
+      "validUntil": null
+    },
+    {
+      "id": "rel_c692e15afb11dd36490a04ff",
+      "source": "ent_3a37da3f5299ebb929022501",
+      "target": "ent_33ca241f15038efee9de4447",
+      "type": "rel_message_report",
+      "label": "消息形成报修",
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ],
+      "validFrom": null,
+      "validUntil": null
+    },
+    {
+      "id": "rel_21b9b233b12a6bb4cedd7c14",
+      "source": "ent_bb259db0dee3a95402a15591",
+      "target": "ent_073ccfcd1ff083b5d56d8356",
+      "type": "rel_report_workorder",
+      "label": "报修关联工单",
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ],
+      "validFrom": null,
+      "validUntil": null
+    },
+    {
+      "id": "rel_38580c32b09d94cfe8fc4542",
+      "source": "ent_33ca241f15038efee9de4447",
+      "target": "ent_a3ce9a5469b6fee475ac3487",
+      "type": "rel_report_workorder",
+      "label": "报修关联工单",
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ],
+      "validFrom": null,
+      "validUntil": null
+    },
+    {
+      "id": "rel_56834954583621b56225bddd",
+      "source": "ent_bd5b71f30a4d471281844c89",
+      "target": "ent_bb259db0dee3a95402a15591",
+      "type": "rel_incident_report",
+      "label": "故障候选包含报修",
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ],
+      "validFrom": null,
+      "validUntil": null
+    },
+    {
+      "id": "rel_c6809bcd1b6afea8ce3d2a55",
+      "source": "ent_bd5b71f30a4d471281844c89",
+      "target": "ent_33ca241f15038efee9de4447",
+      "type": "rel_incident_report",
+      "label": "故障候选包含报修",
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ],
+      "validFrom": null,
+      "validUntil": null
+    },
+    {
+      "id": "rel_6d8c377987d8563ba7368155",
+      "source": "ent_bd5b71f30a4d471281844c89",
+      "target": "ent_7ad0bbaadf5aab86fcfa1db8",
+      "type": "rel_incident_alert",
+      "label": "故障候选包含告警",
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ],
+      "validFrom": null,
+      "validUntil": null
+    },
+    {
+      "id": "rel_d7a330d0591ad27a4f7d427a",
+      "source": "ent_bb259db0dee3a95402a15591",
+      "target": "ent_010d4d36c5c2372bc85cf199",
+      "type": "rel_report_store",
+      "label": "报修发生于门店",
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ],
+      "validFrom": null,
+      "validUntil": null
+    },
+    {
+      "id": "rel_0956b6677c0c9577af4b4ba2",
+      "source": "ent_33ca241f15038efee9de4447",
+      "target": "ent_010d4d36c5c2372bc85cf199",
+      "type": "rel_report_store",
+      "label": "报修发生于门店",
+      "confidence": 0.78,
+      "sourceRefs": [
+        "src_aa4217d373de4543abc6cf718540becb"
+      ],
+      "validFrom": null,
+      "validUntil": null
+    }
+  ],
+  "constraints": [
+    "每个实体和关系必须保留当前项目 SourceId，不以展示标签替代原始来源。",
+    "合同、设备身份和工单信息冲突时并列保留，不自动覆盖或合并。",
+    "final_domain、final_priority、final_owner、final_vendor、final_decision 不进入抽取和图谱。",
+    "消息、告警、报修和工单分别保留材料中的记录时间。",
+    "合同、值班和政策的生效时间与记录时间分开；无正文时只保留候选状态。"
+  ],
+  "derivedFacts": [],
+  "sources": [
+    "src_a44e36460acd45eea1820367c61d0c8c",
+    "src_aa4217d373de4543abc6cf718540becb",
+    "src_ffdb0d3c652741fcb960e7324bcd08a1"
+  ],
+  "permissionScope": "仅用于当前项目第四阶段的本体候选抽取、Schema 审阅、项目隔离图谱构建、只读验证和 Agent 有界上下文；禁止生产写入、正式派单、消息通知和费用承诺。\n\n  混合材料的权威性不完全相同，当前界面又只能统一选择一个级别，第一轮建议选择“辅助依据”，避免把所有文件误标为权威事实。"
+}

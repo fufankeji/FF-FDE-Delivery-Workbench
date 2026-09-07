@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_fdc5c72379834e6e97971a3d5736d21b",
+  "originalName": "02-semantic-capability-workshop.md",
+  "storedName": "02-semantic-capability-workshop.md",
+  "relativePath": "fde-resources/02-semantic-capability-workshop.md",
+  "mimeType": "text/markdown; charset=utf-8",
+  "extension": "md",
+  "bytes": 2688,
+  "createdAt": "2026-09-04T09:40:25.674Z",
+  "modifiedAt": "2026-09-04T09:40:25.676Z",
+  "mtimeMs": 1788514825675.5107,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 2688,
+    "sourceMtimeMs": 1788514825675.5107,
+    "derivedPath": ".fde/derived/src_fdc5c72379834e6e97971a3d5736d21b.md",
+    "updatedAt": "2026-09-04T09:40:25.707Z"
+  }
+}

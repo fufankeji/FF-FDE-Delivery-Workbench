@@ -1,0 +1,267 @@
+{
+  "schemaVersion": 1,
+  "stage": "production",
+  "status": "review-ready",
+  "workItems": [
+    {
+      "id": "readiness",
+      "status": "complete"
+    },
+    {
+      "id": "release",
+      "status": "complete"
+    },
+    {
+      "id": "adoption",
+      "status": "complete"
+    },
+    {
+      "id": "handover",
+      "status": "complete"
+    }
+  ],
+  "blockers": [],
+  "recommendation": "go",
+  "delivery": {
+    "schemaVersion": 1,
+    "version": "local-delivery-flow-r1",
+    "versionFiles": [
+      {
+        "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+        "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+      }
+    ],
+    "environment": {
+      "kind": "production",
+      "label": "生产与交付范围"
+    },
+    "semantic": {
+      "mode": "snapshot",
+      "schemaVersion": "0.1.1-preview",
+      "graphRevision": "sha256:58ee663b62eec5cc338b7570616aaea479eea99e31baf545e5069442dea076a6",
+      "summary": "本地应用通过 backend/catalog.mjs 读取既有 56 实体 / 56 关系快照并查询相关子图。尚未接入独立 Semantica 在线查询、生产权限或更新流水线；DSH 中有 Semantica 工具不代表本应用已接通。",
+      "evidence": [
+        {
+          "path": "backend/catalog.mjs",
+          "sha256": "06802a58c1f4523b51d3ab37f496851dde3c3d0ad28f7038ccfbd352be427bd2"
+        },
+        {
+          "path": "docs/architecture/architecture.md",
+          "sha256": "2e669fae199d50759d12962398f22dc0ca03d1d764174bc41cac2f54d3f891bf"
+        },
+        {
+          "path": ".fde/design/knowledge-graph.json",
+          "sha256": "960a8b029c76ccb9c50d38c2ab1aa6f9852c1df3e781d6356e692fef6f4adec2"
+        }
+      ]
+    },
+    "items": [
+      {
+        "id": "production-1",
+        "category": "release",
+        "title": "候选版本分批发布",
+        "summary": "测试发布批次 DEMO-REL-001：10% → 50% → 100%；每批观察 30 分钟，回退目标保持为 demo-r1。",
+        "criterion": "无关键告警；错误率不超过 1%；回退版本可用",
+        "owner": "发布负责人",
+        "status": "passed",
+        "required": true,
+        "version": "local-delivery-flow-r1",
+        "scope": "production",
+        "observedAt": "2026-09-07T10:06:28.310Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      },
+      {
+        "id": "production-2",
+        "category": "adoption",
+        "title": "使用范围与采用情况",
+        "summary": "模拟两周内 12/12 名操作者活跃，处理 240 个案例；204 条建议采用，采用率 85%。",
+        "criterion": "活跃率 ≥80%；建议采用率 ≥80%",
+        "owner": "业务负责人",
+        "status": "passed",
+        "required": true,
+        "version": "local-delivery-flow-r1",
+        "scope": "production",
+        "observedAt": "2026-09-07T10:06:28.311Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      },
+      {
+        "id": "production-3",
+        "category": "acceptance",
+        "title": "核心业务链路验收",
+        "summary": "联调 20 条业务用例全部覆盖：查看来源 → 生成建议 → 人工确认 → 保存草稿。",
+        "criterion": "20/20 用例通过，无正式派单调用",
+        "owner": "客户验收代表",
+        "status": "passed",
+        "required": true,
+        "version": "local-delivery-flow-r1",
+        "scope": "production",
+        "observedAt": "2026-09-07T10:06:28.311Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      },
+      {
+        "id": "production-4",
+        "category": "acceptance",
+        "title": "权限与来源验收",
+        "summary": "模拟越权动作测试 8/8 被阻断；抽查 30 条事实均带来源，缺失字段不臆测填充。",
+        "criterion": "越权阻断 100%；来源可追溯 100%",
+        "owner": "安全验收代表",
+        "status": "passed",
+        "required": true,
+        "version": "local-delivery-flow-r1",
+        "scope": "production",
+        "observedAt": "2026-09-07T10:06:28.311Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      },
+      {
+        "id": "production-5",
+        "category": "acceptance",
+        "title": "恢复与接管验收",
+        "summary": "模拟停止自动建议后可继续人工处理；恢复 2 分 10 秒，12 份已确认草稿全部保留。",
+        "criterion": "恢复 ≤5 分钟；已确认数据无丢失",
+        "owner": "运维验收代表",
+        "status": "passed",
+        "required": true,
+        "version": "local-delivery-flow-r1",
+        "scope": "production",
+        "observedAt": "2026-09-07T10:06:28.311Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      },
+      {
+        "id": "production-6",
+        "category": "deliverable",
+        "title": "应用代码与版本清单",
+        "summary": "联调交付清单包括前端、后端、运行说明和版本摘要；本文件是交付格式样例，不是新构建的软件包。",
+        "criterion": "文件清单、版本与接收责任明确",
+        "owner": "交付负责人",
+        "status": "passed",
+        "required": true,
+        "version": "local-delivery-flow-r1",
+        "scope": "production",
+        "observedAt": "2026-09-07T10:06:28.311Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      },
+      {
+        "id": "production-7",
+        "category": "deliverable",
+        "title": "语义资产与数据规则",
+        "summary": "联调清单包含最小 Schema、图谱快照引用、来源规则、时间规则和只读权限；不声称在线 Semantica 查询已接通。",
+        "criterion": "区分快照消费与运行时服务；明确更新责任",
+        "owner": "语义维护人",
+        "status": "passed",
+        "required": true,
+        "version": "local-delivery-flow-r1",
+        "scope": "production",
+        "observedAt": "2026-09-07T10:06:28.311Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      },
+      {
+        "id": "production-8",
+        "category": "deliverable",
+        "title": "操作、故障与测试资料",
+        "summary": "联调交付项：操作指南、接管/回退步骤、验收用例、已知问题和变更记录。",
+        "criterion": "资料可读，交付项有唯一接收角色",
+        "owner": "交付负责人",
+        "status": "passed",
+        "required": true,
+        "version": "local-delivery-flow-r1",
+        "scope": "production",
+        "observedAt": "2026-09-07T10:06:28.311Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      },
+      {
+        "id": "production-9",
+        "category": "handover",
+        "title": "接收团队独立实操",
+        "summary": "测试接收团队完成启动、停止、查看日志、定位来源、人工接管和恢复六项演练。",
+        "criterion": "6/6 实操完成；不依赖开发人员代操作",
+        "owner": "接收运维团队",
+        "status": "passed",
+        "required": true,
+        "version": "local-delivery-flow-r1",
+        "scope": "production",
+        "observedAt": "2026-09-07T10:06:28.311Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      },
+      {
+        "id": "production-10",
+        "category": "handover",
+        "title": "责任与升级路径",
+        "summary": "联调责任分工：业务负责建议采用，系统负责运行恢复，数据负责来源映射，安全负责动作边界；严重故障 15 分钟响应。",
+        "criterion": "每类问题有 Owner、升级路径和备份角色",
+        "owner": "服务负责人",
+        "status": "passed",
+        "required": true,
+        "version": "local-delivery-flow-r1",
+        "scope": "production",
+        "observedAt": "2026-09-07T10:06:28.311Z",
+        "nextAction": "仅查看示例；真实执行仍需使用真实版本、授权与证据。",
+        "evidence": [
+          {
+            "path": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+            "sha256": "bf133c0775d5794bea127febc148da466c1f31ff58773eff8e39c79b32088530"
+          }
+        ]
+      }
+    ]
+  },
+  "dataProvenance": {
+    "kind": "integration-fixture",
+    "source": "docs/verification/2026-09-07-delivery-flow-fixture.md",
+    "authorizedBy": "用户明确要求直接通过数据走项目原交付链",
+    "note": "人工构造的联调输入，不表示实际生产上线、客户签收或人工页面验收"
+  }
+}

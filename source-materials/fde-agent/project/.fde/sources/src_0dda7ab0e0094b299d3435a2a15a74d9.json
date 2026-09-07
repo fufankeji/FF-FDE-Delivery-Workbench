@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_0dda7ab0e0094b299d3435a2a15a74d9",
+  "originalName": "06-owner-verifier-workshop.txt",
+  "storedName": "06-owner-verifier-workshop.txt",
+  "relativePath": "fde-resources/06-owner-verifier-workshop.txt",
+  "mimeType": "text/plain; charset=utf-8",
+  "extension": "txt",
+  "bytes": 1926,
+  "createdAt": "2026-09-04T02:54:37.776Z",
+  "modifiedAt": "2026-09-04T02:54:37.777Z",
+  "mtimeMs": 1788490477776.7273,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 1926,
+    "sourceMtimeMs": 1788490477776.7273,
+    "derivedPath": ".fde/derived/src_0dda7ab0e0094b299d3435a2a15a74d9.md",
+    "updatedAt": "2026-09-04T02:54:37.858Z"
+  }
+}

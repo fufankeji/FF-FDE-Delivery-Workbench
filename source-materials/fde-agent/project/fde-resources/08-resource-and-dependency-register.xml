@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resourceAndDependencyRegister
+  caseSourceId="SRC-SIM-0208"
+  evidenceKind="simulation"
+  availableFrom="stage-02-definition"
+  asOf="2026-08-06">
+  <resources>
+    <resource id="RES-OPS-01" role="设备运维专员" candidateOwner="林哲" availableHoursPerWeek="4" status="candidate" />
+    <resource id="RES-IT-01" role="IT 接口工程师" candidateOwner="周凯" availableHoursPerWeek="2" status="candidate" />
+    <resource id="RES-REVIEW-01" role="Pilot 人工复核" candidateOwner="林哲" availableHoursPerWeek="unknown" status="unconfirmed" />
+    <resource id="RES-VERIFY-01" role="独立指标验证" candidateOwner="唐婧" availableHoursPerWeek="unknown" status="unconfirmed" />
+  </resources>
+  <dependencies>
+    <dependency id="DEP-SANDBOX-01" name="工单系统 Sandbox" owner="工单系统供应商" status="not-open" leadTime="10-20 个工作日" evidence="供应商口头回复" />
+    <dependency id="DEP-SEC-01" name="信息安全评审" owner="信息安全团队" status="not-submitted" leadTime="通常 15 个工作日" evidence="客户内部经验" />
+    <dependency id="DEP-CHANGE-01" name="生产变更窗口" owner="IT 运维" status="monthly-window" leadTime="每月一次" evidence="客户流程说明" />
+    <dependency id="DEP-ASSET-01" name="设备台账稳定匹配" owner="设备运维" status="unverified" leadTime="unknown" evidence="阶段一已发现旧标签冲突" />
+    <dependency id="DEP-CONTRACT-01" name="合同与 SLA 权威版本" owner="采购与法务" status="unconfirmed" leadTime="unknown" evidence="现有值班表不能替代合同" />
+    <dependency id="DEP-IDENTITY-01" name="工作台用户身份与权限范围" owner="IT 与信息安全" status="unverified" leadTime="unknown" evidence="尚未完成现场调查" />
+  </dependencies>
+  <planningRules>
+    <rule>客户等待时间必须单独列出，不能算成开发工时。</rule>
+    <rule>未知负责人、未知工时和未开通访问必须进入估算区间或阻塞项。</rule>
+    <rule>不得把供应商口头周期改写成承诺日期。</rule>
+  </planningRules>
+</resourceAndDependencyRegister>

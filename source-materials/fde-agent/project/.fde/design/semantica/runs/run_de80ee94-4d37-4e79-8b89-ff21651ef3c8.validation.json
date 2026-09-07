@@ -1,0 +1,265 @@
+{
+  "runId": "run_de80ee94-4d37-4e79-8b89-ff21651ef3c8",
+  "status": "failed",
+  "checkedAt": "2026-09-04T10:19:40.089Z",
+  "graphRevision": "sha256:e7f2c0fbb7b9db798428a14701ce35ac2f981ce4b579d9cdb620c014399c125b",
+  "definitionDigest": "sha256:25a656ea2ec24e1be2d75fe7803349087ca8cd988315f9fd891d5dcdd2489837",
+  "structuralValid": true,
+  "issues": [
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_f5c40ed5bac1cafc2273e027",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_5b33d579d1790aeefd0098c0",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_7f06f94d0c0080b6020c52c7",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_29d9bd9b00fe27a9305bb450",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_4e3177fdfe02872b24290007",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_9e3dd67426fbe98136d501cd",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_815009a35d8a4f3f4a2400be",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_8fb8caf2eac773c4adbeff3b",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_cf11749c32798d2312dd2308",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_e7b71ea2eb191b65c5aba83d",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_f913f08fb8e70d7fbf652c11",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_88d74fd82a8d6b504b68a72d",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_4460c3742f0708c44bd8f19e",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_c5bc0855899aaf1d331647ba",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_fad224c9a19b65d47661fe58",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_68d52642f1bc7c653224d3d2",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_a17ef56424eb02d4a13184c7",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_eaec3289ab101c31fec3cc10",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_d0da15fd93fcff45ea7d8aea",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_6ebf53168e5fc3af06726aaf",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_fc3bc38da389d8b2dc58175d",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_b1e79f7d3525a35853d8bd16",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_898b60413578af6c4d85d97b",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_61a14f3216a3afd911bcb571",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_1916ad0b157f542a3e1d7945",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_567f7ea7c693e7a3e281b0bb",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_a44404a3d9d3e837f81c863b",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_61299695c2abcc393a7bf2fe",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "INVALID_TYPE",
+      "message": "Unknown entity type: DATE",
+      "severity": "warning",
+      "element_id": "ent_9fc8c1073542cc1b22c58c72",
+      "element_type": "entity",
+      "details": {}
+    },
+    {
+      "code": "ORPHAN_NODES",
+      "message": "Found 29 orphan nodes (no relationships).",
+      "severity": "warning",
+      "element_id": null,
+      "element_type": null,
+      "details": {
+        "count": 29,
+        "ids": [
+          "ent_68d52642f1bc7c653224d3d2",
+          "ent_61299695c2abcc393a7bf2fe",
+          "ent_8fb8caf2eac773c4adbeff3b",
+          "ent_29d9bd9b00fe27a9305bb450",
+          "ent_a44404a3d9d3e837f81c863b",
+          "ent_61a14f3216a3afd911bcb571",
+          "ent_fad224c9a19b65d47661fe58",
+          "ent_567f7ea7c693e7a3e281b0bb",
+          "ent_4460c3742f0708c44bd8f19e",
+          "ent_e7b71ea2eb191b65c5aba83d"
+        ]
+      }
+    }
+  ],
+  "questions": []
+}

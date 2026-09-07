@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_99c9f3bcca9a4b1aa7fff5922132f786",
+  "originalName": "10-role-and-boundary-confirmation.md",
+  "storedName": "10-role-and-boundary-confirmation.md",
+  "relativePath": "fde-resources/10-role-and-boundary-confirmation.md",
+  "mimeType": "text/markdown; charset=utf-8",
+  "extension": "md",
+  "bytes": 2635,
+  "createdAt": "2026-09-04T02:54:37.755Z",
+  "modifiedAt": "2026-09-04T02:54:37.756Z",
+  "mtimeMs": 1788490477755.5178,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 2635,
+    "sourceMtimeMs": 1788490477755.5178,
+    "derivedPath": ".fde/derived/src_99c9f3bcca9a4b1aa7fff5922132f786.md",
+    "updatedAt": "2026-09-04T02:54:37.835Z"
+  }
+}

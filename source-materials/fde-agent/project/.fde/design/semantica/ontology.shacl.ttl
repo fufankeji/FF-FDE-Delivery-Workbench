@@ -1,0 +1,189 @@
+@prefix ex: <https://fde.local/ontology/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://semantica.dev/shapes/shapes> a owl:Ontology .
+
+<https://semantica.dev/shapes/StoreShape>
+    a sh:NodeShape ;
+    sh:targetClass <https://fde.local/ontology/Store> ;
+    sh:name "门店" ;
+    sh:property [
+        sh:path <https://fde.local/ontology/store_id> ;
+        sh:datatype xsd:xsd:string ;
+        sh:minCount 1 ;
+        sh:severity sh:Violation
+    ] ;
+    sh:property [
+        sh:path <https://fde.local/ontology/rel_store_asset> ;
+        sh:class <https://fde.local/ontology/Asset> ;
+        sh:severity sh:Violation
+    ] .
+
+<https://semantica.dev/shapes/AssetShape>
+    a sh:NodeShape ;
+    sh:targetClass <https://fde.local/ontology/Asset> ;
+    sh:name "设备" ;
+    sh:property [
+        sh:path <https://fde.local/ontology/asset_id> ;
+        sh:datatype xsd:xsd:string ;
+        sh:minCount 1 ;
+        sh:severity sh:Violation
+    ] ;
+    sh:property [
+        sh:path <https://fde.local/ontology/rel_asset_contract> ;
+        sh:class <https://fde.local/ontology/Contract> ;
+        sh:severity sh:Violation
+    ] .
+
+<https://semantica.dev/shapes/IncidentShape>
+    a sh:NodeShape ;
+    sh:targetClass <https://fde.local/ontology/Incident> ;
+    sh:name "故障候选" ;
+    sh:property [
+        sh:path <https://fde.local/ontology/incident_id> ;
+        sh:datatype xsd:xsd:string ;
+        sh:minCount 1 ;
+        sh:severity sh:Violation
+    ] ;
+    sh:property [
+        sh:path <https://fde.local/ontology/rel_incident_report> ;
+        sh:class <https://fde.local/ontology/Report> ;
+        sh:severity sh:Violation
+    ] ;
+    sh:property [
+        sh:path <https://fde.local/ontology/rel_incident_alert> ;
+        sh:class <https://fde.local/ontology/Alert> ;
+        sh:severity sh:Violation
+    ] .
+
+<https://semantica.dev/shapes/AlertShape>
+    a sh:NodeShape ;
+    sh:targetClass <https://fde.local/ontology/Alert> ;
+    sh:name "告警" ;
+    sh:property [
+        sh:path <https://fde.local/ontology/alert_id> ;
+        sh:datatype xsd:xsd:string ;
+        sh:minCount 1 ;
+        sh:severity sh:Violation
+    ] .
+
+<https://semantica.dev/shapes/ReportShape>
+    a sh:NodeShape ;
+    sh:targetClass <https://fde.local/ontology/Report> ;
+    sh:name "报修记录" ;
+    sh:property [
+        sh:path <https://fde.local/ontology/report_id> ;
+        sh:datatype xsd:xsd:string ;
+        sh:minCount 1 ;
+        sh:severity sh:Violation
+    ] ;
+    sh:property [
+        sh:path <https://fde.local/ontology/rel_report_workorder> ;
+        sh:class <https://fde.local/ontology/WorkOrder> ;
+        sh:severity sh:Violation
+    ] ;
+    sh:property [
+        sh:path <https://fde.local/ontology/rel_report_store> ;
+        sh:class <https://fde.local/ontology/Store> ;
+        sh:severity sh:Violation
+    ] .
+
+<https://semantica.dev/shapes/MessageShape>
+    a sh:NodeShape ;
+    sh:targetClass <https://fde.local/ontology/Message> ;
+    sh:name "消息记录" ;
+    sh:property [
+        sh:path <https://fde.local/ontology/message_id> ;
+        sh:datatype xsd:xsd:string ;
+        sh:minCount 1 ;
+        sh:severity sh:Violation
+    ] ;
+    sh:property [
+        sh:path <https://fde.local/ontology/rel_message_report> ;
+        sh:class <https://fde.local/ontology/Report> ;
+        sh:severity sh:Violation
+    ] .
+
+<https://semantica.dev/shapes/WorkOrderShape>
+    a sh:NodeShape ;
+    sh:targetClass <https://fde.local/ontology/WorkOrder> ;
+    sh:name "工单" ;
+    sh:property [
+        sh:path <https://fde.local/ontology/work_order_id> ;
+        sh:datatype xsd:xsd:string ;
+        sh:minCount 1 ;
+        sh:severity sh:Violation
+    ] ;
+    sh:property [
+        sh:path <https://fde.local/ontology/rel_workorder_store> ;
+        sh:class <https://fde.local/ontology/Store> ;
+        sh:severity sh:Violation
+    ] ;
+    sh:property [
+        sh:path <https://fde.local/ontology/rel_workorder_asset> ;
+        sh:class <https://fde.local/ontology/Asset> ;
+        sh:severity sh:Violation
+    ] ;
+    sh:property [
+        sh:path <https://fde.local/ontology/rel_workorder_vendor> ;
+        sh:class <https://fde.local/ontology/Vendor> ;
+        sh:severity sh:Violation
+    ] ;
+    sh:property [
+        sh:path <https://fde.local/ontology/rel_workorder_duplicate> ;
+        sh:class <https://fde.local/ontology/WorkOrder> ;
+        sh:severity sh:Violation
+    ] .
+
+<https://semantica.dev/shapes/ContractShape>
+    a sh:NodeShape ;
+    sh:targetClass <https://fde.local/ontology/Contract> ;
+    sh:name "合同候选" ;
+    sh:property [
+        sh:path <https://fde.local/ontology/contract_id> ;
+        sh:datatype xsd:xsd:string ;
+        sh:minCount 1 ;
+        sh:severity sh:Violation
+    ] .
+
+<https://semantica.dev/shapes/VendorShape>
+    a sh:NodeShape ;
+    sh:targetClass <https://fde.local/ontology/Vendor> ;
+    sh:name "维修商" ;
+    sh:property [
+        sh:path <https://fde.local/ontology/vendor_id> ;
+        sh:datatype xsd:xsd:string ;
+        sh:minCount 1 ;
+        sh:severity sh:Violation
+    ] ;
+    sh:property [
+        sh:path <https://fde.local/ontology/rel_vendor_contract> ;
+        sh:class <https://fde.local/ontology/Contract> ;
+        sh:severity sh:Violation
+    ] .
+
+<https://semantica.dev/shapes/PrincipalShape>
+    a sh:NodeShape ;
+    sh:targetClass <https://fde.local/ontology/Principal> ;
+    sh:name "权限主体" ;
+    sh:property [
+        sh:path <https://fde.local/ontology/principal_id> ;
+        sh:datatype xsd:xsd:string ;
+        sh:minCount 1 ;
+        sh:severity sh:Violation
+    ] .
+
+<https://semantica.dev/shapes/DataSourceShape>
+    a sh:NodeShape ;
+    sh:targetClass <https://fde.local/ontology/DataSource> ;
+    sh:name "证据来源" ;
+    sh:property [
+        sh:path <https://fde.local/ontology/source_id> ;
+        sh:datatype xsd:xsd:string ;
+        sh:minCount 1 ;
+        sh:severity sh:Violation
+    ] .

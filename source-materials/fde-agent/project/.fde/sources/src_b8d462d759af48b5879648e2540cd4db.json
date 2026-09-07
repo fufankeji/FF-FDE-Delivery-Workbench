@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "sourceId": "src_b8d462d759af48b5879648e2540cd4db",
+  "originalName": "08-escalation-email.eml",
+  "storedName": "08-escalation-email.eml",
+  "relativePath": "fde-resources/08-escalation-email.eml",
+  "mimeType": "application/octet-stream",
+  "extension": "eml",
+  "bytes": 1245,
+  "createdAt": "2026-09-03T10:23:37.288Z",
+  "modifiedAt": "2026-09-03T10:23:37.289Z",
+  "mtimeMs": 1788431017289.2002,
+  "previewKind": "unsupported",
+  "parse": {
+    "status": "unsupported",
+    "message": "当前本地识别器不支持此格式。"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "id": "run_198308c9-8f7b-4e79-b675-cca6417adf55",
+  "kind": "build",
+  "status": "succeeded",
+  "startedAt": "2026-09-04T10:26:07.989Z",
+  "providerVersion": "0.6.7",
+  "definitionVersion": "0.1.1-preview",
+  "definitionDigest": "sha256:8e81402d47f636984f86e6843567d9535527c73b6edd9bcc11901a3e494cca70",
+  "sourceDigests": [
+    "sha256:39ce56db847fc34ef6321eb76b873292bdd84f9da84975eb9b8e1e18aec50005",
+    "sha256:1f632800efbe4bd803739d82c2a8473535f81c679232b937dba03640712ca6d5",
+    "sha256:887c918918fe00735df8a0e0e8f64ea783e24fffc426bc6197453df9b6ba9f41",
+    "sha256:07dd0c8db0b36dd0ccd8d1b7d1973fbe021dabe1bc4e4b8e6273c5495b323c8f",
+    "sha256:1ccaac3c4926cdb5c8c29b7e229470ddac1a10060f58620acb6f27e355bf0559",
+    "sha256:a3c4ba0b00896568628deff031456e2f930f7f55fd9162654dcf7be03fffaaed",
+    "sha256:12689c3c80a2a9cc27b14fcfc7c386c97190e459b709bf355780830bcaf6262c",
+    "sha256:281de7dbae71dae59cbf86bb5d9832a53d16b397f2efd73775619e78c4eb6737",
+    "sha256:bb60ba13b4236c9ea029a8dae954f5ebb093d78013c90e217682734d34337ba1"
+  ],
+  "evidencePaths": [
+    ".fde/design/semantica/graph.json",
+    ".fde/design/knowledge-graph.json"
+  ],
+  "diagnostics": [],
+  "summary": "Semantica 已构建 56 个实体、56 条关系；结构验证仍需独立运行。",
+  "completedAt": "2026-09-04T10:26:09.351Z"
+}

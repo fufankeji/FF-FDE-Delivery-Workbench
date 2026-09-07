@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_0b7bb9068a09492dae83b5432fad81c5",
+  "originalName": "01-baseline-and-target-discussion.md",
+  "storedName": "01-baseline-and-target-discussion.md",
+  "relativePath": "fde-resources/01-baseline-and-target-discussion.md",
+  "mimeType": "text/markdown; charset=utf-8",
+  "extension": "md",
+  "bytes": 2257,
+  "createdAt": "2026-09-04T03:08:27.113Z",
+  "modifiedAt": "2026-09-04T03:08:27.113Z",
+  "mtimeMs": 1788491307113.2742,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 2257,
+    "sourceMtimeMs": 1788491307113.2742,
+    "derivedPath": ".fde/derived/src_0b7bb9068a09492dae83b5432fad81c5.md",
+    "updatedAt": "2026-09-04T03:08:27.158Z"
+  }
+}

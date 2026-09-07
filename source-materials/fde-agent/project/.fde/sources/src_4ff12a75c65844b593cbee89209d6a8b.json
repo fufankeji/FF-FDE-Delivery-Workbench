@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_4ff12a75c65844b593cbee89209d6a8b",
+  "originalName": "01-systems-access-and-ownership.md",
+  "storedName": "01-systems-access-and-ownership.md",
+  "relativePath": "fde-resources/01-systems-access-and-ownership.md",
+  "mimeType": "text/markdown; charset=utf-8",
+  "extension": "md",
+  "bytes": 2935,
+  "createdAt": "2026-09-04T04:20:03.223Z",
+  "modifiedAt": "2026-09-04T04:20:03.224Z",
+  "mtimeMs": 1788495603223.963,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 2935,
+    "sourceMtimeMs": 1788495603223.963,
+    "derivedPath": ".fde/derived/src_4ff12a75c65844b593cbee89209d6a8b.md",
+    "updatedAt": "2026-09-04T04:20:03.264Z"
+  }
+}

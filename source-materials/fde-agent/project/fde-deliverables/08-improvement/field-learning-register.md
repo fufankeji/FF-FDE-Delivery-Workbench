@@ -1,0 +1,16 @@
+# 前序发现与反馈来源
+
+记录日期：2026-09-07。候选版本：`local-repair-v0.2-ui`。
+
+已登记本地测试和快照接入两条事实来源。尚无生产事故、业务采用指标或客户反馈，不得从本地案例构造生产健康状态。
+
+## 可追溯依据
+
+- `docs/architecture/architecture.md`
+- `docs/verification/2026-09-07-stage5-run.json`
+- `docs/verification/2026-09-07-stage5-integration.md`
+- `docs/verification/2026-09-07-delivery-observation.json`
+
+## 状态边界
+
+本文件是依据现有真实材料形成的准备记录，不是试点／生产已完成报告，不含 FDE 决定或客户批准。项目继续停留在当前实际阶段；后三阶段仅供只读预览。数据以对应 `.fde/stages/` 文件的 delivery 字段供工作台读取，文件摘要不一致时必须重新核对。

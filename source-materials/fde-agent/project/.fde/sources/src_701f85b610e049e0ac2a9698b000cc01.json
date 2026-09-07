@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_701f85b610e049e0ac2a9698b000cc01",
+  "originalName": "04-device-register.xml",
+  "storedName": "04-device-register.xml",
+  "relativePath": "fde-resources/04-device-register.xml",
+  "mimeType": "application/xml; charset=utf-8",
+  "extension": "xml",
+  "bytes": 3062,
+  "createdAt": "2026-09-03T10:23:37.296Z",
+  "modifiedAt": "2026-09-03T10:23:37.296Z",
+  "mtimeMs": 1788431017295.9082,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 3062,
+    "sourceMtimeMs": 1788431017295.9082,
+    "derivedPath": ".fde/derived/src_701f85b610e049e0ac2a9698b000cc01.md",
+    "updatedAt": "2026-09-03T10:23:37.342Z"
+  }
+}

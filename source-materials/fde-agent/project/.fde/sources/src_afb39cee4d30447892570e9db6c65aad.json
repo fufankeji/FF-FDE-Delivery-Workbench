@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_afb39cee4d30447892570e9db6c65aad",
+  "originalName": "02-representative-cases.md",
+  "storedName": "02-representative-cases.md",
+  "relativePath": "fde-resources/02-representative-cases.md",
+  "mimeType": "text/markdown; charset=utf-8",
+  "extension": "md",
+  "bytes": 2394,
+  "createdAt": "2026-09-03T10:19:59.586Z",
+  "modifiedAt": "2026-09-03T10:19:59.586Z",
+  "mtimeMs": 1788430799585.9114,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 2394,
+    "sourceMtimeMs": 1788430799585.9114,
+    "derivedPath": ".fde/derived/src_afb39cee4d30447892570e9db6c65aad.md",
+    "updatedAt": "2026-09-03T10:19:59.601Z"
+  }
+}

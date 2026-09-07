@@ -1,0 +1,251 @@
+{
+  "schemaVersion": 1,
+  "stage": "investigation",
+  "status": "review-ready",
+  "workItems": [
+    {
+      "id": "data",
+      "status": "complete"
+    },
+    {
+      "id": "systems",
+      "status": "complete"
+    },
+    {
+      "id": "access",
+      "status": "complete"
+    },
+    {
+      "id": "owners",
+      "status": "complete"
+    }
+  ],
+  "blockers": [
+    {
+      "id": "storenet-access-pending",
+      "title": "StoreNet 告警读取未批（AR-304，~5 工作日）——不阻塞当前只读调查，阻塞下一阶段网络告警读回",
+      "severity": "medium",
+      "status": "open"
+    },
+    {
+      "id": "sandbox-draft-write-pending",
+      "title": "WorkOrder Sandbox 草稿写未批（AR-305，8–12 工作日）——不阻塞当前调查，阻塞下一阶段草稿写演示",
+      "severity": "medium",
+      "status": "open"
+    },
+    {
+      "id": "enterprise-chat-access-deferred",
+      "title": "企业消息平台无 API/数据批准（AR-307 deferred）——首期用人工上传文本，生产动作前须解决",
+      "severity": "medium",
+      "status": "open"
+    },
+    {
+      "id": "contract-version-unverified",
+      "title": "ContractHub 权威版本未核（6 份仿真摘要，PDF 正文为准）——阻塞下一阶段合同覆盖判断",
+      "severity": "medium",
+      "status": "open"
+    }
+  ],
+  "recommendation": "pending",
+  "investigation": {
+    "systems": [
+      {
+        "id": "workorder-pro",
+        "label": "WorkOrder Pro 7",
+        "kind": "system",
+        "status": "conditional",
+        "owner": "林哲",
+        "note": "工单创建/派单/状态/关闭；SaaS；只读测试账号已批、草稿写 pending、正式派单未申请。AR-301/305/306"
+      },
+      {
+        "id": "assetbook",
+        "label": "AssetBook",
+        "kind": "system",
+        "status": "confirmed",
+        "owner": "许文",
+        "note": "门店设备台账；每日导出；4.6% 在用设备无唯一有效标签。AR-302"
+      },
+      {
+        "id": "contracthub",
+        "label": "ContractHub",
+        "kind": "system",
+        "status": "conditional",
+        "owner": "沈悦",
+        "note": "供应商合同与 SLA；PDF 与人工元数据并存；仅批准 6 份仿真摘要。AR-303"
+      },
+      {
+        "id": "storenet-monitor",
+        "label": "StoreNet Monitor",
+        "kind": "system",
+        "status": "pending",
+        "owner": "罗峰",
+        "note": "门店网络监控；可读在线/告警，Agent 不得改配置；读取待开通。AR-304"
+      },
+      {
+        "id": "enterprise-chat",
+        "label": "企业消息平台",
+        "kind": "external",
+        "status": "blocked",
+        "owner": "数字化运营部／法务",
+        "note": "报修入口之一；真实群含员工/顾客信息；无 API/数据批准。AR-307"
+      },
+      {
+        "id": "report-record",
+        "label": "报修记录（report_id）",
+        "kind": "data",
+        "status": "confirmed",
+        "note": "单条报修消息/电话记录标识，非业务事件 ID；字段字典字段。来源 src_fbbc…"
+      }
+    ],
+    "connections": [
+      {
+        "from": "enterprise-chat",
+        "to": "report-record",
+        "label": "门店经消息平台报修，产生 report_id（脱敏样本）"
+      },
+      {
+        "from": "report-record",
+        "to": "assetbook",
+        "label": "asset_text→asset_id 候选匹配（17% 首次失败）"
+      },
+      {
+        "from": "report-record",
+        "to": "workorder-pro",
+        "label": "人工建工单（草稿）→正式工单；无统一事件 ID，以门店/时间/设备/症状组合匹配"
+      }
+    ],
+    "actionBoundaries": [
+      {
+        "target": "WorkOrder 历史工单导出",
+        "read": "allowed",
+        "suggest": "not-applicable",
+        "draft": "not-applicable",
+        "execute": "denied"
+      },
+      {
+        "target": "WorkOrder Sandbox 草稿",
+        "read": "allowed",
+        "suggest": "allowed",
+        "draft": "pending",
+        "execute": "denied"
+      },
+      {
+        "target": "WorkOrder 正式派单",
+        "read": "not-applicable",
+        "suggest": "not-applicable",
+        "draft": "not-applicable",
+        "execute": "denied"
+      },
+      {
+        "target": "AssetBook 快照",
+        "read": "allowed",
+        "suggest": "not-applicable",
+        "draft": "denied",
+        "execute": "denied"
+      },
+      {
+        "target": "ContractHub 仿真摘要",
+        "read": "allowed",
+        "suggest": "allowed",
+        "draft": "not-applicable",
+        "execute": "denied"
+      },
+      {
+        "target": "StoreNet Monitor",
+        "read": "pending",
+        "suggest": "not-applicable",
+        "draft": "not-applicable",
+        "execute": "denied"
+      },
+      {
+        "target": "企业消息平台",
+        "read": "denied",
+        "suggest": "denied",
+        "draft": "denied",
+        "execute": "denied"
+      },
+      {
+        "target": "P0 应急路径",
+        "read": "allowed",
+        "suggest": "allowed",
+        "draft": "not-applicable",
+        "execute": "denied"
+      }
+    ],
+    "dataFindings": [
+      {
+        "label": "评估标签隔离",
+        "value": "final_domain / final_priority 不进入候选上下文",
+        "status": "confirmed"
+      },
+      {
+        "label": "不可信指令输入",
+        "value": "不得改变权限或绕过审批",
+        "status": "warning"
+      },
+      {
+        "label": "跨系统关联口径",
+        "value": "没有统一事件 ID",
+        "status": "warning"
+      },
+      {
+        "label": "样本代表性",
+        "value": "12 条样例不可外推 1246 总体",
+        "status": "warning"
+      },
+      {
+        "label": "南京事件链",
+        "value": "告警恢复与根因仍待核",
+        "status": "pending"
+      },
+      {
+        "label": "接口版本差异",
+        "value": "文档 7.4 / Sandbox 7.3.1",
+        "status": "warning"
+      },
+      {
+        "label": "真实写动作",
+        "value": "本轮未执行",
+        "status": "confirmed"
+      }
+    ],
+    "governanceReviews": [
+      {
+        "area": "security",
+        "status": "pending",
+        "owner": "信息安全团队／林哲",
+        "note": "草稿写进入申请，完整信息安全评审未通过"
+      },
+      {
+        "area": "privacy",
+        "status": "pending",
+        "owner": "数字化运营部／法务",
+        "note": "企业消息平台 API 与数据使用批准延后至 Pilot 后评估"
+      },
+      {
+        "area": "legal",
+        "status": "pending",
+        "owner": "法务",
+        "note": "企业消息平台群数据合规与 ContractHub 正文权威性待核"
+      },
+      {
+        "area": "procurement",
+        "status": "conditional",
+        "owner": "沈悦",
+        "note": "仅 6 份仿真摘要，不得作合同覆盖决定"
+      },
+      {
+        "area": "finance",
+        "status": "pending",
+        "owner": "财务",
+        "note": "120/260 成本标准未获财务批准，仅为候选情景"
+      },
+      {
+        "area": "business",
+        "status": "conditional",
+        "owner": "贺敏／林哲",
+        "note": "区域运营与设备运维责任已在仿真中确认；真实生产口径、Sandbox 写结果和 API 版本仍待核"
+      }
+    ]
+  }
+}

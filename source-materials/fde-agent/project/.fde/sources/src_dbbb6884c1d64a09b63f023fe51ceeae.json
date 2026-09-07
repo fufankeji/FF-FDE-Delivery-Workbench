@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_dbbb6884c1d64a09b63f023fe51ceeae",
+  "originalName": "01-solution-constraints.md",
+  "storedName": "01-solution-constraints.md",
+  "relativePath": "fde-resources/01-solution-constraints.md",
+  "mimeType": "text/markdown; charset=utf-8",
+  "extension": "md",
+  "bytes": 3475,
+  "createdAt": "2026-09-04T08:56:30.994Z",
+  "modifiedAt": "2026-09-04T08:56:30.994Z",
+  "mtimeMs": 1788512190994.096,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 3475,
+    "sourceMtimeMs": 1788512190994.096,
+    "derivedPath": ".fde/derived/src_dbbb6884c1d64a09b63f023fe51ceeae.md",
+    "updatedAt": "2026-09-04T08:56:31.022Z"
+  }
+}

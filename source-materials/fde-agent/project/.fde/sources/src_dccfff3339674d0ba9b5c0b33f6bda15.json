@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_dccfff3339674d0ba9b5c0b33f6bda15",
+  "originalName": "12-governance-review-notes.txt",
+  "storedName": "12-governance-review-notes.txt",
+  "relativePath": "fde-resources/12-governance-review-notes.txt",
+  "mimeType": "text/plain; charset=utf-8",
+  "extension": "txt",
+  "bytes": 2795,
+  "createdAt": "2026-09-04T04:25:36.825Z",
+  "modifiedAt": "2026-09-04T04:25:36.825Z",
+  "mtimeMs": 1788495936824.9558,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 2795,
+    "sourceMtimeMs": 1788495936824.9558,
+    "derivedPath": ".fde/derived/src_dccfff3339674d0ba9b5c0b33f6bda15.md",
+    "updatedAt": "2026-09-04T04:25:36.862Z"
+  }
+}

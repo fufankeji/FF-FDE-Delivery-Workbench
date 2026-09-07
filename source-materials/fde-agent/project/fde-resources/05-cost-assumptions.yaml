@@ -1,0 +1,40 @@
+case_source_id: SRC-SIM-0205
+evidence_kind: simulation
+available_from: stage-02-definition
+currency: CNY
+as_of: "2026-08-04"
+
+assumptions:
+  - id: COST-HUMAN-001
+    item: 总部运维人工综合成本
+    value: 120
+    unit: CNY_per_hour
+    source: 财务业务伙伴在目标讨论会中的口头范围
+    approval_status: unconfirmed
+    confidence: low
+    allowed_use: 仅用于候选情景测算
+    forbidden_claim: 不得写成正式财务成本标准
+
+  - id: COST-REDISPATCH-001
+    item: 首次错误派单的无效上门或协调成本
+    value: 260
+    unit: CNY_per_order
+    sample_size: 37
+    source: 2026 年 5 至 7 月错误派单样本人工汇总
+    approval_status: limited_sample
+    confidence: low
+    allowed_use: 只能给出带样本限制的候选节省区间
+
+unknown_costs:
+  - 项目建设与历史数据整理
+  - 模型推理与存储
+  - 工单系统和身份系统接入
+  - Pilot 与生产期人工复核
+  - 安全、法务和治理评审
+  - 支持、监控、故障处理与退出
+
+calculation_rules:
+  - 已测数据、手工估算、客户目标和项目预测必须分栏表达。
+  - 未确认的成本不得合并成单一确定 ROI。
+  - 基本情景和下行情景都必须包含人工复核负荷。
+  - P0/P1 停业与食品损失当前不使用统一平均金额。

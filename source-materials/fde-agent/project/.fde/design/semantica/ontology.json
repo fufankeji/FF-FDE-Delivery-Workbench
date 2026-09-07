@@ -1,0 +1,574 @@
+{
+  "uri": "https://fde.local/ontology/",
+  "name": "FDEProjectOntology",
+  "version": "0.1.1-preview",
+  "classes": [
+    {
+      "name": "Store",
+      "uri": "https://fde.local/ontology/Store",
+      "label": "门店",
+      "comment": "",
+      "properties": [
+        "store_id"
+      ],
+      "aliases": [
+        "门店",
+        "store"
+      ],
+      "fieldMappings": [
+        {
+          "sourceField": "label",
+          "targetProperty": "store_id"
+        }
+      ],
+      "@type": "owl:Class"
+    },
+    {
+      "name": "Asset",
+      "uri": "https://fde.local/ontology/Asset",
+      "label": "设备",
+      "comment": "",
+      "properties": [
+        "asset_id"
+      ],
+      "aliases": [
+        "设备",
+        "收银终端",
+        "网络设备",
+        "空调",
+        "冷柜"
+      ],
+      "fieldMappings": [
+        {
+          "sourceField": "label",
+          "targetProperty": "asset_id"
+        }
+      ],
+      "@type": "owl:Class"
+    },
+    {
+      "name": "Incident",
+      "uri": "https://fde.local/ontology/Incident",
+      "label": "故障候选",
+      "comment": "",
+      "properties": [
+        "incident_id"
+      ],
+      "aliases": [
+        "故障",
+        "事件",
+        "incident"
+      ],
+      "fieldMappings": [
+        {
+          "sourceField": "label",
+          "targetProperty": "incident_id"
+        }
+      ],
+      "@type": "owl:Class"
+    },
+    {
+      "name": "Alert",
+      "uri": "https://fde.local/ontology/Alert",
+      "label": "告警",
+      "comment": "",
+      "properties": [
+        "alert_id"
+      ],
+      "aliases": [
+        "告警",
+        "alert"
+      ],
+      "fieldMappings": [
+        {
+          "sourceField": "label",
+          "targetProperty": "alert_id"
+        }
+      ],
+      "@type": "owl:Class"
+    },
+    {
+      "name": "Report",
+      "uri": "https://fde.local/ontology/Report",
+      "label": "报修记录",
+      "comment": "",
+      "properties": [
+        "report_id"
+      ],
+      "aliases": [
+        "报修",
+        "report"
+      ],
+      "fieldMappings": [
+        {
+          "sourceField": "label",
+          "targetProperty": "report_id"
+        }
+      ],
+      "@type": "owl:Class"
+    },
+    {
+      "name": "Message",
+      "uri": "https://fde.local/ontology/Message",
+      "label": "消息记录",
+      "comment": "",
+      "properties": [
+        "message_id"
+      ],
+      "aliases": [
+        "消息",
+        "聊天记录"
+      ],
+      "fieldMappings": [
+        {
+          "sourceField": "label",
+          "targetProperty": "message_id"
+        }
+      ],
+      "@type": "owl:Class"
+    },
+    {
+      "name": "WorkOrder",
+      "uri": "https://fde.local/ontology/WorkOrder",
+      "label": "工单",
+      "comment": "",
+      "properties": [
+        "work_order_id"
+      ],
+      "aliases": [
+        "工单",
+        "work order"
+      ],
+      "fieldMappings": [
+        {
+          "sourceField": "label",
+          "targetProperty": "work_order_id"
+        }
+      ],
+      "@type": "owl:Class"
+    },
+    {
+      "name": "Contract",
+      "uri": "https://fde.local/ontology/Contract",
+      "label": "合同候选",
+      "comment": "",
+      "properties": [
+        "contract_id"
+      ],
+      "aliases": [
+        "合同",
+        "contract"
+      ],
+      "fieldMappings": [
+        {
+          "sourceField": "label",
+          "targetProperty": "contract_id"
+        }
+      ],
+      "@type": "owl:Class"
+    },
+    {
+      "name": "Vendor",
+      "uri": "https://fde.local/ontology/Vendor",
+      "label": "维修商",
+      "comment": "",
+      "properties": [
+        "vendor_id"
+      ],
+      "aliases": [
+        "维修商",
+        "供应商",
+        "vendor"
+      ],
+      "fieldMappings": [
+        {
+          "sourceField": "label",
+          "targetProperty": "vendor_id"
+        }
+      ],
+      "@type": "owl:Class"
+    },
+    {
+      "name": "Principal",
+      "uri": "https://fde.local/ontology/Principal",
+      "label": "权限主体",
+      "comment": "",
+      "properties": [
+        "principal_id"
+      ],
+      "aliases": [
+        "用户",
+        "Agent",
+        "执行主体"
+      ],
+      "fieldMappings": [
+        {
+          "sourceField": "label",
+          "targetProperty": "principal_id"
+        }
+      ],
+      "@type": "owl:Class"
+    },
+    {
+      "name": "DataSource",
+      "uri": "https://fde.local/ontology/DataSource",
+      "label": "证据来源",
+      "comment": "",
+      "properties": [
+        "source_id"
+      ],
+      "aliases": [
+        "数据来源",
+        "source"
+      ],
+      "fieldMappings": [
+        {
+          "sourceField": "label",
+          "targetProperty": "source_id"
+        }
+      ],
+      "@type": "owl:Class"
+    }
+  ],
+  "properties": [
+    {
+      "name": "store_id",
+      "uri": "https://fde.local/ontology/store_id",
+      "label": "门店编号",
+      "comment": "Project data property",
+      "type": "data",
+      "domain": [
+        "Store"
+      ],
+      "range": "xsd:string",
+      "required": true,
+      "unique": true,
+      "@type": "owl:DatatypeProperty"
+    },
+    {
+      "name": "asset_id",
+      "uri": "https://fde.local/ontology/asset_id",
+      "label": "设备编号",
+      "comment": "Project data property",
+      "type": "data",
+      "domain": [
+        "Asset"
+      ],
+      "range": "xsd:string",
+      "required": true,
+      "unique": true,
+      "@type": "owl:DatatypeProperty"
+    },
+    {
+      "name": "incident_id",
+      "uri": "https://fde.local/ontology/incident_id",
+      "label": "故障候选编号",
+      "comment": "Project data property",
+      "type": "data",
+      "domain": [
+        "Incident"
+      ],
+      "range": "xsd:string",
+      "required": true,
+      "unique": true,
+      "@type": "owl:DatatypeProperty"
+    },
+    {
+      "name": "alert_id",
+      "uri": "https://fde.local/ontology/alert_id",
+      "label": "告警编号",
+      "comment": "Project data property",
+      "type": "data",
+      "domain": [
+        "Alert"
+      ],
+      "range": "xsd:string",
+      "required": true,
+      "unique": true,
+      "@type": "owl:DatatypeProperty"
+    },
+    {
+      "name": "report_id",
+      "uri": "https://fde.local/ontology/report_id",
+      "label": "报修记录编号",
+      "comment": "Project data property",
+      "type": "data",
+      "domain": [
+        "Report"
+      ],
+      "range": "xsd:string",
+      "required": true,
+      "unique": true,
+      "@type": "owl:DatatypeProperty"
+    },
+    {
+      "name": "message_id",
+      "uri": "https://fde.local/ontology/message_id",
+      "label": "消息记录编号",
+      "comment": "Project data property",
+      "type": "data",
+      "domain": [
+        "Message"
+      ],
+      "range": "xsd:string",
+      "required": true,
+      "unique": true,
+      "@type": "owl:DatatypeProperty"
+    },
+    {
+      "name": "work_order_id",
+      "uri": "https://fde.local/ontology/work_order_id",
+      "label": "工单编号",
+      "comment": "Project data property",
+      "type": "data",
+      "domain": [
+        "WorkOrder"
+      ],
+      "range": "xsd:string",
+      "required": true,
+      "unique": true,
+      "@type": "owl:DatatypeProperty"
+    },
+    {
+      "name": "contract_id",
+      "uri": "https://fde.local/ontology/contract_id",
+      "label": "合同候选编号",
+      "comment": "Project data property",
+      "type": "data",
+      "domain": [
+        "Contract"
+      ],
+      "range": "xsd:string",
+      "required": true,
+      "unique": true,
+      "@type": "owl:DatatypeProperty"
+    },
+    {
+      "name": "vendor_id",
+      "uri": "https://fde.local/ontology/vendor_id",
+      "label": "维修商编号",
+      "comment": "Project data property",
+      "type": "data",
+      "domain": [
+        "Vendor"
+      ],
+      "range": "xsd:string",
+      "required": true,
+      "unique": true,
+      "@type": "owl:DatatypeProperty"
+    },
+    {
+      "name": "principal_id",
+      "uri": "https://fde.local/ontology/principal_id",
+      "label": "权限主体编号",
+      "comment": "Project data property",
+      "type": "data",
+      "domain": [
+        "Principal"
+      ],
+      "range": "xsd:string",
+      "required": true,
+      "unique": true,
+      "@type": "owl:DatatypeProperty"
+    },
+    {
+      "name": "source_id",
+      "uri": "https://fde.local/ontology/source_id",
+      "label": "证据来源编号",
+      "comment": "Project data property",
+      "type": "data",
+      "domain": [
+        "DataSource"
+      ],
+      "range": "xsd:string",
+      "required": true,
+      "unique": true,
+      "@type": "owl:DatatypeProperty"
+    },
+    {
+      "name": "rel_store_asset",
+      "uri": "https://fde.local/ontology/rel_store_asset",
+      "label": "门店拥有设备",
+      "comment": "",
+      "type": "object",
+      "domain": [
+        "Store"
+      ],
+      "range": [
+        "Asset"
+      ],
+      "cardinality": "one-to-many",
+      "@type": "owl:ObjectProperty"
+    },
+    {
+      "name": "rel_workorder_store",
+      "uri": "https://fde.local/ontology/rel_workorder_store",
+      "label": "工单发生于门店",
+      "comment": "",
+      "type": "object",
+      "domain": [
+        "WorkOrder"
+      ],
+      "range": [
+        "Store"
+      ],
+      "cardinality": "many-to-one",
+      "@type": "owl:ObjectProperty"
+    },
+    {
+      "name": "rel_workorder_asset",
+      "uri": "https://fde.local/ontology/rel_workorder_asset",
+      "label": "工单涉及设备",
+      "comment": "",
+      "type": "object",
+      "domain": [
+        "WorkOrder"
+      ],
+      "range": [
+        "Asset"
+      ],
+      "cardinality": "many-to-one",
+      "@type": "owl:ObjectProperty"
+    },
+    {
+      "name": "rel_workorder_vendor",
+      "uri": "https://fde.local/ontology/rel_workorder_vendor",
+      "label": "工单关联维修商",
+      "comment": "",
+      "type": "object",
+      "domain": [
+        "WorkOrder"
+      ],
+      "range": [
+        "Vendor"
+      ],
+      "cardinality": "many-to-one",
+      "@type": "owl:ObjectProperty"
+    },
+    {
+      "name": "rel_asset_contract",
+      "uri": "https://fde.local/ontology/rel_asset_contract",
+      "label": "设备引用合同",
+      "comment": "",
+      "type": "object",
+      "domain": [
+        "Asset"
+      ],
+      "range": [
+        "Contract"
+      ],
+      "cardinality": "many-to-one",
+      "@type": "owl:ObjectProperty"
+    },
+    {
+      "name": "rel_vendor_contract",
+      "uri": "https://fde.local/ontology/rel_vendor_contract",
+      "label": "维修商引用合同",
+      "comment": "",
+      "type": "object",
+      "domain": [
+        "Vendor"
+      ],
+      "range": [
+        "Contract"
+      ],
+      "cardinality": "many-to-one",
+      "@type": "owl:ObjectProperty"
+    },
+    {
+      "name": "rel_message_report",
+      "uri": "https://fde.local/ontology/rel_message_report",
+      "label": "消息形成报修",
+      "comment": "",
+      "type": "object",
+      "domain": [
+        "Message"
+      ],
+      "range": [
+        "Report"
+      ],
+      "cardinality": "many-to-one",
+      "@type": "owl:ObjectProperty"
+    },
+    {
+      "name": "rel_report_workorder",
+      "uri": "https://fde.local/ontology/rel_report_workorder",
+      "label": "报修关联工单",
+      "comment": "",
+      "type": "object",
+      "domain": [
+        "Report"
+      ],
+      "range": [
+        "WorkOrder"
+      ],
+      "cardinality": "one-to-many",
+      "@type": "owl:ObjectProperty"
+    },
+    {
+      "name": "rel_workorder_duplicate",
+      "uri": "https://fde.local/ontology/rel_workorder_duplicate",
+      "label": "重复工单指向",
+      "comment": "",
+      "type": "object",
+      "domain": [
+        "WorkOrder"
+      ],
+      "range": [
+        "WorkOrder"
+      ],
+      "cardinality": "many-to-one",
+      "@type": "owl:ObjectProperty"
+    },
+    {
+      "name": "rel_incident_report",
+      "uri": "https://fde.local/ontology/rel_incident_report",
+      "label": "故障候选包含报修",
+      "comment": "",
+      "type": "object",
+      "domain": [
+        "Incident"
+      ],
+      "range": [
+        "Report"
+      ],
+      "cardinality": "one-to-many",
+      "@type": "owl:ObjectProperty"
+    },
+    {
+      "name": "rel_incident_alert",
+      "uri": "https://fde.local/ontology/rel_incident_alert",
+      "label": "故障候选包含告警",
+      "comment": "",
+      "type": "object",
+      "domain": [
+        "Incident"
+      ],
+      "range": [
+        "Alert"
+      ],
+      "cardinality": "one-to-many",
+      "@type": "owl:ObjectProperty"
+    },
+    {
+      "name": "rel_report_store",
+      "uri": "https://fde.local/ontology/rel_report_store",
+      "label": "报修发生于门店",
+      "comment": "",
+      "type": "object",
+      "domain": [
+        "Report"
+      ],
+      "range": [
+        "Store"
+      ],
+      "cardinality": "many-to-one",
+      "@type": "owl:ObjectProperty"
+    }
+  ],
+  "imports": [],
+  "metadata": {
+    "generated_at": "2026-09-04T10:26:07.775786+00:00",
+    "source": "fde-workspace-definition"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_50532fd88c1f438b84e2955b28f10f0e",
+  "originalName": "09-sandbox-readback-log.txt",
+  "storedName": "09-sandbox-readback-log.txt",
+  "relativePath": "fde-resources/09-sandbox-readback-log.txt",
+  "mimeType": "text/plain; charset=utf-8",
+  "extension": "txt",
+  "bytes": 2057,
+  "createdAt": "2026-09-04T04:24:02.753Z",
+  "modifiedAt": "2026-09-04T04:24:02.754Z",
+  "mtimeMs": 1788495842753.5066,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 2057,
+    "sourceMtimeMs": 1788495842753.5066,
+    "derivedPath": ".fde/derived/src_50532fd88c1f438b84e2955b28f10f0e.md",
+    "updatedAt": "2026-09-04T04:24:02.800Z"
+  }
+}

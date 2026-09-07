@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "stage": "definition",
+  "status": "review-ready",
+  "workItems": [
+    {
+      "id": "baseline",
+      "status": "complete"
+    },
+    {
+      "id": "outcome",
+      "status": "complete"
+    },
+    {
+      "id": "scope",
+      "status": "complete"
+    },
+    {
+      "id": "ownership",
+      "status": "complete"
+    }
+  ],
+  "blockers": [
+    {
+      "id": "roles-confirmation",
+      "title": "阶段二责任确认（顾宁/林哲/唐婧/贺敏），按 SRC-SIM-0210 (src_99c9) 已在仿真内确认",
+      "severity": "high",
+      "status": "resolved"
+    },
+    {
+      "id": "system-contract-access",
+      "title": "工单 Sandbox/API/字段/权限、设备台账匹配率、合同与 SLA 权威版本——阶段三环境调查项，不阻塞进入阶段三",
+      "severity": "medium",
+      "status": "open"
+    },
+    {
+      "id": "scope-time-resource-conflict",
+      "title": "范围/时间/资源/治理冲突：需有权人从 delivery-plan A–E 重谈选项中选定",
+      "severity": "medium",
+      "status": "open"
+    },
+    {
+      "id": "financial-cost-pilot-capacity",
+      "title": "财务正式成本标准与 Pilot 人工复核容量未定——价值情景口径，不阻塞阶段二收口",
+      "severity": "medium",
+      "status": "open"
+    }
+  ],
+  "recommendation": "go"
+}

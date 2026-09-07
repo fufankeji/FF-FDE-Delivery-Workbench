@@ -1,0 +1,8 @@
+.runtime/
+**/node_modules/
+**/dist/
+.env
+.DS_Store
+**/__pycache__/
+frontend/design/ui-exploration/**/candidates/
+frontend/design/ui-exploration/**/attempts/

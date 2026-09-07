@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_aa4217d373de4543abc6cf718540becb",
+  "originalName": "07-nanjing-incident-timeline.json",
+  "storedName": "07-nanjing-incident-timeline.json",
+  "relativePath": "fde-resources/07-nanjing-incident-timeline.json",
+  "mimeType": "application/json; charset=utf-8",
+  "extension": "json",
+  "bytes": 3921,
+  "createdAt": "2026-09-04T04:24:02.741Z",
+  "modifiedAt": "2026-09-04T04:24:02.741Z",
+  "mtimeMs": 1788495842741.3445,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 3921,
+    "sourceMtimeMs": 1788495842741.3445,
+    "derivedPath": ".fde/derived/src_aa4217d373de4543abc6cf718540becb.md",
+    "updatedAt": "2026-09-04T04:24:02.800Z"
+  }
+}

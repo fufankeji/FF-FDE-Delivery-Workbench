@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sourceId": "src_5cffed03145649f5bec95f69e4188407",
+  "originalName": "03-policy-security-and-governance.md",
+  "storedName": "03-policy-security-and-governance.md",
+  "relativePath": "fde-resources/03-policy-security-and-governance.md",
+  "mimeType": "text/markdown; charset=utf-8",
+  "extension": "md",
+  "bytes": 2606,
+  "createdAt": "2026-09-04T04:25:48.078Z",
+  "modifiedAt": "2026-09-04T04:25:48.078Z",
+  "mtimeMs": 1788495948078.2903,
+  "previewKind": "text",
+  "parse": {
+    "status": "ready",
+    "parser": "@jiaoqsh/dsh-document",
+    "parserVersion": "0.1.1",
+    "sourceBytes": 2606,
+    "sourceMtimeMs": 1788495948078.2903,
+    "derivedPath": ".fde/derived/src_5cffed03145649f5bec95f69e4188407.md",
+    "updatedAt": "2026-09-04T04:25:48.109Z"
+  }
+}
