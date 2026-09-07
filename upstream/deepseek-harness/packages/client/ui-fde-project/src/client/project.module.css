@@ -4597,7 +4597,8 @@
 .projectPriorityFacts { position: absolute; bottom: 4px; left: 185px; display: flex; gap: 30px; width: max-content; max-width: calc(100% - 185px); color: var(--dsw-alias-label-primary-inverted); pointer-events: none; }
 .projectPriorityFacts > span { display: inline-flex; gap: 10px; align-items: center; font-size: 13px; line-height: 20px; white-space: nowrap; }
 .projectPriorityFacts svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.5; }
-.projectCenterRefresh .projectPriorityArt { width: 47%; color: color-mix(in srgb, var(--project-dashboard-blue) 55%, var(--dsw-alias-label-primary-inverted)); }
+.projectCenterRefresh .projectPriorityArt { width: 100%; overflow: hidden; mask-image: linear-gradient(to right, transparent 22%, black 58%); }
+.projectCenterRefresh .projectPriorityArt img { inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: right center; filter: none; transform: none; }
 .projectCenterRefresh .projectPriorityArt::before, .projectCenterRefresh .projectPriorityArt::after { display: none; }
 .projectPriorityArt > svg { width: 100%; height: 100%; }
 .projectCenterRefresh .projectCollectionSurface { flex: 1 0 auto; height: auto; min-height: 0; margin-top: 16px; padding: 8px 10px 10px; overflow: visible; border-radius: 14px; background: color-mix(in srgb, var(--dsw-alias-bg-layer-1) 90%, transparent); box-shadow: 0 3px 8px color-mix(in srgb, var(--project-dashboard-navy) 5%, transparent); }
@@ -4695,7 +4696,7 @@
   .projectCenterRefresh .projectCenterHeader { height: 104px; }
   .projectPriorityFacts { position: static; flex-wrap: wrap; max-width: none; margin-top: 14px; gap: 10px; }
   .projectCenterRefresh .projectPriorityCopy { padding-right: 22%; }
-  .projectCenterRefresh .projectPriorityArt { width: 38%; opacity: .75; }
+  .projectCenterRefresh .projectPriorityArt { width: 100%; opacity: .65; mask-image: linear-gradient(to right, transparent 34%, black 75%); }
   .projectCenterRefresh .projectViewControls { gap: 8px; }
   .projectCenterRefresh .projectManagementDetails { height: auto; grid-template-columns: minmax(0, 1fr); gap: 14px; }
   .projectCenterRefresh .projectManagementDetails > section { height: 220px; }

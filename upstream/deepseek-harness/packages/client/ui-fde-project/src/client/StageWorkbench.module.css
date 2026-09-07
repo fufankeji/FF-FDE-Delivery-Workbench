@@ -1554,18 +1554,22 @@
   padding-bottom: calc(var(--dsh-composer-height, 132px) + 20px);
 }
 
+.browsedStage[data-hide-stage-composer='true'] {
+  padding-bottom: 20px;
+}
+
 .browsedStage[data-historical='true'][data-stage='discovery'] {
   width: 100%;
   max-width: none;
   gap: 14px;
-  padding: 22px 18px calc(var(--dsh-composer-height, 132px) + 20px) 15px;
+  padding: 22px 18px 20px 15px;
 }
 
 .browsedStage[data-future='true'] {
   width: 100%;
   max-width: none;
   gap: 14px;
-  padding: 22px 18px calc(var(--dsh-composer-height, 132px) + 20px) 15px;
+  padding: 22px 18px 20px 15px;
 }
 
 .currentDiscoveryStage {
@@ -1842,8 +1846,7 @@
   background-clip: padding-box;
 }
 
-/* Center completed discovery within the space above the resident composer.
-   Give real evidence the extra room before centering; short screens scroll. */
+/* Give completed discovery the full evidence viewport; short screens scroll. */
 .browsedStage[data-historical='true'][data-stage='discovery'][data-conversation-composer-overlay] {
   container: discovery-history / inline-size;
   display: flex;
@@ -3035,6 +3038,8 @@
   padding: 18px 46px 18px 22px;
 }
 
+.investigationStageRoot[data-hide-stage-composer='true'] { padding-bottom: 18px; }
+
 .investigationStageRoot .browsedStageNotice {
   min-height: 90px;
   margin-bottom: 0;
@@ -3402,6 +3407,12 @@
   overflow-y: auto;
   overscroll-behavior: contain;
 }
+
+.designStageRoot[data-hide-stage-composer='true'][data-conversation-composer-overlay] {
+  height: 100%;
+}
+
+.designStageRoot[data-hide-stage-composer='true'] { padding-bottom: 18px; }
 
 .designStageShell {
   display: grid;
@@ -4375,6 +4386,12 @@
   padding-bottom: 16px;
   scroll-padding-bottom: 16px;
 }
+
+.genericStageRoot[data-stage='definition'][data-hide-stage-composer='true'][data-conversation-composer-overlay] {
+  height: 100%;
+}
+
+.genericStageRoot[data-stage='definition'][data-hide-stage-composer='true'] { padding-bottom: 16px; }
 
 .genericStageRoot[data-stage='definition'] .genericStageGrid {
   display: grid;

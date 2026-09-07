@@ -2,8 +2,12 @@
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import type { ComponentProps } from 'react'
-import { ProjectStageWorkbenchHero } from '../src/client/StageWorkbench.tsx'
+import { ProjectStageWorkbenchHero, ProjectStageWorkbenchView } from '../src/client/StageWorkbench.tsx'
 afterEach(cleanup)
+beforeAll(() => {
+  HTMLDialogElement.prototype.showModal = function () { this.setAttribute('open', '') }
+  HTMLDialogElement.prototype.close = function () { this.removeAttribute('open') }
+})
 
 const hook = <T,>(snapshot: T) => <S,>(selector: (state: T) => S): S => selector(snapshot)
 
@@ -71,7 +75,7 @@ function props(overrides: Record<string, unknown> = {}) {
   } as unknown as ComponentProps<typeof ProjectStageWorkbenchHero>
 }
 
-function evaluationProps(options: { historical?: boolean; empty?: boolean; status?: 'PASS' | 'FAIL' | 'STALE'; runtime?: 'running' | 'blocked' } = {}) {
+function evaluationProps(options: { historical?: boolean; empty?: boolean; status?: 'PASS' | 'FAIL' | 'STALE'; runtime?: 'running' | 'blocked'; metricCount?: number } = {}) {
   const ready = !options.empty && (options.status === undefined || options.status === 'PASS')
   const reviewBlockers = ready ? [] : ['当前版本缺少有效验证证据']
   const stage = {
@@ -86,7 +90,7 @@ function evaluationProps(options: { historical?: boolean; empty?: boolean; statu
       candidate: { version: options.empty ? '' : 'candidate-r7', summary: '本轮受测业务链', sourceFiles: [{ path: 'app.ts', status: 'present' }] },
       testing: { environment: options.empty ? '' : 'local sandbox', current: ready, fingerprint: options.empty ? undefined : 'sha256:current', metrics: options.empty ? [] : [
         { id: 'latency', title: '接口响应', kind: '性能', required: true, criterion: 'P95 < 300ms', sources: [{ path: 'contract.md', status: 'present' }], status: options.status ?? 'PASS', value: '210ms', evidence: [{ path: 'evidence.txt', status: 'present' }] },
-      ] },
+      ].flatMap(metric => Array.from({ length: options.metricCount ?? 1 }, (_, index) => index === 0 ? metric : { ...metric, id: `metric-${index}`, title: `验证指标 ${index + 1}` })) },
     },
   }
   return props({
@@ -99,11 +103,60 @@ function evaluationProps(options: { historical?: boolean; empty?: boolean; statu
   })
 }
 
-describe('final-stage routing from the current project', () => {
-  beforeAll(() => {
-    HTMLDialogElement.prototype.showModal = function () { this.setAttribute('open', '') }
-    HTMLDialogElement.prototype.close = function () { this.removeAttribute('open') }
+describe('stage composer visibility', () => {
+  const stages = ['discovery', 'definition', 'investigation', 'design', 'evaluation', 'pilot', 'production', 'improvement'] as const
+  type Stage = typeof stages[number]
+  const stageProps = (actual: Stage, viewed: Stage) => props({
+    useWorkspaces: hook({ items: [{ workspaceId: 'workspace-1', title: '企业知识库搭建', path: '/isolated/project', sessionIds: ['session-1'] }] }),
+    useStageProgress: hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: {
+      workspaceId: 'workspace-1', lifecycleVersion: 2, currentStage: 'requirements', v2Stage: actual, revision: 8,
+    } } } }),
+    useStageView: hook({ byWorkspace: { 'workspace-1': viewed } }),
+    useProjectSurfaces: hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: {
+      requirements: { artifacts: [] },
+      v2Stages: Object.fromEntries(stages.slice(1).map((id, index) => [id, {
+        id, index: index + 2, title: id, objective: `${id} 目标`, explanation: '', prompt: `${id} 工作`,
+        stateStatus: 'ready', statePath: `.fde/stages/${id}.json`, status: 'working', recommendation: 'pending',
+        currentWorkId: 'first', workItems: [{ id: 'first', title: '核对当前事实', purpose: '补齐证据', status: 'current' }],
+        requiredCount: 0, presentCount: 0, reviewReady: false, reviewBlockers: [], blockers: [], artifacts: [],
+      }])),
+    } } } }),
+  }) as unknown as ComponentProps<typeof ProjectStageWorkbenchView>
+
+  it.each(stages.flatMap(stage => [
+    { stage, actual: stage, mode: 'current' },
+    ...(stage !== 'improvement' ? [{ stage, actual: 'improvement' as const, mode: 'historical' }] : []),
+    ...(stage !== 'discovery' ? [{ stage, actual: 'discovery' as const, mode: 'future' }] : []),
+  ]))('keeps $stage input exclusive to the actual stage ($mode)', ({ stage, actual, mode }) => {
+    const input = stageProps(actual, stage)
+    const view = render(<ProjectStageWorkbenchView {...input} />)
+    const workbench = view.container.querySelector(`[data-stage="${stage}"]`)
+    expect(workbench).not.toBeNull()
+    expect(workbench?.hasAttribute('data-conversation-composer-overlay')).toBe(true)
+    expect(workbench?.getAttribute('data-hide-stage-composer')).toBe(mode === 'current' ? null : 'true')
+    if (mode !== 'current') {
+      expect(screen.queryByRole('button', { name: '开始本阶段工作' })).toBeNull()
+      expect(screen.queryByRole('button', { name: '返回上一阶段' })).toBeNull()
+      fireEvent.click(screen.getByRole('button', { name: /返回当前阶段/ }))
+      expect(input.returnToCurrentStage).toHaveBeenCalledWith('workspace-1')
+    }
+    expect(input.completeV2Stage).not.toHaveBeenCalled()
+    expect(input.returnV2Stage).not.toHaveBeenCalled()
+    expect(input.prepareStageDraft).not.toHaveBeenCalled()
   })
+
+  it('hides an advanced stage and restores input after the authoritative stage returns', () => {
+    const view = render(<ProjectStageWorkbenchView {...stageProps('design', 'design')} />)
+    const hidden = () => view.container.querySelector('[data-stage="design"]')?.getAttribute('data-hide-stage-composer')
+    expect(hidden()).toBeNull()
+    view.rerender(<ProjectStageWorkbenchView {...stageProps('evaluation', 'design')} />)
+    expect(hidden()).toBe('true')
+    view.rerender(<ProjectStageWorkbenchView {...stageProps('design', 'design')} />)
+    expect(hidden()).toBeNull()
+  })
+})
+
+describe('final-stage routing from the current project', () => {
   it.each([
     ['pilot', '试点运行与交付'],
     ['production', '生产与验收交接'],
@@ -113,7 +166,7 @@ describe('final-stage routing from the current project', () => {
     const future = { id: stage, statePath: `.fde/stages/${stage}.json`, presentCount: 0, requiredCount: 3, reviewReady: false, reviewBlockers: ['尚无交付记录'], artifacts: [] }
     render(<ProjectStageWorkbenchHero {...input}
       useStageView={hook({ byWorkspace: { 'workspace-1': stage } })}
-      useProjectSurfaces={hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: { requirements: { artifacts: [] }, v2Stages: { [stage]: future } } } } }) as typeof input.useProjectSurfaces}
+      useProjectSurfaces={hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: { requirements: { artifacts: [] }, v2Stages: { [stage]: future } } } } }) as unknown as typeof input.useProjectSurfaces}
     />)
     expect(screen.getByRole('heading', { level: 1, name: title })).toBeTruthy()
     expect(screen.queryByRole('button', { name: '提交 FDE 评审' })).toBeNull()
@@ -123,6 +176,18 @@ describe('final-stage routing from the current project', () => {
 })
 
 describe('stage-five information workbench', () => {
+  it.each([false, true])('keeps all metrics and evidence inside a keyboard-accessible scroll region (historical: %s)', historical => {
+    const input = evaluationProps({ historical, metricCount: 12 })
+    render(<ProjectStageWorkbenchHero {...input} />)
+    const region = screen.getByRole('region', { name: '测试指标表格，可上下和左右滚动' })
+    expect(region.getAttribute('tabindex')).toBe('0')
+    expect(within(region).getAllByRole('row')).toHaveLength(13)
+    expect(within(region).getByText('验证指标 12')).toBeTruthy()
+    fireEvent.click(within(region).getAllByRole('button', { name: 'evidence.txt' })[11]!)
+    expect(input.openProjectFile).toHaveBeenCalledWith('session-1', '/isolated/project', 'evidence.txt', 'evidence.txt')
+    expect(within(region).queryAllByRole('button', { name: '在对话中验证' })).toHaveLength(historical ? 0 : 12)
+  })
+
   it('shows useful empty information without a developer panel, fake progress or a record rail', () => {
     const input = evaluationProps({ empty: true })
     const view = render(<ProjectStageWorkbenchHero {...input} />)
@@ -864,7 +929,8 @@ describe('ProjectStageWorkbenchHero', () => {
     expect(screen.getByText('outcome-contract.md')).toBeTruthy()
     expect(screen.getByRole('heading', { name: '从最小 Schema 到可查询的真实项目关系' })).toBeTruthy()
     expect(screen.getByText('semantica · 0.6.7')).toBeTruthy()
-    expect(screen.getAllByText('2 个实体 · 1 条关系')).toHaveLength(2)
+    expect(screen.getByText('2 个实体 · 1 条关系')).toBeTruthy()
+    expect(screen.getByText('2 个实体 · 1 / 1 条关系')).toBeTruthy()
     expect(screen.getByLabelText('项目知识图谱：2 个节点，1 条关系')).toBeTruthy()
     expect(screen.getByText('当前环境无法启动三维图谱')).toBeTruthy()
     expect(screen.queryByText('现在先做')).toBeNull()

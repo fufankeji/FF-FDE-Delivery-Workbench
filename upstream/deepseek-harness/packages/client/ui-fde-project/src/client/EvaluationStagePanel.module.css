@@ -73,10 +73,10 @@
 .root .fileLinks button { display: block; min-height: 24px; padding: 2px 0; text-align: left; color: var(--dsw-alias-state-business-primary); border: 0; background: transparent; font-size: 11px; overflow-wrap: anywhere; }
 .empty { display: flex; align-items: center; justify-content: center; gap: 30px; min-height: 78px; box-sizing: border-box; padding: 10px 20px; border: 1px dashed var(--dsw-alias-border-l2); border-radius: 10px; background: color-mix(in srgb, var(--dsw-alias-state-business-tertiary) 45%, var(--dsw-alias-bg-layer-1)); }
 .empty p { margin-top: 4px; }
-.tableScroll { overflow-x: auto; min-width: 0; }
-.tableScroll table { border-collapse: collapse; width: 100%; min-width: 720px; table-layout: fixed; }
+.tableScroll { overflow: auto; min-width: 0; max-height: min(520px, 55dvh); scrollbar-gutter: stable; scrollbar-width: thin; scrollbar-color: var(--dsw-alias-label-caption) var(--dsw-alias-bg-layer-2); }
+.tableScroll table { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 720px; table-layout: fixed; }
 .tableScroll th, .tableScroll td { padding: 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--dsw-alias-border-l2); }
-.tableScroll th { font-size: 11px; color: var(--dsw-alias-label-secondary); background: var(--dsw-alias-bg-layer-2); }
+.tableScroll th { position: sticky; top: 0; z-index: 1; font-size: 11px; color: var(--dsw-alias-label-secondary); background: var(--dsw-alias-bg-layer-2); }
 .tableScroll th:nth-child(2) { width: 27%; }
 .tableScroll th:last-child { width: 120px; }
 .tableScroll small, .artifacts small { display: block; color: var(--dsw-alias-label-caption); margin-top: 5px; font-size: 11px; }

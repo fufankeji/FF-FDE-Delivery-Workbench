@@ -2861,7 +2861,7 @@ export function ProjectProgressOverlay({
   const [selectedSourceId, setSelectedSourceId] = useState<string | undefined>()
   const [projectScope, setProjectScope] = useState<'attention' | 'all'>('all')
   const [projectCollectionView, setProjectCollectionView] = useState<'card' | 'list'>('card')
-  const [projectSort, setProjectSort] = useState<'priority' | 'activity'>('priority')
+  const [projectSort, setProjectSort] = useState<'priority' | 'activity'>('activity')
   const [projectQuery, setProjectQuery] = useState('')
   const [projectPage, setProjectPage] = useState(1)
   const [allActivity, setAllActivity] = useState(false)
@@ -2895,13 +2895,21 @@ export function ProjectProgressOverlay({
     const workspaceSessions = workspace.sessionIds.map(id => sessions.byId[id]).filter(item => item !== undefined)
     const latestSession = workspaceSessions.toSorted((left, right) => right.updatedAt - left.updatedAt)[0]
     const metadata = readProjectMetadata(workspace.path)
+    const stage = stages[String(workspace.workspaceId)]
+    const latestActivityAt = Math.max(
+      Date.parse(workspace.createdAt) || 0,
+      Date.parse(workspace.updatedAt) || 0,
+      latestSession?.updatedAt ?? 0,
+      stage?.status === 'ready' ? Date.parse(stage.value.updatedAt) || 0 : 0,
+    )
     return {
       workspaceId: String(workspace.workspaceId), title: workspace.title, path: workspace.path,
       createdAt: workspace.createdAt, sessions: workspaceSessions.length,
       runningSessions: workspaceSessions.filter(item => item.running).length,
-      ...(latestSession === undefined ? {} : { latestSessionTitle: latestSession.displayTitle, latestActivityAt: latestSession.updatedAt }),
+      latestActivityAt,
+      ...(latestSession === undefined ? {} : { latestSessionTitle: latestSession.displayTitle }),
       companyName: metadata.companyName, schedule: metadata.schedule,
-      stage: stages[String(workspace.workspaceId)],
+      stage,
       surface: surfaces[String(workspace.workspaceId)],
     }
   }), [sessions.byId, stages, surfaces, workspaces])
@@ -3118,7 +3126,7 @@ export function ProjectProgressOverlay({
                   </>}
               </div>
               <div className={css.projectPriorityArt} aria-hidden="true">
-                <ProjectArtwork hero />
+                <img src="/fde-dashboard/project-priority-depth.webp" width={1881} height={836} alt="" decoding="async" draggable={false} />
               </div>
             </aside>
           </section>
@@ -3143,8 +3151,8 @@ export function ProjectProgressOverlay({
                 <button type="button" className={css.projectToolButton} data-project-filter="" data-active={projectScope === 'attention' || undefined} aria-label={`筛选项目，当前：${projectScope === 'attention' ? '待我处理' : '全部项目'}`} onClick={() => { setProjectScope(current => current === 'attention' ? 'all' : 'attention'); setProjectPage(1); showProjectOverview() }}>
                   <DashboardIcon kind="filter" />{projectScope === 'attention' ? '待我处理' : '筛选'}
                 </button>
-                <button type="button" className={css.projectToolButton} data-project-sort="" data-active={projectSort === 'activity' || undefined} aria-label={`项目排序，当前：${projectSort === 'priority' ? '优先事项' : '最近更新'}`} onClick={() => { setProjectSort(current => current === 'priority' ? 'activity' : 'priority'); setProjectPage(1) }}>
-                  <DashboardIcon kind="sort" />{projectSort === 'activity' ? '最近更新' : '排序'}
+                <button type="button" className={css.projectToolButton} data-project-sort="" data-active={projectSort === 'activity' || undefined} aria-label={`项目排序，当前：${projectSort === 'priority' ? '优先事项' : '最近操作'}`} onClick={() => { setProjectSort(current => current === 'priority' ? 'activity' : 'priority'); setProjectPage(1) }}>
+                  <DashboardIcon kind="sort" />{projectSort === 'activity' ? '最近操作' : '优先事项'}
                 </button>
               </div>
             </div>

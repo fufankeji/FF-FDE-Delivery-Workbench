@@ -2,6 +2,8 @@
 
 English | [中文](README.zh.md)
 
+Read-only project stages use `data-hide-stage-composer="true"` to hide the active view's composer seat. In a blank Session, only the native input bar and input dock are hidden; the stage workbench and draft remain mounted. Leaving the read-only view restores the same composer.
+
 Conversation domain: skeleton (header/tabs/composer/empty state), chat view (grouped step-summary flow, streaming tail isolation, and turn status), composer dock (session stats sticky with the input), input dock (queue rows plus the todo plan strip), details shell, and scope-addressed ConversationController. Tool presentation belongs to [`ui-tool`](../ui-tool/README.md).
 
 Compaction renders as one collapsed row at the checkpoint's flow position without replacing the transcript above it. Automatic compaction uses the context-compacted title. Every completed marker with a loaded `compaction/summary` event shows the replaced-item and estimated-token counts and discloses the summary on click. Manual `/compact` starts as a running `compact` row; on successful settlement its explicit summary-event reference folds that command into the checkpoint row under the same React key. A completed checkpoint keeps the context-compaction icon at rest and replaces it with the collapsed or expanded disclosure only on hover or keyboard focus. Input rejection, no compactable history, cancellation, and failure retain the generic command row and its handler-authored text. Pairing never depends on adjacency because durable context may be injected while compaction is running. The framed checkpoint payload is model-facing and never renders; when the cited `compaction/summary` event is outside the loaded window, the checkpoint remains visible but non-expandable.

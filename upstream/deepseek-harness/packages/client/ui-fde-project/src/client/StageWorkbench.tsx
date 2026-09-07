@@ -956,6 +956,7 @@ function DesignStagePanel({ props, workspace, sessionId, view, stageState, surfa
     data-conversation-hero-project=""
     data-stage="design"
     data-historical={historical ? 'true' : undefined}
+    data-hide-stage-composer={historical ? 'true' : undefined}
     data-conversation-composer-layout={historical ? 'stage-history' : 'stage-execution'}
     data-conversation-composer-overlay={view ? '' : undefined}
     data-artifacts-collapsed="true"
@@ -1347,6 +1348,7 @@ function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage,
     data-conversation-hero-project=""
     data-stage={stage}
     data-historical={historical ? 'true' : undefined}
+    data-hide-stage-composer={historical ? 'true' : undefined}
     data-conversation-composer-layout={historical ? 'stage-history' : stage === 'definition' ? 'stage-definition' : 'stage-execution'}
     data-conversation-composer-overlay={view ? '' : undefined}
     data-artifacts-collapsed={artifactsCollapsed ? 'true' : undefined}
@@ -1805,7 +1807,7 @@ function BrowsedStagePanel({ props, workspace, sessionId, view, actualStage, vie
     })
   }
 
-  return <section className={`${css.root} ${css.browsedStage}`} data-stage={viewedStage} data-historical={historical ? 'true' : undefined} data-future={historical ? undefined : 'true'} data-conversation-composer-layout="stage-history" data-conversation-composer-overlay={view ? '' : undefined} aria-label={`正在查看：${title}`}>
+  return <section className={`${css.root} ${css.browsedStage}`} data-stage={viewedStage} data-historical={historical ? 'true' : undefined} data-future={historical ? undefined : 'true'} data-hide-stage-composer="true" data-conversation-composer-layout="stage-history" data-conversation-composer-overlay={view ? '' : undefined} aria-label={`正在查看：${title}`}>
     <header className={css.browsedStageNotice}>
       {historical && <HistoricalNoticeIcon />}
       <div><span>{historical ? '阶段完成记录' : '未开始阶段'}</span><strong>正在查看第 {String(viewedIndex + 1)} 阶段，项目当前在“{V2_STAGE_NAMES[actualIndex]}”</strong><p>{historical ? '以下内容来自当前项目已经保存的资料和阶段记录，不用计划模板补齐缺失事实。' : '这里只说明该阶段何时可以开始，不代表已经安排或执行了工作。'}</p></div>

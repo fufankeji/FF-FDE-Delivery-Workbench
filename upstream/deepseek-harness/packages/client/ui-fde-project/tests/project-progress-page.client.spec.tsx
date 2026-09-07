@@ -220,7 +220,7 @@ describe('ProjectProgressOverlay standalone page', () => {
     fireEvent.click(screen.getByRole('button', { name: '新建项目' }))
     expect(openProjectCreation).toHaveBeenCalledTimes(1)
     const filterButton = screen.getByRole('button', { name: '筛选项目，当前：全部项目' })
-    const sortButton = screen.getByRole('button', { name: '项目排序，当前：优先事项' })
+    const sortButton = screen.getByRole('button', { name: '项目排序，当前：最近操作' })
     expect(filterButton).toBeTruthy()
     expect(sortButton).toBeTruthy()
     expect(screen.getByRole('heading', { name: '全部项目 2' })).toBeTruthy()
@@ -268,6 +268,53 @@ describe('ProjectProgressOverlay standalone page', () => {
     expect(screen.getByRole('heading', { name: '全部项目 2' })).toBeTruthy()
   })
 
+  it('orders cards and lists by the latest project, session or stage activity while retaining priority sorting', () => {
+    const date = (day: number) => `2026-09-${String(day).padStart(2, '0')}T00:00:00.000Z`
+    const workspaces = [
+      { workspaceId: 'old', title: '旧的待处理项目', createdAt: date(1), updatedAt: date(3), sessionIds: [] },
+      { workspaceId: 'chat', title: '最近会话项目', createdAt: date(1), updatedAt: date(1), sessionIds: ['session-chat'] },
+      { workspaceId: 'stage', title: '阶段更新项目', createdAt: date(1), updatedAt: date(1), sessionIds: [] },
+      { workspaceId: 'new', title: '刚创建无会话项目', createdAt: date(7), updatedAt: date(7), sessionIds: [] },
+      { workspaceId: 'edited', title: '最近编辑项目', createdAt: date(1), updatedAt: date(9), sessionIds: [] },
+    ].map(workspace => ({ ...workspace, path: `/project/${workspace.workspaceId}` }))
+    const session = { id: 'session-chat', displayTitle: '最新工作', running: false, updatedAt: Date.parse(date(5)) }
+    const input = {
+      useProjectPage: hook({ open: true, view: 'overview' }),
+      useWorkspaces: hook({ items: workspaces }), useSessions: hook({ byId: { 'session-chat': session } }),
+      useStageProgress: hook({ byWorkspace: {
+        old: { status: 'error', message: '暂时无法读取阶段' },
+        stage: { status: 'ready', value: { workspaceId: 'stage', lifecycleVersion: 2, currentStage: 'solution', v2Stage: 'definition', revision: 2, createdAt: date(1), updatedAt: date(6) } },
+      } }),
+      useProjectSurfaces: hook({ byWorkspace: {} }), useProjectSources: hook({ byWorkspace: {} }),
+      loadStage: vi.fn(), retryStage: vi.fn(), loadProjectSurface: vi.fn(), refreshProjectSurface: vi.fn(),
+      loadProjectSources: vi.fn(), enterProject: vi.fn(), showProjectDetail: vi.fn(), showProjectOverview: vi.fn(),
+      showProjectTimeline: vi.fn(), openProjectCreation: vi.fn(), renderSlot: vi.fn(() => null), t: makeTranslate(zh),
+    } as unknown as ProjectProgressOverlayProps
+    const view = render(<ProjectProgressOverlay {...input} />)
+    const order = ['最近编辑项目', '刚创建无会话项目', '阶段更新项目', '最近会话项目', '旧的待处理项目']
+    const cards = screen.getByRole('region', { name: '项目卡片' })
+    expect(within(cards).getAllByRole('heading', { level: 2 }).map(heading => heading.textContent)).toEqual(order)
+    const background = view.container.querySelector('img[src="/fde-dashboard/project-priority-depth.webp"]')
+    expect(background?.getAttribute('alt')).toBe('')
+    expect(background?.parentElement?.getAttribute('aria-hidden')).toBe('true')
+    fireEvent.click(screen.getByRole('button', { name: '列表' }))
+    const table = screen.getByRole('table', { name: '项目列表' })
+    within(table).getAllByRole('row').slice(1).forEach((row, index) => {
+      expect(within(row).getByText(order[index]!)).toBeTruthy()
+    })
+    fireEvent.click(screen.getByRole('button', { name: '项目排序，当前：最近操作' }))
+    expect(within(within(table).getAllByRole('row')[1]!).getByText('旧的待处理项目')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '项目排序，当前：优先事项' }))
+    view.rerender(<ProjectProgressOverlay {...input}
+      useSessions={hook({ byId: { 'session-chat': { ...session, updatedAt: Date.parse(date(10)) } } }) as unknown as ProjectProgressOverlayProps['useSessions']}
+    />)
+    expect(within(within(table).getAllByRole('row')[1]!).getByText('最近会话项目')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '卡片' }))
+    expect(within(screen.getByRole('region', { name: '项目卡片' })).getAllByRole('heading', { level: 2 })[0]?.textContent).toBe('最近会话项目')
+    expect(input.enterProject).not.toHaveBeenCalled()
+    expect(input.showProjectDetail).not.toHaveBeenCalled()
+  })
+
   it('paginates the filtered collection without truncating totals, recent activity, or project navigation', () => {
     const workspaces = Array.from({ length: 13 }, (_, index) => ({
       workspaceId: `workspace-${index + 1}`, title: `客户项目 ${index + 1}`, path: `/project/${index + 1}`,
@@ -279,7 +326,7 @@ describe('ProjectProgressOverlay standalone page', () => {
       useProjectPage: hook({ open: true, view: 'overview' as const }),
       useStageProgress: hook({ byWorkspace: {} }), useProjectSurfaces: hook({ byWorkspace: {} }),
       useProjectSources: hook({ byWorkspace: {} }), useWorkspaces: hook({ items: workspaces }),
-      useSessions: hook({ byId: Object.fromEntries(workspaces.map((workspace, index) => [workspace.sessionIds[0], { id: workspace.sessionIds[0], displayTitle: `交付记录 ${index + 1}`, running: false, updatedAt: index + 1 }])) }),
+      useSessions: hook({ byId: Object.fromEntries(workspaces.map((workspace, index) => [workspace.sessionIds[0], { id: workspace.sessionIds[0], displayTitle: `交付记录 ${index + 1}`, running: false, updatedAt: Date.parse(workspace.createdAt) + index + 1 }])) }),
       loadStage: vi.fn(), retryStage: vi.fn(), loadProjectSurface: vi.fn(), refreshProjectSurface: vi.fn(),
       loadProjectSources: vi.fn(), enterProject, showProjectDetail, showProjectOverview: vi.fn(),
       showProjectTimeline: vi.fn(), openProjectCreation: vi.fn(), renderSlot: vi.fn(() => null), t: makeTranslate(zh),
@@ -302,7 +349,7 @@ describe('ProjectProgressOverlay standalone page', () => {
     expect(screen.getByRole('button', { name: '下一页' }).hasAttribute('disabled')).toBe(true)
     fireEvent.click(within(collection).getByRole('button', { name: /进入项目/ }))
     expect(enterProject).toHaveBeenCalledWith('workspace-1')
-    fireEvent.click(screen.getByRole('button', { name: '项目排序，当前：优先事项' }))
+    fireEvent.click(screen.getByRole('button', { name: '项目排序，当前：最近操作' }))
     expect(screen.getByText('1 / 3')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: '下一页' }))
     fireEvent.change(screen.getByRole('searchbox', { name: '搜索项目或企业' }), { target: { value: '客户项目 13' } })
@@ -322,7 +369,7 @@ describe('ProjectProgressOverlay standalone page', () => {
     expect(within(screen.getByRole('table', { name: '项目列表' })).getAllByRole('row')).toHaveLength(7)
     fireEvent.click(screen.getByRole('button', { name: '下一页' }))
     fireEvent.click(screen.getByRole('button', { name: '下一页' }))
-    view.rerender(<ProjectProgressOverlay {...input} useWorkspaces={hook({ items: workspaces.slice(0, 2) }) as ProjectProgressOverlayProps['useWorkspaces']} />)
+    view.rerender(<ProjectProgressOverlay {...input} useWorkspaces={hook({ items: workspaces.slice(0, 2) }) as unknown as ProjectProgressOverlayProps['useWorkspaces']} />)
     expect(within(screen.getByRole('table', { name: '项目列表' })).getAllByRole('row')).toHaveLength(3)
     expect(screen.queryByRole('navigation', { name: '项目分页' })).toBeNull()
   })
