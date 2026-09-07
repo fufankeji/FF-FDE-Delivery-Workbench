@@ -35,7 +35,9 @@ updated: "2026-09-07"
 - `evaluation.testing` 包含 `environment`、`metrics`（`id/title/kind/required/criterion/sourceRefs`）和可选 `run`。`run` 包含 `fingerprint` 与 `results`（`metricId/status/value/evidenceRefs`）；结果状态为 `NOT_RUN/RUNNING/PASS/WARN/FAIL`，运行前缺省保持未运行。
 - Host 对候选文件的真实字节、版本、环境和指标定义生成 SHA-256 指纹；`project_evaluation_get` 只读工具返回当前投影和指纹，DSH 执行真实检查后记录对应结果。版本不匹配显示 `STALE`；路径越界、文件不可读、必测项缺证据／非 PASS 阻止阶段门。指纹只覆盖显式清单，DSH 必须列全本轮实现、配置和数据依赖，工作台不扫描整个客户目录。
 - 工作台复用 `ProjectRuntimeHeaderInjected` 的四个运行回调与既有快照，保留运行期轮询。进入架构／评估页通过既有视图导航；准备方案／执行指标只调用 `prepareStageDraft`，不会自动发送消息。
-- `EvaluationStagePanel` 接收现有 StageWorkbench 共享 props，提供受测版本、运行情况、测试表、证据预览、问题与验收、按需展开的项目记录；CSS 使用容器宽度适配、内部表格滚动及末尾输入框安全间距。
+- `EvaluationStagePanel` 接收现有 StageWorkbench 共享 props，提供受测版本、运行情况、测试表、证据预览、问题与验收、按需展开的项目记录；CSS 使用容器宽度适配和内部表格横向滚动。
+- 参考用户 `阶段 5.png`，采用阶段横幅、等宽双栏、验证结果和登记／验收材料分组。保留原有输入框和高度预留；补充记录和验证按钮调用原有 `prepareStageDraft`，切换到 Agent 对话、保留已有草稿，不自动发送。其他阶段、对话输入与历史只读合同不变。
+- 版本、环境、指标、运行状态、产物与阻塞数仍来自同一投影；详细阻塞条件保留在可展开区域，不按参考图硬编码缺失记录或待核对数量。长表、记录展开和返回表单使用自然高度，不将操作裁切在固定面板内。
 - 本轮不实现新的自动评估引擎、客户项目、指标豁免或生产权限；既有 Agent Trial 页面继续可用并明确其作用范围。F009 其他尚未完成的广义执行器／UAT 任务继续保持未完成。
 
 ## 实施顺序

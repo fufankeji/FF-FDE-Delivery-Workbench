@@ -1,0 +1,23 @@
+/* Stage-five reference palette: scoped to this panel, not the user's shell. */
+[data-fde-stage-workbench][data-stage='evaluation'] {
+  --dsw-alias-evaluation-on-accent: #fff;
+  --dsw-alias-evaluation-hero-warn: #ffc453;
+  --dsw-alias-evaluation-hero-background: radial-gradient(ellipse at 68% 54%, #124f86 0%, transparent 42%), linear-gradient(110deg, #041c38, #072b4e);
+  --dsw-alias-evaluation-canvas: var(--dsw-alias-bg-base);
+}
+
+body:not([data-ds-dark-theme]) [data-fde-stage-workbench][data-stage='evaluation'] {
+  --dsw-alias-evaluation-canvas: #f6f8fd;
+  --dsw-alias-state-business-primary: #004cff;
+  --dsw-alias-state-business-tertiary: #eaf2ff;
+  --dsw-alias-bg-base: #f6f8fd;
+  --dsw-alias-bg-layer-1: #fff;
+  --dsw-alias-bg-layer-2: #f2f6fc;
+  --dsw-alias-bg-overlay: #dce0e7;
+  --dsw-alias-border-l2: #d6e1f7;
+  --dsw-alias-label-primary: #111b30;
+  --dsw-alias-label-secondary: #536078;
+  --dsw-alias-label-caption: #8b94a5;
+  --dsw-alias-state-warn-label: #c66a00;
+  --dsw-alias-state-warn-tertiary: #fff5df;
+}
