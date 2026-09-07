@@ -10,6 +10,7 @@ import ForceGraph3D, {
 } from '3d-force-graph'
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import * as THREE from 'three'
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import type { V2KnowledgeGraphSnapshot } from './controller.ts'
 import {
   layoutKnowledgeGraph,
@@ -32,7 +33,7 @@ const COMMUNITY_COLORS = [
   '#67c5da',
   '#b6c1d5',
 ] as const
-const BACKGROUND_COLOR = '#020306'
+const BACKGROUND_COLOR = '#000000'
 
 type EdgeMode = 'primary' | 'all'
 
@@ -127,25 +128,135 @@ function graphNodeColor(node: ProjectGraphNode, state: GraphVisualState): string
 }
 
 function graphLinkColor(edge: ProjectGraphLink, state: GraphVisualState): string {
-  if (state.activeId !== undefined && edgeTouches(edge, state.activeId)) return '#8bd5eb'
+  if (state.activeId !== undefined && edgeTouches(edge, state.activeId)) return '#a9efff'
   if (state.activeId !== undefined) return '#182633'
-  return '#b8c5d4'
+  return edge.primary ? '#61c8ed' : '#526e9e'
 }
 
 function graphLinkWidth(edge: ProjectGraphLink, state: GraphVisualState): number {
-  if (state.activeId !== undefined && edgeTouches(edge, state.activeId)) return 0.32
-  return 0
+  if (state.activeId !== undefined && edgeTouches(edge, state.activeId)) return 0.65
+  return edge.primary ? 0.24 : 0.1
 }
 
 function graphLinkParticles(edge: ProjectGraphLink, state: GraphVisualState): number {
   if (!edgeIsVisible(edge, state)) return 0
-  return state.activeId !== undefined && edgeTouches(edge, state.activeId) ? 2 : 0
+  if (state.activeId !== undefined) return edgeTouches(edge, state.activeId) ? 3 : 0
+  return edge.primary ? 1 : 0
 }
 
 function primaryEdgeIds(edges: readonly KnowledgeGraphLayoutEdge[]): ReadonlySet<string> {
-  const weights = edges.map(edge => edge.weight).sort((left, right) => right - left)
-  const threshold = weights[Math.max(0, Math.floor(weights.length * 0.36) - 1)] ?? 0
-  return new Set(edges.filter(edge => edge.weight >= threshold).map(edge => edge.id))
+  // A maximum spanning forest preserves connectivity, even when all weights tie.
+  // This is a visual backbone, not an assertion of business importance.
+  const parents = new Map<string, string>()
+  const find = (id: string): string => {
+    const parent = parents.get(id)
+    if (parent === undefined || parent === id) return id
+    const root = find(parent)
+    parents.set(id, root)
+    return root
+  }
+  const selected = new Set<string>()
+  for (const edge of [...edges].sort((a, b) => b.weight - a.weight || a.id.localeCompare(b.id))) {
+    const a = find(edge.source.id), b = find(edge.target.id)
+    if (a === b) continue
+    parents.set(a, b)
+    selected.add(edge.id)
+  }
+  return selected
+}
+
+function createConstellationForce(data: ProjectGraphData) {
+  const adjacency = new Map(data.nodes.map(node => [node.id, new Set<string>()]))
+  for (const edge of data.links) {
+    adjacency.get(edge.sourceId)?.add(edge.targetId)
+    adjacency.get(edge.targetId)?.add(edge.sourceId)
+  }
+  const seen = new Set<string>()
+  const components: string[][] = []
+  for (const id of [...adjacency.keys()].sort()) {
+    if (seen.has(id)) continue
+    const component: string[] = [], queue = [id]
+    seen.add(id)
+    while (queue.length > 0) {
+      const current = queue.pop()!
+      component.push(current)
+      for (const next of adjacency.get(current) ?? []) if (!seen.has(next)) { seen.add(next); queue.push(next) }
+    }
+    components.push(component)
+  }
+  components.sort((a, b) => b.length - a.length || a[0]!.localeCompare(b[0]!))
+  const anchors = new Map<string, THREE.Vector3>()
+  const spread = 65 + Math.sqrt(data.nodes.length) * 10
+  components.forEach((component, index) => {
+    const angle = index * 2.399963229728653
+    const radius = index === 0 ? 0 : spread * Math.sqrt(index / Math.max(1, components.length - 1))
+    const anchor = new THREE.Vector3(Math.cos(angle) * radius * 1.5, Math.sin(angle) * radius * .8, Math.sin(angle * 1.7) * radius * .45)
+    for (const id of component) anchors.set(id, anchor)
+  })
+  let nodes: ProjectGraphNode[] = []
+  const force = (alpha: number): void => {
+    for (const node of nodes) {
+      const anchor = anchors.get(node.id)
+      if (!anchor) continue
+      node.vx = (node.vx ?? 0) + (anchor.x - (node.x ?? 0)) * .065 * alpha
+      node.vy = (node.vy ?? 0) + (anchor.y - (node.y ?? 0)) * .085 * alpha
+      node.vz = (node.vz ?? 0) + (anchor.z - (node.z ?? 0)) * .085 * alpha
+    }
+  }
+  force.initialize = (value: ProjectGraphNode[]): void => { nodes = value }
+  return force
+}
+
+function createLuminousNodes(state: () => GraphVisualState) {
+  const pixels = new Uint8Array(64 * 64 * 4)
+  for (let y = 0; y < 64; y++) for (let x = 0; x < 64; x++) {
+    const index = (y * 64 + x) * 4
+    const radius = Math.hypot((x - 31.5) / 31.5, (y - 31.5) / 31.5)
+    pixels.set([255, 255, 255, Math.round(Math.max(0, Math.exp(-radius * radius * 5) - Math.exp(-5)) * 255)], index)
+  }
+  const texture = new THREE.DataTexture(pixels, 64, 64)
+  texture.needsUpdate = true
+  const sphere = new THREE.SphereGeometry(1, 24, 16)
+  const ring = new THREE.TorusGeometry(1, .025, 6, 48)
+  const visuals = new Map<string, { node: ProjectGraphNode; core: THREE.MeshPhongMaterial; halo: THREE.SpriteMaterial; orbit: THREE.MeshBasicMaterial | undefined }>()
+  const update = (): void => {
+    for (const visual of visuals.values()) {
+      const color = graphNodeColor(visual.node, state())
+      visual.core.color.set(color)
+      visual.core.emissive.set(color).multiplyScalar(.65)
+      visual.halo.color.set(color)
+      visual.orbit?.color.set(color)
+    }
+  }
+  return {
+    create(node: ProjectGraphNode): THREE.Group {
+      const radius = 3.6 + Math.sqrt(node.degree) * 1.25
+      const group = new THREE.Group()
+      const core = new THREE.MeshPhongMaterial({ color: node.communityColor, emissive: node.communityColor, emissiveIntensity: .65, shininess: 100, specular: '#e7faff' })
+      const body = new THREE.Mesh(sphere, core)
+      body.scale.setScalar(radius)
+      const halo = new THREE.SpriteMaterial({ map: texture, color: node.communityColor, transparent: true, opacity: .7, blending: THREE.AdditiveBlending, depthWrite: false })
+      const glow = new THREE.Sprite(halo)
+      glow.scale.setScalar(radius * 7)
+      group.add(body, glow)
+      let orbit: THREE.MeshBasicMaterial | undefined
+      if (node.degree >= 3) {
+        orbit = new THREE.MeshBasicMaterial({ color: node.communityColor, transparent: true, opacity: .65, blending: THREE.AdditiveBlending, depthWrite: false })
+        const band = new THREE.Mesh(ring, orbit)
+        band.scale.setScalar(radius * 1.65)
+        band.rotation.set(.65, .35, .2)
+        group.add(band)
+      }
+      visuals.set(node.id, { node, core, halo, orbit })
+      update()
+      return group
+    },
+    update,
+    dispose(): void {
+      for (const { core, halo, orbit } of visuals.values()) { core.dispose(); halo.dispose(); orbit?.dispose() }
+      visuals.clear(); sphere.dispose(); ring.dispose(); texture.dispose()
+    },
+  }
 }
 
 function prepareGraphData(layout: KnowledgeGraphLayout): ProjectGraphData {
@@ -241,11 +352,11 @@ function createGalaxyDust(): GalaxyDust {
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
   geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
   const material = new THREE.PointsMaterial({
-    size: 0.9,
+    size: 1.15,
     sizeAttenuation: false,
     vertexColors: true,
     transparent: true,
-    opacity: 0.38,
+    opacity: 0.5,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
   })
@@ -287,14 +398,14 @@ function createGraphLabels(
       const height = graph.height()
       const right = state.selectedId === undefined ? width - 20 : width - Math.min(358, width * 0.4)
       const occupied: { x: number, y: number, width: number }[] = []
-      const limit = Math.min(24, Math.max(8, Math.floor(width * height / 28000)))
+      const limit = Math.min(18, Math.max(6, Math.floor(width * height / 40000)))
       const ordered = state.activeId === undefined ? labels : [...labels].sort((a, b) =>
         Number(b.node.id === state.activeId) - Number(a.node.id === state.activeId))
       for (const { node, element, width: labelWidth } of ordered) {
         const relevant = state.relatedNodeIds.has(node.id)
         const eligible = state.isolatedCommunityId !== undefined
           ? node.communityId === state.isolatedCommunityId
-          : state.activeId !== undefined && relevant
+          : state.activeId === undefined || relevant
         point.set(node.x ?? 0, node.y ?? 0, node.z ?? 0).project(graph.camera())
         const sx = (point.x + 1) * width / 2
         const sy = (1 - point.y) * height / 2
@@ -302,7 +413,7 @@ function createGraphLabels(
         const y = sy - 8
         const visible = eligible && occupied.length < limit && point.z > -1 && point.z < 1
           && x >= 16 && x + labelWidth <= right && y > 65 && y < height - 68
-          && !occupied.some(box => x < box.x + box.width + 8 && x + labelWidth + 8 > box.x && Math.abs(y - box.y) < 22)
+          && !occupied.some(box => x < box.x + box.width + 8 && x + labelWidth + 8 > box.x && Math.abs(y - box.y) < 30)
         element.hidden = !visible
         if (!visible) continue
         element.style.transform = `translate3d(${String(x)}px,${String(y)}px,0)`
@@ -325,8 +436,8 @@ function applyVisualState(
     .linkColor(edge => graphLinkColor(edge, state))
     .linkWidth(edge => graphLinkWidth(edge, state))
     .linkDirectionalParticles(edge => graphLinkParticles(edge, state))
-    .linkDirectionalParticleWidth(edge => state.activeId !== undefined && edgeTouches(edge, state.activeId) ? 0.55 : 0)
-    .linkDirectionalParticleColor(edge => graphLinkColor(edge, state))
+    .linkDirectionalParticleWidth(edge => state.activeId !== undefined && edgeTouches(edge, state.activeId) ? 1.25 : .75)
+    .linkDirectionalParticleColor(() => '#c5f7ff')
     .refresh()
 }
 
@@ -409,6 +520,7 @@ function ForceGraphCanvas({
 }) {
   const hostRef = useRef<HTMLDivElement>(null)
   const graphRef = useRef<ForceGraph3DInstance<ProjectGraphNode, ProjectGraphLink>>()
+  const luminousRef = useRef<ReturnType<typeof createLuminousNodes>>()
   const stateRef = useRef(visualState)
   const playingRef = useRef(playing)
   const previousPlaying = useRef(playing)
@@ -433,15 +545,17 @@ function ForceGraphCanvas({
     const renderer = graph.renderer()
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.outputColorSpace = THREE.SRGBColorSpace
+    const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), .9, .65, .55)
+    graph.postProcessingComposer().addPass(bloom)
+    const luminous = createLuminousNodes(() => stateRef.current)
+    luminousRef.current = luminous
 
     let fitted = false
     let interacted = false
     const fitInitial = (): void => {
       if (fitted || interacted) return
       fitted = true
-      // Match upstream's node-count camera distance. Fitting every outlier here
-      // turns the reference's immersive network into a tiny distant sphere.
-      graph.cameraPosition({ x: 0, y: 0, z: Math.cbrt(Math.max(1, data.nodes.length)) * 170 })
+      fitGraphView(graph, 0)
     }
     graph
       .backgroundColor(BACKGROUND_COLOR)
@@ -451,15 +565,18 @@ function ForceGraphCanvas({
       .nodeVal(node => node.value)
       .nodeRelSize(4)
       .nodeOpacity(0.85)
+      .nodeThreeObject(node => luminous.create(node))
       .nodeLabel(createNodeTooltip)
       .linkLabel(createLinkTooltip)
-      .linkOpacity(0.4)
+      .linkOpacity(0.65)
       .linkCurvature(edge => edge.curvature)
-      .linkDirectionalParticleSpeed(0.004)
+      .linkDirectionalParticleSpeed(playingRef.current ? .003 : 0)
       .linkHoverPrecision(4)
-      // Use the upstream live 3D simulation, never a prepacked 2D layout.
-      .warmupTicks(playingRef.current ? 40 : 240)
-      .cooldownTicks(playingRef.current ? Infinity : 0)
+      // Soft component attraction keeps real disconnected groups in frame.
+      // The native 3D engine still owns every position; no fixed coordinates.
+      .d3Force('constellation', createConstellationForce(data))
+      .warmupTicks(playingRef.current ? 120 : 240)
+      .cooldownTicks(playingRef.current ? 160 : 0)
       .onEngineTick(fitInitial)
       .onEngineStop(fitInitial)
       .onNodeClick(node => { onPause(); onSelect(node.id) })
@@ -473,7 +590,7 @@ function ForceGraphCanvas({
     const labels = createGraphLabels(host, graph, id => { onPause(); onSelect(id) })
     const controls = graph.controls() as OrbitLikeControls
     controls.autoRotate = false
-    controls.autoRotateSpeed = 0.7
+    controls.autoRotateSpeed = 0.45
     controls.enableDamping = true
     controls.dampingFactor = 0.1
 
@@ -489,6 +606,7 @@ function ForceGraphCanvas({
       graph.width(Math.max(1, Math.round(bounds.width))).height(Math.max(1, Math.round(bounds.height)))
       const state = stateRef.current
       if (state.selectedId !== undefined) focusGraphNode(graph, state.selectedId)
+      else if (fitted) fitGraphView(graph, 0, state.isolatedCommunityId === undefined ? undefined : node => node.communityId === state.isolatedCommunityId)
     }
     resize()
     const observer = typeof ResizeObserver === 'undefined' ? undefined : new ResizeObserver(resize)
@@ -522,6 +640,10 @@ function ForceGraphCanvas({
       host.removeEventListener('wheel', interrupt)
       if (observer === undefined) window.removeEventListener('resize', resize)
       labels.dispose()
+      graph.postProcessingComposer().removePass(bloom)
+      bloom.dispose()
+      luminous.dispose()
+      luminousRef.current = undefined
       scene.remove(dust.points)
       dust.dispose()
       graph._destructor()
@@ -534,7 +656,8 @@ function ForceGraphCanvas({
     if (graph === undefined) return
     const controls = graph.controls() as OrbitLikeControls
     controls.autoRotate = playing && visualState.activeId === undefined
-    graph.cooldownTicks(playing ? Infinity : 0)
+    graph.cooldownTicks(playing ? 160 : 0)
+    graph.linkDirectionalParticleSpeed(playing ? .003 : 0)
     // Reheating before the upstream deferred graph initialization would tick an absent layout.
     if (playing && !previousPlaying.current) graph.d3ReheatSimulation()
     previousPlaying.current = playing
@@ -544,6 +667,8 @@ function ForceGraphCanvas({
     const graph = graphRef.current
     if (graph === undefined) return
     applyVisualState(graph, visualState)
+    luminousRef.current?.update()
+    graph.linkDirectionalParticleSpeed(playing && visualState.activeId === undefined ? .003 : 0)
     const isolationChanged = previousIsolatedCommunityId.current !== visualState.isolatedCommunityId
     if (visualState.selectedId !== undefined && previousSelectedId.current !== visualState.selectedId) {
       focusGraphNode(graph, visualState.selectedId)
@@ -558,7 +683,7 @@ function ForceGraphCanvas({
     }
     previousSelectedId.current = visualState.selectedId
     previousIsolatedCommunityId.current = visualState.isolatedCommunityId
-  }, [visualState])
+  }, [visualState, playing])
 
   useEffect(() => {
     if (previousResetVersion.current === resetVersion) return
@@ -717,6 +842,7 @@ export function KnowledgeGraphExplorer({ snapshot }: { readonly snapshot: V2Know
             data-knowledge-graph-control="primary"
             data-active={edgeMode === 'primary'}
             aria-pressed={edgeMode === 'primary'}
+            title="显示保留连通性的结构主干，不代表业务重要性"
             onClick={() => { setEdgeMode('primary') }}
           >主干关系</button>
           <button
@@ -775,10 +901,10 @@ export function KnowledgeGraphExplorer({ snapshot }: { readonly snapshot: V2Know
       <div className={css.summary}>
       <div className={css.status} data-knowledge-graph-status>
         {active === undefined
-          ? `${String(snapshot.nodes.length)} 个实体 · ${String(snapshot.edges.length)} 条关系`
+          ? `${String(snapshot.nodes.length)} 个实体 · ${String(graphData.links.filter(edge => edgeIsVisible(edge, visualState)).length)} / ${String(snapshot.edges.length)} 条关系`
           : `${active.label} · ${active.type}`}
       </div>
-      <div className={css.interactionHint}>拖拽旋转 · 滚轮缩放 · 点击查看</div>
+      <div className={css.interactionHint} title="流光仅表示已登记关系的方向，不代表实时传输或执行状态">拖拽旋转 · 滚轮缩放 · 点击查看 · 流光表示关系方向</div>
       </div>
       <div className={css.legend} aria-label="知识社区图例">
         {legend.map((community: KnowledgeGraphLayoutCommunity, index) => <button

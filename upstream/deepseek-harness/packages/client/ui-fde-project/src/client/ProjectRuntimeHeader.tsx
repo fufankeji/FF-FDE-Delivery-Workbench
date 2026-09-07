@@ -115,6 +115,7 @@ export function ProjectRuntimeHeader({
       {state === 'running' ? (
         <>
           <button type="button" disabled={busy || runtime?.previewUrl === undefined} onClick={() => { void open() }}>{t('runtime.open')}</button>
+          {runtime?.previewUrl === undefined ? null : <button type="button" title={runtime.previewUrl} onClick={() => { window.open(runtime.previewUrl, '_blank', 'noopener,noreferrer') }}>{t('runtime.openExternal')}</button>}
           <button type="button" disabled={busy} onClick={() => { void terminal() }}>{t('runtime.terminal')}</button>
           <button type="button" disabled={busy} onClick={() => { void stop() }}>{t('runtime.stop')}</button>
         </>

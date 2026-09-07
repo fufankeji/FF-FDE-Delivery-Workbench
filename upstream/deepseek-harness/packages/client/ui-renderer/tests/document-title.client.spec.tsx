@@ -16,21 +16,21 @@ describe('DocumentTitle', () => {
     const mounted = render(<DocumentTitle />)
     expect(document.title).toBe('DeepSeek Harness')
     mounted.rerender(<DocumentTitle title="First title" />)
-    expect(document.title).toBe('First title — DeepSeek Harness')
+    expect(document.title).toBe('DeepSeek Harness — First title')
     mounted.rerender(<DocumentTitle title="Revised title" />)
-    expect(document.title).toBe('Revised title — DeepSeek Harness')
+    expect(document.title).toBe('DeepSeek Harness — Revised title')
     mounted.rerender(<DocumentTitle />)
     expect(document.title).toBe('DeepSeek Harness')
     mounted.unmount()
     expect(document.title).toBe('DeepSeek Harness')
   })
 
-  it('uses the generic title when the build provides no title', () => {
+  it('keeps the workbench brand first when the build provides no title', () => {
     vi.stubEnv('DSH_CLIENT_TITLE', '')
     delete process.env.DSH_CLIENT_TITLE
     const mounted = render(<DocumentTitle title="First title" />)
-    expect(document.title).toBe('First title — DSH Local Build')
+    expect(document.title).toBe('FF - FDE 交付工作台 — First title')
     mounted.unmount()
-    expect(document.title).toBe('DSH Local Build')
+    expect(document.title).toBe('FF - FDE 交付工作台')
   })
 })

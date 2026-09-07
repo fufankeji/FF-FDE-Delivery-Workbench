@@ -1,10 +1,12 @@
 .root {
+  --dsw-alias-label-primary-foreground: var(--dsw-alias-graph-foreground);
+  --dsw-alias-state-business-primary: var(--dsw-alias-graph-accent);
   position: relative;
   min-width: 0;
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--dsw-alias-state-business-primary) 28%, var(--dsw-alias-border-l2));
   border-radius: 16px;
-  background: var(--dsw-static-neutral-bluish-1000);
+  background: var(--dsw-alias-graph-background);
   color: var(--dsw-alias-label-primary-foreground);
   box-shadow: 0 20px 46px color-mix(in srgb, var(--dsw-alias-shadow-color) 24%, transparent);
 }
@@ -13,10 +15,7 @@
   position: relative;
   height: clamp(430px, 58vh, 680px);
   min-height: 430px;
-  background:
-    radial-gradient(circle at 28% 42%, color-mix(in srgb, var(--dsw-alias-state-business-primary) 18%, transparent), transparent 34%),
-    radial-gradient(circle at 72% 60%, color-mix(in srgb, var(--dsw-alias-state-success-primary) 11%, transparent), transparent 30%),
-    var(--dsw-static-neutral-bluish-1000);
+  background: var(--dsw-alias-graph-background);
 }
 
 .root:fullscreen {
@@ -69,14 +68,14 @@
   position: absolute;
   top: 0;
   left: 0;
-  max-width: 138px;
+  max-width: 164px;
   overflow: hidden;
-  padding: 1px 4px;
-  border: 0;
-  border-radius: 4px;
-  background: color-mix(in srgb, var(--dsw-static-neutral-bluish-1000) 65%, transparent);
-  color: color-mix(in srgb, var(--dsw-alias-label-primary-foreground) 75%, transparent);
-  font-size: 11px;
+  padding: 3px 7px;
+  border: 1px solid color-mix(in srgb, var(--dsw-alias-graph-accent) 18%, transparent);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--dsw-alias-graph-background) 82%, transparent);
+  color: var(--dsw-alias-graph-foreground);
+  font-size: 12px;
   font-weight: 500;
   line-height: 17px;
   text-overflow: ellipsis;

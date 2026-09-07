@@ -17,6 +17,7 @@ updated: "2026-09-07"
 - Feature 不按页面、前端、后端或模型拆分；每项结果可以跨 DeepSeek Harness Host、Client、Session、Skill、Tool 和 Workspace。
 - 本表确认后是 Feature 边界、需求／PSC 归属和依赖的唯一事实源。
 - 文档确认不等于批量开发授权；后续仍按用户指令逐个 Feature 开发、调试和更新证据。
+- 项目通用预览归属 F002 的共享工作台能力，F009 等阶段仅复用入口；遵守 PSC-007、PSC-019 的运行记录与隔离要求，不给各阶段或业务项目分别维护端口补丁。
 
 ## Feature Map
 

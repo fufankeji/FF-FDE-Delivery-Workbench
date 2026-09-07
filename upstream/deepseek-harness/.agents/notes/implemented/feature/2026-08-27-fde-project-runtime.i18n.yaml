@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write .agents/notes/implemented/feature/2026-08-27-fde-project-runtime.md
-2026-08-27-fde-project-runtime.md: b73f72672b279fd613f9a386f14c5924f8baa3cd
-2026-08-27-fde-project-runtime.zh.md: eb6f23c3b2ea562f71a594ede317642ba7364004
+2026-08-27-fde-project-runtime.md: c14aaffda7bb672001456274aec09e6964dd7ab8
+2026-08-27-fde-project-runtime.zh.md: 0eec64c0a6d2718f29dcfe331317e77069b1be2f

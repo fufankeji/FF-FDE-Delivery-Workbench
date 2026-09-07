@@ -6,6 +6,8 @@ The browser Cordis plugin that owns the React rendering layer. [`dsh-client-web`
 
 The client entry also owns the React implementation of slot outlets, session providers, and observable-to-uSES binding. Business plugins pass bare observable sources through typed slot `hooks`; the renderer binds them at the outlet. The plugin activates after `slots`, `sessions`, and `layout`, projects the selected session title, and performs the sole context-level `renderSlot('root')` call. React, React DOM, Cordis, ui-slots, and ui-primitives retain one browser identity through the web shell's static module table; this package arrives as a dynamic client bundle.
 
+Browser tabs put the build-selected product title before the current session title. Without a build override, the product title is `FF - FDE 交付工作台`; deselecting a session or unmounting restores that product title.
+
 ## Model Experience
 
 None, as the UI renderer only assembles browser UI and contributes no model-visible input.

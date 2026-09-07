@@ -6,6 +6,30 @@ import type { ProjectSurfaceSnapshot } from './types.ts'
 
 const MAX_BODY_BYTES = 16 * 1024
 
+/** Create a preview only from a trusted GUI request and a registered Workspace ID. */
+export function createProjectPreviewRoute(options: {
+  readonly trusted: (request: IncomingMessage) => boolean
+  readonly open: (workspaceId: string, parentOrigin: string) => Promise<{ url: string; sourceUrl: string }>
+}): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
+  return async (request, response) => {
+    try {
+      if (!options.trusted(request)) throw new FdeProjectRequestError('forbidden', 403, '当前请求不能打开项目预览。')
+      if (request.method !== 'POST') throw new FdeProjectRequestError('method-not-allowed', 405, '项目预览接口只接受 POST。')
+      const input = await readJson(request) as Record<string, unknown>
+      if (typeof input?.workspaceId !== 'string' || !input.workspaceId || Object.keys(input).some(key => key !== 'workspaceId')) {
+        throw new FdeProjectRequestError('bad-request', 400, '预览只接受已登记的项目 ID，不接受代理目标地址。')
+      }
+      const value = await options.open(input.workspaceId, request.headers.origin ?? `http://${request.headers.host}`)
+      writeJson(response, 200, { ok: true, value })
+    } catch (error) {
+      request.resume()
+      writeJson(response, error instanceof FdeProjectRequestError ? error.status : 409, {
+        ok: false, error: { code: 'preview-unavailable', message: error instanceof Error ? error.message : '项目预览不可用。' },
+      })
+    }
+  }
+}
+
 /** HTTP-safe project request failure with a stable code and status. */
 export class FdeProjectRequestError extends Error {
   constructor(readonly code: string, readonly status: number, message: string) {

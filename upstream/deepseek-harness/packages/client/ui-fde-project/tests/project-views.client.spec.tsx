@@ -88,11 +88,12 @@ describe('FDE project views', () => {
             summary: '不再重复展示的架构摘要',
             status: 'confirmed',
             updatedAt: '2026-08-27T13:44:41.000Z',
-            groups: [{ id: 'entry', label: '交互层' }, { id: 'core', label: '智能层' }, { id: 'data', label: '数据层' }],
+            groups: [{ id: 'entry', label: '交互层' }, { id: 'core', label: '智能层' }, { id: 'data', label: '数据层' }, { id: 'output', label: '本地结果' }],
             nodes: [
               { id: 'web', label: 'Web 入口', kind: 'entry', group: 'entry' },
               { id: 'agent', label: 'Agent 编排', kind: 'core', note: '组织项目任务', group: 'core' },
               { id: 'db', label: '项目数据库', kind: 'store', group: 'data' },
+              { id: 'result', label: '本地草稿', kind: 'output', group: 'output' },
             ],
             edges: [
               { from: 'web', to: 'agent', label: '提交任务' },
@@ -114,7 +115,21 @@ describe('FDE project views', () => {
 
     render(<ArchitectureView {...props} />)
 
-    expect(screen.getByRole('img', { name: '候选架构标题' })).toBeTruthy()
+    const canvas = screen.getByRole('img', { name: '候选架构标题' })
+    expect(canvas.getAttribute('preserveAspectRatio')).toBe('xMidYMid meet')
+    expect(canvas.getAttribute('viewBox')).toBe('0 0 1476 286')
+    expect(canvas.style.minWidth).toBe('')
+    expect(canvas.style.getPropertyValue('--architecture-zoom')).toBe('100%')
+    expect(screen.getByRole('button', { name: '查看 本地草稿' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '放大' }))
+    expect(canvas.style.getPropertyValue('--architecture-zoom')).toBe('110%')
+    const viewport = canvas.parentElement!
+    viewport.scrollLeft = 100
+    viewport.scrollTop = 50
+    fireEvent.click(screen.getByRole('button', { name: '适应窗口' }))
+    expect(canvas.style.getPropertyValue('--architecture-zoom')).toBe('100%')
+    expect(viewport.scrollLeft).toBe(0)
+    expect(viewport.scrollTop).toBe(0)
     expect(screen.queryByText('不再重复展示的架构摘要')).toBeNull()
     expect(screen.queryByText('版本')).toBeNull()
     expect(screen.queryByText('更新时间')).toBeNull()

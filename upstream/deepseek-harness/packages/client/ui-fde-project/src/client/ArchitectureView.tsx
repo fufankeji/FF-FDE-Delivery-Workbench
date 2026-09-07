@@ -1,6 +1,7 @@
 /** Project system architecture view and export actions. */
 
 import { useMemo, useRef, useState } from 'react'
+import type { CSSProperties } from 'react'
 import type { ProjectArchitecture } from './controller.ts'
 import type { ProjectViewProps } from './slots.ts'
 import { ProjectViewHeader, ProjectViewState } from './view-state.tsx'
@@ -131,7 +132,7 @@ function architectureLayout(architecture: ProjectArchitecture): ArchitectureLayo
   const nodeTop = 126
   const nodeGap = 28
   const maxRows = Math.max(1, ...groupDefinitions.map(group => nodesByGroup.get(group.id)?.length ?? 0))
-  const height = Math.max(660, nodeTop + maxRows * NODE_HEIGHT + Math.max(0, maxRows - 1) * nodeGap + 72)
+  const height = nodeTop + maxRows * NODE_HEIGHT + Math.max(0, maxRows - 1) * nodeGap + 72
   const contentWidth = horizontalPadding * 2 + groupDefinitions.length * groupWidth + Math.max(0, groupDefinitions.length - 1) * groupGap
   const width = Math.max(1080, contentWidth)
   const contentOffset = (width - contentWidth) / 2
@@ -349,12 +350,12 @@ function ArchitectureCanvas({ architecture, focusNodeId, zoom, onHoverNode, onSe
     }
     return related
   }, [architecture.edges, focusNodeId])
-  const minimumWidth = Math.max(1080, Math.round(layout.width * zoom / 100))
   return (
     <svg
       className={css.architectureCanvas}
-      style={{ minWidth: `${String(minimumWidth)}px` }}
+      style={{ '--architecture-zoom': `${String(zoom)}%` } as CSSProperties}
       viewBox={`0 0 ${String(layout.width)} ${String(layout.height)}`}
+      preserveAspectRatio="xMidYMid meet"
       role="img"
       aria-label={architecture.title}
     >
@@ -479,6 +480,7 @@ export function ArchitectureView(props: ProjectViewProps) {
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null)
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
   const actionRef = useRef(false)
+  const viewportRef = useRef<HTMLDivElement>(null)
   return (
     <ProjectViewState props={props}>{(snapshot, workspace) => {
       const architecture = snapshot.architecture
@@ -513,7 +515,7 @@ export function ArchitectureView(props: ProjectViewProps) {
         }).finally(() => { actionRef.current = false })
       }
       return (
-        <section className={css.surfaceRoot}>
+        <section className={`${css.surfaceRoot} ${css.architectureSurface}`} data-conversation-composer-overlay>
           <ProjectViewHeader
             eyebrow={workspace.title}
             title="系统架构"
@@ -550,13 +552,19 @@ export function ArchitectureView(props: ProjectViewProps) {
                   <button type="button" aria-label={motionPaused ? '播放连线动画' : '暂停连线动画'} aria-pressed={motionPaused} onClick={() => { setMotionPaused(value => !value) }}>{motionPaused ? '▶' : 'Ⅱ'}</button>
                   <div className={css.zoomControls} aria-label="架构图缩放">
                     <button type="button" aria-label="缩小" onClick={() => { setZoom(value => Math.max(70, value - 10)) }}>−</button>
-                    <button type="button" aria-label="重置缩放" onClick={() => { setZoom(100) }}>{zoom}%</button>
+                    <button type="button" aria-label="适应窗口" title="完整显示架构图；缩放比例相对于适应窗口" onClick={() => {
+                      setZoom(100)
+                      if (viewportRef.current !== null) {
+                        viewportRef.current.scrollLeft = 0
+                        viewportRef.current.scrollTop = 0
+                      }
+                    }}>{zoom === 100 ? '适应' : `${String(zoom)}%`}</button>
                     <button type="button" aria-label="放大" onClick={() => { setZoom(value => Math.min(180, value + 10)) }}>＋</button>
                   </div>
                 </div>
               </div>
               {exportError !== '' && <p className={css.inlineError} role="alert">{exportError}</p>}
-              <div className={css.architectureViewport}>
+              <div className={css.architectureViewport} ref={viewportRef}>
                 <ArchitectureCanvas
                   architecture={architecture}
                   focusNodeId={focusNodeId}

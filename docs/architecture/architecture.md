@@ -224,7 +224,8 @@ FDE Project (= Harness Workspace)
 - `project_runtime_report` 是 Agent 对当前操作提交事实的唯一工具。它从 calling Session cwd 解析已登记 Workspace，校验 operationId、发起 Session 与迁移；预览只接受不含凭据的 loopback HTTP(S) URL，API 来源只属于同一当前运行记录。启动 `blocked` 保留当前操作身份，因此同一发起 Session 在补齐条件并提交已验证 previewUrl 后可恢复 `running`；停止阻塞、旧 operationId 和跨 Session 报告继续拒绝。
 - Client 在项目开发及后续阶段的 `conversation.session.header.utilities` 常驻显示运行状态。点击启动/停止会先开启 Better Sidebar 的 Agent Terminal、Terminal Tab 与 Browser Tab，再向当前 Session 排队可见提示；浏览器不直接执行 Shell，也不启动隐藏后台进程。
 - 启动动作先通过 Session conversation service 选择当前 Session 的 `chat` View，再发送提示。提示要求 Agent 先读项目根 `AGENTS.md` 及其引用说明，使用 `terminal_list/create/read/wait_for` 启动和验证，最后报告真实地址；不可运行则报告 `blocked`。无论成功或阻塞，Agent 在调用运行报告后都要在当前对话说明结果和下一步；页头运行状态只提供摘要与恢复动作，不拥有或替换中央内容。Client 对 `starting/stopping` 快速刷新、对启动 `blocked` 低频刷新；首次观察到当前操作进入 `running` 后，通过 Better Sidebar 精确 loopback 白名单自动打开一次 Browser，并让 API 文档 View 使用同一快照重新计算。停止提示只对本项目运行终端发送 `SIGINT` 并等待，不使用宽泛 `pkill/killall`，也不关闭终端标签，因此输出可持续审阅。
-- `running` 后 Client 把预览 URL 的精确 loopback `host:port` 合并进 Better Sidebar allowlist，并在当前 Session 的 Browser Tab 打开项目；不调用系统浏览器。iframe 限制继续由 Better Sidebar 显示真实原因和已有外部打开备选。
+- `running` 后 Client 向可信同源的 `/api/fde-project/runtime/preview` 提交 WorkspaceId。Host 只从该项目运行记录读取目标，为项目分配不可预测的 `*.localhost` 主机名与 OS 分配端口，绑定 loopback；Client 授权该精确入口并在当前 Session 的 Browser Tab 打开。页面根路径、相对资源、流式 API 与 WebSocket 使用同一代理；只适配本地响应的嵌入策略、同目标重定向与请求来源，HTML/JS 原件不改写。不同项目不共享来源，工作台凭证不进入预览。每次请求重核运行状态和目标，地址变化或停止后旧入口失效；卸载关闭全部代理连接。
+- Better Sidebar 的嵌入预检根据实际父页面与最终目标来源判断明确的 CSP/X-Frame-Options，不再把所有非通配白名单判为禁止。无法完整判定的策略交给浏览器，不伪造成功。平台不代理任意外部站点；绝对硬编码地址、跨站登录及特殊 Cookie 策略不承诺自动兼容，保留直接打开项目原地址。
 
 ### 5.7 项目级系统架构
 

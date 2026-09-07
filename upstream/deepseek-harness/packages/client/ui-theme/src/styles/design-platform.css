@@ -1,3 +1,12 @@
+/* The graph is an immersive dark scene in either application theme. */
+body {
+  --dsw-static-graph-ice-50: #e6f3ff;
+  --dsw-static-graph-cyan-300: #65cfff;
+  --dsw-alias-graph-background: var(--dsw-static-neutral-1000);
+  --dsw-alias-graph-foreground: var(--dsw-static-graph-ice-50);
+  --dsw-alias-graph-accent: var(--dsw-static-graph-cyan-300);
+}
+
 /* Figma font-weight 510 (an SF Pro variable-font weight) always renders as
    font-weight: 500 in this UI — non-variable webfonts snap intermediate
    weights unpredictably across platforms. */

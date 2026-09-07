@@ -4369,6 +4369,13 @@
   overflow-y: auto;
 }
 
+/* Keep the scrollport above the resident composer, including its bottom inset. */
+.genericStageRoot[data-stage='definition'][data-conversation-composer-overlay] {
+  height: calc(100% - var(--dsh-composer-height, 132px) - 32px);
+  padding-bottom: 16px;
+  scroll-padding-bottom: 16px;
+}
+
 .genericStageRoot[data-stage='definition'] .genericStageGrid {
   display: grid;
   width: 100%;
@@ -4376,7 +4383,7 @@
   min-height: 0;
   margin: 0 auto;
   grid-template-columns: minmax(0, 2.18fr) minmax(320px, 1fr);
-  grid-template-rows: 207px 287px 257px;
+  grid-template-rows: 207px 287px minmax(257px, auto);
   align-content: start;
   align-items: start;
   column-gap: 14px;
@@ -4736,8 +4743,8 @@
   grid-column: 1 / -1;
   grid-row: 3;
   width: 100%;
-  height: 257px;
-  min-height: 0;
+  height: auto;
+  min-height: 257px;
   padding: 8px 14px 9px;
   border-color: #f2d4aa;
   border-radius: 15px;
@@ -4879,7 +4886,7 @@
 
 @media (min-width: 981px) and (min-height: 1100px) {
   .genericStageRoot[data-stage='definition'] .genericStageGrid {
-    grid-template-rows: 237px 337px 297px;
+    grid-template-rows: 237px 337px minmax(297px, auto);
     row-gap: 22px;
   }
 
@@ -4888,7 +4895,7 @@
   .genericStageRoot[data-stage='definition'] .genericStageGrid > aside,
   .genericStageRoot[data-stage='definition'] .projectRecordRail { height: 337px; }
   .genericStageRoot[data-stage='definition'] .promptGuide { min-height: 190px; }
-  .genericStageRoot[data-stage='definition'] .workflowsPanel { height: 297px; }
+  .genericStageRoot[data-stage='definition'] .workflowsPanel { min-height: 297px; }
   .genericStageRoot[data-stage='definition'] .stageReviewArtifacts > article { height: 40px; }
 }
 

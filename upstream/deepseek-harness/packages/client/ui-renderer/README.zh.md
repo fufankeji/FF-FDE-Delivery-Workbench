@@ -6,6 +6,8 @@
 
 client entry 还持有 slot outlet、会话 provider 以及 observable 到 uSES 绑定的 React 实现。业务插件通过带类型的 slot `hooks` 传递裸 observable source；渲染器在 outlet 处完成绑定。插件在 `slots`、`sessions` 和 `layout` 就绪后激活，投影当前会话标题，并执行全程序唯一一次上下文级 `renderSlot('root')` 调用。React、React DOM、Cordis、ui-slots 和 ui-primitives 通过 web 外壳的静态模块表保持同一浏览器身份；本包则以动态客户端 bundle 到达。
 
+浏览器标签将构建指定的产品名放在当前会话标题之前。未指定构建覆盖时，产品名为 `FF - FDE 交付工作台`；取消选择会话或卸载时恢复产品名。
+
 ## 模型体验
 
 无，因为 UI 渲染器只组装浏览器 UI，不贡献模型可见输入。

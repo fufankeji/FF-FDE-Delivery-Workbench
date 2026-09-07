@@ -551,7 +551,7 @@ describe.skipIf(!process.env.DEEPSEEK_API_KEY || notReady.length > 0)('web smoke
     await page.waitForFunction(() => document.body.innerText.length > 50, undefined, { timeout: 15_000 })
     expect(pageErrors).toEqual([])
     await page.waitForFunction(
-      expected => document.title !== expected && document.title.endsWith(` — ${expected}`),
+      expected => document.title !== expected && document.title.startsWith(`${expected} — `),
       productTitle,
       { timeout: 15_000 },
     )
@@ -563,7 +563,7 @@ describe.skipIf(!process.env.DEEPSEEK_API_KEY || notReady.length > 0)('web smoke
     if (sessionId === undefined) throw new Error('created Web session was not listed')
     const durableTitle = await waitForProviderTitle(baseUrl, sessionId)
     await page.waitForFunction(
-      ({ expected, product }) => document.title === `${expected} — ${product}`,
+      ({ expected, product }) => document.title === `${product} — ${expected}`,
       { expected: durableTitle, product: productTitle },
       { timeout: 15_000 },
     )

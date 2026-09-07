@@ -12,6 +12,18 @@ interface SettingsWireFailure {
   readonly error?: { readonly message?: string }
 }
 
+/** Resolve the platform-owned isolated preview instead of changing project CSP. */
+export async function resolveProjectPreview(workspaceId: string, fetchImpl: typeof fetch = fetch): Promise<string> {
+  const response = await fetchImpl('/api/fde-project/runtime/preview', {
+    method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ workspaceId }),
+  })
+  const result = await response.json() as { ok?: boolean; value?: { url?: string }; error?: { message?: string } }
+  if (!response.ok || result.ok !== true || typeof result.value?.url !== 'string') throw new Error(result.error?.message ?? '项目预览服务暂不可用。')
+  const url = new URL(result.value.url)
+  if (url.protocol !== 'http:' || !/^fde-[a-f0-9]{36}\.localhost$/.test(url.hostname) || !url.port || url.username || url.password) throw new Error('平台返回了无效的隔离预览地址。')
+  return url.href
+}
+
 function commaValues(value: string): string[] {
   return value.split(',').map(item => item.trim()).filter(Boolean)
 }

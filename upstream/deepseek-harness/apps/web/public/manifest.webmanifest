@@ -1,15 +1,15 @@
 {
   "id": "/",
-  "name": "DeepSeek Harness",
-  "short_name": "DSH",
+  "name": "FF - FDE 交付工作台",
+  "short_name": "FF-FDE",
   "start_url": "/",
   "scope": "/",
   "display": "fullscreen",
   "icons": [
     {
-      "src": "/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "/ff-brand/ff-logo.png",
+      "sizes": "300x300",
+      "type": "image/png",
       "purpose": "any"
     }
   ]

@@ -3204,11 +3204,24 @@
 .architectureControls button:focus-visible { outline: 2px solid #60a5fa; outline-offset: 2px; }
 .zoomControls { flex: none; display: flex; padding: 3px; border: 1px solid var(--architecture-control-border); border-radius: 9px; background: var(--architecture-control-bg); }
 .zoomControls button:nth-child(2) { min-width: 48px; color: var(--architecture-control-strong); }
-.architectureViewport { position: relative; z-index: 1; overflow: auto; min-height: 620px; overscroll-behavior: contain; scrollbar-color: var(--architecture-scroll-thumb) var(--architecture-scroll-track); scrollbar-width: thin; }
+.architectureSurface {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  overflow: auto;
+  padding-top: 20px;
+  padding-bottom: calc(var(--dsh-composer-height, 152px) + 16px);
+}
+.architectureSurface > .surfaceHeader { flex: none; margin-bottom: 16px; }
+.architectureSurface > .architectureStage { display: flex; flex-direction: column; flex: 1; min-height: 0; min-width: 0; margin-top: 0; }
+.architectureStageBar { flex: none; }
+.architectureViewport { position: relative; z-index: 1; flex: 1; overflow: auto; min-height: 0; min-width: 0; overscroll-behavior: contain; scrollbar-color: var(--architecture-scroll-thumb) var(--architecture-scroll-track); scrollbar-width: thin; }
 .architectureViewport::-webkit-scrollbar { width: 9px; height: 9px; }
 .architectureViewport::-webkit-scrollbar-track { background: var(--architecture-scroll-track); }
 .architectureViewport::-webkit-scrollbar-thumb { border: 2px solid transparent; border-radius: 999px; background: var(--architecture-scroll-thumb); background-clip: padding-box; }
-.architectureCanvas { display: block; width: 100%; height: clamp(620px, calc(100vh - 260px), 780px); }
+.architectureCanvas { display: block; width: var(--architecture-zoom, 100%); height: var(--architecture-zoom, 100%); }
 .architectureBackgroundStart { stop-color: var(--architecture-bg-start); }
 .architectureBackgroundMiddle { stop-color: var(--architecture-bg-middle); }
 .architectureBackgroundEnd { stop-color: var(--architecture-bg-end); }
@@ -4316,8 +4329,6 @@
   .architectureStage { border-radius: 16px; }
   .architectureStageBar { min-height: 48px; padding-inline: 12px; }
   .architectureGuide > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .architectureViewport { min-height: 560px; }
-  .architectureCanvas { height: 560px; }
   .architectureInspector { bottom: 12px; left: 12px; width: min(410px, calc(100% - 24px)); }
   .portfolioHeadline { padding-inline: 18px; }
   .portfolioRadials { grid-template-columns: 1fr; padding-inline: 18px; }

@@ -1,5 +1,5 @@
 diff --git a/lib/client.js b/lib/client.js
-index 6cf688cbba1345a61e6db0738638ae215ad1d2e0..9aa44dee99d3796bf9813e4c766eb68cf4aabdb7 100644
+index 6cf688cbba1345a61e6db0738638ae215ad1d2e0..049a5ac628ee6a63b34132c41a6e35e65101430a 100644
 --- a/lib/client.js	
 +++ b/lib/client.js
 @@ -41,13 +41,13 @@ window.__ModuleLoader__.load({
@@ -39,12 +39,18 @@ index 6cf688cbba1345a61e6db0738638ae215ad1d2e0..9aa44dee99d3796bf9813e4c766eb68c
  			viewersEnabled: {},
  			pluginSettings: {}
  		};
-@@ -9729 +9734,4 @@ window.__ModuleLoader__.load({
+@@ -9725,7 +9730,10 @@ window.__ModuleLoader__.load({
+ 			const tag = document.createElement("style");
+ 			tag.dataset.plugin = "dsh-better-sidebar";
+ 			tag.dataset.pluginCss = tagId$4;
 -			tag.textContent = css$4;
 +			tag.textContent = css$4.replace(
 +				"[data-dsh-panel-host]{z-index:25;pointer-events:none;position:fixed;inset:0;overflow:hidden}",
 +				"[data-dsh-panel-host]{z-index:25;pointer-events:none;position:fixed;inset:0;overflow:clip}"
 +			);
+ 			document.head.appendChild(tag);
+ 		}
+ 		var sidebar_module_css_default = {
 @@ -12263,8 +12271,29 @@ window.__ModuleLoader__.load({
  		* drop over the file window uploads here and never reaches DSH's chat
  		* intake.
@@ -144,7 +150,66 @@ index 6cf688cbba1345a61e6db0738638ae215ad1d2e0..9aa44dee99d3796bf9813e4c766eb68c
  							sessionId: scope.sessionId,
  							cwd: scope.cwd,
  							expanded,
-@@ -19580,7 +19647,7 @@ Mode: this is a continuable side conversation. Your answers stay in this side th
+@@ -16538,24 +16605,39 @@ Mode: this is a continuable side conversation. Your answers stay in this side th
+ 		//#endregion
+ 		//#region src/client/browser.ts
+ 		/**
+-		* Decide whether a site can render inside the sidebar iframe. The signals
+-		* are exactly the ones the BROWSER enforces when it refuses an iframe load:
+-		* X-Frame-Options DENY/SAMEORIGIN, or a frame-ancestors directive that does
+-		* not allow `*` ('self' here means the SITE's own origin — never ours, so
+-		* it also blocks the sidebar). A site we could not reach yields 'unknown'
+-		* and the plain iframe stays.
++		* Compare explicit frame policies with the real parent and final target.
++		* Unsupported sources stay unknown; the browser remains authoritative.
+ 		*/
+-		function embeddabilityOf(probe) {
++		function embeddabilityOf(probe, parentOrigin) {
+ 			if (probe.reachable !== true) return "unknown";
++			if (!parentOrigin || !probe.url) return "unknown";
++			let parent, target;
++			try { parent = new URL(parentOrigin); target = new URL(probe.url); } catch { return "unknown"; }
++			if (probe.frameAncestors !== void 0) {
++				let unknown = false, allowed = false;
++				for (const source of probe.frameAncestors) {
++					if (source === "*") allowed = true;
++					else if (source === "'self'") allowed ||= parent.origin === target.origin;
++					else if (source === "'none'") continue;
++					else if (/^https?:$/.test(source)) allowed ||= parent.protocol === source;
++					else {
++						try {
++							const origin = new URL(source);
++							if (!/^https?:$/.test(origin.protocol) || origin.hostname.includes("*") || source.includes(",") || origin.pathname !== "/") unknown = true;
++							else allowed ||= parent.origin === origin.origin;
++						} catch { unknown = true; }
++					}
++				}
++				return unknown ? "unknown" : allowed ? "embeddable" : "blocked";
++			}
+ 			const xfo = probe.xFrameOptions?.trim().toUpperCase();
+-			if (xfo === "DENY" || xfo === "SAMEORIGIN") return "blocked";
+-			if (probe.frameAncestors !== void 0 && !probe.frameAncestors.some((source) => source === "*")) return "blocked";
++			if (xfo === "DENY" || (xfo === "SAMEORIGIN" && parent.origin !== target.origin)) return "blocked";
+ 			return "embeddable";
+ 		}
+ 		/** A loopback hostname (localhost, IPv6 ::1, 127.0.0.0/8, 0.0.0.0). */
+ 		function isLoopbackHostname(hostname) {
+ 			const host = hostname.replace(/^\[|\]$/g, "").toLowerCase();
+-			if (host === "localhost" || host === "::1" || host === "0.0.0.0") return true;
++			if (host === "localhost" || host === "::1" || host === "0.0.0.0" || /^fde-[a-f0-9]{36}\.localhost$/.test(host)) return true;
+ 			const parts = host.split(".");
+ 			return parts.length === 4 && parts[0] === "127" && parts.every((part) => /^\d{1,3}$/.test(part) && Number(part) <= 255);
+ 		}
+@@ -16813,7 +16895,7 @@ Mode: this is a continuable side conversation. Your answers stay in this side th
+ 				setEmbedBlocked(null);
+ 				setForceEmbed(false);
+ 				api.browserProbe(url).then((probe) => {
+-					if (!cancelled && embeddabilityOf(probe) === "blocked") setEmbedBlocked(url);
++					if (!cancelled && embeddabilityOf(probe, window.location.origin) === "blocked") setEmbedBlocked(url);
+ 				}).catch(() => {});
+ 				return () => {
+ 					cancelled = true;
+@@ -19580,7 +19662,7 @@ Mode: this is a continuable side conversation. Your answers stay in this side th
  				children: /* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
  					className: sidebar_module_css_default.toggleCluster,
  					"data-dsh-toggle-cluster": true,
@@ -153,7 +218,7 @@ index 6cf688cbba1345a61e6db0738638ae215ad1d2e0..9aa44dee99d3796bf9813e4c766eb68c
  						label: t("noSession"),
  						side: "bottom",
  						delayMs: 500,
-@@ -19701,7 +19768,7 @@ Mode: this is a continuable side conversation. Your answers stay in this side th
+@@ -19701,7 +19783,7 @@ Mode: this is a continuable side conversation. Your answers stay in this side th
  					/* @__PURE__ */ (0, react_jsx_runtime.jsxs)("div", {
  						className: sidebar_module_css_default.toggleCluster,
  						"data-dsh-toggle-cluster": true,
@@ -240,6 +305,19 @@ index 6eff381b88ea57652bccd2f18f7557519dcb1074..48c689cae6c022a06064b90e2268bfb0
  	viewersEnabled: z.dict(z.boolean()).default({}),
  	pluginSettings: z.dict(z.dict(z.any())).default({})
  });
+diff --git a/src/client/BrowserView.tsx b/src/client/BrowserView.tsx
+index c44d41a3106619e14e1ccb584f7b4f2897f9ee47..2428afa1f1956a237a8fdfbe71e2afe9e2652e2b 100644
+--- a/src/client/BrowserView.tsx	
++++ b/src/client/BrowserView.tsx
+@@ -112,7 +112,7 @@ export function BrowserView(props: TabComponentProps) {
+     setEmbedBlocked(null)
+     setForceEmbed(false)
+     void api.browserProbe(url).then((probe) => {
+-      if (!cancelled && embeddabilityOf(probe) === 'blocked') setEmbedBlocked(url)
++      if (!cancelled && embeddabilityOf(probe, window.location.origin) === 'blocked') setEmbedBlocked(url)
+     }).catch(() => { /* unreachable: keep the plain iframe */ })
+     return () => { cancelled = true }
+   }, [url])
 diff --git a/src/client/EditorHost.tsx b/src/client/EditorHost.tsx
 index d394c737c14dbedce36469f06a6eb0c24b230b3f..b2f61e3203dd402a4cbeb2a3d13149ab3004b712 100644
 --- a/src/client/EditorHost.tsx	
@@ -407,11 +485,67 @@ index e304328eb8060966700e7911f6f046b8f8f46897..f05170d31af8dc1f04d0f5c543fa7b44
  
    const busy = upload !== null
  
+diff --git a/src/client/browser.ts b/src/client/browser.ts
+index 3aab45e19cb35d32be378b14ecbc5b3b1b367318..ff72f3e7f0cea188a6d286f21a19becba08f27fd 100644
+--- a/src/client/browser.ts	
++++ b/src/client/browser.ts
+@@ -37,25 +37,41 @@ export interface BrowserProbeResult {
+ export type Embeddability = 'embeddable' | 'blocked' | 'unknown'
+ 
+ /**
+- * Decide whether a site can render inside the sidebar iframe. The signals
+- * are exactly the ones the BROWSER enforces when it refuses an iframe load:
+- * X-Frame-Options DENY/SAMEORIGIN, or a frame-ancestors directive that does
+- * not allow `*` ('self' here means the SITE's own origin — never ours, so
+- * it also blocks the sidebar). A site we could not reach yields 'unknown'
+- * and the plain iframe stays.
++ * Compare explicit frame policies with the real parent and final target.
++ * Unsupported source expressions stay unknown so the browser remains the
++ * authority; a valid frame-ancestors policy takes precedence over XFO.
+  */
+-export function embeddabilityOf(probe: BrowserProbeResult): Embeddability {
++export function embeddabilityOf(probe: BrowserProbeResult, parentOrigin?: string): Embeddability {
+   if (probe.reachable !== true) return 'unknown'
++  if (!parentOrigin || !probe.url) return 'unknown'
++  let parent: URL, target: URL
++  try { parent = new URL(parentOrigin); target = new URL(probe.url) } catch { return 'unknown' }
++  if (probe.frameAncestors !== undefined) {
++    let unknown = false, allowed = false
++    for (const source of probe.frameAncestors) {
++      if (source === '*') allowed = true
++      else if (source === "'self'") allowed ||= parent.origin === target.origin
++      else if (source === "'none'") continue
++      else if (/^https?:$/.test(source)) allowed ||= parent.protocol === source
++      else {
++        try {
++          const origin = new URL(source)
++          if (!/^https?:$/.test(origin.protocol) || origin.hostname.includes('*') || source.includes(',') || origin.pathname !== '/') unknown = true
++          else allowed ||= parent.origin === origin.origin
++        } catch { unknown = true }
++      }
++    }
++    return unknown ? 'unknown' : allowed ? 'embeddable' : 'blocked'
++  }
+   const xfo = probe.xFrameOptions?.trim().toUpperCase()
+-  if (xfo === 'DENY' || xfo === 'SAMEORIGIN') return 'blocked'
+-  if (probe.frameAncestors !== undefined && !probe.frameAncestors.some(source => source === '*')) return 'blocked'
++  if (xfo === 'DENY' || (xfo === 'SAMEORIGIN' && parent.origin !== target.origin)) return 'blocked'
+   return 'embeddable'
+ }
+ 
+ /** A loopback hostname (localhost, IPv6 ::1, 127.0.0.0/8, 0.0.0.0). */
+ export function isLoopbackHostname(hostname: string): boolean {
+   const host = hostname.replace(/^\[|\]$/g, '').toLowerCase()
+-  if (host === 'localhost' || host === '::1' || host === '0.0.0.0') return true
++  if (host === 'localhost' || host === '::1' || host === '0.0.0.0' || /^fde-[a-f0-9]{36}\.localhost$/.test(host)) return true
+   const parts = host.split('.')
+   return parts.length === 4
+     && parts[0] === '127'
 diff --git a/src/client/sidebar.module.css b/src/client/sidebar.module.css
 index 26e1862d3dc43d7b009676656dd639303cfe43ee..ff84d995e6f2ef57164f93d086e40276464f6841 100644
---- a/src/client/sidebar.module.css
+--- a/src/client/sidebar.module.css	
 +++ b/src/client/sidebar.module.css
-@@ -43,6 +43,8 @@
+@@ -43,9 +43,11 @@
       hidden panels extended the document's scrollable area, making the whole
       page draggable left-right and up-down while any panel was collapsed.
       The host is exactly viewport-sized (inset: 0), so the clip is invisible
@@ -423,6 +557,9 @@ index 26e1862d3dc43d7b009676656dd639303cfe43ee..ff84d995e6f2ef57164f93d086e40276
 +     call scrollIntoView() without moving the whole dock. Internal scroll
 +     containers and the app's fixed overlay stack are unaffected. */
 +  overflow: clip;
+ }
+ 
+ :global([data-dsh-panel-host][data-dsh-panel-host-degraded]) {
 diff --git a/src/config.ts b/src/config.ts
 index b28b2a7868faebd510ece59c93636a9de6b03c67..d930de53ec346b6fdd777c9b87af91bdee0cc607 100644
 --- a/src/config.ts	

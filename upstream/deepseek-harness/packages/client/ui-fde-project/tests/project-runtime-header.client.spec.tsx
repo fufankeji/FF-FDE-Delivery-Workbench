@@ -49,6 +49,18 @@ function propsFor(
 }
 
 describe('ProjectRuntimeHeader', () => {
+  it('opens the original project externally only after an explicit fallback gesture', () => {
+    const external = vi.spyOn(window, 'open').mockReturnValue(null)
+    const url = 'http://127.0.0.1:4177/'
+    const { props } = propsFor({ schemaVersion: 1, revision: 1, status: 'running', previewUrl: url, updatedAt: '2026-09-07T00:00:00Z' })
+    try {
+      render(<ProjectRuntimeHeader {...props} />)
+      expect(external).not.toHaveBeenCalled()
+      fireEvent.click(screen.getByRole('button', { name: '外部打开' }))
+      expect(external).toHaveBeenCalledWith(url, '_blank', 'noopener,noreferrer')
+    } finally { external.mockRestore() }
+  })
+
   it('starts the current project from the development header', async () => {
     const { props, startProject } = propsFor({
       schemaVersion: 1, revision: 0, status: 'stopped', updatedAt: '1970-01-01T00:00:00.000Z',

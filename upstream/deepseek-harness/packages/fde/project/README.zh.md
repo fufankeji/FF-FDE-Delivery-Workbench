@@ -10,6 +10,8 @@ FDE 项目交付页面使用的可信 Host 支持。它只解析显式 Harness W
 
 ## 项目运行
 
+`POST /api/fde-project/runtime/preview` 只接受可信请求中的 Workspace ID，从运行记录解析已启动地址。临时 loopback 代理为每个项目分配随机 `*.localhost` 来源和 OS 分配端口，与工作台存储和其他项目隔离。页面与资源正文保持原样，支持 HTTP 流和 WebSocket 升级；嵌入响应头适配实际工作台父页面，同目标重定向和请求来源映射到对应入口，Cookie 移除 Domain 属性。每次请求重新核对运行记录；观察到停止或地址变化后，已有流最迟在下一次一秒周期检查中关闭。卸载关闭监听与连接。任意目标、工作台端口、跨来源写入和外部重定向均拒绝，不改项目源码或持久状态。对硬编码绝对来源、跨站登录或不支持的 HTTPS 嵌入环境，浏览器保留显式原地址备选。
+
 一次明确的启动或停止请求会在 `.fde/project-runtime.json` 中创建一个精确操作，并绑定必须执行它的 Session。可见 Agent 读取项目自己的 `AGENTS.md`，使用 Better Sidebar 持久终端工具，验证真实 loopback 项目地址，再通过 `project_runtime_report` 结束该操作。启动阻塞后，如果同一 Session 在同一操作中补齐条件并验证了真实预览地址，可以恢复为运行中；Host 仍会拒绝过期 operation id、其他 Session 的报告、非 loopback 或带凭据的 URL、越过项目的 OpenAPI 路径和其他无效状态迁移。停止项目时，只有 Agent 如实报告服务已经退出后，才清除项目预览与 API 运行事实，同时保留终端标题和可回看的输出。停止结果不明确时必须先重试停止，不能再次启动。
 
 ## 验证合同

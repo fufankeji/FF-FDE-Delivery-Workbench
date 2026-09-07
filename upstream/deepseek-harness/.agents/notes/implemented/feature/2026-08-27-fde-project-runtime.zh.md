@@ -24,7 +24,7 @@ Agent 创建或复用名为“项目运行”的持久终端。启动中、运�
 
 “查看终端”始终先打开运行记录绑定的 Session，并等待 Better Sidebar 采用该 Session 后再读取其布局。查找顺序依次为同名 Agent 终端、该 Session 中已经可见的同名普通终端、最近的 Agent 终端。Harness Host 重启会真实销毁内存 Agent PTY 及其输出，即使最后一份运行记录仍为 `running`。短暂等待后仍无终端时，动作会返回原项目对话并排队一次可见恢复指令：先列举终端，必要时只创建一个空的替代观察终端，再按照项目说明核验已记录预览；明确禁止重复启动或停止服务、在没有当前 operationId 时报告，或声称恢复了旧日志。
 
-“打开项目”使用 Better Sidebar 公共 `openTab` Browser 表层。打开前，客户端只把已验证预览的精确 loopback `host:port` authority 加入 `browserAllowedLoopback`，绝不启动操作系统浏览器。“API 文档”仍以项目开发阶段为最低门槛，但只有当前快照为 `running`、API 文档已配置且存在 OpenAPI 来源时才注册。显式 `.fde/api-docs.json` 继续有效；运行 Agent 报告也可以提供已验证 OpenAPI URL 或项目相对来源。
+“打开项目”先向可信 Host 提交 Workspace ID，由 Host 从运行记录创建隔离的本地代理入口，随后将其精确 authority 加入 `browserAllowedLoopback`，通过 Better Sidebar 公共 `openTab` 打开。每个项目使用随机 `*.localhost` 来源和独立端口，转发原样页面、资源、流式接口与 WebSocket，仅适配本地嵌入、来源和同目标重定向，不修改项目源码。每次请求重新核验运行记录，长连接每秒复核，工作台退出时关闭全部监听。嵌入预检依据真实父页面来源判断，未知策略交给浏览器。默认仍在内置 Browser 中预览；只有用户点击“外部打开”才打开原始运行地址，作为特殊登录或绝对地址的兼容备选。“API 文档”仍以项目开发阶段为最低门槛，但只有当前快照为 `running`、API 文档已配置且存在 OpenAPI 来源时才注册。显式 `.fde/api-docs.json` 继续有效；运行 Agent 报告也可以提供已验证 OpenAPI URL 或项目相对来源。
 
 ## Verification
 
@@ -40,7 +40,7 @@ Apply 集成测试还固定了阻塞路径的展示合同：“启动项目”�
 
 **使用普通 Bash 后台任务。** 拒绝，因为用户无法在工作台中可靠观察、中断或再次查看。锁定终端工具已经提供 Session 归属、保留输出、信号控制和可见页签。
 
-**在操作系统浏览器中打开预览。** 拒绝，因为这会打断一体化交付流程并丢失项目／Session 关联；内置 Browser 已经提供 loopback 白名单。
+**默认在操作系统浏览器中打开预览。** 拒绝，因为这会打断一体化交付流程并丢失项目／Session 关联；外部打开只作为显式兼容备选。
 
 **项目开发一开始就显示 API 文档。** 拒绝，因为阶段状态只证明工作流位置，不证明运行状态或 OpenAPI 可用性。
 

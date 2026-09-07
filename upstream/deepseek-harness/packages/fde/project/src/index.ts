@@ -15,6 +15,7 @@ import {
   createDeploymentTrialReadinessConfirmRoute,
   createEvaluationBaselineRoute,
   createProjectSnapshotRoute,
+  createProjectPreviewRoute,
   createProjectRuntimeAbandonRoute,
   createProjectRuntimeStartRoute,
   createProjectRuntimeStopRoute,
@@ -28,7 +29,9 @@ import { approveProjectEvaluationBaseline, confirmProjectArchitecture, loadProje
 import {
   abandonProjectRuntimeOperation,
   beginProjectRuntimeOperation,
+  loadProjectRuntimeSnapshot,
 } from './project-runtime.ts'
+import { ProjectPreviewGateway } from './project-preview.ts'
 import { registerProjectRuntimeTools } from './project-runtime-tools.ts'
 import {
   REQUIREMENT_ARTIFACT_FILE_PATH,
@@ -222,6 +225,21 @@ export function apply(ctx: Context, config: Config): void {
   registerProjectEvaluationGuard(ctx)
   registerEvaluationWorkbenchTools(ctx)
   const reportFailure = (error: unknown): void => { ctx.logger.warn(error instanceof Error ? error : new Error(String(error))) }
+  const previews = new ProjectPreviewGateway({
+    platformPort: ctx.webServer.port,
+    timeoutMs: config.timeoutMs,
+    target: async workspaceId => {
+      const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
+      if (workspace === undefined) return undefined
+      const runtime = await loadProjectRuntimeSnapshot(workspace.path)
+      return runtime.status === 'running' ? runtime.previewUrl : undefined
+    },
+  })
+  ctx.effect(() => () => previews.dispose(), 'fde-project: isolated previews')
+  ctx.effect(() => ctx.webServer.register({
+    kind: 'exact', path: '/api/fde-project/runtime/preview',
+    handler: createProjectPreviewRoute({ trusted: request => isTrustedApiRequest(request, []), open: (id, parent) => previews.open(id, parent) }),
+  }), 'fde-project: preview route')
   const handler = createProjectSnapshotRoute({
     trusted: request => isTrustedApiRequest(request, []),
     snapshot: async (workspaceId) => {

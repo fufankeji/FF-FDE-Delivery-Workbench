@@ -23,6 +23,7 @@ import { latestProjectSessionId } from './project-data.ts'
 import {
   ensureProjectRuntimeSidebar,
   openProjectPreview,
+  resolveProjectPreview,
   projectRuntimeTerminalRecoveryPrompt,
   projectPreviewAuthority,
   revealProjectSidebar,
@@ -513,8 +514,9 @@ export function apply(ctx: ClientContext): void {
         ? state.value.runtime.previewUrl
         : undefined
       if (url === undefined) throw new Error('当前项目没有已验证的运行地址。')
-      await ensureProjectRuntimeSidebar(betterSidebar, projectPreviewAuthority(url))
-      openProjectPreview(betterSidebar, sessionId, workspacePath, url)
+      const previewUrl = await resolveProjectPreview(workspaceId)
+      await ensureProjectRuntimeSidebar(betterSidebar, projectPreviewAuthority(previewUrl))
+      openProjectPreview(betterSidebar, sessionId, workspacePath, previewUrl)
     },
     showProjectTerminal: async (workspaceId, sessionId, workspacePath) => {
       const state = surfaces.getSnapshot().byWorkspace[workspaceId]
