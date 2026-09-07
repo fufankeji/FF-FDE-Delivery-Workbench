@@ -256,7 +256,7 @@ export const STAKEHOLDER_BRIEF_SKILL = {
 
 本 Skill 适配自固定版本 stakeholder-brief。先识别读者能决定什么，按“建议 → 支撑事实 → 风险与未知 → 需要谁在何时做一件什么事”的顺序写一屏以内的候选简报。所有事实必须引用阶段 Artifact 或逐条 evidenceRef，明确区分已确认、合理推断和未知。
 
-简报只帮助 FDE 或客户做决定，不代替项目中心的人工阶段门；不要因为生成简报而把候选状态改成已确认。`,
+简报只帮助 FDE 或客户做决定，不代替项目中心的阶段评审；不要因为生成简报而把候选状态改成已确认。`,
 } as const
 
 /** Stage-one methods exposed as a read-only business catalog in the project sidebar. */
@@ -644,7 +644,7 @@ export async function apply(ctx: Context): Promise<void> {
       const workspace = ctx.workspaceRegistry.list().find(item => item.path === cwd)
       if (workspace === undefined) return ''
       const record = state.current(workspace.id)
-      const v2Prompt = v2StagePrompt(record?.v2Stage ?? 'discovery')
+      const v2Prompt = record === undefined || record.lifecycleVersion === 2 ? v2StagePrompt(record?.v2Stage ?? 'discovery') : ''
       if (v2Prompt !== '') return v2Prompt
       const stage = record?.currentStage ?? 'requirements'
       return requirementResearchPrompt(stage)

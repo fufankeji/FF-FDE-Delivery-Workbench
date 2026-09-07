@@ -18,7 +18,7 @@ export class FdeStageConflictError extends Error {
 
 /** A fixed stage action was attempted from the wrong current stage. */
 export class FdeStageTransitionError extends Error {
-  constructor(readonly current: ProjectStageRecord, expected: FdeStageId | FdeV2StageId) {
+  constructor(readonly current: ProjectStageRecord, expected: FdeStageId | FdeV2StageId, message?: string) {
     const label: Readonly<Record<FdeStageId | FdeV2StageId, string>> = {
       requirements: '需求调研', solution: '方案设计', development: '项目开发', validation: '验证评估',
       handoff: '验收移交', discovery: '发现高价值问题', definition: '定义结果、范围与责任',
@@ -26,7 +26,7 @@ export class FdeStageTransitionError extends Error {
       evaluation: '运行 PoC 与 Eval', pilot: '企业集成、可靠性改造与受控 Pilot',
       production: '进入生产、推动采用并验收交接', improvement: '持续改进并沉淀可复用能力',
     }
-    super(`当前项目已经不在${label[expected]}阶段。`)
+    super(message ?? `当前项目已经不在${label[expected]}阶段。`)
     this.name = 'FdeStageTransitionError'
   }
 }
@@ -48,16 +48,6 @@ const PREVIOUS_STAGE: Readonly<Record<Exclude<FdeProjectState, 'requirements'>, 
   completed: 'handoff',
 }
 
-const LEGACY_TO_V2: Readonly<Record<FdeProjectState, FdeV2StageId>> = {
-  requirements: 'discovery',
-  solution: 'definition',
-  development: 'design',
-  validation: 'evaluation',
-  pilot: 'pilot',
-  handoff: 'production',
-  completed: 'improvement',
-}
-
 const V2_TO_LEGACY: Readonly<Record<FdeV2StageId, FdeProjectState>> = {
   discovery: 'requirements',
   definition: 'solution',
@@ -75,16 +65,6 @@ function stateIndex(state: FdeProjectState): number {
 
 function v2StateIndex(state: FdeV2StageId): number {
   return FDE_V2_STAGE_IDS.indexOf(state)
-}
-
-function withV2State(record: ProjectStageRecord): ProjectStageRecord {
-  if (record.lifecycleVersion === 2 && record.v2Stage !== undefined) return record
-  return {
-    ...record,
-    lifecycleVersion: 2,
-    v2Stage: LEGACY_TO_V2[record.currentStage],
-    improvementCycles: record.currentStage === 'completed' ? 1 : 0,
-  }
 }
 
 /** Owns current-stage reads and coalesces one Workspace's first durable write. */
@@ -109,13 +89,7 @@ export class FdeStageState {
    */
   open(workspaceId: WorkspaceId): Promise<ProjectStageRecord> {
     const existing = this.table.get(workspaceId)
-    if (existing !== undefined) {
-      const upgraded = withV2State(existing)
-      if (upgraded !== existing) {
-        return this.table.put(workspaceId, upgraded).then(() => upgraded)
-      }
-      return Promise.resolve(existing)
-    }
+    if (existing !== undefined) return Promise.resolve(existing)
     const active = this.pending.get(workspaceId)
     if (active !== undefined) return active
     const attempt = this.initialize(workspaceId)
@@ -178,7 +152,8 @@ export class FdeStageState {
     return this.serialize(workspaceId, async () => {
       const current = await this.open(workspaceId)
       if (current.revision !== expectedRevision) throw new FdeStageConflictError(current)
-      const from = current.v2Stage ?? LEGACY_TO_V2[current.currentStage]
+      if (current.lifecycleVersion !== 2 || current.v2Stage === undefined) throw new FdeStageReturnError(current, '旧项目不能使用八阶段返回入口，请使用原生命周期。')
+      const from = current.v2Stage
       const index = v2StateIndex(from)
       if (index === 0) throw new FdeStageReturnError(current, '发现高价值问题已经是第一个阶段，不能继续返回。')
       const to = FDE_V2_STAGE_IDS[index - 1]
@@ -219,6 +194,7 @@ export class FdeStageState {
       const current = await this.open(workspaceId)
       if (current.revision !== expectedRevision) throw new FdeStageConflictError(current)
       if (current.currentStage === 'requirements') throw new FdeStageReturnError(current)
+      if (current.lifecycleVersion === 2) throw new FdeStageReturnError(current, '八阶段项目不能使用旧返回入口。')
       const to = PREVIOUS_STAGE[current.currentStage]
       const returnedAt = this.clock()
       const revision = current.revision + 1
@@ -260,6 +236,7 @@ export class FdeStageState {
       const current = await this.open(workspaceId)
       if (current.revision !== expectedRevision) throw new FdeStageConflictError(current)
       if (current.currentStage !== from) throw new FdeStageTransitionError(current, from)
+      if (current.lifecycleVersion === 2) throw new FdeStageTransitionError(current, from, '八阶段项目不能使用旧阶段完成入口，请刷新后使用当前阶段操作。')
       const clearReconfirmation = current.reconfirmThrough !== undefined
         && (stateIndex(to) > stateIndex(current.reconfirmThrough)
           || (to === 'completed' && current.reconfirmThrough === 'completed'))
@@ -268,8 +245,6 @@ export class FdeStageState {
       const next: ProjectStageRecord = {
         ...recordForNext,
         currentStage: to,
-        lifecycleVersion: 2,
-        v2Stage: LEGACY_TO_V2[to],
         revision: current.revision + 1,
         updatedAt: this.clock(),
       }
@@ -291,7 +266,8 @@ export class FdeStageState {
     return this.serialize(workspaceId, async () => {
       const current = await this.open(workspaceId)
       if (current.revision !== expectedRevision) throw new FdeStageConflictError(current)
-      const currentV2 = current.v2Stage ?? LEGACY_TO_V2[current.currentStage]
+      if (current.lifecycleVersion !== 2 || current.v2Stage === undefined) throw new FdeStageTransitionError(current, from, '旧项目尚未迁移，不能使用八阶段完成入口。')
+      const currentV2 = current.v2Stage
       if (currentV2 !== from) throw new FdeStageTransitionError(current, from)
       const now = this.clock()
       const target = to ?? from

@@ -205,12 +205,12 @@ function parseInvestigationBlocker(title: string): { readonly title: string; rea
 function designExecutionLabel(execution: V2DesignSnapshot['execution'] | undefined): string {
   if (execution?.label !== undefined) return execution.label
   if (execution?.mechanism === 'manual') return '人工流程优化'
-  if (execution?.mechanism === 'rules') return '规则机制'
+  if (execution?.mechanism === 'rules') return '业务规则'
   if (execution?.mechanism === 'software') return '传统软件'
   if (execution?.mechanism === 'retrieval') return '检索增强'
-  if (execution?.mechanism === 'model') return '模型能力'
+  if (execution?.mechanism === 'model') return '模型调用'
   if (execution?.mechanism === 'agent') return 'Agent 工作流'
-  if (execution?.mechanism === 'hybrid') return '混合机制'
+  if (execution?.mechanism === 'hybrid') return '组合实现'
   return '尚未选定'
 }
 
@@ -221,8 +221,8 @@ function designExecutionStatus(status: V2DesignSnapshot['execution']['status'] |
 }
 
 function designSemanticsLabel(mode: V2DesignSnapshot['semantics']['mode'] | undefined): string {
-  if (mode === 'schema') return '轻量 Schema 与开发 Spec'
-  if (mode === 'ontology') return 'Ontology 与知识图谱'
+  if (mode === 'schema') return '数据结构与开发规格'
+  if (mode === 'ontology') return '本体（Ontology）与知识图谱'
   return '尚未决定'
 }
 
@@ -235,10 +235,10 @@ function designSemanticConclusion(conclusion: V2DesignSnapshot['semantics']['con
 }
 
 function designDecisionLabel(outcome: NonNullable<V2DesignSnapshot['workspace']['decision']>['outcome'] | undefined): string {
-  if (outcome === 'go') return 'Go · 进入 PoC 与 Eval'
-  if (outcome === 'revise') return 'Revise · 修订当前方案'
-  if (outcome === 'narrow') return 'Narrow · 收窄目标或边界'
-  if (outcome === 'stop') return 'Stop · 停止当前投入'
+  if (outcome === 'go') return '进入下一阶段（Go）'
+  if (outcome === 'revise') return '修订方案（Revise）'
+  if (outcome === 'narrow') return '缩小范围（Narrow）'
+  if (outcome === 'stop') return '停止投入（Stop）'
   return '等待人工决定'
 }
 
@@ -259,17 +259,17 @@ function designGraphState(graph: V2DesignSnapshot['graph'] | undefined): { reado
   if (graph?.buildStatus === 'stale') return { title: '图谱快照已经过期', description: graph.message ?? '输入材料或 Schema 已变化，需要重新构建并验证。' }
   if (graph?.status === 'ready' && graph.snapshot?.nodes.length === 0) return { title: '图谱快照中没有可展示的实体', description: '快照已经加载，但没有真实节点；请检查抽取和审核结果。' }
   if (graph?.status === 'missing') return { title: '尚未形成项目知识图谱快照', description: graph.message ?? '发布最小 Ontology Schema 并完成构建后，这里才会显示真实节点和关系。' }
-  return { title: '等待本体路线完成前置工作', description: '先定义能力问题、审核最小 Schema，再用项目材料构建知识图谱。' }
+  return { title: '等待本体路线完成前置工作', description: '先列出图谱需要回答的业务问题，审核实体类型与关系，再用项目材料构建知识图谱。' }
 }
 
 const DESIGN_MECHANISMS: readonly { readonly id: DesignExecutionMechanism; readonly label: string; readonly description: string }[] = [
   { id: 'manual', label: '人工流程', description: '不构建系统或只优化人工协作。' },
-  { id: 'rules', label: '规则机制', description: '稳定条件与确定性规则即可完成。' },
+  { id: 'rules', label: '业务规则', description: '稳定条件与确定性规则即可完成。' },
   { id: 'software', label: '传统软件', description: '用明确接口与事务逻辑实现。' },
   { id: 'retrieval', label: '检索 / RAG', description: '核心是从资料中找到依据并生成回答。' },
-  { id: 'model', label: '模型能力', description: '需要分类、抽取或生成，但无需自主编排。' },
-  { id: 'agent', label: 'Agent 工作流', description: '需要多步判断、工具协同与人工门禁。' },
-  { id: 'hybrid', label: '混合机制', description: '组合确定性软件、模型与人工控制。' },
+  { id: 'model', label: '模型调用', description: '需要分类、抽取或生成，不需要自主安排多步任务。' },
+  { id: 'agent', label: 'Agent 工作流', description: '需要多步判断、工具调用与人工审批。' },
+  { id: 'hybrid', label: '组合实现', description: '组合确定性软件、模型与人工控制。' },
 ]
 
 type DesignExecutionDetail = {
@@ -285,8 +285,8 @@ function designExecutionDetails(rationale: string | undefined): readonly DesignE
   const details = fragments.slice(0, 4).map((value): DesignExecutionDetail => {
     if (/规则|硬门/u.test(value)) return { label: '确定性规则', value, icon: 'shield' }
     if (/软件|流程|审计/u.test(value)) return { label: '传统软件', value, icon: 'monitor' }
-    if (/检索|RAG|SourceId/iu.test(value)) return { label: '检索 + SourceId', value, icon: 'book' }
-    if (/模型|抽取|生成/u.test(value)) return { label: '单有界模型', value, icon: 'database' }
+    if (/检索|RAG|SourceId/iu.test(value)) return { label: '检索与来源引用', value, icon: 'book' }
+    if (/模型|抽取|生成/u.test(value)) return { label: '单次模型调用', value, icon: 'database' }
     return { label: '项目依据', value, icon: 'document' }
   })
   if (details.length > 0) return details
@@ -300,7 +300,7 @@ function designExcludedMechanisms(rationale: string | undefined): string {
 
 function designEvidenceReferences(rationale: string | undefined): string {
   const references = rationale?.match(/src_[0-9a-z]+(?:…|\.\.\.)?/giu) ?? []
-  return references.length > 0 ? references.join(' / ') : '已绑定前序阶段证据'
+  return references.length > 0 ? references.join(' / ') : '尚未登记具体来源引用'
 }
 
 function DesignHeroBlueprint() {
@@ -364,8 +364,8 @@ function DesignProviderArt() {
 
 function semanticRunLabel(kind: V2DesignSnapshot['workspace']['runs'][number]['kind']): string {
   return {
-    extract: '候选抽取', 'propose-schema': '生成候选 Schema', 'publish-schema': '发布 Ontology',
-    build: '构建知识图谱', validate: '独立验证', context: '生成 Agent 上下文', slice: '运行纵向切片',
+    extract: '候选抽取', 'propose-schema': '生成候选 Schema', 'publish-schema': '发布本体',
+    build: '构建知识图谱', validate: '校验图谱与查询', context: '生成 Agent 上下文', slice: '运行纵向切片',
   }[kind]
 }
 
@@ -373,10 +373,14 @@ function semanticRunStatus(status: V2DesignSnapshot['workspace']['runs'][number]
   if (status === 'succeeded') return '成功'
   if (status === 'failed') return '失败'
   if (status === 'running') return '运行中'
-  if (status === 'stale') return '待重评'
+  if (status === 'stale') return '需重新验证'
   if (status === 'cancelled') return '已取消'
   return '等待'
 }
+
+const GRAPH_BUILD_LABELS = { not_applicable: '不适用', waiting: '尚未构建', running: '构建中', succeeded: '构建成功', failed: '构建失败', cancelled: '已取消', stale: '需重新构建' } as const
+const QUERY_KIND_LABELS = { lookup: '对象查找', edge: '直接关系', path: '多跳路径' } as const
+const SOURCE_PARSE_LABELS: Readonly<Record<string, string>> = { ready: '已解析', pending: '待解析', parsing: '解析中', failed: '解析失败', stale: '需重新解析', unsupported: '暂不支持解析' }
 
 function DesignClassIcon({ id, label }: { readonly id: string; readonly label: string }) {
   const text = `${id} ${label}`
@@ -459,21 +463,21 @@ function OntologyDefinitionEditor({ value, onChange }: {
 
   return <div className={css.designDefinitionEditor}>
     <section className={css.designDefinitionGroup}>
-      <header><span><b>01</b><strong>版本与验证边界</strong></span><small>保存为新草稿，不覆盖旧运行证据</small></header>
+      <header><span><b>01</b><strong>版本与校验设置</strong></span><small>保存为新草稿，不覆盖旧运行证据</small></header>
       <div className={css.designDefinitionGrid}>
         <label>Schema 版本<input value={value.version} onChange={(event) => { onChange({ ...value, version: event.target.value }) }} placeholder="0.1.0" /></label>
-        <label>最低置信度<input type="number" min="0" max="1" step="0.05" value={value.confidenceThreshold} onChange={(event) => { onChange({ ...value, confidenceThreshold: Number(event.target.value) }) }} /></label>
-        <label>SHACL 严重级别<select value={value.shaclSeverity} onChange={(event) => { onChange({ ...value, shaclSeverity: event.target.value as SemanticDefinitionInput['shaclSeverity'] }) }}><option value="Violation">Violation · 阻塞</option><option value="Warning">Warning · 警告</option><option value="Info">Info · 提示</option></select></label>
+        <label>最低抽取分数<input type="number" min="0" max="1" step="0.05" value={value.confidenceThreshold} onChange={(event) => { onChange({ ...value, confidenceThreshold: Number(event.target.value) }) }} /></label>
+        <label>SHACL 约束严重级别<select value={value.shaclSeverity} onChange={(event) => { onChange({ ...value, shaclSeverity: event.target.value as SemanticDefinitionInput['shaclSeverity'] }) }}><option value="Violation">Violation · 违规</option><option value="Warning">Warning · 警告</option><option value="Info">Info · 提示</option></select></label>
       </div>
     </section>
 
     <section className={css.designDefinitionGroup}>
-      <header><span><b>02</b><strong>能力问题</strong></span><button type="button" onClick={() => { onChange({ ...value, competencyQuestions: [...value.competencyQuestions, { id: nextDefinitionId('cq', value.competencyQuestions), text: '', required: true, query: { kind: 'lookup', maxDepth: 1, minAnswers: 1 } }] }) }}>＋ 添加问题</button></header>
-      <p>先写系统必须用真实图谱回答的问题；必答问题未通过时，路线不能成为“验证通过”。</p>
+      <header><span><b>02</b><strong>业务问题</strong></span><button type="button" onClick={() => { onChange({ ...value, competencyQuestions: [...value.competencyQuestions, { id: nextDefinitionId('cq', value.competencyQuestions), text: '', required: true, query: { kind: 'lookup', maxDepth: 1, minAnswers: 1 } }] }) }}>＋ 添加问题</button></header>
+      <p>列出图谱必须回答的业务问题。必答问题的查询未通过，不能标记方案验证通过。</p>
       <div className={css.designDefinitionList}>{value.competencyQuestions.map((item, index) => <article key={`${item.id}-${String(index)}`}>
         <header><strong>问题 {String(index + 1).padStart(2, '0')}</strong><button type="button" onClick={() => { onChange({ ...value, competencyQuestions: value.competencyQuestions.filter((_, itemIndex) => itemIndex !== index) }) }}>移除</button></header>
         <div className={css.designDefinitionGrid}>
-          <label>稳定 ID<input value={item.id} onChange={(event) => { updateQuestion(index, { id: event.target.value }) }} /></label>
+          <label>唯一标识 ID<input value={item.id} onChange={(event) => { updateQuestion(index, { id: event.target.value }) }} /></label>
           <label className={css.designDefinitionWide}>业务问题<input value={item.text} onChange={(event) => { updateQuestion(index, { text: event.target.value }) }} placeholder="例如：某类对象变化会影响哪些任务？" /></label>
           <label>查询方式<select value={item.query.kind} onChange={(event) => { updateQuestion(index, { query: { ...item.query, kind: event.target.value as 'lookup' | 'edge' | 'path' } }) }}><option value="lookup">对象查找</option><option value="edge">直接关系</option><option value="path">多跳路径</option></select></label>
           <label>起点类型<input value={item.query.sourceType ?? ''} onChange={(event) => { updateQuestion(index, { query: { ...item.query, sourceType: event.target.value } }) }} placeholder="Class ID" /></label>
@@ -487,17 +491,17 @@ function OntologyDefinitionEditor({ value, onChange }: {
     </section>
 
     <section className={css.designDefinitionGroup}>
-      <header><span><b>03</b><strong>类、属性、别名与字段映射</strong></span><button type="button" onClick={() => { onChange({ ...value, classes: [...value.classes, { id: nextDefinitionId('class', value.classes), label: '', aliases: [], identityKeys: [], properties: [], fieldMappings: [], extractionPatterns: [] }] }) }}>＋ 添加类</button></header>
-      <p>Class 描述领域对象；别名统一业务称呼，身份键用于跨材料匹配，字段映射把来源字段落到已定义属性。</p>
+      <header><span><b>03</b><strong>实体类型、属性与字段映射</strong></span><button type="button" onClick={() => { onChange({ ...value, classes: [...value.classes, { id: nextDefinitionId('class', value.classes), label: '', aliases: [], identityKeys: [], properties: [], fieldMappings: [], extractionPatterns: [] }] }) }}>＋ 添加实体类型</button></header>
+      <p>实体类型（Class）定义业务对象；别名记录不同称呼，标识字段用于匹配同一对象，字段映射关联来源字段与本体属性。</p>
       <div className={css.designDefinitionList}>{value.classes.map((item, index) => <article key={`${item.id}-${String(index)}`}>
         <header><strong>Class {String(index + 1).padStart(2, '0')}</strong><button type="button" onClick={() => { onChange({ ...value, classes: value.classes.filter((_, itemIndex) => itemIndex !== index), relationships: value.relationships.filter(relation => relation.domain !== item.id && relation.range !== item.id) }) }}>移除</button></header>
         <div className={css.designDefinitionGrid}>
-          <label>稳定 ID<input value={item.id} onChange={(event) => { updateClass(index, { id: event.target.value }) }} /></label>
+          <label>唯一标识 ID<input value={item.id} onChange={(event) => { updateClass(index, { id: event.target.value }) }} /></label>
           <label>中文名称<input value={item.label} onChange={(event) => { updateClass(index, { label: event.target.value }) }} /></label>
           <label className={css.designDefinitionWide}>定义<input value={item.description ?? ''} onChange={(event) => { updateClass(index, { description: event.target.value }) }} placeholder="说明这个对象在当前项目中的业务含义" /></label>
           <label className={css.designDefinitionWide}>业务别名<input value={item.aliases.join(', ')} onChange={(event) => { updateClass(index, { aliases: definitionKeys(event.target.value) }) }} placeholder="例如：责任人, Owner" /></label>
-          <label className={css.designDefinitionWide}>身份匹配键<input value={item.identityKeys.join(', ')} onChange={(event) => { updateClass(index, { identityKeys: definitionKeys(event.target.value) }) }} placeholder="例如：external_id, name" /></label>
-          <label className={css.designDefinitionWide}>抽取规则<textarea value={item.extractionPatterns.join('\n')} onChange={(event) => { updateClass(index, { extractionPatterns: definitionLines(event.target.value) }) }} placeholder="每行一条正则；命名组使用 (?&lt;label&gt;...)" /></label>
+          <label className={css.designDefinitionWide}>实体标识字段<input value={item.identityKeys.join(', ')} onChange={(event) => { updateClass(index, { identityKeys: definitionKeys(event.target.value) }) }} placeholder="例如：external_id, name" /></label>
+          <label className={css.designDefinitionWide}>抽取规则<textarea value={item.extractionPatterns.join('\n')} onChange={(event) => { updateClass(index, { extractionPatterns: definitionLines(event.target.value) }) }} placeholder="每行一条正则；命名组使用 (?P&lt;label&gt;...)" /></label>
         </div>
         <div className={css.designPropertyList}>
           <header><strong>属性</strong><button type="button" onClick={() => { updateClass(index, { properties: [...item.properties, { id: nextDefinitionId('property', item.properties), label: '', dataType: 'string', required: false, unique: false }] }) }}>＋ 添加属性</button></header>
@@ -526,27 +530,27 @@ function OntologyDefinitionEditor({ value, onChange }: {
 
     <section className={css.designDefinitionGroup}>
       <header><span><b>04</b><strong>关系与约束</strong></span><button type="button" disabled={value.classes.length === 0} onClick={() => { const first = value.classes[0]?.id ?? ''; onChange({ ...value, relationships: [...value.relationships, { id: nextDefinitionId('relation', value.relationships), label: '', domain: first, range: first, cardinality: 'many-to-many', extractionPatterns: [] }] }) }}>＋ 添加关系</button></header>
-      <p>明确方向、Domain／Range 和基数；关系规则使用 source 与 target 命名组。</p>
+      <p>定义关系的起点类型（Domain）、终点类型（Range）和数量关系（基数）。抽取规则使用 source 与 target 命名组。</p>
       <div className={css.designDefinitionList}>{value.relationships.map((item, index) => <article key={`${item.id}-${String(index)}`}>
         <header><strong>Relation {String(index + 1).padStart(2, '0')}</strong><button type="button" onClick={() => { onChange({ ...value, relationships: value.relationships.filter((_, itemIndex) => itemIndex !== index) }) }}>移除</button></header>
         <div className={css.designDefinitionGrid}>
-          <label>稳定 ID<input value={item.id} onChange={(event) => { updateRelationship(index, { id: event.target.value }) }} /></label>
+          <label>唯一标识 ID<input value={item.id} onChange={(event) => { updateRelationship(index, { id: event.target.value }) }} /></label>
           <label>中文名称<input value={item.label} onChange={(event) => { updateRelationship(index, { label: event.target.value }) }} /></label>
-          <label>Domain<select value={item.domain} onChange={(event) => { updateRelationship(index, { domain: event.target.value }) }}>{classOptions}</select></label>
-          <label>Range<select value={item.range} onChange={(event) => { updateRelationship(index, { range: event.target.value }) }}>{classOptions}</select></label>
-          <label>基数<select value={item.cardinality} onChange={(event) => { updateRelationship(index, { cardinality: event.target.value as typeof item.cardinality }) }}><option value="one-to-one">一对一</option><option value="one-to-many">一对多</option><option value="many-to-one">多对一</option><option value="many-to-many">多对多</option></select></label>
+          <label>起点类型（Domain）<select value={item.domain} onChange={(event) => { updateRelationship(index, { domain: event.target.value }) }}>{classOptions}</select></label>
+          <label>终点类型（Range）<select value={item.range} onChange={(event) => { updateRelationship(index, { range: event.target.value }) }}>{classOptions}</select></label>
+          <label>数量关系<select value={item.cardinality} onChange={(event) => { updateRelationship(index, { cardinality: event.target.value as typeof item.cardinality }) }}><option value="one-to-one">一对一</option><option value="one-to-many">一对多</option><option value="many-to-one">多对一</option><option value="many-to-many">多对多</option></select></label>
           <label className={css.designDefinitionWide}>定义<input value={item.description ?? ''} onChange={(event) => { updateRelationship(index, { description: event.target.value }) }} /></label>
-          <label className={css.designDefinitionWide}>抽取规则<textarea value={item.extractionPatterns.join('\n')} onChange={(event) => { updateRelationship(index, { extractionPatterns: definitionLines(event.target.value) }) }} placeholder="每行一条；使用 (?&lt;source&gt;...) 与 (?&lt;target&gt;...)" /></label>
+          <label className={css.designDefinitionWide}>抽取规则<textarea value={item.extractionPatterns.join('\n')} onChange={(event) => { updateRelationship(index, { extractionPatterns: definitionLines(event.target.value) }) }} placeholder="每行一条；使用 (?P&lt;source&gt;...) 与 (?P&lt;target&gt;...)" /></label>
         </div>
-      </article>)}{value.relationships.length === 0 && <em>当前 Schema 没有关系定义；若能力问题只需对象查找，可以保持为空。</em>}</div>
+      </article>)}{value.relationships.length === 0 && <em>当前 Schema 没有关系定义；若业务问题只需对象查找，可以保持为空。</em>}</div>
     </section>
 
     {(['provenanceRules', 'temporalRules'] as const).map((kind, groupIndex) => <section className={css.designDefinitionGroup} key={kind}>
       <header><span><b>{String(groupIndex + 5).padStart(2, '0')}</b><strong>{kind === 'provenanceRules' ? '来源与冲突规则' : '时间有效规则'}</strong></span><button type="button" onClick={() => { onChange({ ...value, [kind]: [...value[kind], { id: nextDefinitionId(kind === 'provenanceRules' ? 'source_rule' : 'time_rule', value[kind]), label: '', description: '' }] }) }}>＋ 添加规则</button></header>
-      <p>{kind === 'provenanceRules' ? '说明事实必须怎样回指来源，以及来源冲突时采用什么优先级。' : '说明有效时间、记录时间、过期和历史版本如何处理。'}</p>
+      <p>{kind === 'provenanceRules' ? '说明每条事实如何引用来源，以及来源冲突时采用什么优先级。' : '说明有效时间、记录时间、过期和历史版本如何处理。'}</p>
       <div className={css.designDefinitionList}>{value[kind].map((item, index) => <article key={`${item.id}-${String(index)}`}>
         <header><strong>Rule {String(index + 1).padStart(2, '0')}</strong><button type="button" onClick={() => { onChange({ ...value, [kind]: value[kind].filter((_, itemIndex) => itemIndex !== index) }) }}>移除</button></header>
-        <div className={css.designDefinitionGrid}><label>稳定 ID<input value={item.id} onChange={(event) => { updateRule(kind, index, { id: event.target.value }) }} /></label><label>中文名称<input value={item.label} onChange={(event) => { updateRule(kind, index, { label: event.target.value }) }} /></label><label className={css.designDefinitionWide}>规则说明<textarea value={item.description} onChange={(event) => { updateRule(kind, index, { description: event.target.value }) }} /></label></div>
+        <div className={css.designDefinitionGrid}><label>唯一标识 ID<input value={item.id} onChange={(event) => { updateRule(kind, index, { id: event.target.value }) }} /></label><label>中文名称<input value={item.label} onChange={(event) => { updateRule(kind, index, { label: event.target.value }) }} /></label><label className={css.designDefinitionWide}>规则说明<textarea value={item.description} onChange={(event) => { updateRule(kind, index, { description: event.target.value }) }} /></label></div>
       </article>)}{value[kind].length === 0 && <em>尚未定义{kind === 'provenanceRules' ? '来源规则' : '时间规则'}。</em>}</div>
     </section>)}
   </div>
@@ -639,7 +643,7 @@ function InvestigationStagePanel({ props, workspace, sessionId, view, stageState
   >
     {historical && <header className={css.browsedStageNotice}>
       <HistoricalNoticeIcon />
-      <div><span>阶段完成记录</span><strong>正在查看第 3 阶段，项目当前在“{V2_STAGE_NAMES[actualStageIndex]}”</strong><p>保留第三阶段的环境调查驾驶舱与真实记录，当前为只读查看。</p></div>
+      <div><span>阶段完成记录</span><strong>正在查看第 3 阶段，项目当前在“{V2_STAGE_NAMES[actualStageIndex]}”</strong><p>只读查看第三阶段已保存的环境调查结果与记录。</p></div>
       <button type="button" className={css.secondaryButton} onClick={() => { props.returnToCurrentStage(workspace.workspaceId) }}>返回当前阶段 <span aria-hidden="true">→</span></button>
     </header>}
     <div className={css.investigationShell}>
@@ -650,9 +654,9 @@ function InvestigationStagePanel({ props, workspace, sessionId, view, stageState
             <h1 data-investigation-title="">{surface.objective}</h1>
             <p data-investigation-body="">{surface.explanation}</p>
             <div className={css.investigationHeroFacts}>
-              <b>{surface.presentCount}/{surface.requiredCount} 份固定记录</b>
+              <b>{surface.presentCount}/{surface.requiredCount} 份阶段记录</b>
               <b data-tone={openBlockers.length > 0 ? 'warning' : undefined}>{openBlockers.length} 项未解决事项</b>
-              <b>{historical ? '已通过 FDE 人工阶段门' : surface.reviewReady ? '可提交 FDE 评审' : '尚未进入方案设计'}</b>
+              <b>{historical ? '已通过 FDE 阶段评审' : surface.reviewReady ? '可提交 FDE 评审' : '尚未进入方案设计'}</b>
             </div>
           </div>
           <div className={css.investigationStageRing} data-investigation-counter="" aria-label={historical ? '第 3/8 阶段已完成' : '当前处于第 3 阶段，共 8 个阶段'}><strong>03</strong><small>/ 08</small></div>
@@ -672,17 +676,17 @@ function InvestigationStagePanel({ props, workspace, sessionId, view, stageState
 
         <div className={css.investigationPrimaryGrid} data-investigation-primary-grid="">
           <section className={css.environmentMap}>
-            <header><div><span>02 / 系统与数据关系</span><h2>真实环境中的对象和连接</h2><p>节点、连接、Owner 与条件来自调查记录，不根据示例推断。</p></div>
+            <header><div><span>02 / 系统与数据关系</span><h2>系统、数据与接口关系</h2><p>查看已登记的系统、数据流向、负责人和访问条件。</p></div>
               {systemMap?.status === 'present' && <button type="button" onClick={() => { openFile(systemMap.path, systemMap.title) }}>查看系统与访问记录</button>}
             </header>
             {systemNodes.length > 0
               ? <><div className={css.environmentNodes}>{systemNodes.map((node, index) => <article key={node.id} data-kind={node.kind} data-status={node.status} {...recordInteraction(systemMap, `查看系统调查记录：${node.label}`)}>
                 <i data-investigation-node-icon=""><InvestigationIcon name={investigationNodeIcon(node.kind, index)} /></i>
-                <span><strong>{node.label}</strong><small>{node.owner === undefined ? 'Owner 待确认' : `Owner · ${node.owner}`}</small>{node.note !== undefined && <p>{node.note}</p>}</span>
+                <span><strong>{node.label}</strong><small>{node.owner === undefined ? '负责人待确认' : `负责人 · ${node.owner}`}</small>{node.note !== undefined && <p>{node.note}</p>}</span>
                 <b>{investigationFactLabel(node.status)}</b>
               </article>)}</div>
               {connections.length > 0 && <div className={css.environmentConnections}>{connections.map((connection, index) => { const from = systemNodes.find(node => node.id === connection.from)?.label ?? connection.from; const to = systemNodes.find(node => node.id === connection.to)?.label ?? connection.to; return <span key={`${connection.from}-${connection.to}-${String(index)}`} {...recordInteraction(systemMap, `查看系统连接记录：${from}到${to}`)}><b>{from}</b><i>→</i><b>{to}</b><small>{connection.label ?? '关系已登记'}</small></span> })}</div>}</>
-              : <div className={css.investigationEmpty}><strong>还没有登记真实系统关系</strong><p>完成数据与系统只读调查后，这里才显示真实节点、连接、Owner 和访问条件。</p></div>}
+              : <div className={css.investigationEmpty}><strong>还没有登记真实系统关系</strong><p>完成数据与系统只读调查后，这里才显示真实系统、数据连接、负责人和访问条件。</p></div>}
           </section>
 
           <section className={css.actionBoundaryMatrix}>
@@ -691,14 +695,14 @@ function InvestigationStagePanel({ props, workspace, sessionId, view, stageState
               <div><b>调查对象</b><b>读取</b><b>生成建议</b><b>写草稿</b><b>正式执行</b></div>
               {actionBoundaries.map(row => <div key={row.target} data-investigation-action-row="" {...recordInteraction(systemMap, `查看动作边界：${row.target}`)}><strong>{row.target}</strong>{(['read', 'suggest', 'draft', 'execute'] as const).map(action => <span key={action} data-status={row[action]}>{investigationActionLabel(row[action])}</span>)}</div>)}
             </div>
-            {actionBoundaries.length === 0 && <div className={css.investigationEmpty}><strong>动作权限尚未形成矩阵</strong><p>请分别核对读取、生成建议、写草稿和正式执行，不要用一个“有权限”概括。</p></div>}
+            {actionBoundaries.length === 0 && <div className={css.investigationEmpty}><strong>尚未登记各项操作权限</strong><p>请分别核对读取、生成建议、写草稿和正式执行，不要用一个“有权限”概括。</p></div>}
           </section>
         </div>
 
         <div className={css.investigationSecondaryGrid} data-investigation-secondary-grid="">
           <section className={css.investigationFindings} data-investigation-findings="">
-            <header><div><span>04 / 数据适用性</span><h2 data-investigation-findings-title="">质量、口径和可取得条件</h2></div>{dataReadiness?.status === 'present' && <button type="button" onClick={() => { openFile(dataReadiness.path, dataReadiness.title) }}>查看记录</button>}</header>
-            {dataFindings.length > 0 ? <div>{dataFindings.map(item => <article key={item.label} data-status={item.status} {...recordInteraction(dataReadiness, `查看数据发现：${item.label}`)}><i data-investigation-finding-icon=""><InvestigationIcon name={item.status === 'confirmed' ? 'shield' : item.status === 'pending' ? 'clock' : 'warning'} /></i><strong>{item.label}</strong><span>{item.value}</span><b>{item.status === 'confirmed' ? '已确认' : item.status === 'warning' ? '需关注' : item.status === 'blocked' ? '阻塞' : '待确认'}</b></article>)}</div> : <div className={css.investigationEmpty}><strong>尚未登记结构化数据发现</strong><p>{dataReadiness?.status === 'present' ? '已有数据记录，但还没有可投影的字段质量、缺失率或口径结论。' : '数据来源、质量、敏感性和取得方式仍待调查。'}</p></div>}
+            <header><div><span>04 / 数据适用性</span><h2 data-investigation-findings-title="">数据质量、字段含义与获取条件</h2></div>{dataReadiness?.status === 'present' && <button type="button" onClick={() => { openFile(dataReadiness.path, dataReadiness.title) }}>查看记录</button>}</header>
+            {dataFindings.length > 0 ? <div>{dataFindings.map(item => <article key={item.label} data-status={item.status} {...recordInteraction(dataReadiness, `查看数据调查结果：${item.label}`)}><i data-investigation-finding-icon=""><InvestigationIcon name={item.status === 'confirmed' ? 'shield' : item.status === 'pending' ? 'clock' : 'warning'} /></i><strong>{item.label}</strong><span>{item.value}</span><b>{item.status === 'confirmed' ? '已确认' : item.status === 'warning' ? '需关注' : item.status === 'blocked' ? '阻塞' : '待确认'}</b></article>)}</div> : <div className={css.investigationEmpty}><strong>尚未登记数据质量调查结果</strong><p>{dataReadiness?.status === 'present' ? '已有调查文件，请补充字段质量、缺失率和字段含义等调查结果。' : '数据来源、质量、敏感性和取得方式仍待调查。'}</p></div>}
           </section>
 
           <section className={css.investigationGovernance} data-investigation-governance="">
@@ -708,11 +712,11 @@ function InvestigationStagePanel({ props, workspace, sessionId, view, stageState
         </div>
 
         <section className={css.investigationGate} data-investigation-gate="">
-          <header><div><span>06 / 阻塞、固定产物与 FDE 阶段门</span><h2>{historical ? '环境证据已确认，阶段记录已封存' : surface.reviewReady ? '环境证据已齐备，等待人工决定' : '还不能进入方案设计'}</h2><p data-investigation-gate-copy="">{historical ? '以下状态来自第三阶段最终保存的调查记录。' : structured ? '以下状态来自当前调查记录。' : '当前只有阶段骨架；结构化环境事实尚未写入状态文件。'}</p></div><b>{surface.presentCount}/{surface.requiredCount} 份记录</b></header>
+          <header><div><span>06 / 待解决问题、交付文件与阶段评审</span><h2>{historical ? '第三阶段调查与评审记录' : surface.reviewReady ? '环境证据已齐备，等待人工决定' : '还不能进入方案设计'}</h2><p data-investigation-gate-copy="">{historical ? '以下状态来自第三阶段已保存的调查记录。' : structured ? '以下状态来自当前调查记录。' : '尚未保存详细调查结果，请在 Agent 对话中完成调查并更新阶段记录。'}</p></div><b>{surface.presentCount}/{surface.requiredCount} 份记录</b></header>
           <div className={css.investigationArtifacts}>{surface.artifacts.map(artifact => <article key={artifact.id} data-status={artifact.status} data-investigation-artifact-icon=""><i><EvidenceDocumentIcon /></i><span><strong>{artifact.title}</strong><small>{artifact.purpose}</small></span><b>{artifact.status === 'present' ? '已完成' : artifact.status === 'error' ? '读取失败' : '待形成'}</b>{artifact.status === 'present' && <button type="button" onClick={() => { openFile(artifact.path, artifact.title) }}>查看</button>}</article>)}</div>
-          {openBlockers.length > 0 && <div className={css.investigationBlockers}><strong>{openBlockers.length} 项待确认事项 · 保留影响边界</strong><div className={css.investigationBlockerTable}><div><b>待确认事项</b><b>审批 / 时间</b><b>对后续工作的影响</b></div>{openBlockers.map((blocker) => { const row = parseInvestigationBlocker(blocker.title); return <div key={blocker.id} data-severity={blocker.severity} data-investigation-blocker-row=""><span><i aria-hidden="true">!</i><b>待确认</b>{row.title}</span><span>{row.meta}</span><span>{row.impact}</span></div> })}</div></div>}
+          {openBlockers.length > 0 && <div className={css.investigationBlockers}><strong>{openBlockers.length} 项待确认事项 · 核对影响范围</strong><div className={css.investigationBlockerTable}><div><b>待确认事项</b><b>审批 / 时间</b><b>对后续工作的影响</b></div>{openBlockers.map((blocker) => { const row = parseInvestigationBlocker(blocker.title); return <div key={blocker.id} data-severity={blocker.severity} data-investigation-blocker-row=""><span><i aria-hidden="true">!</i><b>待确认</b>{row.title}</span><span>{row.meta}</span><span>{row.impact}</span></div> })}</div></div>}
           {historical
-            ? <footer className={css.historicalArchiveFooter}><span><HistoricalArchiveIcon /><span>阶段已封存；可继续查看当时的调查事实和固定记录。<small>记录完成不等于权限获批。</small></span></span><strong data-investigation-readonly-control="">只读记录</strong></footer>
+            ? <footer className={css.historicalArchiveFooter}><span><HistoricalArchiveIcon /><span>当前只读查看已保存的调查结果与阶段记录。<small>记录完成不等于权限获批。</small></span></span><strong data-investigation-readonly-control="">只读记录</strong></footer>
             : <><div className={css.investigationActions}>
               <button type="button" className={css.primaryButton} onClick={() => { props.prepareStageDraft(sessionId, surface.prompt) }}>开始环境调查</button>
               <button type="button" className={css.secondaryButton} onClick={() => { props.refreshProjectSurface(workspace.workspaceId) }}>刷新调查记录</button>
@@ -808,12 +812,12 @@ function DesignStagePanel({ props, workspace, sessionId, view, stageState, surfa
   const relationships = definition?.relationships ?? []
   const firstClass = classes[0]
   const classStructureSummary = firstClass === undefined ? '尚未定义领域类' : classes.every(item => item.identityKeys.length === firstClass.identityKeys.length && item.properties.length === firstClass.properties.length)
-    ? `每类包含 ${firstClass.identityKeys.length} 个身份键 · ${firstClass.properties.length} 个属性`
-    : `共 ${classes.reduce((count, item) => count + item.identityKeys.length, 0)} 个身份键 · ${classes.reduce((count, item) => count + item.properties.length, 0)} 个属性`
+    ? `每类包含 ${firstClass.identityKeys.length} 个标识字段 · ${firstClass.properties.length} 个属性`
+    : `共 ${classes.reduce((count, item) => count + item.identityKeys.length, 0)} 个标识字段 · ${classes.reduce((count, item) => count + item.properties.length, 0)} 个属性`
   const sortedRuns = [...(semanticWorkspace?.runs ?? [])].reverse()
   const displayedRuns = runsExpanded ? sortedRuns : sortedRuns.slice(0, 8)
   const runDates = [...new Set(displayedRuns.map(run => new Date(run.startedAt).toLocaleDateString('zh-CN')))]
-  const blockerGroups = ([['context', '上下文与切片'], ['ontology', '本体与候选结论'], ['permission', '权限与执行范围'], ['other', '其他待核对条件']] as const)
+  const blockerGroups = ([['context', '任务参考信息与业务验证'], ['ontology', '本体与候选结论'], ['permission', '权限与执行范围'], ['other', '其他待核对条件']] as const)
     .map(([id, title]) => ({ id, title, items: [
       ...surface.reviewBlockers.map((text, index) => ({ id: `review-${index}`, text, severity: undefined })),
       ...openBlockers.map(item => ({ id: item.id, text: item.title, severity: item.severity })),
@@ -867,7 +871,7 @@ function DesignStagePanel({ props, workspace, sessionId, view, stageState, surfa
     if (mechanism === undefined || routeSemanticMode === '' || executionRationale.trim() === '' || semanticRationale.trim() === '') {
       setError('请分别选择两条轴，并填写基于当前项目证据的选择依据。'); return
     }
-    await perform('保存候选路线', async () => {
+    await perform('保存候选方案', async () => {
       await props.configureDesignRoute(workspace.workspaceId, {
         execution: { mechanism: mechanism.id, label: mechanism.label, rationale: executionRationale.trim() },
         semantics: { mode: routeSemanticMode, rationale: semanticRationale.trim() },
@@ -908,8 +912,8 @@ function DesignStagePanel({ props, workspace, sessionId, view, stageState, surfa
     })
   }
   const runContext = async (): Promise<void> => {
-    if (contextQuestionId === '' && contextSeedId === '') { setError('请选择一个能力问题或起始实体。'); return }
-    await perform('生成受控上下文', async () => {
+    if (contextQuestionId === '' && contextSeedId === '') { setError('请选择一个业务问题或起始实体。'); return }
+    await perform('生成任务参考信息', async () => {
       await props.runDesignSemantica(workspace.workspaceId, 'context', {
         query: contextQuery.trim(), ...(contextQuestionId === '' ? {} : { questionId: contextQuestionId }),
         ...(contextSeedId === '' ? {} : { seedNodeId: contextSeedId }), maxDepth: contextDepth,
@@ -920,8 +924,8 @@ function DesignStagePanel({ props, workspace, sessionId, view, stageState, surfa
   const prepareSlice = (): void => {
     const semanticInstruction = ontologyRoute
       ? '先调用 semantic_context_query 获取当前已验证图谱的有边界上下文，并保存返回的 contextRunId。'
-      : '当前采用普通 Schema 路线，不要创建 Ontology 或知识图谱占位。'
-    props.prepareStageDraft(sessionId, `请基于第四阶段已经选定的候选路线，真正实现并运行一条最窄端到端纵向切片。${semanticInstruction}\n\n必须从当前项目的一份真实输入开始，经过关键判断和受控动作，到达可验证结果；保留终端输出、Diff、测试结果或其他项目内证据。完成后调用 semantic_slice_report，如实提交 succeeded 或 failed、真实任务、观察结果、证据引用${ontologyRoute ? '和当前 contextRunId' : ''}。同时形成或更新生产方案设计，不要替代 FDE 作出阶段决定。`)
+      : '当前采用数据结构（Schema） 路线，不要创建 Ontology 或知识图谱占位。'
+    props.prepareStageDraft(sessionId, `请基于第四阶段已经选定的候选方案，真正实现并运行一条最窄端到端纵向切片。${semanticInstruction}\n\n必须从当前项目的一份真实输入开始，经过关键判断和受控动作，到达可验证结果；保留终端输出、Diff、测试结果或其他项目内证据。完成后调用 semantic_slice_report，如实提交 succeeded 或 failed、真实任务、观察结果、证据引用${ontologyRoute ? '和当前 contextRunId' : ''}。同时形成或更新生产方案设计，不要替代 FDE 作出阶段决定。`)
   }
 
   const openFile = (path: string, title: string): void => {
@@ -931,7 +935,7 @@ function DesignStagePanel({ props, workspace, sessionId, view, stageState, surfa
     })
   }
   const submitDecision = async (): Promise<void> => {
-    if (semanticWorkspace?.revision === undefined) { setError('第四阶段证据状态尚未建立，请先保存候选路线。'); return }
+    if (semanticWorkspace?.revision === undefined) { setError('第四阶段证据状态尚未建立，请先保存候选方案。'); return }
     if (decisionRationale.trim() === '') { setError('请填写本次 FDE 决定依据。'); return }
     if (decisionOutcome === 'go' && !surface.reviewReady) { setError('当前版本尚未达到可评审状态，不能提交 Go。'); return }
     setSubmitting(true); setError(null)
@@ -964,7 +968,7 @@ function DesignStagePanel({ props, workspace, sessionId, view, stageState, surfa
   >
     {historical && <header className={css.browsedStageNotice}>
       <HistoricalNoticeIcon />
-      <div><span>阶段完成记录</span><strong>正在查看第 4 阶段，项目当前在“{V2_STAGE_NAMES[actualStageIndex]}”</strong><p>保留当时的实现机制、本体路线、运行证据和人工决定，当前为只读查看。</p></div>
+      <div><span>阶段完成记录</span><strong>正在查看第 4 阶段，项目当前在“{V2_STAGE_NAMES[actualStageIndex]}”</strong><p>保留当时的实现方式、本体路线、运行证据和人工决定，当前为只读查看。</p></div>
       <button type="button" className={css.secondaryButton} onClick={() => { props.returnToCurrentStage(workspace.workspaceId) }}>返回当前阶段 <span aria-hidden="true">→</span></button>
     </header>}
 
@@ -996,43 +1000,43 @@ function DesignStagePanel({ props, workspace, sessionId, view, stageState, surfa
         </section>)}</div>
       </section>
 
-      <section className={css.designRoutePanel} data-design-route="" aria-label="第四阶段机制判断">
-        <header><div><span>02 / 双轴机制判断</span><h2>先决定怎么实现，再决定是否需要本体</h2><p data-design-supporting-copy="">Ontology 不是默认答案；两项判断都必须回到前三阶段的业务、环境和权限证据。</p></div><span className={css.designHeaderActions}><b>{routePending ? '等待判断' : '已形成候选路线'}</b>{!historical && <button type="button" data-design-route-action="" onClick={openRoute}>{routePending ? '开始判断' : '调整路线'}</button>}</span></header>
+      <section className={css.designRoutePanel} data-design-route="" aria-label="第四阶段实现方案选择">
+        <header><div><span>02 / 实现方案与本体选型</span><h2>先决定怎么实现，再决定是否需要本体</h2><p data-design-supporting-copy="">Ontology 不是默认答案；两项判断都必须回到前三阶段的业务、环境和权限证据。</p></div><span className={css.designHeaderActions}><b>{routePending ? '等待判断' : '已记录候选方案'}</b>{!historical && <button type="button" data-design-route-action="" onClick={openRoute}>{routePending ? '开始判断' : '调整方案'}</button>}</span></header>
         <div className={css.designRouteGrid}>
           <article className={css.designExecutionCard} data-state={design?.execution.status ?? 'undecided'}>
-            <header><div><span>判断 01 · 实现机制</span><h3>{designExecutionLabel(design?.execution)}</h3></div><b>{designExecutionStatus(design?.execution.status)}</b></header>
+            <header><div><span>判断 01 · 实现方式</span><h3>{designExecutionLabel(design?.execution)}</h3></div><b>{designExecutionStatus(design?.execution.status)}</b></header>
             <div className={css.designExecutionCardBody}>
               <dl>{executionDetails.map((detail, index) => <div key={`${detail.label}-${index}`}><dt><InvestigationIcon name={detail.icon} />{detail.label}</dt><dd>{detail.value}</dd></div>)}</dl>
               <aside><div><small>本期不采用</small><p>{designExcludedMechanisms(design?.execution.rationale)}</p></div><div><small>证据</small><p>{designEvidenceReferences(design?.execution.rationale)}</p></div></aside>
             </div>
-            {design?.execution.status === 'selected' && <footer><HistoricalArchiveIcon /><span>已由 FDE 接受</span>{mechanismRecord?.updatedAt && <time>{mechanismRecord.updatedAt.slice(0, 10)}</time>}</footer>}
+            {design?.execution.status === 'selected' && <footer><HistoricalArchiveIcon /><span>已记录选型结果</span>{mechanismRecord?.updatedAt && <time>{mechanismRecord.updatedAt.slice(0, 10)}</time>}</footer>}
           </article>
           <span className={css.designRouteArrow} aria-hidden="true"><svg viewBox="0 0 40 24"><path d="M4 12h27M24 5l7 7-7 7" /></svg></span>
           <article className={css.designSemanticDecisionCard} data-state={design?.semantics.mode ?? 'undecided'}>
-            <header><div><span>判断 02 · 语义基础</span><h3>{designSemanticsLabel(design?.semantics.mode)}</h3></div><b>{designSemanticConclusion(design?.semantics.conclusion)}</b></header>
-            <div className={css.designSemanticDecisionBody}><DesignSemanticRouteArt /><div><dl><div><dt>构建判定</dt><dd>{design?.semantics.rationale ?? '尚未记录语义基础判断'}</dd></div></dl><aside><b>构建判定与验证状态需分别查看。</b><span>依据前序业务、环境与权限证据进行判断。</span></aside></div></div>
+            <header><div><span>判断 02 · 本体必要性</span><h3>{designSemanticsLabel(design?.semantics.mode)}</h3></div><b>{designSemanticConclusion(design?.semantics.conclusion)}</b></header>
+            <div className={css.designSemanticDecisionBody}><DesignSemanticRouteArt /><div><dl><div><dt>选型依据</dt><dd>{design?.semantics.rationale ?? '尚未记录本体必要性判断'}</dd></div></dl><aside><b>是否需要本体与验证是否通过分别记录。</b><span>依据前序业务、环境与权限证据进行判断。</span></aside></div></div>
           </article>
         </div>
       </section>
       </div>
 
-      {schemaRoute && <section className={css.designSimpleRoute} aria-label="轻量 Schema 路线">
-        <header><div><span>03 / 当前路线 · 普通 Schema</span><h2>用开发 Spec 与普通 Schema 跑通最小闭环</h2><p>{design?.semantics.rationale ?? '当前目标不需要多跳关系、来源时间推理或共享领域语义，采用更简单的实现机制。'}</p></div><b>{designSemanticConclusion(design?.semantics.conclusion)}</b></header>
-        <ol><li><i>01</i><span><strong>开发 Spec</strong><small>定义输入、输出、状态和非目标</small></span></li><li><i>02</i><span><strong>系统与接口边界</strong><small>继承第三阶段权限和人工门禁</small></span></li><li data-done={semanticWorkspace?.slice?.status === 'succeeded' ? 'true' : undefined}><i>03</i><span><strong>真实纵向切片</strong><small>从项目输入运行到可验证结果</small></span></li><li data-done={surface.reviewReady ? 'true' : undefined}><i>04</i><span><strong>FDE 人工决定</strong><small>Go / Revise / Narrow / Stop</small></span></li></ol>
-        {!historical && <div className={css.designWorkActions}><button type="button" className={css.primaryButton} onClick={prepareSlice}>实现并运行最小切片</button><button type="button" className={css.secondaryButton} onClick={() => { props.prepareStageDraft(sessionId, surface.prompt) }}>补充生产方案设计</button></div>}
+      {schemaRoute && <section className={css.designSimpleRoute} aria-label="不使用图谱的方案">
+        <header><div><span>03 / 当前路线 · 数据结构（Schema）</span><h2>按开发规格实现最小业务流程</h2><p>{design?.semantics.rationale ?? '当前业务可用数据结构、接口和常规开发实现，无需构建知识图谱。'}</p></div><b>{designSemanticConclusion(design?.semantics.conclusion)}</b></header>
+        <ol><li><i>01</i><span><strong>开发规格</strong><small>定义输入、输出、状态和非目标</small></span></li><li><i>02</i><span><strong>系统与接口边界</strong><small>沿用第三阶段确认的权限和审批要求</small></span></li><li data-done={semanticWorkspace?.slice?.status === 'succeeded' ? 'true' : undefined}><i>03</i><span><strong>最小端到端流程</strong><small>从项目输入运行到可验证结果</small></span></li><li data-done={surface.reviewReady ? 'true' : undefined}><i>04</i><span><strong>FDE 人工决定</strong><small>继续 / 修订 / 缩小范围 / 停止</small></span></li></ol>
+        {!historical && <div className={css.designWorkActions}><button type="button" className={css.primaryButton} onClick={prepareSlice}>实现并运行最小业务流程</button><button type="button" className={css.secondaryButton} onClick={() => { props.prepareStageDraft(sessionId, surface.prompt) }}>补充生产方案设计</button></div>}
       </section>}
 
       {ontologyRoute && <>
-        <section className={css.designOntologyProgress} aria-label="本体路线九项业务结构">
-          <header><div><span>03 / 当前路线 · Ontology 与知识图谱</span><h2>两轮最小闭环，九项业务状态分别留证</h2><p>先发布最小 Ontology，再按当前版本建图、验证、生成受控上下文并运行真实任务。</p></div><b>{semanticWorkspace?.provider.status === 'ready' ? `Semantica ${semanticWorkspace.provider.version ?? ''}` : 'Provider 待检查'}</b></header>
+        <section className={css.designOntologyProgress} aria-label="本体构建与业务验证步骤">
+          <header><div><span>03 / 当前路线 · 本体（Ontology）与知识图谱</span><h2>本体构建与业务验证进度</h2><p>先定义并发布本体，再构建图谱、验证查询，最后用于运行项目任务。</p></div><b>{semanticWorkspace?.provider.status === 'ready' ? `Semantica ${semanticWorkspace.provider.version ?? ''}` : 'Semantica 待检查'}</b></header>
           <div>{[
-            ['01', '机制必要性判断', design?.execution.status === 'selected', true],
-            ['02', '本体能力问题', (semanticWorkspace?.definition.competencyQuestions.length ?? 0) > 0, design?.execution.status === 'selected'],
+            ['01', '实现方式选择', design?.execution.status === 'selected', true],
+            ['02', '图谱业务问题', (semanticWorkspace?.definition.competencyQuestions.length ?? 0) > 0, design?.execution.status === 'selected'],
             ['03', 'Schema 与关系', (semanticWorkspace?.definition.classes.length ?? 0) > 0, (semanticWorkspace?.definition.competencyQuestions.length ?? 0) > 0],
             ['04', '来源规则', (semanticWorkspace?.definition.provenanceRules.length ?? 0) > 0, (semanticWorkspace?.definition.classes.length ?? 0) > 0],
             ['05', '时间与置信度规则', (semanticWorkspace?.definition.temporalRules.length ?? 0) > 0, (semanticWorkspace?.definition.classes.length ?? 0) > 0],
             ['06', '构建与验证', semanticWorkspace?.validation?.status === 'passed', buildRun?.status === 'succeeded'],
-            ['07', '项目纵向切片', semanticWorkspace?.slice?.status === 'succeeded', semanticWorkspace?.context?.status === 'ready'],
+            ['07', '最小业务流程', semanticWorkspace?.slice?.status === 'succeeded', semanticWorkspace?.context?.status === 'ready'],
             ['08', '运行证据', (semanticWorkspace?.runs.filter(item => item.status === 'succeeded').length ?? 0) > 0, true],
             ['09', 'FDE 人工决定', surface.reviewReady, semanticWorkspace?.slice?.status === 'succeeded'],
           ].map(([number, label, done, active]) => <article key={String(number)} data-state={semanticStepState(Boolean(done), Boolean(active))}><i>{String(number)}</i><span><strong>{String(label)}</strong><small>{done ? '当前版本已形成' : active ? '当前可处理' : '等待前置证据'}</small></span></article>)}</div>
@@ -1045,11 +1049,11 @@ function DesignStagePanel({ props, workspace, sessionId, view, stageState, surfa
             <section className={css.designSemanticCard} data-design-source-card="">
               <header><span><InvestigationIcon name="document" />本轮代表材料</span><b>{semanticWorkspace?.sources.length ?? 0} / 12</b></header>
               <h3>绑定当前项目已有资料</h3><p>不重复上传；保留材料 ID、版本、权限范围和权威级别。</p>
-              <div className={css.designMiniList} data-design-source-list="">{(semanticWorkspace?.sources ?? []).slice(0, 4).map(source => <div key={source.sourceId}><InvestigationIcon name="document" /><span><strong title={source.name}>{source.name}</strong><small>{source.authority === 'primary' ? '主要依据' : '辅助依据'} · {source.parseStatus}</small></span></div>)}{(semanticWorkspace?.sources.length ?? 0) === 0 && <em>尚未绑定代表材料</em>}</div>
+              <div className={css.designMiniList} data-design-source-list="">{(semanticWorkspace?.sources ?? []).slice(0, 4).map(source => <div key={source.sourceId}><InvestigationIcon name="document" /><span><strong title={source.name}>{source.name}</strong><small>{source.authority === 'primary' ? '主要依据' : '辅助依据'} · {SOURCE_PARSE_LABELS[source.parseStatus] ?? source.parseStatus}</small></span></div>)}{(semanticWorkspace?.sources.length ?? 0) === 0 && <em>尚未绑定代表材料</em>}</div>
               {!historical && <button type="button" data-design-sources-action="" className={css.secondaryButton} onClick={openSources}>选择项目材料</button>}
             </section>
             <section className={css.designSemanticCard} data-design-provider-card="" data-status={semanticWorkspace?.provider.status ?? 'unchecked'}>
-              <header><span><DesignBuildIcon name="provider" />本地能力 Provider</span><b title={semanticWorkspace?.provider.message}>{providerReady ? '可用' : semanticWorkspace?.provider.status === 'unavailable' ? '不可用' : '待检查'}</b></header>
+              <header><span><DesignBuildIcon name="provider" />本地 Semantica 服务</span><b title={semanticWorkspace?.provider.message}>{providerReady ? '可用' : semanticWorkspace?.provider.status === 'unavailable' ? '不可用' : '待检查'}</b></header>
               <h3 className={css.designVersion}>Semantica {semanticWorkspace?.provider.version ?? semanticWorkspace?.provider.expectedVersion ?? '待检查'}</h3>
               <p className={css.designProviderCapabilities}>抽取 · 本体发布 · 建图<br />验证 · 受控查询</p>
               <DesignProviderArt />
@@ -1057,17 +1061,17 @@ function DesignStagePanel({ props, workspace, sessionId, view, stageState, surfa
               {!historical && <button type="button" className={css.secondaryButton} disabled={operation !== null} onClick={() => { void runSemantica('health') }}>{operation === '检查 Semantica' ? '正在检查…' : '检查本地服务'}</button>}
             </section>
             <section className={css.designSemanticCard}>
-              <header><span><InvestigationIcon name="network" />Ontology 定义</span><b className={css.designDefinitionStatus}>{designOntologyStatus(design?.ontology.status)}</b></header>
+              <header><span><InvestigationIcon name="network" />本体定义</span><b className={css.designDefinitionStatus}>{designOntologyStatus(design?.ontology.status)}</b></header>
               <h3 className={css.designVersion}>{semanticWorkspace?.definition.version ?? '待定义'}</h3>
               <div className={css.designSemanticMetrics} data-design-definition-metrics=""><strong><b>{semanticWorkspace?.definition.classes.length ?? 0}</b> 类</strong><strong><b>{semanticWorkspace?.definition.relationships.length ?? 0}</b> 关系</strong></div>
-              <p className={css.designDefinitionSummary}><span>{semanticWorkspace?.definition.competencyQuestions.length ?? 0} 个能力问题</span><span>{semanticWorkspace?.definition.provenanceRules.length ?? 0} 条来源规则</span><span>阈值 {semanticWorkspace?.definition.confidenceThreshold ?? '待定义'}</span></p>
+              <p className={css.designDefinitionSummary}><span>{semanticWorkspace?.definition.competencyQuestions.length ?? 0} 个业务问题</span><span>{semanticWorkspace?.definition.provenanceRules.length ?? 0} 条来源规则</span><span>阈值 {semanticWorkspace?.definition.confidenceThreshold ?? '待定义'}</span></p>
               {!historical && <button type="button" className={css.secondaryButton} onClick={openDefinition}>审阅与编辑定义</button>}
             </section>
             <section className={css.designSemanticCard} data-design-candidate-card="">
               <header><span><InvestigationIcon name="shield" />候选知识审核</span></header>
               <div className={css.designSemanticMetrics}><strong><b>{semanticWorkspace?.candidates.entities.length ?? 0}</b> 个实体</strong><strong><b>{semanticWorkspace?.candidates.relationships.length ?? 0}</b> 条关系</strong></div>
               <b className={css.designAcceptedCount}>{acceptedEntityCount + acceptedRelationshipCount} 项已接受</b>
-              <p className={css.designCandidateNote}>抽取结果先进入候选集合；未接受的候选不会写入正式项目图谱。</p>
+              <p className={css.designCandidateNote}>当前使用规则抽取；规则分数不是经评测的事实可信度。候选须核对来源，接受后才能建图。</p>
               {!historical && <button type="button" className={css.secondaryButton} onClick={openCandidates}>查看候选与来源</button>}
             </section>
           </div>
@@ -1075,13 +1079,13 @@ function DesignStagePanel({ props, workspace, sessionId, view, stageState, surfa
 
         <section className={css.designPipeline} data-design-pipeline="" aria-label="Semantica 分步运行">
           <header><div><span>04 / 构建与验证</span><h2>每一步单独运行，构建成功不等于验证通过</h2></div><b><InvestigationIcon name="clock" />{semanticWorkspace?.runs.length ?? 0} 次运行</b></header>
-          <p className={css.designPipelineNotice}><DesignBuildIcon name="info" />定义、输入或审核变化后，旧验证、上下文与切片自动进入待重评。</p>
+          <p className={css.designPipelineNotice}><DesignBuildIcon name="info" />材料、本体定义或审核结果变化后，需重新验证图谱、查询和业务流程。</p>
           <div className={css.designPipelineScroll}><table><thead><tr><th scope="col">运行步骤</th><th scope="col">最近结果</th><th scope="col">状态</th><th scope="col">最近运行</th>{!historical && <th scope="col">操作</th>}</tr></thead><tbody>{[
-            { id: 'extract' as const, label: '抽取候选', detail: '解析已绑定材料，形成可追溯实体与关系候选。', enabled: providerReady && (semanticWorkspace?.sources.length ?? 0) > 0 },
-            { id: 'propose-schema' as const, label: '生成候选 Schema', detail: '用代表样本形成候选类与关系，仍需人工删改。', enabled: providerReady && (semanticWorkspace?.candidates.entities.length ?? 0) > 0 },
-            { id: 'publish-schema' as const, label: '发布 Ontology', detail: '校验当前定义并冻结版本，同时生成 SHACL。', enabled: providerReady && (semanticWorkspace?.definition.classes.length ?? 0) > 0 },
+            { id: 'extract' as const, label: '抽取候选', detail: '按项目抽取规则与字段映射处理已绑定材料；不自动推断任意领域关系。', enabled: providerReady && (semanticWorkspace?.sources.length ?? 0) > 0 },
+            { id: 'propose-schema' as const, label: '生成候选 Schema', detail: '用代表样本形成候选实体类型与关系，仍需人工删改。', enabled: providerReady && (semanticWorkspace?.candidates.entities.length ?? 0) > 0 },
+            { id: 'publish-schema' as const, label: '发布本体', detail: '校验当前定义并冻结版本，同时生成 SHACL。', enabled: providerReady && (semanticWorkspace?.definition.classes.length ?? 0) > 0 },
             { id: 'build' as const, label: '构建项目图谱', detail: '只写入经审核接受且符合当前定义的事实。', enabled: providerReady && semanticWorkspace?.definition.status === 'published' && acceptedEntityCount > 0 },
-            { id: 'validate' as const, label: '独立验证', detail: '分别执行结构校验与必答能力问题真实查询。', enabled: providerReady && buildRun?.status === 'succeeded' },
+            { id: 'validate' as const, label: '校验图谱与查询', detail: '分别执行结构校验与必答业务问题真实查询。', enabled: providerReady && buildRun?.status === 'succeeded' },
           ].map((step, index) => { const run = latestRun(step.id); return <tr key={step.id} data-status={run?.status ?? 'waiting'}>
             <th scope="row"><span className={css.designPipelineStep}><i>{String(index + 1).padStart(2, '0')}</i>{step.id === 'publish-schema' ? <InvestigationIcon name="network" /> : step.id === 'validate' ? <InvestigationIcon name="shield" /> : <DesignBuildIcon name={step.id === 'extract' ? 'extract' : step.id === 'propose-schema' ? 'schema' : 'cube'} />}<strong>{step.label}</strong></span></th>
             <td className={css.designPipelineResult}>{run?.summary ?? step.detail}</td>
@@ -1089,27 +1093,27 @@ function DesignStagePanel({ props, workspace, sessionId, view, stageState, surfa
             <td>{run === undefined ? <span className={css.designRunWaiting}>—</span> : <time dateTime={run.startedAt}><span>{new Date(run.startedAt).toLocaleDateString('zh-CN')}</span><strong>{new Date(run.startedAt).toLocaleTimeString('zh-CN', { hour12: false })}</strong></time>}</td>
             {!historical && <td><button type="button" aria-label={`${run?.status === 'succeeded' ? '重新运行' : '运行'}：${step.label}`} data-primary={run?.status === 'stale' ? 'true' : undefined} disabled={!step.enabled || operation !== null || run?.status === 'running'} onClick={() => { void runSemantica(step.id) }}>{run?.status === 'succeeded' && <DesignBuildIcon name="refresh" />}{run?.status === 'running' ? '运行中…' : run?.status === 'succeeded' ? '重新运行' : '运行'}</button></td>}
           </tr> })}</tbody></table></div>
-          <footer><InvestigationIcon name="shield" />运行结果与 FDE 人工阶段门分别记录。</footer>
+          <footer><InvestigationIcon name="shield" />运行结果与 FDE 阶段评审分别记录。</footer>
         </section>
         </div>
 
         <section className={`${css.designSchemaPanel} ${css.designDetailSurface}`} data-design-schema="" aria-label="Ontology Schema 摘要">
           <header className={css.designSchemaHeader}>
-            <div><span>05 / Schema、来源和时间规则</span><h2 data-design-schema-title="">定义领域世界，不把实例数据混进 Schema</h2><p data-design-schema-copy="">先明确要回答的问题，再查看类与关系，最后核对来源与时间规则。</p></div>
+            <div><span>05 / Schema、来源和时间规则</span><h2 data-design-schema-title="">定义实体类型、属性与关系</h2><p data-design-schema-copy="">先明确要回答的问题，再查看实体类型与关系，最后核对来源与时间规则。</p></div>
             {!historical && <button type="button" data-design-definition-action="" onClick={openDefinition}>打开完整定义</button>}
-            <div className={css.designSchemaSummary}><span><DesignBuildIcon name="extract" />{definition?.competencyQuestions.length ?? 0} 个能力问题</span><span><DesignBuildIcon name="grid" />{classes.length} 类 · {relationships.length} 关系</span><span><InvestigationIcon name="shield" />置信度 ≥ {definition?.confidenceThreshold ?? '待定义'}</span></div>
+            <div className={css.designSchemaSummary}><span><DesignBuildIcon name="extract" />{definition?.competencyQuestions.length ?? 0} 个业务问题</span><span><DesignBuildIcon name="grid" />{classes.length} 类 · {relationships.length} 关系</span><span><InvestigationIcon name="shield" />抽取分数 ≥ {definition?.confidenceThreshold ?? '待定义'}</span></div>
           </header>
           <div className={css.designSchemaOverview}>
             <section className={css.designQuestionPanel} data-design-question-list="">
-              <header><DesignBuildIcon name="search" /><h3>能力问题</h3><b>{definition?.competencyQuestions.filter(item => item.required).length ?? 0} 项必答</b></header>
+              <header><DesignBuildIcon name="search" /><h3>业务问题</h3><b>{definition?.competencyQuestions.filter(item => item.required).length ?? 0} 项必答</b></header>
               <p>定义查询目标与检查方式</p>
-              {(definition?.competencyQuestions ?? []).map(item => <article key={item.id}><code>{item.id}</code><span>{item.text}{!item.required && <small>可选</small>}</span><b>{item.query.kind}</b></article>)}
+              {(definition?.competencyQuestions ?? []).map(item => <article key={item.id}><code>{item.id}</code><span>{item.text}{!item.required && <small>可选</small>}</span><b>{QUERY_KIND_LABELS[item.query.kind]}</b></article>)}
               {(definition?.competencyQuestions.length ?? 0) === 0 && <em>尚未定义系统必须回答的问题</em>}
             </section>
             <section className={css.designDomainPanel}>
-              <header><InvestigationIcon name="network" /><h3>类与关系</h3><b>{classes.length} 类 · {relationships.length} 关系</b></header>
-              <h4>领域类</h4>
-              <div className={css.designDomainClasses} data-design-domain-classes="">{classes.map(item => <article key={item.id} title={`${item.identityKeys.length} 个身份键 · ${item.properties.length} 个属性`}><DesignClassIcon id={item.id} label={item.label} /><span><code>{item.id}</code><strong>{item.label}</strong></span></article>)}</div>
+              <header><InvestigationIcon name="network" /><h3>实体类型与关系</h3><b>{classes.length} 类 · {relationships.length} 关系</b></header>
+              <h4>实体类型</h4>
+              <div className={css.designDomainClasses} data-design-domain-classes="">{classes.map(item => <article key={item.id} title={`${item.identityKeys.length} 个标识字段 · ${item.properties.length} 个属性`}><DesignClassIcon id={item.id} label={item.label} /><span><code>{item.id}</code><strong>{item.label}</strong></span></article>)}</div>
               <p className={css.designClassStructure}>{classStructureSummary}</p>
               <div className={css.designRelationshipHeading}><h4>关系定义</h4>{relationships.length > 5 ? <button type="button" aria-label={relationshipsExpanded ? '收起关系定义' : '查看全部关系定义'} aria-expanded={relationshipsExpanded} onClick={() => { setRelationshipsExpanded(value => !value) }}>{relationshipsExpanded ? '收起' : `展示 ${Math.min(5, relationships.length)} 条`} · 共 {relationships.length} 条</button> : <span>共 {relationships.length} 条</span>}</div>
               <div className={css.designRelationshipTable}><table aria-label="关系定义"><thead><tr><th scope="col">关系标识</th><th scope="col">连接</th></tr></thead><tbody>{(relationshipsExpanded ? relationships : relationships.slice(0, 5)).map(item => <tr key={item.id} title={`${item.label} · ${item.cardinality}`}><td><code>{item.id}</code></td><td><code>{item.domain} → {item.range}</code></td></tr>)}</tbody></table></div>
@@ -1117,7 +1121,7 @@ function DesignStagePanel({ props, workspace, sessionId, view, stageState, surfa
             </section>
           </div>
           <section className={css.designRulesPanel}>
-            <header><InvestigationIcon name="shield" /><div><h3>来源、时间与置信度</h3><p>每条事实保留出处、冲突与有效范围。</p></div></header>
+            <header><InvestigationIcon name="shield" /><div><h3>来源、时间与置信度</h3><p>查询过滤绑定来源、分数和已声明有效期；文字规则与权限说明仍需人工核对，不代表已执行授权政策。</p></div></header>
             <div className={css.designRuleGrid} data-design-rule-grid="">
               {[...(definition?.provenanceRules ?? []).map(item => ({ ...item, temporal: false })), ...(definition?.temporalRules ?? []).map(item => ({ ...item, temporal: true }))].map(item => {
                 const isolatedFields = item.description.match(/\bfinal_[a-z_]+\b/g) ?? []
@@ -1127,7 +1131,7 @@ function DesignStagePanel({ props, workspace, sessionId, view, stageState, surfa
                   {isolatedFields.length > 0 && <code className={css.designIsolatedFields}>{isolatedFields.join(' · ')}</code>}
                 </article>
               })}
-              <article><InvestigationIcon name="shield" /><div><h4>最低置信度</h4><code>confidence</code><p className={css.designConfidence}><strong>{definition?.confidenceThreshold ?? '—'}</strong><span>SHACL · {definition?.shaclSeverity ?? '待定义'}</span></p></div></article>
+              <article><InvestigationIcon name="shield" /><div><h4>最低抽取分数</h4><code>confidence</code><p className={css.designConfidence}><strong>{definition?.confidenceThreshold ?? '—'}</strong><span>SHACL · {definition?.shaclSeverity ?? '待定义'}</span></p></div></article>
             </div>
           </section>
         </section>
@@ -1136,17 +1140,17 @@ function DesignStagePanel({ props, workspace, sessionId, view, stageState, surfa
           <header>
             <div><span>06 / 实例知识图谱</span><h2>从最小 Schema 到可查询的真实项目关系</h2><p>这里只显示当前项目隔离空间内的真实快照；图谱能画出来不等于纵向切片已经通过。</p></div>
             <dl>
-              <div><dt>Ontology</dt><dd>{designOntologyStatus(design?.ontology.status)}</dd></div>
+              <div><dt>本体</dt><dd>{designOntologyStatus(design?.ontology.status)}</dd></div>
               <div><dt>版本</dt><dd>{design?.ontology.schemaVersion ?? graphSnapshot?.ontologyVersion ?? '待发布'}</dd></div>
               <div><dt>类型</dt><dd>{design?.ontology.classCount ?? '—'} 类 · {design?.ontology.relationshipTypeCount ?? '—'} 种关系</dd></div>
-              <div><dt>构建</dt><dd>{design?.graph.buildStatus ?? 'waiting'}</dd></div>
+              <div><dt>构建</dt><dd>{GRAPH_BUILD_LABELS[design?.graph.buildStatus ?? 'waiting']}</dd></div>
             </dl>
           </header>
           {graphReady && graphSnapshot !== undefined
             ? <>
               <div className={css.designGraphMeta}>
                 <span><small>图谱</small><b>{graphSnapshot.graphId}</b></span>
-                <span><small>Provider</small><b>{graphSnapshot.provider.id}{graphSnapshot.provider.version === undefined ? '' : ` · ${graphSnapshot.provider.version}`}</b></span>
+                <span><small>构建工具</small><b>{graphSnapshot.provider.id}{graphSnapshot.provider.version === undefined ? '' : ` · ${graphSnapshot.provider.version}`}</b></span>
                 <span><small>修订</small><b>{graphSnapshot.revision}</b></span>
                 <span><small>规模</small><b>{graphSnapshot.nodes.length} 个实体 · {graphSnapshot.edges.length} 条关系</b></span>
               </div>
@@ -1161,11 +1165,11 @@ function DesignStagePanel({ props, workspace, sessionId, view, stageState, surfa
 
       <div className={`${css.designCloseout} ${css.designDetailSurface}`} data-design-closeout="">
       {ontologyRoute && <section className={css.designContextPanel} data-design-context="">
-        <header><div><span>07 / Agent 上下文与项目纵向切片</span><h2 data-design-context-title="">查询必要子图，再运行真实业务任务</h2><p data-design-context-copy="">每份上下文保留问题、权限、来源、Schema 与图谱版本，不把整张图注入模型。</p></div><b>{semanticWorkspace?.context?.status === 'ready' ? '上下文已形成' : '等待受控查询'}</b></header>
+        <header><div><span>07 / Agent 上下文与最小业务流程</span><h2 data-design-context-title="">查询必要子图，再运行真实业务任务</h2><p data-design-context-copy="">从图谱查询当前任务需要的实体与关系，附上来源、适用范围和版本，供 Agent 使用。</p></div><b>{semanticWorkspace?.context?.status === 'ready' ? '上下文已形成' : '等待查询图谱'}</b></header>
         <div className={css.designContextFlow}>
-          <article data-ready={semanticWorkspace?.validation?.status === 'passed' ? 'true' : undefined}><DesignBuildIcon name="provider" /><span><strong>01 受控 Agent 上下文</strong><small>{semanticWorkspace?.context === undefined ? '尚未生成' : `${semanticWorkspace.context.status === 'ready' ? '已形成' : semanticWorkspace.context.status === 'stale' ? '待重评' : '失败'} · ${semanticWorkspace.context.entityCount} 个实体 · ${semanticWorkspace.context.relationshipCount} 条关系 · ${semanticWorkspace.context.permissionScope}`}</small><p>选择能力问题，取得带权限与来源的必要子图。</p></span>{!historical && <button type="button" data-design-context-action="" disabled={semanticWorkspace?.validation?.status !== 'passed'} onClick={openContext}>选择问题并查询</button>}</article>
+          <article data-ready={semanticWorkspace?.validation?.status === 'passed' ? 'true' : undefined}><DesignBuildIcon name="provider" /><span><strong>01 Agent 任务参考信息</strong><small>{semanticWorkspace?.context === undefined ? '尚未生成' : `${semanticWorkspace.context.status === 'ready' ? '已形成' : semanticWorkspace.context.status === 'stale' ? '需重新验证' : '失败'} · ${semanticWorkspace.context.entityCount} 个实体 · ${semanticWorkspace.context.relationshipCount} 条关系 · ${semanticWorkspace.context.permissionScope}`}</small><p>选择业务问题，查询相关实体与关系，并保留来源和适用范围。</p></span>{!historical && <button type="button" data-design-context-action="" disabled={semanticWorkspace?.validation?.status !== 'passed'} onClick={openContext}>选择问题并查询</button>}</article>
           <DesignBuildIcon name="arrow" />
-          <article><DesignBuildIcon name="cube" /><span><strong>02 项目纵向切片</strong><small>{semanticWorkspace?.slice === undefined ? '尚未运行真实链路' : `${semanticWorkspace.slice.status === 'succeeded' ? '成功' : semanticWorkspace.slice.status === 'stale' ? '待重评' : '失败'} · ${semanticWorkspace.slice.result}`}</small><p>{semanticWorkspace?.context?.status === 'ready' ? '使用当前受控上下文运行真实业务任务。' : '需要先形成受控上下文。'}</p></span>{!historical && <button type="button" disabled={semanticWorkspace?.context?.status !== 'ready'} onClick={prepareSlice}>交给 Agent 实现并运行</button>}</article>
+          <article><DesignBuildIcon name="cube" /><span><strong>02 最小业务流程</strong><small>{semanticWorkspace?.slice === undefined ? '尚未运行真实链路' : `${semanticWorkspace.slice.status === 'succeeded' ? '成功' : semanticWorkspace.slice.status === 'stale' ? '需重新验证' : '失败'} · ${semanticWorkspace.slice.result}`}</small><p>{semanticWorkspace?.context?.status === 'ready' ? '使用当前任务参考信息运行真实业务任务。' : '需要先形成任务参考信息。'}</p></span>{!historical && <button type="button" disabled={semanticWorkspace?.context?.status !== 'ready'} onClick={prepareSlice}>交给 Agent 实现并运行</button>}</article>
         </div>
       </section>}
 
@@ -1183,27 +1187,27 @@ function DesignStagePanel({ props, workspace, sessionId, view, stageState, surfa
       </section>}
 
       <section className={css.designGate} data-design-gate="">
-        <header><div><span>09 / FDE 人工决定</span><h2>{historical ? '方案与纵向切片记录已封存' : semanticWorkspace?.decision?.status === 'current' ? designDecisionLabel(semanticWorkspace.decision.outcome) : surface.reviewReady ? '候选方案已具备，等待人工决定' : '还不能提交 Go；可以修订、收窄或停止'}</h2><p>{routePending ? '先完成实现机制和语义基础判断。' : ontologyRoute ? '本体路线必须同时证明 Schema、图谱、受控上下文与真实纵向任务可用。' : '轻量路线仍需用一条真实纵向切片证明方案可运行。'}</p></div><div className={css.designGateStatus}>{!historical && !surface.reviewReady && <span><DesignBuildIcon name="info" />Go 条件未满足</span>}<b>{surface.presentCount}/{surface.requiredCount} 份记录</b></div></header>
+        <header><div><span>09 / FDE 人工决定</span><h2>{historical ? '方案与业务验证记录' : semanticWorkspace?.decision?.status === 'current' ? designDecisionLabel(semanticWorkspace.decision.outcome) : surface.reviewReady ? '候选方案已具备，等待人工决定' : '暂不能进入下一阶段，可修订方案、缩小范围或停止'}</h2><p>{routePending ? '先选择实现方式，并判断是否需要本体。' : ontologyRoute ? '本体路线必须同时证明 Schema、图谱、任务参考信息与真实纵向任务可用。' : '轻量路线仍需用一条最小端到端流程证明方案可运行。'}</p></div><div className={css.designGateStatus}>{!historical && !surface.reviewReady && <span><DesignBuildIcon name="info" />进入下一阶段的条件未满足</span>}<b>{surface.presentCount}/{surface.requiredCount} 份记录</b></div></header>
         <div className={css.designArtifacts}>{surface.artifacts.map(artifact => <article key={artifact.id} data-status={artifact.status}><i><EvidenceDocumentIcon /></i><span><strong>{artifact.title}</strong><small>{artifact.purpose}</small></span><b>{artifact.status === 'present' ? '已形成' : artifact.status === 'error' ? '读取失败' : '待形成'}</b>{artifact.status === 'present' && <button type="button" onClick={() => { openFile(artifact.path, artifact.title) }}>查看</button>}</article>)}</div>
         {blockerGroups.length > 0 && <section className={css.designBlockerGroups} aria-label="当前待处理条件"><h3>当前待处理</h3><div>{blockerGroups.map(group => <section key={group.id}><h4>{group.title}</h4><ul>{group.items.map(item => <li key={item.id} data-severity={item.severity}>{item.text}</li>)}</ul></section>)}</div></section>}
         {semanticWorkspace?.decision !== undefined && <article className={css.designDecisionRecord} data-status={semanticWorkspace.decision.status}>
-          <span><small>{semanticWorkspace.decision.status === 'current' ? '当前人工决定' : '上次决定 · 证据变化后待重评'}</small><strong>{designDecisionLabel(semanticWorkspace.decision.outcome)}</strong><p>{semanticWorkspace.decision.rationale}</p></span>
+          <span><small>{semanticWorkspace.decision.status === 'current' ? '当前人工决定' : '上次决定 · 证据变化后需重新验证'}</small><strong>{designDecisionLabel(semanticWorkspace.decision.outcome)}</strong><p>{semanticWorkspace.decision.rationale}</p></span>
           <b>{new Date(semanticWorkspace.decision.decidedAt).toLocaleString('zh-CN')}</b>
         </article>}
         {historical
-          ? <footer className={css.historicalArchiveFooter}><span><HistoricalArchiveIcon />阶段已封存；可继续查看当时的路线、图谱快照、运行证据和人工决定。</span><strong>只读记录</strong></footer>
+          ? <footer className={css.historicalArchiveFooter}><span><HistoricalArchiveIcon />当前只读查看已保存的方案、图谱快照、运行证据和人工决定。</span><strong>只读记录</strong></footer>
           : <>
-            {reviewing && <div className={`${css.genericReview} ${css.designDecisionReview}`}><strong>对当前证据提交哪一种 FDE 决定？</strong><p>机制结论与人工决定分开保存。只有 Go 会推进到“运行 PoC 与 Eval”；其他决定只记录依据并保留在第四阶段。</p><div className={css.designDecisionChoices}>{([
-              ['go', 'Go', '证据齐备，进入 PoC 与 Eval。'],
-              ['revise', 'Revise', '保留当前目标，修订方案或实现。'],
-              ['narrow', 'Narrow', '收窄目标、动作、数据或适用范围。'],
-              ['stop', 'Stop', '当前证据不支持继续投入。'],
-            ] as const).map(([outcome, label, description]) => <button key={outcome} type="button" data-selected={decisionOutcome === outcome ? 'true' : undefined} disabled={outcome === 'go' && !surface.reviewReady} onClick={() => { setDecisionOutcome(outcome) }}><b>{label}</b><small>{description}</small></button>)}</div><label htmlFor="design-decision-rationale">决定依据</label><textarea id="design-decision-rationale" value={decisionRationale} onChange={(event) => { setDecisionRationale(event.target.value) }} placeholder="引用当前方案、纵向切片、风险、权限和未解决问题；不要只写结论。" /><button type="button" className={decisionOutcome === 'go' ? css.primaryButton : css.secondaryButton} disabled={submitting || (decisionOutcome === 'go' && !surface.reviewReady)} onClick={() => { void submitDecision() }}>{submitting ? '正在保存…' : decisionOutcome === 'go' ? '保存 Go 并进入下一阶段' : `保存 ${designDecisionLabel(decisionOutcome)}`}</button></div>}
+            {reviewing && <div className={`${css.genericReview} ${css.designDecisionReview}`}><strong>对当前证据提交哪一种 FDE 决定？</strong><p>方案验证结果与人工决定分开保存。只有 Go 会推进到“运行 PoC 与 Eval”；其他决定只记录依据并保留在第四阶段。</p><div className={css.designDecisionChoices}>{([
+              ['go', '进入下一阶段', '证据齐备，进入 PoC 与 Eval。'],
+              ['revise', '修订方案', '保留当前目标，修订方案或实现。'],
+              ['narrow', '缩小范围', '收窄目标、动作、数据或适用范围。'],
+              ['stop', '停止投入', '当前证据不支持继续投入。'],
+            ] as const).map(([outcome, label, description]) => <button key={outcome} type="button" data-selected={decisionOutcome === outcome ? 'true' : undefined} disabled={outcome === 'go' && !surface.reviewReady} onClick={() => { setDecisionOutcome(outcome) }}><b>{label}</b><small>{description}</small></button>)}</div><label htmlFor="design-decision-rationale">决定依据</label><textarea id="design-decision-rationale" value={decisionRationale} onChange={(event) => { setDecisionRationale(event.target.value) }} placeholder="引用当前方案、纵向切片、风险、权限和未解决问题；不要只写结论。" /><button type="button" className={decisionOutcome === 'go' ? css.primaryButton : css.secondaryButton} disabled={submitting || (decisionOutcome === 'go' && !surface.reviewReady)} onClick={() => { void submitDecision() }}>{submitting ? '正在保存…' : decisionOutcome === 'go' ? '确认并进入下一阶段' : `保存 ${designDecisionLabel(decisionOutcome)}`}</button></div>}
             {returning && <div className={css.genericReview}><label htmlFor="design-return-reason">返回原因</label><textarea id="design-return-reason" value={returnReason} onChange={(event) => { setReturnReason(event.target.value) }} placeholder="例如：新的环境证据改变了可用权限，需要回到第三阶段重新核对。" /><button type="button" className={css.secondaryButton} disabled={submitting} onClick={() => { void returnStage() }}>保留现有材料并返回</button></div>}
           </>}
         {error !== null && <p className={css.inlineError} role="alert">{error}</p>}
       </section>
-      {!historical && <div className={css.designGateActions} data-design-gate-actions=""><span><InvestigationIcon name="scales" />{routePending ? '请先确定当前候选路线' : surface.reviewReady ? '证据已齐备，等待 FDE 作出决定' : '可提交修订、收窄或停止的决定'}</span>
+      {!historical && <div className={css.designGateActions} data-design-gate-actions=""><span><InvestigationIcon name="scales" />{routePending ? '请先确定当前候选方案' : surface.reviewReady ? '证据已齐备，等待 FDE 作出决定' : '可提交修订、收窄或停止的决定'}</span>
         {!routePending && <button type="button" className={css.primaryButton} onClick={openDecision}>{reviewing ? '收起人工决定' : '提交 FDE 决定'}</button>}
         <button type="button" className={css.secondaryButton} onClick={() => { setReturning(value => !value) }}>返回上一阶段</button>
       </div>}
@@ -1211,30 +1215,30 @@ function DesignStagePanel({ props, workspace, sessionId, view, stageState, surfa
     </main>
 
     {drawer !== null && <div className={css.designDrawerBackdrop} onMouseDown={(event) => { if (event.target === event.currentTarget && operation === null) setDrawer(null) }}>
-      <aside className={css.designDrawer} role="dialog" aria-modal="true" aria-label={drawer === 'route' ? '双轴机制判断' : drawer === 'sources' ? '绑定项目材料' : drawer === 'definition' ? '编辑 Ontology 定义' : drawer === 'candidates' ? '审核候选知识' : '生成受控 Agent 上下文'}>
-        <header><div><span>第四阶段 · {drawer === 'route' ? '双轴机制判断' : drawer === 'sources' ? '项目材料绑定' : drawer === 'definition' ? 'Ontology Schema' : drawer === 'candidates' ? '候选知识审核' : 'Agent 上下文'}</span><h2>{drawer === 'route' ? '确定当前候选路线' : drawer === 'sources' ? '选择本轮获准使用的代表材料' : drawer === 'definition' ? '审阅并修改最小领域定义' : drawer === 'candidates' ? '决定哪些候选可以进入正式图谱' : '只查询当前任务需要的子图'}</h2></div><button type="button" aria-label="关闭" disabled={operation !== null} onClick={() => { setDrawer(null) }}>×</button></header>
+      <aside className={css.designDrawer} role="dialog" aria-modal="true" aria-label={drawer === 'route' ? '实现方案与本体选型' : drawer === 'sources' ? '绑定项目材料' : drawer === 'definition' ? '编辑本体定义' : drawer === 'candidates' ? '审核候选知识' : '生成Agent 任务参考信息'}>
+        <header><div><span>第四阶段 · {drawer === 'route' ? '实现方案与本体选型' : drawer === 'sources' ? '项目材料绑定' : drawer === 'definition' ? 'Ontology Schema' : drawer === 'candidates' ? '候选知识审核' : 'Agent 上下文'}</span><h2>{drawer === 'route' ? '确定当前候选方案' : drawer === 'sources' ? '选择本轮获准使用的代表材料' : drawer === 'definition' ? '审阅并修改最小领域定义' : drawer === 'candidates' ? '决定哪些候选可以进入正式图谱' : '只查询当前任务需要的子图'}</h2></div><button type="button" aria-label="关闭" disabled={operation !== null} onClick={() => { setDrawer(null) }}>×</button></header>
         <div className={css.designDrawerBody}>
           {drawer === 'route' && <>
-            <section className={css.designDrawerSection}><span>第一条轴 · 系统如何完成工作</span><div className={css.designChoiceGrid}>{DESIGN_MECHANISMS.map(item => <button key={item.id} type="button" data-selected={routeMechanism === item.id ? 'true' : undefined} onClick={() => { setRouteMechanism(item.id) }}><strong>{item.label}</strong><small>{item.description}</small></button>)}</div><label>选择依据<textarea value={executionRationale} onChange={(event) => { setExecutionRationale(event.target.value) }} placeholder="引用阶段 2/3 的业务结果、权限、风险和成本证据。" /></label></section>
-            <section className={css.designDrawerSection}><span>第二条轴 · 系统如何表达领域事实</span><div className={css.designChoiceGrid} data-columns="2"><button type="button" data-selected={routeSemanticMode === 'schema' ? 'true' : undefined} onClick={() => { setRouteSemanticMode('schema') }}><strong>普通 Schema</strong><small>对象与接口边界清晰，不需要跨来源实体统一、多跳、来源时间或图推理。</small></button><button type="button" data-selected={routeSemanticMode === 'ontology' ? 'true' : undefined} onClick={() => { setRouteSemanticMode('ontology') }}><strong>Ontology 与知识图谱</strong><small>存在必须验证的复杂关系、来源、时间、多跳查询或多 Agent 共享语义。</small></button></div><label>必要性依据<textarea value={semanticRationale} onChange={(event) => { setSemanticRationale(event.target.value) }} placeholder="说明为什么普通 Schema 足够，或哪些能力问题确实要求正式本体。" /></label></section>
+            <section className={css.designDrawerSection}><span>选择实现方式</span><div className={css.designChoiceGrid}>{DESIGN_MECHANISMS.map(item => <button key={item.id} type="button" data-selected={routeMechanism === item.id ? 'true' : undefined} onClick={() => { setRouteMechanism(item.id) }}><strong>{item.label}</strong><small>{item.description}</small></button>)}</div><label>选择依据<textarea value={executionRationale} onChange={(event) => { setExecutionRationale(event.target.value) }} placeholder="引用阶段 2/3 的业务结果、权限、风险和成本证据。" /></label></section>
+            <section className={css.designDrawerSection}><span>判断是否需要本体与知识图谱</span><div className={css.designChoiceGrid} data-columns="2"><button type="button" data-selected={routeSemanticMode === 'schema' ? 'true' : undefined} onClick={() => { setRouteSemanticMode('schema') }}><strong>数据结构（Schema）</strong><small>对象与接口边界清晰，不需要跨来源实体统一、多跳、来源时间或图推理。</small></button><button type="button" data-selected={routeSemanticMode === 'ontology' ? 'true' : undefined} onClick={() => { setRouteSemanticMode('ontology') }}><strong>本体（Ontology）与知识图谱</strong><small>存在必须验证的复杂关系、来源、时间、多跳查询或多 Agent 共享语义。</small></button></div><label>必要性依据<textarea value={semanticRationale} onChange={(event) => { setSemanticRationale(event.target.value) }} placeholder="说明为什么数据结构（Schema） 足够，或哪些业务问题确实要求正式本体。" /></label></section>
           </>}
           {drawer === 'sources' && <>
             <section className={css.designDrawerSection}><span>已识别项目材料 · {selectedSources.length}/12</span><div className={css.designSourceChoices}>{readySources.map(source => <label key={source.sourceId} data-selected={selectedSources.includes(source.sourceId) ? 'true' : undefined}><input type="checkbox" checked={selectedSources.includes(source.sourceId)} onChange={(event) => { setSelectedSources(current => event.target.checked ? [...current, source.sourceId] : current.filter(id => id !== source.sourceId)) }} /><span><strong>{source.originalName}</strong><small>{source.relativePath} · {(source.bytes / 1024).toFixed(1)} KB</small></span></label>)}{readySources.length === 0 && <p>当前没有已完成本地识别的项目材料。请先从项目资料入口上传或完成识别。</p>}</div></section>
-            <section className={css.designDrawerSection}><label>本轮获准用途<textarea value={permissionScope} onChange={(event) => { setPermissionScope(event.target.value) }} /></label><label>来源权威级别<select value={sourceAuthority} onChange={(event) => { setSourceAuthority(event.target.value as 'primary' | 'supporting') }}><option value="primary">主要依据</option><option value="supporting">辅助依据</option></select></label><p>保存后会锁定材料 ID、内容摘要和修改时间；原件变化时必须重新绑定。</p></section>
+            <section className={css.designDrawerSection}><label>本轮获准用途<textarea value={permissionScope} onChange={(event) => { setPermissionScope(event.target.value) }} /></label><label>来源权威级别<select value={sourceAuthority} onChange={(event) => { setSourceAuthority(event.target.value as 'primary' | 'supporting') }}><option value="primary">主要依据</option><option value="supporting">辅助依据</option></select></label><p>保存后会锁定材料 ID、文件校验值和修改时间；原件变化时必须重新绑定。</p></section>
           </>}
           {drawer === 'definition' && <>
-            <div className={css.designDefinitionStats}><span><b>{definitionDraft.competencyQuestions.length}</b>能力问题</span><span><b>{definitionDraft.classes.length}</b>类</span><span><b>{definitionDraft.relationships.length}</b>关系</span><span><b>{definitionDraft.provenanceRules.length + definitionDraft.temporalRules.length}</b>规则</span></div>
-            <section className={css.designDrawerSection}><span>完整可版本化定义</span><p>以下修改保存后只形成新草稿，并使旧构建、验证、上下文与纵向切片进入待重评；发布仍需单独运行 Semantica 校验。</p></section>
+            <div className={css.designDefinitionStats}><span><b>{definitionDraft.competencyQuestions.length}</b>业务问题</span><span><b>{definitionDraft.classes.length}</b>类</span><span><b>{definitionDraft.relationships.length}</b>关系</span><span><b>{definitionDraft.provenanceRules.length + definitionDraft.temporalRules.length}</b>规则</span></div>
+            <section className={css.designDrawerSection}><span>本体定义草稿</span><p>以下修改保存后只形成新草稿，并使旧构建、验证、上下文与纵向切片进入需重新验证；发布仍需单独运行 Semantica 校验。</p></section>
             <OntologyDefinitionEditor value={definitionDraft} onChange={setDefinitionDraft} />
           </>}
           {drawer === 'candidates' && <>
             {(semanticWorkspace?.candidates.warnings.length ?? 0) > 0 && <div className={css.designWarnings}>{semanticWorkspace?.candidates.warnings.map((warning, index) => <p key={String(index)}>{warning}</p>)}</div>}
-            <section className={css.designDrawerSection}><span>实体候选 · {semanticWorkspace?.candidates.entities.length ?? 0}</span><div className={css.designCandidateList}>{(semanticWorkspace?.candidates.entities ?? []).map(item => <article key={item.id}><span><strong>{item.label}</strong><small>{item.type} · 置信度 {Math.round(item.confidence * 100)}% · {item.sourceRefs.length} 个来源</small></span><div><button type="button" data-selected={(candidateDecisions[item.id] ?? item.decision) === 'accepted' ? 'true' : undefined} onClick={() => { setCandidateDecisions(current => ({ ...current, [item.id]: 'accepted' })) }}>接受</button><button type="button" data-rejected={(candidateDecisions[item.id] ?? item.decision) === 'rejected' ? 'true' : undefined} onClick={() => { setCandidateDecisions(current => ({ ...current, [item.id]: 'rejected' })) }}>拒绝</button></div></article>)}</div></section>
+            <section className={css.designDrawerSection}><span>实体候选 · {semanticWorkspace?.candidates.entities.length ?? 0}</span><div className={css.designCandidateList}>{(semanticWorkspace?.candidates.entities ?? []).map(item => <article key={item.id}><span><strong>{item.label}</strong><small>{item.type} · 抽取分数 {Math.round(item.confidence * 100)}% · {item.sourceRefs.length} 个来源</small></span><div><button type="button" data-selected={(candidateDecisions[item.id] ?? item.decision) === 'accepted' ? 'true' : undefined} onClick={() => { setCandidateDecisions(current => ({ ...current, [item.id]: 'accepted' })) }}>接受</button><button type="button" data-rejected={(candidateDecisions[item.id] ?? item.decision) === 'rejected' ? 'true' : undefined} onClick={() => { setCandidateDecisions(current => ({ ...current, [item.id]: 'rejected' })) }}>拒绝</button></div></article>)}</div></section>
             <section className={css.designDrawerSection}><span>关系候选 · {semanticWorkspace?.candidates.relationships.length ?? 0}</span><div className={css.designCandidateList}>{(semanticWorkspace?.candidates.relationships ?? []).map(item => <article key={item.id}><span><strong>{item.label ?? item.type}</strong><small>{item.source} → {item.target} · {item.sourceRefs.length} 个来源</small></span><div><button type="button" data-selected={(candidateDecisions[item.id] ?? item.decision) === 'accepted' ? 'true' : undefined} onClick={() => { setCandidateDecisions(current => ({ ...current, [item.id]: 'accepted' })) }}>接受</button><button type="button" data-rejected={(candidateDecisions[item.id] ?? item.decision) === 'rejected' ? 'true' : undefined} onClick={() => { setCandidateDecisions(current => ({ ...current, [item.id]: 'rejected' })) }}>拒绝</button></div></article>)}</div></section>
           </>}
-          {drawer === 'context' && <section className={css.designDrawerSection}><span>当前已验证版本</span><p>Schema {semanticWorkspace?.definition.version} · 图谱 {semanticWorkspace?.validation?.runId ?? '待验证'}。至少选择一个能力问题或起始实体。</p><label>能力问题<select value={contextQuestionId} onChange={(event) => { setContextQuestionId(event.target.value) }}><option value="">不按能力问题</option>{(semanticWorkspace?.definition.competencyQuestions ?? []).map(item => <option key={item.id} value={item.id}>{item.text}</option>)}</select></label><label>起始实体<select value={contextSeedId} onChange={(event) => { setContextSeedId(event.target.value) }}><option value="">不指定实体</option>{(graphSnapshot?.nodes ?? []).map(item => <option key={item.id} value={item.id}>{item.label} · {item.type}</option>)}</select></label><label>任务目的<textarea value={contextQuery} onChange={(event) => { setContextQuery(event.target.value) }} /></label><label>关系深度<select value={contextDepth} onChange={(event) => { setContextDepth(Number(event.target.value)) }}><option value={0}>仅当前实体</option><option value={1}>1 跳关系</option><option value={2}>2 跳关系</option><option value={3}>3 跳关系</option></select></label></section>}
+          {drawer === 'context' && <section className={css.designDrawerSection}><span>当前已验证版本</span><p>Schema {semanticWorkspace?.definition.version} · 图谱 {semanticWorkspace?.validation?.runId ?? '待验证'}。至少选择一个业务问题或起始实体。</p><label>业务问题<select value={contextQuestionId} onChange={(event) => { setContextQuestionId(event.target.value) }}><option value="">不指定业务问题</option>{(semanticWorkspace?.definition.competencyQuestions ?? []).map(item => <option key={item.id} value={item.id}>{item.text}</option>)}</select></label><label>起始实体<select value={contextSeedId} onChange={(event) => { setContextSeedId(event.target.value) }}><option value="">不指定实体</option>{(graphSnapshot?.nodes ?? []).map(item => <option key={item.id} value={item.id}>{item.label} · {item.type}</option>)}</select></label><label>任务目的<textarea value={contextQuery} onChange={(event) => { setContextQuery(event.target.value) }} /></label><label>关系深度<select value={contextDepth} onChange={(event) => { setContextDepth(Number(event.target.value)) }}><option value={0}>仅当前实体</option><option value={1}>1 跳关系</option><option value={2}>2 跳关系</option><option value={3}>3 跳关系</option></select></label></section>}
         </div>
-        <footer>{error !== null && <p role="alert">{error}</p>}<div><button type="button" className={css.tertiaryButton} disabled={operation !== null} onClick={() => { setDrawer(null) }}>取消</button>{drawer === 'route' && <button type="button" className={css.primaryButton} disabled={operation !== null} onClick={() => { void saveRoute() }}>{operation ?? '保存候选路线'}</button>}{drawer === 'sources' && <button type="button" className={css.primaryButton} disabled={operation !== null} onClick={() => { void saveSources() }}>{operation ?? '绑定本轮材料'}</button>}{drawer === 'definition' && <button type="button" className={css.primaryButton} disabled={operation !== null} onClick={() => { void saveDefinition() }}>{operation ?? '保存新草稿'}</button>}{drawer === 'candidates' && <button type="button" className={css.primaryButton} disabled={operation !== null} onClick={() => { void saveCandidateReview() }}>{operation ?? '保存审核决定'}</button>}{drawer === 'context' && <button type="button" className={css.primaryButton} disabled={operation !== null || contextQuery.trim() === ''} onClick={() => { void runContext() }}>{operation ?? '生成受控上下文'}</button>}</div></footer>
+        <footer>{error !== null && <p role="alert">{error}</p>}<div><button type="button" className={css.tertiaryButton} disabled={operation !== null} onClick={() => { setDrawer(null) }}>取消</button>{drawer === 'route' && <button type="button" className={css.primaryButton} disabled={operation !== null} onClick={() => { void saveRoute() }}>{operation ?? '保存候选方案'}</button>}{drawer === 'sources' && <button type="button" className={css.primaryButton} disabled={operation !== null} onClick={() => { void saveSources() }}>{operation ?? '绑定本轮材料'}</button>}{drawer === 'definition' && <button type="button" className={css.primaryButton} disabled={operation !== null} onClick={() => { void saveDefinition() }}>{operation ?? '保存新草稿'}</button>}{drawer === 'candidates' && <button type="button" className={css.primaryButton} disabled={operation !== null} onClick={() => { void saveCandidateReview() }}>{operation ?? '保存审核决定'}</button>}{drawer === 'context' && <button type="button" className={css.primaryButton} disabled={operation !== null || contextQuery.trim() === ''} onClick={() => { void runContext() }}>{operation ?? '生成任务参考信息'}</button>}</div></footer>
       </aside>
     </div>}
   </section>
@@ -1407,7 +1411,7 @@ function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage,
           </div>
           <div className={css.workActions} data-definition-work-actions={stage === 'definition' ? '' : undefined}>
             {historical
-              ? <span className={css.stageUpdateStatus}><i />阶段记录已封存 · 只读</span>
+              ? <span className={css.stageUpdateStatus}><i />已保存阶段记录 · 只读</span>
               : <><button type="button" className={css.primaryButton} onClick={() => {
                 props.prepareStageDraft(sessionId, surface.prompt)
               }}>{stage === 'definition' && <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m5 3 8 5-8 5V3Z" /></svg>}开始本阶段工作</button>
@@ -1422,7 +1426,7 @@ function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage,
           <header>
             <div className={css.reviewHeading}>
               <span aria-hidden="true"><svg viewBox="0 0 20 20" fill="none"><path d="M6.5 4.5h7A1.5 1.5 0 0 1 15 6v10H5V6a1.5 1.5 0 0 1 1.5-1.5Z" /><path d="M8 4V2.75h4V4M7.5 9h5M7.5 12h5" /></svg></span>
-              <div><small>{historical ? '阶段完成记录' : '评审准备'}</small><h2>{historical ? '材料与人工决定已封存' : surface.reviewReady ? '材料已具备，请逐项核对' : '本阶段尚未达到评审条件'}</h2><p>{historical ? '以下材料和状态来自本阶段最终保存的真实记录。' : surface.reviewReady ? '文件齐备只代表可以开始评审，是否进入下一阶段仍由 FDE 决定。' : '还需保存阶段进度并补齐必备记录；材料齐备后仍由 FDE 人工判断。'}</p></div>
+              <div><small>{historical ? '阶段完成记录' : '评审准备'}</small><h2>{historical ? '已保存的材料与人工决定' : surface.reviewReady ? '材料已具备，请逐项核对' : '本阶段尚未达到评审条件'}</h2><p>{historical ? '以下内容来自本阶段已保存的材料和状态。' : surface.reviewReady ? '文件齐备只代表可以开始评审，是否进入下一阶段仍由 FDE 决定。' : '还需保存阶段进度并补齐必备记录；材料齐备后仍由 FDE 人工判断。'}</p></div>
             </div>
             {surface.reviewReady
               ? <div className={css.reviewSummary} data-definition-review-summary={stage === 'definition' ? '' : undefined}>
@@ -1455,7 +1459,7 @@ function LaterStagePanel({ props, workspace, sessionId, view, stageState, stage,
             </div>}
           {surface.reviewReady && !reviewCollapsed && <button type="button" className={css.reviewAllRecords} onClick={() => { setArtifactsCollapsed(false) }}>查看全部记录 ({requiredArtifacts.length}) <span aria-hidden="true">›</span></button>}
           {historical
-            ? <footer className={css.historicalArchiveFooter}><span><HistoricalArchiveIcon />阶段已封存；可继续查看当时的工作记录和固定材料。</span><strong>只读记录</strong></footer>
+            ? <footer className={css.historicalArchiveFooter}><span><HistoricalArchiveIcon />当前只读查看本阶段已保存的工作记录和交付文件。</span><strong>只读记录</strong></footer>
             : <><div className={css.genericGateActions} data-definition-review-actions={stage === 'definition' ? '' : undefined}>
               {surface.reviewReady && <button type="button" className={css.primaryButton} onClick={() => { setReviewing(value => !value) }}>{reviewing ? '收起人工评审' : stage === 'improvement' ? '评审本轮改进' : '提交 FDE 评审'}</button>}
               <button type="button" className={css.tertiaryButton} onClick={() => { setReturning(value => !value) }}>返回上一阶段</button>
@@ -1669,7 +1673,7 @@ function ProjectRecordPanel({
 
   return <section className={css.artifactsPanel} data-project-record-panel="">
     <header>
-      <div><span>项目记录</span><h2>{showAll ? '全部已有记录' : selectedTitle}</h2><p>{showAll ? '按阶段查看项目已经留下的依据、产物和人工决定。' : selectedIsCurrent ? '当前阶段的输入和记录会随工作持续更新。' : '这是已经由 FDE 确认并推进的历史记录。'}</p></div>
+      <div><span>项目记录</span><h2>{showAll ? '全部已有记录' : selectedTitle}</h2><p>{showAll ? '按阶段查看项目已经留下的依据、交付文件和人工决定。' : selectedIsCurrent ? '当前阶段的资料和记录会随工作持续更新。' : '这是已经由 FDE 确认并推进的历史记录。'}</p></div>
       <div className={css.artifactHeaderActions}><b>{showAll ? `${String(recordIndexes.length)} 个阶段` : `${String(selectedPresent)}/${String(selectedRequired.length)}`}</b>{!hideCollapse && <button type="button" aria-expanded="true" aria-label="收起项目记录" title="收起项目记录" onClick={() => { onCollapsedChange(true) }}>收起</button>}</div>
     </header>
 
@@ -1822,16 +1826,16 @@ function BrowsedStagePanel({ props, workspace, sessionId, view, actualStage, vie
             <div className={css.historicalGoalFacts}>
               <span><HistoricalFactIcon type="input" />{sourceFiles.length} 份输入材料</span>
               <span><HistoricalFactIcon type="record" />{presentArtifacts.length} 份阶段记录</span>
-              <span><HistoricalFactIcon type="gate" />已通过人工阶段门</span>
+              <span><HistoricalFactIcon type="gate" />已通过阶段评审</span>
             </div>
           </div>
           <div className={css.historicalCompletionRing} data-stage-ring="" aria-label={`第 ${String(viewedIndex + 1)}/8 阶段已完成`}><strong>{viewedIndex + 1}<small>/8</small></strong><span>已完成</span><i>✓</i></div>
           <div className={css.historicalGoalArt} data-stage-art="" aria-hidden="true"><img src="/fde-dashboard/stage-evidence-stack-3d.webp" alt="" /></div>
-          <div className={css.historicalArchiveNote} data-stage-art-note="">◷ 阶段记录已封存 · 可追溯</div>
+          <div className={css.historicalArchiveNote} data-stage-art-note="">◷ 阶段记录 · 只读查看</div>
         </section>
         <section className={css.historicalEvidenceChain} data-evidence-chain="">
           <header className={css.historicalEvidenceHeader}>
-            <div><span>阶段证据链</span><h2 data-evidence-title="">从输入依据到人工结论</h2><p>所有结论均可回到来源材料与阶段记录。</p></div>
+            <div><span>评审依据与记录</span><h2 data-evidence-title="">从输入依据到人工结论</h2><p>所有结论均可回到来源材料与阶段记录。</p></div>
             <div className={css.historicalEvidenceDirection} aria-hidden="true"><strong>01</strong><i /><strong>03</strong></div>
           </header>
           <div className={css.historicalStageGrid}>
@@ -1871,21 +1875,21 @@ function BrowsedStagePanel({ props, workspace, sessionId, view, actualStage, vie
                   openFile(artifact.path, artifactDisplayTitle(artifact))
                 }}>预览</button>
               </li>)}</ul>
-              {presentArtifacts.length === 0 && <p className={css.unregisteredFact}>未发现可读取的阶段产物。</p>}
+              {presentArtifacts.length === 0 && <p className={css.unregisteredFact}>未发现可读取的阶段交付文件。</p>}
             </section>
             <section data-evidence-decision="">
               <header><span>人工结论</span><h2>当时如何决定</h2></header>
-              <div className={css.historicalDecision}><EvidenceShieldIcon /><span><strong>已通过 FDE 人工阶段门</strong><small>项目随后进入“{nextStageTitle}”。</small></span></div>
+              <div className={css.historicalDecision}><EvidenceShieldIcon /><span><strong>已通过 FDE 阶段评审</strong><small>项目随后进入“{nextStageTitle}”。</small></span></div>
               {selectedWorkflow !== undefined && viewedStage === 'discovery' && <dl><dt>选定业务流程</dt><dd>{selectedWorkflow.title}</dd></dl>}
               {stageRecommendation !== undefined && <dl><dt>阶段建议</dt><dd>{stageRecommendation}</dd></dl>}
-              <dl><dt>遗留阻塞</dt><dd>{stageBlockers.length === 0 ? '未登记未解决阻塞' : `${String(stageBlockers.length)} 项`}</dd></dl>
+              <dl><dt>待解决问题</dt><dd>{stageBlockers.length === 0 ? '未登记待解决问题' : `${String(stageBlockers.length)} 项`}</dd></dl>
               <div className={css.historicalDecisionLink}>查看决策记录 <span aria-hidden="true">→</span></div>
             </section>
           </div>
-          <ol className={css.historicalMilestones} data-stage-milestones="" aria-label="阶段封存轨迹">
-            {['材料进入', '事实还原', '待确认项', '流程冻结', 'FDE 阶段门'].map(item => <li key={item}><i>✓</i><span>{item}</span></li>)}
+          <ol className={css.historicalMilestones} data-stage-milestones="" aria-label="阶段工作记录">
+            {['接收材料', '梳理业务流程', '核对问题', '记录流程选择', 'FDE 阶段评审'].map(item => <li key={item}><i>✓</i><span>{item}</span></li>)}
           </ol>
-          <footer className={css.historicalArchiveFooter}><span><HistoricalArchiveIcon />阶段已封存；后续阶段可引用，但不能静默改写原始记录。</span><strong>查看全部阶段记录</strong></footer>
+          <footer className={css.historicalArchiveFooter}><span><HistoricalArchiveIcon />当前只读查看已保存的阶段资料；本页不提供编辑操作。</span><strong>查看全部阶段记录</strong></footer>
         </section>
       </>
       : <>
@@ -1895,16 +1899,16 @@ function BrowsedStagePanel({ props, workspace, sessionId, view, actualStage, vie
             <div className={css.historicalGoalFacts}>
               <span><HistoricalFactIcon type="input" />{previousArtifacts.length} 份前置阶段记录</span>
               <span><HistoricalFactIcon type="record" />{artifacts.filter(artifact => artifact.required).length} 份预计必备记录</span>
-              <span><HistoricalFactIcon type="gate" />尚未进入人工阶段门</span>
+              <span><HistoricalFactIcon type="gate" />尚未进入阶段评审</span>
             </div>
           </div>
           <div className={css.historicalCompletionRing} data-complete="false" data-future="true" aria-label={`第 ${String(viewedIndex + 1)}/8 阶段尚未开始`}><strong>{viewedIndex + 1}<small>/8</small></strong><span>未开始</span><i>{viewedIndex + 1}</i></div>
           <div className={css.historicalGoalArt} aria-hidden="true"><img src="/fde-dashboard/stage-evidence-stack-3d.webp" alt="" /></div>
-          <div className={css.historicalArchiveNote} data-stage-art-note="">◷ 等待“{V2_STAGE_NAMES[actualIndex]}”完成并通过人工阶段门</div>
+          <div className={css.historicalArchiveNote} data-stage-art-note="">◷ 等待“{V2_STAGE_NAMES[actualIndex]}”完成并通过阶段评审</div>
         </section>
         <section className={css.historicalEvidenceChain} data-future-stage="">
           <header className={css.historicalEvidenceHeader}>
-            <div><span>阶段准备</span><h2>从前置条件到人工阶段门</h2><p>这里只展示开始条件和预计记录，不把尚未发生的工作写成事实。</p></div>
+            <div><span>阶段准备</span><h2>开始条件与评审要求</h2><p>这里只展示开始条件和预计记录，不把尚未发生的工作写成事实。</p></div>
             <div className={css.historicalEvidenceDirection} aria-hidden="true"><strong>01</strong><i /><strong>03</strong></div>
           </header>
           <div className={css.historicalStageGrid}>
@@ -1930,7 +1934,7 @@ function BrowsedStagePanel({ props, workspace, sessionId, view, actualStage, vie
             </section>
           </div>
           <ol className={css.historicalMilestones} aria-label={`第 ${String(viewedIndex + 1)} 阶段预计路径`}>
-            {['前置阶段完成', '开始条件确认', '执行阶段工作', '形成阶段记录', 'FDE 阶段门'].map((item, index) => <li key={item} data-status="waiting"><i>{index + 1}</i><span>{item}</span></li>)}
+            {['前置阶段完成', '开始条件确认', '执行阶段工作', '形成阶段记录', 'FDE 阶段评审'].map((item, index) => <li key={item} data-status="waiting"><i>{index + 1}</i><span>{item}</span></li>)}
           </ol>
           <footer className={css.historicalArchiveFooter}><span><HistoricalArchiveIcon />当前只读查看；返回当前阶段继续形成真实记录。</span><strong>尚未开始</strong></footer>
         </section>
@@ -2284,7 +2288,7 @@ function StageWorkbenchPanel({ props, workspace, sessionId, view }: {
           <div className={css.historicalGoalFacts}>
             <span><HistoricalFactIcon type="input" />{files.length} 份输入材料</span>
             <span><HistoricalFactIcon type="record" />{presentCount}/{requiredArtifacts.length} 份必备记录</span>
-            <span><HistoricalFactIcon type="gate" />{reviewReady ? '等待提交人工阶段门' : '尚未进入人工阶段门'}</span>
+            <span><HistoricalFactIcon type="gate" />{reviewReady ? '等待提交阶段评审' : '尚未进入阶段评审'}</span>
           </div>
         </div>
         <div className={css.historicalCompletionRing} data-stage-ring="" data-complete="false" aria-label="当前处于第 1/8 阶段">
@@ -2319,8 +2323,8 @@ function StageWorkbenchPanel({ props, workspace, sessionId, view }: {
           </section>
           <section data-evidence-decision="">
             <header><span>人工结论</span><h2>接下来如何决定</h2></header>
-            <div className={css.historicalDecision} data-ready={reviewReady ? 'true' : undefined}><EvidenceShieldIcon ready={reviewReady} /><span><strong>{artifactCatalogError !== undefined ? '阶段记录未通过校验' : reviewReady ? '候选材料已齐备' : '等待 FDE 完成本阶段判断'}</strong><small>{artifactCatalogError !== undefined ? '先修复固定记录合同，再继续阶段判断。' : reviewReady ? '核对记录后可提交人工阶段门。' : '继续补齐事实与阶段记录。'}</small></span></div>
-            <dl><dt>当前工作</dt><dd>{FALLBACK_WORK[currentWorkIndex]?.title ?? currentWork.title}</dd><dt>待确认流程</dt><dd>{selectedWorkflow?.title ?? `${String(workflowCatalog.items.length)} 项`}</dd><dt>事实状态</dt><dd>已确认 {workflowEvidence.confirmed} · 待核对 {workflowEvidence.unverified}</dd><dt>遗留阻塞</dt><dd>{(discovery?.blockers ?? []).length} 项</dd></dl>
+            <div className={css.historicalDecision} data-ready={reviewReady ? 'true' : undefined}><EvidenceShieldIcon ready={reviewReady} /><span><strong>{artifactCatalogError !== undefined ? '阶段记录未通过校验' : reviewReady ? '候选材料已齐备' : '等待 FDE 完成本阶段判断'}</strong><small>{artifactCatalogError !== undefined ? '先按提示修正阶段记录格式，再继续评审。' : reviewReady ? '核对记录后可提交阶段评审。' : '继续补齐事实与阶段记录。'}</small></span></div>
+            <dl><dt>当前工作</dt><dd>{FALLBACK_WORK[currentWorkIndex]?.title ?? currentWork.title}</dd><dt>待确认流程</dt><dd>{selectedWorkflow?.title ?? `${String(workflowCatalog.items.length)} 项`}</dd><dt>事实状态</dt><dd>已确认 {workflowEvidence.confirmed} · 待核对 {workflowEvidence.unverified}</dd><dt>待解决问题</dt><dd>{(discovery?.blockers ?? []).length} 项</dd></dl>
           </section>
         </div>
         <ol className={css.historicalMilestones} data-stage-milestones="" aria-label="第一阶段工作路径">
@@ -2328,7 +2332,7 @@ function StageWorkbenchPanel({ props, workspace, sessionId, view }: {
             const display = FALLBACK_WORK[index] ?? item
             return <li key={item.id} data-status={item.status}><i>{item.status === 'complete' ? '✓' : index + 1}</i><span>{display.title}</span></li>
           })}
-          <li data-status={reviewReady ? 'current' : 'waiting'}><i>5</i><span>FDE 阶段门</span></li>
+          <li data-status={reviewReady ? 'current' : 'waiting'}><i>5</i><span>FDE 阶段评审</span></li>
         </ol>
         <footer className={css.historicalArchiveFooter}>
           <span><HistoricalArchiveIcon />当前阶段记录会随对话与资料持续更新。</span>

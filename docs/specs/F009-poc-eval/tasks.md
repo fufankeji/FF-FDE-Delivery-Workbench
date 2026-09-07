@@ -109,8 +109,14 @@ updated: "2026-09-07"
 本轮 T009–T011 的实现与验证记录见 [第五阶段信息工作台验证](../../verification/2026-09-07-stage-five-information-workbench.md)。未完成的 T001–T006 不因本轮信息承接适配而视为完成；当前状态为实现已交付、页面视觉待用户手动确认。
 
 - [ ] T012 按第五阶段参考图调整信息工作台
-  - 来源：AC-F009-003、用户 `阶段 5.png`
+  - 来源：REQ-025, NFR-013, AC-F009-003、用户 `阶段 5.png`
   - 依赖：T010
   - 修改：阶段横幅、等宽双栏、图标、登记与材料分组、第五阶段输入入口与独立滚动
   - 验证：原有状态／运行／验收组件测试、补充记录入口测试、类型构建和在线 Bundle；视觉及插画待人工确认
-  - 证据：`docs/verification/2026-09-07-stage-five-reference-layout.md`
+  - 完成证据：`docs/verification/2026-09-07-stage-five-reference-layout.md`；视觉仍待用户确认，不在本次通用性整改中勾选完成。
+
+## 2026-09-07 整改执行
+
+- 本轮范围：REQ-022, REQ-028；PSC-018, PSC-023；AC-F009-002, AC-F009-004 对应的通用性缺陷，不重新声明整个 Feature 完成。
+- 修改与验证计划：project/evaluation-workbench.ts 与阶段 Skills；以 evaluation-workbench.spec.ts 和 generality-gates.spec.ts 验证当前指纹、证据变化和来源性质。
+- 完成证据与未完成边界统一记录于 [通用性修复记录](../../verification/2026-09-07-platform-generality-repair.md)。本条不改变先前未完成任务的勾选状态。

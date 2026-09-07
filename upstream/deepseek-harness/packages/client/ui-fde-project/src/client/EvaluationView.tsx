@@ -189,7 +189,7 @@ export function EvaluationView(props: ProjectViewProps) {
 
           <section className={css.validationOverview} aria-label="验证总览">
             <article className={css.validationProgressCard}>
-              <header><div><span>必需指标完成度</span><strong>{validation.gateReady ? '已满足阶段门' : '验证进行中'}</strong></div><b>{validation.satisfiedMetricCount}/{validation.requiredMetricCount}</b></header>
+              <header><div><span>必需指标完成度</span><strong>{validation.gateReady ? '已满足评审条件' : '验证进行中'}</strong></div><b>{validation.satisfiedMetricCount}/{validation.requiredMetricCount}</b></header>
               <div className={css.validationProgressBody}>
                 <div className={css.validationRing} style={progressStyle(metricCompletion)}>
                   <div><strong>{metricCompletion}%</strong><span>已满足</span></div>
@@ -256,7 +256,7 @@ export function EvaluationView(props: ProjectViewProps) {
 
           {validation.blockers.length > 0 && (
             <section className={css.validationBlockers} role="status">
-              <header><span>!</span><div><h2>进入部署试运行前仍有 {validation.blockers.length} 个阻塞</h2><p>处理后刷新报告，阶段门会按真实结果重新计算。</p></div></header>
+              <header><span>!</span><div><h2>进入部署试运行前仍有 {validation.blockers.length} 个阻塞</h2><p>处理后刷新报告，系统会按当前结果重新检查评审条件。</p></div></header>
               <div>{validation.blockers.map((blocker, index) => <p key={blocker}><b>{index + 1}</b>{blocker}</p>)}</div>
             </section>
           )}

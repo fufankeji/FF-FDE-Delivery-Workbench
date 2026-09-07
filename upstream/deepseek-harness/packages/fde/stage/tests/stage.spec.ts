@@ -85,6 +85,22 @@ function response() {
 }
 
 describe('FdeStageState', () => {
+  it('rejects cross-version completion and returns without migrating or writing', async () => {
+    const data = table()
+    const state = new FdeStageState(data.value)
+    const first = await state.open(wid('modern'))
+    const definition = await state.completeV2(wid('modern'), first.revision, 'discovery')
+    const writes = data.put.mock.calls.length
+    await expect(state.completeSolution(wid('modern'), definition.revision)).rejects.toThrow('旧阶段完成入口')
+    await expect(state.returnToPrevious(wid('modern'), definition.revision, '返回')).rejects.toThrow('旧返回入口')
+    expect(state.current(wid('modern'))).toBe(definition)
+    const legacy = { currentStage: 'solution' as const, revision: 3, createdAt: '2026-01-01', updatedAt: '2026-01-01' }
+    data.records.set(wid('legacy'), legacy)
+    expect(await state.open(wid('legacy'))).toBe(legacy)
+    await expect(state.completeV2(wid('legacy'), 3, 'definition')).rejects.toThrow('尚未迁移')
+    await expect(state.returnV2ToPrevious(wid('legacy'), 3, '返回')).rejects.toThrow('旧项目')
+    expect(data.put.mock.calls.length).toBe(writes)
+  })
   it('initializes one requirements record and coalesces concurrent readers', async () => {
     const data = table()
     const state = new FdeStageState(data.value, () => '2026-08-26T00:00:00.000Z')
@@ -98,7 +114,7 @@ describe('FdeStageState', () => {
     await expect(state.open(wid('w-1'))).resolves.toBe(first)
   })
 
-  it('completes requirements once for the exact revision', async () => {
+  it('keeps an existing legacy project on its original six-stage lifecycle', async () => {
     const data = table()
     const times = [
       '2026-08-26T00:00:00.000Z', '2026-08-27T00:00:00.000Z',
@@ -106,29 +122,31 @@ describe('FdeStageState', () => {
       '2026-08-31T00:00:00.000Z', '2026-09-01T00:00:00.000Z',
     ]
     const state = new FdeStageState(data.value, () => times.shift() ?? '2026-08-27T00:00:00.000Z')
+    const createdAt = times.shift()!
+    data.records.set(wid('w-1'), { currentStage: 'requirements', revision: 1, createdAt, updatedAt: createdAt })
     await state.open(wid('w-1'))
     const next = await state.completeRequirements(wid('w-1'), 1)
     expect(next).toEqual({
-      currentStage: 'solution', lifecycleVersion: 2, v2Stage: 'definition', improvementCycles: 0, revision: 2,
+      currentStage: 'solution', revision: 2,
       createdAt: '2026-08-26T00:00:00.000Z', updatedAt: '2026-08-27T00:00:00.000Z',
     })
     await expect(state.completeRequirements(wid('w-1'), 1)).rejects.toThrow('已经变化')
     expect(state.current(wid('w-1'))).toBe(next)
     const development = await state.completeSolution(wid('w-1'), 2)
     expect(development).toEqual({
-      currentStage: 'development', lifecycleVersion: 2, v2Stage: 'design', improvementCycles: 0, revision: 3,
+      currentStage: 'development', revision: 3,
       createdAt: '2026-08-26T00:00:00.000Z', updatedAt: '2026-08-28T00:00:00.000Z',
     })
     await expect(state.completeSolution(wid('w-1'), 2)).rejects.toThrow('已经变化')
     const validation = await state.completeDevelopment(wid('w-1'), 3)
     expect(validation).toEqual({
-      currentStage: 'validation', lifecycleVersion: 2, v2Stage: 'evaluation', improvementCycles: 0, revision: 4,
+      currentStage: 'validation', revision: 4,
       createdAt: '2026-08-26T00:00:00.000Z', updatedAt: '2026-08-29T00:00:00.000Z',
     })
     await expect(state.completeDevelopment(wid('w-1'), 3)).rejects.toThrow('已经变化')
     const pilot = await state.completeValidation(wid('w-1'), 4)
     expect(pilot).toEqual({
-      currentStage: 'pilot', lifecycleVersion: 2, v2Stage: 'pilot', improvementCycles: 0, revision: 5,
+      currentStage: 'pilot', revision: 5,
       createdAt: '2026-08-26T00:00:00.000Z', updatedAt: '2026-08-30T00:00:00.000Z',
     })
     await expect(state.completeValidation(wid('w-1'), 4)).rejects.toThrow('已经变化')
@@ -147,6 +165,8 @@ describe('FdeStageState', () => {
       '2026-09-01T00:00:00.000Z', '2026-09-02T00:00:00.000Z',
     ]
     const state = new FdeStageState(data.value, () => times.shift() ?? '2026-09-03T00:00:00.000Z')
+    const createdAt = times.shift()!
+    data.records.set(wid('w-1'), { currentStage: 'requirements', revision: 1, createdAt, updatedAt: createdAt })
     await state.open(wid('w-1'))
     await state.completeRequirements(wid('w-1'), 1)
     await state.completeSolution(wid('w-1'), 2)
@@ -315,7 +335,7 @@ describe('requirement-research model guidance', () => {
       .toContain('第三阶段只调查真实环境与动作边界，不构建本体、不设计架构、不选择模型，也不开始开发')
     expect(v2StagePrompt('investigation')).toContain('同步维护 investigation 的真实系统节点')
     expect(v2StagePrompt('investigation')).toContain('actionBoundaries 的 target/read/suggest/draft/execute')
-    expect(v2StagePrompt('design')).toContain('执行机制与语义基础双轴判断')
+    expect(v2StagePrompt('design')).toContain('实现方式与本体必要性判断')
     expect(v2StagePrompt('design')).toContain('.fde/design/knowledge-graph.json')
     expect(v2StagePrompt('design')).toContain('不得填入演示节点')
     expect(V2_STAGE_SKILLS.find(skill => skill.name === 'contract-design')?.content)

@@ -163,6 +163,7 @@ export interface SemanticQuestionResult {
 }
 
 export interface SemanticValidationResult {
+  readonly checksVersion?: string
   readonly runId: string
   readonly status: 'passed' | 'failed' | 'unavailable' | 'stale'
   readonly checkedAt: string

@@ -120,7 +120,7 @@ export function ObservabilityView(props: ProjectViewProps) {
       <div className={css.observeToolbar}>
         <div>
           <strong>运行脉搏</strong>
-          <span>按会话最后活动时间归集累计投影</span>
+          <span>按会话最近活动时间汇总累计用量</span>
         </div>
         <div className={css.observeRange} aria-label="用量分析时间范围">
           {RANGE_OPTIONS.map(option => (
@@ -263,7 +263,7 @@ export function ObservabilityView(props: ProjectViewProps) {
         </section>
 
         <aside className={css.observeEfficiencyPanel}>
-          <header className={css.observePanelHeader}><div><span>MODEL PULSE</span><h2>模型效率</h2><p>从完整会话投影计算。</p></div></header>
+          <header className={css.observePanelHeader}><div><span>MODEL PULSE</span><h2>模型效率</h2><p>根据完整会话记录计算。</p></div></header>
           <div className={css.observeRuntimeFocus}>
             <div
               className={css.observeRuntimeRing}

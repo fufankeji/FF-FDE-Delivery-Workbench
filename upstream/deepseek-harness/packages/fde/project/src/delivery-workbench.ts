@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto'
 import { readFile, realpath, stat } from 'node:fs/promises'
 import { isAbsolute, join, relative, sep } from 'node:path'
 import type { V2DeliveryEvidence, V2DeliveryItem, V2DeliveryScope, V2DeliverySnapshot, V2LifecycleStageId } from './types.ts'
+import { evidenceProvenanceBlocker } from './evidence-provenance.ts'
 
 const CATEGORIES = {
   pilot: ['authorization', 'integration', 'recovery', 'technical', 'business', 'issue'],
@@ -43,11 +44,12 @@ function empty(status: 'missing' | 'invalid', message: string): V2DeliverySnapsh
  * @param value - Optional delivery object from that record.
  * @returns File-checked facts, preserving declarations and withholding unsupported passes.
  */
-export async function loadDeliveryWorkbench(root: string, stage: V2LifecycleStageId, value: unknown): Promise<V2DeliverySnapshot> {
+export async function loadDeliveryWorkbench(root: string, stage: V2LifecycleStageId, value: unknown, provenance?: unknown): Promise<V2DeliverySnapshot> {
   if (stage !== 'pilot' && stage !== 'production' && stage !== 'improvement') throw new Error('不是交付阶段。')
   if (value === undefined) return empty('missing', '尚未登记本阶段交付证据；已有文件仍可查看。')
   try {
     const data = object(value)
+    const originBlocker = evidenceProvenanceBlocker(provenance) ?? evidenceProvenanceBlocker(data.dataProvenance)
     if (data.schemaVersion !== 1) throw new Error('delivery.schemaVersion 必须为 1。')
     const version = text(data.version, 'version')
     const environment = object(data.environment)
@@ -106,7 +108,7 @@ export async function loadDeliveryWorkbench(root: string, stage: V2LifecycleStag
       const current = versionCurrent && itemVersion === version && refs.length > 0 && refs.every(file => file.current)
       items.push({
         id, category, title: text(row.title, 'title'), declaredStatus,
-        status: resultNeedsProof && (!current || !observedAt || !owner) ? 'stale' : declaredStatus,
+        status: resultNeedsProof && (!current || !observedAt || !owner || originBlocker || evidenceProvenanceBlocker(row.dataProvenance)) ? 'stale' : declaredStatus,
         scope: itemScope, version: itemVersion, summary: text(row.summary, 'summary'),
         required: row.required, evidence: refs,
         ...(owner === undefined ? {} : { owner }),
@@ -116,6 +118,7 @@ export async function loadDeliveryWorkbench(root: string, stage: V2LifecycleStag
       })
     }
     const reviewBlockers: string[] = []
+    if (originBlocker !== undefined) reviewBlockers.push(originBlocker)
     if (!versionCurrent) reviewBlockers.push('候选版本清单缺失或内容已变化，需重新核对证据。')
     const acceptedScope = stage === 'pilot' ? 'pilot' : 'production'
     if (scope(environment.kind) !== acceptedScope) reviewBlockers.push(`当前环境不是${acceptedScope === 'pilot' ? '试点' : '生产'}范围，不能仅依据本地结果评审。`)
@@ -130,7 +133,7 @@ export async function loadDeliveryWorkbench(root: string, stage: V2LifecycleStag
       if (raw.mode !== 'snapshot' && raw.mode !== 'runtime') throw new Error('语义接入方式无效。')
       const refs = await evidence(raw.evidence)
       semantic = { mode: raw.mode, schemaVersion: text(raw.schemaVersion, 'schemaVersion'), graphRevision: text(raw.graphRevision, 'graphRevision'), summary: text(raw.summary, 'semantic.summary'), evidence: refs }
-      if (refs.length === 0 || refs.some(file => !file.current)) reviewBlockers.push('语义依赖证据缺失或已变化。')
+      if (refs.length === 0 || refs.some(file => !file.current)) reviewBlockers.push('知识图谱接入证据缺失或已变化。')
     }
     return {
       status: 'ready', version, versionCurrent, versionFiles,

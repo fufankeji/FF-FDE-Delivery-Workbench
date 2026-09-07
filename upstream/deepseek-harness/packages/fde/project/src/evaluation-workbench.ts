@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto'
 import { readFile, realpath, stat } from 'node:fs/promises'
 import { isAbsolute, join, relative, sep } from 'node:path'
 import type { V2EvaluationFile, V2EvaluationSnapshot } from './types.ts'
+import { evidenceProvenanceBlocker } from './evidence-provenance.ts'
 
 type RecordValue = Record<string, unknown>
 
@@ -51,7 +52,7 @@ function empty(status: V2EvaluationSnapshot['status'], message?: string): V2Eval
  * @param value - The evaluation object from the validated stage JSON.
  * @returns Current file-bound results and actionable review blockers.
  */
-export async function loadEvaluationWorkbench(root: string, value: unknown): Promise<V2EvaluationSnapshot> {
+export async function loadEvaluationWorkbench(root: string, value: unknown, provenance?: unknown): Promise<V2EvaluationSnapshot> {
   if (value === undefined) return empty('missing')
   try {
     const data = record(value, 'evaluation')
@@ -90,6 +91,8 @@ export async function loadEvaluationWorkbench(root: string, value: unknown): Pro
       return result
     }
     const blockers: string[] = []
+    const originBlocker = evidenceProvenanceBlocker(provenance) ?? evidenceProvenanceBlocker(data.dataProvenance)
+    if (originBlocker !== undefined) blockers.push(originBlocker)
     const candidateVersion = candidate.version === undefined ? '' : text(candidate.version, 'candidate.version')
     const summary = candidate.summary === undefined ? '' : text(candidate.summary, 'candidate.summary')
     const sourceFiles = await references(candidate.sourceFiles, 'candidate.sourceFiles')
@@ -117,6 +120,8 @@ export async function loadEvaluationWorkbench(root: string, value: unknown): Pro
       ? `sha256:${createHash('sha256').update(JSON.stringify({ candidateVersion, sourceFiles, environment, metrics: definitions })).digest('hex')}`
       : undefined
     const run = testing.run === undefined ? undefined : record(testing.run, 'testing.run')
+    const runOriginBlocker = evidenceProvenanceBlocker(run?.dataProvenance)
+    if (runOriginBlocker !== undefined) blockers.push(runOriginBlocker)
     const resultRows = rows(run?.results, 'results')
     unique(resultRows, 'results', 'metricId')
     for (const result of resultRows) {
@@ -127,8 +132,14 @@ export async function loadEvaluationWorkbench(root: string, value: unknown): Pro
     const metrics: V2EvaluationSnapshot['testing']['metrics'][number][] = []
     for (const metric of definitions) {
       const result = resultRows.find(item => item.metricId === metric.id)
-      const status = result === undefined ? 'NOT_RUN' : !current ? 'STALE' : result.status as 'NOT_RUN' | 'RUNNING' | 'PASS' | 'WARN' | 'FAIL'
+      let status: V2EvaluationSnapshot['testing']['metrics'][number]['status'] = result === undefined ? 'NOT_RUN' : !current ? 'STALE' : result.status as 'NOT_RUN' | 'RUNNING' | 'PASS' | 'WARN' | 'FAIL'
       const evidence = await references(result?.evidenceRefs, 'result.evidenceRefs')
+      const hashes = result?.evidenceDigests === undefined ? undefined : record(result.evidenceDigests, 'result.evidenceDigests')
+      if (status === 'PASS' && (originBlocker || runOriginBlocker || evidenceProvenanceBlocker(result?.dataProvenance)
+        || evidence.length === 0 || evidence.some(file => file.status !== 'present' || hashes?.[file.path] !== file.sha256))) {
+        status = 'STALE'
+        blockers.push(`结果证据未绑定、已变化或不是真实观察：${metric.title}；请核对实际结果并记录 evidenceDigests。`)
+      }
       const resultValue = result?.value === undefined ? '' : text(result.value, 'result.value')
       if (metric.required && status !== 'PASS') blockers.push(`必测项尚未通过${status === 'STALE' ? '（版本已过期）' : ''}：${metric.title}`)
       else if (metric.required && (!resultValue || evidence.length === 0 || evidence.some(file => file.status !== 'present'))) blockers.push(`必测项缺少实际结果或可读取证据：${metric.title}`)

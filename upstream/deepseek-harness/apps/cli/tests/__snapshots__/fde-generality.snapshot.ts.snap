@@ -1,0 +1,703 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`loads generic FDE gates and read-only query schema through the shipped Web composition 1`] = `
+{
+  "blank": {
+    "presentCount": 0,
+    "reviewReady": false,
+  },
+  "fixture": {
+    "blockers": [
+      "当前记录含联调或模拟输入，不能作为真实交付通过证据；请补充实际运行或人工核对记录。",
+    ],
+    "reviewReady": false,
+  },
+  "independentProject": {
+    "presentCount": 0,
+    "reviewReady": false,
+  },
+  "methodCopy": [
+    {
+      "id": "requirements",
+      "methods": [
+        {
+          "description": "把客户的模糊诉求还原为可调查的真实工作流，并判断它是否值得继续投入，而不是直接设计技术方案。",
+          "id": "qualify-ai-workflow",
+          "label": "判断问题是否值得继续投入",
+        },
+        {
+          "description": "在新项目开始或任务性质改变时，用现有资料建立真实任务定向、缺口和后续能力顺序。",
+          "id": "fde-orient",
+          "label": "项目启动与方向确认",
+        },
+        {
+          "description": "准备并整理对真实流程知情者的短访谈，把只有人知道的内容转成有来源、可复核的候选事实。",
+          "id": "knowledge-interview",
+          "label": "访谈业务人员，还原真实做法",
+        },
+        {
+          "description": "用实际维护、评审和决策证据找到谁知道、谁负责、谁能批准，而不是只相信组织图。",
+          "id": "ownership-map",
+          "label": "找到负责人和决策人",
+        },
+        {
+          "description": "当高价值问题明确落到既有系统时，在有限范围内建立入口、边界、数据、集成和风险线索。",
+          "id": "repo-recon",
+          "label": "盘点现有系统与资料",
+        },
+        {
+          "description": "把当前发现事实转成管理者可在短时间内理解并采取行动的一项决定。",
+          "id": "stakeholder-brief",
+          "label": "整理给负责人看的决策简报",
+        },
+        {
+          "description": "当现场事实推翻原始边界、成功标准或停止条件时，保留历史并形成可追溯的项目重新界定候选。",
+          "id": "reframe-ai-engagement",
+          "label": "核对冲突并调整项目范围",
+        },
+      ],
+    },
+    {
+      "id": "definition",
+      "methods": [
+        {
+          "description": "用客户当前真实做法建立基线，算清问题造成的时间、成本、风险和继续投入的边界。",
+          "id": "engineer-ai-value",
+          "label": "算清当前成本和问题影响",
+        },
+        {
+          "description": "把业务结果、范围和边界改写成能够检查、能够举证的要求与验收条件。",
+          "id": "requirements-to-spec",
+          "label": "把成功标准写成可验收要求",
+        },
+        {
+          "description": "用现有系统、代码、数据和权限事实检查每项要求的可行落点与缺口。",
+          "id": "feasibility-probe",
+          "label": "检查现有条件是否做得到",
+        },
+        {
+          "description": "根据已经查到的事实给出带假设、范围和不确定性的交付估算。",
+          "id": "estimation",
+          "label": "估算周期、人力和主要风险",
+        },
+        {
+          "description": "先处理最可能推翻项目的风险，再安排里程碑、客户配合和阶段决定。",
+          "id": "delivery-plan",
+          "label": "按风险排出交付顺序",
+        },
+        {
+          "description": "把客户的模糊诉求还原为可调查的真实工作流，并判断它是否值得继续投入，而不是直接设计技术方案。",
+          "id": "qualify-ai-workflow",
+          "label": "信息不足时，返回补充业务流程",
+        },
+        {
+          "description": "当现场事实推翻原始边界、成功标准或停止条件时，保留历史并形成可追溯的项目重新界定候选。",
+          "id": "reframe-ai-engagement",
+          "label": "现场事实变化时，重新界定项目",
+        },
+        {
+          "description": "把当前发现事实转成管理者可在短时间内理解并采取行动的一项决定。",
+          "id": "stakeholder-brief",
+          "label": "需要负责人决定时，整理决策简报",
+        },
+        {
+          "description": "当范围、时间、资源或风险无法同时成立时，用证据形成可决策的调整方案。",
+          "id": "escalation-and-renegotiation",
+          "label": "范围、周期或资源冲突时，发起重谈",
+        },
+      ],
+    },
+    {
+      "id": "investigation",
+      "methods": [
+        {
+          "description": "记录需要进入哪些系统、谁能批准、当前缺什么，以及等待会怎样影响计划。",
+          "id": "access-and-onboarding",
+          "label": "把账号、审批和等待事项列清楚",
+        },
+        {
+          "description": "核对数据来源、质量、规模、时效、敏感性和取得方式，判断是否足以支撑目标。",
+          "id": "data-readiness-assessment",
+          "label": "确认数据能不能用于本项目",
+        },
+        {
+          "description": "从真实触发开始，追踪人员、系统、接口、数据和结果经过的每一步。",
+          "id": "trace-the-flow",
+          "label": "跟着一次真实业务走完整链路",
+        },
+        {
+          "description": "从现有表、字段、查询和历史变更中还原实际数据含义与关系。",
+          "id": "data-archaeology",
+          "label": "还原数据口径和历史关系",
+        },
+        {
+          "description": "明确模型、工具和人员各自可访问的数据、可执行动作、审批和人工接管路径。",
+          "id": "secure-ai-action-boundary",
+          "label": "划清系统能读什么、能做什么",
+        },
+        {
+          "description": "用代码和提交历史解释关键限制、兼容逻辑和真实维护责任。",
+          "id": "git-archaeology",
+          "label": "查明关键系统为什么这样设计",
+        },
+        {
+          "description": "把安全、隐私、法务和客户内部治理要求分别交给有权人员核对并留下状态。",
+          "id": "governance-boundary-review",
+          "label": "分别核对安全、隐私和法务要求",
+        },
+      ],
+    },
+    {
+      "id": "design",
+      "methods": [
+        {
+          "description": "比较人工优化、规则、传统软件、机器学习、检索、模型和 Agent 的适用性。",
+          "id": "select-ai-mechanism",
+          "label": "比较实现方式，不默认使用 Agent",
+        },
+        {
+          "description": "把模型、数据、工具、人工审核、监控、失败处理和责任安排成完整运行链路。",
+          "id": "design-production-ai-system",
+          "label": "把方案设计成可长期运行的系统",
+        },
+        {
+          "description": "形成可比较的候选方案、决定依据、风险、非目标和回退方式。",
+          "id": "solution-design",
+          "label": "记录方案取舍和关键决定",
+        },
+        {
+          "description": "明确系统间输入输出、兼容方式、失败响应、版本和迁移责任。",
+          "id": "contract-design",
+          "label": "把接口、事件和数据约定定清楚",
+        },
+        {
+          "description": "把性能、可靠性、安全、审计、成本和降级要求写成可测量底线。",
+          "id": "nfr-baseline",
+          "label": "定下性能、安全和可用性底线",
+        },
+        {
+          "description": "为陌生或高风险系统安排最小改动、验证点和恢复路径。",
+          "id": "safe-change",
+          "label": "把改动拆成可审查、可回退的小步",
+        },
+        {
+          "description": "隔离外部接口的不稳定、限流、错误和数据差异，保护核心流程。",
+          "id": "integration-adapter",
+          "label": "为外部系统设计稳定适配层",
+        },
+      ],
+    },
+    {
+      "id": "evaluation",
+      "methods": [
+        {
+          "description": "从真实工作案例建立正常、边界、失败和对抗案例，并定义评分与验收阈值。",
+          "id": "build-ai-evaluation",
+          "label": "建立覆盖真实业务的评估体系",
+        },
+        {
+          "description": "让每条业务和运行要求都有明确检查、执行者、环境与证据路径。",
+          "id": "verification-plan",
+          "label": "把每条验收要求对应到验证证据",
+        },
+        {
+          "description": "设计合成、脱敏、子集和边界数据，兼顾真实性、隐私和可复现性。",
+          "id": "test-data-strategy",
+          "label": "准备合规且能暴露问题的测试数据",
+        },
+        {
+          "description": "在明确环境中测量性能、容量、故障恢复、安全和审计表现。",
+          "id": "nfr-validation",
+          "label": "实测性能、可靠性和安全底线",
+        },
+        {
+          "description": "在改动遗留系统前，用测试记录当前实际行为和关键例外。",
+          "id": "characterization-tests",
+          "label": "先固定旧系统当前行为",
+        },
+        {
+          "description": "检查方案和实现是否遵守已经确认的安全、隐私与审计要求。",
+          "id": "security-compliance-check",
+          "label": "核对敏感数据、密钥、日志和审计",
+        },
+        {
+          "description": "区分真实缺陷、偶发失败、环境漂移和资源问题，保留可重现证据。",
+          "id": "ci-forensics",
+          "label": "判断自动化检查为什么失败",
+        },
+      ],
+    },
+    {
+      "id": "pilot",
+      "methods": [
+        {
+          "description": "从数据、权限、可靠性、支持、成本和停止条件判断是否具备有限试点条件。",
+          "id": "review-ai-production-readiness",
+          "label": "检查试点前还缺哪些生产条件",
+        },
+        {
+          "description": "明确谁参与、在哪运行、能处理什么、观察多久，以及谁有权开始或停止。",
+          "id": "pilot-scope-and-authority",
+          "label": "定清试点对象、范围和授权",
+        },
+        {
+          "description": "检查身份、网络、接口、数据、审计和支持责任是否满足试点运行。",
+          "id": "enterprise-integration-readiness",
+          "label": "核对企业系统接入是否齐备",
+        },
+        {
+          "description": "明确系统失效时如何发现、降级、人工接管、恢复和回滚。",
+          "id": "reliability-and-recovery",
+          "label": "补齐监控、接管和恢复能力",
+        },
+        {
+          "description": "把试点中的使用量、业务结果、人工介入、异常、成本和反馈整理成可复核结论。",
+          "id": "pilot-evidence-review",
+          "label": "整理试点过程和业务结果",
+        },
+        {
+          "description": "记录发布窗口、审批材料、冻结期、风险接受和最终批准。",
+          "id": "change-control-navigation",
+          "label": "走完客户的变更审批流程",
+        },
+        {
+          "description": "把部署、校验、停止、恢复和回滚写成可由授权人员复现的操作说明。",
+          "id": "deploy-runbook",
+          "label": "写出别人也能执行的部署与回滚步骤",
+        },
+      ],
+    },
+    {
+      "id": "production",
+      "methods": [
+        {
+          "description": "汇总版本、测试、风险、审批、回滚和支持证据，形成可复核的发布建议。",
+          "id": "release-readiness",
+          "label": "确认生产发布证据是否齐全",
+        },
+        {
+          "description": "验证客户能够独立运行、监控、处理异常、变更和升级服务。",
+          "id": "transfer-ai-service",
+          "label": "证明客户团队能够接管服务",
+        },
+        {
+          "description": "定义上线观察期、业务和技术信号、值守责任及回滚触发条件。",
+          "id": "post-deploy-watch",
+          "label": "安排上线后的重点观察",
+        },
+        {
+          "description": "明确 SLO、成本、质量、人工介入、事故、变更和周期复盘的日常责任。",
+          "id": "operate-ai-service",
+          "label": "建立日常运营和服务复盘",
+        },
+        {
+          "description": "汇总准确制品、源代码、配置、文档、运行手册、决定和未完成事项。",
+          "id": "handover-pack",
+          "label": "整理可取得的交付包和已知事项",
+        },
+        {
+          "description": "通过培训、结对和实际操作确认接收团队能够承担约定责任。",
+          "id": "enablement-handoff",
+          "label": "让接收团队完成实操验收",
+        },
+        {
+          "description": "明确双跑、数据同步、对账、切换步骤、停止条件和不可逆时点。",
+          "id": "cutover-plan",
+          "label": "规划新旧系统切换和不可逆点",
+        },
+        {
+          "description": "核对剩余使用者、数据保留、依赖、访问和恢复要求后安全退役旧能力。",
+          "id": "decommission-plan",
+          "label": "确认没有使用者后再下线旧系统",
+        },
+      ],
+    },
+    {
+      "id": "improvement",
+      "methods": [
+        {
+          "description": "从生产指标、用户采用、人工修正、事故、成本和反馈中确认真实变化。",
+          "id": "production-evidence-review",
+          "label": "复盘业务结果、采用和运行问题",
+        },
+        {
+          "description": "把生产问题和机会按业务影响、频率、风险、投入与可逆性排成候选队列。",
+          "id": "improvement-prioritization",
+          "label": "按影响、风险和成本排改进顺序",
+        },
+        {
+          "description": "复用原验收证据并增加回归、生产相似和失败场景，验证改进效果。",
+          "id": "improvement-validation",
+          "label": "证明改进解决原问题且没有带来回归",
+        },
+        {
+          "description": "区分客户特有做法与可跨项目复用的规则、组件、案例和工作方法。",
+          "id": "productize-field-learning",
+          "label": "判断现场经验能否沉淀为复用能力",
+        },
+        {
+          "description": "区分止血与根因修复，用最短证据链定位生产异常影响和责任。",
+          "id": "incident-triage",
+          "label": "从生产症状定位并先恢复业务",
+        },
+        {
+          "description": "识别发现太晚、定位太慢或无法判断业务影响的日志、指标和追踪缺口。",
+          "id": "observability-gap",
+          "label": "补充故障定位所需的监控与日志",
+        },
+        {
+          "description": "为改进版本定义批准、Canary、观察、扩大、停止和回滚条件。",
+          "id": "improvement-release-control",
+          "label": "让改进版本小范围发布并可随时回退",
+        },
+      ],
+    },
+  ],
+  "nonempty": {
+    "presentCount": 3,
+    "reviewReady": true,
+  },
+  "projects": [
+    {
+      "stage": "discovery",
+      "title": "本地计算器",
+    },
+    {
+      "stage": "discovery",
+      "title": "出版资料索引",
+    },
+  ],
+  "query": {
+    "description": "Read the current project validated graph by an explicit questionId or seedNodeId. query describes the task, not semantic search. Default consumption is read-only and does not invalidate stage-four evidence. Use purpose=validation only to prepare a new stage-four slice; it replaces the validation context. Textual permission notes are not an authorization engine.",
+    "parameters": {
+      "properties": {
+        "maxDepth": {
+          "description": "Bounded graph depth from 0 to 3; default 1.",
+          "type": "integer",
+        },
+        "purpose": {
+          "description": "Default consume is read-only. validation explicitly prepares a new stage-four slice and invalidates the previous slice.",
+          "enum": [
+            "consume",
+            "validation",
+          ],
+          "type": "string",
+        },
+        "query": {
+          "description": "Concrete project task or question this context must support.",
+          "type": "string",
+        },
+        "questionId": {
+          "description": "Optional published competency-question id.",
+          "type": "string",
+        },
+        "seedNodeId": {
+          "description": "Optional exact current-project graph node id.",
+          "type": "string",
+        },
+      },
+      "required": [
+        "query",
+      ],
+      "type": "object",
+    },
+  },
+  "readsPreserveBytes": true,
+  "stageCopy": [
+    {
+      "artifacts": [
+        {
+          "path": "fde-deliverables/02-outcome-scope/outcome-contract.md",
+          "title": "业务结果与范围约定",
+        },
+        {
+          "path": "fde-deliverables/02-outcome-scope/value-case.md",
+          "title": "价值测算记录",
+        },
+        {
+          "path": "fde-deliverables/02-outcome-scope/delivery-plan.md",
+          "title": "交付计划",
+        },
+      ],
+      "explanation": "从已经确认的真实流程出发，建立当前基线、成功标准、交付边界、责任人和继续或停止条件。",
+      "id": "definition",
+      "objective": "把要取得的业务结果、这次做到哪里、由谁决定和何时停止说清楚。",
+      "title": "定义结果、范围与责任",
+      "workItems": [
+        {
+          "id": "baseline",
+          "purpose": "记录现在的结果、成本、时长和主要问题。",
+          "title": "建立当前基线",
+        },
+        {
+          "id": "outcome",
+          "purpose": "说清楚取得什么结果才算成功，如何衡量。",
+          "title": "明确成功标准",
+        },
+        {
+          "id": "scope",
+          "purpose": "明确本次做什么、不做什么，以及何时停止或调整。",
+          "title": "划定交付边界",
+        },
+        {
+          "id": "ownership",
+          "purpose": "明确决定人、执行人、客户配合事项和交付节奏。",
+          "title": "确认责任与计划",
+        },
+      ],
+    },
+    {
+      "artifacts": [
+        {
+          "path": "fde-deliverables/03-environment/data-readiness.md",
+          "title": "数据可用性评估",
+        },
+        {
+          "path": "fde-deliverables/03-environment/system-access-map.md",
+          "title": "系统与访问清单",
+        },
+        {
+          "path": "fde-deliverables/03-environment/governance-review.md",
+          "title": "安全与治理核对记录",
+        },
+      ],
+      "explanation": "核对数据质量、系统边界、接口能力、访问权限、审批流程和真实负责人，不在未知条件上设计方案。",
+      "id": "investigation",
+      "objective": "弄清客户现场允许做什么、现有条件能支持什么、还缺什么。",
+      "title": "调查数据、系统、接口、安全与组织",
+      "workItems": [
+        {
+          "id": "data",
+          "purpose": "确认数据来源、质量、规模、敏感性和可取得方式。",
+          "title": "检查数据条件",
+        },
+        {
+          "id": "systems",
+          "purpose": "确认现有系统、调用链、接口限制和需要改动的系统位置。",
+          "title": "梳理系统与接口",
+        },
+        {
+          "id": "access",
+          "purpose": "确认账号、权限、隐私、安全和法务要求。",
+          "title": "核对权限与安全",
+        },
+        {
+          "id": "owners",
+          "purpose": "确认系统负责人、审批人、业务专家和等待事项。",
+          "title": "确认现场责任人",
+        },
+      ],
+    },
+    {
+      "artifacts": [
+        {
+          "path": "fde-deliverables/04-solution-design/mechanism-selection.md",
+          "title": "实现方式选择记录",
+        },
+        {
+          "path": "fde-deliverables/04-solution-design/solution-design.md",
+          "title": "生产方案设计",
+        },
+        {
+          "path": "fde-deliverables/04-solution-design/vertical-slice-record.md",
+          "title": "最小业务流程验证记录",
+        },
+      ],
+      "explanation": "比较规则、传统软件、检索、模型和 Agent 等方式，明确系统边界、工具权限、失败回退并完成一条从输入到结果的最小端到端业务流程。",
+      "id": "design",
+      "objective": "选择最合适的实现方式，并先走通一条可以验证的完整业务链路。",
+      "title": "设计方案并完成端到端纵向切片",
+      "workItems": [
+        {
+          "id": "mechanism",
+          "purpose": "比较规则、软件、检索、模型、Agent 与人工处理。",
+          "title": "选择实现方式",
+        },
+        {
+          "id": "architecture",
+          "purpose": "说明系统接口、数据流向、工具权限和人工审批步骤。",
+          "title": "明确系统边界",
+        },
+        {
+          "id": "slice",
+          "purpose": "先打通一个从输入到结果的完整业务链路。",
+          "title": "验证最小端到端业务流程",
+        },
+        {
+          "id": "decision",
+          "purpose": "记录方案取舍、风险、待确认事项和下一步。",
+          "title": "核对方案决定",
+        },
+      ],
+    },
+    {
+      "artifacts": [
+        {
+          "path": "fde-deliverables/05-poc-eval/evaluation-plan.md",
+          "title": "验证计划",
+        },
+        {
+          "path": "fde-deliverables/05-poc-eval/evaluation-report.md",
+          "title": "验证报告",
+        },
+        {
+          "path": "fde-deliverables/05-poc-eval/evaluation-baseline.md",
+          "title": "验证基线",
+        },
+      ],
+      "explanation": "在 DSH 中完成项目开发与联调，开发在现有 Agent 对话完成；工作台展示受测版本、运行情况、测试指标与证据，最后由 FDE 决定是否进入下一阶段。",
+      "id": "evaluation",
+      "objective": "把已确认的方案开发成可运行项目，再用真实任务验证。",
+      "title": "运行 PoC 与 Eval",
+      "workItems": [
+        {
+          "id": "plan",
+          "purpose": "把每条成功标准映射到用例、数据和证据。",
+          "title": "制定验证计划",
+        },
+        {
+          "id": "cases",
+          "purpose": "准备真实、边界、对抗和失败回退案例。",
+          "title": "准备测试案例",
+        },
+        {
+          "id": "run",
+          "purpose": "执行验证并保存每项结果和可追溯证据。",
+          "title": "运行 PoC 与 Eval",
+        },
+        {
+          "id": "conclusion",
+          "purpose": "说明哪些假设成立、哪些失败以及是否继续。",
+          "title": "形成验证结论",
+        },
+      ],
+    },
+    {
+      "artifacts": [
+        {
+          "path": "fde-deliverables/06-pilot/pilot-scope.md",
+          "title": "试点范围与授权",
+        },
+        {
+          "path": "fde-deliverables/06-pilot/pilot-runbook.md",
+          "title": "试点运行与回滚手册",
+        },
+        {
+          "path": "fde-deliverables/06-pilot/pilot-report.md",
+          "title": "试点结果记录",
+        },
+      ],
+      "explanation": "完成真实系统集成、权限与审计、可靠性改造、运行手册和回滚准备，再经授权进入受控试点。",
+      "id": "pilot",
+      "objective": "把已验证能力接入客户现场，在有限范围内稳定运行。",
+      "title": "企业集成、可靠性改造与受控 Pilot",
+      "workItems": [
+        {
+          "id": "integration",
+          "purpose": "接入真实系统、数据、身份和审批链路。",
+          "title": "完成企业集成",
+        },
+        {
+          "id": "reliability",
+          "purpose": "处理监控、降级、恢复、审计和成本边界。",
+          "title": "补齐可靠性",
+        },
+        {
+          "id": "readiness",
+          "purpose": "核对范围、人员、环境、风险和回滚条件。",
+          "title": "确认试点准备",
+        },
+        {
+          "id": "pilot",
+          "purpose": "在明确范围内运行，记录业务结果和现场问题。",
+          "title": "运行受控试点",
+        },
+      ],
+    },
+    {
+      "artifacts": [
+        {
+          "path": "fde-deliverables/07-production-handover/production-review.md",
+          "title": "生产就绪与发布记录",
+        },
+        {
+          "path": "fde-deliverables/07-production-handover/customer-acceptance.md",
+          "title": "客户验收记录",
+        },
+        {
+          "path": "fde-deliverables/07-production-handover/handover-record.md",
+          "title": "培训与责任移交记录",
+        },
+      ],
+      "explanation": "完成生产就绪审查、受控发布、观察期、用户采用、客户验收、培训和运维责任移交。",
+      "id": "production",
+      "objective": "让系统在生产环境持续产生业务结果，并把责任真正交给客户团队。",
+      "title": "进入生产、推动采用并验收交接",
+      "workItems": [
+        {
+          "id": "readiness",
+          "purpose": "核对发布、监控、容量、安全、回滚和责任人。",
+          "title": "审查生产就绪",
+        },
+        {
+          "id": "release",
+          "purpose": "按授权窗口发布并保存变更与回滚证据。",
+          "title": "受控进入生产",
+        },
+        {
+          "id": "adoption",
+          "purpose": "记录用户采用、业务结果、反馈和验收结论。",
+          "title": "推动使用与验收",
+        },
+        {
+          "id": "handover",
+          "purpose": "完成培训、访问权限和运维责任转移。",
+          "title": "完成责任交接",
+        },
+      ],
+    },
+    {
+      "artifacts": [
+        {
+          "path": "fde-deliverables/08-improvement/field-learning-register.md",
+          "title": "现场经验登记",
+        },
+        {
+          "path": "fde-deliverables/08-improvement/improvement-record.md",
+          "title": "改进与验证记录",
+        },
+        {
+          "path": "fde-deliverables/08-improvement/controlled-release-record.md",
+          "title": "受控发布记录",
+        },
+      ],
+      "explanation": "根据业务指标、运行事件、用户反馈和成本证据选择改进项，受控发布并判断哪些现场经验值得复用。",
+      "id": "improvement",
+      "objective": "根据生产运行记录改进系统，并整理可复用的方法和组件。",
+      "title": "持续改进并沉淀可复用能力",
+      "workItems": [
+        {
+          "id": "evidence",
+          "purpose": "汇总业务结果、运行指标、问题、反馈和成本。",
+          "title": "汇总生产证据",
+        },
+        {
+          "id": "prioritize",
+          "purpose": "按影响、风险和证据选择本轮改进，明确不做项。",
+          "title": "选择改进事项",
+        },
+        {
+          "id": "validate",
+          "purpose": "先测试改进，再按边界发布并观察结果。",
+          "title": "验证并受控发布",
+        },
+        {
+          "id": "productize",
+          "purpose": "记录可复用模板、工具、方法和适用边界。",
+          "title": "整理可复用方法与组件",
+        },
+      ],
+    },
+  ],
+}
+`;

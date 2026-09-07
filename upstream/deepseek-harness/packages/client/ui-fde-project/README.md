@@ -6,6 +6,8 @@ Browser presentation for the FDE project delivery workspace. The system opens on
 
 ## Behavior
 
+Stage headings, instructions, dialogs, and review conditions name concrete delivery tasks. Established lifecycle titles and technical identifiers remain unchanged. Technical editors explain ontology terms in Chinese; graph status and query modes have readable labels. Reported selection, test evidence, and human approval remain distinct. Saved customer content is displayed without terminology rewriting, and read-only historical views do not claim files are immutable snapshots.
+
 Across all eight stages, the workbench exposes the native composer only for the project's actual current stage. Historical and future views hide it and release its reserved space without changing project progress. Returning to the current view restores input; reopening an earlier stage requires the existing reasoned return flow and a successful Host update. Agent Chat retains its normal input and drafts.
 
 The project collection opens on All Projects in card view, ordered by recent activity: the newest Workspace, Session, or loaded stage update, with creation time available for projects without Sessions. Lists, filters, and pagination share that order; priority ordering remains an explicit option and the separate priority card retains its action ranking. The priority-card background is a decorative static WebP, with no pointer interaction or generated UI text.

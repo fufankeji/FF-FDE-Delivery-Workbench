@@ -105,7 +105,7 @@ export function EvaluationStagePanel({
     <header className={css.hero} data-evaluation-hero="">
       <div className={css.heroCopy} data-evaluation-title-group="">
         <span className={css.eyebrow}>第 5/8 阶段 · 运行 PoC 与 Eval</span>
-        <div className={css.heroTitle}><h1 data-evaluation-title="">项目运行与验证</h1><span className={css.badge} data-status={ready ? 'PASS' : 'WARN'}>{historical ? '历史阶段记录' : ready ? '等待人工验收' : evaluation?.status === 'invalid' ? '记录待修正' : '等待有效验证'}</span></div>
+        <div className={css.heroTitle}><h1 data-evaluation-title="">项目运行与验证</h1><span className={css.badge} data-status={ready ? 'PASS' : 'WARN'}>{historical ? '历史阶段记录' : ready ? '等待人工验收' : evaluation?.status === 'invalid' ? '记录待修正' : '等待测试结果'}</span></div>
         <p data-evaluation-intro="">开发在 Agent 对话中进行；这里查看项目成果、测试证据和进入下一阶段的条件。</p>
       </div>
       <div className={css.heroArt} data-evaluation-hero-art="" aria-hidden="true"><img src="/fde-dashboard/evaluation-lab.webp" alt="" width="768" height="512" /></div>
@@ -117,20 +117,20 @@ export function EvaluationStagePanel({
 
     <div className={css.overview}>
       <section className={css.card} aria-label="本轮受测范围与版本">
-        <header><div><span className={css.eyebrow}><EvaluationIcon kind="clipboard" />01 / 本轮受测对象</span><div className={css.candidateTitle}><h2>{evaluation?.candidate.version || '尚未登记受测版本'}</h2><span className={css.badge} data-status={evaluation?.candidate.version ? undefined : 'WARN'}>{evaluation?.testing.current ? '结果对应当前指纹' : evaluation?.candidate.version ? '已登记' : '待登记'}</span></div></div></header>
+        <header><div><span className={css.eyebrow}><EvaluationIcon kind="clipboard" />01 / 本轮受测对象</span><div className={css.candidateTitle}><h2>{evaluation?.candidate.version || '尚未登记受测版本'}</h2><span className={css.badge} data-status={evaluation?.candidate.version ? undefined : 'WARN'}>{evaluation?.testing.current ? '结果对应当前版本' : evaluation?.candidate.version ? '已登记' : '待登记'}</span></div></div></header>
         <p>{evaluation?.candidate.summary || '记录本轮可运行版本与功能范围，不依据文件数量推算开发进度。'}</p>
         <dl className={css.facts}><div><EvaluationIcon kind="cube" /><div><dt>测试环境</dt><dd>{evaluation?.testing.environment || '尚未登记'}</dd></div></div><div><EvaluationIcon kind="target" /><div><dt>必测指标</dt><dd>{required.length > 0 ? `${String(passed)} / ${String(required.length)} 项有通过记录及证据` : '尚未定义'}</dd></div></div></dl>
         {!historical && <button type="button" className={css.textAction} onClick={() => { prepare(surface.prompt) }}><EvaluationIcon kind="chat" />前往 Agent 对话补充记录<EvaluationIcon kind="arrow" /></button>}
         {evaluation?.testing.fingerprint && <details>
-          <summary>版本指纹与受测文件（{evaluation.candidate.sourceFiles.length}）</summary>
-          <p className={css.muted}>指纹覆盖下列清单、环境与指标定义，不代表已扫描整个项目。</p>
+          <summary>版本校验值与受测文件（{evaluation.candidate.sourceFiles.length}）</summary>
+          <p className={css.muted}>校验值根据下列文件、测试环境和指标定义计算，不包括清单之外的项目文件。</p>
           <code className={css.fingerprint}>{evaluation.testing.fingerprint}</code>
           {fileLinks(evaluation.candidate.sourceFiles)}
         </details>}
       </section>
       <section className={css.card} aria-label="项目运行情况">
         <header><div><span className={css.eyebrow}><EvaluationIcon kind="play" />02 / 项目运行</span><h2 className={css.runtimeTitle}><i className={css.runtimeDot} data-running={!historical && runtime?.status === 'running' || undefined} />{historical ? '历史运行不在此重放' : runtime ? RUNTIME_LABELS[runtime.status] : '运行状态尚未读取'}</h2></div></header>
-        <p>{historical ? '此处不使用当前进程状态推断当时运行情况；请查看历史验证报告。' : runtime?.message || '复用现有项目运行能力。服务启动成功不代表测试或阶段验收通过。'}</p>
+        <p>{historical ? '此处不使用当前进程状态推断当时运行情况；请查看历史验证报告。' : runtime?.message || '通过下方操作启动或查看项目。服务启动成功不代表测试或阶段验收通过。'}</p>
         {!historical && <div className={`${css.actions} ${css.runtimeActions}`} data-evaluation-runtime-actions="">
           {runtime && <button type="button" className={css.primary} disabled={busy || transitioning} onClick={() => { runtimeAction(runtime.status === 'running' || (runtime.status === 'blocked' && runtime.action === 'stop') ? 'stopProject' : 'startProject') }}><EvaluationIcon kind="play" />{transitioning ? RUNTIME_LABELS[runtime.status] : runtime.status === 'running' ? '停止项目' : runtime.status === 'blocked' && runtime.action === 'stop' ? '重试停止' : '启动项目'}</button>}
           <button type="button" disabled={busy || !runtime?.previewUrl} onClick={() => { runtimeAction('openProjectPreview') }}><EvaluationIcon kind="terminal" />预览项目</button>
@@ -158,7 +158,7 @@ export function EvaluationStagePanel({
     </section>
 
     <section className={`${css.card} ${css.review}`} aria-label="问题与阶段验收">
-      <header><div><span className={css.eyebrow}><EvaluationIcon kind="shield" />04 / 问题与阶段验收</span><h2>{historical ? '第五阶段已有结论与记录' : ready ? '证据已具备，等待 FDE 核对' : '补齐当前版本的证据，再提交阶段验收'}</h2><p>用于判断能否进入企业集成与受控 Pilot；不等于生产批准或客户最终验收。</p></div><span className={css.badge} data-status={ready ? 'PASS' : 'WARN'}>{issues.length} 项待核对</span></header>
+      <header><div><span className={css.eyebrow}><EvaluationIcon kind="shield" />04 / 问题与阶段验收</span><h2>{historical ? '第五阶段已有结论与记录' : ready ? '证据已具备，等待 FDE 核对' : '补齐当前版本的证据，再提交阶段验收'}</h2><p>用于判断能否进入企业集成与受控试点（Pilot）；不等于生产批准或客户最终验收。</p></div><span className={css.badge} data-status={ready ? 'PASS' : 'WARN'}>{issues.length} 项待核对</span></header>
       <div className={css.reviewGroups}>
         <section className={css.reviewGroup} aria-label="登记信息"><h3>登记信息</h3><div className={css.registrationRow}><b>01</b><EvaluationIcon kind="file" /><div><strong>受测版本与指标</strong><small>{evaluation?.candidate.version || '请在 Agent 对话中按实际项目情况补充记录。'}</small></div><span className={css.badge} data-status={evaluation?.candidate.version && required.length ? 'PASS' : 'WARN'}>{evaluation?.candidate.version && required.length ? '已登记' : '尚未登记'}</span></div>
         <div className={css.registrationRow}><b>02</b><EvaluationIcon kind="code" /><div><strong>阶段状态记录</strong><code>{surface.statePath}</code></div><span className={css.badge} data-status={surface.stateStatus === 'ready' ? 'PASS' : 'WARN'}>{surface.stateStatus === 'ready' ? '已生成' : surface.stateStatus === 'invalid' ? '读取失败' : '尚未生成'}</span></div></section>
@@ -167,8 +167,8 @@ export function EvaluationStagePanel({
       {issues.length > 0 && <details className={css.issueDetails}><summary>查看 {issues.length} 项待核对条件详情</summary><ul className={css.blockers}>{issues.map((item, index) => <li key={`${String(index)}-${item}`}>{item}</li>)}</ul></details>}
       {!historical && <>
         <div className={css.reviewActions}><div className={css.actions}><button type="button" className={css.primary} disabled={!ready || busy} onClick={() => { setConfirming(true); setReturning(false) }}><EvaluationIcon kind={ready ? 'shield' : 'lock'} />提交 FDE 阶段验收</button><button type="button" disabled={busy} onClick={() => { setReturning(!returning); setConfirming(false) }}>返回上一阶段</button></div>{!ready && <p>补齐当前版本的有效证据后开放验收。</p>}</div>
-        {confirming && ready && <div className={css.confirm} role="group" aria-label="确认阶段验收"><strong>已核对本轮版本、实际结果、风险与权限？</strong><p>确认后进入第六阶段；后端会重新读取证据与阶段版本。</p><div className={css.actions}><button type="button" className={css.primary} disabled={busy} onClick={() => { void perform(() => props.completeV2Stage(workspace.workspaceId, stageState.revision, 'evaluation')) }}>确认并进入下一阶段</button><button type="button" disabled={busy} onClick={() => { setConfirming(false) }}>取消</button></div></div>}
-        {returning && <div className={css.confirm}><label htmlFor="evaluation-return-reason">返回方案阶段的原因</label><textarea id="evaluation-return-reason" value={reason} onChange={(event) => { setReason(event.target.value) }} placeholder="说明哪些方案、范围或边界需要重新确认。" /><button type="button" disabled={busy || !reason.trim()} onClick={() => { void perform(() => props.returnV2Stage(workspace.workspaceId, stageState.revision, reason.trim())) }}>确认返回上一阶段</button></div>}
+        {confirming && ready && <div className={css.confirm} role="group" aria-label="确认阶段验收"><strong>已核对本轮版本、实际结果、风险与权限？</strong><p>确认后进入第六阶段；提交时将重新检查证据是否仍对应当前版本。</p><div className={css.actions}><button type="button" className={css.primary} disabled={busy} onClick={() => { void perform(() => props.completeV2Stage(workspace.workspaceId, stageState.revision, 'evaluation')) }}>确认并进入下一阶段</button><button type="button" disabled={busy} onClick={() => { setConfirming(false) }}>取消</button></div></div>}
+        {returning && <div className={css.confirm}><label htmlFor="evaluation-return-reason">返回方案阶段的原因</label><textarea id="evaluation-return-reason" value={reason} onChange={(event) => { setReason(event.target.value) }} placeholder="说明哪些方案、功能范围或权限需要重新确认。" /><button type="button" disabled={busy || !reason.trim()} onClick={() => { void perform(() => props.returnV2Stage(workspace.workspaceId, stageState.revision, reason.trim())) }}>确认返回上一阶段</button></div>}
       </>}
     </section>
     <details className={`${css.card} ${css.records}`} data-evaluation-records=""><summary><EvaluationIcon kind="file" />方案依据与项目记录 · 按阶段查看</summary>{records(openFile)}</details>

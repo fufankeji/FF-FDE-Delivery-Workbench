@@ -2,7 +2,7 @@
 
 import type { Context } from '@deepseek-ai/cordis'
 import { defineTool, type JsonValue, type ToolRunContext } from '@deepseek-ai/dsh-tools'
-import { createAgentContext, readSemanticWorkspace, reportVerticalSlice } from './state.ts'
+import { createAgentContext, queryAgentContext, readSemanticWorkspace, reportVerticalSlice } from './state.ts'
 import type { SemanticProviderConfig } from './types.ts'
 
 const render = (_args: unknown, value: unknown) => [{ type: 'text' as const, text: JSON.stringify(value, null, 2) }]
@@ -20,9 +20,10 @@ async function projectRoot(ctx: Context, exec: Pick<ToolRunContext, 'agent'>): P
 export function registerSemanticaTools(ctx: Context, config: SemanticProviderConfig): void {
   const context = defineTool({
     name: 'semantic_context_query',
-    description: 'Query the current FDE project validated knowledge graph and persist a bounded Agent context with provenance, time, confidence, schema version, graph revision, and permission scope. Never loads another project or the whole graph by default.',
+    description: 'Read the current project validated graph by an explicit questionId or seedNodeId. query describes the task, not semantic search. Default consumption is read-only and does not invalidate stage-four evidence. Use purpose=validation only to prepare a new stage-four slice; it replaces the validation context. Textual permission notes are not an authorization engine.',
     parameters: {
       query: { type: 'string', required: true, description: 'Concrete project task or question this context must support.' },
+      purpose: { type: 'string', enum: ['consume', 'validation'], description: 'Default consume is read-only. validation explicitly prepares a new stage-four slice and invalidates the previous slice.' },
       questionId: { type: 'string', description: 'Optional published competency-question id.' },
       seedNodeId: { type: 'string', description: 'Optional exact current-project graph node id.' },
       maxDepth: { type: 'integer', description: 'Bounded graph depth from 0 to 3; default 1.' },
@@ -30,12 +31,14 @@ export function registerSemanticaTools(ctx: Context, config: SemanticProviderCon
     output: { schema: { type: 'object', additionalProperties: true }, render },
     async execute(args, exec) {
       const root = await projectRoot(ctx, exec)
-      const state = await createAgentContext(root, config, {
+      const input = {
         query: args.query,
         ...(args.questionId === undefined ? {} : { questionId: args.questionId }),
         ...(args.seedNodeId === undefined ? {} : { seedNodeId: args.seedNodeId }),
-        maxDepth: Math.max(0, Math.min(3, args.maxDepth ?? 1)),
-      })
+        maxDepth: args.maxDepth ?? 1,
+      }
+      if (args.purpose !== 'validation') return jsonObject(await queryAgentContext(root, config, input))
+      const state = await createAgentContext(root, config, input)
       if (state.context === undefined) throw new Error('Semantica 未返回 Agent Context。')
       return jsonObject(state.context)
     },

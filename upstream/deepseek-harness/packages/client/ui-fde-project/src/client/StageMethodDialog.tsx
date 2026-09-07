@@ -59,7 +59,7 @@ function fallbackAnswerGroups(answers: readonly string[]): readonly StageSkillCa
   return [
     { label: '事实与责任', tone: 'identity', answers: answers.slice(0, 2) },
     { label: '流程与证据', tone: 'flow', answers: answers.slice(2, 4) },
-    { label: '价值与止损', tone: 'value', answers: answers.slice(4) },
+    { label: '收益与停止条件', tone: 'value', answers: answers.slice(4) },
   ].filter(group => group.answers.length > 0) as readonly StageSkillCatalogAnswerGroup[]
 }
 
@@ -201,7 +201,7 @@ function CoreOverview({ method, stageIndex, onInspectArtifact }: {
       </div>
       <div className={css.decisionCallout} data-method-decision=""><DecisionIcon /><div><strong>这些判断只形成候选结论</strong><p>方法帮助整理事实与建议，但是否进入下一阶段仍由 FDE 人工确认。</p></div></div>
     </TimelineSection>}
-    {method.artifacts !== undefined && <TimelineSection number="03" eyebrow="候选产物" title={`最终形成 ${String(method.artifacts.length)} 份候选记录`} subtitle="不是完成状态，也不代表已经通过人工确认">
+    {method.artifacts !== undefined && <TimelineSection number="03" eyebrow="待审核记录" title={`最终形成 ${String(method.artifacts.length)} 份候选记录`} subtitle="不是完成状态，也不代表已经通过人工确认">
       {requiredArtifacts.length > 0 && <ArtifactGroup label={`必备 · ${String(requiredArtifacts.length)}`} artifacts={requiredArtifacts} required onInspect={onInspectArtifact} />}
       {optionalArtifacts.length > 0 && <ArtifactGroup label={`按需 · ${String(optionalArtifacts.length)}`} artifacts={optionalArtifacts} onInspect={onInspectArtifact} />}
     </TimelineSection>}
@@ -216,16 +216,16 @@ function SupportingOverview({ method, stageIndex, role }: {
   const conditional = role === 'conditional'
   return <div className={css.methodOverview} data-template={role}>
     <UsageSection method={method} stageIndex={stageIndex} role={role} />
-    <TimelineSection number="02" eyebrow={conditional ? '边界处理' : '执行职责'} title={conditional ? '发生冲突后，怎样形成新的边界候选' : '这项能力在阶段中负责什么'} subtitle={conditional ? '先保留原始目标和历史，再登记改变边界的新事实。' : '围绕当前证据缺口开展工作，不取代阶段核心判断。'}>
+    <TimelineSection number="02" eyebrow={conditional ? '边界处理' : '执行职责'} title={conditional ? '项目条件变化后，如何提出范围调整' : '这项能力在阶段中负责什么'} subtitle={conditional ? '先保留原始目标和历史，再登记改变边界的新事实。' : '围绕当前证据缺口开展工作，不取代阶段核心判断。'}>
       <div className={css.responsibilityCallout}><GroupIcon tone={conditional ? 'value' : 'flow'} /><p>{method.description}</p></div>
       {conditional && <ol className={css.boundarySteps}>
         <li><i>01</i><span><strong>保留原始边界</strong><small>不删除原目标、来源和当时假设。</small></span></li>
         <li><i>02</i><span><strong>登记触发冲突</strong><small>明确新事实怎样影响成功标准、风险或停止条件。</small></span></li>
-        <li><i>03</i><span><strong>提出调整候选</strong><small>记录新边界、安全回退和有权决定的人。</small></span></li>
+        <li><i>03</i><span><strong>提出调整方案</strong><small>记录新边界、安全回退和有权决定的人。</small></span></li>
       </ol>}
     </TimelineSection>
-    <TimelineSection number="03" eyebrow={conditional ? '人工决定' : '协同边界'} title={conditional ? '由有权负责人接受或拒绝调整' : '把结果交回阶段核心方法继续判断'}>
-      <div className={css.decisionCallout} data-method-decision="" data-tone={conditional ? 'warning' : 'business'}><DecisionIcon /><div><strong>{conditional ? '不会直接改写项目边界' : '不会独立推进项目阶段'}</strong><p>{conditional ? '没有可靠证据或有权决定的人时，调整保持为待处理候选。' : '能力只贡献有来源的事实、线索或简报；阶段结论仍回到核心方法，并由 FDE 人工决定。'}</p></div></div>
+    <TimelineSection number="03" eyebrow={conditional ? '人工决定' : '工作分工'} title={conditional ? '由有权负责人接受或拒绝调整' : '把结果交回阶段核心方法继续判断'}>
+      <div className={css.decisionCallout} data-method-decision="" data-tone={conditional ? 'warning' : 'business'}><DecisionIcon /><div><strong>{conditional ? '不会直接改写项目边界' : '不会独立推进项目阶段'}</strong><p>{conditional ? '没有可靠证据或有权决定的人时，调整方案保持待确认。' : '能力只贡献有来源的事实、线索或简报；阶段结论仍回到核心方法，并由 FDE 人工决定。'}</p></div></div>
     </TimelineSection>
   </div>
 }
@@ -263,8 +263,8 @@ export function StageMethodDialog({ method, methods, stageIndex, onClose, onSele
         {tab === 'overview' && (role === 'core' ? <CoreOverview method={method} stageIndex={stageIndex} onInspectArtifact={() => { setTab('definition') }} /> : <SupportingOverview method={method} stageIndex={stageIndex} role={role} />)}
 
         {tab === 'orchestration' && <div className={css.orchestration}>
-          <section className={css.driver}><span>核心驱动</span><strong>{method.label}</strong><code>{method.id}</code><p>Agent 根据当前证据缺口按需协同；这里展示的是能力目录，不代表本次运行已经调用。</p></section>
-          {method.workflow !== undefined && <section className={css.workflow}><header><span>它如何工作</span><h3>持续回到事实和候选判断</h3></header><ol>{method.workflow.map((step, index) => <li key={step}><i>{index + 1}</i><span>{step}</span></li>)}</ol></section>}
+          <section className={css.driver}><span>主要工作方法</span><strong>{method.label}</strong><code>{method.id}</code><p>Agent 根据当前证据缺口按需协同；这里展示的是能力目录，不代表本次运行已经调用。</p></section>
+          {method.workflow !== undefined && <section className={css.workflow}><header><span>它如何工作</span><h3>核对事实并形成建议</h3></header><ol>{method.workflow.map((step, index) => <li key={step}><i>{index + 1}</i><span>{step}</span></li>)}</ol></section>}
           {method.collaborators !== undefined && <section className={css.collaborators}><header><span>根据证据缺口按需协同</span><h3>点击能力查看中文核心定义</h3></header><div>{method.collaborators.map(collaborator => {
             const related = methods.find(item => item.id === collaborator.id)
             return <button key={collaborator.id} type="button" data-role={collaborator.role} disabled={related === undefined} onClick={() => { if (related !== undefined) onSelectMethod(related) }}>
@@ -276,12 +276,12 @@ export function StageMethodDialog({ method, methods, stageIndex, onClose, onSele
 
         {tab === 'example' && method.example !== undefined && <div className={css.example}>
           <header><span>方法示例</span><h3>{method.example.title}</h3><p>{method.example.summary}</p><b>示例不代表当前项目已经执行</b></header>
-          <ol>{method.example.steps.map((step, index) => <li key={step.batch}><i>{index + 1}</i><article><span>{step.batch}</span><h4>{step.input}</h4><p>{step.finding}</p><div>{step.skills.map(skill => <b key={skill}>{skill}</b>)}</div><footer>候选产物：<strong>{step.output}</strong></footer></article></li>)}</ol>
+          <ol>{method.example.steps.map((step, index) => <li key={step.batch}><i>{index + 1}</i><article><span>{step.batch}</span><h4>{step.input}</h4><p>{step.finding}</p><div>{step.skills.map(skill => <b key={skill}>{skill}</b>)}</div><footer>待审核记录：<strong>{step.output}</strong></footer></article></li>)}</ol>
         </div>}
 
         {tab === 'references' && method.references !== undefined && <div className={css.references}>
           <header><span>上游资料库</span><h3>方法引用不等于每次都加载进模型上下文</h3><p>这里只展示固定版本中被核心方法引用的资料；实际加载情况以运行轨迹为准。</p></header>
-          {([['method', '方法与 Playbook'], ['artifact', 'Artifact 模板'], ['control', '模式与控制']] as const).map(([category, label]) => {
+          {([['method', '方法与操作手册'], ['artifact', '交付文件模板'], ['control', '模式与控制']] as const).map(([category, label]) => {
             const references = method.references?.filter(reference => reference.category === category) ?? []
             if (references.length === 0) return null
             return <section key={category}><header><h4>{label}</h4><b>{references.length}</b></header><div>{references.map(reference => <a key={reference.path} href={reference.url} target="_blank" rel="noreferrer"><ReferenceIcon kind={reference.kind} /><span><strong>{reference.label}</strong><small>{reference.purpose}</small><code>{reference.path}</code></span><em>{referenceAction(reference)} ↗</em></a>)}</div></section>
@@ -289,13 +289,13 @@ export function StageMethodDialog({ method, methods, stageIndex, onClose, onSele
         </div>}
 
         {tab === 'definition' && <div className={css.definitionTab}>
-          <section className={css.definition}><span>中文 Adapter 完整定义</span><MarkdownText text={method.content} /></section>
+          <section className={css.definition}><span>工作方法说明（中文）</span><MarkdownText text={method.content} /></section>
           <details className={css.technical}><summary>技术信息</summary><dl>
             <div><dt>Skill</dt><dd><code>{method.id}</code></dd></div><div><dt>来源仓库</dt><dd><code>{source.repository}</code></dd></div>
-            {source.commit !== undefined && <div><dt>固定 Commit</dt><dd><code>{source.commit}</code></dd></div>}
-            {method.license !== undefined && <div><dt>License</dt><dd>{method.license}</dd></div>}
+            {source.commit !== undefined && <div><dt>源码提交版本</dt><dd><code>{source.commit}</code></dd></div>}
+            {method.license !== undefined && <div><dt>许可证</dt><dd>{method.license}</dd></div>}
             {method.sourceLanguage !== undefined && <div><dt>上游语言</dt><dd>英文</dd></div>}
-            {method.adapterLanguage !== undefined && <div><dt>产品 Adapter</dt><dd>简体中文</dd></div>}
+            {method.adapterLanguage !== undefined && <div><dt>产品适配说明</dt><dd>简体中文</dd></div>}
           </dl>{method.sourceUrl !== undefined && <a href={method.sourceUrl} target="_blank" rel="noreferrer">查看固定版本上游来源 ↗</a>}</details>
         </div>}
       </div>

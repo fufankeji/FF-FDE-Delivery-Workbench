@@ -41,7 +41,7 @@ describe('delivery stage workbenches', () => {
         items: [{ ...record, id: 'signal-real', category: 'signal', title: 'ISSUE-72 · 客户长文本', summary: '模拟三天收到 5 条反馈；仅限导出显示，不扩张执行权限。', owner: '客户产品负责人' }, record],
       },
     }} />)
-    const signals = screen.getByRole('region', { name: '改进信号表' })
+    const signals = screen.getByRole('region', { name: '运行问题与反馈表' })
     expect(within(signals).getByText('模拟三天收到 5 条反馈')).toBeTruthy()
     expect(within(signals).getByText('仅限导出显示，不扩张执行权限。')).toBeTruthy()
     expect(screen.queryByText('IMP-001')).toBeNull()
@@ -62,7 +62,7 @@ describe('delivery stage workbenches', () => {
     expect(screen.queryByRole('button', { name: /在 Agent 中处理/ })).toBeNull()
     expect(screen.queryByRole('button', { name: '评审本轮改进' })).toBeNull()
     expect((screen.getByRole('button', { name: '查看改进与验证记录' }) as HTMLButtonElement).disabled).toBe(true)
-    expect(screen.getByText('等待信号与发现证据')).toBeTruthy()
+    expect(screen.getByText('等待运行问题与反馈证据')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: '返回当前阶段' }))
     expect(supplied.props.returnToCurrentStage).toHaveBeenCalledWith('w1')
   })
@@ -153,7 +153,7 @@ describe('delivery stage workbenches', () => {
     expect(screen.queryByText('56')).toBeNull()
     expect(screen.getByText('记录中的恢复用时')).toBeTruthy()
     expect(screen.getByText('customer-r3')).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: '复制图谱修订' }))
+    fireEvent.click(screen.getByRole('button', { name: '复制图谱版本' }))
     await waitFor(() => expect(copy).toHaveBeenCalledWith('sha256:customer-revision'))
     await screen.findByRole('status')
     fireEvent.click(screen.getByRole('button', { name: '详情' }))
@@ -217,7 +217,7 @@ describe('delivery stage workbenches', () => {
     expect((screen.getByRole('button', { name: '提交 FDE 评审' }) as HTMLButtonElement).disabled).toBe(true)
     fireEvent.click(screen.getByRole('button', { name: '在 Agent 中处理 ↗' }))
     expect(props.props.prepareStageDraft).toHaveBeenCalledWith('s1', expect.stringContaining('.fde/stages/pilot.json'))
-    expect(screen.queryByText('项目语义依赖')).toBeNull()
+    expect(screen.queryByText('知识图谱接入与版本')).toBeNull()
   })
   it.each(['pilot', 'production'] as const)('retains explicit confirmation and reasoned return for current %s', async stage => {
     const props = input(stage, false, true)

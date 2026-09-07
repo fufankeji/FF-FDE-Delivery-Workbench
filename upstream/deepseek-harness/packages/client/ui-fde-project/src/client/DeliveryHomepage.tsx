@@ -223,8 +223,8 @@ function DeliveryPreviewWindow() {
           <section className={css.deliveryPreviewWindow} aria-label="示例项目动态交付窗口" data-delivery-preview="">
             <header className={css.deliveryPreviewBar}>
               <span className={css.deliveryWindowDots} aria-hidden="true"><i /><i /><i /></span>
-              <span className={css.deliveryWindowTitle}>FF-FDE工作台 <i>/</i> 售后工单交付</span>
-              <span className={css.deliveryWindowStatus}><i aria-hidden="true" />证据实时同步</span>
+              <span className={css.deliveryWindowTitle}>FF-FDE工作台 <i>/</i> 项目交付流程</span>
+              <span className={css.deliveryWindowStatus}><i aria-hidden="true" />阶段与证据</span>
             </header>
 
             <div className={css.deliveryPreviewBody}>
@@ -241,7 +241,7 @@ function DeliveryPreviewWindow() {
                 </nav>
                 <div className={css.deliveryDomainOwner}>
                   <span>当前责任人</span>
-                  <strong><i aria-hidden="true">周</i> 周明 · 交付工程师</strong>
+                  <strong><i aria-hidden="true">责</i> 项目指定责任人</strong>
                 </div>
               </aside>
 
@@ -257,21 +257,21 @@ function DeliveryPreviewWindow() {
                 <div className={css.deliveryOutcomeFlow} aria-label="从客户需求到接受成果的示例">
                   <article data-kind="reality">
                     <header><span>现场事实</span><i aria-hidden="true">01</i></header>
-                    <strong>工单反复重分，<br />而非缺少聊天机器人</strong>
-                    <p>来自 12 次访谈与 15 个真实异常案例</p>
+                    <strong>确认实际业务问题，<br />而非预设技术答案</strong>
+                    <p>从当前项目的访谈、材料与观察中核对</p>
                     <footer><i aria-hidden="true" />现场事实已确认</footer>
                   </article>
                   <span className={css.deliveryFlowConnector} aria-hidden="true"><i /><b>→</b></span>
                   <article data-kind="mechanism">
                     <header><span>最小可行机制</span><i aria-hidden="true">02</i></header>
-                    <strong>规则路由 + 模型分类<br />+ 低置信度人工复核</strong>
+                    <strong>按业务选择实现机制<br />+ 明确人工复核边界</strong>
                     <p>自动化边界与回退路径已经明确</p>
                     <footer><i aria-hidden="true" />机制受控运行</footer>
                   </article>
                   <span className={css.deliveryFlowConnector} aria-hidden="true"><i /><b>→</b></span>
                   <article data-kind="accepted">
                     <header><span>客户验收结果</span><i aria-hidden="true">03</i></header>
-                    <strong>首派准确率 92%，<br />运营团队可以接管</strong>
+                    <strong>以项目指标证明结果，<br />由实际责任人验收</strong>
                     <p>验收证据、责任人与运行手册齐备</p>
                     <footer><i aria-hidden="true" />等待客户签署</footer>
                   </article>

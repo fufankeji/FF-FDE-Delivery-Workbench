@@ -30,6 +30,10 @@ Project snapshots read only the registered workspace records. No alternate demon
 
 The V2 Pilot, production and improvement snapshots include a read-only delivery projection. Version manifests and evidence pin project-local files by SHA-256; absent or changed evidence cannot satisfy the stage gate. Local, sandbox, Pilot, production and prior-source scopes remain distinct. Optional semantic references describe snapshot versus runtime integration, not automatic Semantica deployment. No projection runs services, approves customers, or modifies project data.
 
+## Record integrity and review limits
+
+Fixed stage artifacts must be nonblank regular files inside the registered project. Stage-three empty investigation sections need explicit `investigation.notApplicable.<section>={reason,evidenceRefs}`; unresolved facts, owners and action boundaries block review. Stage-five PASS records bind output evidence using `evidenceDigests` (relative path to SHA-256); unbound or changed evidence is stale. Stages and delivery projections preserve explicit `dataProvenance` and reject fixture/simulated inputs as real delivery proof. These are file-integrity and declaration checks, not an independent execution attestation or customer acceptance service; FDE must still inspect the actual run and approval evidence.
+
 ## Model Experience
 
 ### V2 stage-five evidence reader

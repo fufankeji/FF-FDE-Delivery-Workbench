@@ -13,6 +13,10 @@ The trusted same-origin read-only `GET /api/fde-stage/skills` route returns only
 The selected methods for V2 stages six through eight describe the delivery record format, file digests, evidence scope and optional semantic dependencies. Legacy six-stage records and earlier V2 method instructions are unchanged. The actual stage gate consumes the Host projection, not file counts or an Agent recommendation.
 
 
+## Lifecycle version isolation
+
+Reading an existing record does not migrate it. Legacy completion and return operations accept only legacy records; V2 operations require `lifecycleVersion=2` and an authoritative `v2Stage`. A cross-version operation fails without changing the revision. Prompt selection follows the same version instead of assigning the discovery prompt to every legacy project.
+
 ## Model Experience
 
 While an Agent belongs to a registered project in any active delivery stage, the model sees one short section naming the current stage, fixed output directory, available method routes, and prohibition on confirming or advancing the project. The complete bodies of only the selected Skills are loaded when the existing skill tool is invoked. The terminal `completed` state contributes no stage instruction. No stage-transition tool is registered.

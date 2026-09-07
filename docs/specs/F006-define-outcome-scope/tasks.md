@@ -115,3 +115,9 @@ updated: "2026-09-02"
 | 2026-09-02 | T008 corrected | 第二阶段人工测试包已拆成四份可逐步复制的 Prompt，并分别锁定基线、成功标准、交付边界、责任计划和 FDE 人工评审观察点 | README 仅保留测试说明与导航，不再代替逐步测试脚本 |
 | 2026-09-02 | T011 completed | 第二阶段 Skill、系统提示和四步人工测试提示均固定写入 `stage: definition`；当前联调项目状态已纠正，Host 快照显示三份记录齐备、`reviewReady: true`，两项 medium 待确认事项继续保留 | Host 仍严格拒绝 `stage: outcome-scope`；未放宽 high／critical 阻塞或 FDE 人工确认要求 |
 | 2026-09-04 | T012 completed | Host 严格校验阶段状态结构；内置 Skill 提供完整数组示例并要求产物重读后最后写状态；对象映射不再被静默当作有效进度 | 不替 Agent 或 FDE 消除真实阻塞，也不因三份文件存在而自动推进阶段 |
+
+## 2026-09-07 整改执行
+
+- 本轮范围：REQ-028, NFR-011；PSC-023, PSC-024；AC-F006-002 对应的通用性缺陷，不重新声明整个 Feature 完成。
+- 修改与验证计划：project/v2-stage-surface.ts；以 generality-gates.spec.ts 验证空文件、空白与跨项目符号链接。
+- 完成证据与未完成边界统一记录于 [通用性修复记录](../../verification/2026-09-07-platform-generality-repair.md)。本条不改变先前未完成任务的勾选状态。

@@ -105,7 +105,7 @@ const V2_STAGE_NAMES: Readonly<Record<FdeV2StageId, string>> = {
   discovery: '发现高价值问题',
   definition: '定义结果、范围与责任',
   investigation: '调查现场条件',
-  design: '设计方案与纵向切片',
+  design: '设计方案与业务流程验证',
   evaluation: '运行 PoC 与 Eval',
   pilot: '企业集成与受控试点',
   production: '生产采用与验收交接',
@@ -147,7 +147,7 @@ function stageLabel(stage: ProjectStageLoadState | undefined, loading: string, f
 const STAGE_SUMMARIES: Readonly<Record<FdeStageId, string>> = {
   requirements: '梳理客户资料、业务目标、约束与待确认问题，形成可确认的需求基线。',
   solution: '把确认需求转为项目方案、研发计划、验收方式和可审阅的系统架构。',
-  development: '按 Feature 推进实现，以任务证据、测试结果和收口产物记录真实研发状态。',
+  development: '按 Feature 推进实现，以任务证据、测试结果和交付交付文件记录真实研发状态。',
   validation: '围绕同一候选版本核对评估、测试、运行用量、风险和恢复证据。',
   pilot: '在客户环境进行受控试运行，记录运行问题、修复结果与上线边界。',
   handoff: '完成客户验收、交付材料、运行说明和后续责任移交。',
@@ -200,7 +200,7 @@ function projectNextAction(row: ProjectRow): ProjectNextAction {
     discovery: '补充现场事实并判断问题价值',
     definition: '确认结果、范围、责任与停止条件',
     investigation: '补齐数据、系统、权限与责任人信息',
-    design: '审阅实现方式、系统边界与纵向切片',
+    design: '审阅实现方式、系统边界与业务流程验证',
     evaluation: '运行验证并处理证据缺口',
     pilot: '核对集成准备并记录受控试点结果',
     production: '完成生产采用、客户验收与责任移交',
@@ -228,10 +228,10 @@ function projectProgressFacts(row: ProjectRow): ProjectProgressFacts {
     return { status: '正在同步项目阶段', evidence: `${String(row.sessions)} 个项目会话已登记。`, detail: '完成读取后再给出阶段建议。' }
   }
   if (row.surface?.status === 'error') {
-    return { status: '项目证据读取受阻', evidence: '阶段位置已读取，但产物与证据暂不可用。', detail: row.surface.message }
+    return { status: '项目证据读取受阻', evidence: '阶段位置已读取，但交付文件与证据暂不可用。', detail: row.surface.message }
   }
   if (row.surface === undefined || row.surface.status === 'loading') {
-    return { status: row.runningSessions > 0 ? 'AI FDE 正在执行' : '正在读取项目证据', evidence: `${String(row.sessions)} 个项目会话已登记。`, detail: row.runningSessions > 0 ? `${String(row.runningSessions)} 个会话正在运行。` : '读取完成后展示真实产物。' }
+    return { status: row.runningSessions > 0 ? 'AI FDE 正在执行' : '正在读取项目证据', evidence: `${String(row.sessions)} 个项目会话已登记。`, detail: row.runningSessions > 0 ? `${String(row.runningSessions)} 个会话正在运行。` : '读取完成后展示真实交付文件。' }
   }
   const surface = row.surface.value
   const currentV2 = row.stage.value.v2Stage ?? LEGACY_TO_V2_STAGE[row.stage.value.currentStage]
@@ -240,7 +240,7 @@ function projectProgressFacts(row: ProjectRow): ProjectProgressFacts {
   if (v2Surface !== undefined) {
     return {
       status: row.runningSessions > 0 ? `AI FDE 正在处理${V2_STAGE_NAMES[currentV2]}` : `${V2_STAGE_NAMES[currentV2]}记录已同步`,
-      evidence: `本阶段产物 ${String(v2Surface.presentCount)}/${String(v2Surface.requiredCount)}。`,
+      evidence: `本阶段交付文件 ${String(v2Surface.presentCount)}/${String(v2Surface.requiredCount)}。`,
       detail: v2Surface.blockers.filter(blocker => blocker.status === 'open').length === 0
         ? v2Surface.reviewReady ? '材料已达到 FDE 评审条件。' : '当前没有已登记阻塞，仍需完成阶段工作。'
         : `${String(v2Surface.blockers.filter(blocker => blocker.status === 'open').length)} 个问题待处理。`,
@@ -250,7 +250,7 @@ function projectProgressFacts(row: ProjectRow): ProjectProgressFacts {
   if (stage === 'requirements') {
     return {
       status: row.runningSessions > 0 ? 'AI FDE 正在整理需求' : '需求事实已同步',
-      evidence: `需求阶段产物 ${String(surface.requirements.presentCount)}/${String(surface.requirements.requiredCount)}。`,
+      evidence: `需求阶段交付文件 ${String(surface.requirements.presentCount)}/${String(surface.requirements.requiredCount)}。`,
       detail: `${String(row.sessions)} 个项目会话可继续补充客户上下文。`,
     }
   }
@@ -259,7 +259,7 @@ function projectProgressFacts(row: ProjectRow): ProjectProgressFacts {
     const architecture = surface.architecture === null ? '架构尚未形成' : `架构 ${surface.architecture.status === 'confirmed' ? '已确认' : '待确认'}`
     return {
       status: row.runningSessions > 0 ? 'AI FDE 正在完善方案' : '方案事实已同步',
-      evidence: solution === undefined ? '方案产物尚未读取。' : `方案阶段产物 ${String(solution.presentCount)}/${String(solution.requiredCount)}。`,
+      evidence: solution === undefined ? '方案交付文件尚未读取。' : `方案阶段交付文件 ${String(solution.presentCount)}/${String(solution.requiredCount)}。`,
       detail: architecture,
     }
   }
@@ -276,20 +276,20 @@ function projectProgressFacts(row: ProjectRow): ProjectProgressFacts {
   if (stage === 'validation') {
     return {
       status: row.runningSessions > 0 ? 'AI FDE 正在执行验证' : '验证事实已同步',
-      evidence: `必需指标 ${String(surface.validation.satisfiedMetricCount)}/${String(surface.validation.requiredMetricCount)}，阶段产物 ${String(surface.validation.artifacts.presentCount)}/${String(surface.validation.artifacts.requiredCount)}。`,
+      evidence: `必需指标 ${String(surface.validation.satisfiedMetricCount)}/${String(surface.validation.requiredMetricCount)}，阶段交付文件 ${String(surface.validation.artifacts.presentCount)}/${String(surface.validation.artifacts.requiredCount)}。`,
       detail: surface.validation.blockers.length === 0 ? '当前没有验证阻塞。' : `${String(surface.validation.blockers.length)} 个验证阻塞待处理。`,
     }
   }
   if (stage === 'pilot') {
     return {
       status: row.runningSessions > 0 ? 'AI FDE 正在记录试运行' : '试运行事实已同步',
-      evidence: `试运行产物 ${String(surface.deploymentTrial.artifacts.presentCount)}/${String(surface.deploymentTrial.artifacts.requiredCount)}。`,
+      evidence: `试运行交付文件 ${String(surface.deploymentTrial.artifacts.presentCount)}/${String(surface.deploymentTrial.artifacts.requiredCount)}。`,
       detail: surface.deploymentTrial.blockers.length === 0 ? '当前没有试运行阻塞。' : `${String(surface.deploymentTrial.blockers.length)} 个试运行阻塞待处理。`,
     }
   }
   return {
     status: row.runningSessions > 0 ? 'AI FDE 正在整理验收材料' : '验收移交事实已同步',
-    evidence: `验收移交产物 ${String(surface.acceptanceHandover.artifacts.presentCount)}/${String(surface.acceptanceHandover.artifacts.requiredCount)}。`,
+    evidence: `验收移交交付文件 ${String(surface.acceptanceHandover.artifacts.presentCount)}/${String(surface.acceptanceHandover.artifacts.requiredCount)}。`,
     detail: surface.acceptanceHandover.blockers.length === 0 ? '当前没有移交阻塞。' : `${String(surface.acceptanceHandover.blockers.length)} 个移交阻塞待处理。`,
   }
 }
@@ -555,7 +555,7 @@ function ProjectCurrentFocus({ row, sourceState, surfaceState, enterProject }: {
           <div><dt>阶段输入</dt><dd>{sources.length} 份资料 · {parsedSources} 份已识别</dd></div>
           <div><dt>固定记录</dt><dd>{present}/{required}</dd></div>
           <div><dt>未决阻塞</dt><dd>{blockers === 0 ? '未登记' : `${String(blockers)} 项`}</dd></div>
-          <div><dt>人工阶段门</dt><dd>{reviewReady ? '可申请评审' : '继续补齐证据'}</dd></div>
+          <div><dt>阶段评审</dt><dd>{reviewReady ? '可申请评审' : '继续补齐证据'}</dd></div>
         </dl>
       </div>
       <aside>
@@ -658,7 +658,7 @@ function ProjectV2Detail({ row, sourceState, surfaceState, returnToPrevious, ent
     : historical ? '阶段记录已由 FDE 确认' : reviewReady ? '本阶段已具备 FDE 评审条件' : '本阶段仍需补齐证据'
   const gateDetail = projectCompleted && viewedStage === currentStage
     ? '项目状态为“项目已完成”；已有证据仍可用于后续改进。'
-    : historical ? '该阶段已通过人工阶段门，记录保持可追溯。' : reviewReady ? '固定记录和阻塞条件已满足，等待 FDE 最终决定。' : `${String(reviewBlockers.length)} 项条件仍待处理。`
+    : historical ? '该阶段已通过阶段评审，记录保持可追溯。' : reviewReady ? '固定记录和阻塞条件已满足，等待 FDE 最终决定。' : `${String(reviewBlockers.length)} 项条件仍待处理。`
   const returnLabel = stageValue?.currentStage === 'completed' ? '重新打开项目' : '返回上一阶段'
   const canReturn = stageValue !== undefined && stageValue.currentStage !== 'requirements'
   return (
@@ -705,7 +705,7 @@ function ProjectV2Detail({ row, sourceState, surfaceState, returnToPrevious, ent
 
       <div className={css.projectV2Main} data-v2-detail-main="">
         <aside className={css.projectV2StageRail} data-v2-stage-rail="">
-          <header><span>阶段产物档案</span><h2>八阶段交付路径</h2><p>选择阶段，查看该阶段的真实记录与人工决定。</p></header>
+          <header><span>阶段交付文件档案</span><h2>八阶段交付路径</h2><p>选择阶段，查看该阶段的真实记录与人工决定。</p></header>
           <StageNavigator stage={row.stage} viewedStage={viewedStage} selectStage={setViewedStage} />
         </aside>
 
@@ -717,7 +717,7 @@ function ProjectV2Detail({ row, sourceState, surfaceState, returnToPrevious, ent
               <div><dt><ProjectStageFactIcon type="input" />阶段输入</dt><dd>{inputCount} 项</dd><small>{viewedStage === 'discovery' ? `${String(parsedSources)} 份已识别` : '来自上一阶段固定记录'}</small></div>
               <div><dt><ProjectStageFactIcon type="record" />固定记录</dt><dd>{presentCount} / {requiredCount}</dd><small>只统计可读取 Artifact</small></div>
               <div><dt><ProjectStageFactIcon type="blocker" />未决阻塞</dt><dd>{blockers.length}</dd><small>{blockers.length === 0 ? '当前未登记阻塞' : '等待处理或人工决定'}</small></div>
-              <div><dt><ProjectStageFactIcon type="gate" />人工阶段门</dt><dd>{historical ? '已通过' : reviewReady ? '可评审' : '待补证据'}</dd><small>只有 FDE 可以改变阶段</small></div>
+              <div><dt><ProjectStageFactIcon type="gate" />阶段评审</dt><dd>{historical ? '已通过' : reviewReady ? '可评审' : '待补证据'}</dd><small>只有 FDE 可以改变阶段</small></div>
             </dl>
           </header>
           <section className={css.projectV2EvidenceCard}>
@@ -748,9 +748,9 @@ function ProjectV2Detail({ row, sourceState, surfaceState, returnToPrevious, ent
             {workItems.length === 0 && <p>尚未读取到阶段工作项。</p>}
           </section>
           <section className={css.projectV2Artifacts}>
-            <header><h3>阶段产物</h3><strong>{presentCount} / {requiredCount}</strong></header>
+            <header><h3>阶段交付文件</h3><strong>{presentCount} / {requiredCount}</strong></header>
             <div>{artifacts.slice(0, 4).map(artifact => <article key={artifact.id} data-status={artifact.status}><i><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 2.5h7l4 4v11H5v-15Z" /><path d="M12 2.5v4h4M8 11h5M8 14h5" /></svg></i><span><strong>{artifact.title}</strong><small>{artifact.status === 'present' ? '已有文件' : artifact.required ? '待形成' : '按需形成'}</small></span>{artifact.status === 'present' && <b aria-label="已有文件">✓</b>}</article>)}</div>
-            {artifacts.length === 0 && <p>当前阶段尚未登记固定产物。</p>}
+            {artifacts.length === 0 && <p>当前阶段尚未登记固定交付文件。</p>}
           </section>
         </aside>
       </div>
@@ -824,7 +824,7 @@ function StageVisualSummary({ viewedStage, sourceState, surfaceState }: {
           </article>
           <article>
             <strong>{development?.closure.presentCount ?? 0}<small> / {development?.closure.requiredCount ?? 0}</small></strong>
-            <span>研发收口文件</span>
+            <span>研发交付文件</span>
           </article>
           <article data-warn={(development?.issues.length ?? 0) > 0 || undefined}>
             <strong>{development?.issues.length ?? 0}</strong><span>读取问题</span>
@@ -869,7 +869,7 @@ function StageVisualSummary({ viewedStage, sourceState, surfaceState }: {
           <li><span>03</span><strong>{evidenceReady}/5 组证据</strong></li>
           <li><span>04</span><strong>{pilot?.contract.issues.length ?? 0} 个问题</strong></li>
         </ol>
-        <p>{pilot?.contract.deploymentStatus === undefined ? '尚未建立试运行状态。' : `当前状态：${pilot.contract.deploymentStatus}；固定产物 ${String(pilot.artifacts.presentCount)}/${String(pilot.artifacts.requiredCount)}。`}</p>
+        <p>{pilot?.contract.deploymentStatus === undefined ? '尚未建立试运行状态。' : `当前状态：${pilot.contract.deploymentStatus}；固定交付文件 ${String(pilot.artifacts.presentCount)}/${String(pilot.artifacts.requiredCount)}。`}</p>
       </section>
     )
   }
@@ -893,7 +893,7 @@ function StageVisualSummary({ viewedStage, sourceState, surfaceState }: {
         </article>
         <article>
           <span>DOCS</span>
-          <strong>{handoff?.artifacts.presentCount ?? 0}/{handoff?.artifacts.requiredCount ?? 0} 固定产物</strong>
+          <strong>{handoff?.artifacts.presentCount ?? 0}/{handoff?.artifacts.requiredCount ?? 0} 固定交付文件</strong>
         </article>
         <article><span>OWNER</span><strong>{handoverComplete}/3 项移交</strong></article>
       </div>
@@ -1033,7 +1033,7 @@ function ProjectList({ rows, showProject, labels, enterProject }: {
                 <td>
                   {enterProject !== undefined
                     ? <div className={css.projectListActions}>
-                      <button className={css.projectListSecondaryAction} type="button" onClick={() => { showProject(row.workspaceId) }}>查看产物</button>
+                      <button className={css.projectListSecondaryAction} type="button" onClick={() => { showProject(row.workspaceId) }}>查看交付文件</button>
                       <button className={css.projectListAction} type="button" onClick={() => { enterProject(row.workspaceId) }}>
                         进入项目<span aria-hidden="true">→</span>
                       </button>
@@ -1112,7 +1112,7 @@ function ProjectAttentionCard({ row, priority, showProject, enterProject }: {
       <footer className={css.projectCompactFooter}>
         <time>{row.latestActivityAt === undefined ? '暂无会话更新' : `${formatActivityTime(row.latestActivityAt)} 更新`}</time>
         <div className={css.projectAttentionActions}>
-          <button type="button" onClick={() => { showProject(row.workspaceId) }}>查看产物</button>
+          <button type="button" onClick={() => { showProject(row.workspaceId) }}>查看交付文件</button>
           <button type="button" onClick={() => { enterProject(row.workspaceId) }}>进入项目 <span aria-hidden="true">→</span></button>
         </div>
       </footer>
@@ -1231,10 +1231,10 @@ function ArtifactPreview({ artifact, close, renderPreview }: {
 }) {
   return (
     <div className={css.artifactPreviewLayer} role="dialog" aria-label={`预览${artifact.title}`}>
-      <button type="button" className={css.artifactPreviewScrim} aria-label="关闭产物预览" onClick={close} />
+      <button type="button" className={css.artifactPreviewScrim} aria-label="关闭交付文件预览" onClick={close} />
       <section className={css.outputPreviewPanel}>
         <header className={css.previewHeader}>
-          <div><span className={css.previewEyebrow}>阶段产物 · 只读预览</span><h2>{artifact.title}</h2><span>{artifact.path}{artifact.bytes === undefined ? '' : ` · ${formatBytes(artifact.bytes)}`}</span></div>
+          <div><span className={css.previewEyebrow}>阶段交付文件 · 只读预览</span><h2>{artifact.title}</h2><span>{artifact.path}{artifact.bytes === undefined ? '' : ` · ${formatBytes(artifact.bytes)}`}</span></div>
           <div className={css.previewActions}>
             <a href={artifact.fileUrl} download={artifact.path.split('/').at(-1)}>下载原件</a>
             <button type="button" onClick={close}>关闭</button>
@@ -1327,7 +1327,7 @@ function DevelopmentOutputs({ workspaceId, currentStage, revision, development, 
             <span className={css.evidenceMiniTrack}><span style={{ width: development.core.requiredCount === 0 ? '0%' : `${String(development.core.presentCount / development.core.requiredCount * 100)}%` }} /></span>
           </div>
           <div>
-            <dt>项目开发收口</dt><dd>{development.closure.presentCount}/{development.closure.requiredCount}</dd>
+            <dt>项目开发交付</dt><dd>{development.closure.presentCount}/{development.closure.requiredCount}</dd>
             <span className={css.evidenceMiniTrack}><span style={{ width: development.closure.requiredCount === 0 ? '0%' : `${String(development.closure.presentCount / development.closure.requiredCount * 100)}%` }} /></span>
           </div>
         </dl>
@@ -1381,7 +1381,7 @@ function DevelopmentOutputs({ workspaceId, currentStage, revision, development, 
       </section>
       <section className={css.developmentSection}>
         <header>
-          <div><h3>项目开发收口产物</h3><p>三份文件齐备只表示可以提交；进入验证评估仍由 FDE 决定。</p></div>
+          <div><h3>项目开发交付交付文件</h3><p>三份文件齐备只表示可以提交；进入验证评估仍由 FDE 决定。</p></div>
           <strong>{development.closure.presentCount}/{development.closure.requiredCount}</strong>
         </header>
         <div className={`${css.outputList} ${css.evidenceList} ${css.closureEvidenceList}`}>{development.closure.artifacts.map(artifactButton)}</div>
@@ -1393,7 +1393,7 @@ function DevelopmentOutputs({ workspaceId, currentStage, revision, development, 
         ? <div className={css.stageGate}>
           {!confirming
             ? <>
-              <div><strong>由 FDE 决定是否进入验证评估</strong><p>{ready ? '三份研发收口产物已经齐备，请核对版本、测试/评估证据、运行恢复和剩余风险。' : '研发收口产物尚未齐备，请回到项目交付继续开发和更新文件。'}</p></div>
+              <div><strong>由 FDE 决定是否进入验证评估</strong><p>{ready ? '三份研发交付交付文件已经齐备，请核对版本、测试/评估证据、运行恢复和剩余风险。' : '研发交付交付文件尚未齐备，请回到项目交付继续开发和更新文件。'}</p></div>
               <button type="button" disabled={!ready || revision === undefined} onClick={() => { setConfirming(true); setError(undefined) }}>完成项目开发</button>
             </>
             : <>
@@ -1431,7 +1431,7 @@ function StageAvailability({ viewedStage, currentStage }: {
       <span>{future ? '后续阶段' : currentStage === viewedStage ? '当前阶段' : '阶段记录'}</span>
       <h2>{STAGE_NAMES[viewedStage]}</h2>
       <p>{STAGE_SUMMARIES[viewedStage]}</p>
-      <div><strong>{future ? '尚未开始' : '暂无可核对的阶段专属产物'}</strong><p>{future ? '进入该阶段后，页面只会展示项目真实产生的状态与证据。' : '当前读模型还没有该阶段的专属产物；请进入项目交付继续工作或查看已经开放的业务页面。'}</p></div>
+      <div><strong>{future ? '尚未开始' : '暂无可核对的阶段专属交付文件'}</strong><p>{future ? '进入该阶段后，页面只会展示项目真实产生的状态与证据。' : '当前尚未读取到该阶段的交付文件；请进入项目交付继续工作或查看已经开放的业务页面。'}</p></div>
     </section>
   )
 }
@@ -1492,7 +1492,7 @@ function ValidationOutputs({
   return (
     <section className={css.outputRoot}>
       <header className={css.outputHeader}>
-        <div><h2>评估方案、执行与产物</h2><p>从已确认文档建立评估方案，由 FDE 确认后再执行；结果只读取真实指标与项目内证据。</p></div>
+        <div><h2>评估方案、执行与交付文件</h2><p>从已确认文档建立评估方案，由 FDE 确认后再执行；结果只读取真实指标与项目内证据。</p></div>
         <strong>{validation.satisfiedMetricCount}/{validation.requiredMetricCount} 个必需指标</strong>
       </header>
       <div className={css.developmentSummary}>
@@ -1500,7 +1500,7 @@ function ValidationOutputs({
         <div><span>验证环境</span><strong>{validation.contract.environment ?? '待登记'}</strong></div>
         <div><span>数据/用例</span><strong>{validation.contract.datasets.length}</strong></div>
         <div><span>方案确认</span><strong>{validation.planApproval.status === 'confirmed' ? '已确认' : validation.planApproval.status === 'stale' ? '需重新确认' : validation.planReady ? '待 FDE 确认' : '方案未就绪'}</strong></div>
-        <div><span>阶段产物</span><strong>{validation.artifacts.presentCount}/{validation.artifacts.requiredCount}</strong></div>
+        <div><span>阶段交付文件</span><strong>{validation.artifacts.presentCount}/{validation.artifacts.requiredCount}</strong></div>
       </div>
       {validation.contract.status !== 'ready' && (
         <div className={css.developmentIssues}><p>{validation.contract.message ?? '验证合同尚未就绪。'}</p></div>
@@ -1677,7 +1677,7 @@ function ValidationOutputs({
       )}
       <section className={css.developmentSection}>
         <header>
-          <div><h3>验证评估阶段产物</h3><p>验证计划、验证报告和验证基线齐备只表示可以提交；进入部署试运行仍由 FDE 决定。</p></div>
+          <div><h3>验证评估阶段交付文件</h3><p>验证计划、验证报告和验证基线齐备只表示可以提交；进入部署试运行仍由 FDE 决定。</p></div>
           <strong>{validation.artifacts.presentCount}/{validation.artifacts.requiredCount}</strong>
         </header>
         <div className={css.outputList}>{validation.artifacts.items.map((artifact) => {
@@ -1719,7 +1719,7 @@ function ValidationOutputs({
         ? <div className={css.stageGate}>
           {!confirming
             ? <>
-              <div><strong>由 FDE 决定是否进入部署试运行</strong><p>{validation.gateReady ? '验证合同、必需指标证据和三份固定产物已经齐备，请核对候选版本、接受风险和剩余问题。' : '当前仍有验证阻塞项，请继续执行验证并更新合同和阶段产物。'}</p></div>
+              <div><strong>由 FDE 决定是否进入部署试运行</strong><p>{validation.gateReady ? '验证合同、必需指标证据和三份固定交付文件已经齐备，请核对候选版本、接受风险和剩余问题。' : '当前仍有验证阻塞项，请继续执行验证并更新合同和阶段交付文件。'}</p></div>
               <button type="button" disabled={!validation.gateReady || revision === undefined} onClick={() => { setConfirming(true); setError(undefined) }}>完成验证评估</button>
             </>
             : <>
@@ -1831,7 +1831,7 @@ function DeploymentTrialOutputs({
   return (
     <section className={css.outputRoot}>
       <header className={css.outputHeader}>
-        <div><span className={css.sectionEyebrow}>部署试运行 · 真实环境</span><h2>版本、环境与运行证据</h2><p>本地启动不等于部署完成；页面只汇总当前项目记录的授权、证据、问题和固定产物。</p></div>
+        <div><span className={css.sectionEyebrow}>部署试运行 · 真实环境</span><h2>版本、环境与运行证据</h2><p>本地启动不等于部署完成；页面只汇总当前项目记录的授权、证据、问题和固定交付文件。</p></div>
         <strong>{deploymentTrial.gateReady ? '可提交' : `${String(deploymentTrial.blockers.length)} 个阻塞`}</strong>
       </header>
       <div className={css.developmentSummary}>
@@ -1840,7 +1840,7 @@ function DeploymentTrialOutputs({
         <div><span>环境授权</span><strong>{deploymentTrial.contract.environment?.authorized === true ? '已授权' : '未授权'}</strong></div>
         <div><span>试运行状态</span><strong>{deploymentTrial.contract.deploymentStatus ?? '未建立'}</strong></div>
         <div><span>证据齐备</span><strong>{evidenceReady}/5</strong></div>
-        <div><span>阶段产物</span><strong>{deploymentTrial.artifacts.presentCount}/{deploymentTrial.artifacts.requiredCount}</strong></div>
+        <div><span>阶段交付文件</span><strong>{deploymentTrial.artifacts.presentCount}/{deploymentTrial.artifacts.requiredCount}</strong></div>
       </div>
       {deploymentTrial.contract.status !== 'ready' && <div className={css.developmentIssues}>
         <p>{deploymentTrial.contract.message ?? '部署试运行状态尚未就绪。'}</p>
@@ -1851,8 +1851,8 @@ function DeploymentTrialOutputs({
             <div>
               <strong>确认目标环境与试运行结论</strong>
               <p>{deploymentTrial.confirmationReady
-                ? '五类证据、问题决定和四份产物已经齐备。请由 FDE 明确确认当前目标环境授权与本次试运行结论。'
-                : '当前仍有运行证据、问题决定或阶段产物缺口，暂不能确认试运行结论。'}</p>
+                ? '五类证据、问题决定和四份交付文件已经齐备。请由 FDE 明确确认当前目标环境授权与本次试运行结论。'
+                : '当前仍有运行证据、问题决定或阶段交付文件缺口，暂不能确认试运行结论。'}</p>
             </div>
             <button
               type="button"
@@ -1936,7 +1936,7 @@ function DeploymentTrialOutputs({
           ))}</div>}
       </section>
       <CloseoutArtifactSection
-        title="部署试运行阶段产物"
+        title="部署试运行阶段交付文件"
         description="四份文件齐备只表示可以提交，不能代替真实运行证据和 FDE 决定。"
         artifacts={deploymentTrial.artifacts}
         selectedArtifactId={selectedArtifactId}
@@ -1959,7 +1959,7 @@ function DeploymentTrialOutputs({
               <div>
                 <strong>由 FDE 决定是否进入验收移交</strong>
                 <p>{deploymentTrial.gateReady
-                  ? '版本、环境授权、五类证据、问题决定和四份产物均已齐备，请再次核对。'
+                  ? '版本、环境授权、五类证据、问题决定和四份交付文件均已齐备，请再次核对。'
                   : '当前仍有部署试运行阻塞项，请继续补证或处理问题。'}</p>
               </div>
               <button
@@ -1971,7 +1971,7 @@ function DeploymentTrialOutputs({
             : <>
               <div>
                 <strong>确认进入验收移交</strong>
-                <p>我已核对候选版本、目标环境授权、部署与回滚证据、试运行观察、客户反馈、问题决定及四份阶段产物。</p>
+                <p>我已核对候选版本、目标环境授权、部署与回滚证据、试运行观察、客户反馈、问题决定及四份阶段交付文件。</p>
               </div>
               <div className={css.stageGateActions}>
                 <button type="button" disabled={submitting} onClick={() => { setConfirming(false); setError(undefined) }}>返回核对</button>
@@ -2087,7 +2087,7 @@ function AcceptanceHandoverOutputs({
     <section className={css.outputRoot}>
       <header className={css.outputHeader}>
         <div>
-          <span className={css.sectionEyebrow}>验收移交 · 项目收口</span>
+          <span className={css.sectionEyebrow}>验收移交 · 项目交付</span>
           <h2>最终交付与责任移交</h2>
           <p>统一引用前阶段事实和外部制品位置，不复制第二套结果；项目完成仍由 FDE 最终确认。</p>
         </div>
@@ -2100,7 +2100,7 @@ function AcceptanceHandoverOutputs({
         <div><span>验收条件</span><strong>{contract.conditions.filter(item => item.status === 'open').length} 项待决定</strong></div>
         <div><span>责任移交</span><strong>{handoverFacts.filter(([, ready]) => ready).length}/3</strong></div>
         <div>
-          <span>阶段产物</span>
+          <span>阶段交付文件</span>
           <strong>{acceptanceHandover.artifacts.presentCount}/{acceptanceHandover.artifacts.requiredCount}</strong>
         </div>
       </div>
@@ -2287,7 +2287,7 @@ function AcceptanceHandoverOutputs({
           ? <div><span>移交状态</span><strong>待登记</strong></div>
           : handoverFacts.map(([label, ready]) => <div key={label}><span>{label}</span><strong>{ready ? '已完成' : '未完成'}</strong></div>)}</div>
       </section>
-      <CloseoutArtifactSection title="验收移交阶段产物" description="交付物清单、验收报告、运维使用手册和移交记录共同索引最终事实。" artifacts={acceptanceHandover.artifacts} selectedArtifactId={selectedArtifactId} selectArtifact={setSelectedArtifactId} />
+      <CloseoutArtifactSection title="验收移交阶段交付文件" description="交付物清单、验收报告、运维使用手册和移交记录共同记录最终交付情况。" artifacts={acceptanceHandover.artifacts} selectedArtifactId={selectedArtifactId} selectArtifact={setSelectedArtifactId} />
       {selectedArtifact === undefined
         ? <div className={css.outputPreviewHint}>选择一份“已有文件”查看只读内容。</div>
         : <ArtifactPreview
@@ -2305,7 +2305,7 @@ function AcceptanceHandoverOutputs({
               <div>
                 <strong>由 FDE 决定是否完成项目</strong>
                 <p>{acceptanceHandover.gateReady
-                  ? '验收结论、最终交付物、条件项、责任移交和四份产物均已齐备，请进行最终核对。'
+                  ? '验收结论、最终交付物、条件项、责任移交和四份交付文件均已齐备，请进行最终核对。'
                   : '当前仍有验收移交阻塞项，不能完成项目。'}</p>
               </div>
               <button
@@ -2528,7 +2528,7 @@ function StageOutputs({
         <div className={css.stageGate}>
           {!confirming
             ? <>
-              <div><strong>由 FDE 决定是否进入下一阶段</strong><p>{ready ? '三份标准产物已经齐备，请先核对内容和未决事项。' : '产物尚未齐备，请回到项目交付继续对话和更新文件。'}</p></div>
+              <div><strong>由 FDE 决定是否进入下一阶段</strong><p>{ready ? '三份标准交付文件已经齐备，请先核对内容和未决事项。' : '交付文件尚未齐备，请回到项目交付继续对话和更新文件。'}</p></div>
               <button type="button" disabled={!ready || revision === undefined} onClick={() => { setConfirming(true); setError(undefined) }}>完成需求调研</button>
             </>
             : <>
@@ -2735,14 +2735,14 @@ function ProjectDetail({
       <ProjectCurrentFocus row={row} sourceState={sourceState} surfaceState={surfaceState} enterProject={enterProject} />
       <div className={css.stageExperience}>
         <aside className={css.stageRail}>
-          <header><span>交付档案</span><h2>阶段产物档案</h2><p>按已接入的产物类型查看资料、记录与人工确认。</p></header>
+          <header><span>交付档案</span><h2>阶段交付文件档案</h2><p>按已接入的交付文件类型查看资料、记录与人工确认。</p></header>
           <StageNavigator stage={row.stage} viewedStage={viewedProjectStage} selectStage={selectViewedProjectStage} />
         </aside>
         <div className={css.stageCanvas}>
           <section className={css.stageWorkspaceHeader} data-state={viewedProjectState}>
             <span className={css.stageWorkspaceOrdinal} aria-hidden="true">{String(viewedProjectIndex + 1).padStart(2, '0')}</span>
             <div className={css.stageWorkspaceCopy}>
-              <span>正在查看 · 阶段产物</span>
+              <span>正在查看 · 阶段交付文件</span>
               <h2>{V2_STAGE_NAMES[viewedProjectStage]}</h2>
               <p>{V2_STAGE_SUMMARIES[viewedProjectStage]}</p>
             </div>
@@ -3097,7 +3097,7 @@ export function ProjectProgressOverlay({
               <button type="button" className={css.projectNotification} title={`${attentionRows.length} 个项目待处理`} aria-label={`查看 ${attentionRows.length} 个待处理项目`} onClick={() => { setProjectScope('attention'); setProjectPage(1); setProjectQuery(''); showProjectOverview() }}>
                 <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6.5 9.5a5.5 5.5 0 0 1 11 0c0 6 2.5 6 2.5 7H4c0-1 2.5-1 2.5-7ZM10 19h4" /></svg>
               </button>
-              <details className={css.projectCenterHelp}><summary aria-label="项目中心帮助"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" /><path d="M9.8 9a2.4 2.4 0 1 1 3.15 2.28c-.67.28-.95.72-.95 1.47v.25M12 16.5h.01" /></svg></summary><div><strong>项目中心帮助</strong><p>查看产物可审阅项目记录；进入项目可继续交付。项目超过 6 个时支持搜索与分页，筛选和排序不会修改项目数据。</p></div></details>
+              <details className={css.projectCenterHelp}><summary aria-label="项目中心帮助"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" /><path d="M9.8 9a2.4 2.4 0 1 1 3.15 2.28c-.67.28-.95.72-.95 1.47v.25M12 16.5h.01" /></svg></summary><div><strong>项目中心帮助</strong><p>查看交付文件可审阅项目记录；进入项目可继续交付。项目超过 6 个时支持搜索与分页，筛选和排序不会修改项目数据。</p></div></details>
               <span className={css.projectLocalIdentity} title="本地工作区"><img src="/ff-brand/ff-logo.png" alt="FF - FDE 交付工作台 Logo" /><span>本地工作区</span></span>
             </div>
           </header>

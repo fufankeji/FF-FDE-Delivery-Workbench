@@ -1,0 +1,25 @@
+# Shipped Web composition with isolated test storage and an ephemeral port.
+- id: web-startup
+  disabled: true
+- id: web-runtime
+  disabled: true
+- id: webserver
+  inject: []
+  config:
+    host: 127.0.0.1
+    port: 0
+- id: connection
+  inject: []
+  config:
+    trustedHosts: []
+- id: modules
+  disabled: true
+- id: client-hmr
+  disabled: true
+- id: fde-workbench
+  disabled: true
+- id: session-telemetry-otel
+  disabled: true
+- id: skill-filesystem
+  config:
+    watch: false

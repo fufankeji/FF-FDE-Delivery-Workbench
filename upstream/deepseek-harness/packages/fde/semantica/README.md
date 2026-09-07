@@ -24,7 +24,15 @@ maxSourceBytes: 2097152
 maxSources: 12
 ```
 
-The bundled Python bridge uses Semantica's SDK for provider health, extraction, ontology proposal and validation, graph construction, graph validation, and bounded graph queries. Every operation is explicit and separately recorded. A successful process exit is not interpreted as schema quality, graph validity, or vertical-slice success.
+The bundled Python bridge uses Semantica's SDK for provider health, extraction, ontology proposal and validation, graph construction, and graph validation. Bounded task queries run in the adapter against that graph. Every operation is explicit and separately recorded. A successful process exit is not interpreted as schema quality, graph validity, or vertical-slice success.
+
+The current pattern-based pipeline requires no model API key. To run the real SDK integration checks, set `FDE_SEMANTICA_TEST_PYTHON` to an interpreter that can import Semantica `0.6.7`; otherwise those tests skip. This test setting does not configure the running Web service, which uses `FDE_SEMANTICA_PYTHON`. Supplying a model key alone does not enable LLM extraction in this adapter.
+
+```sh
+FDE_SEMANTICA_TEST_PYTHON=/path/to/semantica/.venv/bin/python \
+  corepack pnpm exec vitest run packages/fde/semantica/tests/semantica.spec.ts \
+  packages/fde/semantica/tests/sdk-generality.spec.ts -t 'real.*SDK'
+```
 
 ## Project data and operations
 
@@ -46,9 +54,9 @@ All actions require a trusted local request, an existing WorkspaceId, and bounde
 
 ## Agent integration
 
-The package registers two stable model tools. `semantic_context_query` queries only the current project's independently validated graph and persists a bounded context containing relevant entities, relationships, provenance, time, confidence, schema version, graph revision, and permission scope. `semantic_slice_report` records the observed result of a slice that the visible Agent or FDE actually ran; it requires project-local evidence and cannot manufacture execution or submit an FDE decision.
+The package registers two stable model tools. `semantic_context_query` defaults to read-only consumption, leaving stage-four files, slice and FDE decision unchanged; its result is logged by Harness. Explicit `purpose=validation` creates replacement design context and invalidates the previous slice. `semantic_slice_report` saves the caller's reported result with nonblank project-local evidence; it does not execute the task or independently certify the claim and cannot submit an FDE decision.
 
-The context operation requires a published competency question or exact seed entity and caps traversal depth at three. It does not inject the entire graph into the model. The slice report must cite ordinary files that currently exist inside the same project; the ontology route additionally requires the current context run id.
+The context operation requires a published competency question or exact seed entity and caps traversal depth at three. `query` describes the task; it is not free-text semantic search. Bound-source, confidence and declared valid-time filtering precedes traversal. Textual rules and `permissionScope` are instructions, not an executed authorization policy. The ontology slice must cite the current validation-context run id, not an ordinary consumption query.
 
 ## Model Experience
 
@@ -68,7 +76,8 @@ The tool schemas are stable across projects and requests. Project-specific quest
 
 ## Known Limitations and Deferred Work
 
-- Semantica's default extraction quality depends on installed optional models and source language. Chinese free text may need reviewed extraction patterns, aliases, and field mappings; provider success is not a quality verdict.
+- This adapter uses pattern NER and project-defined relation patterns, not automatic model selection. Rule scores (0.82 for entity patterns and 0.78 for relation patterns) are heuristics, not calibrated factual confidence. Identity keys determine identity; missing keys and ambiguous relation endpoints are not silently merged. Attribute conflicts remain separate candidates for review.
+- Independent graph validation enforces supported project property types, required/unique values, identity keys, domain/range, cardinality, provenance and valid-time structure in addition to SDK type checks. Exported SHACL is not a claim that every SHACL construct is executed. Competency-query cardinality proves retrievability, not business-answer correctness. Older validations must rerun to obtain a `project-constraints-v1` receipt; graph files and lifecycle history remain intact.
 - Semantica currently exposes useful SDK modules rather than one reliable arbitrary-document-to-production-graph operation. This adapter deliberately orchestrates and validates each step instead of calling one build endpoint.
 - The package does not execute the project's business slice. The visible Agent or FDE runs the real task and then reports project-local evidence.
 - `Stop` records the current stage-four decision and keeps the project in stage four; a separate project lifecycle or archive operation is not yet defined.

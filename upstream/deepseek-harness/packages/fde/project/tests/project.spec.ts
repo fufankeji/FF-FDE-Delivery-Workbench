@@ -176,7 +176,7 @@ describe('FDE project surface snapshot', () => {
       investigation: {
         systems: [
           { id: 'tickets', label: '历史工单', kind: 'data', status: 'confirmed', owner: '售后主管' },
-          { id: 'sandbox', label: '工单 Sandbox', kind: 'system', status: 'conditional' },
+          { id: 'sandbox', label: '工单 Sandbox', kind: 'system', status: 'conditional', owner: '环境负责人', note: '仅限沙箱' },
         ],
         connections: [{ from: 'tickets', to: 'sandbox', label: '只读样本' }],
         actionBoundaries: [{
@@ -184,7 +184,7 @@ describe('FDE project surface snapshot', () => {
           draft: 'conditional', execute: 'denied',
         }],
         dataFindings: [{ label: '设备 ID 缺失率', value: '17%', status: 'warning' }],
-        governanceReviews: [{ area: 'security', status: 'conditional', owner: '信息安全' }],
+        governanceReviews: [{ area: 'security', status: 'conditional', owner: '信息安全', note: '禁止正式执行' }],
       },
     }
     await writeFile(join(states, 'investigation.json'), JSON.stringify(state))
@@ -223,7 +223,7 @@ describe('FDE project surface snapshot', () => {
       stateStatus: 'ready',
       status: 'blocked',
       reviewReady: false,
-      reviewBlockers: ['环境调查驾驶舱尚未形成结构化记录'],
+      reviewBlockers: ['尚未保存环境调查结果'],
     })
 
     await writeFile(join(states, 'investigation.json'), JSON.stringify({
@@ -310,7 +310,7 @@ describe('FDE project surface snapshot', () => {
         { id: 'build-run', kind: 'build', status: 'succeeded', startedAt: '2026-09-04T08:20:00.000Z', completedAt: '2026-09-04T08:21:00.000Z', definitionDigest: 'sha256:definition-1', sourceDigests: ['sha256:source-1'], evidencePaths: ['.fde/design/knowledge-graph.json'], diagnostics: [] },
         { id: 'slice-run', kind: 'slice', status: 'succeeded', startedAt: '2026-09-04T08:30:00.000Z', completedAt: '2026-09-04T08:31:00.000Z', definitionDigest: 'sha256:definition-1', sourceDigests: ['sha256:source-1'], evidencePaths: ['evidence/slice.log'], diagnostics: [] },
       ],
-      validation: { runId: 'validate-run', status: 'passed', checkedAt: '2026-09-04T08:25:00.000Z', graphRevision: 'build-17', definitionDigest: 'sha256:definition-1', structuralValid: true, issues: [], questions: [{ questionId: 'cq-1', status: 'passed', answerCount: 1, sourceRefs: ['source-1'], message: '查询通过。' }] },
+      validation: { runId: 'validate-run', status: 'passed', checksVersion: 'project-constraints-v1', checkedAt: '2026-09-04T08:25:00.000Z', graphRevision: 'build-17', definitionDigest: 'sha256:definition-1', structuralValid: true, issues: [], questions: [{ questionId: 'cq-1', status: 'passed', answerCount: 1, sourceRefs: ['source-1'], message: '查询通过。' }] },
       context: { runId: 'context-run', status: 'ready', createdAt: '2026-09-04T08:27:00.000Z', query: '查询当前切片所需事实', schemaVersion: '0.1.0', graphRevision: 'build-17', entities: [{ id: 'workflow' }], relationships: [{ id: 'uses' }], sources: ['source-1'], permissionScope: '仅限当前项目第四阶段' },
       slice: { runId: 'slice-run', status: 'succeeded', createdAt: '2026-09-04T08:31:00.000Z', task: '运行最窄纵向切片', result: '真实任务通过', contextRunId: 'context-run', evidenceRefs: ['evidence/slice.log'], diagnostics: [] },
     }))

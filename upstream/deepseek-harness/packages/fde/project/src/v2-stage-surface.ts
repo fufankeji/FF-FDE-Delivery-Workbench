@@ -4,6 +4,7 @@ import { readFile, realpath, stat } from 'node:fs/promises'
 import { join, relative, resolve, sep } from 'node:path'
 import { loadEvaluationWorkbench } from './evaluation-workbench.ts'
 import { loadDeliveryWorkbench } from './delivery-workbench.ts'
+import { evidenceProvenanceBlocker } from './evidence-provenance.ts'
 import type {
   V2DesignSnapshot,
   V2InvestigationSnapshot,
@@ -15,6 +16,7 @@ import type {
 } from './types.ts'
 
 const MAX_STATE_BYTES = 256 * 1024
+const MAX_ARTIFACT_BYTES = 8 * 1024 * 1024
 const DESIGN_GRAPH_PATH = '.fde/design/knowledge-graph.json' as const
 const MAX_GRAPH_BYTES = 2 * 1024 * 1024
 const MAX_GRAPH_NODES = 500
@@ -74,32 +76,32 @@ export const V2_STAGE_DEFINITIONS: readonly StageDefinition[] = [
     prompt: '请根据已确认的业务结果和当前项目资料，调查数据、系统、接口、访问权限、安全要求和组织责任，标出已确认事实、缺口、风险与待客户补充事项，并形成第三阶段固定记录。',
     workItems: [
       { id: 'data', title: '检查数据条件', purpose: '确认数据来源、质量、规模、敏感性和可取得方式。' },
-      { id: 'systems', title: '梳理系统与接口', purpose: '确认现有系统、调用链、接口限制和变更落点。' },
+      { id: 'systems', title: '梳理系统与接口', purpose: '确认现有系统、调用链、接口限制和需要改动的系统位置。' },
       { id: 'access', title: '核对权限与安全', purpose: '确认账号、权限、隐私、安全和法务要求。' },
       { id: 'owners', title: '确认现场责任人', purpose: '确认系统负责人、审批人、业务专家和等待事项。' },
     ],
     artifacts: [
       { id: 'data-readiness', title: '数据可用性评估', path: 'fde-deliverables/03-environment/data-readiness.md', purpose: '记录数据来源、质量、敏感性、缺口和取得条件。', required: true },
       { id: 'system-access-map', title: '系统与访问清单', path: 'fde-deliverables/03-environment/system-access-map.md', purpose: '记录系统、接口、账号、权限和实际负责人。', required: true },
-      { id: 'governance-review', title: '安全与治理核对记录', path: 'fde-deliverables/03-environment/governance-review.md', purpose: '记录安全、隐私、法务、审批和人工升级路径。', required: true },
+      { id: 'governance-review', title: '安全与治理核对记录', path: 'fde-deliverables/03-environment/governance-review.md', purpose: '记录安全、隐私、法务、审批和问题升级流程。', required: true },
     ],
   },
   {
     id: 'design', index: 4, title: '设计方案并完成端到端纵向切片',
     objective: '选择最合适的实现方式，并先走通一条可以验证的完整业务链路。',
-    explanation: '比较规则、传统软件、检索、模型和 Agent 等方式，明确系统边界、工具权限、失败回退并完成最小纵向切片。',
+    explanation: '比较规则、传统软件、检索、模型和 Agent 等方式，明确系统边界、工具权限、失败回退并完成一条从输入到结果的最小端到端业务流程。',
     statePath: '.fde/stages/design.json', skill: 'fde-design-vertical-slice',
     prompt: '请根据前三阶段的已确认事实，比较可行的实现方式，形成推荐方案、系统边界、工具和权限设计、失败回退方式，并规划一条可运行的端到端纵向切片。不要把候选方案写成已确认结论。',
     workItems: [
       { id: 'mechanism', title: '选择实现方式', purpose: '比较规则、软件、检索、模型、Agent 与人工处理。' },
-      { id: 'architecture', title: '明确系统边界', purpose: '说明系统、数据、工具、权限和人工审批如何协作。' },
-      { id: 'slice', title: '走通纵向切片', purpose: '先打通一个从输入到结果的完整业务链路。' },
+      { id: 'architecture', title: '明确系统边界', purpose: '说明系统接口、数据流向、工具权限和人工审批步骤。' },
+      { id: 'slice', title: '验证最小端到端业务流程', purpose: '先打通一个从输入到结果的完整业务链路。' },
       { id: 'decision', title: '核对方案决定', purpose: '记录方案取舍、风险、待确认事项和下一步。' },
     ],
     artifacts: [
       { id: 'mechanism-selection', title: '实现方式选择记录', path: 'fde-deliverables/04-solution-design/mechanism-selection.md', purpose: '记录比较过的方案、选择理由和不采用项。', required: true },
-      { id: 'solution-design', title: '生产方案设计', path: 'fde-deliverables/04-solution-design/solution-design.md', purpose: '记录系统边界、工具、权限、回退和关键合同。', required: true },
-      { id: 'vertical-slice-record', title: '纵向切片验证记录', path: 'fde-deliverables/04-solution-design/vertical-slice-record.md', purpose: '记录端到端最小链路、运行结果和未解决问题。', required: true },
+      { id: 'solution-design', title: '生产方案设计', path: 'fde-deliverables/04-solution-design/solution-design.md', purpose: '记录系统边界、工具、权限、回退和接口规范。', required: true },
+      { id: 'vertical-slice-record', title: '最小业务流程验证记录', path: 'fde-deliverables/04-solution-design/vertical-slice-record.md', purpose: '记录端到端最小链路、运行结果和未解决问题。', required: true },
     ],
   },
   {
@@ -158,7 +160,7 @@ export const V2_STAGE_DEFINITIONS: readonly StageDefinition[] = [
   },
   {
     id: 'improvement', index: 8, title: '持续改进并沉淀可复用能力',
-    objective: '把生产证据转成经过验证的改进，并沉淀下一次可复用的能力。',
+    objective: '根据生产运行记录改进系统，并整理可复用的方法和组件。',
     explanation: '根据业务指标、运行事件、用户反馈和成本证据选择改进项，受控发布并判断哪些现场经验值得复用。',
     statePath: '.fde/stages/improvement.json', skill: 'production-evidence-review',
     prompt: '请根据生产运行证据、业务指标、事故、用户反馈和成本记录，选择本轮最值得做的改进，说明验证方法与发布边界，并记录哪些现场经验可以沉淀为可复用能力。',
@@ -166,7 +168,7 @@ export const V2_STAGE_DEFINITIONS: readonly StageDefinition[] = [
       { id: 'evidence', title: '汇总生产证据', purpose: '汇总业务结果、运行指标、问题、反馈和成本。' },
       { id: 'prioritize', title: '选择改进事项', purpose: '按影响、风险和证据选择本轮改进，明确不做项。' },
       { id: 'validate', title: '验证并受控发布', purpose: '先测试改进，再按边界发布并观察结果。' },
-      { id: 'productize', title: '沉淀可复用能力', purpose: '记录可复用模板、工具、方法和适用边界。' },
+      { id: 'productize', title: '整理可复用方法与组件', purpose: '记录可复用模板、工具、方法和适用边界。' },
     ],
     artifacts: [
       { id: 'field-learning-register', title: '现场经验登记', path: 'fde-deliverables/08-improvement/field-learning-register.md', purpose: '记录现场问题、证据、通用性和复用边界。', required: true },
@@ -182,8 +184,13 @@ function asRecord(value: unknown): Record<string, unknown> | undefined {
 
 async function inspectArtifact(root: string, definition: StageDefinition['artifacts'][number]): Promise<V2StageArtifactSnapshot> {
   try {
-    const info = await stat(join(root, definition.path))
-    if (!info.isFile()) throw new Error('固定产物路径不是普通文件。')
+    const rootPath = await realpath(root)
+    const file = await realpath(join(rootPath, definition.path))
+    const rel = relative(rootPath, file)
+    if (rel === '..' || rel.startsWith(`..${sep}`) || resolve(rootPath, rel) !== file) throw new Error('固定产物必须位于当前项目。')
+    const info = await stat(file)
+    if (!info.isFile() || info.size === 0 || info.size > MAX_ARTIFACT_BYTES) throw new Error('固定产物必须是 8 MiB 内的非空普通文件。')
+    if (!(await readFile(file, 'utf8')).trim()) throw new Error('固定产物只有空白内容。')
     return { ...definition, status: 'present', bytes: info.size, updatedAt: info.mtime.toISOString() }
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') return { ...definition, status: 'missing' }
@@ -891,6 +898,7 @@ function parseSemanticWorkspace(value: unknown): V2SemanticWorkspaceSnapshot {
       && validationRecord.status !== 'unavailable' && validationRecord.status !== 'stale') throw new Error('validation.status 无效。')
     return {
       runId: boundedText(validationRecord, 'runId', 'validation', 200), status: validationRecord.status,
+      ...(typeof validationRecord.checksVersion === 'string' ? { checksVersion: validationRecord.checksVersion } : {}),
       checkedAt: dateText(validationRecord, 'checkedAt', 'validation'),
       graphRevision: boundedText(validationRecord, 'graphRevision', 'validation', 160),
       definitionDigest: boundedText(validationRecord, 'definitionDigest', 'validation', 160),
@@ -1070,30 +1078,59 @@ export async function loadV2StageSurface(root: string, stageId: V2LifecycleStage
     ? await loadDesign(root, state.value?.design)
     : undefined
   const evaluation = definition.id === 'evaluation'
-    ? await loadEvaluationWorkbench(root, state.value?.evaluation)
+    ? await loadEvaluationWorkbench(root, state.value?.evaluation, state.value?.dataProvenance)
     : undefined
   const reviewBlockers: string[] = []
+  const provenanceBlocker = evidenceProvenanceBlocker(state.value?.dataProvenance)
+  if (provenanceBlocker !== undefined) reviewBlockers.push(provenanceBlocker)
   const delivery = definition.id === 'pilot' || definition.id === 'production' || definition.id === 'improvement'
-    ? await loadDeliveryWorkbench(root, definition.id, state.value?.delivery)
+    ? await loadDeliveryWorkbench(root, definition.id, state.value?.delivery, state.value?.dataProvenance)
     : undefined
   if (delivery !== undefined) reviewBlockers.push(...delivery.reviewBlockers)
   if (evaluation !== undefined) reviewBlockers.push(...evaluation.reviewBlockers)
   if (state.status === 'missing') reviewBlockers.push(`尚未生成阶段状态文件 ${definition.statePath}`)
   if (state.status === 'invalid') reviewBlockers.push(`阶段状态文件无法读取：${state.message ?? '结构无效'}`)
   if (definition.id === 'investigation' && state.status === 'ready' && investigation === undefined) {
-    reviewBlockers.push('环境调查驾驶舱尚未形成结构化记录')
+    reviewBlockers.push('尚未保存环境调查结果')
+  }
+  if (investigation !== undefined) {
+    const raw = asRecord(state.value?.investigation)
+    const notApplicable = asRecord(raw?.notApplicable)
+    for (const key of ['systems', 'actionBoundaries', 'dataFindings', 'governanceReviews'] as const) {
+      if (investigation[key].length > 0) continue
+      const exemption = asRecord(notApplicable?.[key])
+      const refs = exemption?.evidenceRefs
+      const hasReason = typeof exemption?.reason === 'string' && exemption.reason.trim().length > 0
+      const validRefs = Array.isArray(refs) && refs.length > 0 && refs.length <= 20
+        && refs.every(ref => typeof ref === 'string' && !ref.includes('\\') && !ref.startsWith('/') && ref.split('/').every(part => part !== '..' && part !== '.' && part !== ''))
+      if (!hasReason || !validRefs) { reviewBlockers.push(`调查项 ${key} 为空；需补充实际记录，或填写有证据的不适用理由。`); continue }
+      const evidence = await Promise.all((refs as string[]).map(path => inspectArtifact(root, { id: path, path, title: path, purpose: '不适用依据', required: true })))
+      if (evidence.some(file => file.status !== 'present' || file.path.startsWith('.fde/stages/'))) reviewBlockers.push(`调查项 ${key} 的不适用依据不可读取或使用了状态自证。`)
+    }
+    for (const item of investigation.systems) {
+      if (item.status === 'pending' || item.status === 'blocked' || !item.owner || (item.status === 'conditional' && !item.note)) reviewBlockers.push(`现场对象 ${item.label} 的条件或责任人尚未明确。`)
+    }
+    for (const item of investigation.actionBoundaries) {
+      if ([item.read, item.suggest, item.draft, item.execute].includes('pending')) reviewBlockers.push(`${item.target} 的动作边界仍有待确认项。`)
+    }
+    for (const item of investigation.dataFindings) {
+      if (item.status === 'pending' || item.status === 'blocked') reviewBlockers.push(`数据条件 ${item.label} 尚未解决。`)
+    }
+    for (const item of investigation.governanceReviews) {
+      if (item.status === 'pending' || item.status === 'blocked' || !item.owner || (item.status === 'conditional' && !item.note)) reviewBlockers.push(`${item.area} 审查的结论、条件或责任人尚未明确。`)
+    }
   }
   if (definition.id === 'design' && state.status === 'ready' && design === undefined) {
-    reviewBlockers.push('第四阶段方案路线尚未形成结构化记录')
+    reviewBlockers.push('尚未保存第四阶段实现方案')
   }
   if (design !== undefined) {
-    if (design.execution.status !== 'selected') reviewBlockers.push('执行机制尚未选定')
-    if (design.semantics.mode === 'undecided') reviewBlockers.push('语义基础尚未决定')
-    if (design.workspace.status === 'missing') reviewBlockers.push('第四阶段真实运行工作区尚未建立')
-    if (design.workspace.status === 'invalid') reviewBlockers.push(`第四阶段真实运行工作区无法读取：${design.workspace.message ?? '结构无效'}`)
+    if (design.execution.status !== 'selected') reviewBlockers.push('尚未选择实现方式')
+    if (design.semantics.mode === 'undecided') reviewBlockers.push('尚未判断是否需要本体与知识图谱')
+    if (design.workspace.status === 'missing') reviewBlockers.push('尚未建立第四阶段运行记录')
+    if (design.workspace.status === 'invalid') reviewBlockers.push(`第四阶段运行记录无法读取：${design.workspace.message ?? '结构无效'}`)
     const workspaceRoute = design.workspace.route
     if (design.semantics.mode !== 'undecided' && workspaceRoute === undefined) {
-      reviewBlockers.push('第四阶段路线没有对应的真实工作区记录')
+      reviewBlockers.push('所选方案缺少对应的运行记录')
     } else if (workspaceRoute !== undefined && (
       workspaceRoute.execution.mechanism !== design.execution.mechanism
       || workspaceRoute.execution.label !== design.execution.label
@@ -1102,22 +1139,22 @@ export async function loadV2StageSurface(root: string, stageId: V2LifecycleStage
       || workspaceRoute.semantics.rationale !== design.semantics.rationale
       || workspaceRoute.conclusion !== design.semantics.conclusion
     )) {
-      reviewBlockers.push('阶段路线与当前真实运行工作区版本不一致')
+      reviewBlockers.push('阶段选型与当前运行记录的方案不一致')
     }
     if (design.semantics.mode === 'schema' && design.semantics.conclusion !== 'not_required') {
-      reviewBlockers.push('普通 Schema 路线尚未形成不采用本体的候选结论')
+      reviewBlockers.push('尚未记录不采用本体的理由与结论')
     }
     if (design.semantics.mode === 'schema') {
       const sliceRun = design.workspace.slice === undefined
         ? undefined
         : design.workspace.runs.find(item => item.id === design.workspace.slice?.runId && item.kind === 'slice')
       if (design.workspace.slice?.status !== 'succeeded' || sliceRun?.status !== 'succeeded') {
-        reviewBlockers.push('轻量路线尚未形成带项目证据的真实纵向切片')
+        reviewBlockers.push('尚未保存最小端到端业务流程的运行结果与证据')
       }
     }
     if (design.semantics.mode === 'ontology') {
       if (design.workspace.provider.status !== 'ready' || design.workspace.provider.version !== design.workspace.provider.expectedVersion) {
-        reviewBlockers.push('Semantica Provider 尚未通过固定版本检查')
+        reviewBlockers.push('本地 Semantica 尚未通过版本检查')
       }
       if (design.workspace.sources.length === 0) reviewBlockers.push('尚未绑定当前项目获准使用的代表材料')
       if (design.ontology.status !== 'published' || design.workspace.definition.status !== 'published' || design.workspace.definition.digest === undefined) {
@@ -1134,15 +1171,16 @@ export async function loadV2StageSurface(root: string, stageId: V2LifecycleStage
       if (design.graph.buildStatus !== 'succeeded' || !currentBuild) reviewBlockers.push('当前图谱构建尚未成功完成，或引用版本已经变化')
       const validation = design.workspace.validation
       if (validation?.status !== 'passed'
+        || validation.checksVersion !== 'project-constraints-v1'
         || validation.definitionDigest !== design.workspace.definition.digest
         || validation.graphRevision !== design.graph.snapshot?.revision) {
-        reviewBlockers.push('当前 Schema 与图谱尚未通过同版本独立验证')
+        reviewBlockers.push('当前本体结构与图谱版本尚未通过校验')
       }
       const context = design.workspace.context
       if (context?.status !== 'ready'
         || context.schemaVersion !== design.workspace.definition.version
         || context.graphRevision !== design.graph.snapshot?.revision) {
-        reviewBlockers.push('当前验证版本尚未形成受控 Agent 上下文')
+        reviewBlockers.push('尚未从当前已验证图谱生成 Agent 任务参考信息')
       }
       const sliceRun = design.workspace.slice === undefined
         ? undefined
@@ -1150,9 +1188,9 @@ export async function loadV2StageSurface(root: string, stageId: V2LifecycleStage
       if (design.workspace.slice?.status !== 'succeeded'
         || sliceRun?.status !== 'succeeded'
         || design.workspace.slice.contextRunId !== context?.runId) {
-        reviewBlockers.push('尚未用当前受控上下文跑通带证据的真实纵向切片')
+        reviewBlockers.push('尚未使用当前图谱查询结果完成业务流程验证并保存证据')
       }
-      if (design.semantics.conclusion !== 'validated') reviewBlockers.push('当前本体机制尚未形成验证通过的候选结论')
+      if (design.semantics.conclusion !== 'validated') reviewBlockers.push('尚未记录本体方案的验证通过结论')
     }
   }
   for (const artifact of artifacts.filter(item => item.required && item.status !== 'present')) reviewBlockers.push(`${artifact.title}尚未形成`)
@@ -1178,7 +1216,7 @@ export async function loadV2StageSurface(root: string, stageId: V2LifecycleStage
     requiredCount: definition.artifacts.filter(item => item.required).length,
     presentCount,
     reviewReady: reviewBlockers.length === 0 && status === 'review-ready',
-    reviewBlockers,
+    reviewBlockers: [...new Set(reviewBlockers)],
     ...(definition.id !== 'investigation' || investigation === undefined ? {} : { investigation }),
     ...(definition.id !== 'design' || design === undefined ? {} : { design }),
     ...(evaluation === undefined ? {} : { evaluation }),

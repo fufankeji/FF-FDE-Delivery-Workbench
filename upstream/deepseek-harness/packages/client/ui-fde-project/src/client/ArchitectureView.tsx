@@ -249,7 +249,7 @@ function nodeKindLabel(kind: ProjectArchitecture['nodes'][number]['kind']): stri
   switch (kind) {
     case 'entry': return '入口'
     case 'core': return '核心能力'
-    case 'store': return '数据底座'
+    case 'store': return '数据存储'
     case 'external': return '外部边界'
     case 'output': return '交付输出'
     case 'default': return '系统组件'

@@ -103,3 +103,9 @@ updated: "2026-09-07"
   - 修改：演示入口与独立读取移除、正常项目数据、现有阶段推进接口
   - 完成证据：`docs/verification/2026-09-07-single-project-delivery-flow.md`；46 项定向测试通过，3080 无演示入口，原接口已推进至第八阶段并完成一轮；视觉待人工确认
   - 验证：正常阶段浏览、无演示入口和完成轮数的定向检查
+
+## 2026-09-07 整改执行
+
+- 本轮范围：REQ-028, NFR-011；PSC-025；AC-F010-003 对应的通用性缺陷，不重新声明整个 Feature 完成。
+- 修改与验证计划：project/delivery-workbench.ts 与 v2-stage-surface.ts；以 delivery-workbench.spec.ts 和 generality-gates.spec.ts 验证来源、版本、环境及固定类别。
+- 完成证据与未完成边界统一记录于 [通用性修复记录](../../verification/2026-09-07-platform-generality-repair.md)。本条不改变先前未完成任务的勾选状态。

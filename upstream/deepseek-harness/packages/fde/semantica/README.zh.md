@@ -24,7 +24,15 @@ maxSourceBytes: 2097152
 maxSources: 12
 ```
 
-随包 Python Bridge 使用 Semantica SDK 完成 Provider 健康检查、抽取、本体建议与校验、图谱构建、图谱验证和有边界查询。每项操作都必须显式触发并分别记录。进程成功退出不会被解释为 Schema 质量合格、图谱有效或纵向切片成功。
+随包 Python Bridge 使用 Semantica SDK 完成 Provider 健康检查、抽取、本体建议与校验、图谱构建和图谱验证；有边界任务查询由 Adapter 在该图谱上执行。每项操作都必须显式触发并分别记录。进程成功退出不会被解释为 Schema 质量合格、图谱有效或纵向切片成功。
+
+当前规则管线不需要模型 API Key。运行真实 SDK 集成测试时，将 `FDE_SEMANTICA_TEST_PYTHON` 指向可导入 Semantica `0.6.7` 的解释器，否则这些测试会跳过。该测试变量不改变 Web 服务的运行配置；后者使用 `FDE_SEMANTICA_PYTHON`。仅提供模型密钥不会自动启用 Adapter 的大模型抽取。
+
+```sh
+FDE_SEMANTICA_TEST_PYTHON=/path/to/semantica/.venv/bin/python \
+  corepack pnpm exec vitest run packages/fde/semantica/tests/semantica.spec.ts \
+  packages/fde/semantica/tests/sdk-generality.spec.ts -t 'real.*SDK'
+```
 
 ## 项目数据与操作
 
@@ -46,9 +54,9 @@ maxSources: 12
 
 ## Agent 集成
 
-本包注册两个稳定的模型工具。`semantic_context_query` 只查询当前项目已经独立验证的图谱，并保存一份有边界上下文，其中包含相关实体、关系、来源、时间、置信度、Schema 版本、图谱修订和权限范围。`semantic_slice_report` 记录可见 Agent 或 FDE 已真实运行切片后的观察结果；它要求项目内证据，不能伪造执行，也不能提交 FDE 决定。
+本包注册两个稳定的模型工具。`semantic_context_query` 默认只读消费，不改变第四阶段文件、切片与 FDE 决定，返回结果由 Harness 留痕；显式 `purpose=validation` 才生成编制验证上下文并使旧切片待重跑。`semantic_slice_report` 保存调用者报告的结果及非空项目内证据；它不执行任务、不独立认证声明，也不能提交 FDE 决定。
 
-上下文操作要求选择一个已发布能力问题或精确起始实体，并把遍历深度限制在三跳以内。它不会把整张图注入模型。切片报告必须引用同一项目内当前真实存在的普通文件；本体路线还必须引用当前上下文运行 ID。
+上下文操作要求选择已发布能力问题或精确起始实体，遍历最多三跳。`query` 只描述任务，不执行自由文本语义检索。绑定来源、置信度和已声明有效时间先于遍历过滤；文字规则与 `permissionScope` 是说明，不是已执行的授权政策。本体切片必须引用当前编制验证上下文 ID，而非普通消费查询 ID。
 
 ## 模型体验
 
@@ -68,7 +76,8 @@ maxSources: 12
 
 ## 已知限制与延期工作
 
-- Semantica 默认抽取质量取决于已安装的可选模型和来源语言。中文自由文本可能需要经审核的抽取 Pattern、别名和字段映射；Provider 调用成功不代表质量合格。
+- 当前 Adapter 使用 Pattern NER 与项目关系规则，不自动选择模型。实体规则分数 0.82、关系规则分数 0.78 是启发式分数，不是校准后的事实可信度。身份键决定对象身份，缺身份或关系端点歧义不静默合并，属性冲突保留独立候选供人工处理。
+- 独立图谱验证在 SDK 类型检查之外执行支持的项目字段类型、必填／唯一、身份键、Domain／Range、基数、来源及时间结构检查。生成 SHACL 不代表执行全部 SHACL 语义；能力问题的结果数量只证明可检索性，不证明业务答案正确。旧验证记录须重新验证以取得 project-constraints-v1 回执，原图谱及阶段历史不被改写。
 - Semantica 当前提供的是一组有效 SDK 模块，而不是一个能够把任意文档可靠变为生产图谱的一键操作。本 Adapter 会显式编排并验证每一步，不依赖单一 build 端点。
 - 本包不执行项目业务切片。可见 Agent 或 FDE 负责真实运行任务，之后再提交项目内证据。
 - `Stop` 会记录当前第四阶段决定，并让项目留在第四阶段；独立的项目生命周期停止或归档操作目前尚未定义。

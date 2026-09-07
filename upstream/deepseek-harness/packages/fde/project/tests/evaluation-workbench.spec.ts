@@ -1,6 +1,7 @@
 import { mkdtemp, mkdir, rm, symlink, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { createHash } from 'node:crypto'
 import { afterEach, describe, expect, it } from 'vitest'
 import { loadEvaluationWorkbench } from '../src/evaluation-workbench.ts'
 import { loadV2StageSurface } from '../src/v2-stage-surface.ts'
@@ -18,14 +19,14 @@ async function fixture() {
     candidate: { version: 'r1', summary: 'One executable acceptance path', sourceFiles: ['app.ts'] },
     testing: { environment: 'local-test', metrics: [
       { id: 'business-1', title: '真实业务验收', kind: '业务', required: true, criterion: 'Return ready', sourceRefs: ['criteria.md'] },
-    ], run: { fingerprint: '', results: [] as { metricId: string; status: string; value: string; evidenceRefs: string[] }[] } },
+    ], run: { fingerprint: '', results: [] as { metricId: string; status: string; value: string; evidenceRefs: string[]; evidenceDigests?: Record<string, string> }[] } },
   } }
 }
 
 async function recordPass(root: string, data: Awaited<ReturnType<typeof fixture>>['data']) {
   const prepared = await loadEvaluationWorkbench(root, data)
   data.testing.run = { fingerprint: prepared.testing.fingerprint!, results: [
-    { metricId: 'business-1', status: 'PASS', value: 'ready', evidenceRefs: ['evidence.txt'] },
+    { metricId: 'business-1', status: 'PASS', value: 'ready', evidenceRefs: ['evidence.txt'], evidenceDigests: { 'evidence.txt': createHash('sha256').update('actual result: ready').digest('hex') } },
   ] }
 }
 
@@ -72,7 +73,7 @@ describe('stage-five effective information and evidence gate', () => {
     data.testing.run.results.push({ metricId: 'optional', status: 'FAIL', value: 'known limitation', evidenceRefs: ['evidence.txt'] })
     expect(await loadEvaluationWorkbench(root, data)).toMatchObject({ reviewBlockers: [], testing: { metrics: [{ status: 'PASS' }, { status: 'FAIL' }] } })
     data.testing.run.results[0]!.evidenceRefs = ['missing.txt']
-    expect((await loadEvaluationWorkbench(root, data)).reviewBlockers).toContain('必测项缺少实际结果或可读取证据：真实业务验收')
+    expect((await loadEvaluationWorkbench(root, data)).testing.metrics[0]?.status).toBe('STALE')
   })
 
   it('rejects duplicate IDs and paths outside the registered project, including symlinks', async () => {

@@ -38,6 +38,7 @@ const MECHANISM_ARTIFACT_PATH = 'fde-deliverables/04-solution-design/mechanism-s
 const VERTICAL_SLICE_ARTIFACT_PATH = 'fde-deliverables/04-solution-design/vertical-slice-record.md'
 const MAX_STATE_BYTES = 4 * 1024 * 1024
 const MAX_VISIBLE_CANDIDATES = 500
+const VALIDATION_CHECKS_VERSION = 'project-constraints-v1'
 
 function isoNow(): string { return new Date().toISOString() }
 function digest(value: string | Buffer): string { return `sha256:${createHash('sha256').update(value).digest('hex')}` }
@@ -173,6 +174,7 @@ function routeProgress(state: SemanticWorkspaceState): {
     && build.sourceDigests.every((item, index) => item === currentSourceDigests[index])
   const validationCurrent = state.validation?.status === 'passed'
     && state.validation.definitionDigest === state.definition.digest
+    && state.validation.checksVersion === VALIDATION_CHECKS_VERSION
   const contextCurrent = state.context?.status === 'ready'
     && state.context.schemaVersion === state.definition.version
     && state.context.graphRevision === state.validation?.graphRevision
@@ -831,6 +833,7 @@ export async function validateGraph(root: string, config: SemanticProviderConfig
     const requiredPassed = requiredIds.size > 0 && requiredResults.length === requiredIds.size
       && requiredResults.every(item => item.status === 'passed')
     const validation: SemanticValidationResult = {
+      checksVersion: VALIDATION_CHECKS_VERSION,
       runId: run.id, status: result.structural.is_valid && requiredPassed ? 'passed' : 'failed', checkedAt: isoNow(),
       graphRevision: display.revision, definitionDigest: state.definition.digest,
       structuralValid: result.structural.is_valid, issues: result.structural.issues, questions: result.questions,
@@ -852,38 +855,61 @@ export async function validateGraph(root: string, config: SemanticProviderConfig
   } catch (error) { return await failRun(root, run, error) }
 }
 
-/** Return one bounded, provenance-carrying subgraph for an Agent task. */
+/** Read a validated subgraph without changing design evidence or its FDE decision.
+ * @param root - Registered project root.
+ * @param config - Local provider configuration.
+ * @param input - Exact published question or node selection; query describes the task only.
+ * @returns Version-bound context, logged by the calling Harness tool.
+ */
+export async function queryAgentContext(
+  root: string,
+  config: SemanticProviderConfig,
+  input: { readonly questionId?: string; readonly seedNodeId?: string; readonly query: string; readonly maxDepth: number },
+): Promise<AgentContextResult> {
+  if (!input.questionId?.trim() && !input.seedNodeId?.trim()) throw new Error('请选择已发布的 questionId 或当前图谱的 seedNodeId；query 仅描述任务，不执行自由文本检索。')
+  boundedText(input.query, '查询任务', 2_000)
+  if (!Number.isInteger(input.maxDepth) || input.maxDepth < 0 || input.maxDepth > 3) throw new Error('查询深度必须为 0–3。')
+  const state = await readSemanticWorkspace(root)
+  if (state.provider.status !== 'ready') throw new Error('Semantica Provider 尚未通过版本检查。')
+  if (state.validation?.status !== 'passed' || state.validation.definitionDigest !== state.definition.digest) {
+    throw new Error('当前图谱尚未通过同版本独立验证，不能进入 Agent 上下文。')
+  }
+  if (state.validation.checksVersion !== VALIDATION_CHECKS_VERSION) throw new Error('图谱验证记录未覆盖当前项目约束检查，请先重新验证；原始图谱和阶段历史保留。')
+  const graph = await readRawGraph(root)
+  const displayPath = await projectPath(root, DESIGN_GRAPH_PATH)
+  const displayBytes = await readFile(displayPath, 'utf8')
+  const display = JSON.parse(displayBytes) as { revision?: unknown }
+  if (display.revision !== state.validation.graphRevision) throw new Error('当前图谱修订与验证回执不一致，请重新验证。')
+  const result = await runSemantica<{ readonly entities: readonly Record<string, unknown>[]; readonly relationships: readonly Record<string, unknown>[]; readonly sources: readonly string[]; readonly constraints: readonly string[]; readonly derivedFacts: readonly string[] }>(config, 'context', {
+    graph, definition: state.definition, questionId: input.questionId, seedNodeId: input.seedNodeId,
+    query: input.query, maxDepth: input.maxDepth, minConfidence: state.definition.confidenceThreshold,
+    allowedSourceIds: state.sources.map(item => item.sourceId),
+  })
+  if ((await readSemanticWorkspace(root)).evidenceDigest !== state.evidenceDigest
+    || await readFile(displayPath, 'utf8') !== displayBytes
+    || digest(pretty(await readRawGraph(root))) !== digest(pretty(graph))) throw new Error('查询期间图谱或定义发生变化，请重新查询。')
+  if (result.entities.length === 0) throw new Error('当前查询没有返回满足来源、有效时间和置信度条件的实体。')
+  return {
+    runId: `query_${randomUUID()}`, status: 'ready', createdAt: isoNow(),
+    ...(input.questionId === undefined ? {} : { questionId: input.questionId }),
+    ...(input.seedNodeId === undefined ? {} : { seedNodeId: input.seedNodeId }),
+    query: input.query, schemaVersion: state.definition.version, graphRevision: state.validation.graphRevision,
+    entities: result.entities, relationships: result.relationships, constraints: result.constraints,
+    derivedFacts: result.derivedFacts, sources: result.sources,
+    permissionScope: [...new Set(state.sources.map(item => item.permissionScope))].join('；'),
+  }
+}
+
+/** Create stage-four validation context; replacing it requires a new vertical slice. */
 export async function createAgentContext(
   root: string,
   config: SemanticProviderConfig,
   input: { readonly questionId?: string; readonly seedNodeId?: string; readonly query: string; readonly maxDepth: number },
 ): Promise<SemanticWorkspaceState> {
-  const { state, run } = await beginRun(root, 'context')
+  if (!input.questionId?.trim() && !input.seedNodeId?.trim()) throw new Error('请选择已发布的 questionId 或当前图谱的 seedNodeId。')
+  const { run } = await beginRun(root, 'context')
   try {
-    if (state.provider.status !== 'ready') throw new Error('Semantica Provider 尚未通过版本检查。')
-    if (state.validation?.status !== 'passed' || state.validation.definitionDigest !== state.definition.digest) {
-      throw new Error('当前图谱尚未通过同版本独立验证，不能进入 Agent 上下文。')
-    }
-    const graph = await readRawGraph(root)
-    const display = JSON.parse(await readFile(await projectPath(root, DESIGN_GRAPH_PATH), 'utf8')) as { revision?: unknown }
-    if (typeof display.revision !== 'string' || display.revision !== state.validation.graphRevision) {
-      throw new Error('当前图谱修订与验证回执不一致，请重新验证。')
-    }
-    const result = await runSemantica<{ readonly entities: readonly Record<string, unknown>[]; readonly relationships: readonly Record<string, unknown>[]; readonly sources: readonly string[]; readonly constraints: readonly string[]; readonly derivedFacts: readonly string[] }>(config, 'context', {
-      graph, definition: state.definition, questionId: input.questionId, seedNodeId: input.seedNodeId,
-      query: input.query, maxDepth: input.maxDepth, minConfidence: state.definition.confidenceThreshold,
-    })
-    if (result.entities.length === 0) throw new Error('当前受控查询没有返回满足权限和置信度边界的实体。')
-    const permissionScope = [...new Set(state.sources.map(item => item.permissionScope))].join('；')
-    const context: AgentContextResult = {
-      runId: run.id, status: 'ready', createdAt: isoNow(),
-      ...(input.questionId === undefined ? {} : { questionId: input.questionId }),
-      ...(input.seedNodeId === undefined ? {} : { seedNodeId: input.seedNodeId }),
-      query: input.query, schemaVersion: state.definition.version,
-      graphRevision: state.validation.graphRevision,
-      entities: result.entities, relationships: result.relationships, constraints: result.constraints,
-      derivedFacts: result.derivedFacts, sources: result.sources, permissionScope,
-    }
+    const context: AgentContextResult = { ...await queryAgentContext(root, config, input), runId: run.id }
     const evidencePath = `${RUN_DIRECTORY}/${run.id}.context.json`
     await writeFileAtomic(join(root, evidencePath), pretty(context), { mode: 0o600, dirMode: 0o700 })
     await replaceState(root, (current) => {
@@ -895,7 +921,7 @@ export async function createAgentContext(
       }
     })
     return await finishRun(root, run.id, {
-      status: 'succeeded', summary: `受控查询返回 ${String(result.entities.length)} 个实体、${String(result.relationships.length)} 条关系。`,
+      status: 'succeeded', summary: `受控查询返回 ${String(context.entities.length)} 个实体、${String(context.relationships.length)} 条关系。`,
       evidencePaths: [evidencePath], diagnostics: [],
     })
   } catch (error) { return await failRun(root, run, error) }
@@ -909,7 +935,7 @@ async function validateEvidenceRefs(root: string, refs: readonly string[]): Prom
   for (const ref of refs) {
     const filename = await projectPath(root, ref)
     const info = await stat(filename)
-    if (!info.isFile()) throw new Error(`纵向切片证据 ${ref} 不是项目内普通文件。`)
+    if (!info.isFile() || info.size === 0 || info.size > MAX_STATE_BYTES || !(await readFile(filename, 'utf8')).trim()) throw new Error(`纵向切片证据 ${ref} 必须是项目内非空文件，且不超过 4 MiB。`)
   }
 }
 

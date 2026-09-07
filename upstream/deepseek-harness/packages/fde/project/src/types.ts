@@ -809,6 +809,7 @@ export interface V2SemanticWorkspaceSnapshot {
     readonly diagnostics: readonly string[]
   }[]
   readonly validation?: {
+    readonly checksVersion?: string
     readonly runId: string
     readonly status: 'passed' | 'failed' | 'unavailable' | 'stale'
     readonly checkedAt: string
