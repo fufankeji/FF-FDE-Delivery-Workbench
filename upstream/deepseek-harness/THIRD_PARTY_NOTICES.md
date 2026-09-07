@@ -31,7 +31,7 @@ The following upstream source informed or was adapted into first-party files. Th
 
 | Project | Revision | License | Adapted use |
 | --- | --- | --- | --- |
-| [GraphRAG Workbench](https://github.com/lyon-industries/graphrag-workbench/tree/066727de7457f2226eb93b2c8ccbff9a498b2e12) | [`066727de7457f2226eb93b2c8ccbff9a498b2e12`](https://github.com/lyon-industries/graphrag-workbench/commit/066727de7457f2226eb93b2c8ccbff9a498b2e12) | MIT | 3D knowledge-graph scene, community-aware force layout, progressive reveal, camera focus, and bloom treatment adapted in `packages/client/ui-fde-project/src/client/KnowledgeGraphExplorer.tsx` and `knowledge-graph-layout.ts` |
+| [GraphRAG Workbench](https://github.com/lyon-industries/graphrag-workbench/tree/066727de7457f2226eb93b2c8ccbff9a498b2e12) | [`066727de7457f2226eb93b2c8ccbff9a498b2e12`](https://github.com/lyon-industries/graphrag-workbench/commit/066727de7457f2226eb93b2c8ccbff9a498b2e12) | MIT | community-aware deterministic seed layout adapted in `packages/client/ui-fde-project/src/client/knowledge-graph-layout.ts` |
 
 Copyright (c) 2026 Lyon Industries (Christopher Lyon)
 
@@ -83,12 +83,12 @@ External packages that a workspace package resolves at runtime. The tier covers 
 | [`@opentelemetry/otlp-exporter-base`](https://github.com/open-telemetry/opentelemetry-js) | Apache-2.0 |
 | [`@opentelemetry/resources`](https://github.com/open-telemetry/opentelemetry-js) | Apache-2.0 |
 | [`@opentelemetry/sdk-logs`](https://github.com/open-telemetry/opentelemetry-js) | Apache-2.0 |
-| [`@react-three/fiber`](https://github.com/pmndrs/react-three-fiber) | MIT |
 | [`@shikijs/langs`](https://github.com/shikijs/shiki) | MIT |
 | [`@standard-schema/spec`](https://github.com/standard-schema/standard-schema) | MIT |
 | [`@tanstack/react-virtual`](https://github.com/TanStack/virtual) | MIT |
 | [`@types/mdast`](https://github.com/DefinitelyTyped/DefinitelyTyped) | MIT |
 | [`@vscode/ripgrep`](https://github.com/microsoft/vscode-ripgrep) | MIT |
+| [`3d-force-graph`](https://github.com/vasturiano/3d-force-graph) | MIT |
 | [`anser`](https://github.com/IonicaBizau/anser) | MIT |
 | [`buffer`](https://github.com/feross/buffer) | MIT |
 | [`chokidar`](https://github.com/paulmillr/chokidar) | MIT |
