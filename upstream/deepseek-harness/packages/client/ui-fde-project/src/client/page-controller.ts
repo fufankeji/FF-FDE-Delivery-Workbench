@@ -25,6 +25,8 @@ export class ProjectPageController {
 
   /** Open the page at its project overview. */
   open = (): void => { this.set({ open: true, view: 'overview' }) }
+  /** Return to the product homepage without opening or changing a project. */
+  showHome = (): void => { this.set({ open: true, view: 'home' }) }
   /** Navigate to the multi-project overview. */
   showOverview = (): void => { this.set({ open: true, view: 'overview' }) }
   /** Navigate to the real-date delivery timeline. */

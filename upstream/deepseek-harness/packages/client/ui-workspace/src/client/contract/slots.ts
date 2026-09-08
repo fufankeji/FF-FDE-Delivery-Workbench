@@ -33,6 +33,7 @@ import type {
   SessionId, SessionSearchResultItem, WorkspaceId, WorkspaceView,
 } from '@deepseek-ai/dsh-client-runtime/client'
 import type { createWorkspaceViewStore } from '../stores.ts'
+import type { ProjectMetadataService, ProjectMetadataValue } from '../project-metadata.ts'
 
 /**
  * Owner share of the directory-flow holes: the complete conversation between
@@ -118,6 +119,7 @@ export type WorkspaceBrowserInjected = {
     hostDescription: HostDescriptionSource
     /** True while a project-local sidebar implementation is installed. */
     projectContext: HostObservable<boolean>
+    projectMetadata: ProjectMetadataService
   }
   /**
    * Start a New Session in a Workspace: reuse-or-create its blank session and
@@ -166,6 +168,10 @@ export type WorkspaceBrowserInjected = {
   createWorkspace: (input: { path: string }) => Promise<WorkspaceView>
   /** Create one project directory below a user-selected parent. */
   createDirectory: (path: string, name: string) => Promise<string>
+  /** Load creation facts and import legacy values only if the Host record is absent. */
+  loadProjectMetadata: (workspaceId: string, path: string) => void
+  /** Persist creation facts; failures remain observable for exact-project retry. */
+  saveProjectMetadata: (workspaceId: string, value: ProjectMetadataValue) => Promise<void>
 }
 
 /** Full browser props: shell owner share + viewing store + injected actions + the locale seat. */

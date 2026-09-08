@@ -3,8 +3,34 @@
 import { readFile } from 'node:fs/promises'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import type { ProjectSurfaceSnapshot } from './types.ts'
+import type { ProjectMetadata } from './project-metadata.ts'
 
 const MAX_BODY_BYTES = 16 * 1024
+
+/** Read or initialize creation facts for a registered project through the trusted GUI. */
+export function createProjectMetadataRoute(options: {
+  readonly trusted: (request: IncomingMessage) => boolean
+  readonly read: (workspaceId: string) => Promise<ProjectMetadata | null | undefined>
+  readonly ensure: (workspaceId: string, value: unknown) => Promise<ProjectMetadata | undefined>
+}): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
+  return async (request, response) => {
+    try {
+      if (!options.trusted(request)) throw new FdeProjectRequestError('forbidden', 403, '当前请求不能读取或保存项目基础信息。')
+      if (request.method !== 'POST') throw new FdeProjectRequestError('method-not-allowed', 405, '项目基础信息接口只接受 POST。')
+      const input = await readJson(request) as Record<string, unknown>
+      const workspaceId = workspaceIdOf(input)
+      if (Object.keys(input).some(key => !['workspaceId', 'metadata'].includes(key))) throw new FdeProjectRequestError('invalid-request', 400, '请求包含未知字段。')
+      const value = input.metadata === undefined ? await options.read(workspaceId) : await options.ensure(workspaceId, input.metadata)
+      if (value === undefined) throw new FdeProjectRequestError('not-found', 404, '当前项目不存在。')
+      writeJson(response, 200, { ok: true, workspaceId, value })
+    } catch (error) {
+      request.resume()
+      writeJson(response, error instanceof FdeProjectRequestError ? error.status : 400, {
+        ok: false, error: { message: error instanceof Error ? error.message : '项目基础信息读取或保存失败。' },
+      })
+    }
+  }
+}
 
 /** Create a preview only from a trusted GUI request and a registered Workspace ID. */
 export function createProjectPreviewRoute(options: {

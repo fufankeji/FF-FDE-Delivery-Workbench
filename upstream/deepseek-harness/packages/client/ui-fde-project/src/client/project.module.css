@@ -3882,6 +3882,9 @@
 }
 
 .projectCenterBreadcrumb span { color: var(--dsw-alias-label-secondary); }
+.projectCenterBreadcrumb button { padding: 0; border: 0; border-radius: 3px; background: transparent; color: var(--dsw-alias-state-business-primary); font: inherit; cursor: pointer; }
+.projectCenterBreadcrumb button:hover { text-decoration: underline; }
+.projectCenterBreadcrumb button:focus-visible { outline: 2px solid var(--dsw-alias-state-business-primary); outline-offset: 4px; }
 .projectCenterBreadcrumb i { color: var(--dsw-alias-border-l3); font-style: normal; }
 .projectCenterBreadcrumb strong { color: var(--dsw-alias-label-primary); font-weight: 650; }
 .projectCenterHeader h1 {
@@ -4565,7 +4568,33 @@
 .projectCenterRefresh .projectCenterBreadcrumb { font-size: 13px; line-height: 20px; font-weight: 400; }
 .projectCenterRefresh .projectCenterHeader h1 { display: inline-block; margin: 16px 18px 0 0; color: var(--dsw-alias-label-primary); font-size: 28px; line-height: 36px; font-weight: 700; letter-spacing: 0; }
 .projectCenterRefresh .projectCenterHeader > div:first-child > p:not(.projectCenterBreadcrumb) { display: inline-block; margin: 0; color: var(--dsw-alias-label-secondary); font-size: 13px; line-height: 20px; font-weight: 400; }
-.projectCenterRefresh .projectCenterHeader .projectCreateAction { position: absolute; right: 0; bottom: 0; min-width: 144px; min-height: 40px; margin: 0; padding: 9px 18px; border: 1px solid var(--project-dashboard-blue); border-radius: 9px; color: var(--dsw-alias-label-primary-inverted); background: linear-gradient(180deg, color-mix(in srgb, var(--project-dashboard-blue) 80%, var(--dsw-alias-bg-layer-1)), var(--project-dashboard-blue)); font-size: 14px; line-height: 20px; font-weight: 600; box-shadow: none; }
+.projectCenterRefresh .projectCenterHeader .projectCreateAction {
+  --project-create-accent: color-mix(in srgb, var(--dsw-alias-state-business-primary) 30%, var(--dsw-alias-state-success-primary));
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 144px;
+  min-height: 40px;
+  margin: 0;
+  padding: 9px 18px;
+  border: 1px solid color-mix(in srgb, var(--project-create-accent) 72%, var(--dsw-alias-label-primary));
+  border-radius: 9px;
+  color: var(--dsw-alias-label-primary-inverted);
+  background: color-mix(in srgb, var(--project-create-accent) 80%, var(--dsw-alias-label-primary));
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  box-shadow: none;
+}
+.projectCenterRefresh .projectCenterHeader .projectCreateAction > span { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 14px; height: 20px; line-height: 1; }
+.projectCenterRefresh .projectCenterHeader .projectCreateAction:hover { background: color-mix(in srgb, var(--project-create-accent) 68%, var(--dsw-alias-label-primary)); }
+.projectCenterRefresh .projectCenterHeader .projectCreateAction:focus-visible { outline-color: var(--project-create-accent); }
 .projectCenterUtilities { position: absolute; right: 0; top: -10px; display: flex; align-items: center; gap: 27px; height: 40px; }
 .projectCenterUtilities > button, .projectCenterHelp > summary { display: grid; place-items: center; width: 34px; height: 36px; padding: 0; border: 0; background: transparent; color: var(--dsw-alias-label-primary); cursor: pointer; list-style: none; }
 .projectCenterHelp > summary::-webkit-details-marker { display: none; }
@@ -4677,6 +4706,14 @@
 .projectScheduleDates > i::before, .projectScheduleDates > i::after { display: block; width: 6px; height: 6px; margin-top: -2px; border-radius: 50%; background: var(--dsw-alias-border-l3); content: ''; }
 .projectScheduleDates > i::after { float: right; margin-top: -6px; }
 .projectAllSchedules { align-self: center; margin-top: 7px; }
+.projectCenterRefresh .projectManagementDetails .projectRecentActivityList { max-height: 280px; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+.projectCenterRefresh .projectManagementDetails li .projectScheduleRowAction { display: flex; width: 100%; min-width: 0; gap: 16px; align-items: center; padding: 4px 0; background: transparent; color: inherit; text-align: left; cursor: pointer; }
+.projectScheduleRowAction > div:not(.projectScheduleDates) { flex: 1; min-width: 0; }
+.projectScheduleRowAction strong, .projectScheduleRowAction small { display: block; overflow-wrap: anywhere; }
+.projectScheduleRowAction:hover { background: var(--dsw-alias-bg-layer-2); }
+.projectScheduleRowAction:focus-visible { outline: 2px solid var(--project-dashboard-blue); outline-offset: 3px; border-radius: 6px; }
+.projectMetadataWarning { margin: 12px; padding: 12px; border: 1px solid var(--dsw-alias-border-l1); border-radius: 8px; background: var(--dsw-alias-bg-layer-1); color: var(--dsw-alias-label-primary); }
+.projectMetadataWarning button { margin-left: 12px; cursor: pointer; }
 .projectCenterFootnote { flex: none; margin-top: 12px; color: var(--dsw-alias-label-caption); font-size: 12px; line-height: 20px; text-align: center; }
 .projectCenterRefresh button:focus-visible, .projectCenterHelp summary:focus-visible { outline: 2px solid var(--project-dashboard-blue); outline-offset: 3px; }
 .projectCenterRefresh .projectAttention { display: flex; flex: 1 0 auto; flex-direction: column; }

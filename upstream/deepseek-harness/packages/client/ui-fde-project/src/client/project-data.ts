@@ -1,54 +1,7 @@
-/** Browser-local project metadata and aggregate helpers. */
+/** Project Session aggregates and current-stage labels. */
 
 import type { SessionId, SessionSummary } from '@deepseek-ai/dsh-client-runtime/client'
 import type { FdeProjectState } from './stage-controller.ts'
-
-const WORKSPACE_VIEW_STORAGE_KEY = 'dsh.workspace.view.v6'
-
-/** Display-safe metadata captured by the project creation form. */
-export interface ProjectMetadataView {
-  readonly companyName: string
-  readonly schedule: { readonly status: 'pending-confirmation' } | {
-    readonly status: 'estimated'
-    readonly startDate: string
-    readonly endDate: string
-  }
-}
-
-interface PersistedWorkspaceView {
-  readonly projectMetadataByPath?: Readonly<Record<string, {
-    readonly companyName?: unknown
-    readonly schedule?: unknown
-  }>>
-}
-
-/**
- * Read one project's locally persisted creation metadata without mutating it.
- * @param path - canonical Workspace path used by the existing view store.
- * @returns display-safe metadata or the explicit pending fallback.
- */
-export function readProjectMetadata(path: string): ProjectMetadataView {
-  const fallback: ProjectMetadataView = { companyName: '', schedule: { status: 'pending-confirmation' } }
-  if (typeof localStorage === 'undefined') return fallback
-  try {
-    const raw = localStorage.getItem(WORKSPACE_VIEW_STORAGE_KEY)
-    if (raw === null) return fallback
-    const state = JSON.parse(raw) as PersistedWorkspaceView
-    const value = state.projectMetadataByPath?.[path]
-    if (value === undefined) return fallback
-    const companyName = typeof value.companyName === 'string' ? value.companyName.trim() : ''
-    const schedule = value.schedule
-    if (schedule !== null && typeof schedule === 'object' && !Array.isArray(schedule)) {
-      const record = schedule as Record<string, unknown>
-      if (record.status === 'estimated' && typeof record.startDate === 'string' && typeof record.endDate === 'string') {
-        return { companyName, schedule: { status: 'estimated', startDate: record.startDate, endDate: record.endDate } }
-      }
-    }
-    return { companyName, schedule: { status: 'pending-confirmation' } }
-  } catch {
-    return fallback
-  }
-}
 
 /** Numeric whole-project session statistics derived from existing projections. */
 export interface ProjectRuntimeTotals {

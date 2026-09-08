@@ -15,6 +15,7 @@ import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
 import type {} from '@deepseek-ai/dsh-client-locale/client'
 import type { WorkspaceBrowserInjected, WorkspacePickerInjected } from './contract/slots.ts'
 import { createWorkspaceViewStore } from './stores.ts'
+import { ProjectMetadataController } from './project-metadata.ts'
 import { WorkspaceBrowser } from './WorkspaceBrowser.tsx'
 import { WorkspacePicker } from './WorkspacePicker.tsx'
 import { en, zh, type WorkspaceKey } from './locales.ts'
@@ -25,6 +26,14 @@ export type {
   WorkspacePickerInjected, WorkspacePickerProps,
 } from './contract/slots.ts'
 export type { WorkspaceKey } from './locales.ts'
+export type { ProjectMetadataValue, ProjectMetadataState, ProjectMetadataService } from './project-metadata.ts'
+
+declare module '@deepseek-ai/cordis' {
+  interface Context {
+    /** Host-backed company and delivery dates for exact registered projects. */
+    projectMetadata: import('./project-metadata.ts').ProjectMetadataService
+  }
+}
 
 declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface LocaleNamespaceMap {
@@ -53,6 +62,11 @@ export const inject = ['slots', 'sessions', 'workspaces', 'locale', 'connection'
  * @param ctx - client root context.
  */
 export function apply(ctx: ClientContext): void {
+  const projectMetadata = new ProjectMetadataController()
+  ctx.effect(() => {
+    const dispose = ctx.reflect.provide('projectMetadata', projectMetadata)
+    return () => { projectMetadata.dispose(); void dispose() }
+  }, 'ui-workspace: project metadata')
   const connection = ctx.get('connection') as ConnectionHandle
   const hostDescription = connection.hostDescription
   ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'ui-workspace: dictionaries')
@@ -105,7 +119,9 @@ export function apply(ctx: ClientContext): void {
     },
     createWorkspace: input => ctx.workspaces.create(input),
     createDirectory: (path, name) => ctx.workspaces.createDirectory(path, name),
-    hooks: { directoryFlow: browserFlowSource, hostDescription, projectContext: projectContextSource },
+    loadProjectMetadata: (id, path) => { projectMetadata.load(id, path) },
+    saveProjectMetadata: (id, value) => projectMetadata.save(id, value),
+    hooks: { directoryFlow: browserFlowSource, hostDescription, projectContext: projectContextSource, projectMetadata },
   })
   const pickerInjected = (): WorkspacePickerInjected => ({
     createWorkspace: input => ctx.workspaces.create(input),

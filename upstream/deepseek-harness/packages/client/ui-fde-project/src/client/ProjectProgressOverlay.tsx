@@ -11,7 +11,8 @@ import type {
   ProjectSurfaceLoadState,
   ValidationStageSnapshot,
 } from './controller.ts'
-import { readProjectMetadata, STAGE_NAMES } from './project-data.ts'
+import { STAGE_NAMES } from './project-data.ts'
+import type { ProjectMetadataValue } from '@deepseek-ai/dsh-client-ui-workspace/client'
 import {
   FDE_STAGES,
   FDE_V2_STAGE_IDS,
@@ -36,7 +37,7 @@ interface ProjectRow {
   readonly latestSessionTitle?: string
   readonly latestActivityAt?: number
   readonly companyName: string
-  readonly schedule: ReturnType<typeof readProjectMetadata>['schedule']
+  readonly schedule: ProjectMetadataValue['schedule']
   readonly stage: ProjectStageLoadState | undefined
   readonly surface: ProjectSurfaceLoadState | undefined
 }
@@ -170,30 +171,124 @@ function portfolioStageId(row: ProjectRow): FdeV2StageId | undefined {
 }
 
 function portfolioHealth(row: ProjectRow): 'stable' | 'attention' | 'risk' {
-  if (row.stage?.status === 'error' || row.surface?.status === 'error') return 'risk'
-  if (row.schedule.status === 'pending-confirmation') return 'attention'
+  const attention = projectAttention(row)
+  if (attention?.kind === 'blocker' || attention?.kind === 'overdue') return 'risk'
+  if (attention !== undefined) return 'attention'
   return 'stable'
 }
 
 interface ProjectNextAction {
-  readonly priority: number
   readonly reason: string
   readonly action: string
   readonly decisionOwner: string
 }
 
+interface ProjectAttention extends ProjectNextAction {
+  readonly kind: 'blocker' | 'overdue' | 'review' | 'read-error'
+  readonly label: string
+  readonly priority: number
+}
+
+function projectAttention(row: ProjectRow): ProjectAttention | undefined {
+  if (row.stage?.status === 'ready' && row.stage.value.currentStage === 'completed') return undefined
+  if (row.stage?.status === 'error' || row.surface?.status === 'error') {
+    return {
+      kind: 'read-error', label: '读取失败', priority: 4,
+      reason: row.stage?.status === 'error' ? row.stage.message : row.surface?.status === 'error' ? row.surface.message : '',
+      action: '重新读取项目状态', decisionOwner: 'FDE 处理',
+    }
+  }
+  if (row.stage?.status !== 'ready') return undefined
+
+  const surface = row.surface?.status === 'ready' ? row.surface.value : undefined
+  const state = row.stage.value
+  const isV2 = state.lifecycleVersion === 2 || state.v2Stage !== undefined
+  const stageId = state.v2Stage ?? LEGACY_TO_V2_STAGE[state.currentStage]
+  const stage = isV2 && stageId !== 'discovery' ? surface?.v2Stages?.[stageId] : undefined
+  if (stage?.stateStatus === 'invalid') return {
+    kind: 'read-error', label: '阶段记录无效', priority: 4,
+    reason: stage.message ?? '当前阶段记录未通过格式检查。', action: '检查并修复阶段记录', decisionOwner: 'FDE 处理',
+  }
+  const issues: { title: string; severe: boolean }[] = []
+  let reviewReady = false
+  if (isV2) {
+    if (stage?.stateStatus === 'ready') {
+      issues.push(...stage.blockers.filter(item => item.status === 'open').map(item => ({
+        title: item.title, severe: item.severity === 'critical' || item.severity === 'high',
+      })))
+      issues.push(...stage.workItems.filter(item => item.status === 'blocked').map(item => ({ title: item.title, severe: false })))
+      if (stage.evaluation?.status === 'ready' && stage.evaluation.testing.current) {
+        issues.push(...stage.evaluation.testing.metrics.filter(item => item.status === 'FAIL').map(item => ({ title: item.title, severe: item.required })))
+      }
+      if (stage.delivery?.status === 'ready' && stage.delivery.versionCurrent) {
+        issues.push(...stage.delivery.items.filter(item => item.status === 'failed' || item.status === 'blocked').map(item => ({ title: item.title, severe: item.required })))
+      }
+      reviewReady = stage.reviewReady
+    }
+    if (stageId === 'discovery') reviewReady = surface?.discovery?.reviewReady === true
+  } else if (surface !== undefined) {
+    const contract = state.currentStage === 'validation' ? surface.validation?.contract
+      : state.currentStage === 'pilot' ? surface.deploymentTrial?.contract : undefined
+    if (contract?.status === 'ready') {
+      issues.push(...contract.issues.filter(item => item.status === 'open').map(item => ({
+        title: item.title, severe: item.severity === 'critical' || item.severity === 'high',
+      })))
+    }
+    if (state.currentStage === 'handoff' && surface.acceptanceHandover?.contract.status === 'ready') {
+      issues.push(...surface.acceptanceHandover.contract.conditions.filter(item => item.status === 'open').map(item => ({ title: item.title, severe: false })))
+    }
+    reviewReady = state.currentStage === 'requirements' ? surface.discovery?.reviewReady === true
+      : state.currentStage === 'solution' ? surface.architecture?.status === 'pending-confirmation'
+        : state.currentStage === 'validation' ? surface.validation?.gateReady === true || (surface.validation?.planReady === true && (surface.validation.planApproval.status === 'pending' || surface.validation.planApproval.status === 'stale'))
+          : state.currentStage === 'pilot' ? surface.deploymentTrial?.gateReady === true || surface.deploymentTrial?.confirmationReady === true
+            : state.currentStage === 'handoff' ? surface.acceptanceHandover?.gateReady === true : false
+  }
+
+  const issue = issues.find(item => item.severe) ?? issues[0]
+  const blocker: ProjectAttention | undefined = issue === undefined ? undefined : {
+    kind: 'blocker', label: issue.severe ? '存在阻塞' : '有待处理问题', priority: issue.severe ? 0 : 2,
+    reason: issue.title, action: '查看并处理已登记问题', decisionOwner: 'FDE 处理',
+  }
+  if (blocker?.priority === 0) return blocker
+  if (row.schedule.status === 'estimated') {
+    const end = row.schedule.endDate
+    const date = new Date(`${end}T00:00:00`)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    // Metadata is browser-local; reject invalid dates instead of inferring an overdue delivery.
+    if (/^\d{4}-\d{2}-\d{2}$/.test(end) && Number.isFinite(date.getTime())
+      && date.getFullYear() === Number(end.slice(0, 4)) && date.getMonth() + 1 === Number(end.slice(5, 7)) && date.getDate() === Number(end.slice(8, 10))
+      && date < today) {
+      return {
+        kind: 'overdue', label: '已过计划交付日', priority: 1,
+        reason: `登记的计划结束日期为 ${end}，项目尚未完成。`,
+        action: '核对交付进展与计划日期', decisionOwner: 'FDE 跟进',
+      }
+    }
+  }
+  if (blocker !== undefined) return blocker
+  if (reviewReady) return {
+    kind: 'review', label: '待你确认', priority: 3,
+    reason: `${V2_STAGE_NAMES[stageId]}已有可供 FDE 审阅和确认的记录。`,
+    action: '进入项目审阅并确认', decisionOwner: 'FDE 确认',
+  }
+  return undefined
+}
+
 function projectNextAction(row: ProjectRow): ProjectNextAction {
+  const attention = projectAttention(row)
+  if (attention !== undefined) return attention
   if (row.stage?.status === 'error') {
-    return { priority: 0, reason: '项目阶段读取失败', action: '重新读取项目状态', decisionOwner: 'FDE 处理' }
+    return { reason: '项目阶段读取失败', action: '重新读取项目状态', decisionOwner: 'FDE 处理' }
   }
   if (row.schedule.status === 'pending-confirmation') {
-    return { priority: 1, reason: '交付周期尚未确认', action: '补充项目周期与交付边界', decisionOwner: 'FDE 确认' }
+    return { reason: '交付周期尚未确认', action: '补充项目周期与交付边界', decisionOwner: 'FDE 确认' }
   }
   if (row.stage === undefined || row.stage.status === 'loading') {
-    return { priority: 2, reason: '正在同步项目阶段', action: '查看项目读取进展', decisionOwner: '系统读取' }
+    return { reason: '正在同步项目阶段', action: '查看项目读取进展', decisionOwner: '系统读取' }
   }
   if (row.runningSessions > 0) {
-    return { priority: 3, reason: `${String(row.runningSessions)} 个会话正在运行`, action: '查看当前工作进展', decisionOwner: 'FDE 跟进' }
+    return { reason: `${String(row.runningSessions)} 个会话正在运行`, action: '查看当前工作进展', decisionOwner: 'FDE 跟进' }
   }
   const current = row.stage.value.v2Stage ?? LEGACY_TO_V2_STAGE[row.stage.value.currentStage]
   const actions: Readonly<Record<FdeV2StageId, string>> = {
@@ -207,7 +302,6 @@ function projectNextAction(row: ProjectRow): ProjectNextAction {
     improvement: '根据生产证据选择下一轮改进',
   }
   return {
-    priority: 4,
     reason: `当前处于${V2_STAGE_NAMES[current]}`,
     action: actions[current],
     decisionOwner: 'FDE 确认',
@@ -292,12 +386,6 @@ function projectProgressFacts(row: ProjectRow): ProjectProgressFacts {
     evidence: `验收移交交付文件 ${String(surface.acceptanceHandover.artifacts.presentCount)}/${String(surface.acceptanceHandover.artifacts.requiredCount)}。`,
     detail: surface.acceptanceHandover.blockers.length === 0 ? '当前没有移交阻塞。' : `${String(surface.acceptanceHandover.blockers.length)} 个移交阻塞待处理。`,
   }
-}
-
-function projectRequiresAttention(row: ProjectRow): boolean {
-  if (row.stage?.status !== 'ready') return true
-  if (row.surface?.status === 'error' || row.schedule.status === 'pending-confirmation' || row.runningSessions > 0) return true
-  return row.stage.value.currentStage !== 'completed'
 }
 
 function previousStageOf(stage: FdeProjectState): FdeStageId | undefined {
@@ -980,20 +1068,18 @@ function ProjectList({ rows, showProject, labels, enterProject }: {
             const stageId = portfolioStageId(row) ?? 'discovery'
             const palette = projectPalette(row.title)
             const health = portfolioHealth(row)
+            const attention = projectAttention(row)
             const nextAction = projectNextAction(row)
             const schedule = row.schedule.status === 'estimated'
               ? `${formatDate(row.schedule.startDate)} — ${formatDate(row.schedule.endDate)}`
               : labels.scheduleMissing
             const stageName = stageLabel(row.stage, labels.loading, labels.failed)
             const stagePosition = index < 0 ? '阶段待读取' : `阶段 ${String(index + 1)}/8`
-            const healthLabel = health === 'stable' ? '进展平稳' : health === 'attention' ? '需要关注' : '存在阻塞'
-            const healthDetail = row.stage?.status === 'error'
-              ? labels.failed
-              : row.schedule.status === 'pending-confirmation'
-                ? labels.scheduleMissing
-                : row.runningSessions > 0
-                  ? `${String(row.runningSessions)} 个会话运行中`
-                  : '暂无运行会话'
+            const healthLabel = attention?.label ?? (row.stage?.status !== 'ready' ? '阶段读取中'
+              : row.stage.value.currentStage === 'completed' ? '项目已完成'
+                : row.surface?.status !== 'ready' ? '资料读取中' : '暂无已登记待办')
+            const healthDetail = attention?.reason ?? (row.runningSessions > 0
+              ? `${String(row.runningSessions)} 个会话运行中` : '暂无运行会话')
             return (
               <tr key={row.workspaceId} className={css.projectListRow} data-stage={stageId} data-palette={palette}>
                 <td>
@@ -1077,13 +1163,13 @@ function ProjectArtwork({ hero = false, palette = 'blue' }: { readonly hero?: bo
   </svg>
 }
 
-function ProjectAttentionCard({ row, priority, showProject, enterProject }: {
+function ProjectAttentionCard({ row, showProject, enterProject }: {
   readonly row: ProjectRow
-  readonly priority: boolean
   readonly showProject: (workspaceId: string) => void
   readonly enterProject: (workspaceId: string) => void
 }) {
   const action = projectNextAction(row)
+  const attention = projectAttention(row)
   const progress = projectProgressFacts(row)
   const stageId = portfolioStageId(row) ?? 'discovery'
   const stage = stageLabel(row.stage, '阶段读取中', '阶段读取失败')
@@ -1094,7 +1180,7 @@ function ProjectAttentionCard({ row, priority, showProject, enterProject }: {
   const palette = projectPalette(row.title)
   return (
     <article className={`${css.projectAttentionCard} ${css.projectCompactCard}`} data-project-card="" data-stage={stageId} data-palette={palette}>
-      {priority && <span className={css.projectPriorityRibbon}>★ 优先关注</span>}
+      {attention !== undefined && <span className={css.projectPriorityRibbon} title={attention.reason}>{attention.label}</span>}
       <header>
         <div className={css.projectIdentity}>
           <ProjectMark title={row.title ?? '未命名项目'} palette={palette} className={css.projectMark!} />
@@ -1105,7 +1191,7 @@ function ProjectAttentionCard({ row, priority, showProject, enterProject }: {
       <div className={css.projectCompactProgress}>
         <div><span>当前阶段</span><b data-error={row.stage?.status === 'error' || undefined}>{stageIndex < 0 ? stage : `${stageIndex + 1}/8 · ${stage}`}</b></div>
         <strong title={`${progress.status}；${progress.evidence}；${progress.detail}`}>{progress.status}</strong>
-        <p title={`${action.reason}；${action.action}`}>{action.action}</p>
+        <p title={`${action.reason}；${action.action}`}>{attention?.reason ?? action.action}</p>
         <ProjectArtwork palette={palette} />
       </div>
       <div className={css.projectCompactSession}><span>最近会话</span><p title={row.latestSessionTitle}>{row.latestSessionTitle ?? '暂无项目会话'}</p></div>
@@ -1120,18 +1206,17 @@ function ProjectAttentionCard({ row, priority, showProject, enterProject }: {
   )
 }
 
-function ProjectAttentionList({ rows, priorityId, showProject, enterProject }: {
+function ProjectAttentionList({ rows, showProject, enterProject }: {
   readonly rows: readonly ProjectRow[]
-  readonly priorityId: string | undefined
   readonly showProject: (workspaceId: string) => void
   readonly enterProject: (workspaceId: string) => void
 }) {
   return (
     <section className={css.projectAttention} aria-label="项目卡片">
       {rows.length === 0
-        ? <div className={css.projectCenterEmpty}>所有真实项目当前都没有待处理动作，可切换到“全部项目”查看。</div>
+        ? <div className={css.projectCenterEmpty}>当前范围内没有符合条件的项目，可切换到“全部项目”查看。</div>
         : <div className={css.projectAttentionCards}>{rows.map(row => (
-          <ProjectAttentionCard key={row.workspaceId} row={row} priority={row.workspaceId === priorityId} showProject={showProject} enterProject={enterProject} />
+          <ProjectAttentionCard key={row.workspaceId} row={row} showProject={showProject} enterProject={enterProject} />
         ))}</div>}
     </section>
   )
@@ -1167,7 +1252,7 @@ function Timeline({ rows, showProject, todayLabel }: {
   readonly todayLabel: string
 }) {
   const scheduled = rows.filter((row): row is ProjectRow & { schedule: { status: 'estimated'; startDate: string; endDate: string } } => row.schedule.status === 'estimated')
-  if (scheduled.length === 0) return <div className={css.timelineEmpty}>还没有已确认交付周期的项目。</div>
+  if (scheduled.length === 0) return <div className={css.timelineEmpty}>还没有已登记交付周期的项目。</div>
   const dates = scheduled.flatMap(row => [new Date(`${row.schedule.startDate}T00:00:00`).getTime(), new Date(`${row.schedule.endDate}T00:00:00`).getTime()])
   const day = 86_400_000
   const start = Math.min(...dates) - day * 2
@@ -2843,21 +2928,24 @@ function ProjectDetail({
 
 /** Render the global full page while retaining the ordinary project/session sidebar. */
 export function ProjectProgressOverlay({
-  useProjectPage, useStageProgress, useProjectSurfaces, useProjectSources, useWorkspaces, useSessions,
+  useProjectPage, useStageProgress, useProjectSurfaces, useProjectSources, useProjectMetadata, useWorkspaces, useSessions,
   loadStage, retryStage, loadProjectSurface, refreshProjectSurface, loadProjectSources, parseProjectSource,
-  openProjectCreation, enterProject, reviewProjectArchitecture,
+  openProjectCreation, enterProject, openActivitySession, loadProjectMetadata, reviewProjectArchitecture,
   completeRequirements, completeSolution, completeDevelopment, completeValidation, completePilot, completeHandoff, returnToPrevious,
   acceptValidationMetric, waiveValidationIssue, acceptDeploymentTrialIssue, confirmDeploymentTrialReadiness,
   recordAcceptanceHandoverDecision,
-  showProjectOverview, showProjectTimeline, showProjectDetail,
+  showProjectHome, showProjectOverview, showProjectTimeline, showProjectDetail,
   renderSlot, t,
 }: ProjectProgressOverlayProps) {
   const page = useProjectPage(state => state)
   const workspaces = useWorkspaces(state => state.items)
+  const archivedSessionIds = useWorkspaces(state => state.archivedSessionIds)
   const sessions = useSessions(state => state)
   const stages = useStageProgress(state => state.byWorkspace)
   const surfaces = useProjectSurfaces(state => state.byWorkspace)
   const sources = useProjectSources(state => state.byWorkspace)
+  const metadataStates = useProjectMetadata(state => state.byWorkspace)
+  const [activityError, setActivityError] = useState<string | undefined>()
   const [selectedSourceId, setSelectedSourceId] = useState<string | undefined>()
   const [projectScope, setProjectScope] = useState<'attention' | 'all'>('all')
   const [projectCollectionView, setProjectCollectionView] = useState<'card' | 'list'>('card')
@@ -2874,8 +2962,9 @@ export function ProjectProgressOverlay({
       const workspaceId = String(workspace.workspaceId)
       loadStage(workspaceId)
       loadProjectSurface(workspaceId)
+      loadProjectMetadata(workspaceId, workspace.path)
     }
-  }, [loadProjectSurface, loadStage, page.open, workspaces])
+  }, [loadProjectSurface, loadStage, loadProjectMetadata, page.open, page.view, workspaces])
 
   useEffect(() => {
     if (page.view !== 'project' || page.workspaceId === undefined) return
@@ -2892,9 +2981,11 @@ export function ProjectProgressOverlay({
   }, [page.view, page.workspaceId, selectedSourceId, sources])
 
   const rows = useMemo<readonly ProjectRow[]>(() => workspaces.map((workspace) => {
-    const workspaceSessions = workspace.sessionIds.map(id => sessions.byId[id]).filter(item => item !== undefined)
+    const workspaceSessions = workspace.sessionIds.filter(id => !archivedSessionIds.includes(id)).map(id => sessions.byId[id]).filter(item => item !== undefined).filter(item => item.origin !== 'subagent')
     const latestSession = workspaceSessions.toSorted((left, right) => right.updatedAt - left.updatedAt)[0]
-    const metadata = readProjectMetadata(workspace.path)
+    const metadataState = metadataStates[String(workspace.workspaceId)]
+    const metadata = metadataState?.status === 'ready' && metadataState.value !== null
+      ? metadataState.value : { companyName: '', schedule: { status: 'pending-confirmation' as const } }
     const stage = stages[String(workspace.workspaceId)]
     const latestActivityAt = Math.max(
       Date.parse(workspace.createdAt) || 0,
@@ -2912,24 +3003,23 @@ export function ProjectProgressOverlay({
       stage,
       surface: surfaces[String(workspace.workspaceId)],
     }
-  }), [sessions.byId, stages, surfaces, workspaces])
+  }), [sessions.byId, stages, surfaces, workspaces, archivedSessionIds, metadataStates])
 
   if (!page.open) return null
   const detailRow = page.workspaceId === undefined ? undefined : rows.find(row => row.workspaceId === page.workspaceId)
   const sourceState = page.workspaceId === undefined ? undefined : sources[page.workspaceId]
   const surfaceState = page.workspaceId === undefined ? undefined : surfaces[page.workspaceId]
   const selectedSource = sourceState?.files.find(source => source.sourceId === selectedSourceId)
-  const attentionRows = rows.filter(projectRequiresAttention)
+  const attentionRows = rows.filter(row => projectAttention(row) !== undefined)
   const runningSessionCount = rows.reduce((total, row) => total + row.runningSessions, 0)
   const scheduledProjectCount = rows.filter(row => row.schedule.status === 'estimated').length
   const compareProjectPriority = (left: ProjectRow, right: ProjectRow): number => {
-    const priorityDifference = projectNextAction(left).priority - projectNextAction(right).priority
+    const priorityDifference = (projectAttention(left)?.priority ?? 5) - (projectAttention(right)?.priority ?? 5)
     if (priorityDifference !== 0) return priorityDifference
-    const stageDifference = currentV2StageIndex(right.stage) - currentV2StageIndex(left.stage)
-    return stageDifference === 0 ? (right.latestActivityAt ?? 0) - (left.latestActivityAt ?? 0) : stageDifference
+    return (right.latestActivityAt ?? 0) - (left.latestActivityAt ?? 0)
   }
   const primaryAttentionRow = attentionRows.toSorted(compareProjectPriority)[0]
-  const primaryAttentionAction = primaryAttentionRow === undefined ? undefined : projectNextAction(primaryAttentionRow)
+  const primaryAttentionAction = primaryAttentionRow === undefined ? undefined : projectAttention(primaryAttentionRow)
   const projectRowLabels: ProjectRowLabels = {
     companyMissing: t('progress.companyMissing'), scheduleMissing: t('progress.scheduleMissing'),
     view: t('progress.viewProject'), created: date => t('progress.createdAt', { date }),
@@ -2940,14 +3030,31 @@ export function ProjectProgressOverlay({
     if (projectSort === 'activity') return (right.latestActivityAt ?? 0) - (left.latestActivityAt ?? 0)
     return compareProjectPriority(left, right)
   })
+  const collectionRows = page.view === 'timeline' ? visibleRows.filter(row => row.schedule.status === 'estimated') : visibleRows
   const pageCount = Math.max(1, Math.ceil(visibleRows.length / 6))
   const currentProjectPage = Math.min(projectPage, pageCount)
   const pagedRows = visibleRows.slice((currentProjectPage - 1) * 6, currentProjectPage * 6)
-  const activityRows = rows
-    .filter(row => row.latestActivityAt !== undefined)
-    .toSorted((left, right) => (right.latestActivityAt ?? 0) - (left.latestActivityAt ?? 0))
+  const activityRows = workspaces.flatMap(workspace => {
+    const row = rows.find(item => item.workspaceId === String(workspace.workspaceId))!
+    const entries: { id: string; row: ProjectRow; description: string; at: number; sessionId?: string }[] = []
+    for (const id of workspace.sessionIds) {
+      const session = sessions.byId[id]
+      if (session === undefined || session.blank || session.origin === 'subagent' || archivedSessionIds.includes(id)) continue
+      entries.push({ id: `session:${id}`, row, description: `会话更新 · ${session.displayTitle}`, at: session.updatedAt, sessionId: String(id) })
+    }
+    if (row.stage?.status === 'ready') entries.push({
+      id: `stage:${row.workspaceId}`, row,
+      description: `阶段记录更新 · ${stageLabel(row.stage, projectRowLabels.loading, projectRowLabels.failed)}`,
+      at: Date.parse(row.stage.value.updatedAt),
+    })
+    const createdAt = Date.parse(workspace.createdAt)
+    const updatedAt = Date.parse(workspace.updatedAt)
+    entries.push({ id: `project:${row.workspaceId}`, row, description: updatedAt > createdAt ? '项目记录更新' : '项目已登记', at: Math.max(createdAt, updatedAt) })
+    return entries
+  }).filter(entry => Number.isFinite(entry.at) && entry.at > 0)
+    .toSorted((left, right) => right.at - left.at || left.id.localeCompare(right.id))
   const visibleActivityRows = activityRows.slice(0, allActivity ? undefined : 3)
-  const visibleScheduleRows = rows.filter(row => row.schedule.status === 'estimated').toSorted((left, right) => {
+  const visibleScheduleRows = rows.filter(row => row.schedule.status === 'estimated' && !(row.stage?.status === 'ready' && row.stage.value.currentStage === 'completed')).toSorted((left, right) => {
     if (left.schedule.status === 'estimated' && right.schedule.status === 'estimated') return left.schedule.endDate.localeCompare(right.schedule.endDate)
     if (left.schedule.status === 'estimated') return -1
     if (right.schedule.status === 'estimated') return 1
@@ -2980,6 +3087,10 @@ export function ProjectProgressOverlay({
       style={page.view === 'project' && !v2DetailOpen ? { left: sidebarOffset, width: `calc(100% - ${String(sidebarOffset)}px)` } : undefined}
       data-testid="fde-project-progress"
     >
+      {detailRow !== undefined && metadataStates[detailRow.workspaceId]?.status === 'error' && <p role="alert" className={css.projectMetadataWarning}>
+        项目基础信息未同步：{(metadataStates[detailRow.workspaceId] as { message: string }).message}
+        <button type="button" onClick={() => { loadProjectMetadata(detailRow.workspaceId, detailRow.path, true) }}>重试保存或读取周期</button>
+      </p>}
       {page.view === 'project' && detailRow !== undefined
         ? v2DetailOpen
           ? <ProjectV2Detail
@@ -3086,7 +3197,7 @@ export function ProjectProgressOverlay({
         : <main className={`${css.pageBody} ${css.projectCenterBody} ${css.projectCenterRefresh}`} data-project-center="">
           <header className={css.projectCenterHeader} data-project-center-header="">
             <div>
-              <p className={css.projectCenterBreadcrumb} data-project-breadcrumb=""><span>项目交付</span><i>/</i><strong>项目中心</strong></p>
+              <p className={css.projectCenterBreadcrumb} data-project-breadcrumb=""><button type="button" onClick={showProjectHome}>返回首页</button><i>/</i><strong>项目中心</strong>{page.view === 'timeline' && <><i>/</i><span>交付时间轴</span></>}</p>
               <h1>项目中心</h1>
               <p data-project-center-copy="">掌握交付进展，处理需要你决定的事项。</p>
               <button type="button" className={css.projectCreateAction} data-project-create="" onClick={openProjectCreation}>
@@ -3105,19 +3216,19 @@ export function ProjectProgressOverlay({
           <section className={css.projectCenterSummary} data-project-summary="" aria-label="项目概览">
             <dl className={css.projectCenterMetrics}>
               <div data-kind="projects"><span className={css.projectMetricIcon}><DashboardIcon kind="projects" /></span><div><dt>真实项目</dt><dd>{rows.length}</dd></div></div>
-              <div data-kind="decisions"><span className={css.projectMetricIcon}><DashboardIcon kind="decisions" /></span><div><dt>待人工决定</dt><dd>{attentionRows.length}</dd></div></div>
+              <div data-kind="decisions"><span className={css.projectMetricIcon}><DashboardIcon kind="decisions" /></span><div><dt>待处理项目</dt><dd>{attentionRows.length}</dd></div></div>
               <div data-kind="sessions"><span className={css.projectMetricIcon}><DashboardIcon kind="sessions" /></span><div><dt>运行中会话</dt><dd>{runningSessionCount}</dd></div></div>
               <div data-kind="schedule"><span className={css.projectMetricIcon}><DashboardIcon kind="schedule" /></span><div><dt>已登记周期</dt><dd>{scheduledProjectCount}</dd></div></div>
             </dl>
             <aside className={css.projectCenterPriority} data-empty={primaryAttentionRow === undefined ? true : undefined}>
               <div className={css.projectPriorityCopy}>
-                <span><b aria-hidden="true">★</b> 当前优先事项</span>
+                <span>当前待处理事项</span>
                 {primaryAttentionRow === undefined || primaryAttentionAction === undefined
-                  ? <><strong>目前没有待处理事项</strong><p>可以查看全部项目，或创建新的交付项目。</p></>
+                  ? <><strong>暂无已登记待处理事项</strong><p>未读取的项目状态仍待确认，可以查看全部项目继续工作。</p></>
                   : <>
                     <strong title={primaryAttentionRow.title}>{primaryAttentionRow.title}</strong>
                     <b className={css.projectPriorityStage}>{stageLabel(primaryAttentionRow.stage, '阶段读取中', '阶段读取失败')}</b>
-                    <p>{primaryAttentionAction.reason}</p>
+                    <p>{primaryAttentionAction.label}：{primaryAttentionAction.reason}</p>
                     <div>
                       <span>{primaryAttentionAction.action}</span>
                       <button type="button" onClick={() => { showProjectDetail(primaryAttentionRow.workspaceId) }}>查看并处理 <span aria-hidden="true">→</span></button>
@@ -3134,8 +3245,11 @@ export function ProjectProgressOverlay({
           <section className={css.projectCollectionSurface} data-project-collection="" aria-label="项目集合">
             <div className={css.projectCollectionHeader}>
               <div className={css.projectCollectionTitle}>
+                {page.view === 'timeline' && <button type="button" className={css.projectToolButton} onClick={() => { setProjectScope('all'); setProjectQuery(''); setProjectPage(1); showProjectOverview() }}>
+                  <svg aria-hidden="true" viewBox="0 0 14 14"><path d="m6 3-4 4 4 4M2 7h10" /></svg>返回项目中心
+                </button>}
                 <div>
-                  <h2 data-project-collection-title="">{page.view === 'timeline' ? '交付时间轴' : projectScope === 'attention' ? '待我处理' : '全部项目'} <b>{visibleRows.length}</b></h2>
+                  <h2 data-project-collection-title="">{page.view === 'timeline' ? '交付时间轴' : projectScope === 'attention' ? '待我处理' : '全部项目'} <b>{collectionRows.length}</b></h2>
                   <p>{query ? `“${projectQuery.trim()}”的搜索结果` : '项目进展与下一步'}</p>
                 </div>
               </div>
@@ -3156,19 +3270,19 @@ export function ProjectProgressOverlay({
                 </button>
               </div>
             </div>
-            {(rows.length > 6 || projectQuery !== '') && <div className={css.projectSearchRow}><label><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6" /><path d="m15 15 5 5" /></svg><input type="search" aria-label="搜索项目或企业" placeholder="搜索项目名称或所属企业" value={projectQuery} onChange={event => { setProjectQuery(event.target.value); setProjectPage(1) }} /></label><span>共 {visibleRows.length} 个项目{page.view !== 'timeline' && ' · 每页 6 个'}</span>{projectQuery !== '' && <button type="button" onClick={() => { setProjectQuery(''); setProjectPage(1) }}>清除搜索</button>}</div>}
+            {(rows.length > 6 || projectQuery !== '') && <div className={css.projectSearchRow}><label><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6" /><path d="m15 15 5 5" /></svg><input type="search" aria-label="搜索项目或企业" placeholder="搜索项目名称或所属企业" value={projectQuery} onChange={event => { setProjectQuery(event.target.value); setProjectPage(1) }} /></label><span>共 {collectionRows.length} 个项目{page.view !== 'timeline' && ' · 每页 6 个'}</span>{projectQuery !== '' && <button type="button" onClick={() => { setProjectQuery(''); setProjectPage(1) }}>清除搜索</button>}</div>}
             <div className={css.projectCenterContent}>
-              {visibleRows.length === 0
-                ? <div className={css.projectCenterEmpty}>{query ? '没有匹配的项目，请调整搜索条件。' : projectScope === 'attention' ? '当前没有需要人工决定的项目。' : t('progress.empty')}</div>
-                : page.view === 'timeline'
-                  ? <Timeline rows={visibleRows} showProject={showProjectDetail} todayLabel={t('progress.today')} />
+              {page.view === 'timeline'
+                ? <Timeline rows={collectionRows} showProject={showProjectDetail} todayLabel={t('progress.today')} />
+                : visibleRows.length === 0
+                ? <div className={css.projectCenterEmpty}>{query ? '没有匹配的项目，请调整搜索条件。' : projectScope === 'attention' ? '当前没有已登记的待处理项目，可切换到全部项目继续工作。' : t('progress.empty')}</div>
                   : projectCollectionView === 'list'
                     ? <ProjectList
                       rows={pagedRows} showProject={showProjectDetail} labels={projectRowLabels}
                       enterProject={(workspaceId) => { void enterProject(workspaceId) }}
                     />
                     : <ProjectAttentionList
-                      rows={pagedRows} priorityId={primaryAttentionRow?.workspaceId} showProject={showProjectDetail}
+                      rows={pagedRows} showProject={showProjectDetail}
                       enterProject={(workspaceId) => { void enterProject(workspaceId) }}
                     />}
               {Object.values(stages).some(stage => stage.status === 'error') && (
@@ -3187,15 +3301,20 @@ export function ProjectProgressOverlay({
                   {activityRows.length > 3 && <button type="button" aria-expanded={allActivity} onClick={() => { setAllActivity(value => !value) }}>{allActivity ? '收起动态' : '查看全部动态'} <span aria-hidden="true">→</span></button>}
                 </header>
                 {visibleActivityRows.length === 0
-                  ? <p>项目产生会话活动后，会在这里按时间显示。</p>
-                  : <ul>{visibleActivityRows.map(row => (
-                    <li key={row.workspaceId}>
-                      <span className={css.projectActivityMark} data-stage={portfolioStageId(row) ?? 'discovery'} data-palette={projectPalette(row.title)} aria-hidden="true">{row.title.slice(0, 1).toUpperCase()}</span>
-                      <div><strong>{row.title}</strong><small>{row.latestSessionTitle ?? '项目更新'}</small></div>
-                      <time>{row.latestActivityAt === undefined ? '暂无时间' : formatActivityTime(row.latestActivityAt)}</time>
-                      <button type="button" onClick={() => { showProjectDetail(row.workspaceId) }}>查看</button>
+                  ? <p>还没有可显示的项目更新记录。</p>
+                  : <ul className={css.projectRecentActivityList}>{visibleActivityRows.map(entry => (
+                    <li key={entry.id}>
+                      <span className={css.projectActivityMark} data-stage={portfolioStageId(entry.row) ?? 'discovery'} data-palette={projectPalette(entry.row.title)} aria-hidden="true">{entry.row.title.slice(0, 1).toUpperCase()}</span>
+                      <div><strong>{entry.row.title}</strong><small>{entry.description}</small></div>
+                      <time dateTime={new Date(entry.at).toISOString()}>{formatActivityTime(entry.at)}</time>
+                      <button type="button" onClick={() => {
+                        setActivityError(undefined)
+                        if (entry.sessionId === undefined) showProjectDetail(entry.row.workspaceId)
+                        else void openActivitySession(entry.row.workspaceId, entry.sessionId).catch((error: unknown) => { setActivityError(error instanceof Error ? error.message : '会话打开失败。') })
+                      }}>{entry.sessionId === undefined ? '查看项目' : '查看对话'}</button>
                     </li>
                   ))}</ul>}
+                {activityError !== undefined && <p role="alert">{activityError}</p>}
               </section>
               <section aria-labelledby="project-delivery-schedule-title">
                 <header>
@@ -3203,16 +3322,24 @@ export function ProjectProgressOverlay({
                   <button type="button" className={css.projectTimelineAction} onClick={() => { setProjectScope('all'); setProjectQuery(''); showProjectTimeline() }}>{scheduledProjectCount}/{rows.length} 已登记 <span aria-hidden="true">→</span></button>
                 </header>
                 <ul>{visibleScheduleRows.map(row => (
-                  <li key={row.workspaceId} data-pending={row.schedule.status !== 'estimated' || undefined}>
+                  <li key={row.workspaceId}>
+                    <button type="button" className={css.projectScheduleRowAction} aria-label={`查看 ${row.title} 的交付周期`} onClick={() => { showProjectDetail(row.workspaceId) }}>
                     <span className={css.projectActivityMark} data-stage={portfolioStageId(row) ?? 'discovery'} data-palette={projectPalette(row.title)} aria-hidden="true">{row.title.slice(0, 1).toUpperCase()}</span>
                     <div>
                       <strong>{row.title}</strong>
                       <small>{stageLabel(row.stage, projectRowLabels.loading, projectRowLabels.failed)}</small>
                     </div>
                     {row.schedule.status === 'estimated' && <div className={css.projectScheduleDates}><span><small>开始</small>{formatDate(row.schedule.startDate)}</span><i aria-hidden="true" /><span><small>结束</small>{formatDate(row.schedule.endDate)}</span></div>}
+                    </button>
                   </li>
                 ))}</ul>
-                {visibleScheduleRows.length === 0 ? <p>还没有已登记的交付周期。</p> : <button type="button" className={css.projectAllSchedules} onClick={() => { setProjectScope('all'); setProjectQuery(''); showProjectTimeline() }}>查看全部 {scheduledProjectCount} 个周期 <span aria-hidden="true">→</span></button>}
+                {visibleScheduleRows.length === 0 && <p>{scheduledProjectCount === 0 ? '还没有已登记的交付周期。' : '进行中的项目暂无已登记周期，可查看已完成项目的周期。'}</p>}
+                {rows.some(row => metadataStates[row.workspaceId] === undefined || metadataStates[row.workspaceId]?.status === 'loading') && <p aria-live="polite">正在读取项目周期…</p>}
+                {rows.map(row => {
+                  const state = metadataStates[row.workspaceId]
+                  return state?.status === 'error' ? <p key={row.workspaceId} role="alert">{row.title}：{state.message} <button type="button" onClick={() => { loadProjectMetadata(row.workspaceId, row.path, true) }}>重试保存或读取周期</button></p> : null
+                })}
+                {scheduledProjectCount > 0 && <button type="button" className={css.projectAllSchedules} onClick={() => { setProjectScope('all'); setProjectQuery(''); showProjectTimeline() }}>查看全部 {scheduledProjectCount} 个周期 <span aria-hidden="true">→</span></button>}
               </section>
             </div>
           )}

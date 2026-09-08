@@ -57,7 +57,7 @@ function WorkspaceHoverContent({ label, cwd, createdAt, metadata, t }: {
   label: string
   cwd: string | undefined
   createdAt: number
-  metadata?: ProjectMetadata | undefined
+  metadata?: Pick<ProjectMetadata, 'companyName' | 'schedule'> | undefined
   t: RowTranslate
 }) {
   return (
@@ -139,7 +139,7 @@ export function ProjectRowItem({ group, onOpen, onToggle, onCreate, projectActio
   /** Host account home; POSIX home-rooted hover paths display as `~`. */
   home?: string | undefined
   /** Browser-persisted FDE project facts for the Workspace path. */
-  metadata?: ProjectMetadata | undefined
+  metadata?: Pick<ProjectMetadata, 'companyName' | 'schedule'> | undefined
   t: RowTranslate
 }) {
   const row = group

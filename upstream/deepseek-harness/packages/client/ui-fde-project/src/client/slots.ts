@@ -38,6 +38,7 @@ export interface ProjectPageInjected {
     stageProgress: ProjectStageController
     projectSurfaces: FdeProjectSurfaceController
     projectSources: ProjectSourceController
+    projectMetadata: import('@deepseek-ai/dsh-client-ui-workspace/client').ProjectMetadataService
   }
   loadStage: (workspaceId: string) => void
   retryStage: (workspaceId: string) => void
@@ -80,9 +81,12 @@ export interface ProjectPageInjected {
   parseProjectSource: (workspaceId: string, sourceId: string) => Promise<void>
   openProjectCreation: () => void
   enterProject: (workspaceId: string) => Promise<void>
+  openActivitySession: (workspaceId: string, sessionId: string) => Promise<void>
+  loadProjectMetadata: (workspaceId: string, path: string, force?: boolean) => void
   reviewProjectArchitecture: (workspaceId: string) => Promise<void>
   closeProjectPage: () => void
   openProjectPage: () => void
+  showProjectHome: () => void
   showProjectOverview: () => void
   showProjectTimeline: () => void
   showProjectDetail: (workspaceId: string) => void

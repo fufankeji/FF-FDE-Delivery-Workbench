@@ -121,7 +121,7 @@ FDE Project (= Harness Workspace)
 - F010 先以官方 `storage-domain` 中的 `fde_stage` 表保存 WorkspaceId → 当前阶段记录；项目成功创建后首次读取只初始化 `requirements`，同项目普通 Session 读取同一记录。该当前值不进入页面 store，阶段说明选择只留在组件本地。
 - 创建空白项目时，先创建/选择真实独立目录，再注册 Workspace、创建首个 Session，最后向 UI 发布成功；任一步失败不得留下用户可选的半项目。
 - 一个项目可以有多条普通 Session；每条 Session 保留独立消息历史，但模型调用都注入同一项目当前基线、来源索引、阶段与权限边界。SubAgent/Workflow 仍用于单条会话内的子任务，不取代项目会话。
-- 项目创建表单首版的名称以 Workspace title 持久化；企业、待确认/预计周期等扩展基础信息由 `ui-workspace` 根作用域持久 store 以规范目录路径为键保存，可跨页面重载和 Host 重启恢复。Store 同时保存用户明确勾选的默认项目根目录；未设置时表单必须主动选取，不使用 Home 隐式兜底。业务显示名与物理目录名分离，后者只接受 ASCII 安全段。该层是当前 UI 适配阶段的明确临时持久边界；正式 FDE Project Host Plugin 落地时迁移同一字段合同，避免长期把项目业务事实只留在浏览器。
+- 项目名称以 Workspace title 持久化；企业、待确认/预计周期保存到项目 `.fde/project-metadata.json`，由 `fde-project` 的可信同源接口按已登记 WorkspaceId 解析，不接受浏览器指定路径。`ui-workspace` 的 `projectMetadata` 服务为创建表单、侧栏和项目中心提供同一份 Host 读取状态；浏览器旧数据仅在项目文件缺失时导入，保留旧值且不覆盖服务器记录。根目录偏好仍保存在浏览器；业务显示名与 ASCII 物理目录名继续分离。
 - FDE 新建项目需要“浏览目录＋创建子目录”两个能力同时存在。官方 auto chooser 在本地 macOS loopback 启动时会解析为 native，而 native 只提供系统选择、不提供 `createDirectory`；因此当前 FDE Web Bundle 固定组合官方 `directory-picker-browse` Host backend 与 `ui-directory-picker-browse` Client surface，不再使用 auto。该决定保持官方 capability seam，不修改或绕过 API 权限检查。
 
 ### 5.2 项目文件

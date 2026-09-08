@@ -278,7 +278,7 @@ type SessionTreeProps = Pick<
   /** Registry-global archive set (hidden rows). */
   archivedSessionIds: readonly SessionNode['id'][]
   /** Browser-persisted FDE project facts keyed by canonical Workspace path. */
-  projectMetadataByPath: Readonly<Record<string, ProjectMetadata>>
+  projectMetadataByPath: Readonly<Record<string, Pick<ProjectMetadata, 'companyName' | 'schedule'>>>
   /** Open the browser-owned rename dialog for a real Workspace group. */
   onRenameRequest: (workspaceId: WorkspaceId, currentTitle: string) => void
   /** Open the browser-owned delete-confirmation dialog for a real Workspace group. */
@@ -835,10 +835,13 @@ export function WorkspaceBrowser({
   insertSessionBefore,
   createWorkspace,
   createDirectory,
+  loadProjectMetadata,
+  saveProjectMetadata,
   searchSessions,
   searchResultLimit,
   useDirectoryFlow,
   useProjectContext,
+  useProjectMetadata,
   useHostDescription,
   renderSlot,
   t,
@@ -861,7 +864,14 @@ export function WorkspaceBrowser({
   const groupExpansion = useStore(s => s.groupExpansion)
   const sessionOrderByAccount = useStore(s => s.sessionOrderByAccount)
   const sessionUpdatedAtByAccount = useStore(s => s.sessionUpdatedAtByAccount)
-  const projectMetadataByPath = useStore(s => s.projectMetadataByPath ?? {})
+  const metadataState = useProjectMetadata(state => state.byWorkspace)
+  const projectMetadataByPath = Object.fromEntries(workspaces.flatMap(workspace => {
+    const state = metadataState[workspace.workspaceId]
+    return state?.status === 'ready' && state.value !== null ? [[workspace.path, state.value]] : []
+  }))
+  useEffect(() => {
+    for (const workspace of workspaces) loadProjectMetadata(workspace.workspaceId, workspace.path)
+  }, [loadProjectMetadata, workspaces])
   const defaultProjectRoot = useStore(s => s.defaultProjectRoot ?? '')
   const currentBlankSessionId = useSessions((state) => {
     const current = state.current
@@ -1130,6 +1140,12 @@ export function WorkspaceBrowser({
           directoryName: projectDirectoryNameTrimmed,
           createdAt: new Date().toISOString(),
         })
+        try {
+          await saveProjectMetadata(workspace.workspaceId, { companyName: companyName.trim(), schedule })
+        } catch {
+          // The project exists. Project Center shows the failed save and retries
+          // only metadata; reopening creation here would duplicate the directory.
+        }
         if (rememberProjectRoot) actions.setDefaultProjectRoot(storageParent)
         actions.setGroupExpanded(workspace.workspaceId as string, true)
         setCreatingProject(false)

@@ -9,6 +9,7 @@ import { registerProjectArchitectureTools } from './architecture-tools.ts'
 import { registerProjectEvaluationGuard } from './evaluation-guard.ts'
 import { registerEvaluationWorkbenchTools } from './evaluation-workbench-tools.ts'
 import {
+  createProjectMetadataRoute,
   createArchitectureConfirmRoute,
   createAcceptanceHandoverDecisionRoute,
   createDeploymentTrialIssueAcceptRoute,
@@ -25,6 +26,7 @@ import {
   createValidationPlanConfirmRoute,
 } from './http.ts'
 import { registerProjectOpenApiTools, type ProjectOpenApiPolicy } from './openapi-tools.ts'
+import { ensureProjectMetadata, readProjectMetadata } from './project-metadata.ts'
 import { approveProjectEvaluationBaseline, confirmProjectArchitecture, loadProjectSurfaceSnapshot } from './snapshot.ts'
 import {
   abandonProjectRuntimeOperation,
@@ -225,6 +227,20 @@ export function apply(ctx: Context, config: Config): void {
   registerProjectEvaluationGuard(ctx)
   registerEvaluationWorkbenchTools(ctx)
   const reportFailure = (error: unknown): void => { ctx.logger.warn(error instanceof Error ? error : new Error(String(error))) }
+  ctx.effect(() => ctx.webServer.register({
+    kind: 'exact', path: '/api/fde-project/metadata',
+    handler: createProjectMetadataRoute({
+      trusted: request => isTrustedApiRequest(request, []),
+      read: async id => {
+        const workspace = ctx.workspaceRegistry.get(WorkspaceId(id))
+        return workspace === undefined ? undefined : await readProjectMetadata(workspace.path)
+      },
+      ensure: async (id, value) => {
+        const workspace = ctx.workspaceRegistry.get(WorkspaceId(id))
+        return workspace === undefined ? undefined : await ensureProjectMetadata(workspace.path, value)
+      },
+    }),
+  }), 'fde-project: project metadata')
   const previews = new ProjectPreviewGateway({
     platformPort: ctx.webServer.port,
     timeoutMs: config.timeoutMs,

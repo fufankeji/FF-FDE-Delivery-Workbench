@@ -53,7 +53,7 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
 }
 
 /** Required browser services and the Slot owners that declare our targets. */
-export const inject = ['slots', 'locale', 'sessions', 'workspaces', 'conversation', 'layout']
+export const inject = ['slots', 'locale', 'sessions', 'workspaces', 'conversation', 'layout', 'projectMetadata']
 
 const FDE_PROJECT_PROGRESS_OPEN_EVENT = 'fde:project-progress-open'
 const FDE_PROJECT_CREATE_OPEN_EVENT = 'fde:project-create-open'
@@ -132,7 +132,23 @@ export function apply(ctx: ClientContext): void {
   }
 
   const pageInjected = (): ProjectPageInjected => ({
-    hooks: { projectPage: page, stageProgress: stages, projectSurfaces: surfaces, projectSources: sources },
+    hooks: { projectPage: page, stageProgress: stages, projectSurfaces: surfaces, projectSources: sources, projectMetadata: ctx.projectMetadata },
+    loadProjectMetadata: (id, path, force) => { ctx.projectMetadata.load(id, path, force) },
+    openActivitySession: async (workspaceId, sessionId) => {
+      const state = ctx.workspaces.list.getSnapshot()
+      const workspace = state.items.find(item => String(item.workspaceId) === workspaceId)
+      const session = ctx.sessions.list.getSnapshot().byId[sessionId as SessionId]
+      if (workspace === undefined || !workspace.sessionIds.includes(sessionId as SessionId)
+        || state.archivedSessionIds.includes(sessionId as SessionId) || session === undefined || session.blank || session.origin === 'subagent') {
+        throw new Error('这条会话已不存在或不再属于当前项目。')
+      }
+      ctx.sessions.open(sessionId as SessionId)
+      const conversation = ctx.sessions.scope(sessionId as SessionId)?.get('conversation')
+      if (conversation === undefined) throw new Error('当前项目会话暂时无法打开。')
+      enteredProject = { workspaceId, sessionId }
+      conversation.selectView('chat')
+      page.close()
+    },
     loadStage: (workspaceId) => { stages.load(workspaceId) },
     retryStage: (workspaceId) => { stages.retry(workspaceId) },
     loadProjectSurface: (workspaceId) => { surfaces.load(workspaceId) },
@@ -200,6 +216,7 @@ export function apply(ctx: ClientContext): void {
     reviewProjectArchitecture: async (workspaceId) => { await enterProject(workspaceId, 'fde-architecture') },
     closeProjectPage: page.close,
     openProjectPage: page.open,
+    showProjectHome: page.showHome,
     showProjectOverview: page.showOverview,
     showProjectTimeline: page.showTimeline,
     showProjectDetail: page.showProject,

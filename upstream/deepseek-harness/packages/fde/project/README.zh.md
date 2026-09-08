@@ -4,6 +4,10 @@
 
 FDE 项目交付页面使用的可信 Host 支持。它只解析显式 Harness WorkspaceId，只读取该项目的 `.fde/project-runtime.json`、`.fde/api-docs.json`、`.fde/architecture.json`、`.fde/evaluations/`、`.fde/deployment-trial.json`、`.fde/acceptance-handover.json`、六阶段固定产物和标准项目开发文档，校验有界结构后，通过同源接口返回一个浏览器快照。阶段产物读取器只报告已有、缺失或读取失败，不创建文件，也不把文件存在当成确认；已有的 Markdown 产物会获得有大小限制的同源只读预览地址，Host 按已索引产物标识选择文件，不接受浏览器传入路径。它还适配锁定版本 `dsh-openapi` 的解析和 HTTP 实现，使标准 OpenAPI 工具按调用 Agent 所属的已注册 Workspace 解析配置，而不是使用进程级共享 API 清单。
 
+## 项目基础信息
+
+`POST /api/fde-project/metadata` 只接受可信的已登记 `workspaceId`，不接受任意目录。不传 `metadata` 时读取 `.fde/project-metadata.json` 中的企业与交付周期，文件缺失返回 `null`；传入时在文件锁内创建缺失记录，保留已有记录。日期必须是真实日历日期且结束不早于开始；损坏文件、符号链接和过大记录均拒绝处理。该接口用于项目创建与旧浏览器数据导入，不用于修改已有周期或批准阶段。项目中心与 Workspace 侧栏共享其客户端投影。
+
 ## 项目开发文档
 
 只读研发投影扫描 `docs/PRD.md`、`docs/specs/product-spec.md`、`docs/specs/feature-map.md`，以及最多 100 个规范 `docs/specs/FNNN-slug/{spec,plan,tasks}.md` Feature 目录。可选 frontmatter 提供标题、状态、计划日期、里程碑和阻塞；Markdown 未勾选/已勾选任务是唯一任务数量来源。缺少日期时保持未知，重复 Feature ID 会被报告，浏览器没有反写任务 API。同一投影还报告 `fde-deliverables/03-project-development/` 下三份收口文件。Host 提供字节前会重新索引每个预览 ID，并用 realpath 检查文件仍位于已登记 Workspace 内。

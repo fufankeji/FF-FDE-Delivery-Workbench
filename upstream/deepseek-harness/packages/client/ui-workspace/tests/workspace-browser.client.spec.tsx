@@ -96,6 +96,8 @@ function mount(overrides: Partial<WorkspaceBrowserProps> = {}) {
     createDirectory: vi.fn(async (path, name) => `${path}/${name}`),
     useDirectoryFlow: bindSnapshotSelector({ getSnapshot: () => true, subscribe: () => () => {} }),
     useProjectContext: bindSnapshotSelector({ getSnapshot: () => false, subscribe: () => () => {} }),
+    useProjectMetadata: hook({ byWorkspace: {} }),
+    loadProjectMetadata: vi.fn(), saveProjectMetadata: vi.fn(async () => {}),
     useHostDescription: selector => selector(undefined),
     renderSlot: ((_name: string, owner: { open: boolean }) => (owner.open ? <div data-testid="directory-flow" /> : null)) as never,
     t,
@@ -977,6 +979,9 @@ describe('WorkspaceBrowser', () => {
     expect(startSession).not.toHaveBeenCalled()
     expect(createDirectory).toHaveBeenCalledWith('/projects-root', directoryInput.value)
     expect(createWorkspace).toHaveBeenCalledWith({ path: expectedPath })
+    expect(b.props.saveProjectMetadata).toHaveBeenCalledWith('created', {
+      companyName: '示例科技', schedule: { status: 'estimated', startDate: '2026-09-10', endDate: '2026-10-15' },
+    })
     expect(b.store.getSnapshot().projectMetadataByPath[expectedPath]).toMatchObject({
       name: '智能客服升级',
       companyName: '示例科技',
@@ -996,6 +1001,24 @@ describe('WorkspaceBrowser', () => {
     fireEvent.click(screen.getByRole('button', { name: '新建项目' }))
     expect(screen.getByTitle('/projects-root')).toBeTruthy()
     reopened.view.unmount()
+  })
+
+  it('keeps the created project and recovery copy when saving its delivery dates fails', async () => {
+    const openProjectProgress = vi.fn((event: Event) => { event.preventDefault() })
+    listenForProjectProgress(openProjectProgress)
+    const saveProjectMetadata = vi.fn(async () => { throw new Error('磁盘暂不可写') })
+    const b = mount({ saveProjectMetadata })
+    act(() => { b.store.actions.setDefaultProjectRoot('/projects-root') })
+    fireEvent.click(screen.getByRole('button', { name: '新建项目' }))
+    fireEvent.change(screen.getByLabelText('项目名称'), { target: { value: '保存重试项目' } })
+    fireEvent.click(screen.getByRole('button', { name: '创建项目' }))
+    await waitFor(() => expect(openProjectProgress).toHaveBeenCalledTimes(1))
+    expect(b.props.createDirectory).toHaveBeenCalledTimes(1)
+    expect(b.props.createWorkspace).toHaveBeenCalledTimes(1)
+    expect(saveProjectMetadata).toHaveBeenCalledTimes(1)
+    expect(Object.values(b.store.getSnapshot().projectMetadataByPath)[0]?.name).toBe('保存重试项目')
+    expect(screen.queryByRole('dialog', { name: '新建项目' })).toBeNull()
+    expect(b.props.startSession).not.toHaveBeenCalled()
   })
 
   it('keeps import as a separate directory flow and opens management for the adopted project', async () => {

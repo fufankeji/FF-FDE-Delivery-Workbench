@@ -29,6 +29,7 @@ describe('ui-fde-project apply', () => {
     const locale = new LocaleRuntime(ctx)
     locale.setLocale('zh')
     ctx.provide('locale', locale)
+    ctx.provide('projectMetadata', { getSnapshot: () => ({ byWorkspace: {} }), subscribe: () => () => {}, load: vi.fn(), save: vi.fn() })
     const prompt = vi.fn(async (
       _content: readonly { readonly type: string; readonly text?: string }[],
       _mode: string,
@@ -248,6 +249,7 @@ describe('ui-fde-project apply', () => {
     const locale = new LocaleRuntime(ctx)
     locale.setLocale('zh')
     ctx.provide('locale', locale)
+    ctx.provide('projectMetadata', { getSnapshot: () => ({ byWorkspace: {} }), subscribe: () => () => {}, load: vi.fn(), save: vi.fn() })
     const open = vi.fn()
     const selectView = vi.fn()
     const panelToggle = document.createElement('button')
@@ -324,6 +326,16 @@ describe('ui-fde-project apply', () => {
     expect(selectView).toHaveBeenLastCalledWith('fde-architecture')
     expect(open).toHaveBeenLastCalledWith('latest')
     expect(selectView.mock.invocationCallOrder[0]).toBeLessThan(open.mock.invocationCallOrder.at(-1) ?? 0)
+
+    await injected.openActivitySession('workspace-1', 'older')
+    expect(open).toHaveBeenLastCalledWith('older')
+    expect(selectView).toHaveBeenLastCalledWith('chat')
+    expect(connectWorkspace).not.toHaveBeenCalled()
+    for (const id of ['archived', 'child', 'blank', 'removed']) {
+      await expect(injected.openActivitySession('workspace-1', id)).rejects.toThrow('不再属于')
+    }
+    await expect(injected.openActivitySession('workspace-2', 'older')).rejects.toThrow('不再属于')
+    expect(open).toHaveBeenLastCalledWith('older')
 
     await injected.enterProject('workspace-2')
     expect(selectView).toHaveBeenLastCalledWith('fde-stage-workbench')

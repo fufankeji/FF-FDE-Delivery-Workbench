@@ -2,28 +2,12 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import type { SessionId, SessionSummary } from '@deepseek-ai/dsh-client-runtime/client'
 import {
-  latestProjectSessionId, projectActivityBuckets, projectRuntimeTotals, readProjectMetadata,
+  latestProjectSessionId, projectActivityBuckets, projectRuntimeTotals,
 } from '../src/client/project-data.ts'
 
 afterEach(() => { localStorage.clear() })
 
 describe('FDE project browser data', () => {
-  it('reads creation metadata from the existing workspace view record', () => {
-    localStorage.setItem('dsh.workspace.view.v6', JSON.stringify({
-      projectMetadataByPath: {
-        '/work/alpha': {
-          companyName: '示例科技',
-          schedule: { status: 'estimated', startDate: '2026-08-01', endDate: '2026-09-01' },
-        },
-      },
-    }))
-    expect(readProjectMetadata('/work/alpha')).toEqual({
-      companyName: '示例科技',
-      schedule: { status: 'estimated', startDate: '2026-08-01', endDate: '2026-09-01' },
-    })
-    expect(readProjectMetadata('/work/missing').schedule.status).toBe('pending-confirmation')
-  })
-
   it('aggregates only real Session projection values', () => {
     const session = {
       id: 's-1' as SessionId, displayTitle: '研发', running: true, blank: false, updatedAt: 1,

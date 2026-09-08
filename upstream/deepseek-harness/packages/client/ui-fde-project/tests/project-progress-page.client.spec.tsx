@@ -31,8 +31,9 @@ describe('ProjectProgressOverlay standalone page', () => {
       useProjectPage: hook({ open: true, view: 'home' as const }),
       useStageProgress: hook({ byWorkspace: {} }),
       useProjectSurfaces: hook({ byWorkspace: {} }),
+      useProjectMetadata: hook({ byWorkspace: {} }), loadProjectMetadata: vi.fn(), openActivitySession: vi.fn(),
       useProjectSources: hook({ byWorkspace: {} }),
-      useWorkspaces: hook({ items: [{
+      useWorkspaces: hook({ archivedSessionIds: [], items: [{
         workspaceId: 'workspace-1', title: '数据分析项目', path: '/project/one', sessionIds: [],
         createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:00:00.000Z',
       }] }),
@@ -87,8 +88,9 @@ describe('ProjectProgressOverlay standalone page', () => {
       useProjectPage: hook({ open: true, view: 'overview' as const }),
       useStageProgress: hook({ byWorkspace: {} }),
       useProjectSurfaces: hook({ byWorkspace: {} }),
+      useProjectMetadata: hook({ byWorkspace: {} }), loadProjectMetadata: vi.fn(), openActivitySession: vi.fn(),
       useProjectSources: hook({ byWorkspace: {} }),
-      useWorkspaces: hook({ items: [] }),
+      useWorkspaces: hook({ archivedSessionIds: [], items: [] }),
       useSessions: hook({ byId: {} }),
       loadStage: vi.fn(), retryStage: vi.fn(), loadProjectSurface: vi.fn(), refreshProjectSurface: vi.fn(),
       completeRequirements: vi.fn(), completeSolution: vi.fn(),
@@ -133,8 +135,9 @@ describe('ProjectProgressOverlay standalone page', () => {
           artifacts: [], requiredCount: 0, presentCount: 0, reviewReady: false, reviewBlockers: [],
         }])),
       } } } }),
+      useProjectMetadata: hook({ byWorkspace: {} }), loadProjectMetadata: vi.fn(), openActivitySession: vi.fn(),
       useProjectSources: hook({ byWorkspace: { 'workspace-1': { status: 'ready', files: [] } } }),
-      useWorkspaces: hook({ items: [{ workspaceId: 'workspace-1', title: '真实项目', path: '/project/one', sessionIds: ['session-1'], createdAt: '2026-09-03T00:00:00.000Z', updatedAt: '2026-09-03T00:00:00.000Z' }] }),
+      useWorkspaces: hook({ archivedSessionIds: [], items: [{ workspaceId: 'workspace-1', title: '真实项目', path: '/project/one', sessionIds: ['session-1'], createdAt: '2026-09-03T00:00:00.000Z', updatedAt: '2026-09-03T00:00:00.000Z' }] }),
       useSessions: hook({ byId: { 'session-1': { id: 'session-1', displayTitle: '会话', running: false, blank: true, updatedAt: 1 } } }),
       loadStage: vi.fn(), retryStage, loadProjectSurface: vi.fn(), refreshProjectSurface: vi.fn(),
       completeRequirements: vi.fn(), completeSolution: vi.fn(), completeDevelopment: vi.fn(), completeValidation: vi.fn(), completePilot: vi.fn(), completeHandoff: vi.fn(), returnToPrevious: vi.fn(),
@@ -181,9 +184,18 @@ describe('ProjectProgressOverlay standalone page', () => {
           createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:02:00.000Z',
         } },
       } }),
-      useProjectSurfaces: hook({ byWorkspace: {} }),
+      useProjectSurfaces: hook({ byWorkspace: {
+        'workspace-1': { status: 'ready', value: {
+          requirements: { presentCount: 3, requiredCount: 3 },
+          discovery: { reviewReady: true },
+        } },
+      } }),
+      useProjectMetadata: hook({ byWorkspace: {
+        'workspace-1': { status: 'ready', value: { companyName: '甲方', schedule: { status: 'estimated', startDate: '2026-08-27', endDate: '2026-09-27' } } },
+        'workspace-2': { status: 'ready', value: { companyName: '乙方', schedule: { status: 'estimated', startDate: '2026-08-28', endDate: '2026-09-28' } } },
+      } }), loadProjectMetadata: vi.fn(), openActivitySession: vi.fn(),
       useProjectSources: hook({ byWorkspace: {} }),
-      useWorkspaces: hook({ items: [
+      useWorkspaces: hook({ archivedSessionIds: [], items: [
         {
           workspaceId: 'workspace-1', title: '客户需求梳理', path: '/project/one', sessionIds: ['session-1'],
           createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:00:00.000Z',
@@ -211,7 +223,7 @@ describe('ProjectProgressOverlay standalone page', () => {
     expect(screen.getByRole('button', { name: '查看 1 个待处理项目' })).toBeTruthy()
     expect(screen.queryByLabelText('3 条通知')).toBeNull()
     expect(screen.getByLabelText('项目中心帮助')).toBeTruthy()
-    expect(screen.getByText('当前优先事项')).toBeTruthy()
+    expect(screen.getByText('当前待处理事项')).toBeTruthy()
     expect(screen.getByText('已登记周期')).toBeTruthy()
     expect(screen.getByRole('heading', { name: '最近动态' })).toBeTruthy()
     expect(screen.getByRole('heading', { name: '交付周期' })).toBeTruthy()
@@ -280,12 +292,13 @@ describe('ProjectProgressOverlay standalone page', () => {
     const session = { id: 'session-chat', displayTitle: '最新工作', running: false, updatedAt: Date.parse(date(5)) }
     const input = {
       useProjectPage: hook({ open: true, view: 'overview' }),
-      useWorkspaces: hook({ items: workspaces }), useSessions: hook({ byId: { 'session-chat': session } }),
+      useWorkspaces: hook({ archivedSessionIds: [], items: workspaces }), useSessions: hook({ byId: { 'session-chat': session } }),
       useStageProgress: hook({ byWorkspace: {
         old: { status: 'error', message: '暂时无法读取阶段' },
         stage: { status: 'ready', value: { workspaceId: 'stage', lifecycleVersion: 2, currentStage: 'solution', v2Stage: 'definition', revision: 2, createdAt: date(1), updatedAt: date(6) } },
       } }),
-      useProjectSurfaces: hook({ byWorkspace: {} }), useProjectSources: hook({ byWorkspace: {} }),
+      useProjectSurfaces: hook({ byWorkspace: {} }), useProjectMetadata: hook({ byWorkspace: {} }), loadProjectMetadata: vi.fn(), openActivitySession: vi.fn(),
+      useProjectSources: hook({ byWorkspace: {} }),
       loadStage: vi.fn(), retryStage: vi.fn(), loadProjectSurface: vi.fn(), refreshProjectSurface: vi.fn(),
       loadProjectSources: vi.fn(), enterProject: vi.fn(), showProjectDetail: vi.fn(), showProjectOverview: vi.fn(),
       showProjectTimeline: vi.fn(), openProjectCreation: vi.fn(), renderSlot: vi.fn(() => null), t: makeTranslate(zh),
@@ -325,7 +338,8 @@ describe('ProjectProgressOverlay standalone page', () => {
     const input = {
       useProjectPage: hook({ open: true, view: 'overview' as const }),
       useStageProgress: hook({ byWorkspace: {} }), useProjectSurfaces: hook({ byWorkspace: {} }),
-      useProjectSources: hook({ byWorkspace: {} }), useWorkspaces: hook({ items: workspaces }),
+      useProjectMetadata: hook({ byWorkspace: {} }), loadProjectMetadata: vi.fn(), openActivitySession: vi.fn(),
+      useProjectSources: hook({ byWorkspace: {} }), useWorkspaces: hook({ archivedSessionIds: [], items: workspaces }),
       useSessions: hook({ byId: Object.fromEntries(workspaces.map((workspace, index) => [workspace.sessionIds[0], { id: workspace.sessionIds[0], displayTitle: `交付记录 ${index + 1}`, running: false, updatedAt: Date.parse(workspace.createdAt) + index + 1 }])) }),
       loadStage: vi.fn(), retryStage: vi.fn(), loadProjectSurface: vi.fn(), refreshProjectSurface: vi.fn(),
       loadProjectSources: vi.fn(), enterProject, showProjectDetail, showProjectOverview: vi.fn(),
@@ -338,7 +352,7 @@ describe('ProjectProgressOverlay standalone page', () => {
     expect(screen.getByRole('heading', { name: '全部项目 13' })).toBeTruthy()
     expect(within(activity).getAllByRole('listitem')).toHaveLength(3)
     fireEvent.click(screen.getByRole('button', { name: /查看全部动态/ }))
-    expect(within(activity).getAllByRole('listitem')).toHaveLength(13)
+    expect(within(activity).getAllByRole('listitem')).toHaveLength(26)
     fireEvent.click(screen.getByRole('button', { name: /收起动态/ }))
     expect(within(activity).getAllByRole('listitem')).toHaveLength(3)
     expect(screen.getByRole('button', { name: '上一页' }).hasAttribute('disabled')).toBe(true)
@@ -369,7 +383,7 @@ describe('ProjectProgressOverlay standalone page', () => {
     expect(within(screen.getByRole('table', { name: '项目列表' })).getAllByRole('row')).toHaveLength(7)
     fireEvent.click(screen.getByRole('button', { name: '下一页' }))
     fireEvent.click(screen.getByRole('button', { name: '下一页' }))
-    view.rerender(<ProjectProgressOverlay {...input} useWorkspaces={hook({ items: workspaces.slice(0, 2) }) as unknown as ProjectProgressOverlayProps['useWorkspaces']} />)
+    view.rerender(<ProjectProgressOverlay {...input} useWorkspaces={hook({ archivedSessionIds: [], items: workspaces.slice(0, 2) }) as unknown as ProjectProgressOverlayProps['useWorkspaces']} />)
     expect(within(screen.getByRole('table', { name: '项目列表' })).getAllByRole('row')).toHaveLength(3)
     expect(screen.queryByRole('navigation', { name: '项目分页' })).toBeNull()
   })
@@ -397,8 +411,9 @@ describe('ProjectProgressOverlay standalone page', () => {
           ],
         },
       } } } }),
+      useProjectMetadata: hook({ byWorkspace: {} }), loadProjectMetadata: vi.fn(), openActivitySession: vi.fn(),
       useProjectSources: hook({ byWorkspace: { 'workspace-1': { status: 'ready', files: [] } } }),
-      useWorkspaces: hook({ items: [{
+      useWorkspaces: hook({ archivedSessionIds: [], items: [{
         workspaceId: 'workspace-1', title: '数据分析项目', path: '/project/one', sessionIds: ['session-1'],
         createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:00:00.000Z',
       }] }),
@@ -470,8 +485,9 @@ describe('ProjectProgressOverlay standalone page', () => {
           ],
         },
       } } } }),
+      useProjectMetadata: hook({ byWorkspace: {} }), loadProjectMetadata: vi.fn(), openActivitySession: vi.fn(),
       useProjectSources: hook({ byWorkspace: { 'workspace-1': { status: 'ready', files: [] } } }),
-      useWorkspaces: hook({ items: [{
+      useWorkspaces: hook({ archivedSessionIds: [], items: [{
         workspaceId: 'workspace-1', title: '数据分析项目', path: '/project/one', sessionIds: ['session-1'],
         createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:00:00.000Z',
       }] }),
@@ -547,8 +563,9 @@ describe('ProjectProgressOverlay standalone page', () => {
           ] },
         },
       } } } }),
+      useProjectMetadata: hook({ byWorkspace: {} }), loadProjectMetadata: vi.fn(), openActivitySession: vi.fn(),
       useProjectSources: hook({ byWorkspace: { 'workspace-1': { status: 'ready', files: [] } } }),
-      useWorkspaces: hook({ items: [{
+      useWorkspaces: hook({ archivedSessionIds: [], items: [{
         workspaceId: 'workspace-1', title: '数据分析项目', path: '/project/one', sessionIds: ['session-1'],
         createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:00:00.000Z',
       }] }),
@@ -638,8 +655,9 @@ describe('ProjectProgressOverlay standalone page', () => {
         },
         requirements: { root: 'fde-deliverables/01-requirement-research', requiredCount: 3, presentCount: 3, artifacts: [] },
       } } } }),
+      useProjectMetadata: hook({ byWorkspace: {} }), loadProjectMetadata: vi.fn(), openActivitySession: vi.fn(),
       useProjectSources: hook({ byWorkspace: { 'workspace-1': { status: 'ready', files: [] } } }),
-      useWorkspaces: hook({ items: [{
+      useWorkspaces: hook({ archivedSessionIds: [], items: [{
         workspaceId: 'workspace-1', title: '数据分析项目', path: '/project/one', sessionIds: ['session-1'],
         createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:00:00.000Z',
       }] }),
@@ -717,8 +735,9 @@ describe('ProjectProgressOverlay standalone page', () => {
         requirements: { root: 'fde-deliverables/01-requirement-research', requiredCount: 3, presentCount: 3, artifacts: [] },
         solution: { root: 'fde-deliverables/02-solution-design', requiredCount: 5, presentCount: 0, artifacts: [] },
       } } } }),
+      useProjectMetadata: hook({ byWorkspace: {} }), loadProjectMetadata: vi.fn(), openActivitySession: vi.fn(),
       useProjectSources: hook({ byWorkspace: { 'workspace-1': { status: 'ready', files: [] } } }),
-      useWorkspaces: hook({ items: [{
+      useWorkspaces: hook({ archivedSessionIds: [], items: [{
         workspaceId: 'workspace-1', title: '数据分析项目', path: '/project/one', sessionIds: ['session-1'],
         createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:00:00.000Z',
       }] }),
