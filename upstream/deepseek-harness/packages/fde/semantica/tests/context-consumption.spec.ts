@@ -2,22 +2,27 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, expect, it } from 'vitest'
-import { configureDesignRoute, createAgentContext, queryAgentContext, readSemanticWorkspace } from '../src/state.ts'
+import { bindSemanticSources, configureDesignRoute, createAgentContext, queryAgentContext, readSemanticWorkspace } from '../src/state.ts'
+import { parseProjectSource, registerStoredProjectResources } from '@deepseek-ai/dsh-fde-source'
+import { storeProjectResourceBatch } from '@deepseek-ai/dsh-fde-source/src/upload.ts'
 
 const roots: string[] = []
 afterEach(async () => { await Promise.all(roots.splice(0).map(root => rm(root, { recursive: true, force: true }))) })
-const config = { pythonCommand: 'python3', operationTimeoutMs: 5000, maxSourceBytes: 100000, maxSources: 4 }
+const config = { pythonCommand: process.env.FDE_SEMANTICA_TEST_PYTHON!, operationTimeoutMs: 60000, maxSourceBytes: 100000, maxSources: 4 }
 
-it('consumes another domain through the real Python bridge without changing confirmed design files', async () => {
+it.skipIf(!config.pythonCommand)('consumes another domain through the real Python bridge without changing confirmed design files', async () => {
   const root = await mkdtemp(join(tmpdir(), 'fde-context-consume-'))
   roots.push(root)
-  const base = await configureDesignRoute(root, { execution: { mechanism: 'software', label: '出版检索', rationale: '查作者与文章' }, semantics: { mode: 'ontology', rationale: '跨来源统一作者身份' } })
-  const graph = { entities: [{ id: 'author', type: 'Author', name: 'Lin', confidence: .9, sourceRefs: ['source-1'] }], relationships: [] }
+  await configureDesignRoute(root, { execution: { mechanism: 'software', label: '出版检索', rationale: '查作者与文章' }, semantics: { mode: 'ontology', rationale: '跨来源统一作者身份' } })
+  const stored = await storeProjectResourceBatch(root, [{ name: 'authors.txt', data: Buffer.from('Author: Lin') }])
+  const [source] = await registerStoredProjectResources(root, stored)
+  await parseProjectSource(root, source!.sourceId)
+  const base = await bindSemanticSources(root, [source!.sourceId], '当前项目读取')
+  const graph = { entities: [{ id: 'author', type: 'Author', name: 'Lin', confidence: .9, sourceRefs: [source!.sourceId] }], relationships: [] }
   const state = {
     ...base,
     provider: { ...base.provider, status: 'ready' as const, version: '0.6.7' },
     definition: { ...base.definition, status: 'published' as const, digest: 'definition-1' },
-    sources: [{ sourceId: 'source-1', permissionScope: '项目资料读取' }],
     validation: { status: 'passed', checksVersion: 'project-constraints-v1', definitionDigest: 'definition-1', graphRevision: 'graph-1' },
     slice: { status: 'succeeded' }, route: { ...base.route!, conclusion: 'validated' },
   }
@@ -38,4 +43,4 @@ it('consumes another domain through the real Python bridge without changing conf
   await mkdir(join(root, '.fde/design/semantica/runs'), { recursive: true })
   await createAgentContext(root, config, { seedNodeId: 'author', query: '显式编制验证', maxDepth: 1 })
   expect(await readSemanticWorkspace(root)).toMatchObject({ slice: { status: 'stale' }, route: { conclusion: 'pending' } })
-})
+}, 60000)

@@ -12,6 +12,7 @@ import {
   checkProvider,
   configureDesignRoute,
   createAgentContext,
+  queryAgentContext,
   extractCandidates,
   proposeSchema,
   publishSchema,
@@ -20,6 +21,7 @@ import {
   reviewCandidates,
   saveSemanticDefinition,
   validateGraph,
+  readSemanticWorkspace,
 } from '../src/index.ts'
 import type { SemanticProviderConfig } from '../src/types.ts'
 
@@ -95,6 +97,7 @@ describe('stage-four Semantica workspace', () => {
     const decided = await recordFdeDesignDecision(root, selected.revision, outcome, `${outcome} 的人工依据`)
     expect(decided.decision).toMatchObject({ outcome, rationale: `${outcome} 的人工依据`, routeConclusion: 'pending', semanticMode: 'ontology' })
     expect(decided.decision?.evidenceDigest).toBe(decided.evidenceDigest)
+
     await expect(recordFdeDesignDecision(root, selected.revision, outcome, '过期提交')).rejects.toThrow('证据已变化')
   })
 
@@ -156,6 +159,27 @@ describe('stage-four Semantica workspace', () => {
     })
     const decided = await recordFdeDesignDecision(root, completed.revision, 'go', '当前本体、图谱、上下文和纵向切片证据均已核对。')
     expect(decided.decision?.evidenceDigest).toBe(decided.evidenceDigest)
+
+    const protectedPaths = ['.fde/design/semantica/workspace.json', '.fde/stages/design.json', DESIGN_GRAPH_PATH]
+    const beforeConsume = await Promise.all(protectedPaths.map(path => readFile(join(root, path), 'utf8')))
+    const consumed = await queryAgentContext(root, config, {
+      questionId: 'cq_owner_system', query: '项目开发查询系统的负责人及来源', maxDepth: 1,
+    })
+    const assignments = consumed.relationships.map(edge => ({
+      owner: consumed.entities.find(entity => entity.id === edge.source)?.name,
+      system: consumed.entities.find(entity => entity.id === edge.target)?.name,
+      sourceIds: edge.sourceRefs,
+    }))
+    expect(assignments).toEqual([{ owner: '张三', system: '工单系统', sourceIds: [registered.sourceId] }])
+    expect(await Promise.all(protectedPaths.map(path => readFile(join(root, path), 'utf8')))).toEqual(beforeConsume)
+    await expect(queryAgentContext(root, { ...config, pythonCommand: '/nonexistent/semantica-python' }, {
+      questionId: 'cq_owner_system', query: '不可用环境不得读取缓存成功', maxDepth: 1,
+    })).rejects.toThrow('无法启动')
+
+    const reExtracted = await extractCandidates(root, config)
+    expect(reExtracted.validation?.status).toBe('stale')
+    await expect(queryAgentContext(root, config, { questionId: 'cq_owner_system', query: '拒绝旧图', maxDepth: 1 })).rejects.toThrow('同版本独立验证')
+    expect((await readSemanticWorkspace(root)).decision?.outcome).toBe('go')
 
     const rebound = await bindSemanticSources(root, [registered.sourceId], '仅限当前测试项目第四阶段复核', 'primary')
     expect(rebound.route?.conclusion).toBe('pending')

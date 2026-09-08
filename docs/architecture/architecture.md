@@ -551,6 +551,8 @@ Stop project
 
 Semantica 后续执行需分离编制／验证与发布／查询。当前第四阶段 createAgentContext 会更新上下文并使切片失效，不能复用作生产查询；本轮只展示实际 snapshot/runtime 接入声明与来源，未实现独立生产查询 Provider。知识图谱的业务关系不能直接作为代码影响依赖。运行时、发布和跨客户复用执行器仍为后续独立授权范围。
 
+阶段四、五共用 `semantic_workspace` 准备操作和 `semantic_context_query` 只读消费；前者复用工作台 Provider，不暴露候选审核、Schema 发布或 FDE 决定。消费要求绑定来源版本、当前约束验证回执和实际 SDK 版本有效，结果不写入编制状态。Python 解释器与源码路径通过隔离 `DSH_HOME/.env` 交给现有 Loader；不添加自动发现、全局安装或案例配置。独立客户生产服务、向量检索和 Semantica 原生 AgentContext 仍未启用，现有查询由受控适配器执行。
+
 ## 通用性整改：数据读取与执行边界
 
 阶段投影按 Workspace 根目录检查固定文件、证据摘要及 dataProvenance；这些检查不等于实际执行认证。旧生命周期读操作不迁移数据，状态写入按版本拒绝交叉。Semantica 的 queryAgentContext 仅返回上下文，由 Harness 工具结果保留调用轨迹，不写编制状态；createAgentContext 是显式编制验证操作。Python Adapter 在 SDK 结构检查之外执行项目身份、字段、关系约束；查询先排除不满足绑定来源、已声明时间与分数的节点和边，再遍历。自由文字规则与 permissionScope 不构成授权策略引擎。

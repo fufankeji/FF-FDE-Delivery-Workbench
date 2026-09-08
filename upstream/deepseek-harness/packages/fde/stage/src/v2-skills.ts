@@ -34,7 +34,9 @@ const COMMON_V2_STAGE_RULES = `## 共同行为
 
 第四阶段：semantic_context_query 默认只读查询，必须指定 questionId 或 seedNodeId，query 只是任务说明。只有准备新纵向切片时显式传 purpose=validation 并引用其 contextRunId；普通查询不用于覆盖已有验证记录。规则抽取分数不是经评测的事实可信度，文字规则也不等于已执行授权政策。
 
-同时维护本阶段 JSON 状态文件。根对象固定包含：
+本体构建先调用 semantic_workspace(action=inspect)，按需 section=sources/definition/candidates 查看来源、完整草稿或分页候选。用户在工作台选择本体路线后，依次 health、bind-sources、save-definition、extract；需要候选本体时运行 propose-schema，修订定义后重新抽取。候选接受／拒绝和 Schema 发布必须停下请 FDE 在工作台确认，再 build、validate。只使用已获准的项目 SourceId，修改定义必须携带 inspect 返回的 definition.revision 作为 expectedRevision。不直接修改 .fde/design/semantica/、knowledge-graph.json 或本体路线下的 .fde/stages/design.json；它们由 Provider 操作保存。工具不存在或失败就报告阻塞，不改 JSON 伪造通过。第五阶段开发按明确 questionId/seedNodeId 调用 semantic_context_query(purpose=consume)，用返回的版本、来源和关系完成项目任务并保存实际运行证据；不要为读取图谱而重跑构建或覆盖原阶段决定。
+
+除上述由 Provider 保存的本体路线外，同时维护本阶段 JSON 状态文件。根对象固定包含：
 
 - \`schemaVersion: 1\`；
 - \`stage\`：必须等于当前阶段 ID；

@@ -6,6 +6,7 @@ import { dirname, join, relative, resolve, sep } from 'node:path'
 import { withFileLock, writeFileAtomic } from '@deepseek-ai/dsh-atomic-write'
 import { listProjectSources, resolveProjectSource } from '@deepseek-ai/dsh-fde-source'
 import { runSemantica } from './python.ts'
+import { parseSemanticDefinition } from './definition.ts'
 import type {
   AgentContextResult,
   CompetencyQuestionDefinition,
@@ -492,7 +493,7 @@ export async function saveSemanticDefinition(
   return await replaceState(root, (current) => {
     if (current.route?.semantics.mode !== 'ontology') throw new Error('当前项目没有选择正式本体／知识图谱路线。')
     if (current.definition.revision !== expectedRevision) throw new Error('本体定义已被更新，请刷新后重新编辑。')
-    const definition = normalizeDefinition(input, current.definition.revision + 1)
+    const definition = normalizeDefinition(parseSemanticDefinition(input), current.definition.revision + 1)
     return {
       ...current, definition,
       candidates: current.candidates.status === 'not_run' ? current.candidates : { ...current.candidates, status: 'stale' },
@@ -587,6 +588,11 @@ export async function extractCandidates(root: string, config: SemanticProviderCo
     await replaceState(root, current => ({
       ...current,
       candidates: { status: 'ready', updatedAt: isoNow(), entities: result.entities, relationships: result.relationships, warnings: result.warnings },
+      runs: current.runs.map(item => item.status === 'succeeded' ? { ...item, status: 'stale' as const } : item),
+      ...(current.validation === undefined ? {} : { validation: { ...current.validation, status: 'stale' as const } }),
+      ...(current.context === undefined ? {} : { context: { ...current.context, status: 'stale' as const } }),
+      ...(current.slice === undefined ? {} : { slice: { ...current.slice, status: 'stale' as const } }),
+      ...(current.route === undefined ? {} : { route: { ...current.route, conclusion: 'pending' as const } }),
     }))
     return await finishRun(root, run.id, {
       status: 'succeeded', summary: `形成 ${String(result.entities.length)} 个实体候选、${String(result.relationships.length)} 条关系候选。`,
@@ -776,6 +782,8 @@ export async function buildGraph(root: string, config: SemanticProviderConfig): 
   try {
     if (state.provider.status !== 'ready') throw new Error('Semantica Provider 尚未通过版本检查。')
     if (state.definition.status !== 'published') throw new Error('只有已发布的当前 Ontology 才能用于构建。')
+    if (state.candidates.status !== 'ready') throw new Error('候选知识尚未形成或已过期，请按当前定义重新抽取并审核。')
+    await readBoundDocuments(root, state, config)
     const entities = state.candidates.entities.filter(item => item.decision === 'accepted')
     const acceptedIds = new Set(entities.map(item => item.id))
     const relationships = state.candidates.relationships.filter(item => item.decision === 'accepted' && acceptedIds.has(item.source) && acceptedIds.has(item.target))
@@ -819,6 +827,7 @@ export async function validateGraph(root: string, config: SemanticProviderConfig
   const { state, run } = await beginRun(root, 'validate')
   try {
     if (state.definition.status !== 'published' || state.definition.digest === undefined) throw new Error('当前 Ontology 尚未发布。')
+    await readBoundDocuments(root, state, config)
     const graph = await readRawGraph(root)
     const display = JSON.parse(await readFile(await projectPath(root, DESIGN_GRAPH_PATH), 'utf8')) as { revision: string }
     const result = await runSemantica<{
@@ -827,7 +836,7 @@ export async function validateGraph(root: string, config: SemanticProviderConfig
         readonly issues: readonly { readonly code: string; readonly severity: string; readonly message: string }[]
       }
       readonly questions: SemanticValidationResult['questions']
-    }>(config, 'validate', { graph, definition: state.definition })
+    }>(config, 'validate', { graph, definition: state.definition, allowedSourceIds: state.sources.map(item => item.sourceId) })
     const requiredIds = new Set(state.definition.competencyQuestions.filter(item => item.required).map(item => item.id))
     const requiredResults = result.questions.filter(item => requiredIds.has(item.questionId))
     const requiredPassed = requiredIds.size > 0 && requiredResults.length === requiredIds.size
@@ -875,6 +884,9 @@ export async function queryAgentContext(
     throw new Error('当前图谱尚未通过同版本独立验证，不能进入 Agent 上下文。')
   }
   if (state.validation.checksVersion !== VALIDATION_CHECKS_VERSION) throw new Error('图谱验证记录未覆盖当前项目约束检查，请先重新验证；原始图谱和阶段历史保留。')
+  await readBoundDocuments(root, state, config)
+  const runtime = await runSemantica<{ readonly version: string }>(config, 'health', {})
+  if (runtime.version !== state.provider.expectedVersion) throw new Error(`需要 Semantica ${state.provider.expectedVersion}，当前为 ${runtime.version}。`)
   const graph = await readRawGraph(root)
   const displayPath = await projectPath(root, DESIGN_GRAPH_PATH)
   const displayBytes = await readFile(displayPath, 'utf8')

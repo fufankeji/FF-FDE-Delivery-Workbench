@@ -66,7 +66,7 @@ export const Config: z<Config> = z.object({
   maxSources: z.number().step(1).min(1).default(12),
 })
 
-/** Register same-origin project actions plus two model tools; only the browser action can submit an FDE decision. */
+/** Register project actions and Agent tools; only browser actions publish, review candidates or submit FDE decisions. */
 export function apply(ctx: Context, input: Config): void {
   const config: SemanticProviderConfig = {
     pythonCommand: input.pythonCommand,

@@ -1,0 +1,31 @@
+- id: system-prompt
+  name: '@deepseek-ai/dsh-system-prompt'
+- id: tools
+  name: '@deepseek-ai/dsh-tools'
+- id: session
+  name: '@deepseek-ai/dsh-session'
+- id: persistence
+  name: '@deepseek-ai/dsh-session-persistence-jsonl'
+  config:
+    root: !!js process.env.FDE_TEST_ROOT + '/sessions'
+- id: storage
+  name: '@deepseek-ai/dsh-storage'
+- id: storage-json
+  name: '@deepseek-ai/dsh-storage-json'
+  config:
+    root: !!js process.env.FDE_TEST_ROOT + '/storage'
+- id: storage-domain
+  name: '@deepseek-ai/dsh-storage-domain'
+  config:
+    backend: json
+- id: workspace
+  name: '@deepseek-ai/dsh-workspace'
+- id: webserver
+  name: '@deepseek-ai/dsh-host-webserver'
+  config:
+    host: 127.0.0.1
+    port: 0
+- id: semantica
+  name: '@deepseek-ai/dsh-fde-semantica'
+  config:
+    pythonCommand: !!js process.env.FDE_SEMANTICA_TEST_PYTHON ?? 'python3'

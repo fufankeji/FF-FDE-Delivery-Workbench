@@ -102,6 +102,15 @@ node backend/server.mjs
 
 重新抽取、建图、验证或查询 Semantica 运行时，需要自行安装兼容的 Semantica `0.6.7` 并在启动工作台时设置 `FDE_SEMANTICA_PYTHON`、`FDE_SEMANTICA_SOURCE`。详细边界与操作见 [Semantica 集成说明](upstream/deepseek-harness/packages/fde/semantica/README.zh.md)。素材包不含 Semantica 源码、虚拟环境、模型权重、个人凭证或生产系统账号。
 
+为避免重启后丢失配置，把下面两项保存到实际使用的 `DSH_HOME` 目录内 `.env` 文件，替换为自己的安装路径；仍按前述命令显式传入同一个 `DSH_HOME` 启动。主工作区使用 `.runtime/dsh-home/.env`，导入素材后的独立工作区使用导入脚本打印的 `dshHome`。不要把本机 `.env` 提交到 Git。
+
+```dotenv
+FDE_SEMANTICA_PYTHON=/path/to/semantica/.venv/bin/python
+FDE_SEMANTICA_SOURCE=/path/to/semantica
+```
+
+第四阶段选择本体路线后，可在 Agent 对话中说：“调用 semantic_workspace 检查当前项目，使用我已授权的资料逐步准备本体和图谱；遇到候选审核或 Schema 发布时停下让我确认。”Agent 可绑定材料、编辑草稿、抽取、构建和验证；候选审核、发布以及阶段决定仍在工作台由 FDE 确认。第五阶段通过 `semantic_context_query` 的 `consume` 方式查询当前有效图谱，不需要重新构建。历史记录缺少当前验证或原始资料变化时会拒绝查询，需要重新核对，不能直接改状态恢复通过。
+
 素材构成、校验与更新方式见 [FDE-Agent 素材说明](source-materials/fde-agent/README.md)。
 
 ## 使用 Agent 开发

@@ -2,7 +2,7 @@
 document: feature-tasks
 feature: F008
 status: in-progress
-updated: "2026-09-04"
+updated: "2026-09-08"
 ---
 
 # F008 · 阶段 4：方案与纵向切片任务
@@ -94,9 +94,23 @@ updated: "2026-09-04"
   - 完成证据：简单路线直接按 Spec 跑通且无图谱占位；图谱路线完成项目数据映射、Semantica 构建、独立验证、受控查询和纵向切片；测试领域不进入生产常量或 UI 文案
   - 验证：运行阶段 4 双路线端到端测试
 
+- [x] T012 补齐共享 Provider 的 Agent 操作和人工边界
+  - 来源：REQ-014, REQ-028, AC-F008-002, AC-F008-003
+  - 依赖：T010
+  - 修改：Semantica 工具、定义输入检查、阶段 Skill 与运行配置说明
+  - 完成证据：项目级检查、绑定、草稿与 SDK 操作通过真实工具组合执行；人工审核和发布不能经该工具提交，见 [Agent 接入验证](../../verification/2026-09-08-semantica-agent-workflow.md)
+  - 验证：真实 Loader 组合工具测试
+
+- [x] T013 验证后续开发使用当前有效图谱
+  - 来源：REQ-014, REQ-028, AC-F008-002, AC-F008-003
+  - 依赖：T012
+  - 修改：只读消费校验、领域无关 SDK 测试与运行记录
+  - 完成证据：真实 SDK 形成带来源图谱并支持业务查询；消费不改变设计决定；不同领域及失效来源不误通过；3080 使用持久化本机配置启动，见 [Agent 接入验证](../../verification/2026-09-08-semantica-agent-workflow.md)
+  - 验证：定向 SDK 流程与隔离启动检查
+
 ## Task 数量复核
 
-- 任务总数：11
+- 任务总数：13
 - 原因：覆盖来源、Artifact、机制路由、真实切片、人工决定、方案边界、状态同步、可复现评审，以及条件 Semantica Provider、分步验证和双路线闭环。
 
 ## 执行记录
@@ -117,3 +131,9 @@ updated: "2026-09-04"
 - 本轮范围：REQ-014, REQ-028；PSC-013, PSC-023；AC-F008-002 对应的通用性缺陷，不重新声明整个 Feature 完成。
 - 修改与验证计划：semantica/state.ts、tools.ts、python/bridge.py 和工作台能力说明；以 context-consumption.spec.ts 验证真实 Python 查询无状态副作用，以 bridge_test.py 验证项目约束。
 - 完成证据与未完成边界统一记录于 [通用性修复记录](../../verification/2026-09-07-platform-generality-repair.md)。本条不改变先前未完成任务的勾选状态。
+
+## 2026-09-08 Agent 接入补全
+
+- T012、T013 完成：分批定向测试共 42 项通过，包含真实 Loader 工具装载、Semantica `0.6.7` 抽取／建图／验证、只读业务查询、跨项目来源拒绝和失效证据检查；受影响包类型检查、构建及定向静态检查通过。
+- 配置保存在被忽略的本机 `DSH_HOME/.env`，仅重启主工作树 3080；现有项目图谱、设计工作区与项目注册表摘要未改变。
+- 证据见 [Agent 接入验证](../../verification/2026-09-08-semantica-agent-workflow.md)。本轮没有运行付费模型、自动验收旧项目或替 FDE 做决定；界面操作和真实模型对话仍待用户确认，不据此重新声明整个 Feature 完成。

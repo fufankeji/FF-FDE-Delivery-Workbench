@@ -289,6 +289,9 @@ describe('requirement-research model guidance', () => {
       'fde-integration-pilot', 'fde-production-handover', 'fde-continuous-improvement',
     ]))
     expect(V2_STAGE_SKILLS.every(skill => skill.content.includes('你不能代替 FDE 推进项目阶段'))).toBe(true)
+    expect(V2_STAGE_SKILLS.find(skill => skill.name === 'contract-design')?.content).toContain('semantic_workspace(action=inspect)')
+    expect(V2_STAGE_SKILLS.find(skill => skill.name === 'contract-design')?.content).toContain('候选接受／拒绝和 Schema 发布必须停下请 FDE 在工作台确认')
+    expect(V2_STAGE_SKILLS.find(skill => skill.name === 'verification-plan')?.content).toContain('semantic_context_query(purpose=consume)')
     expect(V2_STAGE_SKILLS.find(skill => skill.name === 'engineer-ai-value')?.content)
       .toContain('`stage` 必须固定写为 `definition`')
     expect(V2_STAGE_SKILLS.find(skill => skill.name === 'engineer-ai-value')?.content)

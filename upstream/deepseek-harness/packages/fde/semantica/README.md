@@ -54,7 +54,11 @@ All actions require a trusted local request, an existing WorkspaceId, and bounde
 
 ## Agent integration
 
-The package registers two stable model tools. `semantic_context_query` defaults to read-only consumption, leaving stage-four files, slice and FDE decision unchanged; its result is logged by Harness. Explicit `purpose=validation` creates replacement design context and invalidates the previous slice. `semantic_slice_report` saves the caller's reported result with nonblank project-local evidence; it does not execute the task or independently certify the claim and cannot submit an FDE decision.
+The package registers three stable model tools. `semantic_workspace` inspects current project state and runs source binding, draft editing, health, extraction, schema proposal, construction or independent validation through the same Provider as the workbench. Inspection pages Sources and candidates in batches of 20 and provides editable `definitionDraft` plus its revision; output is limited to 128 KiB. Mutations require an explicitly selected ontology route. Route selection, candidate acceptance/rejection, publication and FDE decisions remain human workbench actions, not accepted Agent operations.
+
+`semantic_context_query` defaults to read-only consumption, leaving stage-four files, slice and FDE decision unchanged; its result is logged by Harness. Explicit `purpose=validation` creates replacement design context and invalidates the previous slice. `semantic_slice_report` saves the caller's reported result with nonblank project-local evidence; it does not execute the task or independently certify the claim and cannot submit an FDE decision.
+
+Persist runtime paths in the invoking directory's or isolated Harness home's ignored `.env`, using `FDE_SEMANTICA_PYTHON` and optional `FDE_SEMANTICA_SOURCE`; inherited environment variables take precedence. The launch must still supply the intended `DSH_HOME`. Read-only consumption checks live SDK version and bound source versions without writing provider state; a cached ready status does not bypass those checks. Re-extraction invalidates dependent evidence, and stale candidates cannot be rebuilt until refreshed and reviewed.
 
 The context operation requires a published competency question or exact seed entity and caps traversal depth at three. `query` describes the task; it is not free-text semantic search. Bound-source, confidence and declared valid-time filtering precedes traversal. Textual rules and `permissionScope` are instructions, not an executed authorization policy. The ontology slice must cite the current validation-context run id, not an ordinary consumption query.
 
@@ -64,11 +68,11 @@ The context operation requires a published competency question or exact seed ent
 
 #### What the model sees
 
-Two fixed tool schemas: `semantic_context_query` and `semantic_slice_report`. Route selection, source binding, schema editing, candidate review, build, validation, and FDE decisions remain trusted workbench actions and are not exposed as model tools.
+Three fixed tool schemas: `semantic_workspace`, `semantic_context_query` and `semantic_slice_report`. Inspection returns project progress and human tasks; preparation returns actual Provider results. No tool can select the mechanism, approve knowledge, publish a schema or decide a stage.
 
 #### Token effect
 
-The fixed schemas add input tokens to requests that can see the global tool registry. Project graph content enters context only through one bounded query result, and vertical-slice evidence enters only through the explicit report result.
+The fixed schemas add input tokens to requests that can see the global tool registry. Project data enters through an explicit inspection, bounded graph query or slice report; inspection does not return the complete graph or automatically read every source document.
 
 #### KV Cache effect
 

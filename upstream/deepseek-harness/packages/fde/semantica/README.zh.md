@@ -54,7 +54,11 @@ FDE_SEMANTICA_TEST_PYTHON=/path/to/semantica/.venv/bin/python \
 
 ## Agent 集成
 
-本包注册两个稳定的模型工具。`semantic_context_query` 默认只读消费，不改变第四阶段文件、切片与 FDE 决定，返回结果由 Harness 留痕；显式 `purpose=validation` 才生成编制验证上下文并使旧切片待重跑。`semantic_slice_report` 保存调用者报告的结果及非空项目内证据；它不执行任务、不独立认证声明，也不能提交 FDE 决定。
+本包注册三个稳定的模型工具。`semantic_workspace` 检查当前项目状态，并通过与工作台相同的 Provider 执行来源绑定、草稿编辑、环境检查、抽取、候选本体生成、构建或独立验证。来源和候选检查每页返回 20 项，并可取得可编辑的 `definitionDraft` 及其修订；输出上限为 128 KiB。修改操作要求已明确选择本体路线。路线选择、候选接受／拒绝、发布和 FDE 决定仍是工作台中的人工动作，不接受 Agent 提交。
+
+`semantic_context_query` 默认只读消费，不改变第四阶段文件、切片与 FDE 决定，返回结果由 Harness 留痕；显式 `purpose=validation` 才生成编制验证上下文并使旧切片待重跑。`semantic_slice_report` 保存调用者报告的结果及非空项目内证据；它不执行任务、不独立认证声明，也不能提交 FDE 决定。
+
+运行路径通过 `FDE_SEMANTICA_PYTHON` 和可选的 `FDE_SEMANTICA_SOURCE` 保存到启动目录或隔离 Harness home 中被忽略的 `.env`；继承的环境变量优先。启动时仍必须传入预期的 `DSH_HOME`。只读消费检查实际 SDK 版本和绑定来源版本，不写 Provider 状态；缓存的 ready 不能绕过检查。重新抽取会使依赖证据失效，过期候选必须重新抽取和审核后才能建图。
 
 上下文操作要求选择已发布能力问题或精确起始实体，遍历最多三跳。`query` 只描述任务，不执行自由文本语义检索。绑定来源、置信度和已声明有效时间先于遍历过滤；文字规则与 `permissionScope` 是说明，不是已执行的授权政策。本体切片必须引用当前编制验证上下文 ID，而非普通消费查询 ID。
 
@@ -64,11 +68,11 @@ FDE_SEMANTICA_TEST_PYTHON=/path/to/semantica/.venv/bin/python \
 
 #### 模型看到什么
 
-两个固定工具 Schema：`semantic_context_query` 和 `semantic_slice_report`。路线选择、材料绑定、Schema 编辑、候选审核、构建、验证和 FDE 决定仍是受信工作台操作，不暴露为模型工具。
+三个固定工具 Schema：`semantic_workspace`、`semantic_context_query` 和 `semantic_slice_report`。检查返回项目进度与人工待办，准备操作返回 Provider 的实际结果。工具不能选择机制、批准知识、发布 Schema 或作出阶段决定。
 
 #### Token 影响
 
-能看到全局工具注册表的请求会增加两个固定 Schema 的输入 Token。项目图谱内容只通过一次有边界查询结果进入上下文；纵向切片证据只通过显式报告结果进入。
+能看到全局工具注册表的请求会增加固定 Schema 的输入 Token。项目数据通过显式检查、有界图谱查询或切片报告进入上下文；检查不返回完整图谱，也不自动读取全部来源文档。
 
 #### KV 缓存影响
 
