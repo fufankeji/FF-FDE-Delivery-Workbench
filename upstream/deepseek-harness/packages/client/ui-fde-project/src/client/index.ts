@@ -575,7 +575,10 @@ export function apply(ctx: ClientContext): void {
 
   ctx.slots.inject('shell.overlay', () => ctx.slots.register({
     name: 'shell.overlay', id: 'fde-project-progress', order: 10, locale: NS, inject: pageInjected,
-    children: { 'fde.project.source.preview': { kind: 'single', scope: 'root' } },
+    children: {
+      'fde.project.source.preview': { kind: 'single', scope: 'root' },
+      'fde.workbench.module.action': { kind: 'list', scope: 'root' },
+    },
   }, ProjectProgressOverlay))
 
   ctx.slots.inject('conversation.hero.content', () => ctx.slots.register({

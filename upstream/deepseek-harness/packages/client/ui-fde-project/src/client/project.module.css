@@ -285,7 +285,9 @@
   letter-spacing: 0.01em;
 }
 
-.deliveryHomeNav > button {
+.deliveryHomeNavActions { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 12px; }
+
+.deliveryHomeNav [data-delivery-nav-action] {
   justify-self: end;
   min-height: 36px;
   padding: 0 14px;
@@ -842,13 +844,13 @@
 @keyframes delivery-final-orbit-flow { to { stroke-dashoffset: -180; } }
 @keyframes delivery-final-orbit-pulse { 0%, 100% { opacity: .55; transform: scale(.78); } 50% { opacity: 1; transform: scale(1.08); } }
 
-.deliveryHomeNav > button:active,
+.deliveryHomeNav [data-delivery-nav-action]:active,
 .deliveryHeroActions a:active,
 .deliveryHeroActions button:active,
 .deliveryManifesto > div > button:active { transform: scale(0.97); }
 
 @media (hover: hover) and (pointer: fine) {
-  .deliveryHomeNav > button:hover { border-color: color-mix(in srgb, var(--home-ink) 22%, transparent); background: color-mix(in srgb, var(--home-ink) 5%, transparent); }
+  .deliveryHomeNav [data-delivery-nav-action]:hover { border-color: color-mix(in srgb, var(--home-ink) 22%, transparent); background: color-mix(in srgb, var(--home-ink) 5%, transparent); }
   .deliveryCometSurface:hover .deliveryCometGlare { opacity: 0.14; }
   .deliveryHeroActions a:hover,
   .deliveryHeroActions button:hover { transform: translateY(-2px); }
@@ -886,7 +888,7 @@
 .deliveryBrandLogo { width: 34px; height: 34px; border-radius: 8px; }
 .deliveryBrand > span { font-size: 18px; font-weight: 680; }
 
-.deliveryHomeNav > button {
+.deliveryHomeNav [data-delivery-nav-action] {
   min-height: 40px;
   padding: 0 18px;
   border-color: #c9ced8;
@@ -4455,7 +4457,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .deliveryHomeNav > button,
+  .deliveryHomeNav [data-delivery-nav-action],
   .deliveryHeroActions a,
   .deliveryHeroActions button,
   .deliveryManifesto > div > button {
@@ -4475,7 +4477,7 @@
   .deliveryCometGlare { display: none; }
   .deliveryScrollIndicator > div { animation: none; }
 
-  .deliveryHomeNav > button:active,
+  .deliveryHomeNav [data-delivery-nav-action]:active,
   .deliveryHeroActions a:active,
   .deliveryHeroActions button:active,
   .deliveryManifesto > div > button:active { transform: none; }
@@ -4504,7 +4506,7 @@
 @media (max-width: 780px) {
   .homeBody { padding-bottom: 50px; }
   .deliveryHomeNav { grid-template-columns: 1fr auto; min-height: 66px; padding-inline: 18px; }
-  .deliveryHomeNav > button { padding-inline: 11px; }
+  .deliveryHomeNav [data-delivery-nav-action] { padding-inline: 11px; }
   .deliveryPreviewWrap { padding: 0 12px 40px; }
   .deliveryCometSurface,
   .deliveryCometGlare,
@@ -4554,6 +4556,14 @@
 }
 
 /* Project-center collection: bounded rendering, document-level scrolling. */
+.projectModuleNavigation { display: flex; flex: none; justify-content: flex-end; gap: 12px; margin-bottom: 18px; }
+.projectModuleNavigation:empty { display: none; }
+
+@media (max-width: 600px) {
+  .deliveryHomeNav { grid-template-columns: 1fr; gap: 12px; padding-block: 12px; }
+  .deliveryHomeNavActions { justify-content: flex-start; }
+}
+
 .projectCenterRefresh {
   display: flex;
   flex-direction: column;

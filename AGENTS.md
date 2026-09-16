@@ -65,6 +65,8 @@ FDEDeliveryWorkbench/
 
 ## 技术基线与真实命令
 
+- 独立业务挖掘实验室位于 `packages/fde/discovery-lab` 与 `packages/client/ui-fde-discovery-lab`；其素材导入与训练数据边界见[包说明](upstream/deepseek-harness/packages/fde/discovery-lab/README.zh.md)。不要把 `DSH_HOME/fde-discovery-lab` 当作可重建素材缓存，也不要将训练轮次登记为项目或阶段。
+
 - 前端：锁定官方 DeepSeek Harness `0.1.1-rc.2` 的 React/Vite Web Client、Client Runtime 与 UI Slots；FDE UI 以独立 Client Plugins 适配。
 - 后端：锁定官方 DeepSeek Harness Cordis/TypeScript Host，复用 Workspace、Session、Agent Loop、Tools、FS、Shell、Terminal、LSP、Approval 和 Web API；FDE 领域以 Host Plugins 扩展。
 - 数据与模型：Workspace 负责项目文件，主 Session 与自定义 `fde/*` Events/Projection 负责项目事件和状态；图片复用官方 Attachment，普通文件由待开发的 FDE Source capability 负责；模型通过官方 LLM/Credentials 配置。

@@ -3071,7 +3071,7 @@ export function ProjectProgressOverlay({
         data-testid="fde-delivery-home"
       >
         <main className={`${css.pageBody} ${css.homeBody}`}>
-          <DeliveryHomepage projectCount={workspacePhase === 'ready' ? rows.length : undefined} projectReadError={workspaceReadState === 'error'} openProjects={showProjectOverview} />
+          <DeliveryHomepage projectCount={workspacePhase === 'ready' ? rows.length : undefined} projectReadError={workspaceReadState === 'error'} openProjects={showProjectOverview} renderSlot={renderSlot} />
         </main>
       </div>
     )
@@ -3197,6 +3197,9 @@ export function ProjectProgressOverlay({
           renderPreview={source => renderSlot('fde.project.source.preview', { source })}
         />
         : <main className={`${css.pageBody} ${css.projectCenterBody} ${css.projectCenterRefresh}`} data-project-center="">
+          <nav className={css.projectModuleNavigation} aria-label="工作台独立功能">
+            {renderSlot('fde.workbench.module.action', {})}
+          </nav>
           <header className={css.projectCenterHeader} data-project-center-header="">
             <div>
               <p className={css.projectCenterBreadcrumb} data-project-breadcrumb=""><button type="button" onClick={showProjectHome}>返回首页</button><i>/</i><strong>项目中心</strong>{page.view === 'timeline' && <><i>/</i><span>交付时间轴</span></>}</p>

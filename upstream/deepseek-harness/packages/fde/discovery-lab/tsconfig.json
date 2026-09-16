@@ -1,0 +1,47 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib/types",
+    "types": [
+      "node"
+    ],
+    "allowJs": true,
+    "checkJs": false
+  },
+  "include": [
+    "src"
+  ],
+  "references": [
+    {
+      "path": "../../../vendor/cordis"
+    },
+    {
+      "path": "../../../vendor/schemastery"
+    },
+    {
+      "path": "../../core/agent"
+    },
+    {
+      "path": "../../core/tools"
+    },
+    {
+      "path": "../../core/system-prompt"
+    },
+    {
+      "path": "../../client/connection/tsconfig.host.json"
+    },
+    {
+      "path": "../../host/webserver"
+    },
+    {
+      "path": "../../llm/llm"
+    },
+    {
+      "path": "../../session/session-persistence"
+    },
+    {
+      "path": "../../runtime-diagnostics/invariants"
+    }
+  ]
+}

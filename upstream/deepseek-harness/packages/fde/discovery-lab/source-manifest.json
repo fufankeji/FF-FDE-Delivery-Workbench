@@ -1,0 +1,29 @@
+{
+  "sourceArchiveSha256": "267f87063964110322211aed8666893757f94eacf1cfbcd28993468ece8af7f4",
+  "runtimeSha256": "2c68c7b2ef51f6e92c1cb00e796dbbdb249362eb249821152a9f26128e057678",
+  "originalFiles": {
+    "packages/fde/discovery-lab/src/vendor/cases.js": "3f7113a06e93674896621ba9be341c3b573701ce3dd04d148a09d8867aaaf61e",
+    "packages/fde/discovery-lab/src/vendor/evaluation.js": "4bb65f3620f8a6291484aa1da9bcd93dcd7839babcc9b8d52090ec9adecb0d5d",
+    "packages/fde/discovery-lab/src/vendor/evidence-input.js": "5b0e04d2fcc999fe2c9dc4671b30fca65604d9cc5171ec79357a27ab4bd6ca04",
+    "packages/fde/discovery-lab/src/vendor/http.js": "0456c75c280ff3c9ad8e7e340bc9f965b2f5f5f316de718f7918ef1056d76b98",
+    "packages/fde/discovery-lab/src/vendor/metrics.js": "a7d1a11f3f036a3a89e828c94afda9a1d2b096cfdce3abc7705896e1141d40e4",
+    "packages/fde/discovery-lab/src/vendor/native-sessions.js": "3c6c4a38cc32ea69b6bb1826ba14ab3647ad4e6b915057044f13c4811016b094",
+    "packages/fde/discovery-lab/src/vendor/python.js": "4c4140f64fa751f9e64621a8a8e0a1c30c0be78ffff8e2bd7bc8755bfa815fdc",
+    "packages/fde/discovery-lab/src/vendor/reports.js": "1269cedffbf73594d932d8c557a9ae316aca39eff162be091610024c9bd7d5e0",
+    "packages/fde/discovery-lab/src/vendor/store.js": "ca780d88c58044f8ba8b1e139da98ddf1de6875f06f700eb5b6220f6da8bff67",
+    "packages/fde/discovery-lab/src/vendor/training.js": "8d37a4bb0df33d6e83bd926606365119adcebaedc80435fbdcd3019a5048be0e",
+    "packages/client/ui-fde-discovery-lab/app/App.tsx": "d7a141e429fdea15134f11ec8c9133939375fc132e57f4bdc8dd6c9c1373538c",
+    "packages/client/ui-fde-discovery-lab/app/AssetReaders.tsx": "a4de7fb33e67d57fb66183af4d2d27cd6ceacb68756276261532a898fecaaab1",
+    "packages/client/ui-fde-discovery-lab/app/CaseVersionInfo.tsx": "67f95561bad03ca9399527ad39f1fa8e01b10299e5c6cd5cdf56fc8c528b9433",
+    "packages/client/ui-fde-discovery-lab/app/JsonReader.tsx": "8558e815ef633d8c3bb85da7f2b9a902edc6835f053362a33bb012910decacc7",
+    "packages/client/ui-fde-discovery-lab/app/PixelOffice.tsx": "bc1cdcf0d0287561a68acfcbd18e119be7ffb3a2ff35b27b7176975d21d89313",
+    "packages/client/ui-fde-discovery-lab/app/PixelPeople.tsx": "dd1cc9174e7ae96323c6088ff909520c7f5f725c00ec307284b21780ba07840a",
+    "packages/client/ui-fde-discovery-lab/app/SceneArt.tsx": "09d4ce56769ec5baa9306c66f9ed7f6157c1ba8b5b342823a3e16d0e5a5d8ce3",
+    "packages/client/ui-fde-discovery-lab/app/api.ts": "92c96dbc59009147c4555fa70ca248c89f8c2a400d72918f8f4d60cfcc90229b",
+    "packages/client/ui-fde-discovery-lab/app/discoveryTips.ts": "1e57c80d41f38006c418a2f74d223a1f956ce7ea2a16188de2299ffbfadb9e87",
+    "packages/client/ui-fde-discovery-lab/app/lan.css": "2f2c1f2fd121802443fc92c550b4ca62dd20a36cd860ecad59f3bb55f012987b",
+    "packages/client/ui-fde-discovery-lab/app/lan.tsx": "078a1a5b3f9efacceef40312fd9c19c0016d86598255eb3346abac543cb917c6",
+    "packages/client/ui-fde-discovery-lab/app/requestId.ts": "d5a2b974ac7ae261fbe7e7c0b9a4f7db737de0cf0fd30c547aa0b1655136690c",
+    "packages/client/ui-fde-discovery-lab/app/styles.css": "e9034ec5286d106f569376a5c394c248139abdb0fc84916bc4736b927c6f71d6"
+  }
+}

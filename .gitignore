@@ -10,6 +10,8 @@
 **/build/
 **/.cache/
 **/.artifacts/
+# Rebuildable discovery-lab material payload imported from the delivery archive.
+/upstream/deepseek-harness/packages/fde/discovery-lab/.assets/
 **/.dsh-build/
 **/coverage/
 **/test-results/

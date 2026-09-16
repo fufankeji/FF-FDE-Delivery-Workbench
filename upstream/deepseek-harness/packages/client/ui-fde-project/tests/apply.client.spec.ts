@@ -141,6 +141,7 @@ describe('ui-fde-project apply', () => {
     expect(slots.entries('sidebar.footer.action')[0]?.component).toBe(ProjectProgressLauncher)
     expect(slots.entries('shell.overlay')[0]?.component).toBe(ProjectProgressOverlay)
     expect(slots.spec('fde.project.source.preview')).toEqual({ kind: 'single', scope: 'root' })
+    expect(slots.spec('fde.workbench.module.action')).toEqual({ kind: 'list', scope: 'root' })
     await vi.waitFor(() => {
       expect(fetchImpl.mock.calls.filter(call => requestPath(call[0]).endsWith('/fde-project/snapshot'))).toHaveLength(1)
     })

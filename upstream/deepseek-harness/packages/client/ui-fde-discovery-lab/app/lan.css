@@ -1,0 +1,6 @@
+html,body,#root{margin:0;width:100%;height:100%;min-width:1000px}
+body{background:#f6f6f1}
+.fde-lan-shell{height:100%;display:flex;flex-direction:column}
+.fde-lan-main{flex:1;min-height:0}
+.fde-lan-main .fde-workspace{height:calc(100dvh - 82px);min-height:695px}
+@media(max-width:1190px){.fde-lan-main .fde-workspace{height:calc(100dvh - 73px)}}

@@ -85,6 +85,9 @@
 
     # Read-only project artifacts used by API docs, architecture, and
     # evaluation pages. Every request resolves a registered Workspace first.
+    - id: fde-discovery-lab
+      name: '@deepseek-ai/dsh-fde-discovery-lab'
+
     - id: fde-project
       name: '@deepseek-ai/dsh-fde-project'
       config:
@@ -296,6 +299,9 @@
     # independent from project, Session, and Agent persistence.
     - id: ui-fde-appearance
       name: '@deepseek-ai/dsh-client-ui-fde-appearance'
+
+    - id: ui-fde-discovery-lab
+      name: '@deepseek-ai/dsh-client-ui-fde-discovery-lab'
 
     - id: ui-settings-models
       name: '@deepseek-ai/dsh-client-ui-settings-models'

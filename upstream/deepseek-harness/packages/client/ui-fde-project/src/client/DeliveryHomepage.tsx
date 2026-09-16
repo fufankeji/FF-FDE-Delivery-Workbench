@@ -1,6 +1,8 @@
 /** Product-positioning home shown when the FDE workbench first opens. */
 
 import type { MouseEvent, ReactNode } from 'react'
+import type { PropsRenderSlots } from '@deepseek-ai/dsh-client-ui-slots'
+import type {} from './slots.ts'
 import { useRef } from 'react'
 import { domAnimation, LazyMotion, m, MotionConfig, useMotionTemplate, useMotionValue, useSpring, useTransform } from 'motion/react'
 import css from './project.module.css'
@@ -399,11 +401,12 @@ export function DeliveryHomepage({
   projectCount,
   projectReadError,
   openProjects,
+  renderSlot,
 }: {
   readonly projectCount: number | undefined
   readonly projectReadError: boolean
   readonly openProjects: () => void
-}) {
+} & PropsRenderSlots<'fde.workbench.module.action'>) {
   return (
     <MotionConfig reducedMotion="user">
       <LazyMotion features={domAnimation}>
@@ -413,9 +416,12 @@ export function DeliveryHomepage({
               <img className={css.deliveryBrandLogo} src="/ff-brand/ff-logo.png" alt="" aria-hidden="true" />
               <span>FF-FDE工作台</span>
             </a>
-            <button type="button" onClick={openProjects} data-delivery-nav-action="">
-              进入工作台 <span aria-hidden="true">↗</span>
-            </button>
+            <div className={css.deliveryHomeNavActions}>
+              {renderSlot('fde.workbench.module.action', {})}
+              <button type="button" onClick={openProjects} data-delivery-nav-action="">
+                进入工作台 <span aria-hidden="true">↗</span>
+              </button>
+            </div>
           </nav>
 
           <div id="fde-home-top" className={css.deliveryHero} data-delivery-hero="">

@@ -27,6 +27,8 @@ export interface ProjectSourcePreviewOwnerProps {
 
 declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface SlotMap {
+    /** Independent modules available without selecting a project. */
+    'fde.workbench.module.action': { kind: 'list'; scope: 'root' }
     /** One shared read-only renderer for a selected project source or fixed deliverable. */
     'fde.project.source.preview': { kind: 'single'; scope: 'root'; owner: ProjectSourcePreviewOwnerProps }
   }
@@ -215,7 +217,7 @@ export type ProjectProgressLauncherProps =
 /** Props for the root Project Progress overlay. */
 export type ProjectProgressOverlayProps =
   PropsRuntime<'shell.overlay'>
-  & PropsRenderSlots<'fde.project.source.preview'>
+  & PropsRenderSlots<'fde.project.source.preview' | 'fde.workbench.module.action'>
   & InjectFace<ProjectPageInjected>
   & PropsLocale<'fdeProject'>
 

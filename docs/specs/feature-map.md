@@ -3,7 +3,7 @@ document: feature-map
 status: confirmed
 prd: docs/PRD.md
 product_spec: docs/specs/product-spec.md
-updated: "2026-09-07"
+updated: "2026-09-16"
 ---
 
 # FF - FDE 交付工作台 V2 Feature Map
@@ -36,6 +36,8 @@ updated: "2026-09-07"
 | F011 | F011-production-adoption-handover | 阶段 7：生产、采用与验收交接 | FDE 看见生产结果、采用、验收、交付物和责任移交是否真实成立 | REQ-003, REQ-006, REQ-007, REQ-023, REQ-025, REQ-026, REQ-028, NFR-002, NFR-004, NFR-011, NFR-012, NFR-013, NFR-014, PSC-003, PSC-005, PSC-006, PSC-019, PSC-021, PSC-022, PSC-023, PSC-024, PSC-025 | F010 | P0 | in-progress |
 | F012 | F012-continuous-improvement | 阶段 8：持续改进与能力沉淀 | FDE 把生产证据转成经复测、审批、可回滚的改进和有边界的复用资产 | REQ-003, REQ-006, REQ-007, REQ-024, REQ-025, REQ-026, REQ-028, NFR-002, NFR-004, NFR-011, NFR-012, NFR-013, NFR-014, PSC-003, PSC-005, PSC-006, PSC-020, PSC-021, PSC-022, PSC-023, PSC-024, PSC-025 | F011 | P1 | in-progress |
 
+| F024 | F024-business-discovery-lab | 独立业务挖掘实验室 | 无需创建项目即可完成五案例访谈、取证、计算和报告训练，返回后项目与八阶段不变 | REQ-030, REQ-031, REQ-032, PSC-026 | 无 | P0 | in-progress |
+
 ## 首个验证切片
 
 F001～F004 建立共享能力，F005 用“发现高价值问题”完成第一条端到端产品验证。首个阶段只接入 `qualify-ai-workflow`、条件触发的 `reframe-ai-engagement`，以及 Workflow Charter、Engagement Reframe、Field Observation Log 三类必要 Artifact；不安装完整外部能力库。实施可以在同一切片内增量进行，但只有当前用户明确授权的 Feature 才进入 in-progress。
@@ -45,6 +47,8 @@ F001～F004 建立共享能力，F005 用“发现高价值问题”完成第一
 - V1 六阶段项目到 V2 的自动或批量迁移不在当前 Feature Map；既有项目由 F001 继续保护。
 - 阶段 6–8 已确认专用页签、版本化证据和未来只读预览；实际部署、外部观测和生产语义查询执行器仍需后续授权接入。
 - 外部 Skill 源码接入、翻译和许可审查在对应阶段实施前逐项完成，不因路由目录确认而批量安装。
+- F024 只集成独立训练模块，不增加报告回流、项目联动、学员账号或自动阶段决定。F013～F023 历史编号不重复分配。
+- F024 实现、目标构建与无密钥检查已完成；真实模型质量与界面体验待用户手动确认，保留 `in-progress`，不以自动检查替代人工验收。
 
 ## 变更记录
 

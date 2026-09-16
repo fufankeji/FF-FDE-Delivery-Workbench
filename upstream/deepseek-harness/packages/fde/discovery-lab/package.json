@@ -1,0 +1,64 @@
+{
+  "name": "@deepseek-ai/dsh-fde-discovery-lab",
+  "version": "0.1.1-rc.2",
+  "description": "Independent business discovery training for the FDE workbench",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/types/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./invariant": {
+      "types": "./lib/types/invariant.d.ts",
+      "default": "./lib/invariant.js"
+    },
+    "./src/*": "./src/*",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "scripts",
+    "SOURCE.md",
+    "source-manifest.json"
+  ],
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "import:assets": "python3 scripts/import-assets.py",
+    "bundle": "tsdown"
+  },
+  "dependencies": {
+    "@deepseek-ai/schemastery": "workspace:^",
+    "pdfkit": "0.17.2"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-session": "workspace:^",
+    "@deepseek-ai/cordis": "workspace:^",
+    "@deepseek-ai/dsh-agent": "workspace:^",
+    "@deepseek-ai/dsh-client-connection": "workspace:^",
+    "@deepseek-ai/dsh-host-webserver": "workspace:^",
+    "@deepseek-ai/dsh-invariants": "workspace:^",
+    "@deepseek-ai/dsh-llm": "workspace:^",
+    "@deepseek-ai/dsh-session-persistence": "workspace:^",
+    "@deepseek-ai/dsh-system-prompt": "workspace:^",
+    "@deepseek-ai/dsh-tools": "workspace:^"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis-plugin-include": "workspace:^",
+    "@deepseek-ai/dsh-agent-loop": "workspace:^",
+    "@deepseek-ai/dsh-session": "workspace:^",
+    "@deepseek-ai/dsh-session-persistence-jsonl": "workspace:^",
+    "@deepseek-ai/cordis": "workspace:^",
+    "@deepseek-ai/cordis-plugin-loader": "workspace:^",
+    "@deepseek-ai/dsh-agent": "workspace:^",
+    "@deepseek-ai/dsh-client-connection": "workspace:^",
+    "@deepseek-ai/dsh-host-webserver": "workspace:^",
+    "@deepseek-ai/dsh-invariants": "workspace:^",
+    "@deepseek-ai/dsh-llm": "workspace:^",
+    "@deepseek-ai/dsh-session-persistence": "workspace:^",
+    "@deepseek-ai/dsh-system-prompt": "workspace:^",
+    "@deepseek-ai/dsh-tools": "workspace:^"
+  }
+}

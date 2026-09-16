@@ -109,6 +109,8 @@ The runtime instruction is appended to the ordinary Session suffix. Its operatio
 
 Project Center and its timeline expose **Back to homepage** in the top breadcrumb. The timeline also exposes **Back to Project Center**, which restores the project collection, recent activity and delivery preview. Card/list switching remains available, and navigation does not open a Session or change project data.
 
+The fullscreen homepage and Project Center declare and render the root-scoped `fde.workbench.module.action` list slot for independent module launchers. It carries no project state; the discovery lab uses it so its entry remains visible when the sidebar is covered. Existing project actions remain unchanged.
+
 Recent activity pairs each latest update with its own title and timestamp. Session entries open that exact ordinary, non-archived Session in Agent Chat; stage and project-record entries open the corresponding project-management page. A removed or unavailable Session reports an error without falling back to another conversation. The list initially shows three entries and scrolls when expanded.
 
 Delivery previews show registered dates for unfinished projects, ordered by end date, and each row opens its project. Both count and footer links open the complete delivery timeline. Timeline counts include only projects with registered dates; completed project dates remain available there. Company and dates come from the shared Workspace metadata service, with visible errors and retry instead of fabricated dates.

@@ -1,7 +1,7 @@
 ---
 document: architecture
 status: draft
-updated: "2026-09-07"
+updated: "2026-09-16"
 prd: docs/PRD.md
 product_spec: docs/specs/product-spec.md
 ---
@@ -20,6 +20,16 @@ product_spec: docs/specs/product-spec.md
 > 运行基线更新：官方源码现已按 `upstream/deepseek-harness.lock.json` 检出到 `upstream/deepseek-harness/`，本地分支为 `main`；页面运行在 `http://127.0.0.1:3080`。当前组合已加入六阶段提示、独立项目进度、项目交付四个结果 View、右侧开发工作区与“界面主题”设置页；Architecture 在完整 FDE 领域与升级验证完成前继续保持 `draft`。
 
 ## 2. 架构目标与原则
+
+### 独立业务挖掘实验室（F024）
+
+实验室以 `packages/fde/discovery-lab` Host 插件和 `packages/client/ui-fde-discovery-lab` Client 插件接入当前 `0.1.1-rc.2` 基座，不升级宿主或修改 Agent Loop。Host 复用官方 Agent、Session、Tools、LLM 和持久化；仅维护实验室自己的轮次数据库和岗位会话，不注入 Workspace、FDE Stage 或项目服务。原插件 `0.3.2` 的业务代码保留来源说明，以最小修改适配当前会话事件接口和权限边界。
+
+Client 在首页及项目中心的 `fde.workbench.module.action` 和原 `sidebar.footer.action` 增加入口，在 `shell.overlay` 挂载独立页面。模块入口槽由 `ui-fde-project` 的全屏页面声明和渲染，不传入项目数据；实验室通过 Slot 注册共享自身导航 Store，不依赖侧栏可见性，也不调用项目控制器。原像素办公室应用由当前宿主的专属路径提供，并在 iframe 中运行，隔离原应用的全局 CSS 与 React 生命周期；不是另起宿主或局域网代理。关闭页面仅改变该插件的浏览状态，不重置项目选择或阶段；返回后保留原工作台。接口采用独立 `/api/fde-discovery-lab` 命名空间，并复用工作台的 Host/Origin/Fetch-Metadata 信任校验。
+
+训练数据位于显式 `DSH_HOME/fde-discovery-lab/`，每案例共享一个当前轮次；原生 Session 日志仍由宿主持久化，但不登记到项目 Workspace。业务原件、案例定义、固定计算模块和 PDF 字体从用户授权的 `0.3.2` 运行包按摘要及白名单导入 Host 包的 `.assets/`，该目录不进 Git，可用导入脚本重建；不导入源码归档的教师和未来事件目录。运行数据不随素材重建覆盖。适配源码、导入脚本和来源摘要受 Git 管理，构建与依赖继续使用当前仓库路径。
+
+打开入口、案例列表或恢复已存在记录不触发模型。真实访谈、核对和报告调用共用宿主模型凭据，保持实验室原 `DEEPSEEK_PROVIDER/DEEPSEEK_MODEL` 环境变量及默认路由，不跟随、不改变普通项目模型选择。开发只运行无密钥验证；真实模型和人工体验不以构建、HTTP 成功或模拟响应代替。当前宿主的空 Session 延迟写入，适配层按精确 Session 原生记录决定创建或恢复，并使用 `sessions.flush(session)` 完成持久化检查点。
 
 1. **Harness 负责 Agent 与执行内核**：复用官方 Workspace、Session、Agent Loop、LLM、Tools、FS、Shell、Terminal、LSP、Jobs、Workflow、SubAgent、Approval、Web Host 和 Client Runtime。
 2. **FDE 负责产品领域**：项目来源、三层记忆、候选产物、确认清单、项目基线、阶段门、工程验证和交付语义由独立 FDE Plugins 提供。

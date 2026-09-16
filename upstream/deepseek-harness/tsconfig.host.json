@@ -164,6 +164,7 @@
     { "path": "./packages/workspace/workspace" },
     { "path": "./packages/fde/stage" },
     { "path": "./packages/fde/project" },
+    { "path": "./packages/fde/discovery-lab" },
     { "path": "./packages/fde/source" },
     { "path": "./packages/fde/semantica" },
     { "path": "./packages/session/session-title" },
