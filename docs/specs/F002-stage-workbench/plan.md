@@ -26,6 +26,10 @@ updated: "2026-09-08"
 
 ## 实现方案
 
+### 按调用时间读取用量（2026-09-08）
+
+`session-stats` 注册独立数值投影 `sessionActivity`，复用累计统计 reducer，按调用开始时间生成稀疏五分钟时段并替换同一步重复 Token 回执；既有累计投影不变。`fde-project` 的受信 Workspace 用量接口读取已连接快照，或通过公开 `sessionProjectionCache.coldSnapshot` 回放旧日志，不激活 Agent、不返回消息正文。`ui-fde-project` 的专用控制器取消过时请求并区分加载、失败与部分结果；默认累计，日期范围内卡片、图表和会话表共用活动数据。只验证跨日、去重、取消、检查点、真实 Loader、范围切换、请求取消，以及真实项目接口和 3080 在线 Bundle；不调用模型或自动推进项目。
+
 - 本次修复：`fde-project` 在已登记 Workspace 下持久化 `.fde/project-metadata.json`，提供可信同源读取与缺失时保存接口；`ui-workspace` 通过共享 `projectMetadata` 服务承接创建保存、旧数据导入与读取投影，`ui-fde-project` 通过既有服务/Hook 通道消费，不改 Workspace 内核或 Agent Loop。
 - 项目中心由已加载的 Session、阶段和 Workspace 快照生成带目标的近期记录；会话跳转校验所属 Workspace 和可见性。周期预览、计数与时间轴共享筛选，失败可重试，长列表独立滚动。
 - 本轮唯一行为验证：Host 持久化/路由、共享读取/创建恢复、项目中心交互的定向测试；另执行受影响包类型检查、构建及 3080 实际资源核验，不自动推进阶段。

@@ -194,6 +194,32 @@ describe('connection client apply', () => {
     expect(seen.some(u => u.includes('/api/respond'))).toBe(true)
   })
 
+  it('loads the workspace baseline over LAN HTTP without secure-context randomUUID', async () => {
+    ;(globalThis as Win).location = { hostname: '192.168.1.5', origin: 'http://192.168.1.5:3080', search: '' }
+    const crypto = globalThis.crypto
+    vi.stubGlobal('crypto', { getRandomValues: crypto.getRandomValues.bind(crypto) })
+    const original = globalThis.fetch
+    const ids: string[] = []
+    globalThis.fetch = vi.fn(async (input: URL | RequestInfo, init?: RequestInit) => {
+      expect(String(input)).toBe('http://192.168.1.5:3080/api/workspace.list')
+      const body = JSON.parse(String(init?.body)) as { rpcId: string }
+      ids.push(body.rpcId)
+      return Response.json({ type: 'server-response', rpcId: body.rpcId,
+        result: { ok: true, value: { items: [], archivedSessionIds: [] } } })
+    })
+    try {
+      const handle = await mount()
+      await expect(handle.api.workspace.list({})).resolves.toMatchObject({ result: { ok: true } })
+      await expect(handle.api.workspace.list({})).resolves.toMatchObject({ result: { ok: true } })
+      expect(ids).toHaveLength(2)
+      expect(ids[0]).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/)
+      expect(ids[0]).not.toBe(ids[1])
+    } finally {
+      globalThis.fetch = original
+      vi.unstubAllGlobals()
+    }
+  })
+
   it('opens one WebSocket per downlink, parses frames, and aborts both without using fetch', async () => {
     ;(globalThis as Win).location = {
       hostname: 'localhost', search: '', origin: 'http://localhost:3080',

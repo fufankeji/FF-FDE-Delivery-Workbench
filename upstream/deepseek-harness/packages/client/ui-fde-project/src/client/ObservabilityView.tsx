@@ -1,8 +1,8 @@
 /** Project-local observability dashboard over existing Session projections. */
 
-import { useState, type CSSProperties } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import {
-  projectActivityBuckets, projectRuntimeTotals,
+  projectActivityBuckets, projectRuntimeTotals, projectUsageSessions,
   type ProjectActivityBucket, type ProjectActivityRange,
 } from './project-data.ts'
 import type { ProjectViewProps } from './slots.ts'
@@ -10,6 +10,7 @@ import { ProjectViewHeader } from './view-state.tsx'
 import css from './project.module.css'
 
 const RANGE_OPTIONS: readonly { id: ProjectActivityRange; label: string; shortLabel: string }[] = [
+  { id: 'all', label: '项目累计', shortLabel: '累计' },
   { id: 'today', label: '今天', shortLabel: '今日' },
   { id: '7d', label: '近 7 天', shortLabel: '7 天' },
   { id: '30d', label: '近 30 天', shortLabel: '30 天' },
@@ -41,19 +42,37 @@ function activityLevel(bucket: ProjectActivityBucket, peak: number): number {
 
 /** Present live, project-scoped activity without requiring an external telemetry service. */
 export function ObservabilityView(props: ProjectViewProps) {
-  const [range, setRange] = useState<ProjectActivityRange>('today')
+  const [range, setRange] = useState<ProjectActivityRange>('all')
   const [hoveredBucketKey, setHoveredBucketKey] = useState<string>()
   const [selectedBucketKey, setSelectedBucketKey] = useState<string>()
   const workspace = props.useWorkspaces(state => state.items.find(item => item.sessionIds.includes(props.sessionId)))
   const sessions = props.useSessions(state => workspace === undefined
     ? []
     : workspace.sessionIds.map(id => state.byId[id]).filter(item => item !== undefined))
+  const usageState = props.useProjectUsage(state => workspace === undefined ? undefined : state.byWorkspace[workspace.workspaceId])
+  const workspaceId = workspace?.workspaceId
+  // Refresh for membership and usage changes, not unrelated session-title/updatedAt edits.
+  const fingerprint = sessions.map(session => {
+    const total = projectRuntimeTotals([session])
+    return `${session.id}:${session.running}:${total.steps}:${total.inputTokens}:${total.outputTokens}`
+  }).join('|')
+  useEffect(() => {
+    if (workspaceId !== undefined) props.loadProjectUsage(workspaceId)
+  }, [workspaceId, fingerprint, props.loadProjectUsage])
   if (workspace === undefined) return <div className={css.surfaceState}>{props.t('surface.noProject')}</div>
+  if (usageState?.status !== 'ready') return <section className={css.surfaceRoot}>
+    <ProjectViewHeader eyebrow={workspace.title} title="项目用量分析" description="从已保存的调用记录读取项目用量，不改变项目或对话数据。" />
+    <div className={css.surfaceState} role="status">
+      <p>{usageState?.status === 'error' ? usageState.message : '正在读取项目历史用量…'}</p>
+      {usageState?.status === 'error' && <button type="button" onClick={() => props.loadProjectUsage(workspace.workspaceId)}>重新读取</button>}
+    </div>
+  </section>
 
-  const buckets = projectActivityBuckets(sessions, range)
-  const rangeStart = buckets[0]?.start ?? 0
-  const rangeEnd = buckets.at(-1)?.end ?? Number.POSITIVE_INFINITY
-  const visibleSessions = sessions.filter(session => session.updatedAt >= rangeStart && session.updatedAt < rangeEnd)
+  const visibleSessions = projectUsageSessions(sessions, usageState.value, range)
+  const lastActivity = usageState.value.sessions.reduce((latest, row) => row.status === 'ready'
+    ? row.activity.buckets.reduce((value, point) => Math.max(value, point.start), latest) : latest, 0)
+  const unavailable = usageState.value.sessions.filter(row => row.status === 'unavailable').length
+  const buckets = projectActivityBuckets(visibleSessions, range)
   const totals = projectRuntimeTotals(visibleSessions)
   const selectedRange = RANGE_OPTIONS.find(item => item.id === range) as typeof RANGE_OPTIONS[number]
   const totalTokens = totals.inputTokens + totals.outputTokens
@@ -119,8 +138,8 @@ export function ObservabilityView(props: ProjectViewProps) {
 
       <div className={css.observeToolbar}>
         <div>
-          <strong>运行脉搏</strong>
-          <span>按会话最近活动时间汇总累计用量</span>
+          <strong>统计范围</strong>
+          <span>按调用开始时间统计 · 本地时区 · 输入含缓存读取</span>
         </div>
         <div className={css.observeRange} aria-label="用量分析时间范围">
           {RANGE_OPTIONS.map(option => (
@@ -137,6 +156,16 @@ export function ObservabilityView(props: ProjectViewProps) {
           ))}
         </div>
       </div>
+
+      {unavailable > 0 && <div className={css.observeNotice} role="status">
+        <span>{unavailable} 条会话用量未读取，当前统计不完整。</span>
+        <button type="button" onClick={() => props.loadProjectUsage(workspace.workspaceId)}>重新读取</button>
+      </div>}
+      {totalTokens === 0 && totals.steps === 0 && <div className={css.observeNotice} role="status">
+        <span>{unavailable > 0 ? '已读取的会话在当前范围内没有调用。' : range === 'all' ? '当前项目尚无调用记录。' : `${selectedRange.label}暂无调用。`}
+          {range !== 'all' && lastActivity > 0 && ` 历史用量仍保留，最近调用时段：${new Date(lastActivity).toLocaleString('zh-CN')}。`}</span>
+        {range !== 'all' && <button type="button" onClick={() => { setRange('all'); setSelectedBucketKey(undefined); setHoveredBucketKey(undefined) }}>查看项目累计</button>}
+      </div>}
 
       <div className={css.observeKpis}>
         <article data-tone="business">
@@ -201,7 +230,7 @@ export function ObservabilityView(props: ProjectViewProps) {
                   const x = chartLeft + (index + 0.5) * bucketWidth - barWidth / 2
                   const inputY = chartTop + chartInnerHeight - inputHeight
                   const outputY = inputY - outputHeight
-                  const showLabel = range === '30d' ? index % 5 === 0 || index === buckets.length - 1 : range !== 'today' || index % 12 === 0
+                  const showLabel = index % (range === 'today' ? 12 : Math.max(1, Math.ceil(buckets.length / 8))) === 0 || index === buckets.length - 1
                   return <g key={bucket.key}>
                     <title>{`${bucket.description}：输入 ${compact(bucket.inputTokens)}，输出 ${compact(bucket.outputTokens)}，${String(bucket.steps)} 步`}</title>
                     <rect className={css.observeInputBar} x={x} y={inputY} width={barWidth} height={inputHeight} rx="3" />
@@ -340,22 +369,24 @@ export function ObservabilityView(props: ProjectViewProps) {
 
       <section className={css.observeSessionSection}>
         <div className={css.sectionHeading}>
-          <div><h2>会话运行画像</h2><p>{selectedRange.label}内最后活跃的项目会话。</p></div>
+          <div><h2>会话用量明细</h2><p>{range === 'all' ? '项目会话的累计调用用量。' : '仅统计所选范围内开始的调用。'}</p></div>
           <span>{visibleSessions.length} 个会话</span>
         </div>
         {visibleSessions.length === 0
           ? <div className={css.smallEmpty}>当前时间范围内没有会话活动。</div>
           : (
             <div className={css.tableScroll}><table className={css.dataTable}>
-              <thead><tr><th>会话</th><th>状态</th><th>轮次 / 步骤</th><th>Token 用量</th><th>模型 / 工具耗时</th><th>最后活动</th></tr></thead>
+              <thead><tr><th>会话</th><th>当前状态</th><th>轮次 / 步骤</th><th>Token 用量</th><th>模型 / 工具耗时</th><th>最近调用时段</th></tr></thead>
               <tbody>{visibleSessions.map((session) => {
                 const one = projectRuntimeTotals([session])
                 const sessionTokens = one.inputTokens + one.outputTokens
                 const sessionStepDensity = one.turns > 0 ? one.steps / one.turns : 0
+                const row = usageState.value.sessions.find(item => item.sessionId === session.id)
+                const lastCall = row?.status === 'ready' ? Math.max(0, ...row.activity.buckets.map(point => point.start)) : 0
                 return <tr key={session.id}>
                   <td><strong>{session.displayTitle}</strong><small>{String(session.id).slice(0, 8)}</small></td>
                   <td><span className={css.sessionStatus} data-running={session.running || undefined}>{session.running ? '运行中' : session.completed ? '已完成' : session.blank ? '未开始' : '等待中'}</span></td>
-                  <td><strong>{one.turns} / {one.steps}</strong><small>{sessionStepDensity.toFixed(1)} 平均步密度</small></td>
+                  <td><strong>{one.turns} / {one.steps}</strong><small>{sessionStepDensity.toFixed(1)} 步 / 轮</small></td>
                   <td>
                     <div className={css.observeSessionUsage}>
                       <div><span style={{ width: percent(ratio(sessionTokens, maxSessionTokens) * 100) }} /></div>
@@ -363,7 +394,7 @@ export function ObservabilityView(props: ProjectViewProps) {
                     </div>
                   </td>
                   <td><strong>{duration(one.llmMs)} / {duration(one.toolMs)}</strong><small>模型 / 工具</small></td>
-                  <td>{new Date(session.updatedAt).toLocaleString('zh-CN')}</td>
+                  <td>{lastCall > 0 ? new Date(lastCall).toLocaleString('zh-CN') : '暂无调用'}</td>
                 </tr>
               })}</tbody>
             </table></div>

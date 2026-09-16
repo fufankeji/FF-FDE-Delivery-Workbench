@@ -11,6 +11,7 @@
 
 import type { Context } from '@deepseek-ai/cordis'
 import { sessionStatsProjectionDefinition } from './projection.ts'
+import { sessionActivityProjectionDefinition } from './activity.ts'
 
 export type * from './types.ts'
 
@@ -26,4 +27,5 @@ export const inject = ['sessionProjections']
  */
 export function apply(ctx: Context): void {
   ctx.sessionProjections.register(sessionStatsProjectionDefinition)
+  ctx.sessionProjections.register(sessionActivityProjectionDefinition)
 }

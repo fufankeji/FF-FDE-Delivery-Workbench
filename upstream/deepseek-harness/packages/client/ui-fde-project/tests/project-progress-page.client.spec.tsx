@@ -33,7 +33,7 @@ describe('ProjectProgressOverlay standalone page', () => {
       useProjectSurfaces: hook({ byWorkspace: {} }),
       useProjectMetadata: hook({ byWorkspace: {} }), loadProjectMetadata: vi.fn(), openActivitySession: vi.fn(),
       useProjectSources: hook({ byWorkspace: {} }),
-      useWorkspaces: hook({ archivedSessionIds: [], items: [{
+      useWorkspaces: hook({ phase: 'ready', state: 'idle', archivedSessionIds: [], items: [{
         workspaceId: 'workspace-1', title: '数据分析项目', path: '/project/one', sessionIds: [],
         createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:00:00.000Z',
       }] }),
@@ -46,7 +46,7 @@ describe('ProjectProgressOverlay standalone page', () => {
       t: makeTranslate(zh),
     } as unknown as ProjectProgressOverlayProps
 
-    render(<ProjectProgressOverlay {...props} />)
+    const view = render(<ProjectProgressOverlay {...props} />)
     expect(screen.getByRole('region', { name: 'FF-FDE工作台产品首页' })).toBeTruthy()
     expect(screen.getByRole('button', { name: /进入工作台/ })).toBeTruthy()
     expect(screen.getByRole('button', { name: /进入交付工作台 · 1 个项目/ })).toBeTruthy()
@@ -74,6 +74,22 @@ describe('ProjectProgressOverlay standalone page', () => {
     expect(showProjectOverview).toHaveBeenCalledTimes(2)
     fireEvent.click(screen.getByRole('button', { name: /开始一次真实交付/ }))
     expect(showProjectOverview).toHaveBeenCalledTimes(3)
+
+    view.rerender(<ProjectProgressOverlay {...props} useWorkspaces={hook({
+      phase: 'pending', state: 'loading', archivedSessionIds: [], items: [],
+    }) as never} />)
+    expect(screen.getByRole('status').textContent).toBe('正在连接并读取项目…')
+    expect(screen.queryByText(/当前 0 个真实项目/)).toBeNull()
+    view.rerender(<ProjectProgressOverlay {...props} useWorkspaces={hook({
+      phase: 'pending', state: 'error', archivedSessionIds: [], items: [],
+    }) as never} />)
+    expect(screen.getByRole('status').textContent).toContain('项目列表读取失败')
+    view.rerender(<ProjectProgressOverlay {...props} useWorkspaces={hook({
+      phase: 'ready', state: 'idle', archivedSessionIds: [], items: [],
+    }) as never} />)
+    expect(screen.getByRole('status').textContent).toContain('当前 0 个真实项目')
+    view.rerender(<ProjectProgressOverlay {...props} />)
+    expect(screen.getByRole('status').textContent).toContain('当前 1 个真实项目')
   })
 
   it('hides the center/details work surfaces while open and restores them on close', () => {

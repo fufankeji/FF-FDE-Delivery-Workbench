@@ -38,9 +38,25 @@ export interface SessionStatsProjection {
   decodeTokens: number
 }
 
+/** Numeric activity in one five-minute request-start interval; no conversation content. */
+export interface SessionActivityBucket extends SessionStatsProjection {
+  start: number
+  uncachedInputTokens: number
+  cacheReadTokens: number
+  cacheWriteTokens: number
+  outputTokens: number
+}
+
+/** Sparse full-log intervals, independent of the session's latest update time. */
+export interface SessionActivityProjection {
+  buckets: readonly SessionActivityBucket[]
+}
+
 declare module '@deepseek-ai/dsh-session-projection/types' {
   interface SessionProjectionMap {
     /** Whole-log turn/step counts and wall times; see {@link SessionStatsProjection}. */
     sessionStats: SessionStatsProjection
+    /** Request-dated usage and execution metrics. */
+    sessionActivity: SessionActivityProjection
   }
 }

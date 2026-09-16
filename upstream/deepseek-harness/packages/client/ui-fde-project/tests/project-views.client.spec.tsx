@@ -153,8 +153,14 @@ describe('FDE project views', () => {
       projectionValues: {
         sessionStats: { turns: 2, steps: 4, llmMs: 1_200, toolMs: 300, ttftMs: 180, ttftSteps: 2, decodeMs: 600, decodeTokens: 60 },
         tokenUsage: { uncachedInputTokens: inputTokens, cacheReadTokens: 100, cacheWriteTokens: 20, outputTokens: 80 },
-      } as never,
+      },
     })
+    const todaySession = summary(todayId, '今日方案会话', now - 60 * 60 * 1_000, 600)
+    const olderSession = summary(olderId, '历史调研会话', now - 2 * 24 * 60 * 60 * 1_000, 400)
+    const usageRows = [todaySession, olderSession].map(session => ({ sessionId: session.id, status: 'ready',
+      stats: session.projectionValues.sessionStats, usage: session.projectionValues.tokenUsage,
+      activity: { buckets: [{ start: session.updatedAt, ...session.projectionValues.sessionStats, ...session.projectionValues.tokenUsage }] },
+    }))
     const props = {
       sessionId: todayId,
       useSession: (() => undefined) as never,
@@ -166,10 +172,12 @@ describe('FDE project views', () => {
         [olderId]: summary(olderId, '历史调研会话', now - 2 * 24 * 60 * 60 * 1_000, 400),
       } }),
       useWorkspaces: hook({ items: [{ workspaceId, path: '/project', title: '数据分析项目', sessionIds: [todayId, olderId] }] }),
+      useProjectUsage: hook({ byWorkspace: { [workspaceId]: { status: 'ready', value: { workspaceId, sessions: usageRows } } } }),
+      loadProjectUsage: vi.fn(),
       t: makeTranslate(zh),
     } as unknown as ProjectViewProps
 
-    render(<ObservabilityView {...props} />)
+    const view = render(<ObservabilityView {...props} />)
 
     expect(screen.queryByText('本地观测可用')).toBeNull()
     expect(screen.queryByText('需要跨项目追踪时再启用外部服务')).toBeNull()
@@ -177,6 +185,9 @@ describe('FDE project views', () => {
     expect(screen.getByText('模型效率')).toBeTruthy()
     expect(screen.getByText('会话活跃热力')).toBeTruthy()
     expect(screen.getByText('平均首 Token')).toBeTruthy()
+    expect(screen.getByRole('button', { name: '项目累计' }).getAttribute('aria-pressed')).toBe('true')
+    expect(screen.getByText('历史调研会话')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '今天' }))
     expect(screen.getByRole('img', { name: /今天 Token 用量与执行步骤趋势/ })).toBeTruthy()
     expect(screen.getByText('今日方案会话')).toBeTruthy()
     expect(screen.queryByText('历史调研会话')).toBeNull()
@@ -195,6 +206,16 @@ describe('FDE project views', () => {
     fireEvent.click(screen.getByRole('button', { name: '近 7 天' }))
     expect(screen.getByRole('img', { name: /近 7 天 Token 用量与执行步骤趋势/ })).toBeTruthy()
     expect(screen.getByText('历史调研会话')).toBeTruthy()
+    view.rerender(<ObservabilityView {...props} useProjectUsage={hook({ byWorkspace: { [workspaceId]: {
+      status: 'ready', value: { workspaceId, sessions: usageRows.slice(1) },
+    } } }) as never} />)
+    fireEvent.click(screen.getByRole('button', { name: '今天' }))
+    expect(screen.getByText(/今天暂无调用/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '查看项目累计' }))
+    expect(screen.getByText('历史调研会话')).toBeTruthy()
+    view.rerender(<ObservabilityView {...props} useProjectUsage={hook({ byWorkspace: { [workspaceId]: { status: 'error', message: '项目用量读取失败' } } }) as never} />)
+    expect(screen.getByRole('button', { name: '重新读取' })).toBeTruthy()
+    expect(screen.queryByText('累计总用量')).toBeNull()
   })
 
   it('shows plan generation, FDE confirmation, and keeps fixed cases behind a second explicit action', async () => {

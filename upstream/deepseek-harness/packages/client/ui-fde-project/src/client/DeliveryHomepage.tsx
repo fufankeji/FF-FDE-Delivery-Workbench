@@ -397,9 +397,11 @@ function DeliveryLifecycleDiagram() {
  */
 export function DeliveryHomepage({
   projectCount,
+  projectReadError,
   openProjects,
 }: {
-  readonly projectCount: number
+  readonly projectCount: number | undefined
+  readonly projectReadError: boolean
   readonly openProjects: () => void
 }) {
   return (
@@ -445,7 +447,10 @@ export function DeliveryHomepage({
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.4, delay: 0.3 }}
                 data-delivery-supporting=""
-              ><i aria-hidden="true" />当前 {projectCount} 个真实项目正在交付 · 证据持续同步</m.p>
+                role="status"
+              ><i aria-hidden="true" />{projectReadError ? '项目列表读取失败，请进入工作台重试。'
+                  : projectCount === undefined ? '正在连接并读取项目…'
+                    : `当前 ${String(projectCount)} 个真实项目正在交付 · 证据持续同步`}</m.p>
               <m.div
                 className={css.deliveryHeroActions}
                 initial={{ opacity: 0, transform: 'translateY(12px)' }}
@@ -453,7 +458,7 @@ export function DeliveryHomepage({
                 transition={{ duration: 0.48, delay: 0.36, ease: [0.23, 1, 0.32, 1] }}
               >
                 <button type="button" onClick={openProjects} data-delivery-primary-action="">
-                  {projectCount > 0 ? `进入交付工作台 · ${String(projectCount)} 个项目` : '进入交付工作台'} <span aria-hidden="true">→</span>
+                  {projectCount !== undefined && projectCount > 0 ? `进入交付工作台 · ${String(projectCount)} 个项目` : '进入交付工作台'} <span aria-hidden="true">→</span>
                 </button>
                 <a href="#fde-lifecycle" data-delivery-secondary-action="">查看交付生命周期 <span aria-hidden="true">↓</span></a>
               </m.div>

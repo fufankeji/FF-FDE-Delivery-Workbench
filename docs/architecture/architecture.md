@@ -508,6 +508,8 @@ Stop project
 
 ## 16. 外部服务与安全边界
 
+- 工作台局域网入口：用户显式使用 `--lan` 时，Web 启动器绑定 `0.0.0.0`，由现有 WebRuntime 为 RPC/WebSocket 推导本机 IPv4 信任地址。FDE 项目、阶段、资料、Semantica 和用量接口复用 Connection 的 `createWebRequestTrust`，只接受实际监听端口上的本机 IP，并保留 Host/Origin/Fetch-Metadata 校验。默认仍为回环地址；设置与凭据 RPC 的本机限制不变。此模式不提供身份认证或多人权限隔离，不适合公网部署；没有扩大独立项目预览的监听范围。
+
 - DeepSeek 或其他模型服务：由官方 LLM/Credentials capability 管理；密钥不进入本项目文档或源码。
 - 企业系统、MCP、部署平台：必须作为项目级明确授权能力接入，不因安装工作台自动获得权限。
 - 项目预览：只允许当前 Agent 验证并报告的不含凭据的 loopback HTTP(S) 地址，并按精确 host:port 放行；不得扩大到所有 localhost 端口、局域网或任意外部 URL。

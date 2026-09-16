@@ -2939,6 +2939,8 @@ export function ProjectProgressOverlay({
 }: ProjectProgressOverlayProps) {
   const page = useProjectPage(state => state)
   const workspaces = useWorkspaces(state => state.items)
+  const workspacePhase = useWorkspaces(state => state.phase)
+  const workspaceReadState = useWorkspaces(state => state.state)
   const archivedSessionIds = useWorkspaces(state => state.archivedSessionIds)
   const sessions = useSessions(state => state)
   const stages = useStageProgress(state => state.byWorkspace)
@@ -3069,7 +3071,7 @@ export function ProjectProgressOverlay({
         data-testid="fde-delivery-home"
       >
         <main className={`${css.pageBody} ${css.homeBody}`}>
-          <DeliveryHomepage projectCount={rows.length} openProjects={showProjectOverview} />
+          <DeliveryHomepage projectCount={workspacePhase === 'ready' ? rows.length : undefined} projectReadError={workspaceReadState === 'error'} openProjects={showProjectOverview} />
         </main>
       </div>
     )

@@ -75,6 +75,7 @@ FDEDeliveryWorkbench/
 - 修改 `packages/client/**/src/` 后，重启前必须先执行对应 Client 包的 `bundle`（例如 `corepack pnpm --filter @deepseek-ai/dsh-client-ui-fde-project bundle`）；仅重启 Host 不会自动更新已构建的浏览器 Bundle。
 - 重启后的最小验证同时包含三项：`3080` 返回 HTTP 200；监听进程使用项目隔离的 `DSH_HOME`；`.runtime/dsh-home/storages/workspace.json` 只含隔离区登记的 Workspace。涉及前端改动时，还必须从首页 Boot Manifest 读取实际 Client Bundle URL，并确认该在线 Bundle 已包含本轮新行为、且不再包含应删除的旧文案。HTTP 200 本身不代表新代码或正确工作区已加载。
 - 当前官方 Web：http://127.0.0.1:3080；未配置模型时只验证官方界面与无密钥能力，不调用计费服务。
+- 用户明确要求局域网访问时，在同一隔离运行区使用 `DSH_HOME=../../.runtime/dsh-home corepack pnpm dsh web --no-open --lan --port 3080`，同时验证本机和实际局域网 IP 上的页面、FDE 数据接口与 WebSocket；不得开放其他 worktree 或擅自做公网映射。详见 README 的局域网访问说明。
 
 ## 单阶段开发与文档同步
 

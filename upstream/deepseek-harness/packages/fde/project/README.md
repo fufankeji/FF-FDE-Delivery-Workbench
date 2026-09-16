@@ -2,9 +2,13 @@
 
 English | [中文](README.zh.md)
 
+HTTP routes share Connection's deployment-aware request check: local-only by default; explicit `--lan` admits same-origin requests to the machine's IPv4 addresses on the listening port. This mode has no login authentication; privileged settings remain local.
+
 Trusted Host support for the FDE project-delivery surfaces. It resolves one explicit Harness WorkspaceId, reads only that Workspace's `.fde/project-runtime.json`, `.fde/api-docs.json`, `.fde/architecture.json`, `.fde/evaluations/`, `.fde/deployment-trial.json`, `.fde/acceptance-handover.json`, fixed six-stage outputs, and canonical project-development docs, validates bounded structures, and returns one same-origin snapshot for the browser. Stage output readers report present, missing, or read-error state without creating files or treating presence as confirmation; present Markdown outputs receive bounded, read-only same-origin preview URLs selected by Host-indexed artifact ids rather than browser-supplied paths. It also adapts the locked `dsh-openapi` parser and HTTP implementation so the standard OpenAPI tools resolve configuration from the calling Agent's registered Workspace instead of a process-global API list.
 
 ## Project metadata
+
+`GET /api/fde-project/usage?workspaceId=…` is a trusted same-origin numeric read over the registered workspace's sessions only. It uses attached projections or the public projection cache's cold replay without activating an Agent or returning messages. Each session returns cumulative stats, Token totals and request-dated activity, or an explicit unavailable state. Requests cannot supply session ids or paths; client disconnect cancels historical reads. Projection-service disposal removes the route.
 
 `POST /api/fde-project/metadata` accepts a trusted registered `workspaceId`, never an arbitrary directory. Without `metadata` it reads company and delivery dates from `.fde/project-metadata.json`, returning `null` when absent. With `metadata` it creates the missing record under a file lock and preserves an existing record. Dates must be real calendar dates in ascending order; corrupt files, symlinks and oversized records are rejected. This endpoint supports project creation and legacy browser import, not editing an existing schedule or approving a stage. Project Center and the Workspace sidebar share its client projection.
 

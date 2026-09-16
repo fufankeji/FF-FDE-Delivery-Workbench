@@ -7,6 +7,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
 import type {} from '@deepseek-ai/dsh-client-ui-workspace/client'
 import type { AcceptanceHandoverDecision, DesignExecutionMechanism, FdeProjectSurfaceController, SemanticDefinitionInput } from './controller.ts'
 import type { ProjectPageController } from './page-controller.ts'
+import type { ProjectUsageController } from './usage-controller.ts'
 import type { FdeV2StageId, ProjectStageController } from './stage-controller.ts'
 import type { ProjectStageViewController } from './stage-view-controller.ts'
 import type { ProjectSourceController, ProjectSourcePreviewKind } from './source-controller.ts'
@@ -94,7 +95,8 @@ export interface ProjectPageInjected {
 
 /** Current-project callbacks and snapshot observable injected into project views. */
 export interface ProjectViewInjected {
-  hooks: { projectSurfaces: FdeProjectSurfaceController }
+  hooks: { projectSurfaces: FdeProjectSurfaceController; projectUsage: ProjectUsageController }
+  loadProjectUsage: (workspaceId: string) => void
   loadProjectSurface: (workspaceId: string) => void
   refreshProjectSurface: (workspaceId: string) => void
   prepareValidationPlan: () => Promise<void>

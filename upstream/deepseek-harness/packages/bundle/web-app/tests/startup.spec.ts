@@ -134,11 +134,25 @@ describe('web command-line provider', () => {
     expect(observed.exits).toEqual([1])
   })
 
-  it('rejects the intentionally unsupported all-interfaces host before the consumer activates', async () => {
+  it('requires explicit LAN opt-in before the all-interface consumer activates', async () => {
     const { values, observed } = await bootProvider(['--host', '0.0.0.0'])
-    expect(observed.out).toContain('--host 0.0.0.0 is intentionally not supported yet for safety: it would expose remote code execution to the network; use 127.0.0.1 instead')
+    expect(observed.out).toContain('all-interfaces binding requires --lan')
     expect(values).toBeUndefined()
     expect(observed.readerConfig).toBeUndefined()
+    expect(observed.exits).toEqual([1])
+  })
+
+  it('boots the real Loader provider and consumer with explicit LAN access on the selected port', async () => {
+    const { values, observed } = await bootProvider(['--lan', '--no-open', '--port', '3080'])
+    expect(values).toEqual({ host: '0.0.0.0', openBrowser: false, port: 3080, trustedHosts: [] })
+    expect(observed.readerConfig).toEqual(values)
+    expect(observed.exits).toEqual([])
+  })
+
+  it('rejects a conflicting loopback host instead of silently broadening its bind', async () => {
+    const { values, observed } = await bootProvider(['--lan', '--host', '127.0.0.1'])
+    expect(values).toBeUndefined()
+    expect(observed.out).toContain('--lan cannot be combined with a different --host')
     expect(observed.exits).toEqual([1])
   })
 })

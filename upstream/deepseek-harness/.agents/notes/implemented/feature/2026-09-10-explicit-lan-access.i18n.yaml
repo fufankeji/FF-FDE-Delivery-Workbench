@@ -1,0 +1,6 @@
+# Bilingual-pair consistency record (docs/i18n/README.md): the git blob hash of each
+# side as of the last confirmed-consistent state. Both languages carry equal authority;
+# after editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write .agents/notes/implemented/feature/2026-09-10-explicit-lan-access.md
+2026-09-10-explicit-lan-access.md: 53dbe556510e8c31c98c9d53784e4d4b62ba295e
+2026-09-10-explicit-lan-access.zh.md: 8fce26a93a9c3011da906f604fcff2eb67e873d4

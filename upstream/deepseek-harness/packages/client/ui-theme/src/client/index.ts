@@ -21,7 +21,7 @@ import { createAppearanceRowStore } from './settings-store.ts'
 import { installThemeStyles } from './styles.ts'
 import { en, zh, type ThemeKey } from './locales.ts'
 import {
-  DEFAULT_PREFERENCE, isThemePreference, THEME_PREFERENCE_FIELD, THEME_SETTINGS_NAMESPACE,
+  DEFAULT_PREFERENCE, isThemePreference, THEME_BOOTSTRAP_ATTRIBUTE, THEME_PREFERENCE_FIELD, THEME_SETTINGS_NAMESPACE,
   type ThemePreference, type ThemeSettings,
 } from '../theme-settings.ts'
 
@@ -168,7 +168,8 @@ export class ThemeRuntime {
   constructor(ctx: Context, host: SettingsScope<ThemeSettings>) {
     this.ctx = ctx
     this.host = host
-    this.preference = DEFAULT_PREFERENCE
+    const bootstrap = typeof document === 'undefined' ? null : document.documentElement.getAttribute(THEME_BOOTSTRAP_ATTRIBUTE)
+    this.preference = isThemePreference(bootstrap) ? bootstrap : DEFAULT_PREFERENCE
     // Non-browser runs (node e2e booting the client tree) have no matchMedia.
     this.media = typeof matchMedia === 'undefined' ? undefined : matchMedia('(prefers-color-scheme: dark)')
     this.snapshot = this.buildSnapshot()

@@ -2,7 +2,7 @@
 
 English | [中文](README.zh.md)
 
-Host-side FDE project source capability. A loopback/same-origin multipart request addresses an explicit Harness Workspace, validates the whole batch, publishes originals into `fde-resources/`, and creates stable Source records under `.fde/sources/`. Separate same-origin routes list sources, read one verified original, and run local document-to-Markdown conversion into `.fde/derived/`.
+Host-side FDE project source capability. A deployment-trusted same-origin multipart request addresses an explicit Harness Workspace, validates the whole batch, publishes originals into `fde-resources/`, and creates stable Source records under `.fde/sources/`. Separate same-origin routes list sources, read one verified original, and run local document-to-Markdown conversion into `.fde/derived/`.
 
 The filename, collision, and filesystem-safety posture was informed by the MIT-licensed [`dsh-local-file-upload`](https://github.com/zhangbo1201/dsh-file-upload) source at commit `94118e7cfb0fc96ce7c9854aad0859e8e468e8d9`; this package is implemented against the pinned Harness `0.1.1-rc.2` Workspace and WebServer contracts and does not install the external plugin.
 
@@ -19,4 +19,4 @@ None; no provider request is assembled or changed.
 - The current defaults are 25 MiB per file, 20 files, and 100 MiB of file content per batch.
 - Local conversion covers generated DOCX, XLSX, PPTX, PDF, CSV, Markdown, and text samples. OCR, audio transcription, source permissions, version relationships, deletion, and conversation references remain deferred.
 - A changed original marks its derived result stale; local conversion failures retain the original.
-- The exact route is intentionally loopback-only until the product has an authenticated remote upload boundary.
+- Local-only binding remains the default. Explicit `--lan` enables local IPv4 and exact-port access through Connection's shared request check; this mode is unauthenticated and restricted to trusted networks by the operator.

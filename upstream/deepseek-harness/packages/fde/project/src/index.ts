@@ -2,10 +2,11 @@
 
 import type { Context } from '@deepseek-ai/cordis'
 import z from '@deepseek-ai/schemastery'
-import { isTrustedApiRequest } from '@deepseek-ai/dsh-client-connection'
+import { createWebRequestTrust } from '@deepseek-ai/dsh-client-connection'
 import type {} from '@deepseek-ai/dsh-host-webserver'
 import { WorkspaceId } from '@deepseek-ai/dsh-workspace'
 import { registerProjectArchitectureTools } from './architecture-tools.ts'
+import { registerProjectUsage } from './usage.ts'
 import { registerProjectEvaluationGuard } from './evaluation-guard.ts'
 import { registerEvaluationWorkbenchTools } from './evaluation-workbench-tools.ts'
 import {
@@ -215,6 +216,7 @@ function positiveInteger(label: string, value: number, minimum: number): void {
 
 /** Register one trusted read-only endpoint for project API, architecture, and eval artifacts. */
 export function apply(ctx: Context, config: Config): void {
+  const trusted = createWebRequestTrust(ctx.webServer)
   positiveInteger('timeoutMs', config.timeoutMs, 1)
   positiveInteger('maxSpecBytes', config.maxSpecBytes, 1_024)
   positiveInteger('maxResponseBytes', config.maxResponseBytes, 1_024)
@@ -223,6 +225,7 @@ export function apply(ctx: Context, config: Config): void {
   positiveInteger('artifactPreviewMaxBytes', config.artifactPreviewMaxBytes, 1_024)
   registerProjectOpenApiTools(ctx, config)
   registerProjectArchitectureTools(ctx)
+  registerProjectUsage(ctx)
   registerProjectRuntimeTools(ctx)
   registerProjectEvaluationGuard(ctx)
   registerEvaluationWorkbenchTools(ctx)
@@ -230,7 +233,7 @@ export function apply(ctx: Context, config: Config): void {
   ctx.effect(() => ctx.webServer.register({
     kind: 'exact', path: '/api/fde-project/metadata',
     handler: createProjectMetadataRoute({
-      trusted: request => isTrustedApiRequest(request, []),
+      trusted,
       read: async id => {
         const workspace = ctx.workspaceRegistry.get(WorkspaceId(id))
         return workspace === undefined ? undefined : await readProjectMetadata(workspace.path)
@@ -254,10 +257,10 @@ export function apply(ctx: Context, config: Config): void {
   ctx.effect(() => () => previews.dispose(), 'fde-project: isolated previews')
   ctx.effect(() => ctx.webServer.register({
     kind: 'exact', path: '/api/fde-project/runtime/preview',
-    handler: createProjectPreviewRoute({ trusted: request => isTrustedApiRequest(request, []), open: (id, parent) => previews.open(id, parent) }),
+    handler: createProjectPreviewRoute({ trusted, open: (id, parent) => previews.open(id, parent) }),
   }), 'fde-project: preview route')
   const handler = createProjectSnapshotRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     snapshot: async (workspaceId) => {
       const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
       if (workspace === undefined) return undefined
@@ -271,7 +274,7 @@ export function apply(ctx: Context, config: Config): void {
     handler,
   }), `fde-project: ${FDE_PROJECT_SNAPSHOT_PATH}`)
   const artifactFile = createRequirementArtifactFileRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     artifact: async (workspaceId, artifactId) => {
       const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
       if (workspace === undefined) return undefined
@@ -286,7 +289,7 @@ export function apply(ctx: Context, config: Config): void {
     handler: artifactFile,
   }), `fde-project: ${FDE_REQUIREMENT_ARTIFACT_FILE_PATH}`)
   const solutionArtifactFile = createRequirementArtifactFileRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     artifact: async (workspaceId, artifactId) => {
       const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
       if (workspace === undefined) return undefined
@@ -301,7 +304,7 @@ export function apply(ctx: Context, config: Config): void {
     handler: solutionArtifactFile,
   }), `fde-project: ${FDE_SOLUTION_ARTIFACT_FILE_PATH}`)
   const developmentArtifactFile = createRequirementArtifactFileRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     artifact: async (workspaceId, artifactId) => {
       const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
       if (workspace === undefined) return undefined
@@ -316,7 +319,7 @@ export function apply(ctx: Context, config: Config): void {
     handler: developmentArtifactFile,
   }), `fde-project: ${FDE_DEVELOPMENT_ARTIFACT_FILE_PATH}`)
   const validationArtifactFile = createRequirementArtifactFileRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     artifact: async (workspaceId, artifactId) => {
       const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
       if (workspace === undefined) return undefined
@@ -331,7 +334,7 @@ export function apply(ctx: Context, config: Config): void {
     handler: validationArtifactFile,
   }), `fde-project: ${FDE_VALIDATION_ARTIFACT_FILE_PATH}`)
   const deploymentTrialArtifactFile = createRequirementArtifactFileRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     artifact: async (workspaceId, artifactId) => {
       const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
       if (workspace === undefined) return undefined
@@ -346,7 +349,7 @@ export function apply(ctx: Context, config: Config): void {
     handler: deploymentTrialArtifactFile,
   }), `fde-project: ${FDE_DEPLOYMENT_TRIAL_ARTIFACT_FILE_PATH}`)
   const acceptanceHandoverArtifactFile = createRequirementArtifactFileRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     artifact: async (workspaceId, artifactId) => {
       const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
       if (workspace === undefined) return undefined
@@ -361,7 +364,7 @@ export function apply(ctx: Context, config: Config): void {
     handler: acceptanceHandoverArtifactFile,
   }), `fde-project: ${FDE_ACCEPTANCE_HANDOVER_ARTIFACT_FILE_PATH}`)
   const confirm = createArchitectureConfirmRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     confirm: async (workspaceId, revision) => {
       const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
       if (workspace === undefined) return undefined
@@ -376,7 +379,7 @@ export function apply(ctx: Context, config: Config): void {
     handler: confirm,
   }), `fde-project: ${FDE_ARCHITECTURE_CONFIRM_PATH}`)
   const confirmPlan = createValidationPlanConfirmRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     confirm: async (workspaceId, contractDigest) => {
       const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
       if (workspace === undefined) return undefined
@@ -391,7 +394,7 @@ export function apply(ctx: Context, config: Config): void {
     handler: confirmPlan,
   }), `fde-project: ${FDE_VALIDATION_PLAN_CONFIRM_PATH}`)
   const acceptMetric = createValidationMetricAcceptRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     accept: async (workspaceId, contractDigest, metricId, reason) => {
       const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
       if (workspace === undefined) return undefined
@@ -406,7 +409,7 @@ export function apply(ctx: Context, config: Config): void {
     handler: acceptMetric,
   }), `fde-project: ${FDE_VALIDATION_METRIC_ACCEPT_PATH}`)
   const waiveIssue = createValidationIssueWaiveRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     waive: async (workspaceId, contractDigest, issueId, reason) => {
       const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
       if (workspace === undefined) return undefined
@@ -421,7 +424,7 @@ export function apply(ctx: Context, config: Config): void {
     handler: waiveIssue,
   }), `fde-project: ${FDE_VALIDATION_ISSUE_WAIVE_PATH}`)
   const acceptPilotIssue = createDeploymentTrialIssueAcceptRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     accept: async (workspaceId, contractDigest, issueId, reason) => {
       const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
       if (workspace === undefined) return undefined
@@ -436,7 +439,7 @@ export function apply(ctx: Context, config: Config): void {
     handler: acceptPilotIssue,
   }), `fde-project: ${FDE_DEPLOYMENT_TRIAL_ISSUE_ACCEPT_PATH}`)
   const confirmPilotReadiness = createDeploymentTrialReadinessConfirmRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     confirm: async (workspaceId, contractDigest) => {
       const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
       if (workspace === undefined) return undefined
@@ -451,7 +454,7 @@ export function apply(ctx: Context, config: Config): void {
     handler: confirmPilotReadiness,
   }), `fde-project: ${FDE_DEPLOYMENT_TRIAL_READINESS_CONFIRM_PATH}`)
   const recordHandoffDecision = createAcceptanceHandoverDecisionRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     record: async (workspaceId, contractDigest, decision) => {
       const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
       if (workspace === undefined) return undefined
@@ -466,7 +469,7 @@ export function apply(ctx: Context, config: Config): void {
     handler: recordHandoffDecision,
   }), `fde-project: ${FDE_ACCEPTANCE_HANDOVER_DECISION_PATH}`)
   const baseline = createEvaluationBaselineRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     approve: async (workspaceId, reportPath) => {
       const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
       if (workspace === undefined) return undefined
@@ -481,7 +484,7 @@ export function apply(ctx: Context, config: Config): void {
     handler: baseline,
   }), `fde-project: ${FDE_EVALUATION_BASELINE_PATH}`)
   const startRuntime = createProjectRuntimeStartRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     act: async (workspaceId, sessionId) => {
       const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
       if (workspace === undefined) return undefined
@@ -496,7 +499,7 @@ export function apply(ctx: Context, config: Config): void {
     handler: startRuntime,
   }), `fde-project: ${FDE_PROJECT_RUNTIME_START_PATH}`)
   const stopRuntime = createProjectRuntimeStopRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     act: async (workspaceId, sessionId) => {
       const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
       if (workspace === undefined) return undefined
@@ -511,7 +514,7 @@ export function apply(ctx: Context, config: Config): void {
     handler: stopRuntime,
   }), `fde-project: ${FDE_PROJECT_RUNTIME_STOP_PATH}`)
   const abandonRuntime = createProjectRuntimeAbandonRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     abandon: async (workspaceId, operationId, message) => {
       const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
       if (workspace === undefined) return undefined

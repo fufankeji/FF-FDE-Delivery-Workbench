@@ -16,6 +16,8 @@
 
 ## 组合
 
+同一插件注册版本 1 的 `sessionActivity`：按调用开始时间归属的稀疏五分钟数值时段，跨午夜调用仍归属开始时段。它复用累计统计 reducer，以最终 Token 回执替换同一步的流式样本；取消调用保留已报告用量，缺少开始事件时采用回执时间。耗时及轮次计数沿用上述语义。独立缓存键通过公开投影缓存回放旧日志，不改写原日志。该视图不包含消息内容，既有 `sessionStats` 和 `tokenUsage` 累计不变。
+
 ```yaml
 - id: session-stats
   name: '@deepseek-ai/dsh-session-stats'

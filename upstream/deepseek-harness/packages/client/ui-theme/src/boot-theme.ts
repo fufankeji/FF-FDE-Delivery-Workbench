@@ -6,12 +6,13 @@
  */
 
 import type { IndexInjection } from '@deepseek-ai/dsh-host-webserver'
-import { DEFAULT_PREFERENCE, type ThemePreference } from './theme-settings.ts'
+import { DEFAULT_PREFERENCE, THEME_BOOTSTRAP_ATTRIBUTE, type ThemePreference } from './theme-settings.ts'
 
 /** Build the inline script body for one schema-validated built-in preference. */
 function bootThemeScript(preference: ThemePreference): string {
   return `(() => {
   const preference = ${JSON.stringify(preference)}
+  document.documentElement.setAttribute(${JSON.stringify(THEME_BOOTSTRAP_ATTRIBUTE)}, preference)
   const systemDark = preference === 'system'
     && typeof matchMedia !== 'undefined'
     && matchMedia('(prefers-color-scheme: dark)').matches

@@ -1,7 +1,8 @@
 /** Browser API carrier: HTTP upstream plus one WebSocket per downstream event stream. */
 
 import type { ApiProxy, HostFrame, MuxFrame, RpcRequest, ServerRequest } from './api.ts'
-import { AbstractApiClient } from './api.ts'
+import { AbstractApiClient, RpcId } from './api.ts'
+import { randomUuid } from './random-uuid.ts'
 import { hostFrameSchema, muxFrameSchema } from '@deepseek-ai/dsh-host-apiproxy/api/events.schema'
 import { serverRequestSchema } from '@deepseek-ai/dsh-host-apiproxy/api/rpc.schema'
 import { HOST_EVENTS_PATH, MUX_EVENTS_PATH } from '../api-path.ts'
@@ -11,6 +12,11 @@ type Parser<F> = { parse(value: unknown): F }
 
 /** Browser platform subclass: unary/respond use fetch; mux/host use downlink-only WebSockets. */
 export class WebApiClient extends AbstractApiClient {
+  /** LAN HTTP lacks crypto.randomUUID, but still exposes cryptographic getRandomValues. */
+  protected override mintRpcId(): RpcId {
+    return RpcId(randomUuid())
+  }
+
   protected doFetch(input: URL, init?: RequestInit): Promise<Response> {
     return globalThis.fetch(input, init)
   }

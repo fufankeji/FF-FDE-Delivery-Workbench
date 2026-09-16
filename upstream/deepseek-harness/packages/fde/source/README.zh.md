@@ -2,7 +2,7 @@
 
 [English](README.md) | 中文
 
-FDE 项目来源的 Host 端能力。仅限本机同源的 multipart 请求会显式指定 Harness Workspace，在完整批次校验成功后，把原件发布到 `fde-resources/`，并在 `.fde/sources/` 建立稳定 Source 记录。独立的同源接口负责列出来源、读取一份经过校验的原件，以及在本地把文档转换为 `.fde/derived/` 中的 Markdown。
+FDE 项目来源的 Host 端能力。经部署信任检查的同源 multipart 请求会显式指定 Harness Workspace，在完整批次校验成功后，把原件发布到 `fde-resources/`，并在 `.fde/sources/` 建立稳定 Source 记录。独立的同源接口负责列出来源、读取一份经过校验的原件，以及在本地把文档转换为 `.fde/derived/` 中的 Markdown。
 
 文件名、冲突处理和文件系统安全姿态参考了 MIT 许可的 [`dsh-local-file-upload`](https://github.com/zhangbo1201/dsh-file-upload) 源码提交 `94118e7cfb0fc96ce7c9854aad0859e8e468e8d9`；本包针对锁定的 Harness `0.1.1-rc.2` Workspace 与 WebServer 合同重新实现，不安装该外部插件。
 
@@ -19,4 +19,4 @@ FDE 项目来源的 Host 端能力。仅限本机同源的 multipart 请求会�
 - 当前默认限制为单文件 25 MiB、每批 20 个文件、每批文件内容合计 100 MiB。
 - 本地转换已用运行时生成的 DOCX、XLSX、PPTX、PDF、CSV、Markdown 和文本样本验证。OCR、音频转写、来源权限、版本关系、删除和对话引用仍然延期。
 - 原件变化后旧派生会标记过期；本地转换失败不会删除原件。
-- 在产品建立带认证的远程上传边界前，该独立路由刻意只允许本机访问。
+- 默认仅本机监听。显式使用 `--lan` 后，通过 Connection 共享请求检查接受本机 IPv4 与精确监听端口；此模式无身份认证，部署者只能在可信网络中开放。

@@ -16,6 +16,8 @@ Function plugin registering the `sessionStats` projection unit: whole-log conver
 
 ## Composition
 
+The same plugin registers `sessionActivity` version 1: sparse five-minute numeric intervals attributed to request start, including requests crossing midnight. It reuses the cumulative stats reducer and replaces a step's streamed Token sample with its final receipt; it retains reported usage for cancelled requests and falls back to receipt time when the start event is absent. Duration and turn-count semantics remain those above. The independent cache key replays old logs through the public projection cache without rewriting them. No message content enters this view; cumulative `sessionStats` and `tokenUsage` remain unchanged.
+
 ```yaml
 - id: session-stats
   name: '@deepseek-ai/dsh-session-stats'

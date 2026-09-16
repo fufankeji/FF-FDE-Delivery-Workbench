@@ -2,7 +2,7 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import type { SessionId, SessionSummary } from '@deepseek-ai/dsh-client-runtime/client'
 import {
-  latestProjectSessionId, projectActivityBuckets, projectRuntimeTotals,
+  latestProjectSessionId, projectActivityBuckets, projectRuntimeTotals, projectUsageSessions,
 } from '../src/client/project-data.ts'
 
 afterEach(() => { localStorage.clear() })
@@ -24,13 +24,16 @@ describe('FDE project browser data', () => {
     })
   })
 
-  it('attributes cumulative Session activity to honest latest-activity time buckets', () => {
+  it('attributes actual request activity rather than session updatedAt to time buckets', () => {
     const now = new Date(2026, 7, 27, 18, 0, 0, 0).getTime()
     const session = (id: string, updatedAt: number, tokens: number): SessionSummary => ({
       id: id as SessionId, displayTitle: id, running: false, blank: false, updatedAt,
       projectionValues: {
         sessionStats: { turns: 1, steps: 2, llmMs: 100, toolMs: 50, ttftMs: 10, ttftSteps: 1, decodeMs: 20, decodeTokens: 5 },
         tokenUsage: { uncachedInputTokens: tokens, cacheReadTokens: 0, cacheWriteTokens: 0, outputTokens: tokens / 2 },
+        sessionActivity: { buckets: [{ start: updatedAt, turns: 1, steps: 2, llmMs: 100, toolMs: 50,
+          ttftMs: 10, ttftSteps: 1, decodeMs: 20, decodeTokens: 5,
+          uncachedInputTokens: tokens, cacheReadTokens: 0, cacheWriteTokens: 0, outputTokens: tokens / 2 }] },
       } as never,
     })
     const sessions = [
@@ -49,6 +52,27 @@ describe('FDE project browser data', () => {
     expect(week).toHaveLength(7)
     expect(week.reduce((sum, bucket) => sum + bucket.sessions, 0)).toBe(3)
     expect(projectActivityBuckets(sessions, '30d', now)).toHaveLength(30)
+    expect(projectActivityBuckets(sessions.map(session => ({ ...session, updatedAt: now })), 'today', now)).toEqual(today)
+  })
+
+  it('splits a multi-day session consistently across cards, table and chart without dropping old cumulative history', () => {
+    const now = new Date(2026, 8, 8, 12).getTime()
+    const stats = { turns: 1, steps: 2, llmMs: 100, toolMs: 50, ttftMs: 10, ttftSteps: 1, decodeMs: 20, decodeTokens: 5 }
+    const usage = { uncachedInputTokens: 100, cacheReadTokens: 20, cacheWriteTokens: 0, outputTokens: 10 }
+    const points = [new Date(2024, 0, 1, 12).getTime(), now].map(start => ({ ...stats, ...usage, start }))
+    const data = { workspaceId: 'w', sessions: [{ sessionId: 's', status: 'ready' as const,
+      stats: { ...stats, turns: 2, steps: 4 }, usage: { ...usage, uncachedInputTokens: 200, cacheReadTokens: 40, outputTokens: 20 }, activity: { buckets: points } }] }
+    const sessions = [{ id: 's' as SessionId, displayTitle: '跨天会话', updatedAt: now, running: false, blank: false }]
+    const today = projectUsageSessions(sessions, data, 'today', now)
+    expect(projectRuntimeTotals(today)).toMatchObject({ turns: 1, steps: 2, inputTokens: 120, outputTokens: 10 })
+    expect(projectActivityBuckets(today, 'today', now).reduce((sum, bucket) => sum + bucket.inputTokens, 0)).toBe(120)
+    const all = projectUsageSessions(sessions, data, 'all', now)
+    const chart = projectActivityBuckets(all, 'all', now)
+    expect(chart.length).toBeLessThanOrEqual(90)
+    expect(chart[0]?.description).toContain('–')
+    expect(chart.reduce((sum, bucket) => sum + bucket.inputTokens, 0)).toBe(240)
+    expect(projectRuntimeTotals(all)).toMatchObject({ steps: 4, inputTokens: 240, outputTokens: 20 })
+    expect(projectUsageSessions(sessions, { workspaceId: 'w', sessions: [{ sessionId: 's', status: 'unavailable' }] }, 'all', now)).toEqual([])
   })
 
   it('selects the latest visible ordinary project Session', () => {

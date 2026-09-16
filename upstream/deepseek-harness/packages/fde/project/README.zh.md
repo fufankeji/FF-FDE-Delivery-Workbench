@@ -2,9 +2,13 @@
 
 [English](README.md) | 中文
 
+HTTP 接口共享 Connection 的部署请求检查：默认仅本机；显式 `--lan` 时接受本机 IPv4 与监听端口上的同源请求。此模式无登录鉴权，特权设置仍限本机。
+
 FDE 项目交付页面使用的可信 Host 支持。它只解析显式 Harness WorkspaceId，只读取该项目的 `.fde/project-runtime.json`、`.fde/api-docs.json`、`.fde/architecture.json`、`.fde/evaluations/`、`.fde/deployment-trial.json`、`.fde/acceptance-handover.json`、六阶段固定产物和标准项目开发文档，校验有界结构后，通过同源接口返回一个浏览器快照。阶段产物读取器只报告已有、缺失或读取失败，不创建文件，也不把文件存在当成确认；已有的 Markdown 产物会获得有大小限制的同源只读预览地址，Host 按已索引产物标识选择文件，不接受浏览器传入路径。它还适配锁定版本 `dsh-openapi` 的解析和 HTTP 实现，使标准 OpenAPI 工具按调用 Agent 所属的已注册 Workspace 解析配置，而不是使用进程级共享 API 清单。
 
 ## 项目基础信息
+
+`GET /api/fde-project/usage?workspaceId=…` 只允许受信同源请求读取已登记 Workspace 所属会话的数值用量。它使用已连接投影或公开投影缓存的冷回放，不激活 Agent、不返回消息。每条会话返回累计统计、Token 总量和按调用时间生成的活动，或明确的不可用状态。请求不能指定会话 ID 或文件路径；客户端断开时取消历史读取。投影服务卸载会移除路由。
 
 `POST /api/fde-project/metadata` 只接受可信的已登记 `workspaceId`，不接受任意目录。不传 `metadata` 时读取 `.fde/project-metadata.json` 中的企业与交付周期，文件缺失返回 `null`；传入时在文件锁内创建缺失记录，保留已有记录。日期必须是真实日历日期且结束不早于开始；损坏文件、符号链接和过大记录均拒绝处理。该接口用于项目创建与旧浏览器数据导入，不用于修改已有周期或批准阶段。项目中心与 Workspace 侧栏共享其客户端投影。
 

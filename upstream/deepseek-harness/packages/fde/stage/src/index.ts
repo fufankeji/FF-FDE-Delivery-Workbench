@@ -2,7 +2,7 @@
 
 import type { Context } from '@deepseek-ai/cordis'
 import type {} from '@deepseek-ai/dsh-agent'
-import { isTrustedApiRequest } from '@deepseek-ai/dsh-client-connection'
+import { createWebRequestTrust } from '@deepseek-ai/dsh-client-connection'
 import {
   loadAcceptanceHandoverStage,
   loadDeploymentTrialStage,
@@ -620,6 +620,7 @@ export function acceptanceHandoverPrompt(stage: FdeProjectState): string {
  */
 export async function apply(ctx: Context): Promise<void> {
   const domain = await ctx.storageDomain.open(fdeStageDomainSpec)
+  const trusted = createWebRequestTrust(ctx.webServer)
   const state = new FdeStageState(domain.table('projects'))
   ctx.effect(() => async () => { await domain.close() }, 'fde-stage: domain')
   ctx.skills.register(QUALIFY_AI_WORKFLOW_SKILL)
@@ -656,7 +657,7 @@ export async function apply(ctx: Context): Promise<void> {
     },
   })
   const handler = createStageRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     workspaceExists: id => ctx.workspaceRegistry.get(WorkspaceId(id)) !== undefined,
     open: workspaceId => state.open(workspaceId),
     reportFailure: (error) => { ctx.logger.warn(error instanceof Error ? error : new Error(String(error))) },
@@ -667,7 +668,7 @@ export async function apply(ctx: Context): Promise<void> {
     handler,
   }), `fde-stage: ${FDE_STAGE_OPEN_PATH}`)
   const skillCatalog = createStageSkillCatalogRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     catalog: DISCOVERY_STAGE_SKILL_CATALOG,
     reportFailure: (error) => { ctx.logger.warn(error instanceof Error ? error : new Error(String(error))) },
   })
@@ -677,7 +678,7 @@ export async function apply(ctx: Context): Promise<void> {
     handler: skillCatalog,
   }), `fde-stage: ${FDE_STAGE_SKILL_CATALOG_PATH}`)
   const completeRequirements = createCompleteRequirementsRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     workspaceExists: id => ctx.workspaceRegistry.get(WorkspaceId(id)) !== undefined,
     requirements: async (workspaceId) => {
       const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
@@ -694,7 +695,7 @@ export async function apply(ctx: Context): Promise<void> {
     handler: completeRequirements,
   }), `fde-stage: ${FDE_STAGE_COMPLETE_REQUIREMENTS_PATH}`)
   const completeSolution = createCompleteSolutionRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     workspaceExists: id => ctx.workspaceRegistry.get(WorkspaceId(id)) !== undefined,
     solution: async (workspaceId) => {
       const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
@@ -714,7 +715,7 @@ export async function apply(ctx: Context): Promise<void> {
     handler: completeSolution,
   }), `fde-stage: ${FDE_STAGE_COMPLETE_SOLUTION_PATH}`)
   const completeDevelopment = createCompleteDevelopmentRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     workspaceExists: id => ctx.workspaceRegistry.get(WorkspaceId(id)) !== undefined,
     development: async (workspaceId) => {
       const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
@@ -731,7 +732,7 @@ export async function apply(ctx: Context): Promise<void> {
     handler: completeDevelopment,
   }), `fde-stage: ${FDE_STAGE_COMPLETE_DEVELOPMENT_PATH}`)
   const completeValidation = createCompleteValidationRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     workspaceExists: id => ctx.workspaceRegistry.get(WorkspaceId(id)) !== undefined,
     validation: async (workspaceId) => {
       const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
@@ -748,7 +749,7 @@ export async function apply(ctx: Context): Promise<void> {
     handler: completeValidation,
   }), `fde-stage: ${FDE_STAGE_COMPLETE_VALIDATION_PATH}`)
   const completePilot = createCompletePilotRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     workspaceExists: id => ctx.workspaceRegistry.get(WorkspaceId(id)) !== undefined,
     deploymentTrial: async (workspaceId) => {
       const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
@@ -765,7 +766,7 @@ export async function apply(ctx: Context): Promise<void> {
     handler: completePilot,
   }), `fde-stage: ${FDE_STAGE_COMPLETE_PILOT_PATH}`)
   const completeHandoff = createCompleteHandoffRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     workspaceExists: id => ctx.workspaceRegistry.get(WorkspaceId(id)) !== undefined,
     acceptanceHandover: async (workspaceId) => {
       const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
@@ -782,7 +783,7 @@ export async function apply(ctx: Context): Promise<void> {
     handler: completeHandoff,
   }), `fde-stage: ${FDE_STAGE_COMPLETE_HANDOFF_PATH}`)
   const returnStage = createReturnStageRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     workspaceExists: id => ctx.workspaceRegistry.get(WorkspaceId(id)) !== undefined,
     returnToPrevious: async (workspaceId, expectedRevision, reason) => await state.returnToPrevious(workspaceId, expectedRevision, reason),
     reportFailure: (error) => { ctx.logger.warn(error instanceof Error ? error : new Error(String(error))) },
@@ -793,7 +794,7 @@ export async function apply(ctx: Context): Promise<void> {
     handler: returnStage,
   }), `fde-stage: ${FDE_STAGE_RETURN_PATH}`)
   const completeV2 = createCompleteV2StageRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     workspaceExists: id => ctx.workspaceRegistry.get(WorkspaceId(id)) !== undefined,
     readiness: async (workspaceId, stage) => {
       const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))
@@ -811,7 +812,7 @@ export async function apply(ctx: Context): Promise<void> {
   })
   ctx.effect(() => ctx.webServer.register({ kind: 'exact', path: FDE_V2_STAGE_COMPLETE_PATH, handler: completeV2 }), `fde-stage: ${FDE_V2_STAGE_COMPLETE_PATH}`)
   const returnV2 = createReturnV2StageRoute({
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     workspaceExists: id => ctx.workspaceRegistry.get(WorkspaceId(id)) !== undefined,
     returnToPrevious: async (workspaceId, expectedRevision, reason) => await state.returnV2ToPrevious(
       workspaceId, expectedRevision, reason,

@@ -76,6 +76,8 @@ describe('real Loader composition', () => {
     session.append('turn/end', { turn: 1, reason: { kind: 'completed' } })
     expect(loaded.sessionProjections.snapshot(session).values.sessionStats)
       .toMatchObject({ turns: 1, steps: 1 })
+    expect(loaded.sessionProjections.snapshot(session).values.sessionActivity?.buckets)
+      .toEqual([expect.objectContaining({ turns: 1, steps: 1, outputTokens: 0, start: expect.any(Number) })])
   })
 
   it('keeps the function-plugin namespace free of a default export', () => {

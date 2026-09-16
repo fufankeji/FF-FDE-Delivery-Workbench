@@ -1,7 +1,7 @@
 /** Project-scoped Semantica Host provider. @module @deepseek-ai/dsh-fde-semantica */
 
 import type { Context } from '@deepseek-ai/cordis'
-import { isTrustedApiRequest } from '@deepseek-ai/dsh-client-connection'
+import { createWebRequestTrust } from '@deepseek-ai/dsh-client-connection'
 import { loadProjectSurfaceSnapshot } from '@deepseek-ai/dsh-fde-project'
 import type {} from '@deepseek-ai/dsh-host-webserver'
 import z from '@deepseek-ai/schemastery'
@@ -68,6 +68,7 @@ export const Config: z<Config> = z.object({
 
 /** Register project actions and Agent tools; only browser actions publish, review candidates or submit FDE decisions. */
 export function apply(ctx: Context, input: Config): void {
+  const trusted = createWebRequestTrust(ctx.webServer)
   const config: SemanticProviderConfig = {
     pythonCommand: input.pythonCommand,
     ...(input.semanticaSource === undefined || input.semanticaSource.trim() === '' ? {} : { semanticaSource: input.semanticaSource }),
@@ -82,7 +83,7 @@ export function apply(ctx: Context, input: Config): void {
     return await loadProjectSurfaceSnapshot({ workspaceId, title: workspace.title, path: workspace.path })
   }
   const options: SemanticaRouteOptions = {
-    trusted: request => isTrustedApiRequest(request, []), workspacePath: root, snapshot,
+    trusted, workspacePath: root, snapshot,
     configureRoute: configureDesignRoute,
     bindSources: bindSemanticSources,
     saveDefinition: saveSemanticDefinition,

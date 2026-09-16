@@ -10,6 +10,7 @@ import type { BetterSidebarService } from 'dsh-better-sidebar'
 import { ApiDocsView } from './ApiDocsView.tsx'
 import { ArchitectureView } from './ArchitectureView.tsx'
 import { FdeProjectSurfaceController } from './controller.ts'
+import { ProjectUsageController } from './usage-controller.ts'
 import { EvaluationView } from './EvaluationView.tsx'
 import { en, NS, zh, type FdeProjectKey } from './locales.ts'
 import { ObservabilityView } from './ObservabilityView.tsx'
@@ -66,6 +67,9 @@ export function apply(ctx: ClientContext): void {
   const stageView = new ProjectStageViewController()
   const sources = new ProjectSourceController()
   const surfaces = new FdeProjectSurfaceController()
+  const usage = new ProjectUsageController()
+  const loadProjectUsage = usage.load.bind(usage)
+  ctx.effect(() => () => usage.dispose(), 'ui-fde-project: usage controller')
   ctx.effect(() => () => { page.dispose(); stages.dispose(); stageView.dispose(); sources.dispose(); surfaces.dispose() }, 'ui-fde-project: controllers')
   ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'ui-fde-project: dictionaries')
   ctx.effect(() => {
@@ -223,7 +227,8 @@ export function apply(ctx: ClientContext): void {
   })
 
   const projectViewInjected = (sessionId: SessionId): ProjectViewInjected => ({
-    hooks: { projectSurfaces: surfaces },
+    hooks: { projectSurfaces: surfaces, projectUsage: usage },
+    loadProjectUsage,
     loadProjectSurface: (workspaceId) => { surfaces.load(workspaceId) },
     refreshProjectSurface: (workspaceId) => { surfaces.refresh(workspaceId) },
     prepareValidationPlan: async () => {

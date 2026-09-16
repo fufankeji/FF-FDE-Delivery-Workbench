@@ -2,6 +2,7 @@
 
 import type { SessionId, SessionSummary } from '@deepseek-ai/dsh-client-runtime/client'
 import type { FdeProjectState } from './stage-controller.ts'
+import { STAT_KEYS, TOKEN_KEYS, type ProjectUsage, type UsageNumbers, type UsagePoint } from './usage-controller.ts'
 
 /** Numeric whole-project session statistics derived from existing projections. */
 export interface ProjectRuntimeTotals {
@@ -25,9 +26,9 @@ export interface ProjectRuntimeTotals {
 }
 
 /** Time windows offered by the project observability surface. */
-export type ProjectActivityRange = 'today' | '7d' | '30d'
+export type ProjectActivityRange = 'all' | 'today' | '7d' | '30d'
 
-/** One display bucket attributed by each Session's most recent activity time. */
+/** One display interval over actual request-start activity. */
 export interface ProjectActivityBucket {
   readonly key: string
   readonly label: string
@@ -93,29 +94,53 @@ export function projectRuntimeTotals(sessions: readonly SessionSummary[]): Proje
   }
 }
 
-function activityBoundaries(range: ProjectActivityRange, now: number): readonly Date[] {
+function activityBoundaries(range: ProjectActivityRange, now: number, earliest = now): readonly Date[] {
+  const start = new Date(range === 'all' ? Math.min(now, earliest) : now)
+  start.setHours(0, 0, 0, 0)
+  if (range === '7d' || range === '30d') start.setDate(start.getDate() - (range === '7d' ? 6 : 29))
   const end = new Date(now)
-  if (range === 'today') {
-    end.setHours(0, 0, 0, 0)
-    return Array.from({ length: 289 }, (_, index) => {
-      const point = new Date(end)
-      point.setMinutes(index * 5)
-      return point
-    })
-  }
-  const days = range === '7d' ? 7 : 30
   end.setHours(0, 0, 0, 0)
-  end.setDate(end.getDate() - days + 1)
-  return Array.from({ length: days + 1 }, (_, index) => {
-    const point = new Date(end)
-    point.setDate(point.getDate() + index)
-    return point
+  end.setDate(end.getDate() + 1)
+  const points = [start]
+  // Long-lived projects retain every interval, merging adjacent days into at most 90 bars.
+  const stride = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / 86_400_000 / 90))
+  while ((points.at(-1) as Date).getTime() < end.getTime()) {
+    const next = new Date(points.at(-1) as Date)
+    if (range === 'today') next.setTime(next.getTime() + 300_000)
+    else next.setDate(next.getDate() + stride)
+    points.push(new Date(Math.min(next.getTime(), end.getTime())))
+  }
+  return points
+}
+
+function activityPoints(session: SessionSummary): readonly UsagePoint[] {
+  const values = session.projectionValues as Readonly<Record<string, unknown>> | undefined
+  return (values?.sessionActivity as { buckets?: readonly UsagePoint[] } | undefined)?.buckets ?? []
+}
+
+/** Limit both the table and cards by request time, while retaining the independent whole-log totals. */
+export function projectUsageSessions(sessions: readonly SessionSummary[], data: ProjectUsage, range: ProjectActivityRange, now = Date.now()): SessionSummary[] {
+  const boundaries = activityBoundaries(range, now)
+  const start = range === 'all' ? Number.NEGATIVE_INFINITY : (boundaries[0] as Date).getTime()
+  const end = (boundaries.at(-1) as Date).getTime()
+  return sessions.flatMap(session => {
+    if (session.origin === 'subagent') return []
+    const row = data.sessions.find(item => item.sessionId === session.id)
+    if (row?.status !== 'ready') return []
+    const points = row.activity.buckets.filter(point => point.start >= start && point.start < end)
+    if (range !== 'all' && points.length === 0) return []
+    const totals = Object.fromEntries([...STAT_KEYS, ...TOKEN_KEYS].map(key => [key, points.reduce((sum, point) => sum + point[key], 0)])) as UsageNumbers
+    return [{ ...session, projectionValues: {
+      ...session.projectionValues,
+      sessionStats: range === 'all' ? row.stats : totals,
+      tokenUsage: range === 'all' ? row.usage : totals,
+      sessionActivity: { buckets: points },
+    } }]
   })
 }
 
 /**
- * Attribute each Session's cumulative projection to its latest-activity bucket.
- * This supports honest local trend exploration without claiming event-level telemetry.
+ * Merge request-start activity into local calendar intervals. Session.updatedAt is not a usage date.
  * @param sessions - current project's Session summaries.
  * @param range - requested local calendar window.
  * @param now - range anchor, injectable for deterministic tests.
@@ -126,7 +151,8 @@ export function projectActivityBuckets(
   range: ProjectActivityRange,
   now: number = Date.now(),
 ): readonly ProjectActivityBucket[] {
-  const boundaries = activityBoundaries(range, now)
+  const earliest = sessions.reduce((min, session) => activityPoints(session).reduce((value, point) => Math.min(value, point.start), min), now)
+  const boundaries = activityBoundaries(range, now, earliest)
   const dateLabel = new Intl.DateTimeFormat('zh-CN', { month: 'numeric', day: 'numeric' })
   const buckets = boundaries.slice(0, -1).map((start, index) => {
     const end = boundaries[index + 1] as Date
@@ -136,7 +162,7 @@ export function projectActivityBuckets(
       : dateLabel.format(start)
     const description = range === 'today'
       ? `${dateLabel.format(start)} ${label}–${timeLabel(end)}`
-      : dateLabel.format(start)
+      : `${dateLabel.format(start)}${end.getTime() - start.getTime() > 90_000_000 ? `–${dateLabel.format(new Date(end.getTime() - 1))}` : ''}`
     return {
       key: start.toISOString(), label, description,
       start: start.getTime(), end: end.getTime(),
@@ -144,18 +170,18 @@ export function projectActivityBuckets(
     }
   })
   for (const session of sessions) {
-    const bucket = buckets.find(item => session.updatedAt >= item.start && session.updatedAt < item.end)
-    if (bucket === undefined) continue
-    const totals = projectRuntimeTotals([session])
-    Object.assign(bucket, {
-      sessions: bucket.sessions + 1,
-      turns: bucket.turns + totals.turns,
-      steps: bucket.steps + totals.steps,
-      inputTokens: bucket.inputTokens + totals.inputTokens,
-      outputTokens: bucket.outputTokens + totals.outputTokens,
-      llmMs: bucket.llmMs + totals.llmMs,
-      toolMs: bucket.toolMs + totals.toolMs,
-    })
+    const active = new Set<string>()
+    for (const point of activityPoints(session)) {
+      const bucket = buckets.find(item => point.start >= item.start && point.start < item.end)
+      if (bucket === undefined) continue
+      bucket.turns += point.turns
+      bucket.steps += point.steps
+      bucket.inputTokens += point.uncachedInputTokens + point.cacheReadTokens + point.cacheWriteTokens
+      bucket.outputTokens += point.outputTokens
+      bucket.llmMs += point.llmMs
+      bucket.toolMs += point.toolMs
+      if (!active.has(bucket.key)) { bucket.sessions += 1; active.add(bucket.key) }
+    }
   }
   return buckets
 }

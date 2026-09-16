@@ -11,6 +11,9 @@ export const THEME_SETTINGS_NAMESPACE = 'ui-theme'
 /** Field carrying the selected built-in theme preference. */
 export const THEME_PREFERENCE_FIELD = 'preference'
 
+/** Non-sensitive Host preference handed from index bootstrap to the live theme owner. */
+export const THEME_BOOTSTRAP_ATTRIBUTE = 'data-dsh-theme-preference'
+
 /** Theme preference persisted by the product Appearance row. */
 export type ThemePreference = typeof THEME_PREFERENCES[number]
 

@@ -3346,7 +3346,9 @@
 }
 .inlineError { color: var(--dsw-alias-state-error-primary); font: var(--dsw-font-xxs-12); }
 
-.observeToolbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 14px; }
+.observeToolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 14px; }
+.observeNotice { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; padding: 14px 16px; border: 1px solid var(--dsw-alias-border-l2); border-radius: 12px; color: var(--dsw-alias-label-secondary); background: var(--dsw-alias-bg-layer-2); font: var(--dsw-font-xs-13); }
+.observeNotice button { flex: none; padding: 6px 12px; border: 1px solid var(--dsw-alias-border-l1); border-radius: 7px; color: var(--dsw-alias-state-business-primary); background: var(--dsw-alias-bg-layer-1); cursor: pointer; }
 .observeToolbar > div:first-child { display: flex; align-items: baseline; min-width: 0; gap: 10px; }
 .observeToolbar strong { font: var(--dsw-font-xs-strong-13); }
 .observeToolbar span { overflow: hidden; color: var(--dsw-alias-label-caption); font: var(--dsw-font-xxxs-11); text-overflow: ellipsis; white-space: nowrap; }

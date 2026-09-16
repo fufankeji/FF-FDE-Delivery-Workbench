@@ -65,7 +65,7 @@ describe('sessionStats projection unit (registry drive)', () => {
     const { ctx, session } = await harness(true)
     const changes: { key: string; value: unknown; seq: number }[] = []
     ctx.sessionProjections.onChanged((_session, key, value, seq) => {
-      changes.push({ key, value, seq })
+      if (key === 'sessionStats') changes.push({ key, value, seq })
     })
     session.append('turn/start', { turn: 1 })
     const firstSeq = closeStep(session, 1, 1)

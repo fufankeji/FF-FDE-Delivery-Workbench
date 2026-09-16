@@ -2,7 +2,7 @@
 
 import type { Context } from '@deepseek-ai/cordis'
 import z from '@deepseek-ai/schemastery'
-import { isTrustedApiRequest } from '@deepseek-ai/dsh-client-connection'
+import { createWebRequestTrust } from '@deepseek-ai/dsh-client-connection'
 import type {} from '@deepseek-ai/dsh-host-webserver'
 import { WorkspaceId } from '@deepseek-ai/dsh-workspace'
 import {
@@ -94,11 +94,12 @@ export const Config: z<Config> = z.object({
 })
 
 /**
- * Register the loopback/same-origin project resource upload route.
+ * Register the deployment-trusted same-origin project resource upload route.
  * @param ctx - Host context carrying WebServer and WorkspaceRegistry.
  * @param config - deployment limits after Loader defaulting.
  */
 export function apply(ctx: Context, config: Config = {}): void {
+  const trusted = createWebRequestTrust(ctx.webServer)
   const limits: ProjectResourceLimits = {
     maxFileBytes: config.maxFileBytes ?? DEFAULT_MAX_FILE_BYTES,
     maxFiles: config.maxFiles ?? DEFAULT_MAX_FILES,
@@ -109,13 +110,13 @@ export function apply(ctx: Context, config: Config = {}): void {
   }
   const handler = createProjectResourceUploadHandler({
     limits,
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     workspacePath: workspaceId => ctx.workspaceRegistry.get(WorkspaceId(workspaceId))?.path,
     registerSources: async (workspacePath, files) => registerStoredProjectResources(workspacePath, files),
     reportFailure: (error) => { ctx.logger.warn(error instanceof Error ? error : new Error(String(error))) },
   })
   const sourceRoutes: ProjectSourceRouteOptions = {
-    trusted: request => isTrustedApiRequest(request, []),
+    trusted,
     workspacePath: workspaceId => ctx.workspaceRegistry.get(WorkspaceId(workspaceId))?.path,
     maxFileBytes: limits.maxFileBytes,
     reportFailure: (error) => { ctx.logger.warn(error instanceof Error ? error : new Error(String(error))) },
