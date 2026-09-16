@@ -121,11 +121,12 @@ it('isolates roles and globals, persists native evidence, restores idle roles an
   first.ctx.tools.register(defineContentToolFixture({
     name: 'workspaceMutator', description: 'unrelated ordinary workspace tool',
     parameters: {},
-    execute: () => { globalExecutions++; return [{ type: 'text', text: 'changed' }] },
+    execute: async () => { globalExecutions++; return [{ type: 'text', text: 'changed' }] },
   }))
   first.ctx.on('agent/pre-step', async (_payload, next) => {
     const value = await next()
-    return { ...value, messages: [...(value.messages ?? []), createUserMessage({
+    if (value.kind === 'reject') return value
+    return { ...value, messages: [...value.messages, createUserMessage({
       content: [{ type: 'text', text: 'WORKSPACE_ONLY_INSTRUCTION' }],
       source: { kind: 'plugin', plugin: 'unrelated' },
     })] }
@@ -142,7 +143,7 @@ it('isolates roles and globals, persists native evidence, restores idle roles an
   expect((await fetch(first.base + '/fde-discovery-lab/cases/finance/case.json')).status).toBe(404)
   await first.api('/runs/' + otherRun.runId + '/roles/' + otherRun.case.roles[0].id + '/select', {})
   await first.api('/runs/' + run.runId + '/roles/employee/messages', { requestId: 'first-interview', text: '请提供' + asset.title + '资料给我查看' })
-  await expect.poll(async () => JSON.stringify(await first.api('/runs/' + run.runId + '/requests/first-interview')), { timeout: 1500 }).toBe(JSON.stringify({requestId:'first-interview',status:'completed',error:null}))
+  await expect.poll(async () => JSON.stringify(await first.api('/runs/' + run.runId + '/requests/first-interview')), { timeout: 1500 }).toBe(JSON.stringify({ requestId: 'first-interview', status: 'completed', error: null }))
   await expect.poll(async () => (await first.api('/runs/' + run.runId)).sessions.find((s: { roleId: string }) => s.roleId === 'employee').evaluationStatus, { timeout: 8000 }).toBe('idle')
   const completed = await first.api('/runs/' + run.runId)
   expect(completed.assets.map((a: { id: string }) => a.id)).toEqual([asset.id])

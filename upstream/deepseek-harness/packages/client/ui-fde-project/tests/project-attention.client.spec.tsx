@@ -48,8 +48,12 @@ function props(entries: Entry[]): ProjectProgressOverlayProps {
     useSessions: hook({ byId: Object.fromEntries(entries.map(entry => [entry.id, {
       id: entry.id, displayTitle: '项目工作记录', running: entry.running ?? false, updatedAt: 0,
     }])) }),
-    useStageProgress: hook({ byWorkspace: Object.fromEntries(entries.flatMap(entry => entry.stage === undefined ? [] : [[entry.id, entry.stage]])) }),
-    useProjectSurfaces: hook({ byWorkspace: Object.fromEntries(entries.flatMap(entry => entry.surface === undefined ? [] : [[entry.id, entry.surface]])) }),
+    useStageProgress: hook({
+      byWorkspace: Object.fromEntries(entries.flatMap(entry => entry.stage === undefined ? [] : [[entry.id, entry.stage]])),
+    }),
+    useProjectSurfaces: hook({
+      byWorkspace: Object.fromEntries(entries.flatMap(entry => entry.surface === undefined ? [] : [[entry.id, entry.surface]])),
+    }),
     useProjectSources: hook({ byWorkspace: {} }), loadStage: vi.fn(), retryStage: vi.fn(),
     useProjectMetadata: hook({ byWorkspace: metadataFixtures }), loadProjectMetadata: vi.fn(), openActivitySession: vi.fn(),
     loadProjectSurface: vi.fn(), refreshProjectSurface: vi.fn(), loadProjectSources: vi.fn(),
@@ -95,7 +99,7 @@ describe('Project Center evidence-backed attention', () => {
     expect(within(screen.getByRole('region', { name: '项目集合' })).queryByRole('button', { name: /进入项目/ })).toBeNull()
   })
 
-  it.each(['2026-09-08', '2026-09-09', '2026-02-30', 'invalid'])('does not mark a current, future or invalid date %s overdue', end => {
+  it.each(['2026-09-08', '2026-09-09', '2026-02-30', 'invalid'])('does not mark a current, future or invalid date %s overdue', (end) => {
     schedule('日期检查', end)
     render(<ProjectProgressOverlay {...props([{ id: '日期检查', stage: readyStage, surface: surface() }])} />)
     expect(within(screen.getByRole('region', { name: '项目卡片' })).queryByText('已过计划交付日')).toBeNull()
@@ -160,27 +164,36 @@ describe('Project Center evidence-backed attention', () => {
     expect(screen.getByRole('button', { name: '查看 1 个待处理项目' })).toBeTruthy()
   })
 
-  it.each(['evaluation', 'delivery'] as const)('uses actual failed %s results, not unrun work, and clears them on success', kind => {
-    const failed = kind === 'evaluation' ? {
-      evaluation: { status: 'ready', testing: { current: true, metrics: [
-        { id: 'isolation', title: '跨项目数据隔离测试失败', required: true, status: 'FAIL' },
-        { id: 'later', title: '尚未运行的测试', required: true, status: 'NOT_RUN' },
-      ] } },
+  it.each(['evaluation', 'delivery'] as const)('uses actual failed %s results, not unrun work, and clears them on success', (kind) => {
+    const resultSurface = (passed: boolean): Partial<V2StageSurfaceSnapshot> => kind === 'evaluation' ? {
+      evaluation: {
+        status: 'ready', candidate: { summary: '隔离验证候选', version: 'v1', sourceFiles: [] },
+        testing: { environment: 'local', current: true, metrics: [
+          { id: 'isolation', title: passed ? '隔离验证' : '跨项目数据隔离测试失败', kind: 'isolation', required: true,
+            criterion: '项目数据相互隔离', sources: [], status: passed ? 'PASS' : 'FAIL', value: '', evidence: [] },
+          { id: 'later', title: '尚未运行的测试', kind: 'regression', required: true,
+            criterion: '回归验证通过', sources: [], status: 'NOT_RUN', value: '', evidence: [] },
+        ] },
+        reviewBlockers: [],
+      },
     } : {
-      delivery: { status: 'ready', versionCurrent: true, items: [
-        { id: 'rollback', title: '恢复演练执行失败', required: true, status: 'failed' },
-        { id: 'later', title: '尚未执行的交付工作', required: true, status: 'pending' },
-      ] },
+      delivery: {
+        status: 'ready', version: 'v1', versionCurrent: true, versionFiles: [],
+        environment: { kind: 'local', label: '本地验证' },
+        items: [
+          { id: 'rollback', category: 'recovery', title: passed ? '恢复演练' : '恢复演练执行失败', required: true,
+            declaredStatus: passed ? 'passed' : 'failed', status: passed ? 'passed' : 'failed',
+            scope: 'local', version: 'v1', summary: '', evidence: [] },
+          { id: 'later', category: 'handoff', title: '尚未执行的交付工作', required: true,
+            declaredStatus: 'pending', status: 'pending', scope: 'local', version: 'v1', summary: '', evidence: [] },
+        ],
+        reviewBlockers: [],
+      },
     }
-    const input = props([{ id: '执行结果项目', stage: readyStage, surface: surface(failed as Partial<V2StageSurfaceSnapshot>) }])
+    const input = props([{ id: '执行结果项目', stage: readyStage, surface: surface(resultSurface(false)) }])
     const view = render(<ProjectProgressOverlay {...input} />)
     expect(within(screen.getByRole('region', { name: '项目卡片' })).getByText('存在阻塞').title).toContain('失败')
-    const passed = kind === 'evaluation' ? {
-      evaluation: { status: 'ready', testing: { current: true, metrics: [{ title: '隔离验证', required: true, status: 'PASS' }, { title: '未运行', required: true, status: 'NOT_RUN' }] } },
-    } : {
-      delivery: { status: 'ready', versionCurrent: true, items: [{ title: '恢复演练', required: true, status: 'passed' }, { title: '未执行', required: true, status: 'pending' }] },
-    }
-    view.rerender(<ProjectProgressOverlay {...input} useProjectSurfaces={props([{ id: '执行结果项目', surface: surface(passed as Partial<V2StageSurfaceSnapshot>) }]).useProjectSurfaces} />)
+    view.rerender(<ProjectProgressOverlay {...input} useProjectSurfaces={props([{ id: '执行结果项目', surface: surface(resultSurface(true)) }]).useProjectSurfaces} />)
     expect(screen.getByRole('button', { name: '查看 0 个待处理项目' })).toBeTruthy()
     expect(within(screen.getByRole('region', { name: '项目卡片' })).queryByText('存在阻塞')).toBeNull()
   })

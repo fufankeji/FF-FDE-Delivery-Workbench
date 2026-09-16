@@ -304,8 +304,7 @@ describe('workspace browser rows', () => {
       render(<ProjectRowItem
         group={group}
         metadata={{
-          name: 'Project', companyName: '示例科技', schedule: { status: 'pending-confirmation' },
-          storagePath: '/projects/project', createdAt: '2026-01-01T00:00:00.000Z',
+          companyName: '示例科技', schedule: { status: 'pending-confirmation' },
         }}
         onOpen={vi.fn()} onToggle={vi.fn()} onCreate={vi.fn()} t={t}
       />)

@@ -43,7 +43,8 @@ function mount(metadata?: Record<string, unknown>) {
     } }),
     loadStage: vi.fn(), retryStage: vi.fn(), loadProjectSurface: vi.fn(), refreshProjectSurface: vi.fn(),
     loadProjectSources: vi.fn(), parseProjectSource: vi.fn(), loadProjectMetadata, openActivitySession,
-    enterProject: vi.fn(), showProjectDetail, showProjectHome: page.showHome, showProjectOverview: page.showOverview, showProjectTimeline: page.showTimeline,
+    enterProject: vi.fn(), showProjectDetail, showProjectHome: page.showHome,
+    showProjectOverview: page.showOverview, showProjectTimeline: page.showTimeline,
     openProjectCreation: vi.fn(), renderSlot: vi.fn(() => null), t: makeTranslate(zh),
   } as unknown as ProjectProgressOverlayProps
   render(<ProjectProgressOverlay {...props} />)
@@ -108,7 +109,7 @@ describe('Project Center recent activity and delivery navigation', () => {
     fireEvent.click(screen.getByRole('button', { name: /全部项目/ }))
     fireEvent.click(within(screen.getByRole('region', { name: '交付周期' })).getByRole('button', { name: /已登记/ }))
     expect(screen.getByRole('heading', { name: '交付时间轴 2' })).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: '列表', exact: true }))
+    fireEvent.click(screen.getByRole('button', { name: '列表' }))
     expect(screen.getByRole('heading', { name: '全部项目 3' })).toBeTruthy()
     expect(screen.getByRole('table', { name: '项目列表' })).toBeTruthy()
   })
@@ -121,7 +122,7 @@ describe('Project Center recent activity and delivery navigation', () => {
     fireEvent.click(within(schedule).getByRole('button', { name: /0\/3 已登记/ }))
     expect(screen.getByRole('heading', { name: '交付时间轴 0' })).toBeTruthy()
     expect(screen.getByText('还没有已登记交付周期的项目。')).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: '卡片', exact: true }))
+    fireEvent.click(screen.getByRole('button', { name: '卡片' }))
     input.openActivitySession.mockRejectedValueOnce(new Error('会话已移除'))
     fireEvent.click(screen.getByRole('button', { name: '查看对话' }))
     await waitFor(() => expect(screen.getByText('会话已移除')).toBeTruthy())

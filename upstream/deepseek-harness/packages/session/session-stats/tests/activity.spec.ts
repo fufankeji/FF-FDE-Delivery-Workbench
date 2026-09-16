@@ -1,13 +1,23 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, expectTypeOf, it } from 'vitest'
 import type { SessionEvent } from '@deepseek-ai/dsh-session'
+import type { SessionProjectionStateMap } from '@deepseek-ai/dsh-session-projection/types'
 import { createMessage } from '@deepseek-ai/dsh-llm'
 import { sessionActivityProjectionDefinition as definition } from '../src/activity.ts'
+import type { SessionActivityBucket } from '../src/types.ts'
 
 const at = (time: number, type: string, data: unknown) => ({ time, type, data, seq: time }) as SessionEvent
 const message = createMessage({ role: 'assistant', content: [{ type: 'text', text: 'test' }], source: { kind: 'model', provider: 'mock', model: 'mock' } })
 const fold = (events: SessionEvent[]) => definition.wire.view(events.reduce(definition.apply, definition.init()))
 
 describe('request-dated activity', () => {
+  it('keeps the registered state and checkpoint schema concrete', () => {
+    expectTypeOf<SessionProjectionStateMap['sessionActivity']>().not.toBeAny()
+    expectTypeOf<ReturnType<typeof definition.stateSchema.parse>>()
+      .toEqualTypeOf<SessionProjectionStateMap['sessionActivity']>()
+    expectTypeOf<ReturnType<typeof definition.wire.view>['buckets'][number]>()
+      .toEqualTypeOf<SessionActivityBucket>()
+    expect(definition.stateSchema.parse(definition.init())).toEqual(definition.init())
+  })
   it('replaces streamed usage with the final receipt and attributes a cross-midnight step to its start', () => {
     const start = Date.UTC(2026, 8, 7, 23, 59)
     const result = fold([
