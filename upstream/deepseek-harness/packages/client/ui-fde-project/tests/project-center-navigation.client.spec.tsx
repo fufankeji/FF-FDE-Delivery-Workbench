@@ -43,7 +43,8 @@ function mount(metadata?: Record<string, unknown>) {
     } }),
     loadStage: vi.fn(), retryStage: vi.fn(), loadProjectSurface: vi.fn(), refreshProjectSurface: vi.fn(),
     loadProjectSources: vi.fn(), parseProjectSource: vi.fn(), loadProjectMetadata, openActivitySession,
-    enterProject: vi.fn(), showProjectDetail, showProjectHome: page.showHome, showProjectOverview: page.showOverview, showProjectTimeline: page.showTimeline,
+    enterProject: vi.fn(), showProjectDetail, showProjectHome: page.showHome,
+    showProjectOverview: page.showOverview, showProjectTimeline: page.showTimeline,
     openProjectCreation: vi.fn(), renderSlot: vi.fn(() => null), t: makeTranslate(zh),
   } as unknown as ProjectProgressOverlayProps
   render(<ProjectProgressOverlay {...props} />)

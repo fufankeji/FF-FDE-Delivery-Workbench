@@ -133,7 +133,7 @@ it('isolates roles and globals, persists native evidence, restores idle roles an
   first.ctx.on('agent/pre-step', async (_payload, next) => {
     const value = await next()
     if (value.kind === 'reject') return value
-    return { ...value, messages: [...(value.messages ?? []), createUserMessage({
+    return { ...value, messages: [...value.messages, createUserMessage({
       content: [{ type: 'text', text: 'WORKSPACE_ONLY_INSTRUCTION' }],
       source: { kind: 'plugin', plugin: 'unrelated' },
     })] }

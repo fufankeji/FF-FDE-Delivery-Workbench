@@ -1,7 +1,8 @@
 /** Request-dated numeric activity folded from durable events, without copying messages. */
 import { z } from 'zod'
 import type { ProjectionDefinition } from '@deepseek-ai/dsh-session-projection'
-import { sessionStatsProjectionDefinition as statsDefinition, sessionStatsSchema, sessionStatsStateSchema, type SessionStatsState } from './projection.ts'
+import type { SessionProjectionStateMap } from '@deepseek-ai/dsh-session-projection/types'
+import { sessionStatsProjectionDefinition as statsDefinition, sessionStatsSchema, sessionStatsStateSchema } from './projection.ts'
 import type { SessionActivityBucket } from './types.ts'
 
 const tokenSchema = z.object({
@@ -16,10 +17,15 @@ const schema = z.object({
   lastUsage: z.object({ turn: z.number(), step: z.number(), start: z.number(), tokens: tokenSchema }).nullable(),
 })
 interface State {
-  stats: SessionStatsState
+  stats: SessionProjectionStateMap['sessionStats']
   stepStart: number | null
   buckets: Record<string, SessionActivityBucket>
-  lastUsage: { turn: number; step: number; start: number; tokens: z.infer<typeof tokenSchema> } | null
+  lastUsage: {
+    turn: number
+    step: number
+    start: number
+    tokens: z.infer<typeof tokenSchema>
+  } | null
 }
 declare module '@deepseek-ai/dsh-session-projection/types' {
   interface SessionProjectionStateMap { sessionActivity: State }
