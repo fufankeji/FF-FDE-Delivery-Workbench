@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import type { WorkspaceId } from '@deepseek-ai/dsh-client-runtime/client'
+import type { WorkspaceId } from '@deepseek-ai/dsh-workspace'
 import { makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
 import { ProjectResourceComposerAction, ProjectResourceUploadAction } from '../src/client/ProjectResourceUploadAction.tsx'
 import { zh } from '../src/client/locales.ts'
@@ -16,7 +16,7 @@ const t = makeTranslate(zh) as never
 function mount(fetchImpl: typeof fetch) {
   vi.stubGlobal('fetch', fetchImpl)
   return render(<ProjectResourceUploadAction
-    useSessions={(() => undefined) as never}
+    usePanelInfo={(() => undefined) as never} useSessionPendingInteraction={(() => new Map()) as never} useResource={(() => undefined) as never} useSessions={(() => undefined) as never}
     useWorkspaces={(() => undefined) as never}
     workspaceId={'workspace-1' as WorkspaceId}
     title="客户项目"
@@ -29,10 +29,8 @@ describe('ProjectResourceUploadAction', () => {
   it('shows one small project-scoped upload action inside the native composer', () => {
     render(<ProjectResourceComposerAction
       sessionId={'session-1' as never}
-      session={{} as never}
-      input={{} as never}
       useSession={(() => undefined) as never}
-      useSessions={(() => undefined) as never}
+      usePanelInfo={(() => undefined) as never} useSessionPendingInteraction={(() => new Map()) as never} useResource={(() => undefined) as never} useConversation={(() => undefined) as never} useChat={(() => undefined) as never} useTrajectory={(() => undefined) as never} useSessions={(() => undefined) as never}
       useWorkspaces={((selector: (state: unknown) => unknown) => selector({
         items: [{ workspaceId: 'workspace-1', path: '/projects/customer', sessionIds: ['session-1'] }],
       })) as never}

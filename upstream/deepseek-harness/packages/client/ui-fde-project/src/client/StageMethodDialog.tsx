@@ -289,7 +289,7 @@ export function StageMethodDialog({ method, methods, stageIndex, onClose, onSele
         </div>}
 
         {tab === 'definition' && <div className={css.definitionTab}>
-          <section className={css.definition}><span>工作方法说明（中文）</span><MarkdownText text={method.content} /></section>
+          <section className={css.definition}><span>工作方法说明（中文）</span><MarkdownText text={method.content} labels={{ code: { copyLabel: '复制', copiedLabel: '已复制' }, footnotes: '脚注' }} /></section>
           <details className={css.technical}><summary>技术信息</summary><dl>
             <div><dt>Skill</dt><dd><code>{method.id}</code></dd></div><div><dt>来源仓库</dt><dd><code>{source.repository}</code></dd></div>
             {source.commit !== undefined && <div><dt>源码提交版本</dt><dd><code>{source.commit}</code></dd></div>}

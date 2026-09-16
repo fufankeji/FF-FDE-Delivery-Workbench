@@ -1,0 +1,38 @@
+- text: FF-FDE工作台
+- button "Collapse sidebar":
+  - img
+- button "New project":
+  - img
+  - text: New project
+- text: Projects
+- button "Search sessions":
+  - img
+- textbox "Search sessions..."
+- button "View options":
+  - img
+- tree "Sessions":
+  - treeitem "workspace" [expanded]:
+    - img
+    - text: workspace
+  - treeitem "New Session" [selected]
+- button "Settings":
+  - img
+  - text: Settings
+- text: 见所未见，成所未成
+- button "Choose project":
+  - img
+  - text: workspace
+  - img
+- button "Standard mode":
+  - img
+  - text: Standard mode
+  - img
+- textbox "Describe what you want to build, / commands, @ files or sessions"
+- button "Add files or run commands":
+  - img
+- 'button "Access mode, current: Workspace Write"': Workspace Write
+- button "Plan mode on, press to turn off": Plan
+- button "Select model, current DeepSeek-V4-Flash":
+  - text: DeepSeek-V4-Flash
+  - img
+- button "Send message" [disabled]

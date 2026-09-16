@@ -8,13 +8,19 @@
 - P0 核心旅程：创建或选择项目 → 收集原始来源 → 与项目 Agent 协作 → 形成方案、业务系统和运行证据 → FDE 审阅并决定 → 试点、生产交接与持续改进。
 - 当前已实现：项目中心、多会话导航、项目 `fde-resources/` 原件与稳定 SourceId、本地文档识别、八阶段项目工作台、项目启动/关闭/预览、系统架构、用量分析、评估优化，以及右侧 Files/Editor/Git/Review Dock。历史阶段只读回看；继续工作需返回相应阶段，不因浏览页面改变项目进度。
 - 当前资料边界：导入、本地识别和预览都不修改输入框、不创建消息、不触发 Agent；已验证 DOCX、XLSX、PPTX、PDF、CSV、Markdown 和文本识别，OCR、版本/删除、权限/有效性与对话显式引用尚未实现。
-- 当前开发工作区边界：锁定 `dsh-better-sidebar@0.16.1` 与 `dsh-file-review-tab@0.2.0`；左侧保留项目/会话及独立功能入口、中央保留官方对话，右侧按需展示文件、编辑、Git Diff 与 Agent 文件审查，且两类 Diff 保持不同来源语义。
+- 当前开发工作区边界：锁定 `dsh-better-sidebar@0.19.1` 与 `dsh-file-review-tab@0.5.0`；左侧保留项目/会话及独立功能入口、中央保留官方对话，右侧按需展示文件、编辑、Git Diff 与 Agent 文件审查，且两类 Diff 保持不同来源语义。
 - 当前项目进度：项目中心按最近操作汇总项目、阶段、会话和交付周期，支持查看产物、进入项目及历史阶段回看；不把文件数量或服务启动成功直接当成阶段验收。
 - 当前项目结果：项目交付中提供“API 文档”和“系统架构”。API 工具复用锁定 `dsh-openapi` 并按 calling Agent Workspace 隔离；系统架构提供 Agent 候选、精确 revision、人工确认、缩放和 SVG/PNG 导出，不把运行图冒充设计架构。
 - 当前运行与质量：观测固定 `dsh-observe`，默认 disabled 且无外发，页面汇总项目内真实 Session/Stats/Token；评估固定 `dsh-eval-harness`，经过二次费用确认后运行隔离 Trial，展示报告、人工 Baseline 和同名用例差异。自动开发验证没有调用付费模型。
 - 当前界面主题：设置中的“界面主题”提供官方原版、大肥鱼拟人、云端猫咪和三套九天皮肤，也支持只在当前浏览器处理和保存的自定义背景；皮肤与浅色/深色/跟随系统相互独立。
 - 当前独立训练：业务挖掘实验室保留五案例、像素办公室、岗位访谈、资料、计算、报告与历史；不要求创建项目，不推进项目阶段。实现与无密钥检查已完成，真实模型和视觉体验待人工确认。
 - 明确不做：客户管理、跨项目资源与成本管理、经营统计、教学账号与班级管理、团队协作、跨项目资产复用和完整 VS Code Workbench。
+
+## 官方基座更新
+
+当前固定官方 `dsh-v0.1.6-alpha.1` / `0a15e36e7f82b6ed45af6fa9759f29b40dcd965d`，由 Corepack 按 package.json 使用 `pnpm@10.34.5`。升级与后续更新步骤见[基座升级说明](docs/architecture/harness-016-upgrade.md)，结果见[验证记录](docs/verification/2026-09-16-harness-016-upgrade.md)。普通 `git pull --ff-only` 更新本工作台发行源码，不会自动合并官方版本。
+
+官方 Web 首次访问现在使用终端输出的本地登录链接建立浏览器 Cookie。旧会话由官方迁移器读取并保留原格式文件；第一次切换版本前应先验证隔离副本。当前升级分支的隔离预览使用 3082，主工作台保持原版本，等待人工验收。
 
 ## 八阶段如何使用
 
@@ -33,7 +39,7 @@
 
 ## 项目结构
 
-- `upstream/deepseek-harness/`：锁定官方 DeepSeek Harness `0.1.1-rc.2` 的开发工作副本及当前 FDE 下游插件。
+- `upstream/deepseek-harness/`：锁定官方 DeepSeek Harness `0.1.6-alpha.1` 的源码及当前 FDE 下游插件。
 - `.runtime/dsh-home/`：被忽略的本地 DSH 运行状态。
 - `source-materials/fde-agent/`：随仓库分发的 FDE-Agent 项目素材、导入脚本和文件校验清单；不是工作台的全局业务模板。
 - `frontend/`、`backend/`：预留给后续独立 FDE 前端/后端交付层；当前实现仍在锁定基座中以插件方式完成 vertical slices。

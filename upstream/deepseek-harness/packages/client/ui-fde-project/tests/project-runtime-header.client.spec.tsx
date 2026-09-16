@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import type { SessionId, WorkspaceId } from '@deepseek-ai/dsh-client-runtime/client'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import type { WorkspaceId } from '@deepseek-ai/dsh-workspace'
 import { makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
 import { ProjectRuntimeHeader } from '../src/client/ProjectRuntimeHeader.tsx'
 import { zh } from '../src/client/locales.ts'

@@ -1,7 +1,8 @@
+import type { JsonValue } from '@deepseek-ai/dsh-util-values'
 /** Agent tool for reporting one exact project runtime operation. */
 
 import type { Context } from '@deepseek-ai/cordis'
-import { defineTool, type JsonValue } from '@deepseek-ai/dsh-tools'
+import { defineTool } from '@deepseek-ai/dsh-tools'
 import { reportProjectRuntime } from './project-runtime.ts'
 import { projectRootForExecution } from './tool-context.ts'
 

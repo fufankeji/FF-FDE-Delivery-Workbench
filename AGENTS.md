@@ -48,7 +48,7 @@ FDEDeliveryWorkbench/
 - 根目录只保留项目级文档和真实跨服务编排文件。
 - 前端专属内容不得散落到 `frontend/` 外；后端、Agent、LLM 和数据服务专属内容不得散落到 `backend/` 外。
 - `FDEDeliveryWorkbench/` 根目录是唯一 canonical Git 仓库；`docs/`、根文档、产品资产与 `upstream/deepseek-harness/` 源码由同一仓库、分支和 worktree 管理。
-- `upstream/deepseek-harness/` 保留迁移前 DeepSeek Harness 的提交历史并承载当前 FDE 扩展；`upstream/deepseek-harness.lock.json` 只记录原始官方基线与来源，不再表示该目录是被忽略的可再生 checkout。
+- `upstream/deepseek-harness/` 承载官方源码与当前 FDE 扩展；`upstream/deepseek-harness.lock.json` 记录当前和上一官方基线，不表示该目录可以直接覆盖或重建。
 - FDE 行为优先放入独立 Host/Client Plugins 与 FDE Bundle/Profile；不修改官方 Agent Loop，只有运行证明确认不存在公共扩展点时才维护最小补丁。
 - 不为目录整齐凭空添加 workspace、Compose、CI、数据库或部署设施。
 
@@ -67,7 +67,7 @@ FDEDeliveryWorkbench/
 
 - 独立业务挖掘实验室位于 `packages/fde/discovery-lab` 与 `packages/client/ui-fde-discovery-lab`；其素材导入与训练数据边界见[包说明](upstream/deepseek-harness/packages/fde/discovery-lab/README.zh.md)。不要把 `DSH_HOME/fde-discovery-lab` 当作可重建素材缓存，也不要将训练轮次登记为项目或阶段。
 
-- 前端：锁定官方 DeepSeek Harness `0.1.1-rc.2` 的 React/Vite Web Client、Client Runtime 与 UI Slots；FDE UI 以独立 Client Plugins 适配。
+- 前端：锁定官方 DeepSeek Harness `0.1.6-alpha.1` 的 React/Vite Web Client、拆分后的 Session/Workspace Controllers、Store 与 UI Slots；FDE UI 以独立 Client Plugins 适配。
 - 后端：锁定官方 DeepSeek Harness Cordis/TypeScript Host，复用 Workspace、Session、Agent Loop、Tools、FS、Shell、Terminal、LSP、Approval 和 Web API；FDE 领域以 Host Plugins 扩展。
 - 数据与模型：Workspace 负责项目文件，主 Session 与自定义 `fde/*` Events/Projection 负责项目事件和状态；图片复用官方 Attachment，普通文件由待开发的 FDE Source capability 负责；模型通过官方 LLM/Credentials 配置。
 - 安装：从当前根仓库或 Feature worktree 进入其 `upstream/deepseek-harness/`，执行 `corepack pnpm install --frozen-lockfile`。
@@ -78,6 +78,13 @@ FDEDeliveryWorkbench/
 - 重启后的最小验证同时包含三项：`3080` 返回 HTTP 200；监听进程使用项目隔离的 `DSH_HOME`；`.runtime/dsh-home/storages/workspace.json` 只含隔离区登记的 Workspace。涉及前端改动时，还必须从首页 Boot Manifest 读取实际 Client Bundle URL，并确认该在线 Bundle 已包含本轮新行为、且不再包含应删除的旧文案。HTTP 200 本身不代表新代码或正确工作区已加载。
 - 当前官方 Web：http://127.0.0.1:3080；未配置模型时只验证官方界面与无密钥能力，不调用计费服务。
 - 用户明确要求局域网访问时，在同一隔离运行区使用 `DSH_HOME=../../.runtime/dsh-home corepack pnpm dsh web --no-open --lan --port 3080`，同时验证本机和实际局域网 IP 上的页面、FDE 数据接口与 WebSocket；不得开放其他 worktree 或擅自做公网映射。详见 README 的局域网访问说明。
+
+## 官方基座维护
+
+- 当前标签与提交见 `upstream/deepseek-harness.lock.json`，本次升级与下一次操作见 `docs/architecture/harness-016-upgrade.md`。
+- 官方根树映射在子目录中，升级使用旧官方树、当前下游树和新官方树做三方合并，不直接覆盖目录或执行 `git pull upstream master`。
+- 当前使用 `pnpm@10.34.5`，避开本组合已复现的 pnpm 11 peer 解析异常。完整构建中的 `build:fde-integrations` 从固定 Git 插件源码生成评估入口，并支持 `session.vN.jsonl[.zstd]`；生成的 lib 不提交。
+- 首次升级先用隔离副本验证官方 Session 逐代迁移；保留旧格式原件。代码回退不会自动撤销新版本会话写入，回退时必须同时选回升级前的数据副本。
 
 ## 单阶段开发与文档同步
 

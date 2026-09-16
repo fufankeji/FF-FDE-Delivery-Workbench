@@ -1,9 +1,10 @@
+import type { JsonValue } from '@deepseek-ai/dsh-util-values'
 /** Workspace-scoped adapter over the locked dsh-openapi parser and HTTP implementation. */
 
 import { dirname, join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import type { Context } from '@deepseek-ai/cordis'
-import { defineTool, type JsonValue } from '@deepseek-ai/dsh-tools'
+import { defineTool } from '@deepseek-ai/dsh-tools'
 import type { ProjectOpenApiConfig } from './types.ts'
 import { loadProjectOpenApiConfig } from './snapshot.ts'
 import { projectRootForExecution } from './tool-context.ts'

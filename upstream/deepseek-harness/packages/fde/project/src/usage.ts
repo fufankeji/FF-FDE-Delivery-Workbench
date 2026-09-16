@@ -4,11 +4,12 @@ import { createWebRequestTrust } from '@deepseek-ai/dsh-client-connection'
 import { SessionId } from '@deepseek-ai/dsh-session'
 import type {} from '@deepseek-ai/dsh-session-projection'
 import type {} from '@deepseek-ai/dsh-session-projection-cache'
+import type {} from '@deepseek-ai/dsh-session-persistence'
 import { WorkspaceId } from '@deepseek-ai/dsh-workspace'
 
 /** Register only when the durable projection services are available. */
 export function registerProjectUsage(ctx: Context): void {
-  ctx.inject(['sessions', 'sessionProjections', 'sessionProjectionCache'], scoped => {
+  ctx.inject(['sessions', 'sessionProjections', 'sessionProjectionCache', 'sessionPersistence'], scoped => {
     const trusted = createWebRequestTrust(scoped.webServer)
     scoped.effect(() => scoped.webServer.register({
       kind: 'exact', path: '/api/fde-project/usage',
@@ -35,7 +36,11 @@ export function registerProjectUsage(ctx: Context): void {
             try {
               const session = scoped.sessions.get(SessionId(sessionId))
               const snapshot = session === undefined
-                ? await scoped.sessionProjectionCache.coldSnapshot(SessionId(sessionId), abort.signal)
+                ? await (async () => {
+                  await using handle = await scoped.sessionPersistence.open(SessionId(sessionId), 'read', { signal: abort.signal })
+                  const log = await handle.read(undefined, undefined, { signal: abort.signal })
+                  return scoped.sessionProjectionCache.coldSnapshot(handle.header, handle.inheritedEventCount, log.events)
+                })()
                 : scoped.sessionProjections.snapshot(session)
               const values = snapshot.values as Record<string, unknown>
               if (values.sessionStats === undefined || values.tokenUsage === undefined || values.sessionActivity === undefined) {

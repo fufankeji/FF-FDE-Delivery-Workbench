@@ -1,5 +1,6 @@
 import type { Context } from '@deepseek-ai/cordis'
 import base from '../styles/base.css?inline'
+import cornerShape from '../styles/corner-shape.css?inline'
 import designPlatform from '../styles/design-platform.css?inline'
 import fdeEvaluation from '../styles/fde-evaluation.css?inline'
 import scrollbar from '../styles/scrollbar.css?inline'
@@ -10,6 +11,7 @@ const PLUGIN_ID = '@deepseek-ai/dsh-client-ui-theme'
 
 const STYLES = [
   ['base.css', base],
+  ['corner-shape.css', cornerShape],
   ['design-platform.css', designPlatform],
   ['fde-evaluation.css', fdeEvaluation],
   ['scrollbar.css', scrollbar],

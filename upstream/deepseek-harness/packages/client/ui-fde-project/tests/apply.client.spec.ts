@@ -2,7 +2,8 @@
 import { Context } from '@deepseek-ai/cordis'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { LocaleRuntime } from '@deepseek-ai/dsh-client-locale/client'
-import { SlotRegistry, createSnapshotStore } from '@deepseek-ai/dsh-client-runtime/client'
+import { SlotRegistry } from '@deepseek-ai/dsh-client-ui-renderer/client'
+import { createSnapshotStore } from '@deepseek-ai/dsh-client-store'
 import { apply, inject } from '../src/client/index.ts'
 import { ArchitectureView } from '../src/client/ArchitectureView.tsx'
 import { ObservabilityView } from '../src/client/ObservabilityView.tsx'
@@ -135,6 +136,8 @@ describe('ui-fde-project apply', () => {
         'sidebar.workspaces.projectContext': { kind: 'single', scope: 'root' },
       },
     } as never, () => null)
+    ctx.provide('uiWorkspace', { connectWorkspace: (...args: unknown[]) => (ctx.get('workspaces') as unknown as { connectWorkspace: (...args: unknown[]) => unknown }).connectWorkspace(...args) })
+    ctx.provide('sidebarRight', { isExpanded: () => false, toggleExpanded: vi.fn() })
     const fiber = ctx.plugin({ inject: [...inject], apply })
     await fiber.await()
 
@@ -312,6 +315,8 @@ describe('ui-fde-project apply', () => {
         'conversation.view': { kind: 'list', scope: 'session' },
       },
     } as never, () => null)
+    ctx.provide('uiWorkspace', { connectWorkspace: (...args: unknown[]) => (ctx.get('workspaces') as unknown as { connectWorkspace: (...args: unknown[]) => unknown }).connectWorkspace(...args) })
+    ctx.provide('sidebarRight', { isExpanded: () => false, toggleExpanded: vi.fn() })
     const fiber = ctx.plugin({ inject: [...inject], apply })
     await fiber.await()
     const injected = (slots.entries('shell.overlay')[0]!.inject as unknown as () => ProjectPageInjected)()

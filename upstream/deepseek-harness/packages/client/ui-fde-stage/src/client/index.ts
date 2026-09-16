@@ -1,6 +1,7 @@
+import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 /** FDE project-stage browser plugin: one shared controller and two contextual Slot entries. */
 
-import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
+import type { Context as ClientContext } from '@deepseek-ai/cordis'
 import type {} from '@deepseek-ai/dsh-client-locale/client'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import { FDE_PROJECT_PROGRESS_OPEN_EVENT, FdeStageProgressController } from './controller.ts'

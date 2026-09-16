@@ -10,7 +10,7 @@ const overlay = process.argv[2]
 if (!overlay) throw new Error('FDE snapshot requires an overlay')
 const runtimeHome = process.env.DSH_HOME
 if (!runtimeHome) throw new Error('FDE snapshot requires an isolated DSH_HOME')
-healProfilesModuleFallback(join(repository, 'apps/cli/package.json'), runtimeHome)
+await healProfilesModuleFallback({ installAnchor: join(repository, 'apps/cli/package.json'), home: runtimeHome })
 const rootConfig = join(runtimeHome, 'profiles', 'generality', 'cordis.yml')
 await mkdir(dirname(rootConfig), { recursive: true })
 await writeFile(rootConfig, '[]\n')

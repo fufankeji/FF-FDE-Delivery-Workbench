@@ -3,21 +3,52 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "lib/types",
-    "types": ["node"]
+    "types": [
+      "node"
+    ]
   },
-  "include": ["src"],
+  "include": [
+    "src"
+  ],
   "references": [
-    { "path": "../../../vendor/cordis" },
-    { "path": "../../../vendor/schemastery" },
-    { "path": "../../util/atomic-write" },
-    { "path": "../../client/connection/tsconfig.host.json" },
-    { "path": "../../core/tools" },
-    { "path": "../../core/session" },
-    { "path": "../../session/session-projection" },
-    { "path": "../../session/session-projection-cache" },
-    { "path": "../../host/webserver" },
-    { "path": "../../llm/llm" },
-    { "path": "../../runtime-diagnostics/invariants" },
-    { "path": "../../workspace/workspace" }
+    {
+      "path": "../../../vendor/cordis"
+    },
+    {
+      "path": "../../../vendor/schemastery"
+    },
+    {
+      "path": "../../util/atomic-write"
+    },
+    {
+      "path": "../../client/connection/tsconfig.host.json"
+    },
+    {
+      "path": "../../core/tools"
+    },
+    {
+      "path": "../../core/session"
+    },
+    {
+      "path": "../../session/session-projection"
+    },
+    {
+      "path": "../../host/webserver"
+    },
+    {
+      "path": "../../llm/llm"
+    },
+    {
+      "path": "../../runtime-diagnostics/invariants"
+    },
+    {
+      "path": "../../workspace/workspace"
+    },
+    {
+      "path": "../../session/session-projection-cache"
+    },
+    {
+      "path": "../../util/values"
+    }
   ]
 }

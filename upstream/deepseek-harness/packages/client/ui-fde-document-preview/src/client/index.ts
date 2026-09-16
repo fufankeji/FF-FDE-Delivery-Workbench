@@ -1,7 +1,8 @@
+import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 /** Register shared project and Better Sidebar document viewers. */
 
 import { createElement } from 'react'
-import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
+import type { Context as ClientContext } from '@deepseek-ai/cordis'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type { ProjectSourcePreviewOwnerProps } from '@deepseek-ai/dsh-client-ui-fde-project/client'
 import type { FileViewerProps } from 'dsh-better-sidebar'

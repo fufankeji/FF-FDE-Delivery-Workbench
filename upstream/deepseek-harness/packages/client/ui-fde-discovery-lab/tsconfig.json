@@ -12,9 +12,6 @@
       "path": "../../../vendor/cordis"
     },
     {
-      "path": "../runtime"
-    },
-    {
       "path": "../ui-slots"
     },
     {
@@ -28,6 +25,18 @@
     },
     {
       "path": "../../runtime-diagnostics/invariants"
+    },
+    {
+      "path": "../ui-renderer"
+    },
+    {
+      "path": "../store"
+    },
+    {
+      "path": "../../api/session-controller/tsconfig.client.json"
+    },
+    {
+      "path": "../../api/workspace-controller/tsconfig.client.json"
     }
   ]
 }

@@ -20,9 +20,7 @@ function serviceFor(initialTabs: readonly TestTab[]) {
       sessionId: 'session-1',
       prefs: {},
       state: {
-        splits: { kind: 'leaf', tabs },
-        bottomSplits: { kind: 'leaf', tabs: [] },
-        floats: [],
+        bottomSplits: { kind: 'leaf', tabs },
       },
     }),
     openTab,

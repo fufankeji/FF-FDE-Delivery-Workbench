@@ -1,7 +1,8 @@
+import type { JsonValue } from '@deepseek-ai/dsh-util-values'
 /** Read-only current-project candidate and test evidence tool for DSH. */
 
 import type { Context } from '@deepseek-ai/cordis'
-import { defineTool, type JsonValue } from '@deepseek-ai/dsh-tools'
+import { defineTool } from '@deepseek-ai/dsh-tools'
 import { projectRootForExecution } from './tool-context.ts'
 import { loadV2StageSurface } from './v2-stage-surface.ts'
 

@@ -5,7 +5,7 @@
  */
 
 import { useEffect, useState } from 'react'
-import type { SnapshotStore } from '@deepseek-ai/dsh-client-runtime/client'
+import type { SnapshotStore } from '@deepseek-ai/dsh-client-store'
 import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import {
   IconChevronDownOutline14, Menu, RiskConfirmation,
@@ -58,9 +58,9 @@ export function PermissionRow({ load, select, usePermission, t }: PermissionRowP
   if (state.status === 'unavailable') return null
   const selected = state.options.find(option => option.id === state.currentValue)
   const busy = state.status === 'loading' || state.status === 'saving' || confirmingFullAccess
-  const label = selected === undefined
-    ? (busy ? t('loading') : t('unavailable'))
-    : displayPermissionPreset(selected.id, selected.label, t)
+  const optionLabel = (option: PermissionSettingsState['options'][number]): string =>
+    displayPermissionPreset(option.id, option.label, t)
+  const label = selected !== undefined ? optionLabel(selected) : (busy ? t('loading') : t('unavailable'))
   const description: string = state.error ?? t('description')
 
   return (
@@ -73,10 +73,7 @@ export function PermissionRow({ load, select, usePermission, t }: PermissionRowP
         <Menu
           open={open}
           onClose={() => { setOpen(false) }}
-          items={state.options.map(option => ({
-            id: option.id,
-            label: displayPermissionPreset(option.id, option.label, t),
-          }))}
+          items={state.options.map(option => ({ id: option.id, label: optionLabel(option) }))}
           selectedId={state.currentValue}
           onSelect={(id) => {
             setOpen(false)
@@ -111,6 +108,7 @@ export function PermissionRow({ load, select, usePermission, t }: PermissionRowP
         description={t('confirm.description')}
         acknowledgeLabel={t('confirm.acknowledge')}
         cancelLabel={t('confirm.cancel')}
+        closeLabel={t('close')}
         confirmLabel={t('confirm.enable')}
         acknowledged={acknowledged}
         disabled={!state.writable || state.status === 'saving'}

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { boot } from '@deepseek-ai/dsh-app-boot'
-import { CallId } from '@deepseek-ai/dsh-llm'
+import { ToolCallId } from '@deepseek-ai/dsh-llm'
 import type { Agent } from '@deepseek-ai/dsh-agent'
 import type { AgentContextResult } from '../../src/types.ts'
 
@@ -19,7 +19,7 @@ try {
   // Direct tool dispatch supplies a real Session; no model or loop turn is claimed.
   const agent = { session, ctx } as unknown as Agent
   const call = async (action: string, input: Record<string, unknown> = {}) => ctx.tools.execute({
-    agent, signal: new AbortController().signal, callId: CallId(action),
+    agent, signal: new AbortController().signal, callId: ToolCallId(action),
     name: 'semantic_workspace', arguments: { action, ...input },
   })
   const inspected = await call('inspect')
@@ -76,7 +76,7 @@ try {
     assert.equal(state.validation?.status, 'passed')
     const before = await readFile(join(project, '.fde/design/semantica/workspace.json'), 'utf8')
     const query = () => ctx.tools.execute({
-      agent, signal: new AbortController().signal, callId: CallId('consume'), name: 'semantic_context_query',
+      agent, signal: new AbortController().signal, callId: ToolCallId('consume'), name: 'semantic_context_query',
       arguments: { purpose: 'consume', questionId: 'author_articles', query: '查询作品的作者并列出来源', maxDepth: 1 },
     })
     const consumed = await query()

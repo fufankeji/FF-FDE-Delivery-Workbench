@@ -4,10 +4,6 @@ import { runInNewContext } from 'node:vm'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { bootThemeInjection } from '../src/boot-theme.ts'
 import type { ThemePreference } from '../src/theme-settings.ts'
-import { THEME_BOOTSTRAP_ATTRIBUTE } from '../src/theme-settings.ts'
-import { Context } from '@deepseek-ai/cordis'
-import { stubSettingsScope } from '@deepseek-ai/dsh-client-test-runtime'
-import { ThemeRuntime } from '../src/client/index.ts'
 
 const DARK_ATTRIBUTE = 'data-ds-dark-theme'
 
@@ -15,8 +11,8 @@ function mockSystemDark(matches: boolean): void {
   vi.stubGlobal('matchMedia', vi.fn(() => ({ matches }) as MediaQueryList))
 }
 
-function executeBootstrap(preference?: ThemePreference): void {
-  const row = bootThemeInjection(preference)
+function executeBootstrap(preference?: ThemePreference, fontSize?: number): void {
+  const row = bootThemeInjection(preference, fontSize)
   if (row.kind !== 'script') throw new Error('theme bootstrap row is not a script')
   runInNewContext(row.text, { document, matchMedia: globalThis.matchMedia })
 }
@@ -26,7 +22,7 @@ afterEach(() => {
   vi.unstubAllGlobals()
   document.documentElement.style.removeProperty('color-scheme')
   document.body.removeAttribute(DARK_ATTRIBUTE)
-  document.documentElement.removeAttribute(THEME_BOOTSTRAP_ATTRIBUTE)
+  document.body.style.removeProperty('--dsh-content-font-size')
 })
 
 describe('theme bootstrap row', () => {
@@ -64,29 +60,11 @@ describe('theme bootstrap row', () => {
     expect(document.body.hasAttribute(DARK_ATTRIBUTE)).toBe(false)
   })
 
-  it.each(['light', 'dark', 'system'] as const)('keeps the Host %s preference when LAN settings have no Host mirror', async preference => {
-    vi.stubGlobal('matchMedia', () => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() }))
-    executeBootstrap(preference)
-    const ctx = new Context()
-    const host = stubSettingsScope<{ preference: ThemePreference }>()
-    const theme = new ThemeRuntime(ctx, host.scope)
-    expect(theme.getTheme().preference).toBe(preference)
-    expect(theme.getTheme().active.colorScheme).toBe(preference === 'light' ? 'light' : 'dark')
-    expect(host.set).not.toHaveBeenCalled()
-    // Later user actions remain authoritative, rather than being pinned to bootstrap.
-    theme.setTheme(preference === 'light' ? 'dark' : 'light')
-    expect(host.set).toHaveBeenCalledOnce()
-    await ctx.fiber.dispose()
-  })
-
-  it('lets the later Host settings snapshot supersede bootstrap without writing a preference', async () => {
+  it('writes the durable content font size and defaults it to 14px', () => {
+    mockSystemDark(false)
+    executeBootstrap('light', 17)
+    expect(document.body.style.getPropertyValue('--dsh-content-font-size')).toBe('17px')
     executeBootstrap('light')
-    const ctx = new Context()
-    const host = stubSettingsScope<{ preference: ThemePreference }>()
-    const theme = new ThemeRuntime(ctx, host.scope)
-    host.publish({ status: 'ready', value: { preference: 'dark' }, revision: 1, writable: true })
-    expect(theme.getTheme().preference).toBe('dark')
-    expect(host.set).not.toHaveBeenCalled()
-    await ctx.fiber.dispose()
+    expect(document.body.style.getPropertyValue('--dsh-content-font-size')).toBe('14px')
   })
 })

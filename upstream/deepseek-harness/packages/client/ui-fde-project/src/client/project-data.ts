@@ -1,6 +1,7 @@
 /** Project Session aggregates and current-stage labels. */
 
-import type { SessionId, SessionSummary } from '@deepseek-ai/dsh-client-runtime/client'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import type { SessionSummary } from '@deepseek-ai/dsh-api-session-controller/client'
 import type { FdeProjectState } from './stage-controller.ts'
 import { STAT_KEYS, TOKEN_KEYS, type ProjectUsage, type UsageNumbers, type UsagePoint } from './usage-controller.ts'
 

@@ -1,9 +1,10 @@
-/** `sidebar` namespace dictionaries: shell fold controls. */
+/** `sidebar` namespace dictionaries for shell controls and global panels. */
 
 /** Simplified Chinese dictionary (the key-set source of truth). */
 export const zh = {
   'toggle.open': '打开侧边栏',
   'toggle.collapse': '收起侧边栏',
+  'panels.label': '全局面板',
 } satisfies Record<string, string>
 
 /** The sidebar namespace key union. */
@@ -13,4 +14,5 @@ export type SidebarKey = keyof typeof zh
 export const en = {
   'toggle.open': 'Open sidebar',
   'toggle.collapse': 'Collapse sidebar',
+  'panels.label': 'Global panels',
 } satisfies Record<SidebarKey, string>

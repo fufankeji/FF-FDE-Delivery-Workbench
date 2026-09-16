@@ -4,14 +4,18 @@ import { mkdtemp, rm, writeFile, readFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
+import { createRequire } from 'node:module'
+import { dirname } from 'node:path'
+import { sessionDir } from '../../../session/session-persistence-jsonl/src/format.ts'
 import { Context } from '@deepseek-ai/cordis'
 import Loader from '@deepseek-ai/cordis-plugin-loader'
 import Include from '@deepseek-ai/cordis-plugin-include'
-import LlmRuntime, { LlmAdapter, CallId, createUserMessage, type GenerateOptions, type StreamChunk } from '@deepseek-ai/dsh-llm'
+import LlmRuntime, { LlmAdapter, ReasoningEffortId, ToolCallId, createUserMessage, type GenerateOptions, type StreamChunk } from '@deepseek-ai/dsh-llm'
 import SessionStore, { SessionId } from '@deepseek-ai/dsh-session'
 import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
 import ToolRuntime, { defineContentToolFixture } from '@deepseek-ai/dsh-tools'
 import AgentRegistry from '@deepseek-ai/dsh-agent'
+import SessionProjections from '@deepseek-ai/dsh-session-projection'
 import AgentLoop from '@deepseek-ai/dsh-agent-loop'
 import JsonlPersistence from '@deepseek-ai/dsh-session-persistence-jsonl'
 import WebServer from '@deepseek-ai/dsh-host-webserver'
@@ -35,7 +39,7 @@ function textChunks(text: string): StreamChunk[] {
   ]
 }
 function toolChunks(name: string, args: object): StreamChunk[] {
-  const id = CallId('call-' + Math.random().toString(36).slice(2))
+  const id = ToolCallId('call-' + Math.random().toString(36).slice(2))
   const argumentsJson = JSON.stringify(args)
   return [
     { type: 'block-start', index: 0, blockType: 'tool-call' },
@@ -44,21 +48,24 @@ function toolChunks(name: string, args: object): StreamChunk[] {
     { type: 'finish', reason: { kind: 'tool-calls' } },
   ]
 }
+function systemOf(options: GenerateOptions): string {
+  return options.messages.filter(message => message.role === 'system').flatMap(message => message.content.filter(block => block.type === 'text').map(block => block.text)).join('\n')
+}
 class OfflineAdapter extends LlmAdapter {
   requests: GenerateOptions[] = []
   steps = 0
   assetId = ''
   forbiddenAssetId = ''
   override resolveModel(provider: string, model: string) {
-    return Promise.resolve({ provider, id: model, name: model })
+    return Promise.resolve({ provider, id: model, name: model, reasoning: { efforts: [{ id: ReasoningEffortId('off'), name: 'Off' }] } })
   }
   override async * stream(options: GenerateOptions): AsyncIterable<StreamChunk> {
     this.requests.push(options)
-    if (options.system?.includes('独立的访谈证据核对员')) {
+    if (systemOf(options).includes('独立的访谈证据核对员')) {
       yield* textChunks('{"candidates":[]}')
       return
     }
-    if (!options.system?.includes('你正在扮演企业访谈')) { yield* textChunks('ordinary'); return }
+    if (!systemOf(options).includes('你正在扮演企业访谈')) { yield* textChunks('ordinary'); return }
     this.steps++
     if (this.steps === 1) yield* toolChunks('workspaceMutator', {})
     else if (this.steps === 2) yield* toolChunks('offerCaseAsset', { assetId: this.forbiddenAssetId })
@@ -70,12 +77,12 @@ async function mount(adapter: OfflineAdapter) {
   const configPath = join(directory, 'cordis.yml')
   const modules = new Map<string, unknown>([
     ['llm', LlmRuntime], ['session', SessionStore], ['prompt', SystemPrompt],
-    ['tools', ToolRuntime], ['agents', AgentRegistry], ['loop', AgentLoop],
+    ['projections', SessionProjections], ['tools', ToolRuntime], ['agents', AgentRegistry], ['loop', AgentLoop],
     ['persistence', JsonlPersistence], ['web', WebServer], ['lab', Lab],
   ])
   await writeFile(configPath, [
-    '- name: llm', '- name: session', '- name: prompt', "  config: { persona: 'WORKSPACE_ONLY_CONTEXT' }",
-    '- name: tools', '- name: agents', '- name: loop', '  config: { agents: [] }',
+    '- name: llm', '- name: session', '- name: prompt', "  config: { personaPrefix: 'WORKSPACE_ONLY_CONTEXT' }",
+    '- name: projections', '- name: tools', '- name: agents', '- name: loop', '  config: { agents: [] }',
     '- name: persistence', '  config:', '    root: ' + JSON.stringify(join(directory, 'sessions')),
     '- name: web', "  config: { host: '127.0.0.1', port: 0 }", '- name: lab', '',
   ].join('\n'))
@@ -121,10 +128,11 @@ it('isolates roles and globals, persists native evidence, restores idle roles an
   first.ctx.tools.register(defineContentToolFixture({
     name: 'workspaceMutator', description: 'unrelated ordinary workspace tool',
     parameters: {},
-    execute: () => { globalExecutions++; return [{ type: 'text', text: 'changed' }] },
+    execute: async () => { globalExecutions++; return [{ type: 'text', text: 'changed' }] },
   }))
   first.ctx.on('agent/pre-step', async (_payload, next) => {
     const value = await next()
+    if (value.kind === 'reject') return value
     return { ...value, messages: [...(value.messages ?? []), createUserMessage({
       content: [{ type: 'text', text: 'WORKSPACE_ONLY_INSTRUCTION' }],
       source: { kind: 'plugin', plugin: 'unrelated' },
@@ -143,17 +151,28 @@ it('isolates roles and globals, persists native evidence, restores idle roles an
   await first.api('/runs/' + otherRun.runId + '/roles/' + otherRun.case.roles[0].id + '/select', {})
   await first.api('/runs/' + run.runId + '/roles/employee/messages', { requestId: 'first-interview', text: '请提供' + asset.title + '资料给我查看' })
   await expect.poll(async () => JSON.stringify(await first.api('/runs/' + run.runId + '/requests/first-interview')), { timeout: 1500 }).toBe(JSON.stringify({requestId:'first-interview',status:'completed',error:null}))
-  await expect.poll(async () => (await first.api('/runs/' + run.runId)).sessions.find((s: { roleId: string }) => s.roleId === 'employee').evaluationStatus, { timeout: 8000 }).toBe('idle')
+  await expect.poll(async () => { const role = (await first.api('/runs/' + run.runId)).sessions.find((s: { roleId: string }) => s.roleId === 'employee'); return { status: role.evaluationStatus, error: role.evaluationError } }, { timeout: 8000 }).toEqual({ status: 'idle', error: null })
   const completed = await first.api('/runs/' + run.runId)
   expect(completed.assets.map((a: { id: string }) => a.id)).toEqual([asset.id])
   expect(completed.evidence.some((e: { kind: string }) => e.kind === 'interview')).toBe(true)
   expect(completed.progress.completed).toBe(0)
+  const evalRequire = createRequire(new URL('../../../bundle/web-app/package.json', import.meta.url))
+  const evalRoot = dirname(evalRequire.resolve('dsh-eval-harness/package.json'))
+  const { findSessionFile } = await import(/* @vite-ignore */ pathToFileURL(join(evalRoot, 'lib/runner.js')).href)
+  const { collectFromFile } = await import(/* @vite-ignore */ pathToFileURL(join(evalRoot, 'lib/collector.js')).href)
+  const employeeId = completed.sessions.find((row: { roleId: string }) => row.roleId === 'employee').sessionId
+  const log = await findSessionFile(sessionDir(join(directory, 'sessions'), join(directory, 'fde-discovery-lab/workspaces'), SessionId(employeeId)), 0)
+  expect(log).toMatch(/session\.v3\.jsonl/)
+  const trace = await collectFromFile(log)
+  expect(trace.finalText).toContain('已授权的业务原件')
+  expect(trace.toolsCalled).toContain('offerCaseAsset')
+
   expect(globalExecutions).toBe(0)
   expect((await first.response('/runs/' + run.runId + '/assets/' + other.id)).status).toBe(403)
   expect((await first.response('/runs/' + run.runId + '/assets/' + asset.id)).status).toBe(200)
   expect((await first.response('/runs/' + run.runId + '/reports', {})).status).toBe(409)
   for (const request of adapter.requests) {
-    expect(request.system).not.toContain('WORKSPACE_ONLY_CONTEXT')
+    expect(systemOf(request)).not.toContain('WORKSPACE_ONLY_CONTEXT')
     expect(JSON.stringify(request.messages)).not.toContain('WORKSPACE_ONLY_INSTRUCTION')
     expect(request.tools?.map(tool => tool.name) ?? []).not.toContain('workspaceMutator')
   }
@@ -161,7 +180,7 @@ it('isolates roles and globals, persists native evidence, restores idle roles an
   ordinary.agent.followup(createUserMessage({ content: [{ type: 'text', text: 'hello' }], source: { kind: 'user' } }))
   await ordinary.agent.whenIdle()
   expect(adapter.requests.at(-1)?.tools?.map(tool => tool.name)).toContain('workspaceMutator')
-  expect(adapter.requests.at(-1)?.system).toContain('WORKSPACE_ONLY_CONTEXT')
+  expect(systemOf(adapter.requests.at(-1)!)).toContain('WORKSPACE_ONLY_CONTEXT')
   await first.ctx.fiber.dispose()
   contexts.pop()
 

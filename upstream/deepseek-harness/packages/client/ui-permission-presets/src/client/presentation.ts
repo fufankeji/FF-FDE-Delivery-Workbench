@@ -1,13 +1,28 @@
+import { en } from './locales.ts'
+
 /** Machine value of the preset that requires an explicit GUI risk gate. */
 export const FULL_ACCESS_PRESET = 'danger-full-access'
-const READ_ONLY_PRESET = 'read-only'
-const WORKSPACE_WRITE_PRESET = 'workspace-write'
 
-/** Locale keys for the three built-in permission products. */
-export type PermissionPresetLabelKey = 'preset.readOnly' | 'preset.workspaceWrite' | 'preset.fullAccess'
+/** Machine value of the experimental current-session review preset. */
+export const AUTO_REVIEW_PRESET = 'auto'
 
-/** Translation face shared by the two permission locale namespaces. */
-export type PermissionPresetTranslate = (key: PermissionPresetLabelKey) => string
+/** Locale dictionary key for a built-in permission preset label. */
+export type PermissionPresetLabelKey =
+  | 'preset.readOnly'
+  | 'preset.workspaceWrite'
+  | 'preset.fullAccess'
+
+const PRESET_LABEL_KEYS = new Map<string, PermissionPresetLabelKey>([
+  ['read-only', 'preset.readOnly'],
+  ['workspace-write', 'preset.workspaceWrite'],
+  [FULL_ACCESS_PRESET, 'preset.fullAccess'],
+])
+
+const DEFAULT_PRESET_LABELS: Record<PermissionPresetLabelKey, string> = {
+  'preset.readOnly': en['preset.readOnly'],
+  'preset.workspaceWrite': en['preset.workspaceWrite'],
+  'preset.fullAccess': en['preset.fullAccess'],
+}
 
 /**
  * Convert conventional kebab-case preset names into user-facing title case.
@@ -19,26 +34,21 @@ export function displayPresetName(name: string): string {
   return name.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
 }
 
-function usesBuiltInName(value: string, name: string): boolean {
-  if (name === value) return true
-  const displayed = displayPresetName(name)
-  if (value === READ_ONLY_PRESET) return displayed === 'Read Only'
-  if (value === WORKSPACE_WRITE_PRESET) return displayed === 'Workspace Write'
-  if (value === FULL_ACCESS_PRESET) return displayed === 'Full Access' || displayed === 'Full access'
-  return false
-}
-
 /**
  * Render a permission preset under its product label.
  * @param value - preset machine value.
  * @param name - host-supplied preset name.
- * @param t - optional active-locale translator for built-in presets.
- * @returns the localized built-in product label or conventional custom name.
+ * @param t - optional locale dictionary lookup for built-in product labels.
+ * @returns the built-in product label or the conventional display name.
  */
-export function displayPermissionPreset(value: string, name: string, t?: PermissionPresetTranslate): string {
-  if (!usesBuiltInName(value, name)) return displayPresetName(name)
-  if (value === READ_ONLY_PRESET) return t?.('preset.readOnly') ?? 'Read Only'
-  if (value === WORKSPACE_WRITE_PRESET) return t?.('preset.workspaceWrite') ?? 'Workspace Write'
-  if (value === FULL_ACCESS_PRESET) return t?.('preset.fullAccess') ?? 'Full access'
+export function displayPermissionPreset(
+  value: string,
+  name: string,
+  t?: (key: PermissionPresetLabelKey) => string,
+): string {
+  const key = PRESET_LABEL_KEYS.get(value)
+  if (key !== undefined && (name === value || name === DEFAULT_PRESET_LABELS[key])) {
+    return t?.(key) ?? DEFAULT_PRESET_LABELS[key]
+  }
   return displayPresetName(name)
 }

@@ -83,7 +83,7 @@ export class TrainingService {
       await this.native.open({sessionId:row.session_id,resume:!!row.opened,prompt:rolePrompt(c,role),tools:this.roleTools(run,c,role)});
       if(!this.store.live(runId,run.generation)){await this.native.dispose(row.session_id);throw Object.assign(new Error('训练轮次已更新，请进入新一轮。'),{status:409});}
       this.store.exec('UPDATE role_sessions SET opened=1 WHERE run_id=? AND role_id=?',runId,roleId);
-      this.recover(run,row);
+      await this.recover(run,row);
       return row;
     })();
     this.preparing.set(key,task);try{return await task;}finally{this.preparing.delete(key);}
@@ -98,10 +98,10 @@ export class TrainingService {
         availableAssets:c.assets.filter(a=>role.assetIds.includes(a.id)&&a.roleIds.includes(role.id)).map(a=>({assetId:a.id,title:a.title,...(a.releaseGate?{releaseCondition:'需先取得并查看原始样本，再询问分类复核依据。'}:{})})),
         assetScope:'facts.sources只是本次查询事实引用，不是完整资料目录。availableAssets才是本人可提供目录；用户明确索取其中资料时调用offerCaseAsset，署名转交不代表本人亲历。目录可见不等于本轮已取得，仍须工具成功发放。'};
     }),
-    businessTool('offerCaseAsset','用户明确索取资料时提供本人目录中的一份原件；不能发未授权资料。',{assetId:{type:'string'}},['assetId'],({assetId})=>{
+    businessTool('offerCaseAsset','用户明确索取资料时提供本人目录中的一份原件；不能发未授权资料。',{assetId:{type:'string'}},['assetId'],async ({assetId})=>{
       if(!this.store.live(run.id,run.generation))throw new Error('RUN_ARCHIVED');
       const mapping=this.store.get('SELECT session_id FROM role_sessions WHERE run_id=? AND role_id=?',run.id,role.id);
-      const history=mapping?this.native.events(mapping.session_id):[];
+      const history=mapping?await this.native.events(mapping.session_id):[];
       const question=history.filter(e=>e.type==='user/message'&&e.data.source?.kind==='user').at(-1);
       const asked=textContent(question?.data);
       const previousAnswer=history.filter(e=>e.type==='assistant/message'&&e.seq<question?.seq).at(-1);
@@ -123,18 +123,18 @@ export class TrainingService {
     if(!viewed||!asked)throw Object.assign(new Error('请先查看本轮已取得的原始样本，再向本岗位询问分类或复核依据。'),{status:403});
   }
   markViewed(runId,assetId){this.store.exec('INSERT OR IGNORE INTO asset_views VALUES(?,?,?)',runId,assetId,now());}
-  recover(run,row){
+  async recover(run,row){
     if(!this.store.live(run.id,run.generation))return;
     const requests=this.store.all("SELECT * FROM requests WHERE run_id=? AND role_id=? AND status IN ('accepted','running')",run.id,row.role_id);
     if(!requests.length || this.active.has(`${run.id}/${row.role_id}`))return;
-    const events=this.native.events(row.session_id);
+    const events=await this.native.events(row.session_id);
     for(const request of requests){
       const user=events.find(e=>e.type==='user/message'&&e.data.id===request.message_id);
       const start=user&&events.filter(e=>e.type==='turn/start'&&e.seq<user.seq).at(-1);
       const replies=start?events.filter(e=>e.type==='assistant/message'&&e.data.turn===start.data.turn&&!e.data.interrupted):[];
       const ended=start&&events.find(e=>e.type==='turn/end'&&e.data.turn===start.data.turn);
       const successful=ended?.data.reason?.kind==='completed'&&replies.some(e=>textContent(e.data.message));
-      if(user)this.commitEvidence(run,row,events.filter(e=>e.seq>user.seq),{includeInterview:!!successful});
+      if(user)await this.commitEvidence(run,row,events.filter(e=>e.seq>user.seq),{includeInterview:!!successful});
       if(successful){this.store.exec("UPDATE requests SET status='completed',error=NULL WHERE run_id=? AND id=?",run.id,request.id);this.queueEvaluation(run.id,row.role_id);}
       else this.store.exec("UPDATE requests SET status='failed',error=? WHERE run_id=? AND id=?",'会话中断，已核对原生记录。可继续提问，已取得资料保留。',run.id,request.id);
     }
@@ -152,9 +152,9 @@ export class TrainingService {
     this.streams.set(row.session_id,'');
     const {completion}=this.native.send(row.session_id,text,({messageId})=>this.store.exec('INSERT INTO requests VALUES(?,?,?,?,?,?,?)',runId,requestId,roleId,messageId,'accepted',null,now()));
     this.store.exec("UPDATE requests SET status='running' WHERE run_id=? AND id=?",runId,requestId);
-    const tracked=completion.then(result=>{
+    const tracked=completion.then(async result=>{
       if(!this.store.live(runId,run.generation))return;
-      this.commitEvidence(run,row,result.events,{includeInterview:result.status==='completed'});
+      await this.commitEvidence(run,row,result.events,{includeInterview:result.status==='completed'});
       const error=result.status==='completed'?null:result.reason?.error?.message || '回答已停止或未能完成，可继续提问。';
       this.store.exec('UPDATE requests SET status=?,error=? WHERE run_id=? AND id=?',result.status==='completed'?'completed':'failed',error,runId,requestId);
       if(result.status==='completed')this.queueEvaluation(runId,roleId);
@@ -163,9 +163,9 @@ export class TrainingService {
     this.active.set(key,tracked);
     return {requestId,status:'accepted'};
   }
-  commitEvidence(run,row,events,{includeInterview=true}={}){
+  async commitEvidence(run,row,events,{includeInterview=true}={}){
     if(!this.store.live(run.id,run.generation))return;
-    const c=this.caseFor(run),role=this.role(c,row.role_id),all=this.native.events(row.session_id);
+    const c=this.caseFor(run),role=this.role(c,row.role_id),all=await this.native.events(row.session_id);
     for(const event of events){
       if(includeInterview && event.type==='assistant/message' && !event.data.interrupted){
         const text=textContent(event.data.message);if(!text)continue;
@@ -202,12 +202,13 @@ export class TrainingService {
     const grants=this.store.all('SELECT * FROM grants WHERE run_id=?',runId);
     const evidence=this.store.all('SELECT * FROM evidence WHERE run_id=? ORDER BY created_at,id',runId);
     const results=this.store.all('SELECT * FROM discovery WHERE run_id=?',runId);
-    const sessions=c.roles.map(role=>{
+    const sessions=await Promise.all(c.roles.map(async role=>{
       const row=this.store.get('SELECT * FROM role_sessions WHERE run_id=? AND role_id=?',runId,role.id);
       const active=this.store.get("SELECT * FROM requests WHERE run_id=? AND role_id=? ORDER BY created_at DESC LIMIT 1",runId,role.id);
       const busy=active&&['accepted','running'].includes(active.status);
-      return {roleId:role.id,sessionId:row?.session_id,status:busy?'running':active?.status==='failed'?'error':'idle',messages:row?this.native.messages(row.session_id).map(m=>({...m,createdAt:new Date(m.createdAt).toISOString(),assetIds:grants.filter(g=>g.role_id===role.id&&g.seq<m.seq&&m.role==='assistant'&&!this.native.messages(row.session_id).some(other=>other.role==='assistant'&&other.seq>g.seq&&other.seq<m.seq)).map(g=>g.asset_id),evidenceIds:evidence.filter(e=>e.message_id===m.id).map(e=>e.id)})):[],streamingText:row?this.streams.get(row.session_id):undefined,activeRequestId:busy?active.id:undefined,error:active?.error,evaluationStatus:row?.eval_status||'idle',evaluationError:row?.eval_error};
-    });
+      const messages=row?await this.native.messages(row.session_id):[];
+      return {roleId:role.id,sessionId:row?.session_id,status:busy?'running':active?.status==='failed'?'error':'idle',messages:row?messages.map(m=>({...m,createdAt:new Date(m.createdAt).toISOString(),assetIds:grants.filter(g=>g.role_id===role.id&&g.seq<m.seq&&m.role==='assistant'&&!messages.some(other=>other.role==='assistant'&&other.seq>g.seq&&other.seq<m.seq)).map(g=>g.asset_id),evidenceIds:evidence.filter(e=>e.message_id===m.id).map(e=>e.id)})):[],streamingText:row?this.streams.get(row.session_id):undefined,activeRequestId:busy?active.id:undefined,error:active?.error,evaluationStatus:row?.eval_status||'idle',evaluationError:row?.eval_error};
+    }));
     const acquiredIds=new Set(grants.map(g=>g.asset_id));
     const discovery=c.discoveries.map(item=>{const row=results.find(r=>r.item_id===item.id);const title=id=>c.assets.find(a=>a.id===id)?.title||id;return {id:item.id,roleId:item.roleId,topic:item.title,status:row?.status||'untouched',required:item.required,requiredAssetTitles:(item.requiredAssetIds||[]).map(title),missingAssetTitles:(item.requiredAssetIds||[]).filter(id=>!acquiredIds.has(id)).map(title),evidenceRefs:JSON.parse(row?.evidence_refs||'[]'),explanation:row?.status==='needs_deeper'?`“${item.title}”还需要更明确的访谈或原件依据，可使用提问提示继续核实。`:row?.explanation};});
     const displayedAssetMessage=(roleId,seq)=>sessions.find(s=>s.roleId===roleId)?.messages.find(m=>m.role==='assistant'&&m.seq>seq)?.id;

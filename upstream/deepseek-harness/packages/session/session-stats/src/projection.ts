@@ -1,6 +1,6 @@
 /**
  * The `sessionStats` projection unit: a pure fold of step boundaries, stream
- * chunks, tool pairs, and assembled assistant messages into whole-log counts
+ * embedded streams, tool pairs, and assembled assistant messages into whole-log counts
  * and wall times.
  *
  * `step/end` — not `assistant/message` — is the counted step event because it
@@ -24,8 +24,9 @@
  */
 
 import { z } from 'zod'
-import { isTokenDelta } from '@deepseek-ai/dsh-llm/message'
+import { assistantStreamFirstTokenTime } from '@deepseek-ai/dsh-llm'
 import type { ProjectionDefinition } from '@deepseek-ai/dsh-session-projection'
+
 
 /** Accumulated whole-log figures (the view is exactly these totals). */
 interface SessionStatsTotals {
@@ -53,7 +54,7 @@ interface SessionStatsTotals {
  * `lastTurn` slot decides "first closed step of a new turn"; the state is
  * plain JSON per the unit contract (persisted-cache precondition).
  */
-interface SessionStatsState extends SessionStatsTotals {
+export interface SessionStatsState extends SessionStatsTotals {
   /** Turn of the last counted `step/end`; null before the first. */
   lastTurn: number | null
   /** The open step's boundary facts; null outside a step or after its message assembled. */
@@ -68,7 +69,7 @@ declare module '@deepseek-ai/dsh-session-projection/types' {
   }
 }
 
-const sessionStatsSchema = z.object({
+export const sessionStatsSchema = z.object({
   turns: z.number().int().nonnegative(),
   steps: z.number().int().nonnegative(),
   llmMs: z.number().nonnegative(),
@@ -85,7 +86,7 @@ const sessionStatsSchema = z.object({
  * The view is a strict subset of the state, so this schema extends
  * `sessionStatsSchema` (the wire output boundary) with the boundary fields.
  */
-const sessionStatsStateSchema = sessionStatsSchema.extend({
+export const sessionStatsStateSchema = sessionStatsSchema.extend({
   lastTurn: z.number().int().nonnegative().nullable(),
   openStep: z.object({
     turn: z.number().int().nonnegative(),
@@ -134,15 +135,17 @@ export const sessionStatsProjectionDefinition = {
           ...state,
           openStep: { turn: event.data.turn, step: event.data.step, startTime: event.time, firstTokenTime: null },
         }
-      case 'assistant/chunk': {
+      case 'assistant/attempt': {
         const open = state.openStep
         if (open === null || open.turn !== event.data.turn || open.step !== event.data.step) return state
-        if (open.firstTokenTime !== null || !isTokenDelta(event.data.chunk)) return state
-        return { ...state, openStep: { ...open, firstTokenTime: event.time } }
+        const first = assistantStreamFirstTokenTime(event.data.stream) ?? null
+        if (open.firstTokenTime !== null || first === null) return state
+        return { ...state, openStep: { ...open, firstTokenTime: first } }
       }
       case 'assistant/message': {
         const open = state.openStep
         if (open === null || open.turn !== event.data.turn || open.step !== event.data.step) return state
+        const firstToken = open.firstTokenTime ?? assistantStreamFirstTokenTime(event.data.stream) ?? null
         // One assembled message per step: closing the boundary means a
         // defensive duplicate cannot accrue twice.
         const next: SessionStatsState = {
@@ -150,12 +153,12 @@ export const sessionStatsProjectionDefinition = {
           llmMs: state.llmMs + Math.max(0, event.time - open.startTime),
           openStep: null,
         }
-        if (open.firstTokenTime !== null) {
-          next.ttftMs += Math.max(0, open.firstTokenTime - open.startTime)
+        if (firstToken !== null) {
+          next.ttftMs += Math.max(0, firstToken - open.startTime)
           next.ttftSteps += 1
           const outputTokens = usageOutputTokens(event.data.usage)
           if (outputTokens !== null) {
-            next.decodeMs += Math.max(0, event.time - open.firstTokenTime)
+            next.decodeMs += Math.max(0, event.time - firstToken)
             next.decodeTokens += outputTokens
           }
         }

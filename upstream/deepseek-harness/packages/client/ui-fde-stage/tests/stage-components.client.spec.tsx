@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, render, screen } from '@testing-library/react'
-import type { SessionId, WorkspaceId } from '@deepseek-ai/dsh-client-runtime/client'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import type { WorkspaceId } from '@deepseek-ai/dsh-workspace'
 import { makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
 import { StageHeaderStatus } from '../src/client/StageHeaderStatus.tsx'
 import { zh } from '../src/client/locales.ts'
@@ -35,7 +36,7 @@ function runtime(stageSnapshot: FdeStageProgressSnapshot = ready) {
   return {
     sessionId,
     useSession: (() => undefined) as never,
-    useSessions: (() => undefined) as never,
+    usePanelInfo: (() => undefined) as never, useSessionPendingInteraction: (() => new Map()) as never, useResource: (() => undefined) as never, useConversation: (() => undefined) as never, useChat: (() => undefined) as never, useTrajectory: (() => undefined) as never, useSessions: (() => undefined) as never,
     useWorkspaces,
     useProjection: (() => undefined) as never,
     useInput: (() => undefined) as never,

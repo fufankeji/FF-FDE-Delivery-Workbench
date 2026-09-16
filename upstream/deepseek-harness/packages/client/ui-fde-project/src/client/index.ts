@@ -1,6 +1,11 @@
+import { installProjectFileRefresh } from './file-refresh.ts'
+import type {} from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
+import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 /** FDE project browser plugin: global progress plus four project-level views. */
 
-import type { ClientContext, SessionId, WorkspaceId } from '@deepseek-ai/dsh-client-runtime/client'
+import type { Context as ClientContext } from '@deepseek-ai/cordis'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import type { WorkspaceId } from '@deepseek-ai/dsh-workspace'
 import type {} from '@deepseek-ai/dsh-client-locale/client'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type {} from '@deepseek-ai/dsh-client-ui-layout/client'
@@ -54,7 +59,7 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
 }
 
 /** Required browser services and the Slot owners that declare our targets. */
-export const inject = ['slots', 'locale', 'sessions', 'workspaces', 'conversation', 'layout', 'projectMetadata']
+export const inject = ['slots', 'locale', 'sessions', 'workspaces', 'conversation', 'layout', 'projectMetadata', 'uiWorkspace', 'sidebarRight']
 
 const FDE_PROJECT_PROGRESS_OPEN_EVENT = 'fde:project-progress-open'
 const FDE_PROJECT_CREATE_OPEN_EVENT = 'fde:project-create-open'
@@ -62,6 +67,7 @@ const FDE_PROJECT_SOURCE_UPLOAD_OPEN_EVENT = 'fde:project-source-upload-open'
 
 /** Register the global project page and the four project delivery views. */
 export function apply(ctx: ClientContext): void {
+  installProjectFileRefresh(ctx)
   const page = new ProjectPageController()
   const stages = new ProjectStageController()
   const stageView = new ProjectStageViewController()
@@ -97,12 +103,12 @@ export function apply(ctx: ClientContext): void {
       workspace.sessionIds,
       sessions.byId,
       workspaceState.archivedSessionIds,
-    ) ?? await ctx.workspaces.connectWorkspace(workspaceId as WorkspaceId)
+    ) ?? await ctx.uiWorkspace.connectWorkspace(workspaceId as WorkspaceId)
   }
 
   const activateProjectWorkbenchLayout = (): void => {
     ctx.layout.openSidebar(396)
-    ctx.layout.closeDetails()
+    if (ctx.sidebarRight.isExpanded()) ctx.sidebarRight.toggleExpanded()
     if (typeof document === 'undefined') return
     let attempts = 0
     const collapseProjectToolPanel = (): void => {

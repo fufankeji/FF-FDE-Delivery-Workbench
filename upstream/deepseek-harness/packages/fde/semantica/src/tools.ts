@@ -1,7 +1,8 @@
+import type { JsonValue } from '@deepseek-ai/dsh-util-values'
 /** Project-scoped Agent preparation, bounded graph context and slice reports. */
 
 import type { Context } from '@deepseek-ai/cordis'
-import { defineTool, type JsonValue, type ToolRunContext } from '@deepseek-ai/dsh-tools'
+import { defineTool, type ToolRunContext } from '@deepseek-ai/dsh-tools'
 import { listProjectSources } from '@deepseek-ai/dsh-fde-source'
 import { parseSemanticDefinition } from './definition.ts'
 import { bindSemanticSources, buildGraph, checkProvider, createAgentContext, extractCandidates, proposeSchema, queryAgentContext, readSemanticWorkspace, reportVerticalSlice, saveSemanticDefinition, validateGraph } from './state.ts'

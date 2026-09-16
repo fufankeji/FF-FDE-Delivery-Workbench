@@ -132,9 +132,7 @@ function tabsOf(node: RuntimeSplit | undefined): RuntimeTab[] {
 function runtimeTerminalOf(service: BetterSidebarService, preferredTitle: string): RuntimeTab | undefined {
   const state = service.getSnapshot().state
   const terminals = [
-    ...tabsOf(state?.splits as RuntimeSplit | undefined),
     ...tabsOf(state?.bottomSplits as RuntimeSplit | undefined),
-    ...((state?.floats ?? []).map(item => item.tab) as RuntimeTab[]),
   ].filter(tab => tab.type === 'terminal')
   const newestFirst = [...terminals].reverse()
   return newestFirst.find(tab => tab.id.startsWith('agent:') && tab.title === preferredTitle)

@@ -4,17 +4,57 @@
     "rootDir": "src",
     "outDir": "lib/types"
   },
-  "include": ["src"],
+  "include": [
+    "src"
+  ],
   "references": [
-    { "path": "../../../vendor/cordis" },
-    { "path": "../locale" },
-    { "path": "../runtime" },
-    { "path": "../ui-conversation" },
-    { "path": "../ui-layout" },
-    { "path": "../ui-primitives" },
-    { "path": "../ui-sidebar" },
-    { "path": "../ui-workspace" },
-    { "path": "../ui-slots" },
-    { "path": "../../runtime-diagnostics/invariants" }
+    {
+      "path": "../../../vendor/cordis"
+    },
+    {
+      "path": "../locale"
+    },
+    {
+      "path": "../ui-conversation"
+    },
+    {
+      "path": "../ui-layout"
+    },
+    {
+      "path": "../ui-primitives"
+    },
+    {
+      "path": "../ui-sidebar"
+    },
+    {
+      "path": "../ui-workspace"
+    },
+    {
+      "path": "../ui-slots"
+    },
+    {
+      "path": "../../runtime-diagnostics/invariants"
+    },
+    {
+      "path": "../ui-renderer"
+    },
+    {
+      "path": "../store"
+    },
+    {
+      "path": "../../api/session-controller/tsconfig.client.json"
+    },
+    {
+      "path": "../../api/workspace-controller/tsconfig.client.json"
+    },
+    {
+      "path": "../ui-sidebar-right"
+    },
+    {
+      "path": "../../api/workspace-files/tsconfig.client.json"
+    },
+    {
+      "path": "../../api/remotes/tsconfig.client.json"
+    }
   ]
 }

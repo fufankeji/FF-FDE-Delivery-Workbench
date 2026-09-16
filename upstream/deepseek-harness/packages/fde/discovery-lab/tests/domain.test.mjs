@@ -212,15 +212,15 @@ test('Quoted visible list text and ordered omissions preserve actual business wo
 });
 
 test('Native completion requires a completed turn, not a preamble before an error or cancellation', async () => {
-  const adapter={ctx:{sessions:{flush:async()=>{}}}};
+  const adapter={ctx:{sessions:{flush:async()=>{}}},events:async()=>[]};
   const base=[{type:'turn/start',seq:1,data:{turn:'one'}},{type:'user/message',seq:2,data:{id:'q'}},{type:'assistant/message',seq:3,data:{turn:'one',message:{content:[{type:'text',text:'正在查找该资料。'}]}}}];
   for(const kind of ['completed','error','aborted']){
     const events=[...base,{type:'turn/end',seq:4,data:{turn:'one',reason:{kind}}}];
-    const agent={whenIdle:async()=>{},session:{events}};
+    const agent={whenIdle:async()=>{},session:{events}};adapter.events=async()=>events;
     const value=await NativeSessions.prototype.settle.call(adapter,agent,'q',0);
     assert.equal(value.status,kind==='completed'?'completed':'failed');
   }
-  const agent={whenIdle:async()=>{},session:{events:base}};
+  const agent={whenIdle:async()=>{},session:{events:base}};adapter.events=async()=>base;
   assert.equal((await NativeSessions.prototype.settle.call(adapter,agent,'q',0)).status,'failed');
 });
 
@@ -228,7 +228,7 @@ test('Resuming a native role durably drops parked input once before exposing its
   let cleared=0,flushed=0,resumed=0;
   const inbox={nextTurn:[{id:'old-unconsumed'}],nextStep:[],clear(){cleared++;this.nextTurn=[];}};
   const handle={agent:{inbox},dispose:async()=>{}};
-  const ctx={on(){},sessionPersistence:{supportsRawArtifacts:false},agents:{async resume(){resumed++;return handle;}},sessions:{async flush(){flushed++;}}};
+  const ctx={on(){},sessionPersistence:{stat:async()=>({})},agents:{async resume(){resumed++;return handle;}},sessions:{async flush(){flushed++;}}};
   const native=new NativeSessions(ctx,{cwd:temporary(t)});
   await native.open({sessionId:'resumed-role',resume:true,prompt:'岗位'});
   assert.equal(cleared,1);assert.equal(flushed,1);assert.equal(inbox.nextTurn.length,0);
@@ -241,7 +241,7 @@ test('Resuming a native role durably drops parked input once before exposing its
 test('Native creation recovers only its exact durable identity collision', async t => {
   let resumes=0;
   const handle={agent:{inbox:{nextTurn:[],nextStep:[]}},dispose:async()=>{}};
-  const ctx={on(){},sessionPersistence:{supportsRawArtifacts:false},agents:{async create({sessionId}){throw Object.assign(new Error('already exists'),{name:'SessionAlreadyExistsError',sessionId});},async resume(){resumes++;return handle;}},sessions:{flush:async()=>{}}};
+  const ctx={on(){},sessionPersistence:{stat:async()=>undefined},agents:{async create({sessionId}){throw Object.assign(new Error('already exists'),{name:'SessionAlreadyExistsError',sessionId});},async resume(){resumes++;return handle;}},sessions:{flush:async()=>{}}};
   const native=new NativeSessions(ctx,{cwd:temporary(t)});
   await native.open({sessionId:'committed-before-opened',prompt:'角色'});
   assert.equal(resumes,1);
@@ -308,7 +308,7 @@ test('Restart rejects a send waiting for role creation and preserves the other c
   const gate=deferred();let created=0;let sent=0;let disposed=0;
   const session={seq:0,events:[]};
   const handle={agent:{status:'idle',session,followup(){sent++;},whenIdle:async()=>{},cancel(){}},dispose:async()=>{disposed++;}};
-  const ctx={on(){},sessionPersistence:{supportsRawArtifacts:false},agents:{async create(){created++;await gate.promise;return handle;}},sessions:{flush:async()=>{}}};
+  const ctx={on(){},sessionPersistence:{stat:async()=>undefined},agents:{async create(){created++;await gate.promise;return handle;}},sessions:{flush:async()=>{}}};
   const {service}=fixture(t,ctx);const run=await service.start('alpha');const other=await service.start('beta');
   const pending=service.send(run.runId,'a','pending','当前接口情况？');await tick();assert.equal(created,1);
   // Do not await restart before releasing create: a correct implementation may

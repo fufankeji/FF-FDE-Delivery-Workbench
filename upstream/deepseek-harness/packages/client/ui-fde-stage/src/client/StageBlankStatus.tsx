@@ -18,7 +18,7 @@ export function StageBlankStatus({
     if (workspaceId !== undefined) loadStage(workspaceId)
   }, [loadStage, workspaceId])
 
-  if (session.composerPhase !== 'blank' || workspaceId === undefined) return null
+  if (!session.blank || workspaceId === undefined) return null
   if (stage?.status === 'error') {
     return (
       <div className={css.blankStatus} data-compact="true" data-state="error" role="status">

@@ -3,7 +3,11 @@ import type { SessionEvent } from '@deepseek-ai/dsh-session'
 import { createMessage } from '@deepseek-ai/dsh-llm'
 import { sessionActivityProjectionDefinition as definition } from '../src/activity.ts'
 
-const at = (time: number, type: string, data: unknown) => ({ time, type, data, seq: time }) as SessionEvent
+const at = (time: number, type: string, data: unknown) => {
+  const payload = data as { turn: number; step: number; chunk?: unknown }
+  if (type === 'assistant/chunk') return { time, type: 'assistant/attempt', data: { turn: payload.turn, step: payload.step, stream: [{ type: 'chunk', time, chunk: payload.chunk }] }, seq: time } as SessionEvent
+  return { time, type, data: type === 'assistant/message' ? { stream: [], ...payload } : data, seq: time } as SessionEvent
+}
 const message = createMessage({ role: 'assistant', content: [{ type: 'text', text: 'test' }], source: { kind: 'model', provider: 'mock', model: 'mock' } })
 const fold = (events: SessionEvent[]) => definition.wire.view(events.reduce(definition.apply, definition.init()))
 

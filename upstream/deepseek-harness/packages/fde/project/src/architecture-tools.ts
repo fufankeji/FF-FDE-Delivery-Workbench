@@ -1,7 +1,8 @@
+import type { JsonValue } from '@deepseek-ai/dsh-util-values'
 /** Agent tools for reading and atomically publishing project architecture candidates. */
 
 import type { Context } from '@deepseek-ai/cordis'
-import { defineTool, type JsonValue } from '@deepseek-ai/dsh-tools'
+import { defineTool } from '@deepseek-ai/dsh-tools'
 import { ARCHITECTURE_NODE_KINDS } from './types.ts'
 import { readProjectArchitecture, replaceProjectArchitecture } from './snapshot.ts'
 import { projectRootForExecution } from './tool-context.ts'

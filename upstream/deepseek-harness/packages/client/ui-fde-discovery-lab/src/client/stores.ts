@@ -1,4 +1,5 @@
-import { defineStore, type EngineStoreHandle } from '@deepseek-ai/dsh-client-runtime/client'
+import { defineStore } from '@deepseek-ai/dsh-client-store'
+import type { EngineStoreHandle } from '@deepseek-ai/dsh-client-store'
 type State = { open: boolean }
 type Actions = { open: (draft: State) => void; close: (draft: State) => void }
 /** One apply-scoped navigation store; never writes project or session state. */

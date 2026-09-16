@@ -172,7 +172,7 @@ describe('Project Center evidence-backed attention', () => {
         { id: 'later', title: '尚未执行的交付工作', required: true, status: 'pending' },
       ] },
     }
-    const input = props([{ id: '执行结果项目', stage: readyStage, surface: surface(failed as Partial<V2StageSurfaceSnapshot>) }])
+    const input = props([{ id: '执行结果项目', stage: readyStage, surface: surface(failed as unknown as Partial<V2StageSurfaceSnapshot>) }])
     const view = render(<ProjectProgressOverlay {...input} />)
     expect(within(screen.getByRole('region', { name: '项目卡片' })).getByText('存在阻塞').title).toContain('失败')
     const passed = kind === 'evaluation' ? {
@@ -180,7 +180,7 @@ describe('Project Center evidence-backed attention', () => {
     } : {
       delivery: { status: 'ready', versionCurrent: true, items: [{ title: '恢复演练', required: true, status: 'passed' }, { title: '未执行', required: true, status: 'pending' }] },
     }
-    view.rerender(<ProjectProgressOverlay {...input} useProjectSurfaces={props([{ id: '执行结果项目', surface: surface(passed as Partial<V2StageSurfaceSnapshot>) }]).useProjectSurfaces} />)
+    view.rerender(<ProjectProgressOverlay {...input} useProjectSurfaces={props([{ id: '执行结果项目', surface: surface(passed as unknown as Partial<V2StageSurfaceSnapshot>) }]).useProjectSurfaces} />)
     expect(screen.getByRole('button', { name: '查看 0 个待处理项目' })).toBeTruthy()
     expect(within(screen.getByRole('region', { name: '项目卡片' })).queryByText('存在阻塞')).toBeNull()
   })

@@ -37,16 +37,14 @@ export class NativeSessions {
         // Their synthetic user messages must never enter an interview or report session.
         scope.on('agent/pre-step', async (_payload, next) => {
           const value = await next();
-          if (!value.messages) return value;
+          if (value.kind === 'reject') return value;
           return {...value, messages:value.messages.filter(m => m.source?.kind === 'user' || (m.source?.kind === 'plugin' && m.source.plugin === 'fde-discovery-lab'))};
         }, {prepend:true});
       };
       const options = {setup, agentOptions:{provider:process.env.DEEPSEEK_PROVIDER || 'deepseek-official', model:process.env.DEEPSEEK_MODEL || 'deepseek-v4-flash', reasoningEffort:'off', maxTokens}};
       // This host lazily materializes JSONL: selecting an idle role alone
       // leaves no artifact. Corrupt artifacts still throw; only absence is new.
-      if(this.ctx.sessionPersistence.supportsRawArtifacts){
-        resume=(await this.ctx.sessionPersistence.readRaw(sessionId))!==undefined;
-      }
+      resume=(await this.ctx.sessionPersistence.stat(sessionId))!==undefined;
       let handle, resumed=resume;
       try {
         handle=resume
@@ -74,13 +72,15 @@ export class NativeSessions {
     this.pending.set(sessionId, operation);
     try { return await operation; } finally { this.pending.delete(sessionId); }
   }
-  events(sessionId) {
+  async events(sessionId) {
     const handle = this.handles.get(sessionId);
     if (!handle) throw new Error('SESSION_NOT_OPEN');
-    return handle.agent.session.events;
+    await this.ctx.sessions.flush(handle.agent.session);
+    const reader = await this.ctx.sessionPersistence.open(sessionId, 'read');
+    try { return (await reader.read()).events; } finally { await reader.close(); }
   }
-  messages(sessionId) {
-    return this.events(sessionId).flatMap(e => {
+  async messages(sessionId) {
+    return (await this.events(sessionId)).flatMap(e => {
       if (e.type === 'user/message' && e.data.source?.kind === 'user') return [{id:e.data.id,seq:e.seq,role:'user',text:textContent(e.data),createdAt:e.time}];
       if (e.type === 'assistant/message') {
         const text = textContent(e.data.message);
@@ -102,7 +102,7 @@ export class NativeSessions {
   async settle(agent, messageId, fromSeq) {
     await agent.whenIdle();
     await this.ctx.sessions.flush(agent.session);
-    const events = agent.session.events.slice(fromSeq);
+    const events = (await this.events(agent.id)).filter(event => event.seq >= fromSeq);
     const consumed = events.find(e => e.type === 'user/message' && e.data.id === messageId);
     if (!consumed) return {status:'canceled',messageId,events:[]};
     // One active request per owned session: identify its consumed turn first.
