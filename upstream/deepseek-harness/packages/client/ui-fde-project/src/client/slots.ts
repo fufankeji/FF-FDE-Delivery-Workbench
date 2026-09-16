@@ -27,8 +27,10 @@ export interface ProjectSourcePreviewOwnerProps {
 
 declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface SlotMap {
-    /** Independent modules available without selecting a project. */
-    'fde.workbench.module.action': { kind: 'list'; scope: 'root' }
+    /** Persistent independent lab surface; hidden, not unmounted, on module switches. */
+    'fde.workbench.lab.page': { kind: 'single'; scope: 'root'; owner: { active: boolean; back: () => void } }
+    /** Read-only lab summary displayed on the workbench overview. */
+    'fde.workbench.lab.summary': { kind: 'single'; scope: 'root'; owner: { openLab: () => void } }
     /** One shared read-only renderer for a selected project source or fixed deliverable. */
     'fde.project.source.preview': { kind: 'single'; scope: 'root'; owner: ProjectSourcePreviewOwnerProps }
   }
@@ -90,6 +92,10 @@ export interface ProjectPageInjected {
   closeProjectPage: () => void
   openProjectPage: () => void
   showProjectHome: () => void
+  showWorkbenchOverview: () => void
+  showWorkbenchLab: () => void
+  returnFromWorkbenchLab: () => void
+  showWorkbenchSkills: () => void
   showProjectOverview: () => void
   showProjectTimeline: () => void
   showProjectDetail: (workspaceId: string) => void
@@ -217,7 +223,7 @@ export type ProjectProgressLauncherProps =
 /** Props for the root Project Progress overlay. */
 export type ProjectProgressOverlayProps =
   PropsRuntime<'shell.overlay'>
-  & PropsRenderSlots<'fde.project.source.preview' | 'fde.workbench.module.action'>
+  & PropsRenderSlots<'fde.project.source.preview' | 'fde.workbench.lab.summary'>
   & InjectFace<ProjectPageInjected>
   & PropsLocale<'fdeProject'>
 

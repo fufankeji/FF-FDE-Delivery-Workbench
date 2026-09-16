@@ -3834,9 +3834,9 @@
 /* Project center: compact management dashboard, aligned to the approved reference. */
 .projectCenterOverlay {
   position: fixed;
-  inset: 0;
+  inset: 0 0 0 var(--fde-navigation-width, 0px);
   z-index: 40;
-  width: 100vw !important;
+  width: calc(100% - var(--fde-navigation-width, 0px)) !important;
   height: 100dvh;
 }
 

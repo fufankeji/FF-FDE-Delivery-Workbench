@@ -386,6 +386,10 @@ FDE Workspace 与阶段 2/3 证据
 - `conversation.view` 的作用域是 Session；API 文档和系统架构虽然从该位置打开，权威配置与产物必须按 WorkspaceId 保存并跨同项目会话共享。
 - 普通文件、用户 Xterm、完整编辑器和 FDE 领域状态均需新增插件。
 
+### 8.3.1 统一一级导航（F025）
+
+`ui-fde-project` 复用 apply-scoped `ProjectPageController` 管理介绍页、总览、项目中心、项目详情、实验室与技能占位页；导航仅发布页面快照，不写 Host 领域状态。新增 `shell.overlay` 导航项，通过明确的子 Slot 接收实验室页面；实验室插件只消费 active 与返回回调，不运行时导入项目插件。总览的实验室摘要通过独立 Slot 从既有只读案例 API 获取真实数量。已打开 iframe 在切换时隐藏而非卸载，保留训练现场；全局侧栏采用共享宽度为页面让位，进入具体项目仍复用原生项目导航。
+
 ### 8.4 工作台界面主题
 
 - F016 新增独立 `@deepseek-ai/dsh-client-ui-fde-appearance` Client 插件，通过 `settings.section` 注册“界面主题”，不修改官方 `ui-theme` 的浅色、深色和跟随系统偏好，也不进入 Host Profile 的项目领域。

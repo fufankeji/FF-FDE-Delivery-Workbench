@@ -7,7 +7,8 @@
 .moduleLauncher:hover { background:var(--dsw-alias-interactive-bg-hover); }
 .moduleLauncher:focus-visible { outline:2px solid var(--dsw-alias-state-business-primary); outline-offset:2px; }
 /* Appearance skins can make the base token translucent; a full page must occlude the page beneath it. */
-.page { position:fixed; inset:0; z-index:80; display:flex; flex-direction:column; background:Canvas; background:rgb(from var(--dsw-alias-bg-base) r g b / 1); color:var(--dsw-alias-label-primary); }
+.page { position:fixed; inset:0 0 0 var(--fde-navigation-width, 0px); z-index:50; display:flex; flex-direction:column; background:Canvas; background:rgb(from var(--dsw-alias-bg-base) r g b / 1); color:var(--dsw-alias-label-primary); }
+.page[hidden] { display:none; }
 .header { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 20px; border-bottom:1px solid var(--dsw-alias-border-l1); background:var(--dsw-alias-bg-base); }
 .header>div { display:flex; align-items:center; gap:16px; }
 .header span { opacity:.65; font-size:12px; }
@@ -15,4 +16,12 @@
 .content { position:relative; flex:1; min-height:0; }
 .frame { width:100%; height:100%; border:0; display:block; background:#f5f6f3; }
 .status { position:absolute; inset:0; display:grid; place-content:center; pointer-events:none; }
+.status button { pointer-events:auto; }
 @media(max-width:600px) { .header { padding:10px 12px; } .header span { display:none; } }
+.summaryMetric { display:flex; flex-wrap:wrap; align-items:center; gap:22px; min-height:74px; margin:10px 0; }
+.summaryMetric>div { display:flex; align-items:baseline; gap:8px; }
+.summaryMetric strong { font:600 30px/1.3 var(--dsw-font-family); }
+.summaryMetric span { font:400 12px/1.5 var(--dsw-font-family); color:var(--dsw-alias-label-tertiary); }
+.summaryNotice { font:400 12px/1.7 var(--dsw-font-family); color:var(--dsw-alias-state-error-primary); margin-bottom:12px; }
+.summaryNotice p { margin:0 0 6px; }
+.resume { min-height:0 !important; margin-bottom:14px !important; font:400 11px/1.8 var(--dsw-font-family); }

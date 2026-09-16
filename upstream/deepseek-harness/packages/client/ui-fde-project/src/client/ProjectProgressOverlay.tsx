@@ -25,6 +25,8 @@ import type { ProjectSourceItem, ProjectSourceLoadState } from './source-control
 import type { ProjectProgressOverlayProps } from './slots.ts'
 import type { ProjectPreviewFile } from './slots.ts'
 import { DeliveryHomepage } from './DeliveryHomepage.tsx'
+import { SkillsCenterPlaceholder, WorkbenchOverview } from './WorkbenchOverview.tsx'
+import workbenchCss from './workbench.module.css'
 import css from './project.module.css'
 
 interface ProjectRow {
@@ -2934,7 +2936,8 @@ export function ProjectProgressOverlay({
   completeRequirements, completeSolution, completeDevelopment, completeValidation, completePilot, completeHandoff, returnToPrevious,
   acceptValidationMetric, waiveValidationIssue, acceptDeploymentTrialIssue, confirmDeploymentTrialReadiness,
   recordAcceptanceHandoverDecision,
-  showProjectHome, showProjectOverview, showProjectTimeline, showProjectDetail,
+  showProjectOverview, showProjectTimeline, showProjectDetail,
+  showWorkbenchOverview, showWorkbenchLab, showWorkbenchSkills,
   renderSlot, t,
 }: ProjectProgressOverlayProps) {
   const page = useProjectPage(state => state)
@@ -2955,11 +2958,11 @@ export function ProjectProgressOverlay({
   const [projectQuery, setProjectQuery] = useState('')
   const [projectPage, setProjectPage] = useState(1)
   const [allActivity, setAllActivity] = useState(false)
-  const [rootRef, sidebarOffset] = useSidebarOffset(page.open)
+  const [rootRef] = useSidebarOffset(page.open)
   useStandalonePage(page.open, rootRef)
 
   useEffect(() => {
-    if (!page.open || page.view === 'home') return
+    if (!page.open || page.view === 'home' || page.view === 'lab' || page.view === 'skills') return
     for (const workspace of workspaces) {
       const workspaceId = String(workspace.workspaceId)
       loadStage(workspaceId)
@@ -3071,11 +3074,23 @@ export function ProjectProgressOverlay({
         data-testid="fde-delivery-home"
       >
         <main className={`${css.pageBody} ${css.homeBody}`}>
-          <DeliveryHomepage projectCount={workspacePhase === 'ready' ? rows.length : undefined} projectReadError={workspaceReadState === 'error'} openProjects={showProjectOverview} renderSlot={renderSlot} />
+          <DeliveryHomepage projectCount={workspacePhase === 'ready' ? rows.length : undefined} projectReadError={workspaceReadState === 'error'} openProjects={showWorkbenchOverview} t={t} />
         </main>
       </div>
     )
   }
+
+  if (page.view === 'dashboard') return <div ref={rootRef} className={workbenchCss.frame} data-testid="fde-workbench-overview">
+    <WorkbenchOverview
+      status={workspaceReadState === 'error' ? 'error' : workspacePhase === 'ready' ? 'ready' : 'loading'}
+      projects={rows.map(row => ({ workspaceId: row.workspaceId, title: row.title, companyName: row.companyName, stage: stageLabel(row.stage, t('progress.stageLoading'), t('progress.stageError')), updatedAt: row.latestActivityAt ?? 0 }))}
+      openProjects={showProjectOverview} openLab={showWorkbenchLab} openSkills={showWorkbenchSkills}
+      createProject={openProjectCreation} enterProject={enterProject} renderSlot={renderSlot} t={t}
+    />
+  </div>
+  if (page.view === 'skills') return <div ref={rootRef} className={workbenchCss.frame} data-testid="fde-skills-center"><SkillsCenterPlaceholder back={showWorkbenchOverview} t={t} /></div>
+  // The separate lab occupant covers this frame while retaining its iframe instance.
+  if (page.view === 'lab') return <div ref={rootRef} className={workbenchCss.frame} aria-hidden="true" />
 
   const legacyDetailOpen = page.view === 'project'
     && detailRow?.stage?.status === 'ready'
@@ -3085,8 +3100,7 @@ export function ProjectProgressOverlay({
   return (
     <div
       ref={rootRef}
-      className={`${css.pageOverlay} ${page.view === 'project' && !v2DetailOpen ? '' : css.projectCenterOverlay}`}
-      style={page.view === 'project' && !v2DetailOpen ? { left: sidebarOffset, width: `calc(100% - ${String(sidebarOffset)}px)` } : undefined}
+      className={`${css.pageOverlay} ${css.projectCenterOverlay}`}
       data-testid="fde-project-progress"
     >
       {detailRow !== undefined && metadataStates[detailRow.workspaceId]?.status === 'error' && <p role="alert" className={css.projectMetadataWarning}>
@@ -3197,12 +3211,9 @@ export function ProjectProgressOverlay({
           renderPreview={source => renderSlot('fde.project.source.preview', { source })}
         />
         : <main className={`${css.pageBody} ${css.projectCenterBody} ${css.projectCenterRefresh}`} data-project-center="">
-          <nav className={css.projectModuleNavigation} aria-label="工作台独立功能">
-            {renderSlot('fde.workbench.module.action', {})}
-          </nav>
           <header className={css.projectCenterHeader} data-project-center-header="">
             <div>
-              <p className={css.projectCenterBreadcrumb} data-project-breadcrumb=""><button type="button" onClick={showProjectHome}>返回首页</button><i>/</i><strong>项目中心</strong>{page.view === 'timeline' && <><i>/</i><span>交付时间轴</span></>}</p>
+              <p className={css.projectCenterBreadcrumb} data-project-breadcrumb=""><button type="button" onClick={showWorkbenchOverview}>{t('workbench.back')}</button><i>/</i><strong>项目中心</strong>{page.view === 'timeline' && <><i>/</i><span>交付时间轴</span></>}</p>
               <h1>项目中心</h1>
               <p data-project-center-copy="">掌握交付进展，处理需要你决定的事项。</p>
               <button type="button" className={css.projectCreateAction} data-project-create="" onClick={openProjectCreation}>

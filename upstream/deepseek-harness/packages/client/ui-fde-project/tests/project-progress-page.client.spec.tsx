@@ -25,7 +25,7 @@ const hook = <T,>(value: T) => <S,>(selector: (state: T) => S) => selector(value
 
 describe('ProjectProgressOverlay standalone page', () => {
   it('opens on the product homepage before entering project operations', () => {
-    const showProjectOverview = vi.fn()
+    const showWorkbenchOverview = vi.fn()
     const loadStage = vi.fn()
     const props = {
       useProjectPage: hook({ open: true, view: 'home' as const }),
@@ -41,15 +41,17 @@ describe('ProjectProgressOverlay standalone page', () => {
       loadStage, retryStage: vi.fn(), loadProjectSurface: vi.fn(), refreshProjectSurface: vi.fn(),
       completeRequirements: vi.fn(), completeSolution: vi.fn(),
       loadProjectSources: vi.fn(), parseProjectSource: vi.fn(),
-      enterProject: vi.fn(), reviewProjectArchitecture: vi.fn(), closeProjectPage: vi.fn(), showProjectOverview,
+      enterProject: vi.fn(), reviewProjectArchitecture: vi.fn(), closeProjectPage: vi.fn(), showWorkbenchOverview, showWorkbenchLab: vi.fn(),
       showProjectTimeline: vi.fn(), showProjectDetail: vi.fn(), renderSlot: vi.fn(() => null),
       t: makeTranslate(zh),
     } as unknown as ProjectProgressOverlayProps
 
     const view = render(<ProjectProgressOverlay {...props} />)
     expect(screen.getByRole('region', { name: 'FF-FDE工作台产品首页' })).toBeTruthy()
-    expect(screen.getByRole('button', { name: /进入工作台/ })).toBeTruthy()
-    expect(screen.getByRole('button', { name: /进入交付工作台 · 1 个项目/ })).toBeTruthy()
+    expect(screen.getAllByRole('button', { name: '进入平台' })).toHaveLength(3)
+    expect(screen.queryByRole('button', { name: /业务挖掘实验室|进入工作台|进入交付工作台|开始一次真实交付/ })).toBeNull()
+    expect(within(screen.getByRole('navigation', { name: '产品首页导航' })).getAllByRole('button')).toHaveLength(1)
+    expect(props.renderSlot).not.toHaveBeenCalled()
     expect(screen.getByRole('link', { name: /查看交付生命周期/ }).getAttribute('href')).toBe('#fde-lifecycle')
     expect(screen.getByRole('region', { name: '示例项目动态交付窗口' })).toBeTruthy()
     expect(screen.getByText('证据驱动的 FDE 交付系统')).toBeTruthy()
@@ -66,14 +68,9 @@ describe('ProjectProgressOverlay standalone page', () => {
     expect(screen.getByRole('region', { name: '交付方法核心表达' })).toBeTruthy()
     expect(screen.getByText('模型与算力只是投入，自主程度需要设计；')).toBeTruthy()
     expect(screen.queryByRole('link', { name: /交付方法指南/ })).toBeNull()
-    expect(screen.getByRole('button', { name: /开始一次真实交付/ })).toBeTruthy()
     expect(loadStage).not.toHaveBeenCalled()
-    fireEvent.click(screen.getByRole('button', { name: /进入工作台/ }))
-    expect(showProjectOverview).toHaveBeenCalledTimes(1)
-    fireEvent.click(screen.getByRole('button', { name: /进入交付工作台 · 1 个项目/ }))
-    expect(showProjectOverview).toHaveBeenCalledTimes(2)
-    fireEvent.click(screen.getByRole('button', { name: /开始一次真实交付/ }))
-    expect(showProjectOverview).toHaveBeenCalledTimes(3)
+    for (const button of screen.getAllByRole('button', { name: '进入平台' })) fireEvent.click(button)
+    expect(showWorkbenchOverview).toHaveBeenCalledTimes(3)
 
     view.rerender(<ProjectProgressOverlay {...props} useWorkspaces={hook({
       phase: 'pending', state: 'loading', archivedSessionIds: [], items: [],

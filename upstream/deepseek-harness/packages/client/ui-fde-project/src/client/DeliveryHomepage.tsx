@@ -1,7 +1,7 @@
 /** Product-positioning home shown when the FDE workbench first opens. */
 
 import type { MouseEvent, ReactNode } from 'react'
-import type { PropsRenderSlots } from '@deepseek-ai/dsh-client-ui-slots'
+import type { PropsLocale } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from './slots.ts'
 import { useRef } from 'react'
 import { domAnimation, LazyMotion, m, MotionConfig, useMotionTemplate, useMotionValue, useSpring, useTransform } from 'motion/react'
@@ -401,12 +401,12 @@ export function DeliveryHomepage({
   projectCount,
   projectReadError,
   openProjects,
-  renderSlot,
+  t,
 }: {
   readonly projectCount: number | undefined
   readonly projectReadError: boolean
   readonly openProjects: () => void
-} & PropsRenderSlots<'fde.workbench.module.action'>) {
+} & PropsLocale<'fdeProject'>) {
   return (
     <MotionConfig reducedMotion="user">
       <LazyMotion features={domAnimation}>
@@ -417,9 +417,8 @@ export function DeliveryHomepage({
               <span>FF-FDE工作台</span>
             </a>
             <div className={css.deliveryHomeNavActions}>
-              {renderSlot('fde.workbench.module.action', {})}
               <button type="button" onClick={openProjects} data-delivery-nav-action="">
-                进入工作台 <span aria-hidden="true">↗</span>
+                {t('home.enterPlatform')} <span aria-hidden="true">↗</span>
               </button>
             </div>
           </nav>
@@ -454,7 +453,7 @@ export function DeliveryHomepage({
                 transition={{ duration: 0.4, delay: 0.3 }}
                 data-delivery-supporting=""
                 role="status"
-              ><i aria-hidden="true" />{projectReadError ? '项目列表读取失败，请进入工作台重试。'
+              ><i aria-hidden="true" />{projectReadError ? t('home.projectFailure')
                   : projectCount === undefined ? '正在连接并读取项目…'
                     : `当前 ${String(projectCount)} 个真实项目正在交付 · 证据持续同步`}</m.p>
               <m.div
@@ -464,7 +463,7 @@ export function DeliveryHomepage({
                 transition={{ duration: 0.48, delay: 0.36, ease: [0.23, 1, 0.32, 1] }}
               >
                 <button type="button" onClick={openProjects} data-delivery-primary-action="">
-                  {projectCount !== undefined && projectCount > 0 ? `进入交付工作台 · ${String(projectCount)} 个项目` : '进入交付工作台'} <span aria-hidden="true">→</span>
+                  {t('home.enterPlatform')} <span aria-hidden="true">→</span>
                 </button>
                 <a href="#fde-lifecycle" data-delivery-secondary-action="">查看交付生命周期 <span aria-hidden="true">↓</span></a>
               </m.div>
@@ -517,7 +516,7 @@ export function DeliveryHomepage({
             <div className={css.deliveryManifestoAction} data-delivery-final-action-wrap="">
               <span data-delivery-final-prompt="">准备交付真实结果了吗？</span>
               <button type="button" onClick={openProjects} data-delivery-final-action="">
-                <span>开始一次真实交付</span><DeliveryArrowIcon />
+                <span>{t('home.enterPlatform')}</span><DeliveryArrowIcon />
               </button>
             </div>
           </section>

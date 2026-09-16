@@ -37,8 +37,11 @@ updated: "2026-09-16"
 | F012 | F012-continuous-improvement | 阶段 8：持续改进与能力沉淀 | FDE 把生产证据转成经复测、审批、可回滚的改进和有边界的复用资产 | REQ-003, REQ-006, REQ-007, REQ-024, REQ-025, REQ-026, REQ-028, NFR-002, NFR-004, NFR-011, NFR-012, NFR-013, NFR-014, PSC-003, PSC-005, PSC-006, PSC-020, PSC-021, PSC-022, PSC-023, PSC-024, PSC-025 | F011 | P1 | in-progress |
 
 | F024 | F024-business-discovery-lab | 独立业务挖掘实验室 | 无需创建项目即可完成五案例访谈、取证、计算和报告训练，返回后项目与八阶段不变 | REQ-030, REQ-031, REQ-032, PSC-026 | 无 | P0 | in-progress |
+| F025 | F025-platform-navigation | 统一工作台导航与总览 | 默认总览、三模块切换、继续项目且保留训练现场，技能中心仅占位 | REQ-033, REQ-034, PSC-027 | F002, F024 | P0 | in-progress |
 
 ## 首个验证切片
+
+F025 的统一导航范围由用户于 2026-09-16 确认：默认总览，保留项目中心和实验室全部业务流程；技能中心仅入口与占位，具体 Skills 接入等待后续指令。
 
 F001～F004 建立共享能力，F005 用“发现高价值问题”完成第一条端到端产品验证。首个阶段只接入 `qualify-ai-workflow`、条件触发的 `reframe-ai-engagement`，以及 Workflow Charter、Engagement Reframe、Field Observation Log 三类必要 Artifact；不安装完整外部能力库。实施可以在同一切片内增量进行，但只有当前用户明确授权的 Feature 才进入 in-progress。
 

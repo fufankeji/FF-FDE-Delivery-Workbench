@@ -2,7 +2,7 @@
 
 English | [中文](README.zh.md)
 
-Adds “业务挖掘实验室” to the homepage navigation and the top of the fullscreen project center through `fde.workbench.module.action`, while retaining the sidebar action. No project is required. The full-page training frame offers “返回工作台”. Navigation is held in one plugin-owned store; opening and closing the page never reads or writes project/session selection.
+Contributes the training page through `fde.workbench.lab.page` and a read-only overview summary through `fde.workbench.lab.summary`. The introduction homepage has no separate lab shortcut. The platform navigation owns the Lab entry and retains the project-sidebar shortcut. No project is required. “返回原工作面” restores the previous platform page without changing project/session selection.
 
 The original React/Pixi application is built into `lib/app/` by the package `bundle` command, including when invoked through the root Client build. The [Host plugin](../../fde/discovery-lab/README.md) serves it at `/fde-discovery-lab/`. A same-origin iframe isolates its CSS, React runtime and rendering lifecycle from workbench UI. No extra server or proxy is started.
 
@@ -18,6 +18,6 @@ None from the navigation wrapper. Native training conversations and helper usage
 
 - The source application's desktop layout retains a 1000 px minimum width and horizontal scrolling on narrow screens; this is not a mobile redesign.
 - The original application styling remains independent of workbench skins.
-- Returning removes the iframe, not backend training records or an ongoing interview. Reopening restores records from the Host.
+- Module switching hides but preserves the iframe after its first visit, including transient training input. Browser refresh, plugin disposal, or explicit retry after a loading failure recreates it; persisted records are restored from the Host.
 - Live-model quality and the original pixel-office experience require human acceptance.
 - Source provenance and private redistribution boundary are documented in the [source record](../../fde/discovery-lab/SOURCE.md).

@@ -22,6 +22,7 @@ import { ObservabilityView } from './ObservabilityView.tsx'
 import { ProjectPageController } from './page-controller.ts'
 import { ProjectProgressLauncher } from './ProjectProgressLauncher.tsx'
 import { ProjectProgressOverlay } from './ProjectProgressOverlay.tsx'
+import { WorkbenchNavigation, WorkbenchLabLauncher } from './WorkbenchNavigation.tsx'
 import { ProjectRuntimeHeader } from './ProjectRuntimeHeader.tsx'
 import { ProjectContextSidebar } from './ProjectContextSidebar.tsx'
 import { ProjectStageWorkbenchHero, ProjectStageWorkbenchView } from './StageWorkbench.tsx'
@@ -227,6 +228,10 @@ export function apply(ctx: ClientContext): void {
     closeProjectPage: page.close,
     openProjectPage: page.open,
     showProjectHome: page.showHome,
+    showWorkbenchOverview: page.showDashboard,
+    showWorkbenchLab: page.showLab,
+    returnFromWorkbenchLab: page.returnFromLab,
+    showWorkbenchSkills: page.showSkills,
     showProjectOverview: page.showOverview,
     showProjectTimeline: page.showTimeline,
     showProjectDetail: page.showProject,
@@ -583,9 +588,18 @@ export function apply(ctx: ClientContext): void {
     name: 'shell.overlay', id: 'fde-project-progress', order: 10, locale: NS, inject: pageInjected,
     children: {
       'fde.project.source.preview': { kind: 'single', scope: 'root' },
-      'fde.workbench.module.action': { kind: 'list', scope: 'root' },
+      'fde.workbench.lab.summary': { kind: 'single', scope: 'root' },
     },
   }, ProjectProgressOverlay))
+
+  ctx.slots.inject('shell.overlay', () => ctx.slots.register({
+    name: 'shell.overlay', id: 'fde-workbench-navigation', order: 11, locale: NS, inject: pageInjected,
+    children: { 'fde.workbench.lab.page': { kind: 'single', scope: 'root' } },
+  }, WorkbenchNavigation))
+
+  ctx.slots.inject('sidebar.footer.action', () => ctx.slots.register({
+    name: 'sidebar.footer.action', id: 'fde-discovery-lab', order: -19, locale: NS, inject: pageInjected,
+  }, WorkbenchLabLauncher))
 
   ctx.slots.inject('conversation.hero.content', () => ctx.slots.register({
     name: 'conversation.hero.content', priority: -20, locale: NS,

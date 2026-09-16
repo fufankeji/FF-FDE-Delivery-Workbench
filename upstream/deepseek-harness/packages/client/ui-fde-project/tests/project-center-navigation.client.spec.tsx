@@ -27,7 +27,7 @@ function mount(metadata?: Record<string, unknown>) {
   }))
   const props = {
     useProjectPage: bindSnapshotSelector(page),
-    useWorkspaces: hook({ items: workspaces, archivedSessionIds: ['archived'] }),
+    useWorkspaces: hook({ items: workspaces, archivedSessionIds: ['archived'], phase: 'ready', state: 'idle' }),
     useSessions: hook({ byId: Object.fromEntries(['session-one', 'archived', 'blank', 'child'].map(id => [id, {
       id, displayTitle: id, updatedAt: Date.parse('2026-09-08T02:00:00Z'), blank: id === 'blank', origin: id === 'child' ? 'subagent' : 'user', running: false,
     }])) }),
@@ -44,6 +44,7 @@ function mount(metadata?: Record<string, unknown>) {
     loadStage: vi.fn(), retryStage: vi.fn(), loadProjectSurface: vi.fn(), refreshProjectSurface: vi.fn(),
     loadProjectSources: vi.fn(), parseProjectSource: vi.fn(), loadProjectMetadata, openActivitySession,
     enterProject: vi.fn(), showProjectDetail, showProjectHome: page.showHome,
+    showWorkbenchOverview: page.showDashboard, showWorkbenchLab: page.showLab, showWorkbenchSkills: page.showSkills,
     showProjectOverview: page.showOverview, showProjectTimeline: page.showTimeline,
     openProjectCreation: vi.fn(), renderSlot: vi.fn(() => null), t: makeTranslate(zh),
   } as unknown as ProjectProgressOverlayProps
@@ -52,7 +53,7 @@ function mount(metadata?: Record<string, unknown>) {
 }
 
 describe('Project Center recent activity and delivery navigation', () => {
-  it('returns from the timeline to the complete project overview and to the product homepage', () => {
+  it('returns from the timeline to the complete project center and then to the workbench overview', () => {
     const input = mount()
     const openTimeline = () => fireEvent.click(screen.getByRole('button', { name: /查看全部 2 个周期/ }))
     openTimeline()
@@ -63,13 +64,13 @@ describe('Project Center recent activity and delivery navigation', () => {
     expect(screen.getByRole('region', { name: '交付周期' })).toBeTruthy()
     expect(screen.queryByRole('button', { name: '返回项目中心' })).toBeNull()
     openTimeline()
-    fireEvent.click(screen.getByRole('button', { name: '返回首页' }))
-    expect(input.page.getSnapshot()).toEqual({ open: true, view: 'home' })
-    expect(screen.getByRole('region', { name: 'FF-FDE工作台产品首页' })).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: /进入工作台/ }))
+    fireEvent.click(screen.getByRole('button', { name: '返回总览' }))
+    expect(input.page.getSnapshot()).toEqual({ open: true, view: 'dashboard' })
+    expect(screen.getByRole('heading', { name: '工作台总览' })).toBeTruthy()
+    fireEvent.click(screen.getAllByRole('button', { name: /查看项目/ })[0]!)
     expect(screen.getByRole('region', { name: '最近动态' })).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: '返回首页' }))
-    expect(input.page.getSnapshot().view).toBe('home')
+    fireEvent.click(screen.getByRole('button', { name: '返回总览' }))
+    expect(input.page.getSnapshot().view).toBe('dashboard')
     expect(input.props.enterProject).not.toHaveBeenCalled()
   })
 

@@ -2,6 +2,23 @@ import { describe, expect, it, vi } from 'vitest'
 import { ProjectPageController } from '../src/client/page-controller.ts'
 
 describe('ProjectPageController', () => {
+  it('keeps module navigation independent and restores the exact lab entry page', () => {
+    const controller = new ProjectPageController()
+    controller.showDashboard()
+    expect(controller.getSnapshot().view).toBe('dashboard')
+    controller.showSkills()
+    expect(controller.getSnapshot().view).toBe('skills')
+    controller.showProject('project-one')
+    controller.showLab()
+    controller.showLab()
+    expect(controller.getSnapshot()).toEqual({ open: true, view: 'lab' })
+    controller.returnFromLab()
+    expect(controller.getSnapshot()).toEqual({ open: true, view: 'project', workspaceId: 'project-one' })
+    controller.close()
+    controller.showLab()
+    controller.returnFromLab()
+    expect(controller.getSnapshot()).toEqual({ open: false, view: 'closed' })
+  })
   it('navigates overview, timeline, project detail, and closed states explicitly', () => {
     const controller = new ProjectPageController()
     expect(controller.getSnapshot()).toEqual({ open: true, view: 'home' })

@@ -1,46 +1,61 @@
-import { useState } from 'react'
-import type { PropsRuntime, PropsStore } from '@deepseek-ai/dsh-client-ui-slots'
+import { useEffect, useState } from 'react'
+import { Button } from '@deepseek-ai/dsh-client-ui-primitives'
+import type { PropsLocale, PropsRuntime, PropsStore } from '@deepseek-ai/dsh-client-ui-slots'
 import type { createLabStore } from './stores.ts'
 import css from './lab.module.css'
 type LabStore = ReturnType<typeof createLabStore>
-type LauncherProps = PropsRuntime<'sidebar.footer.action'> & PropsStore<LabStore>
-type OverlayProps = PropsRuntime<'shell.overlay'> & PropsStore<LabStore>
-type ModuleLauncherProps = PropsRuntime<'fde.workbench.module.action'> & PropsStore<LabStore>
+type OverlayProps = PropsRuntime<'fde.workbench.lab.page'> & PropsStore<LabStore> & PropsLocale<'fdeProject'>
 
-/** Visible in the full-page home and project center, independent of the sidebar. */
-export function LabModuleLauncher({ useStore, actions }: ModuleLauncherProps) {
-  const open = useStore(state => state.open)
-  return <button type="button" className={css.moduleLauncher} aria-pressed={open} title="独立训练，无需创建或选择项目" onClick={() => actions.open()}>
-    <span aria-hidden="true">◈</span>业务挖掘实验室
-  </button>
-}
-
-/** Same entry in expanded and compact sidebars. */
-export function LabLauncher({ wide, useStore, actions }: LauncherProps) {
-  const open = useStore(state => state.open)
-  return <button type="button" className={css.launcher} data-wide={wide || undefined} aria-label="业务挖掘实验室" aria-pressed={open} title={wide ? undefined : '业务挖掘实验室'} onClick={() => actions.open()}>
-    <span aria-hidden="true">◈</span>{wide && <span>业务挖掘实验室</span>}
-  </button>
-}
-
-/** Full-size frame isolates the original app CSS, React and Pixi lifecycle. */
-export function LabOverlay({ useStore, actions }: OverlayProps) {
-  const open = useStore(state => state.open)
-  if (!open) return null
-  return <section className={css.page} role="dialog" aria-modal="true" aria-label="业务挖掘实验室">
+/** Keep the isolated training frame alive after its first explicit navigation. */
+export function LabOverlay({ active, back, useStore, actions, t }: OverlayProps) {
+  const opened = useStore(state => state.open)
+  useEffect(() => { if (active && !opened) actions.open() }, [active, opened, actions])
+  if (!active && !opened) return null
+  return <section className={css.page} hidden={!active} aria-label={t('lab.title')}>
     <header className={css.header}>
-      <div><strong>业务挖掘实验室</strong><span>独立训练 · 不改变项目阶段</span></div>
-      <button type="button" onClick={() => actions.close()}>返回工作台</button>
+      <div><strong>{t('lab.title')}</strong><span>{t('lab.independent')}</span></div>
+      <button type="button" onClick={back}>{t('lab.return')}</button>
     </header>
-    <LabFrame />
+    <LabFrame t={t} />
   </section>
 }
-function LabFrame() {
+function LabFrame({ t }: PropsLocale<'fdeProject'>) {
   const [loaded, setLoaded] = useState(false)
   const [failed, setFailed] = useState(false)
+  const [attempt, setAttempt] = useState(0)
   return <div className={css.content}>
-    {!loaded && !failed && <div className={css.status} role="status">正在加载实验室…</div>}
-    {failed && <div className={css.status} role="alert">实验室暂时无法打开，请返回后重试。</div>}
-    <iframe className={css.frame} title="业务挖掘实验室训练区" src="/fde-discovery-lab/" onLoad={() => setLoaded(true)} onError={() => setFailed(true)} />
+    {!loaded && !failed && <div className={css.status} role="status">{t('lab.loading')}</div>}
+    {failed && <div className={css.status} role="alert"><p>{t('lab.failed')}</p><Button variant="outline" onClick={() => { setLoaded(false); setFailed(false); setAttempt(value => value + 1) }}>{t('lab.retry')}</Button></div>}
+    <iframe key={attempt} className={css.frame} title={t('lab.frame')} src="/fde-discovery-lab/" onLoad={() => setLoaded(true)} onErrorCapture={() => setFailed(true)} />
   </div>
+}
+
+type Summary = { readonly status: 'loading' | 'error' } | { readonly status: 'ready'; readonly cases: number; readonly started: number }
+
+/** Read only public case summaries; never create a run or request a model. */
+export function LabSummary({ openLab, t }: PropsRuntime<'fde.workbench.lab.summary'> & PropsLocale<'fdeProject'>) {
+  const [summary, setSummary] = useState<Summary>({ status: 'loading' })
+  const [retry, setRetry] = useState(0)
+  useEffect(() => {
+    const controller = new AbortController()
+    setSummary({ status: 'loading' })
+    void fetch('/api/fde-discovery-lab/cases', { signal: controller.signal }).then(async response => {
+      if (!response.ok) throw new Error('Case catalog unavailable')
+      const value: unknown = await response.json()
+      if (!Array.isArray(value) || !value.every((row: unknown) => typeof row === 'object' && row !== null && 'id' in row && typeof row.id === 'string')) throw new Error('Invalid case catalog')
+      const cases = new Map(value.map((row: { id: string; currentRunId?: string }) => [row.id, row]))
+      if (!controller.signal.aborted) setSummary({ status: 'ready', cases: cases.size, started: [...cases.values()].filter(row => typeof row.currentRunId === 'string' && row.currentRunId.length > 0).length })
+    }).catch(() => { if (!controller.signal.aborted) setSummary({ status: 'error' }) })
+    return () => { controller.abort() }
+  }, [retry])
+  return <>
+    <h2>{t('workbench.lab')}</h2><p>{t('lab.description')}</p>
+    <div className={css.summaryMetric} aria-live="polite">
+      {summary.status === 'ready' ? <><div><strong>1</strong><span>{t('lab.count')}</span></div><div><strong>{summary.cases}</strong><span>{t('lab.cases')}</span></div></>
+        : <span>{t(summary.status === 'loading' ? 'workbench.loading' : 'workbench.failed')}</span>}
+    </div>
+    {summary.status === 'error' && <div className={css.summaryNotice} role="alert"><p>{t('lab.unavailable')}</p><Button variant="ghost" size="sm" onClick={() => { setRetry(value => value + 1) }}>{t('lab.retry')}</Button></div>}
+    {summary.status === 'ready' && summary.started > 0 && <p className={css.resume}>{t('lab.resumeDescription', { count: summary.started })}</p>}
+    <Button variant="outline" onClick={openLab}>{t(summary.status === 'ready' && summary.started > 0 ? 'lab.resume' : 'lab.open')} <span aria-hidden="true">→</span></Button>
+  </>
 }
