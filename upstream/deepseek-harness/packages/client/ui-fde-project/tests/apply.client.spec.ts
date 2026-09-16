@@ -178,6 +178,19 @@ describe('ui-fde-project apply', () => {
     expect(draft).not.toContain('evidenceRef')
     expect(draft).not.toContain('不要一次加载全部')
 
+    for (const [action, expected] of [
+      ['prepare-interview', '最影响判断的少量问题'],
+      ['restore-workflow', '额外劳动及原因'],
+      ['qualify-value', '样本、时间窗和计算口径'],
+      ['form-conclusion', '进入下一阶段、继续补充调查、缩小问题范围或暂停这个问题'],
+    ] as const) {
+      draft = ''
+      stageInjected.prepareDiscoveryDraft('session-1', action, [])
+      expect(draft).toContain(expected)
+      expect(draft).not.toMatch(/Go、Revise|Skill|evidenceRef/)
+      expect(prompt).not.toHaveBeenCalled()
+    }
+
     draft = '用户已经写好的问题'
     setDraft.mockClear()
     notify.mockClear()

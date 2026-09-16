@@ -307,20 +307,20 @@ export function apply(ctx: ClientContext): void {
     sourcePaths: readonly string[],
   ): string => {
     if (action === 'prepare-interview') {
-      return '客户最近遇到的问题是：____。请先帮我还原他们现在怎么做、问题发生在哪一步，以及还需要向哪些业务人员确认。暂时不要讨论解决方案。'
+      return '客户最近遇到的问题是：____。请先读取已有资料和记录，帮我还原他们现在怎么做、哪里产生了额外劳动及其原因，再提出最影响判断的少量问题，说明向谁核对。暂时不要讨论技术方案。'
     }
     if (action === 'reframe-engagement') {
       return '客户原先的说法和现场情况可能存在不一致。请帮我核对具体哪里不一致、会影响哪些已约定内容，以及需要由谁确认。暂时不要修改项目范围或讨论解决方案。'
     }
     if (action === 'restore-workflow') {
       const materials = sourcePaths.map(path => `- ${path}`).join('\n')
-      return `请继续还原当前候选业务流程：明确真实执行人、触发条件、正常步骤、重要异常、人工回退和责任边界。只补当前仍缺的事实，不讨论技术方案。${materials === '' ? '' : `\n\n本次可核对资料：\n${materials}`}`
+      return `请继续还原当前候选业务流程：明确真实执行人、触发条件、正常步骤、重要异常、额外劳动及原因、人工回退和责任边界。区分制度规定与实际操作，只补当前仍缺的事实，不讨论技术方案。${materials === '' ? '' : `\n\n本次可核对资料：\n${materials}`}`
     }
     if (action === 'qualify-value') {
-      return '请基于当前已经还原的业务流程，继续核对问题影响、业务结果、当前基线、结果验证人、风险上限和停止条件。请明确区分已确认事实、合理推断和仍需谁来核对的未知项，不推进项目阶段。'
+      return '请基于已经还原的业务流程，核对额外劳动、问题原因、业务影响及指标的样本、时间窗和计算口径。先比较流程或规则改进能解决什么，再说明 AI 的额外价值与优先顺序；明确结果验证人、风险上限、人工回退和停止条件。区分已确认事实、合理推断和未知项，不编造收益，不推进项目阶段。'
     }
     if (action === 'form-conclusion') {
-      return '请核对第一阶段三项必备记录和候选业务流程，整理当前已确认事实、未解决阻塞和 Go、Revise、Narrow 或 Stop 候选建议。不要代替 FDE 作出决定，也不要推进项目阶段。'
+      return '请核对第一阶段三项必备记录和候选业务流程，说明业务如何完成、额外劳动及原因、优先处理依据与 AI 增量，以及会改变建议的未知项。整理进入下一阶段、继续补充调查、缩小问题范围或暂停这个问题的候选建议，并同步修订受影响的记录。不要代替 FDE 作出决定，也不要推进项目阶段。'
     }
     if (action === 'repair-stage-records') {
       return '请检查第一阶段 `.fde/discovery/artifacts.json` 与固定阶段记录合同，修复无效 ID、固定路径、来源版本、结构状态或证据引用。Catalog 只能登记 research-report、confirmation-checklist、requirement-baseline 和条件性的 engagement-reframe；其他补充文件可以保留，但不要登记进该 Catalog。不要改变业务结论或推进项目阶段。'
@@ -332,7 +332,7 @@ export function apply(ctx: ClientContext): void {
       return '我决定暂时不推进这个问题，原因是：____。请记录当前决定人、暂停原因、仍缺少的证据和重新启动条件，并更新项目调整记录或业务流程状态。不要推进项目阶段。'
     }
     const materials = sourcePaths.map(path => `- ${path}`).join('\n')
-    return `请结合以下客户资料，从一个最近发生的案例开始，帮我还原客户现在怎么做、问题发生在哪一步，以及还需要向哪些业务人员确认。暂时不要讨论解决方案。\n\n本次参考资料：\n${materials}`
+    return `请结合以下客户资料和已有记录，从一个最近发生的案例开始，还原客户现在怎么做、哪里产生额外劳动及其原因。先说明已知事实，再提出最影响判断的少量问题，说明向谁核对。暂时不要讨论技术方案。\n\n本次参考资料：\n${materials}`
   }
 
   const focusNativeComposer = (): void => {

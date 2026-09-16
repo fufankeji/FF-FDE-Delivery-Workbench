@@ -53,9 +53,11 @@ describe('theme bootstrap row', () => {
     expect(document.body.hasAttribute(DARK_ATTRIBUTE)).toBe(dark)
   })
 
-  it('defaults to system and falls back to light when matchMedia is unavailable', () => {
-    vi.stubGlobal('matchMedia', undefined)
+  it.each([true, false, undefined])('defaults to light with system dark=%s', (matches) => {
+    if (matches === undefined) vi.stubGlobal('matchMedia', undefined)
+    else mockSystemDark(matches)
     executeBootstrap()
+    expect(document.documentElement.getAttribute('data-dsh-theme-preference')).toBe('light')
     expect(document.documentElement.style.colorScheme).toBe('light')
     expect(document.body.hasAttribute(DARK_ATTRIBUTE)).toBe(false)
   })

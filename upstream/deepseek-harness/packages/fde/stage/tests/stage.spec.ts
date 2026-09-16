@@ -385,7 +385,55 @@ describe('requirement-research model guidance', () => {
     ])
     expect(requirementResearchPrompt('requirements')).toContain('先按方法层加载 `qualify-ai-workflow`')
     expect(requirementResearchPrompt('requirements')).toContain('不得一次加载全部')
+    expect(requirementResearchPrompt('requirements')).toContain('本任务所需的当前项目既有阶段记录，不扩展到其他未授权资料')
     expect(requirementResearchPrompt('solution')).toBe('')
+  })
+
+  it('requires causal diagnosis and measured comparisons before an AI recommendation', () => {
+    const { content } = QUALIFY_AI_WORKFLOW_SKILL
+    const steps = ['先读材料，再还原业务', '从额外劳动追到原因', '保留证据等级与指标口径', '比较传统改进与 AI 增量', '增量修订与质量复核']
+    expect(steps.map(step => content.indexOf(`## ${step}`))).toEqual(
+      [...steps.map(step => content.indexOf(`## ${step}`))].sort((a, b) => a - b),
+    )
+    for (const rule of [
+      '每轮只问最影响判断的 1–3 个问题', '有边界的初步报告',
+      '人工参与或审批本身不是痛点', '有证据的原因 → 业务影响',
+      '教学／模拟数据不能作为客户生产事实', '样本与总体、起止点、分母和公式',
+      '操作耗时不等于端到端时长，也不等于 AI 可节省时间', '未知不写成零',
+      '重叠标签和并行劳动不得重复相加', '不编造投资回报',
+      '不是必须逐级升级的阶梯', '正式本体不是默认方案', '不强造综合评分',
+      '同步修订受影响的流程、指标、问题原因、优先级和建议',
+      '不能代替 FDE 决定或推进项目阶段',
+    ]) expect(content).toContain(rule)
+    for (const step of steps) expect(content).toContain(`## ${step}`)
+  })
+
+  it('keeps the diagnosis in the existing three artifacts and Chinese method catalog', () => {
+    const core = DISCOVERY_STAGE_SKILL_CATALOG.stages[0].methods[0]
+    expect(core.content).toBe(QUALIFY_AI_WORKFLOW_SKILL.content)
+    expect(core.content).toContain('客户现状记录是主报告')
+    expect(core.content).toContain('待确认事项只收敛未知、冲突、责任人')
+    expect(core.content).toContain('业务流程说明从主报告收敛候选工作流')
+    expect(core.content).toContain('不复制第二套素材')
+    expect(core.content).toContain('第一阶段不强制完整数据字典、接口或系统审计')
+    expect(core.content).toContain('业务说明、建议和操作文案使用中文')
+    expect(core.artifacts.filter(artifact => artifact.required).map(artifact => artifact.path)).toEqual([
+      'fde-deliverables/01-requirement-research/requirement-research-report.md',
+      'fde-deliverables/01-requirement-research/confirmation-checklist.md',
+      'fde-deliverables/01-requirement-research/requirement-baseline.md',
+    ])
+    for (const heading of ['## 来源事实', '## 代表案例', '## 现场观察', '## 未验证事项']) {
+      expect(core.content).toContain(heading)
+    }
+    expect(core.answers).toEqual(core.answerGroups.flatMap(group => group.answers))
+    expect(core.answers.join('\n')).toContain('传统改进能解决什么，AI 增量与优先顺序是什么？')
+    expect(core.workflow.at(-1)).toBe('由 FDE 决定进入下一阶段、继续调查、缩小范围或暂停')
+    expect(core.example.summary).toContain('教学示例，不是客户事实')
+    for (const method of DISCOVERY_STAGE_SKILL_CATALOG.stages[0].methods) {
+      expect(`${method.description}\n${method.whenToUse}\n${method.content}`).not.toMatch(/sponsor|stated ask|suspected real problem|Must、Should、Nice|Go、Revise、Narrow/)
+    }
+    expect(KNOWLEDGE_INTERVIEW_SKILL.content).toContain('每轮只问最影响判断的 1–3 个问题')
+    expect(OWNERSHIP_MAP_SKILL.content).toContain('state 设为 unverified')
   })
 
   it('keeps the solution contract in one on-demand Skill and only prompts during solution design', () => {

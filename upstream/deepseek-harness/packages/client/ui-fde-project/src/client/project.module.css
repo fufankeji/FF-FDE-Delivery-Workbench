@@ -232,7 +232,7 @@
     var(--home-canvas);
 }
 
-:global(body[data-ds-dark-theme]) .deliveryHomepage {
+:global(body[data-ds-dark-theme]) .deliveryPreviewWindow {
   --home-canvas: #0b0b0d;
   --home-ink: #f2f3f5;
   --home-muted: #9a9ea8;

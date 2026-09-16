@@ -31,7 +31,7 @@ Project Center derives actionable notices only from current-stage open issues, c
 
 ## Project files
 
-The product homepage keeps its existing layout and palette. Project counts appear only after the Workspace baseline is ready. Pending and failed reads show their status instead of a false zero, and entering project operations remains available.
+The product homepage keeps its existing layout and light palette under every workbench theme; only the delivery preview follows the theme. The homepage does not change the user's theme preference. Project counts appear only after the Workspace baseline is ready. Pending and failed reads show their status instead of a false zero, and entering project operations remains available.
 
 ```text
 .fde/project-runtime.json
@@ -88,6 +88,8 @@ Production uses a light header, a dark evidence-total strip, release-sequence an
 
 Improvement uses a navy illustrated header, grouped evidence counts, source-grounded signal rows, fixed-record cards and a compact graph-dependency panel. The complete summary and simulation qualifiers remain available in details; missing evidence never becomes a successful example. File and Agent shortcuts reuse the existing callbacks. Human review still requires confirmation, records one improvement cycle and does not execute release. The page scrolls above the existing composer.
 
+
+Stage-one recommendation actions prepare Chinese business questions about extra work and its causes, measurement definitions, non-AI comparisons, and the next human decision. They still only prefill the native composer, preserve existing drafts, and never send or advance a project automatically. Machine identifiers in technical repair instructions retain their exact spelling.
 
 ## Model Experience
 

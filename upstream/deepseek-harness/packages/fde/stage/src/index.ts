@@ -142,7 +142,15 @@ const DISCOVERY_STRUCTURED_OUTPUT_CONTRACT = `## 阶段 1 持久化合同
 2. \`fde-deliverables/01-requirement-research/confirmation-checklist.md\`，必须包含“## 待确认事项”“## 已确认事项”“## 决策权”。
 3. \`fde-deliverables/01-requirement-research/requirement-baseline.md\`，必须包含“## 候选工作流”“## 业务结果”“## 现状基线”“## 范围与非目标”“## 人工回退”“## 停止条件”。
 
-### Artifact Catalog
+三份记录各负其责，不另建一套业务诊断报告：
+
+- 客户现状记录是主报告。在“来源事实”下写原始诉求、业务背景与范围、数据与系统条件；在“代表案例”下还原真实流程与组织；在“现场观察”下写基线与问题诊断、AI 价值机会、建议与验证优先级；在“未验证事项”下指出会改变结论的缺口，并引用确认清单。
+- 待确认事项只收敛未知、冲突、责任人、核对方式和待决定事项；保留已确认事项及其来源，不复制主报告全文。
+- 业务流程说明从主报告收敛候选工作流、业务结果、现状基线、范围与非目标、人工回退和停止条件；尚未测量或批准的内容明确标注，不把候选建议写成客户决定。
+
+复用项目已有来源索引和原始资料，不复制第二套素材。在主报告或分析附录中列明本次授权范围内已取得、未取得和受限材料，区分原件与派生文件，以项目相对路径引用。材料字段只展开到影响当前判断的部分，字段含义未知时不猜测；第一阶段不强制完整数据字典、接口或系统审计，深入环境调查由第三阶段承接。
+
+### 候选产物目录（Artifact Catalog）
 
 维护 \`.fde/discovery/artifacts.json\`，根对象固定为 \`{"schemaVersion":1,"artifacts":[]}\`。每项必须包含 \`id\`、正整数 \`version\`、固定 \`contentPath\`、\`sourceAdapter\`、\`structureState\`、\`evidenceState\`、非空 \`evidenceRefs\`、\`inputRefs\`、\`decisionRefs\` 和 \`supersedes\`。structureState 只能是 missing、invalid、starter_valid、complete_valid 或 not_applicable；evidenceState 只能是 confirmed、inferred 或 unverified。
 
@@ -156,25 +164,49 @@ const DISCOVERY_STRUCTURED_OUTPUT_CONTRACT = `## 阶段 1 持久化合同
 - 事实确认清单：\`{"id":"ff-fde-workbench/discovery-contract","version":"F005-v2","commit":"product-spec/F005","license":"project","artifact":"fact-confirmation-list"}\`
 - 工作流章程：\`{"id":"davidahmann/fde-guide","version":"060ef0f3","commit":"060ef0f3b67743b2e1fc3705763d423eae980236","license":"Apache-2.0","artifact":"workflow-charter"}\`
 
-Artifact evidenceRefs 使用与候选工作流相同的逐条结构。文件刚达到上述最小章节时可标为 starter_valid；只有内容确实达到完整合同并经过结构复核时才标 complete_valid。结构有效不等于证据已确认，文件存在也不等于客户或 FDE 已接受。`
+产物的 evidenceRefs 使用与候选工作流相同的逐条结构。文件刚达到上述最小章节时可标为 starter_valid；只有内容确实达到完整合同并经过结构复核时才标 complete_valid。结构有效不等于证据已确认，文件存在也不等于客户或 FDE 已接受。`
 
 /** Method-layer Skill for every stage-one workflow qualification. */
 export const QUALIFY_AI_WORKFLOW_SKILL = {
   name: 'qualify-ai-workflow',
-  description: '把客户的模糊诉求还原为可调查的真实工作流，并判断它是否值得继续投入，而不是直接设计技术方案。',
+  description: '从实际业务、额外劳动和证据出发，核对问题原因与指标口径，比较传统改进和 AI 增量，判断哪个问题值得优先投入。',
   whenToUse: '当前项目处于发现高价值问题，用户描述客户诉求、引用现场资料、要求梳理真实工作、比较候选问题或形成阶段候选结论时优先使用。',
   source: DISCOVERY_METHOD_SOURCE,
-  content: `# 资格判断真实 AI 工作流
+  content: `# 业务诊断与 AI 机会判断
 
-本 Skill 适配自固定版本的 qualify-ai-workflow，属于阶段 1 的方法核心。先保留客户原话和显式引用来源，再识别真实参与者、触发条件、输入、判断、动作、结果、人工回退和异常路径。对比卖出的说法、人员陈述、现场观察、系统强制行为和政策授权，不把其中任何一类自动当成事实。
+本 Skill 以固定版本的 qualify-ai-workflow 为方法来源，业务因果、计量口径与三份记录分工是工作台的本地增强，不冒充上游原文。它是阶段 1 的核心方法，不替代后续价值工程、环境调查或方案设计。
 
-至少取得一名真实流程知情者、一个近期正常案例和一个重要异常案例。明确结果验证者、业务结果、当前基线或“尚未测量”、访问边界、最大可接受效果、风险上限和停止条件。信息不足时先提出最少的关键问题；方法结论只能是继续发现、暂缓或不应建设的候选建议，不能推进项目阶段。
+## 先读材料，再还原业务
+
+先读取本次明确授权的材料、已有阶段记录和用户修订，复用来源索引；不要扩大读取范围或重复询问材料已经回答的问题。保留客户原话和来源，先用业务语言讲清楚这项业务为什么发生、由谁执行、经过哪些系统、如何判断、怎样完成，以及正常路径、异常分支和人工回退。区分制度规定、系统实现与实际操作，对比卖出的说法、人员陈述、现场观察和政策授权。
+
+围绕一名真实流程知情者、一个近期正常案例和一个重要异常案例取证；尚未取得时如实登记缺口。每轮只问最影响判断的 1–3 个问题，说明为什么问、应向谁或从什么材料核对，不暗示用户必须发现 AI 痛点，也不要求用户编造数字。信息不足仍可形成有边界的初步报告；用户要求先出稿时不强制多轮访谈。
+
+## 从额外劳动追到原因
+
+逐项建立“发生场景 → 当前做法 → 额外核对、沟通、等待或返工 → 有证据的原因 → 业务影响”的因果链。人工参与或审批本身不是痛点；例如反复查看三个系统，应先核对是信息未关联、语义难判断、规则冲突还是必须由人协商，不直接把它归为缺少 AI。原因没有证据时标为推断，并给出能区分不同原因的最小核对动作。
+
+## 保留证据等级与指标口径
+
+分别标明原始记录或日志支持的事实、未经核实的口述、合理推断、教学／模拟数据和未知项。教学／模拟数据不能作为客户生产事实；写入结构化索引时仍使用既有 state 与 kind 枚举，在 summary 中保留来源性质和限定。计算值必须能回到输入、公式和来源；材料冲突时保留双方、有效范围和采用依据，不能把最新文件自动当成已批准版本。
+
+指标写清来源、单位、时间窗、样本与总体、起止点、分母和公式；区分历史总体、便利样本、专项样本与教学示例。操作耗时不等于端到端时长，也不等于 AI 可节省时间；重叠标签和并行劳动不得重复相加，便利样本不得无依据外推总体，未知不写成零。不编造投资回报、节省比例或准确率；未测量时写“尚未测量”及最小测量办法。输入改变后重算受影响指标。
+
+## 比较传统改进与 AI 增量
+
+先说明流程调整、规则配置、信息关联或现有软件能解决什么，再说明 AI 在理解非结构化信息、辅助判断或有限自动化上额外解决什么。信息贯通、辅助判断、有限自动化是可组合方向，不是必须逐级升级的阶梯；正式本体不是默认方案。只做业务机会判断，不提前选择技术栈或展开详细方案。
+
+按发生频率、可改善劳动、业务影响、数据可得性和验证成本解释优先顺序，不强造综合评分。每项优先建议说明适用场景、事实依据、非 AI 对照、AI 增量、关键未知、最小验证动作、结果验证人、访问边界、预期改善上限、风险上限、人工回退和停止条件；不适合 AI、暂缓或不应建设也可以是有效候选结论。
+
+## 增量修订与质量复核
+
+用户纠正事实后，同步修订受影响的流程、指标、问题原因、优先级和建议，保留来源与版本，不只追加相互矛盾的补充说明。交付前确认报告能回答：业务现在如何完成；额外劳动及原因是什么；为什么优先处理且 AI 比传统改进多解决什么；哪些证据支持结论、哪些未知会改变建议。回答不了时明确缺口，不把目录齐全当成诊断完成。
 
 只有当前任务确实需要时，再加载工程 Skill：首次定向用 fde-orient，向知情者取证用 knowledge-interview，找维护者或决策人用 ownership-map，问题明确落到既有代码用 repo-recon，需要管理者决定用 stakeholder-brief。不得为了显得完整一次加载全部。
 
 ${DISCOVERY_STRUCTURED_OUTPUT_CONTRACT}
 
-最终回复必须说明：本轮引用了什么、形成或更新了什么候选、哪些主张仍未验证、下一项最小现场动作是什么。`,
+最终回复用简体中文说明本轮引用、候选结论、未验证主张和下一项最小现场动作。业务说明、建议和操作文案使用中文；Skill ID、文件路径、JSON 字段与枚举、来源标识保持原样。候选建议交由 FDE 选择进入下一阶段、继续补充调查、缩小问题范围或暂停这个问题；不能代替 FDE 决定或推进项目阶段。`,
 } as const
 
 /** Conditional method-layer Skill for material engagement conflicts. */
@@ -185,7 +217,7 @@ export const REFRAME_AI_ENGAGEMENT_SKILL = {
   source: DISCOVERY_METHOD_SOURCE,
   content: `# 重新界定 AI 项目
 
-本 Skill 适配自固定版本的 reframe-ai-engagement，是条件方法，不是普通需求修改工具。先保留原始说法、来源和当时假设，再记录触发冲突的新事实、影响范围、安全回退、哪些 Artifact 需要重评，以及谁有权接受新边界。没有有权决定的人或可靠证据时保持待处理，不替客户选择。
+本 Skill 适配自固定版本的 reframe-ai-engagement，是条件方法，不是普通需求修改工具。先保留原始说法、来源和当时假设，再记录触发冲突的新事实、影响范围、安全回退、哪些候选记录需要重评，以及谁有权接受新边界。没有有权决定的人或可靠证据时保持待处理，不替客户选择。取得明确修订依据后，同步调整受影响的流程、指标和建议，保留历史，不只追加冲突说明。
 
 只有冲突确实改变边界、成功标准或停止条件时，维护 \`fde-deliverables/01-requirement-research/engagement-reframe.md\`，并包含“## 触发事实”“## 原边界”“## 新边界”“## 安全回退”“## 决策人”。同时在 Artifact Catalog 增加或更新 engagement-reframe，来源适配器固定为 \`{"id":"davidahmann/fde-guide","version":"060ef0f3","commit":"060ef0f3b67743b2e1fc3705763d423eae980236","license":"Apache-2.0","artifact":"engagement-reframe"}\`，其余字段遵循以下合同。
 
@@ -202,7 +234,7 @@ export const FDE_ORIENT_SKILL = {
   source: DISCOVERY_ENGINEERING_SOURCE,
   content: `# FDE 项目定向
 
-本 Skill 适配自固定版本 fde-orient。先检查当前项目已有资料和阶段候选，不重复询问文件已经能回答的问题。记录客户原始要求、发起人与实际 sponsor、时限驱动、成功的当前说法、现有访问和已经尝试过的方法。区分 stated ask 与 suspected real problem，但不要在此展开完整需求或技术方案。
+本 Skill 适配自固定版本 fde-orient。先检查当前项目本次授权的已有资料和阶段候选，不重复询问文件已经能回答的问题。记录客户原始要求、发起人与实际项目支持者、时限驱动、成功的当前说法、现有访问和已经尝试过的方法。区分客户表面诉求与可能的真实问题，但不要在此展开完整需求或技术方案。
 
 输出只贡献给阶段 1 的现场观察记录、事实确认清单和下一步 Skill 顺序；所有主张都以逐条 evidenceRef 交给 qualify-ai-workflow 维护。已有有效定向时直接读取并继续，不重新开始。`,
 } as const
@@ -215,7 +247,7 @@ export const KNOWLEDGE_INTERVIEW_SKILL = {
   source: DISCOVERY_ENGINEERING_SOURCE,
   content: `# 现场知识访谈
 
-本 Skill 适配自固定版本 knowledge-interview。先从已有 Artifact 和显式引用资料中找出代码或文件无法回答的缺口，把问题按 Must、Should、Nice 排序；优先询问近期正常案例、重要异常案例、最后一次真实发生、人工回退、谁负责和谁能决定。
+本 Skill 适配自固定版本 knowledge-interview。先从已有候选记录和显式引用资料中找出代码或文件无法回答的缺口，把问题按“必须核对、重要补充、可选了解”排序。每轮只问最影响判断的 1–3 个问题，并说明原因和核对对象；优先追问近期正常案例、重要异常案例、最后一次真实发生、额外劳动及原因、人工回退、谁负责和谁能决定。不要把提问写成寻找 AI 痛点的诱导，也不要要求对方凭空提供数字。
 
 访谈后把“亲眼观察”“近期记忆”“设计时假设”和“未知”分开。每条结论必须生成 interview 类型的逐条 evidenceRef，ref 指向访谈编号或会话轮次；只有得到有权责任人明确答复或权威系统读回时才使用 confirmed。把结果交给 qualify-ai-workflow 更新固定候选产物，不自行推进阶段。`,
 } as const
@@ -230,7 +262,7 @@ export const OWNERSHIP_MAP_SKILL = {
 
 本 Skill 适配自固定版本 ownership-map。优先读取用户明确授权的责任资料、CODEOWNERS、近期提交和评审记录；区分原作者、当前维护者、偶发贡献者、业务责任人和有权决策者。声明所有权只是候选，必须用近期活动或责任人答复交叉验证。
 
-每项结果必须形成 project-file、system、interview 或 unverified 的逐条 evidenceRef，并交给 qualify-ai-workflow 更新事实确认清单和工作流章程。不要把提交次数直接解释成审批权。`,
+每项结果必须形成逐条 evidenceRef：kind 使用 project-file、system 或 interview；尚未核实的结论将 state 设为 unverified，并交给 qualify-ai-workflow 更新事实确认清单和工作流章程。不要把提交次数直接解释成审批权。`,
 } as const
 
 /** Engineering-layer bounded codebase reconnaissance. */
@@ -241,7 +273,7 @@ export const REPO_RECON_SKILL = {
   source: DISCOVERY_ENGINEERING_SOURCE,
   content: `# 有界代码库勘察
 
-本 Skill 适配自固定版本 repo-recon。先确认本轮授权范围和候选工作流，只做回答当前发现问题所需的广度勘察：系统形态、入口、主要边界、持久化、外部集成、测试与配置线索。不要把目录数量、技术栈或代码复杂度本身当成业务价值。
+本 Skill 适配自固定版本 repo-recon。先确认本轮授权范围和候选工作流，只做回答当前发现问题所需的广度勘察：系统形态、入口、主要边界、持久化、外部集成、测试与配置线索。优先核对会改变问题原因或机会判断的字段和系统行为，不强制完整数据字典、接口清单或环境审计；深入环境调查留给第三阶段。不要把目录数量、技术栈或代码复杂度本身当成业务价值。
 
 代码结论必须形成 project-file 或 system 类型的逐条 evidenceRef，ref 精确到项目相对路径、命令结果或系统读回。把结果交给 qualify-ai-workflow 更新候选记录；不要在阶段 1 开始设计或修改代码。`,
 } as const
@@ -250,11 +282,11 @@ export const REPO_RECON_SKILL = {
 export const STAKEHOLDER_BRIEF_SKILL = {
   name: 'stakeholder-brief',
   description: '把当前发现事实转成管理者可在短时间内理解并采取行动的一项决定。',
-  whenToUse: '阶段候选材料已经足以请求 sponsor、业务负责人或交付负责人做一个明确决定时使用；没有变化或没有决定时不使用。',
+  whenToUse: '阶段候选材料已经足以请求项目支持者、业务负责人或交付负责人做一个明确决定时使用；没有变化或没有决定时不使用。',
   source: DISCOVERY_ENGINEERING_SOURCE,
   content: `# 阶段一决策简报
 
-本 Skill 适配自固定版本 stakeholder-brief。先识别读者能决定什么，按“建议 → 支撑事实 → 风险与未知 → 需要谁在何时做一件什么事”的顺序写一屏以内的候选简报。所有事实必须引用阶段 Artifact 或逐条 evidenceRef，明确区分已确认、合理推断和未知。
+本 Skill 适配自固定版本 stakeholder-brief。先识别读者能决定什么，按“建议 → 支撑事实 → 风险与未知 → 需要谁在何时做一件什么事”的顺序写一屏以内的中文候选简报；说明优先原因、传统改进与 AI 增量，不编造收益。所有事实必须引用阶段记录或逐条 evidenceRef，明确区分已确认、合理推断和未知。
 
 简报只帮助 FDE 或客户做决定，不代替项目中心的阶段评审；不要因为生成简报而把候选状态改成已确认。`,
 } as const
@@ -272,49 +304,49 @@ export const DISCOVERY_STAGE_SKILL_CATALOG = {
         source: QUALIFY_AI_WORKFLOW_SKILL.source, sourceUrl: DISCOVERY_METHOD_URL,
         sourceLanguage: 'en', adapterLanguage: 'zh-CN', license: 'Apache-2.0', content: QUALIFY_AI_WORKFLOW_SKILL.content,
         answers: [
-          '客户描述的是不是真实、稳定的业务流程？',
+          '这项业务现在如何完成，边界和触发条件是什么？',
           '谁实际执行流程，谁负责结果，谁有权决定？',
-          '正常路径和重要异常路径分别是什么？',
-          '当前问题有没有能够追溯的可信证据？',
-          '业务结果是什么，当前基线已经测量还是未知？',
-          '哪些风险要求收窄、暂缓或停止项目？',
-          '现有事实是否足以进入下一阶段的价值工程？',
+          '正常与异常路径中有哪些额外劳动，原因是什么？',
+          '哪些是有来源的事实，哪些只是口述、推断或模拟数据？',
+          '指标的样本、时间窗和计算口径是否支持当前判断？',
+          '传统改进能解决什么，AI 增量与优先顺序是什么？',
+          '哪些未知、风险或回退条件会改变下一步建议？',
         ],
         answerGroups: [
           {
             label: '事实与责任', tone: 'identity', answers: [
-              '客户描述的是不是真实、稳定的业务流程？',
+              '这项业务现在如何完成，边界和触发条件是什么？',
               '谁实际执行流程，谁负责结果，谁有权决定？',
             ],
           },
           {
             label: '流程与证据', tone: 'flow', answers: [
-              '正常路径和重要异常路径分别是什么？',
-              '当前问题有没有能够追溯的可信证据？',
+              '正常与异常路径中有哪些额外劳动，原因是什么？',
+              '哪些是有来源的事实，哪些只是口述、推断或模拟数据？',
             ],
           },
           {
             label: '价值与止损', tone: 'value', answers: [
-              '业务结果是什么，当前基线已经测量还是未知？',
-              '哪些风险要求收窄、暂缓或停止项目？',
-              '现有事实是否足以进入下一阶段的价值工程？',
+              '指标的样本、时间窗和计算口径是否支持当前判断？',
+              '传统改进能解决什么，AI 增量与优先顺序是什么？',
+              '哪些未知、风险或回退条件会改变下一步建议？',
             ],
           },
         ],
         workflow: [
-          '保留客户原始说法和显式引用来源',
-          '寻找近期正常案例和重要异常案例',
-          '区分人员陈述、现场观察、系统行为和政策授权',
-          '补齐角色、基线、结果、回退和停止条件',
-          '判断当前最关键的证据缺口',
-          '根据缺口按需协同工程能力',
-          '形成候选工作流、阶段记录和候选建议',
-          '等待 FDE 作出 Go、Revise、Narrow 或 Stop 决定',
+          '读取授权材料和已有修订，保留原始诉求与来源',
+          '还原正常与异常案例中的角色、系统、步骤和结果',
+          '追踪额外劳动、问题原因与影响，区分规定与实际',
+          '核对指标来源、样本、时间窗和计算口径',
+          '比较传统改进与 AI 增量，说明优先级与适用边界',
+          '按关键缺口协同工程能力，每轮核对少量问题',
+          '更新三份固定记录，复核因果、证据与未知边界',
+          '由 FDE 决定进入下一阶段、继续调查、缩小范围或暂停',
         ],
         artifacts: [
-          { label: '客户现状记录', path: 'fde-deliverables/01-requirement-research/requirement-research-report.md', purpose: '记录来源事实、代表案例、现场观察和未验证事项。', required: true },
-          { label: '待确认事项', path: 'fde-deliverables/01-requirement-research/confirmation-checklist.md', purpose: '区分待确认事实、已确认事实和决策权。', required: true },
-          { label: '业务流程说明', path: 'fde-deliverables/01-requirement-research/requirement-baseline.md', purpose: '记录候选工作流、业务结果、基线、边界和停止条件。', required: true },
+          { label: '客户现状记录', path: 'fde-deliverables/01-requirement-research/requirement-research-report.md', purpose: '主报告：说明真实业务、数据条件、问题原因、指标口径与 AI 机会，保留证据和未知。', required: true },
+          { label: '待确认事项', path: 'fde-deliverables/01-requirement-research/confirmation-checklist.md', purpose: '集中记录未知、冲突、核对方式、责任人和待决定事项，不重复主报告。', required: true },
+          { label: '业务流程说明', path: 'fde-deliverables/01-requirement-research/requirement-baseline.md', purpose: '从诊断中收敛候选流程、业务结果、基线、范围、人工回退和停止条件。', required: true },
           { label: '项目调整记录', path: 'fde-deliverables/01-requirement-research/engagement-reframe.md', purpose: '仅在重大事实改变项目边界时形成。', required: false },
         ],
         collaborators: [
@@ -326,12 +358,12 @@ export const DISCOVERY_STAGE_SKILL_CATALOG = {
           { id: REFRAME_AI_ENGAGEMENT_SKILL.name, label: '核对冲突并调整项目范围', condition: '目标、现场事实或政策授权发生重大冲突', contribution: '保留原始目标，形成可追溯的重新界定候选', role: 'conditional' },
         ],
         example: {
-          title: '智修协同：从自动派单到人工确认草稿',
-          summary: '展示核心方法如何逐步补齐事实，并在权限冲突出现后收窄候选边界。',
+          title: '智修协同：先诊断额外劳动，再判断 AI 增量',
+          summary: '教学示例，不是客户事实：比较信息关联与 AI 辅助判断，并在权限不足时收窄候选边界。',
           steps: [
             { batch: '第一批', input: '客户原始简报：自动处理 80% 报修并自动派单', finding: '这只是发起人的目标，缺少代表案例、流程知情者和权限依据。', skills: ['资格判断', '项目定向'], output: '候选工作流与首轮待核对问题' },
-            { batch: '第二批', input: '聊天、工单、设备台账、政策和现场图片', finding: '重复工单、设备身份、合同约束和自动派单权限存在冲突。', skills: ['系统勘察', '责任映射'], output: '客户现状记录与待确认事项' },
-            { batch: '第三批', input: '流程知情者访谈与审批事实', finding: '区域经理、采购、财务和信息安全尚未批准自动派单。', skills: ['知识访谈', '重新界定'], output: '“建议＋人工确认工单草稿”的候选边界' },
+            { batch: '第二批', input: '聊天、工单、设备台账、政策和现场图片', finding: '需核对反复查台账来自设备关联缺失还是语义判断；样本耗时不能直接当作总体可节省时间。', skills: ['系统勘察', '责任映射'], output: '客户现状记录与待确认事项' },
+            { batch: '第三批', input: '流程知情者访谈与审批事实', finding: '先用规则关联设备，再验证 AI 提取描述的增量；自动派单未获批准，保留人工确认与停止条件。', skills: ['知识访谈', '重新界定'], output: '“建议＋人工确认工单草稿”的候选边界' },
           ],
         },
         references: [
@@ -581,7 +613,7 @@ export const ACCEPTANCE_HANDOVER_SKILL = {
 /** Short stage-aware prompt; the complete Skill body remains on-demand. */
 export function requirementResearchPrompt(stage: FdeProjectState): string {
   if (stage !== 'requirements') return ''
-  return '当前 FDE 项目处于“发现高价值问题”。先按方法层加载 `qualify-ai-workflow`；只有现场事实推翻继承边界、成功标准或停止条件时才追加 `reframe-ai-engagement`。再按真实缺口选择必要工程 Skill：首次定向用 `fde-orient`，向流程知情者取证用 `knowledge-interview`，确认维护者或决策权用 `ownership-map`，问题明确落到既有代码用 `repo-recon`，需要管理者决定用 `stakeholder-brief`；不得一次加载全部。只使用用户本轮明确引用的项目资料和当前对话。候选工作流必须写入 `.fde/discovery/workflows.json` schemaVersion 2 的逐条 evidenceRefs；阶段产物必须在 `.fde/discovery/artifacts.json` 登记固定来源版本、内容版本、结构成熟度与证据引用。文件存在不等于结构有效或事实已确认；你不能代替 FDE 做阶段决定或推进项目。'
+  return '当前 FDE 项目处于“发现高价值问题”。先按方法层加载 `qualify-ai-workflow`；只有现场事实推翻继承边界、成功标准或停止条件时才追加 `reframe-ai-engagement`。再按真实缺口选择必要工程 Skill：首次定向用 `fde-orient`，向流程知情者取证用 `knowledge-interview`，确认维护者或决策权用 `ownership-map`，问题明确落到既有代码用 `repo-recon`，需要管理者决定用 `stakeholder-brief`；不得一次加载全部。只使用用户本轮明确引用的项目资料、当前对话和本任务所需的当前项目既有阶段记录，不扩展到其他未授权资料。候选工作流必须写入 `.fde/discovery/workflows.json` schemaVersion 2 的逐条 evidenceRefs；阶段产物必须在 `.fde/discovery/artifacts.json` 登记固定来源版本、内容版本、结构成熟度与证据引用。文件存在不等于结构有效或事实已确认；你不能代替 FDE 做阶段决定或推进项目。'
 }
 
 /** Short solution-aware prompt; the complete Skill body remains on-demand. */

@@ -10,6 +10,8 @@ For stage one the package registers separate method Skills (`qualify-ai-workflow
 
 The trusted same-origin read-only `GET /api/fde-stage/skills` route returns only the methods fixed in the product, including business-facing labels, required-or-conditional grouping where applicable, usage guidance, full Markdown definitions, and source metadata. It never enumerates the operator's machine, global Skill directories, or other projects, and exposes no execution or mutation capability. The client uses this projection to render an explainable method tree beneath the current stage.
 
+The stage-one core method requires business reconstruction, causes of extra work, explicit measurement definitions, and comparison with non-AI improvements before recommending AI opportunities. These are local adaptations, not additional upstream claims. Its Chinese guidance reuses the three existing records: the current-state report carries the diagnosis, the confirmation checklist tracks unresolved facts and decisions, and the workflow baseline summarizes the candidate scope. Stable identifiers, pinned sources, minimum Markdown headings and manual decisions are unchanged; existing reports are not rewritten on load. Method guidance does not prove the truth or quality of a generated diagnosis.
+
 ## V2 delivery records
 
 The selected methods for V2 stages six through eight describe the delivery record format, file digests, evidence scope and optional semantic dependencies. Legacy six-stage records and earlier V2 method instructions are unchanged. The actual stage gate consumes the Host projection, not file counts or an Agent recommendation.
