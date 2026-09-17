@@ -1,5 +1,5 @@
 /** Read-only stage-one packages derived from the runtime method catalog. */
-import { strToU8, zipSync } from 'fflate'
+import { strToU8, zipSync } from 'fflate/browser'
 import type { StageSkillCatalogMethod, StageSkillCatalogValue } from './stage-skill-catalog.ts'
 import { ENGINEERING_LICENSE, METHOD_LICENSE, METHOD_NOTICE } from './skills-center-licenses.ts'
 

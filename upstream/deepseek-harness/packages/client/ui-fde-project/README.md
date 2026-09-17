@@ -6,7 +6,7 @@ Browser presentation for the FDE project delivery workspace. The system opens on
 
 ## Behavior
 
-Skills Center opens `SKILL.md` by default after View. Its file list contains only the files included in that workbench adaptation: `SKILL.md`, `README.md`, `LICENSE`, and `NOTICE.md`. Whole-package ZIP and individual-file downloads reuse the displayed strings, including pinned source attribution and licensing; external reference links are not bundled files. Back restores search and list scroll. Failed catalog reads can be retried. Workbench paths and helper dependencies remain unchanged; compatibility with other agents is not claimed.
+Skills Center opens `SKILL.md` by default after View. Its file list contains only the files included in that workbench adaptation: `SKILL.md`, `README.md`, `LICENSE`, and `NOTICE.md`. Whole-package ZIP and individual-file downloads reuse the displayed strings, including pinned source attribution and licensing; external reference links are not bundled files. ZIP generation uses `fflate/browser` so the plugin does not request Node built-ins during browser import. Back restores search and list scroll. Failed catalog reads can be retried. Workbench paths and helper dependencies remain unchanged; compatibility with other agents is not claimed.
 
 The platform sidebar places Settings below the return-home action and attribution. Its `sidebar.settings.shortcut` outlet opens the existing Settings panel, including the Models/API-key section; it neither duplicates configuration nor removes the project sidebar's original Settings entry.
 

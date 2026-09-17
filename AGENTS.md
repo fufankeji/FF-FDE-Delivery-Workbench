@@ -38,7 +38,7 @@ FDEDeliveryWorkbench/
 ├── upstream/
 │   ├── deepseek-harness.lock.json  # 官方源码版本、提交与 checkout 位置
 │   └── deepseek-harness/  # 与产品资产同仓管理、保留上游历史的官方源码与 FDE 扩展
-├── .runtime/  # 每个 worktree 独立且被 Git 忽略的 DSH_HOME 与本地运行状态
+├── .runtime/  # 主工作树的 DSH_HOME 与本地运行状态，均被 Git 忽略
 ├── docs/      # PRD、Product Spec、Feature 规格、架构和验证证据
 ├── README.md
 ├── AGENTS.md
@@ -101,16 +101,14 @@ FDEDeliveryWorkbench/
 - 当前 Feature Map 可以先保持 `draft`。只有用户开始该阶段并确认其边界时，才创建对应 Feature 目录和三件套；Architecture 未稳定前，Plan/Tasks 不得猜测官方扩展点或实现文件。
 - 当前阶段完成并同步文档后立即停止。没有用户下一阶段的明确指令，不自动继续拆分、开发、重构或美化。
 
-## 并行分支与 Worktree
+## 主分支开发与 Worktree 清理
 
-`FDEDeliveryWorkbench/` 根目录是 `main` 主工作树和唯一 Git 顶层；并行 Feature 必须从这个根仓库创建 worktree，使源码、产品文档、验证记录、依赖、构建产物和运行状态按 worktree 一起隔离。
+`FDEDeliveryWorkbench/` 根目录是唯一 Git 顶层。默认直接在现有 `main` 主工作树开发、构建和运行，不因新增 Feature、UI 修改或并行任务自动创建分支、worktree 或重复 checkout。
 
-- 根主工作树存在 staged、unstaged 或 untracked 改动时，不得在其中创建或切换 Feature 分支。Git 分支只隔离提交，不隔离工作目录、生成文件或构建产物。
-- 每个 Feature 必须从已提交的根仓库 `main` SHA 创建，并使用 `git worktree add .worktrees/<feature> -b feature/<feature> main` 创建独立 checkout。如果所需主线改动尚未提交，等待主会话提交或由用户明确指定基线 SHA，不得把主工作树的脏状态复制到 Feature worktree。
-- 每个 Feature worktree 都必须包含自己的 `docs/`、`upstream/deepseek-harness/`、`.runtime/dsh-home/` 和构建产物；依赖安装、代码修改、文档更新、构建和测试只能在该 worktree 内执行。
-- 并发运行时分别使用不同端口、各自相对根目录的 `.runtime/dsh-home`、数据库、数据目录及其他可变状态。构建产物和 `node_modules` 留在各自 worktree；pnpm 内容寻址仓库可以共享。
-- Feature 验证通过后，从干净 worktree 合并回 `main`。主线是 Feature 祖先时优先使用 `--ff-only`，随后核对目标分支与 Feature 提交 SHA；构建包中出现功能不代表已经完成合并。
-- 清理前检查 tracked 与 untracked 状态，确认全部 Feature 提交已包含于 `main`，并保存任何独有交付物；先删除 Feature worktree，再安全删除 Feature 分支。
+- 保留主工作树已有的 staged、unstaged 和 untracked 改动；只提交当前任务的明确文件，不覆盖或顺带提交其他任务内容。
+- 只有用户明确要求创建 worktree 时才创建；此前先说明用途、磁盘成本、运行数据来源和清理条件。运行数据仍须显式指定 `DSH_HOME`，不得默默切换为空运行区或全局默认目录。
+- 收回既有 worktree 时先检查所有提交和未提交改动；可快进则使用 `--ff-only`，否则核对差异后合并。构建产物中出现功能不代表提交已合并。
+- 删除前确认所有应保留提交已包含于 `main`，独有设计稿、Session 和其他运行数据已保留。工作树与分支分别处理，不能因 Git 状态干净就把被忽略的数据当作可删除缓存。
 
 ### FDE-Agent 运行数据同步
 
