@@ -37,11 +37,12 @@ updated: "2026-09-16"
 | F012 | F012-continuous-improvement | 阶段 8：持续改进与能力沉淀 | FDE 把生产证据转成经复测、审批、可回滚的改进和有边界的复用资产 | REQ-003, REQ-006, REQ-007, REQ-024, REQ-025, REQ-026, REQ-028, NFR-002, NFR-004, NFR-011, NFR-012, NFR-013, NFR-014, PSC-003, PSC-005, PSC-006, PSC-020, PSC-021, PSC-022, PSC-023, PSC-024, PSC-025 | F011 | P1 | in-progress |
 
 | F024 | F024-business-discovery-lab | 独立业务挖掘实验室 | 无需创建项目即可完成五案例访谈、取证、计算和报告训练，返回后项目与八阶段不变 | REQ-030, REQ-031, REQ-032, PSC-026 | 无 | P0 | in-progress |
-| F025 | F025-platform-navigation | 统一工作台导航与总览 | 默认总览、三模块切换、继续项目且保留训练现场，技能中心仅占位 | REQ-033, REQ-034, PSC-027 | F002, F024 | P0 | in-progress |
+| F025 | F025-platform-navigation | 统一工作台导航与总览 | 默认总览、三模块切换、继续项目且保留训练现场 | REQ-033, PSC-027 | F002, F024 | P0 | in-progress |
+| F026 | F026-stage-one-skills-center | 第一阶段技能阅读与下载 | 浏览七个方法卡片、进入真实文件阅读并下载同版本适配包 | REQ-034, PSC-028 | F025, F005 | P0 | in-progress |
 
 ## 首个验证切片
 
-F025 的统一导航范围由用户于 2026-09-16 确认：默认总览，保留项目中心和实验室全部业务流程；技能中心仅入口与占位，具体 Skills 接入等待后续指令。
+F025 的统一导航由用户于 2026-09-16 确认。2026-09-17 用户确认 F026 第一阶段七个 Skill 的卡片、查看、文件阅读与下载，并授权按定稿图实施；F026 替代技能占位，保留 F025 的侧栏、项目中心及实验室流程。
 
 F001～F004 建立共享能力，F005 用“发现高价值问题”完成第一条端到端产品验证。首个阶段只接入 `qualify-ai-workflow`、条件触发的 `reframe-ai-engagement`，以及 Workflow Charter、Engagement Reframe、Field Observation Log 三类必要 Artifact；不安装完整外部能力库。实施可以在同一切片内增量进行，但只有当前用户明确授权的 Feature 才进入 in-progress。
 

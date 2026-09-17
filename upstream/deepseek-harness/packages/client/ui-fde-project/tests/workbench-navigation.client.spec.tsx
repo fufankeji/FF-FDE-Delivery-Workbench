@@ -4,7 +4,7 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import { bindSnapshotSelector, makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
 import type { ComponentProps } from 'react'
 import { WorkbenchNavigation, WorkbenchLabLauncher } from '../src/client/WorkbenchNavigation.tsx'
-import { SkillsCenterPlaceholder, WorkbenchOverview } from '../src/client/WorkbenchOverview.tsx'
+import { WorkbenchOverview } from '../src/client/WorkbenchOverview.tsx'
 import { ProjectPageController } from '../src/client/page-controller.ts'
 import { zh } from '../src/client/locales.ts'
 
@@ -74,7 +74,7 @@ it('shows real projects ordered by update and opens the exact project without an
   expect(props.openSkills).toHaveBeenCalledOnce()
 })
 
-it('keeps the compact metrics, three recent rows and pending skills card tied to real data', () => {
+it('keeps the compact metrics, three recent rows and stage-one library entry tied to real data', () => {
   const props = overviewProps()
   const title = '连锁门店设备故障智能分诊项目与企业知识检索工作流'
   const projects = [...props.projects,
@@ -90,7 +90,7 @@ it('keeps the compact metrics, three recent rows and pending skills card tied to
   expect(within(recent).getAllByText('当前阶段')).toHaveLength(3)
   expect(within(recent).getByText('未填写所属企业')).toBeTruthy()
   expect(screen.queryByText('第四个项目')).toBeNull()
-  expect(screen.getByText('待接入').closest('[data-overview-skills]')).toBeTruthy()
+  expect(screen.getByText('第一阶段').closest('[data-overview-skills]')).toBeTruthy()
   expect(props.renderSlot).toHaveBeenCalledOnce()
   expect(props.renderSlot).toHaveBeenCalledWith('fde.workbench.lab.summary', { openLab: props.openLab })
 })
@@ -112,15 +112,14 @@ it('distinguishes loading, failure, empty projects and a failed project entry', 
   await waitFor(() => expect(screen.getByRole('alert').textContent).toBe('项目不可用'))
 })
 
-it('keeps Skills visibly unconnected and performs no catalog requests', () => {
+it('offers the stage-one library without loading its files from the overview', () => {
   const fetch = vi.fn()
   vi.stubGlobal('fetch', fetch)
-  const back = vi.fn()
-  render(<SkillsCenterPlaceholder t={t} back={back} />)
-  expect(screen.getByText('待接入')).toBeTruthy()
-  expect(screen.getByText('项目内已有的阶段方法仍可正常查看和使用。')).toBeTruthy()
-  expect(screen.getAllByRole('button')).toHaveLength(1)
-  fireEvent.click(screen.getByRole('button', { name: /返回总览/ }))
-  expect(back).toHaveBeenCalledOnce()
+  const props = overviewProps()
+  render(<WorkbenchOverview {...props} />)
+  expect(screen.getByText('第一阶段')).toBeTruthy()
+  expect(screen.queryByText('待接入')).toBeNull()
+  fireEvent.click(screen.getByRole('button', { name: /查看技能中心/ }))
+  expect(props.openSkills).toHaveBeenCalledOnce()
   expect(fetch).not.toHaveBeenCalled()
 })

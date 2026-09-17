@@ -1,4 +1,4 @@
-/** Platform overview and the deliberately unconnected skills-center page. */
+/** Platform overview with independent project, lab and Skill-library entries. */
 import { useState } from 'react'
 import { Button } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { PropsLocale, PropsRenderSlots } from '@deepseek-ai/dsh-client-ui-slots'
@@ -58,7 +58,7 @@ export function WorkbenchOverview({ status, projects, openProjects, openLab, ope
     </section>
     {renderSlot('fde.workbench.lab.summary', { openLab })}
     <article className={css.skillsCard} data-overview-skills>
-      <header><span className={css.cardIcon}><WorkbenchIcon kind="skills" /></span><h2>{t('workbench.skills')}</h2><span className={css.pending}>{t('workbench.pending')}</span></header>
+      <header><span className={css.cardIcon}><WorkbenchIcon kind="skills" /></span><h2>{t('workbench.skills')}</h2><span className={css.pending}>{t('workbench.skillsAvailable')}</span></header>
       <p>{t('workbench.skillsDescription')}</p>
       <div className={css.cardAction}><Button className={css.skillsButton} variant="outline" onClick={openSkills}>{t('workbench.openSkills')}<WorkbenchIcon kind="arrow" /></Button></div>
     </article>
@@ -72,19 +72,4 @@ function ProjectMark({ index }: { readonly index: number }) {
       : index === 1 ? <><path d="M4 28V11l12-8 12 8v17H4ZM12 28v-9h8v9M13 13h6" /></>
         : <><path d="M4 13v15h24V13M2 12l3-9h22l3 9M12 28v-9h8v9" /><path d="M2 12a4.7 4.7 0 0 0 9.3 0 4.7 4.7 0 0 0 9.4 0 4.7 4.7 0 0 0 9.3 0" /></>}
   </svg>
-}
-
-/** Present the agreed placeholder without querying or exposing Skills. */
-export function SkillsCenterPlaceholder({ back, t }: PropsLocale<'fdeProject'> & { readonly back: () => void }) {
-  return <main className={css.overview}>
-    <header className={css.pageHeader}><div><span className={css.eyebrow}>{t('workbench.local')}</span><h1>{t('workbench.skills')}</h1><p>{t('workbench.skillsDescription')}</p></div></header>
-    <section className={css.skillsEmpty}>
-      <span className={css.skillsIcon}><WorkbenchIcon kind="skills" /></span>
-      <span className={css.pending}>{t('workbench.pending')}</span>
-      <h2>{t('workbench.skillsTitle')}</h2><p>{t('workbench.skillsBody')}</p>
-      <small>{t('workbench.skillsExisting')}</small>
-      <Button variant="outline" onClick={back}>{t('workbench.back')} →</Button>
-    </section>
-    <footer className={css.footer}>{t('workbench.footer')}</footer>
-  </main>
 }

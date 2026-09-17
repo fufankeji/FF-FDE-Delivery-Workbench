@@ -25,7 +25,8 @@ import type { ProjectSourceItem, ProjectSourceLoadState } from './source-control
 import type { ProjectProgressOverlayProps } from './slots.ts'
 import type { ProjectPreviewFile } from './slots.ts'
 import { DeliveryHomepage } from './DeliveryHomepage.tsx'
-import { SkillsCenterPlaceholder, WorkbenchOverview } from './WorkbenchOverview.tsx'
+import { WorkbenchOverview } from './WorkbenchOverview.tsx'
+import { SkillsCenter } from './SkillsCenter.tsx'
 import workbenchCss from './workbench.module.css'
 import css from './project.module.css'
 
@@ -3088,7 +3089,7 @@ export function ProjectProgressOverlay({
       createProject={openProjectCreation} enterProject={enterProject} renderSlot={renderSlot} t={t}
     />
   </div>
-  if (page.view === 'skills') return <div ref={rootRef} className={workbenchCss.frame} data-testid="fde-skills-center"><SkillsCenterPlaceholder back={showWorkbenchOverview} t={t} /></div>
+  if (page.view === 'skills') return <div ref={rootRef} className={workbenchCss.frame} data-testid="fde-skills-center"><SkillsCenter t={t} /></div>
   // The separate lab occupant covers this frame while retaining its iframe instance.
   if (page.view === 'lab') return <div ref={rootRef} className={workbenchCss.frame} aria-hidden="true" />
 

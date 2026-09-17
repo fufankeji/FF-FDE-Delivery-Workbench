@@ -388,7 +388,11 @@ FDE Workspace 与阶段 2/3 证据
 
 ### 8.3.1 统一一级导航（F025）
 
-`ui-fde-project` 复用 apply-scoped `ProjectPageController` 管理介绍页、总览、项目中心、项目详情、实验室与技能占位页；导航仅发布页面快照，不写 Host 领域状态。新增 `shell.overlay` 导航项，通过明确的子 Slot 接收实验室页面；实验室插件只消费 active 与返回回调，不运行时导入项目插件。总览的实验室摘要通过独立 Slot 从既有只读案例 API 获取真实数量。已打开 iframe 在切换时隐藏而非卸载，保留训练现场；全局侧栏采用共享宽度为页面让位，进入具体项目仍复用原生项目导航。
+`ui-fde-project` 复用 apply-scoped `ProjectPageController` 管理介绍页、总览、项目中心、项目详情、实验室与技能中心；导航仅发布页面快照，不写 Host 领域状态。新增 `shell.overlay` 导航项，通过明确的子 Slot 接收实验室页面；实验室插件只消费 active 与返回回调，不运行时导入项目插件。总览的实验室摘要通过独立 Slot 从既有只读案例 API 获取真实数量。已打开 iframe 在切换时隐藏而非卸载，保留训练现场；全局侧栏采用共享宽度为页面让位，进入具体项目仍复用原生项目导航。
+
+### 8.3.2 第一阶段技能资产（F026）
+
+技能中心复用既有只读阶段目录，仅选择 requirements/index=0 的七个已确认 ID，不扫描文件系统、用户 Skill 目录或客户 Workspace。浏览器将同一份正文组织为 SKILL.md、README.md、LICENSE 与 NOTICE.md，阅读与 fflate ZIP 编码共用文件字符串，单文件保存同样不重新抓取或改写内容。既有项目内方法与 Agent 注册保持不变。文件阅读复用共享安全 MarkdownText，包内代码路径通过显式文件词典跳转，上游链接维持安全外链，外链不计作包内文件。装饰纹理位于 Web public/fde-skills，颜色由 ui-theme 的页面作用域别名提供，不改变平台侧栏。
 
 ### 8.4 工作台界面主题
 

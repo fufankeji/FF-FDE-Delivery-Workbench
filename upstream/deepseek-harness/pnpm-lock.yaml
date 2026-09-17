@@ -3333,6 +3333,9 @@ importers:
       dsh-better-sidebar:
         specifier: 0.19.1
         version: 0.19.1(patch_hash=d67f68a158cf1e224390290498084500644236b3b68957b5a708f812dfe624b9)(80e1b8418d9998487b9c851ef641fa1b)
+      fflate:
+        specifier: 0.8.2
+        version: 0.8.2
       react:
         specifier: ^18.2.0
         version: 18.3.1
