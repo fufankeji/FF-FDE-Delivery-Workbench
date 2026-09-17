@@ -8,6 +8,8 @@ The original React/Pixi application is built into `lib/app/` by the package `bun
 
 ## Model Experience
 
+The overview summary renders two compact metrics and a Lab card into the owner's numeric grid tracks, coordinating the same narrow-screen breakpoints without sharing package-local CSS Module area names. It reads the case catalog once per mount or explicit retry; the card reuses those values. Existing training appears only when `currentRunId` is present, and its action opens the same independent lab without creating a run. The owner provides semantic border/accent variables; the training iframe and its source application are unchanged.
+
 The wrapper adds no prompt, tool or model call. The framed application's explicit interview, evaluation and report actions use the Host plugin's training Agents and may incur provider charges.
 
 #### KV Cache effect

@@ -29,6 +29,8 @@ Users reach the shell through the sidebar's bottom Settings control; feature plu
 
 ### The General section
 
+An alternate platform sidebar can declare `sidebar.settings.shortcut`. This package contributes a trigger sharing the original shell's open/section viewing store; it does not mount a second panel, duplicate onboarding, or own model credentials. Closing the panel restores focus to the actual opening control. The original sidebar trigger remains available.
+
 The General section holds rows registered into `settings.general.item` by feature packages — it has no built-in rows. Feature plugins own the row copy and behavior; the shell only provides the section and its slot. The Appearance row, for example, lives in ui-theme.
 
 ### Opening the configuration file

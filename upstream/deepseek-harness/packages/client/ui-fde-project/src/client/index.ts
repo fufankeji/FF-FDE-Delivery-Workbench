@@ -594,7 +594,10 @@ export function apply(ctx: ClientContext): void {
 
   ctx.slots.inject('shell.overlay', () => ctx.slots.register({
     name: 'shell.overlay', id: 'fde-workbench-navigation', order: 11, locale: NS, inject: pageInjected,
-    children: { 'fde.workbench.lab.page': { kind: 'single', scope: 'root' } },
+    children: {
+      'fde.workbench.lab.page': { kind: 'single', scope: 'root' },
+      'sidebar.settings.shortcut': { kind: 'single', scope: 'root' },
+    },
   }, WorkbenchNavigation))
 
   ctx.slots.inject('sidebar.footer.action', () => ctx.slots.register({

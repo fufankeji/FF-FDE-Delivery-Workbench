@@ -34,44 +34,44 @@ export function WorkbenchOverview({ status, projects, openProjects, openLab, ope
       setError(cause instanceof Error ? cause.message : String(cause))
     }).finally(() => { setOpening(undefined) })
   }
-  return <main className={css.overview}>
-    <header className={css.pageHeader}>
-      <div><span className={css.eyebrow}>{t('workbench.local')}</span><h1>{t('workbench.title')}</h1><p>{t('workbench.subtitle')}</p></div>
-      <Button variant="primary" onClick={createProject}>{t('workbench.create')} <span aria-hidden="true">＋</span></Button>
+  return <main className={css.dashboard} data-overview-dashboard>
+    <header className={css.dashboardHeader} data-overview-header>
+      <div><span className={css.breadcrumb}>{t('workbench.local')} <span aria-hidden="true">/</span> {t('workbench.overview')}</span><h1>{t('workbench.title')}</h1><p>{t('workbench.subtitle')}</p></div>
+      <Button className={css.createButton} variant="primary" onClick={createProject} data-overview-create><WorkbenchIcon kind="add" />{t('workbench.create')}</Button>
     </header>
-    <section className={css.modules} aria-label={t('workbench.nav')}>
-      <article className={css.moduleCard}>
-        <span className={css.moduleIcon}><WorkbenchIcon kind="overview" /></span>
-        <h2>{t('workbench.projects')}</h2><p>{t('workbench.projectDescription')}</p>
-        <div className={css.moduleMetric} aria-live="polite"><strong>{status === 'ready' ? projects.length : t(status === 'error' ? 'workbench.failed' : 'workbench.loading')}</strong>{status === 'ready' && <span>{t('workbench.projectUnit')}</span>}</div>
-        <Button variant="outline" onClick={openProjects}>{t('workbench.openProjects')} <span aria-hidden="true">→</span></Button>
-      </article>
-      <article className={css.moduleCard}>
-        <span className={css.moduleIcon}><WorkbenchIcon kind="lab" /></span>
-        {renderSlot('fde.workbench.lab.summary', { openLab })}
-      </article>
-      <article className={css.moduleCard}>
-        <span className={css.moduleIcon}><WorkbenchIcon kind="skills" /></span>
-        <h2>{t('workbench.skills')}</h2><p>{t('workbench.skillsDescription')}</p>
-        <div className={css.moduleMetric}><span className={css.pending}>{t('workbench.pending')}</span></div>
-        <Button variant="outline" onClick={openSkills}>{t('workbench.openSkills')} <span aria-hidden="true">→</span></Button>
-      </article>
-    </section>
-    <section className={css.recent} aria-label={t('workbench.recent')}>
-      <header><div><h2>{t('workbench.recent')}</h2><p>{t('workbench.recentDescription')}</p></div><Button variant="ghost" onClick={openProjects}>{t('workbench.openProjects')} →</Button></header>
+    <div className={css.projectMetric} data-overview-project-metric aria-live="polite">
+      <span className={css.metricIcon}><WorkbenchIcon kind="overview" /></span>
+      {status === 'ready' ? <div><strong>{projects.length}</strong><span>{t('workbench.projectUnit')}</span></div> : <span className={css.metricStatus}>{t(status === 'error' ? 'workbench.failed' : 'workbench.loading')}</span>}
+    </div>
+    <section className={css.recent} aria-label={t('workbench.recent')} data-overview-recent>
+      <header><div><h2>{t('workbench.recent')}{status === 'ready' && <span className={css.recentCount}>{recent.length}</span>}</h2><p>{t('workbench.recentDescription')}</p></div><Button className={css.projectsLink} variant="ghost" onClick={openProjects}>{t('workbench.openProjects')}<WorkbenchIcon kind="arrow" /></Button></header>
       {status === 'error' ? <p className={css.empty} role="alert">{t('workbench.projectFailure')}</p>
         : status === 'loading' ? <p className={css.empty} role="status">{t('workbench.loading')}</p>
           : recent.length === 0 ? <div className={css.empty}><h3>{t('workbench.noProjects')}</h3><p>{t('workbench.noProjectsDescription')}</p><Button variant="primary" onClick={createProject}>{t('workbench.create')}</Button><Button variant="ghost" onClick={openLab}>{t('lab.open')}</Button></div>
-            : <ul>{recent.map(project => <li key={project.workspaceId}>
-              <span className={css.projectMark} aria-hidden="true">{project.title.slice(0, 1)}</span>
-              <div className={css.projectName}><strong>{project.title}</strong><span>{project.companyName || t('progress.companyMissing')}</span></div>
-              <span className={css.projectStage}>{project.stage}</span>
-              <Button variant="outline" disabled={opening !== undefined} onClick={() => { open(project.workspaceId) }}>{opening === project.workspaceId ? t('workbench.loading') : t('workbench.enter')} →</Button>
+            : <ul>{recent.map((project, index) => <li key={project.workspaceId}>
+              <span className={css.projectMark} data-variant={index} aria-hidden="true"><ProjectMark index={index} /></span>
+              <div className={css.projectName}><strong title={project.title}>{project.title}</strong><span title={project.companyName || t('progress.companyMissing')} data-project-company>{project.companyName || t('progress.companyMissing')}</span></div>
+              <div className={css.projectStage}><span>{t('workbench.currentStage')}</span><strong title={project.stage}>{project.stage}</strong></div>
+              <Button className={css.enterButton} variant="outline" disabled={opening !== undefined} onClick={() => { open(project.workspaceId) }}>{opening === project.workspaceId ? t('workbench.loading') : t('workbench.enter')}<WorkbenchIcon kind="arrow" /></Button>
             </li>)}</ul>}
       {error !== undefined && <p className={css.error} role="alert">{error}</p>}
     </section>
-    <footer className={css.footer}>{t('workbench.footer')}</footer>
+    {renderSlot('fde.workbench.lab.summary', { openLab })}
+    <article className={css.skillsCard} data-overview-skills>
+      <header><span className={css.cardIcon}><WorkbenchIcon kind="skills" /></span><h2>{t('workbench.skills')}</h2><span className={css.pending}>{t('workbench.pending')}</span></header>
+      <p>{t('workbench.skillsDescription')}</p>
+      <div className={css.cardAction}><Button className={css.skillsButton} variant="outline" onClick={openSkills}>{t('workbench.openSkills')}<WorkbenchIcon kind="arrow" /></Button></div>
+    </article>
   </main>
+}
+
+/** Decorative row marks; they do not classify projects or change their order. */
+function ProjectMark({ index }: { readonly index: number }) {
+  return <svg viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    {index === 0 ? <path strokeWidth="3" d="M7 27v-7M16 27V12M25 27V4" />
+      : index === 1 ? <><path d="M4 28V11l12-8 12 8v17H4ZM12 28v-9h8v9M13 13h6" /></>
+        : <><path d="M4 13v15h24V13M2 12l3-9h22l3 9M12 28v-9h8v9" /><path d="M2 12a4.7 4.7 0 0 0 9.3 0 4.7 4.7 0 0 0 9.4 0 4.7 4.7 0 0 0 9.3 0" /></>}
+  </svg>
 }
 
 /** Present the agreed placeholder without querying or exposing Skills. */

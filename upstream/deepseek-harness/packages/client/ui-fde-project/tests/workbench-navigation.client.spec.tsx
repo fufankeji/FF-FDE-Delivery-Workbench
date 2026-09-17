@@ -13,7 +13,7 @@ afterEach(() => { cleanup(); vi.unstubAllGlobals() })
 
 it('offers four peer destinations, preserves the project shortcut, and removes layout ownership on exit', () => {
   const page = new ProjectPageController()
-  const renderSlot = vi.fn(() => null)
+  const renderSlot = vi.fn((key: string) => key === 'sidebar.settings.shortcut' ? <button type="button">设置</button> : null)
   const props = {
     useProjectPage: bindSnapshotSelector(page), showWorkbenchOverview: page.showDashboard,
     showProjectOverview: page.showOverview, showWorkbenchLab: page.showLab, showWorkbenchSkills: page.showSkills,
@@ -26,15 +26,22 @@ it('offers four peer destinations, preserves the project shortcut, and removes l
   const nav = screen.getByRole('navigation', { name: '工作台导航' })
   expect(within(nav).getAllByRole('button').map(button => button.textContent)).toEqual(['总览', '项目中心', '实验室', '技能中心'])
   expect(document.body.dataset.fdeWorkbench).toBe('open')
+  const settings = screen.getByRole('button', { name: '设置' })
+  expect(screen.getByText('@赋范空间 独家研发').compareDocumentPosition(settings) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  expect(renderSlot).toHaveBeenCalledWith('sidebar.settings.shortcut', { wide: true })
   for (const [label, destination] of [['总览', 'dashboard'], ['项目中心', 'overview'], ['技能中心', 'skills'], ['实验室', 'lab']] as const) {
     const button = within(nav).getByRole('button', { name: label })
     fireEvent.click(button)
     expect(page.getSnapshot().view).toBe(destination)
     expect(button.getAttribute('aria-current')).toBe('page')
   }
-  fireEvent.click(screen.getByRole('button', { name: '返回介绍首页' }))
+  const home = screen.getByRole('button', { name: '返回介绍首页' })
+  expect(home.querySelectorAll('svg')).toHaveLength(1)
+  expect(home.textContent).toBe('返回介绍首页')
+  fireEvent.click(home)
   expect(page.getSnapshot().view).toBe('home')
   expect(document.body.dataset.fdeWorkbench).toBeUndefined()
+  expect(screen.queryByRole('button', { name: '设置' })).toBeNull()
   expect(renderSlot).toHaveBeenLastCalledWith('fde.workbench.lab.page', { active: false, back: page.returnFromLab })
 })
 
@@ -61,6 +68,31 @@ it('shows real projects ordered by update and opens the exact project without an
   expect(props.openProjects).not.toHaveBeenCalled()
   fireEvent.click(screen.getByRole('button', { name: /新建项目/ }))
   expect(props.createProject).toHaveBeenCalledTimes(1)
+  fireEvent.click(screen.getByRole('button', { name: /查看项目/ }))
+  expect(props.openProjects).toHaveBeenCalledOnce()
+  fireEvent.click(screen.getByRole('button', { name: /查看技能中心/ }))
+  expect(props.openSkills).toHaveBeenCalledOnce()
+})
+
+it('keeps the compact metrics, three recent rows and pending skills card tied to real data', () => {
+  const props = overviewProps()
+  const title = '连锁门店设备故障智能分诊项目与企业知识检索工作流'
+  const projects = [...props.projects,
+    { workspaceId: 'long', title, companyName: '', stage: '调查真实环境', updatedAt: 12 },
+    { workspaceId: 'fourth', title: '第四个项目', companyName: '', stage: '发现高价值问题', updatedAt: 0 },
+  ]
+  render(<WorkbenchOverview {...props} projects={projects} />)
+  expect(screen.getByText('个真实项目').previousElementSibling?.textContent).toBe('4')
+  const recent = screen.getByRole('region', { name: '继续工作' })
+  expect(within(recent).getAllByRole('listitem')).toHaveLength(3)
+  expect(within(recent).getByRole('heading', { name: '继续工作3' })).toBeTruthy()
+  expect(within(recent).getByTitle(title).textContent).toBe(title)
+  expect(within(recent).getAllByText('当前阶段')).toHaveLength(3)
+  expect(within(recent).getByText('未填写所属企业')).toBeTruthy()
+  expect(screen.queryByText('第四个项目')).toBeNull()
+  expect(screen.getByText('待接入').closest('[data-overview-skills]')).toBeTruthy()
+  expect(props.renderSlot).toHaveBeenCalledOnce()
+  expect(props.renderSlot).toHaveBeenCalledWith('fde.workbench.lab.summary', { openLab: props.openLab })
 })
 
 it('distinguishes loading, failure, empty projects and a failed project entry', async () => {

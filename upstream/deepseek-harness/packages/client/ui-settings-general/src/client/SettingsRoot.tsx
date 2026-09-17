@@ -5,7 +5,7 @@
  * close label, sections) arrives from registrants through slots; accessible
  * names resolve from localized content (trigger: shell locale; dialog:
  * aria-labelledby the title node; close: visually-hidden slot text). Modal
- * open state and the active section id are component-local viewing state;
+ * open state and the active section id share one entry-declared viewing store;
  * the onboarding coordinator mounts exactly one ordered registrant while the
  * sessions-derived empty-Hero fact is active. Visible dialog chrome belongs
  * to the step, so a mounted-but-deciding step paints nothing here.
@@ -19,7 +19,7 @@ import {
   IconPersonalizationOutline16, IconSettingsOutline16,
 } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { ConnectionIndicatorState } from '@deepseek-ai/dsh-client-ui-primitives'
-import type { SettingsRootComponentProps, SettingsSectionRow } from './shell-contract.ts'
+import type { SettingsRootComponentProps, SettingsSectionRow, SettingsShortcutProps } from './shell-contract.ts'
 import css from './SettingsRoot.module.css'
 
 const RECOVERY_CONFIRMATION_MS = 2_000
@@ -115,29 +115,27 @@ function SettingsPanel({ rows, renderSlot, activeId, onSelect, onClose }: PanelP
  */
 export function SettingsRoot(props: SettingsRootComponentProps) {
   const {
-    wide, reconnect, useConnectionState, useSections, useOnboardingSteps, useSessions, renderSlot, t,
+    wide, reconnect, useConnectionState, useSections, useOnboardingSteps, useSessions, useStore, actions, renderSlot, t,
   } = props
-  const [open, setOpen] = useState(false)
-  const [activeId, setActiveId] = useState<string | undefined>(undefined)
+  const { open, activeId } = useStore(state => state)
   const [completedOnboarding, setCompletedOnboarding] = useState<ReadonlySet<string>>(() => new Set())
   const [showRecovery, setShowRecovery] = useState(false)
   const [holdConnecting, setHoldConnecting] = useState(false)
   const connectingShownAt = useRef<number | undefined>(undefined)
   const triggerButton = useRef<HTMLButtonElement | null>(null)
+  const openingTrigger = useRef<HTMLElement | null>(null)
   const wasOpen = useRef(open)
-  const close = useCallback(() => {
-    setOpen(false)
-    setActiveId(undefined)
-  }, [])
-  // Restore after the close commit, when the dialog can no longer own focus.
-  useEffect(() => {
-    if (wasOpen.current && !open) triggerButton.current?.focus()
+  const close = actions.close
+  // Capture the actual opener before the panel takes focus, including alternate sidebars.
+  useLayoutEffect(() => {
+    if (!wasOpen.current && open) openingTrigger.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    if (wasOpen.current && !open) {
+      const target = openingTrigger.current?.isConnected ? openingTrigger.current : triggerButton.current
+      target?.focus()
+    }
     wasOpen.current = open
   }, [open])
-  const openSection = useCallback((id: string) => {
-    setActiveId(id)
-    setOpen(true)
-  }, [])
+  const openSection = actions.open
 
   // The ledger tick keeps the nav rows fresh: registrants re-register with
   // freshly localized text on locale change, and the trigger/header/close
@@ -221,7 +219,7 @@ export function SettingsRoot(props: SettingsRootComponentProps) {
           aria-label={t('trigger')}
           aria-haspopup="dialog"
           aria-expanded={open}
-          onClick={() => { setOpen(true) }}
+          onClick={() => { actions.open() }}
         >
           {renderSlot('settings.trigger', { wide })}
         </button>
@@ -240,7 +238,7 @@ export function SettingsRoot(props: SettingsRootComponentProps) {
           rows={rows}
           renderSlot={renderSlot}
           activeId={activeId}
-          onSelect={setActiveId}
+          onSelect={actions.select}
           onClose={close}
         />
       )}
@@ -254,4 +252,13 @@ export function SettingsRoot(props: SettingsRootComponentProps) {
       }, { only: onboardingStep.id })}
     </>
   )
+}
+
+/** Open the one existing settings panel from another sidebar without duplicating configuration UI. */
+export function SettingsShortcut({ wide, useStore, actions, t }: SettingsShortcutProps) {
+  const open = useStore(state => state.open)
+  return <button type="button" className={clsx(css.trigger, css.shortcut, !wide && css.rail)} aria-label={t('trigger')} title={t('trigger')} aria-haspopup="dialog" aria-expanded={open} onClick={() => { actions.open() }}>
+    <IconSettingsOutline16 size={20} />
+    {wide && <span className={css.triggerLabel}>{t('trigger')}</span>}
+  </button>
 }

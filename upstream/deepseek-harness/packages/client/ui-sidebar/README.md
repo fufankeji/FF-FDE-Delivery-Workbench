@@ -55,6 +55,8 @@ The shell is pure composition: `SidebarRootComponentProps` composes the layout o
 
 ### Slot discipline
 
+The contract also defines the optional `sidebar.settings.shortcut` trigger seat for an alternate platform sidebar to declare. The settings shell supplies this trigger and shares its existing panel state; the original sidebar continues to declare only `sidebar.settings`.
+
 Declaration-aware `slots.inject()` lets a replacing package activate before or after the sidebar. The foot is the `sidebar.settings` seat: the sidebar renders only the bottom-pinned layout slot and shares its column state (`wide`). The `/client` exports are the plugin body (`apply`/`inject`) plus the contract types only; SidebarRoot, the row components, and the tree derivation remain package-internal behind the slot registration.
 
 </details>

@@ -23,7 +23,8 @@ import type {} from '@deepseek-ai/dsh-client-ui-session/client'
 import type {
   SettingsOnboardingStep, SettingsRootInjected, SettingsSectionRow,
 } from './shell-contract.ts'
-import { SettingsRoot } from './SettingsRoot.tsx'
+import { SettingsRoot, SettingsShortcut } from './SettingsRoot.tsx'
+import { createSettingsShellStore } from './shell-store.ts'
 import { CloseLabel, HeaderContent, TriggerContent } from './chrome.tsx'
 import { GeneralSection } from './GeneralSection.tsx'
 import { SettingsDocumentAction } from './SettingsDocumentAction.tsx'
@@ -65,6 +66,7 @@ export const inject = ['slots', 'locale', 'connection', 'remote', 'remote.settin
  * @param ctx - client root context.
  */
 export function apply(ctx: ClientContext): void {
+  const shellStore = createSettingsShellStore()
   ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'ui-settings-general: dictionaries')
   const connection = ctx.get('connection') as ConnectionHandle
 
@@ -145,6 +147,7 @@ export function apply(ctx: ClientContext): void {
   })
   ctx.slots.inject('sidebar.settings', () => ctx.slots.register({
     name: 'sidebar.settings',
+    store: shellStore,
     locale: NS,
     children: {
       'settings.trigger': { kind: 'single', scope: 'root' },
@@ -156,6 +159,10 @@ export function apply(ctx: ClientContext): void {
     },
     inject: shellInjected,
   }, SettingsRoot))
+
+  ctx.slots.inject('sidebar.settings.shortcut', () => ctx.slots.register({
+    name: 'sidebar.settings.shortcut', locale: NS, store: shellStore,
+  }, SettingsShortcut))
 
   ctx.slots.inject('settings.trigger', () =>
     ctx.slots.register({ name: 'settings.trigger', locale: NS }, TriggerContent))

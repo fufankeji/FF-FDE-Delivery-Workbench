@@ -6,6 +6,10 @@ Browser presentation for the FDE project delivery workspace. The system opens on
 
 ## Behavior
 
+The platform sidebar places Settings below the return-home action and attribution. Its `sidebar.settings.shortcut` outlet opens the existing Settings panel, including the Models/API-key section; it neither duplicates configuration nor removes the project sidebar's original Settings entry.
+
+Overview uses a compact three-metric strip, the three most recently updated projects, and separate Lab and pending Skills cards. Counts, project order, company and stage labels remain source-driven. The lab summary contributes two top metrics and a bottom card through its existing slot; one request supplies all three. Both packages coordinate numeric grid tracks at the same breakpoints because CSS Module area names are package-local. Decorative project marks do not classify projects. The sidebar owns the overview's footer attribution.
+
 Stage headings, instructions, dialogs, and review conditions name concrete delivery tasks. Established lifecycle titles and technical identifiers remain unchanged. Technical editors explain ontology terms in Chinese; graph status and query modes have readable labels. Reported selection, test evidence, and human approval remain distinct. Saved customer content is displayed without terminology rewriting, and read-only historical views do not claim files are immutable snapshots.
 
 Across all eight stages, the workbench exposes the native composer only for the project's actual current stage. Historical and future views hide it and release its reserved space without changing project progress. Returning to the current view restores input; reopening an earlier stage requires the existing reasoned return flow and a successful Host update. Agent Chat retains its normal input and drafts.

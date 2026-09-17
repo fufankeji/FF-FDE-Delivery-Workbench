@@ -6,16 +6,18 @@ import css from './workbench.module.css'
 import projectCss from './project.module.css'
 
 type NavigationProps = PropsRuntime<'shell.overlay'>
-  & PropsRenderSlots<'fde.workbench.lab.page'>
+  & PropsRenderSlots<'fde.workbench.lab.page' | 'sidebar.settings.shortcut'>
   & InjectFace<ProjectPageInjected> & PropsLocale<'fdeProject'>
 
 /** A compact, consistent glyph for each platform destination. */
-export function WorkbenchIcon({ kind }: { readonly kind: 'dashboard' | 'overview' | 'lab' | 'skills' }) {
+export function WorkbenchIcon({ kind }: { readonly kind: 'dashboard' | 'overview' | 'lab' | 'skills' | 'add' | 'arrow' }) {
   return <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     {kind === 'dashboard' && <><rect x="3" y="3" width="7" height="7" rx="2" /><rect x="14" y="3" width="7" height="7" rx="2" /><rect x="3" y="14" width="7" height="7" rx="2" /><rect x="14" y="14" width="7" height="7" rx="2" /></>}
     {kind === 'overview' && <><rect x="3" y="7" width="18" height="14" rx="2" /><path d="M8 7V4h8v3M3 12h18M10 12v3h4v-3" /></>}
     {kind === 'lab' && <><path d="M9 3h6M10 3v7L4.5 19a1.3 1.3 0 0 0 1.1 2h12.8a1.3 1.3 0 0 0 1.1-2L14 10V3M8 15h8" /><path d="M10 18h.01M14 18h.01" /></>}
     {kind === 'skills' && <><path d="m12 3 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 16l9 5 9-5" /></>}
+    {kind === 'add' && <path d="M12 4v16M4 12h16" />}
+    {kind === 'arrow' && <path d="M5 12h14m-6-6 6 6-6 6" />}
   </svg>
 }
 
@@ -48,8 +50,9 @@ export function WorkbenchNavigation({ useProjectPage, showWorkbenchOverview, sho
         </button>)}
       </nav>
       <div className={css.navBottom}>
-        <button type="button" onClick={showProjectHome} title={t('workbench.home')}><span aria-hidden="true">↗</span><span>{t('workbench.home')}</span></button>
+        <button type="button" className={css.homeButton} onClick={showProjectHome} title={t('workbench.home')}><WorkbenchIcon kind="arrow" /><span>{t('workbench.home')}</span></button>
         <small>{t('workbench.footer')}</small>
+        <div className={css.settingsEntry}>{renderSlot('sidebar.settings.shortcut', { wide: true })}</div>
       </div>
     </aside>}
     {renderSlot('fde.workbench.lab.page', { active: page.open && page.view === 'lab', back: returnFromWorkbenchLab })}

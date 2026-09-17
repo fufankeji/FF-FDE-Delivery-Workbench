@@ -3,9 +3,10 @@ import type { GlobalStandardProps } from '@deepseek-ai/dsh-client-ui-slots'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { useEffect, useState } from 'react'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
-import { makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
+import { bindSnapshotSelector, makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
 import type { SettingsRootComponentProps } from '../src/client/shell-contract.ts'
-import { SettingsRoot } from '../src/client/SettingsRoot.tsx'
+import { SettingsRoot, SettingsShortcut } from '../src/client/SettingsRoot.tsx'
+import { createSettingsShellStore } from '../src/client/shell-store.ts'
 import { en, zh } from '../src/client/locales.ts'
 
 // Every fixture carries the resource hook the resources plugin merges into GlobalStandardProps.
@@ -35,6 +36,7 @@ const useSessionPendingInteraction: SettingsRootComponentProps['useSessionPendin
 
 function mount({
   wide = true,
+  shortcut = false,
   dictionary = en,
   connectionState = 'connected',
   onboardingActive = true,
@@ -49,6 +51,7 @@ function mount({
   ],
 }: {
   wide?: boolean
+  shortcut?: boolean
   dictionary?: typeof en | typeof zh
   connectionState?: ConnectionSnapshot
   onboardingActive?: boolean
@@ -76,7 +79,9 @@ function mount({
       byId: { 'active-session': { blank: false } },
     })) as never
   const unusedHook = (() => { throw new Error('unused by SettingsRoot') }) as never
+  const { store, actions } = createSettingsShellStore().create()
   const props: SettingsRootComponentProps = {
+    useStore: bindSnapshotSelector(store), actions,
     useSessions,
     useSessionPendingInteraction,
     usePanelInfo, useResource,
@@ -105,7 +110,7 @@ function mount({
     },
     renderSlot,
   }
-  const view = render(<SettingsRoot {...props} />)
+  const view = render(<><SettingsRoot {...props} />{shortcut && <SettingsShortcut {...props} />}</>)
   const bump = (next: Row[]) => {
     act(() => {
       current = next
@@ -129,6 +134,27 @@ function openPanel() {
 }
 
 describe('SettingsRoot trigger', () => {
+  it('opens the existing panel from an alternate sidebar, reaches Models, and restores the actual opener', () => {
+    mount({ shortcut: true, onboardingActive: false })
+    const [original, alternate] = screen.getAllByRole('button', { name: 'Settings' })
+    alternate!.focus()
+    fireEvent.click(alternate!)
+    expect(screen.getAllByRole('dialog')).toHaveLength(1)
+    expect(original!.getAttribute('aria-expanded')).toBe('true')
+    expect(alternate!.getAttribute('aria-expanded')).toBe('true')
+    fireEvent.click(screen.getByRole('button', { name: 'Models' }))
+    expect(screen.getByTestId('section-models')).toBeTruthy()
+    fireEvent.keyDown(document, { key: 'Escape' })
+    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(document.activeElement).toBe(alternate)
+    original!.focus()
+    fireEvent.click(original!)
+    expect(screen.getAllByRole('dialog')).toHaveLength(1)
+    expect(screen.getByTestId('section-general')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+    expect(document.activeElement).toBe(original)
+  })
+
   it.each([
     { column: 'expanded English', wide: true, dictionary: en, name: 'Settings' },
     { column: 'collapsed English', wide: false, dictionary: en, name: 'Settings' },

@@ -68,6 +68,8 @@
   white-space: nowrap;
 }
 
+.shortcut { width: 100%; gap: 12px; }
+
 /* Full-viewport layer (figma Mask 501:29946 #000@24%): mask tokens match the
    Modal primitive (--dsw-alias-bg-mask-1 + --dsw-mask-blur). */
 .overlay {

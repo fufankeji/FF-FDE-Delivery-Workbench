@@ -55,6 +55,8 @@ dsh Web 客户端的侧边栏让用户识别当前构建、启动新会话、将
 
 ### slot 纪律
 
+约定还定义可选的 `sidebar.settings.shortcut` 入口席位，由另一套平台侧栏声明。设置外壳提供该入口，并共享既有面板状态；原侧栏仍只声明 `sidebar.settings`。
+
 声明感知的 `slots.inject()` 让替换包无论先于还是后于侧边栏激活都能生效。页脚承载 `sidebar.settings` 席位：侧边栏只渲染固定在底部的布局 slot，并共享其栏状态（`wide`）。`/client` 导出接口只包含插件主体（`apply`/`inject`）及约定类型；SidebarRoot、行组件与树派生仍由 slot 注册封装在包内。
 
 </details>

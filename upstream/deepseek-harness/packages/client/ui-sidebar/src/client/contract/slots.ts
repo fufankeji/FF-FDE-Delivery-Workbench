@@ -42,6 +42,8 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
      * The sidebar passes only its column state — it holds no settings state.
      */
     'sidebar.settings': { kind: 'single'; scope: 'root'; owner: SidebarSettingsOwnerProps }
+    /** Optional alternate sidebar trigger; opens the existing settings shell, not another panel. */
+    'sidebar.settings.shortcut': { kind: 'single'; scope: 'root'; owner: SidebarSettingsOwnerProps }
     /**
      * Optional actions beside Settings at the sidebar foot. Declared by this
      * package's 'sidebar' entry; each action receives only the column state.
