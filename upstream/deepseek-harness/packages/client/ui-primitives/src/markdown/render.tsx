@@ -169,6 +169,16 @@ export interface MarkdownFileMentions {
   resolve(value: string): { open: () => void; label: string; title: string } | undefined
 }
 
+/** Explicit file openers for relative Markdown links; authored link labels are preserved. */
+export interface MarkdownFileLinks {
+  /**
+   * Resolve a relative destination against the owner's known file collection.
+   * @param value - Authored destination, before URI normalization.
+   * @returns A file opener and title, or undefined to keep the link inert.
+   */
+  resolve(value: string): { open: () => void; title: string } | undefined
+}
+
 /**
  * One render pass's state: immutable options and targets plus the footnote
  * numbering accumulated in document order while references render.
@@ -182,6 +192,8 @@ export interface MarkdownRenderContext {
   readonly inBlockquote?: boolean
   /** Inline-code file mentions; absent wherever no opener vocabulary exists. */
   readonly fileMentions: MarkdownFileMentions | undefined
+  /** Relative file links; only settled rendering receives this opt-in vocabulary. */
+  readonly fileLinks?: MarkdownFileLinks | undefined
   /** Local-path image vocabulary; absent wherever no rewriting owner exists. */
   readonly pathImages: MarkdownPathImages | undefined
   /** Inside an anchor's children: interactive mentions must not nest there. */
@@ -338,7 +350,10 @@ function renderNode(node: Md.RootContent, key: Key, context: MarkdownRenderConte
     case 'table':
       return renderTable(node, key, context)
     case 'link':
-      return renderAnchor(node.url, renderChildren(node.children, { ...context, inLink: true }), key, !anchorWrapsOnlyImages(node.children))
+      return renderAnchor(
+        node.url, renderChildren(node.children, { ...context, inLink: true }), key,
+        !anchorWrapsOnlyImages(node.children), context.fileLinks,
+      )
     case 'linkReference':
       return renderLinkReference(node, key, context)
     case 'image':
@@ -543,7 +558,13 @@ function renderSafeLink(href: string, children: ReactNode[], key: Key, glyph = t
 }
 
 /** Anchor over a parsed markdown destination, which hast normalized before the allowlist saw it. */
-function renderAnchor(url: string, children: ReactNode[], key: Key, glyph = true): ReactNode {
+function renderAnchor(url: string, children: ReactNode[], key: Key, glyph = true, fileLinks?: MarkdownFileLinks): ReactNode {
+  if (url.trim() !== '' && !/^(?:[a-z][a-z0-9+.-]*:|[\\/]|#)/i.test(url.trim())) {
+    const file = fileLinks?.resolve(url)
+    if (file !== undefined) return <button key={key} type="button" className={css.fileMention} title={file.title} onClick={file.open}>
+      {glyph && <LinkIcon kind={classifyLinkPath(url)} className={css.linkIcon} />}{children}
+    </button>
+  }
   return renderSafeLink(normalizeUri(url), children, key, glyph)
 }
 
@@ -608,7 +629,7 @@ function renderLinkReference(
     return <Fragment key={key}>{'['}{renderChildren(node.children, context)}{referenceSuffix(node)}</Fragment>
   }
   const rendered = renderChildren(node.children, { ...context, inLink: true })
-  return renderAnchor(definition.url, rendered, key, !anchorWrapsOnlyImages(node.children))
+  return renderAnchor(definition.url, rendered, key, !anchorWrapsOnlyImages(node.children), context.fileLinks)
 }
 
 function renderImageReference(

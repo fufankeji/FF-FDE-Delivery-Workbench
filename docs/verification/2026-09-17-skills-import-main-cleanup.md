@@ -49,7 +49,7 @@ DSH_HOME=/Users/muyu/MuYuProjectBuild/FDEDeliveryWorkbench/.runtime/dsh-home cor
 
 ## 保留内容与生命周期
 
-- 原三个 `.runtime/` 以同文件系统移动方式保存在主目录 `.runtime/retired-worktrees/`，合计约 330 MB，移动前后 inode 相同，没有制造第二份副本。它们不是当前活动数据；需用户确认不再需要，或逐项确认独有记录已进入当前事实源后才可清理。目录 README 说明原路径与恢复限制。
+- 原三个 `.runtime/` 曾以同文件系统移动方式集中至主目录 `.runtime/retired-worktrees/`，合计约 330 MB，没有制造第二份副本。用户随后明确要求不保留这些旧副本；核对当前服务使用主目录 `dsh-home` 且旧目录没有进程占用后，已永久删除该目录及内容。旧副本未纳入 Git，不能从 Git 恢复；当前主运行数据和设计稿未删除，3080 进程保持运行。
 - 第二、三轮 UI 抽图的 `attempts/`、`candidates/` 移回主目录 `source-materials/ui-exploration/`，保留原件且继续忽略，不把生成大图提交到 Git；约 7.2 MB，后续设计不再需要时可清理未采用候选。
 - 两个 worktree 中的实验室 `.assets/` 各 248 个文件与主目录逐文件 SHA-256 相同，删除的是重复副本；主目录素材保留。
 - 构建与启动日志分别为 `.runtime/main-skills-fix-build.log`、`.runtime/main-skills-fix-web.log`，用于本轮验证，停服且不再需要排查后可清理。启动日志可能包含本地鉴权链接，不提交或分享。

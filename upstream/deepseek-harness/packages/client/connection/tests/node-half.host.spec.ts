@@ -278,6 +278,38 @@ describe('connection node half', () => {
     await dispose()
   })
 
+  it('allows explicitly unauthenticated LAN access without removing the Host and Origin fences', async () => {
+    const { connection, routes, dispose } = await mounted({
+      browserAuthentication: false, trustedHosts: ['192.168.1.5:3080'],
+    })
+    try {
+      expect(connection.authenticatedUrl('http://192.168.1.5:3080')).toBe('http://192.168.1.5:3080')
+      for (const host of ['127.0.0.1:3080', '192.168.1.5:3080']) {
+        const request = fakeRequest({ host, origin: `http://${host}` }, '/')
+        const index = fakeResponse()
+        expect(connection.authorizeIndex(request, index.response)).toBe(true)
+        expect(index.state).toEqual({})
+        expect(connection.requestRejection(request)).toBeUndefined()
+        const api = fakeResponse()
+        await routes[0]!.handler(fakeRequest({ host }), api.response)
+        expect(api.state.status).toBe(404)
+      }
+      for (const headers of [
+        { host: 'attacker.example:3080' },
+        { host: '192.168.1.5:3080', origin: 'http://attacker.example' },
+        { host: '192.168.1.5:3080', 'sec-fetch-site': 'cross-site' },
+      ]) {
+        const request = fakeRequest(headers, '/')
+        const index = fakeResponse()
+        expect(connection.authorizeIndex(request, index.response)).toBe(false)
+        expect(index.state).toMatchObject({ status: 403, body: 'forbidden' })
+        expect(connection.requestRejection(request)).toBe(403)
+      }
+    } finally {
+      await dispose()
+    }
+  })
+
   it('provides a disposable dedicated RPC channel', async () => {
     const ctx = new Context()
     const routes: WebRoute[] = []

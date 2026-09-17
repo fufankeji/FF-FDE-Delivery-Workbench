@@ -390,9 +390,11 @@ FDE Workspace 与阶段 2/3 证据
 
 `ui-fde-project` 复用 apply-scoped `ProjectPageController` 管理介绍页、总览、项目中心、项目详情、实验室与技能中心；导航仅发布页面快照，不写 Host 领域状态。新增 `shell.overlay` 导航项，通过明确的子 Slot 接收实验室页面；实验室插件只消费 active 与返回回调，不运行时导入项目插件。总览的实验室摘要通过独立 Slot 从既有只读案例 API 获取真实数量。已打开 iframe 在切换时隐藏而非卸载，保留训练现场；全局侧栏采用共享宽度为页面让位，进入具体项目仍复用原生项目导航。
 
-### 8.3.2 第一阶段技能资产（F026）
+### 8.3.2 平台与课程技能资产（F026）
 
-技能中心复用既有只读阶段目录，仅选择 requirements/index=0 的七个已确认 ID，不扫描文件系统、用户 Skill 目录或客户 Workspace。浏览器将同一份正文组织为 SKILL.md、README.md、LICENSE 与 NOTICE.md，阅读与 fflate ZIP 编码共用文件字符串，单文件保存同样不重新抓取或改写内容。既有项目内方法与 Agent 注册保持不变。文件阅读复用共享安全 MarkdownText，包内代码路径通过显式文件词典跳转，上游链接维持安全外链，外链不计作包内文件。装饰纹理位于 Web public/fde-skills，颜色由 ui-theme 的页面作用域别名提供，不改变平台侧栏。
+平台内置复用既有只读阶段目录，仅选择 requirements/index=0 的七个已确认 ID，组织为 SKILL.md、README.md、LICENSE 与 NOTICE.md。课程原版由 ui-fde-project 的 course-skills 原文 JSON 快照提供，记录真实相对路径、UTF-8 内容、逐文件哈希及课次；项目内只有这一份收录内容，不追加平台文件或新许可证，不在运行时扫描 SSD、用户 Skill 目录或客户 Workspace。浏览器阅读与 fflate ZIP 编码共用文件字符串。来源与 Skill ID 组成界面身份，课程原版未进入 Host Skill 注册或 Agent 路由。
+
+目录树由真实文件路径生成，包内相对链接基于当前文件目录解析并限制在包内已知文件。共享安全 MarkdownText 的可选 fileLinks 仅给已确认本地文件提供打开回调，外部及危险协议仍受原规则限制；不配置该入口的调用者和流式输出保持原行为。原七个适配版及所有项目执行流程不变。装饰纹理位于 Web public/fde-skills，来源颜色由 ui-theme 的页面和 body 弹窗作用域别名提供，不改变平台侧栏。
 
 ### 8.4 工作台界面主题
 
@@ -526,7 +528,7 @@ Stop project
 
 ## 16. 外部服务与安全边界
 
-- 工作台局域网入口：用户显式使用 `--lan` 时，Web 启动器绑定 `0.0.0.0`，由现有 WebRuntime 为 RPC/WebSocket 推导本机 IPv4 信任地址。FDE 项目、阶段、资料、Semantica 和用量接口复用 Connection 的 `createWebRequestTrust`，只接受实际监听端口上的本机 IP，并保留 Host/Origin/Fetch-Metadata 校验。默认仍为回环地址；设置与凭据 RPC 的本机限制不变。此模式不提供身份认证或多人权限隔离，不适合公网部署；没有扩大独立项目预览的监听范围。
+- 工作台局域网入口：用户显式使用 `--lan` 时，Web 启动器绑定 `0.0.0.0`，由现有 WebRuntime 为 RPC/WebSocket 推导本机 IPv4 信任地址；Connection 的 `browserAuthentication` 仅在该启动参数下关闭，首页、RPC、WebSocket 免 token/cookie，Host/Origin/Fetch-Metadata 校验仍保留。FDE 项目、阶段、资料、Semantica 和用量接口复用 Connection 的 `createWebRequestTrust`，只接受实际监听端口上的本机 IP。默认回环启动仍启用浏览器授权，已有凭据不被删除。当前后台不提供按用户或方法划分的权限，不能把界面上的本机入口限制视作安全隔离；免授权模式仅用于可信局域网，不适合公网部署，也不扩大独立项目预览的监听范围。
 
 - DeepSeek 或其他模型服务：由官方 LLM/Credentials capability 管理；密钥不进入本项目文档或源码。
 - 企业系统、MCP、部署平台：必须作为项目级明确授权能力接入，不因安装工作台自动获得权限。

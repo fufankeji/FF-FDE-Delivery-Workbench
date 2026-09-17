@@ -21,7 +21,8 @@ it('offers four peer destinations, preserves the project shortcut, and removes l
   } as unknown as ComponentProps<typeof WorkbenchNavigation>
   const view = render(<WorkbenchNavigation {...props} />)
   expect(screen.queryByRole('navigation')).toBeNull()
-  view.rerender(<><WorkbenchNavigation {...props} /><WorkbenchLabLauncher {...props as unknown as ComponentProps<typeof WorkbenchLabLauncher>} wide /></>)
+  view.rerender(<><WorkbenchNavigation {...props} />
+    <WorkbenchLabLauncher {...props as unknown as ComponentProps<typeof WorkbenchLabLauncher>} wide /></>)
   fireEvent.click(screen.getByRole('button', { name: '业务挖掘实验室' }))
   const nav = screen.getByRole('navigation', { name: '工作台导航' })
   expect(within(nav).getAllByRole('button').map(button => button.textContent)).toEqual(['总览', '项目中心', '实验室', '技能中心'])
@@ -64,7 +65,7 @@ it('shows real projects ordered by update and opens the exact project without an
   expect(rows[0]?.textContent).toContain('最近项目')
   expect(screen.getByText('个真实项目').previousElementSibling?.textContent).toBe('2')
   fireEvent.click(within(rows[0]!).getByRole('button', { name: /进入项目/ }))
-  await waitFor(() => expect(props.enterProject).toHaveBeenCalledWith('recent'))
+  await waitFor(() => { expect(props.enterProject).toHaveBeenCalledWith('recent') })
   expect(props.openProjects).not.toHaveBeenCalled()
   fireEvent.click(screen.getByRole('button', { name: /新建项目/ }))
   expect(props.createProject).toHaveBeenCalledTimes(1)
@@ -74,7 +75,7 @@ it('shows real projects ordered by update and opens the exact project without an
   expect(props.openSkills).toHaveBeenCalledOnce()
 })
 
-it('keeps the compact metrics, three recent rows and stage-one library entry tied to real data', () => {
+it('keeps the compact metrics, three recent rows and platform/course library entry tied to real data', () => {
   const props = overviewProps()
   const title = '连锁门店设备故障智能分诊项目与企业知识检索工作流'
   const projects = [...props.projects,
@@ -90,7 +91,7 @@ it('keeps the compact metrics, three recent rows and stage-one library entry tie
   expect(within(recent).getAllByText('当前阶段')).toHaveLength(3)
   expect(within(recent).getByText('未填写所属企业')).toBeTruthy()
   expect(screen.queryByText('第四个项目')).toBeNull()
-  expect(screen.getByText('第一阶段').closest('[data-overview-skills]')).toBeTruthy()
+  expect(screen.getByText('内置 / 课程').closest('[data-overview-skills]')).toBeTruthy()
   expect(props.renderSlot).toHaveBeenCalledOnce()
   expect(props.renderSlot).toHaveBeenCalledWith('fde.workbench.lab.summary', { openLab: props.openLab })
 })
@@ -109,15 +110,15 @@ it('distinguishes loading, failure, empty projects and a failed project entry', 
   expect(props.openLab).toHaveBeenCalledTimes(1)
   view.rerender(<WorkbenchOverview {...props} enterProject={vi.fn(async () => { throw new Error('项目不可用') })} />)
   fireEvent.click(screen.getAllByRole('button', { name: /进入项目/ })[0]!)
-  await waitFor(() => expect(screen.getByRole('alert').textContent).toBe('项目不可用'))
+  await waitFor(() => { expect(screen.getByRole('alert').textContent).toBe('项目不可用') })
 })
 
-it('offers the stage-one library without loading its files from the overview', () => {
+it('offers the platform/course library without loading its files from the overview', () => {
   const fetch = vi.fn()
   vi.stubGlobal('fetch', fetch)
   const props = overviewProps()
   render(<WorkbenchOverview {...props} />)
-  expect(screen.getByText('第一阶段')).toBeTruthy()
+  expect(screen.getByText('内置 / 课程')).toBeTruthy()
   expect(screen.queryByText('待接入')).toBeNull()
   fireEvent.click(screen.getByRole('button', { name: /查看技能中心/ }))
   expect(props.openSkills).toHaveBeenCalledOnce()

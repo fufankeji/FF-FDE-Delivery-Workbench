@@ -38,11 +38,13 @@ updated: "2026-09-16"
 
 | F024 | F024-business-discovery-lab | 独立业务挖掘实验室 | 无需创建项目即可完成五案例访谈、取证、计算和报告训练，返回后项目与八阶段不变 | REQ-030, REQ-031, REQ-032, PSC-026 | 无 | P0 | in-progress |
 | F025 | F025-platform-navigation | 统一工作台导航与总览 | 默认总览、三模块切换、继续项目且保留训练现场 | REQ-033, PSC-027 | F002, F024 | P0 | in-progress |
-| F026 | F026-stage-one-skills-center | 第一阶段技能阅读与下载 | 浏览七个方法卡片、进入真实文件阅读并下载同版本适配包 | REQ-034, PSC-028 | F025, F005 | P0 | in-progress |
+| F026 | F026-stage-one-skills-center | 平台与课程技能阅读下载 | 区分七个内置方法与已提供的课程原版，在弹窗阅读真实目录并下载同版本文件 | REQ-034, PSC-028 | F025, F005 | P0 | in-progress |
 
 ## 首个验证切片
 
 F025 的统一导航由用户于 2026-09-16 确认。2026-09-17 用户确认 F026 第一阶段七个 Skill 的卡片、查看、文件阅读与下载，并授权按定稿图实施；F026 替代技能占位，保留 F025 的侧栏、项目中心及实验室流程。
+
+2026-09-17 后续授权在 F026 同页新增课程原版分类、课次标记与完整原包阅读下载；保持稳定 Feature ID 和已有内置方法，不把课程资料接入 Agent 调用链。
 
 F001～F004 建立共享能力，F005 用“发现高价值问题”完成第一条端到端产品验证。首个阶段只接入 `qualify-ai-workflow`、条件触发的 `reframe-ai-engagement`，以及 Workflow Charter、Engagement Reframe、Field Observation Log 三类必要 Artifact；不安装完整外部能力库。实施可以在同一切片内增量进行，但只有当前用户明确授权的 Feature 才进入 in-progress。
 

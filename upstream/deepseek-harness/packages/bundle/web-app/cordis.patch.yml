@@ -267,8 +267,10 @@
     # webserver under /api; browser half is the fetch/SSE client.
     - id: connection
       name: '@deepseek-ai/dsh-client-connection'
-      inject: [webRuntime]
+      inject: [webRuntime, webStartup]
       config:
+        # Only explicit --lan resolves this startup host; bind overrides alone keep authentication.
+        browserAuthentication: !!js ctx.webStartup.host !== '0.0.0.0'
         # LAN literals derived from the active bind plus --trusted-host extras.
         # A deployment adding authorities keeps this expression and concatenates
         # its literals, for example: ['app.internal', ...ctx.webRuntime.trustedHosts].

@@ -67,3 +67,15 @@ DSH_HOME=../../.runtime/dsh-home corepack pnpm dsh web --no-open --host 127.0.0.
 - `corepack pnpm run build` 退出 0，记录 270 个 Client 产物；日志 `/tmp/fde-home-entry-polish-build.log` 可随时按相同命令重建。
 - 3084 预览更新至 PID `96271`，cwd 与隔离 `DSH_HOME` 正确。首页和项目包均 HTTP 200，Boot Manifest revision 为 `82f56af813bc`，实际项目包 `rev=30ead923d91aa295-37` 包含新按钮样式及保留的设置入口。
 - 没有启动浏览器、截图或像素比较，视觉效果待用户手动确认；未提交、推送或合并，3080 服务不动。
+
+## 后续反馈：总览字号与密度优化
+
+- 用户指出实际总览字号偏大，并授权优化。按新反馈调整排版，不再以参考图中的大字号作为本页验收目标；页面分区、数据来源、导航目的地及操作保持不变。
+- 直接在主工作树 `main` 修改两个 CSS Module。桌面页面标题为 26/34px，区块标题为 18/26px，项目名为 16/24px、500 字重，导航/正文/按钮为 14/22px，辅助信息为 12–13px，三项统计数字统一为 28/36px。项目行最小高度从 106px 收紧至 88px，导航行从 55px 收紧至 44px，卡片内边距与图标同步调整。
+- 窄屏覆盖规则不再把导航、标题、项目名或实验室摘要字号放大；手机页面标题为 24/32px，既有图标式窄侧栏保留。技能中心详情、实验室 iframe 原应用和项目工作台样式未修改。
+- `corepack pnpm exec vitest run packages/client/ui-fde-project/tests/workbench-navigation.client.spec.tsx packages/client/ui-fde-discovery-lab/tests/navigation.client.spec.tsx` 退出 0：2 文件、10 项通过，覆盖四个入口、项目排序与进入、加载/失败/空状态、实验室摘要、训练页面保留及重试。
+- `corepack pnpm --filter @deepseek-ai/dsh-client-ui-fde-project --filter @deepseek-ai/dsh-client-ui-fde-discovery-lab bundle` 退出 0。只构建两个受影响包，未重复全仓构建；沿用的完整构建记录不能当作本轮全量构建证据。构建提示已有 `tsconfig.base.json` 重复映射和跨平台包警告，未改动这些无关配置。
+- 两个包既有中英文 README 同步，指定两对 `verify-translation-pairing` 检查通过。没有新增产品规格或英文规格副本。
+- 3080 更新至 PID `19793`，cwd 为主仓 `upstream/deepseek-harness`，显式 `DSH_HOME` 为主仓 `.runtime/dsh-home`；`workspace.json` 重启前后 SHA-256 均为 `a31cecf16fbae99538a99d363a9d1b5d7d0cc95bc4b6fb03bd2be5e9246248f9`，没有切换或重建运行数据。
+- 本地鉴权后首页 HTTP 200，Boot Manifest revision 为 `679003bbc9e0`。实际项目包 `5b039991a0e657cc-37` 与实验室包 `5b039991a0e657cc-22` 均 HTTP 200，可执行内容与本次本地产物一致；在线样式包含新标题、导航、项目名称、区块标题、统计字号和 88px 项目行高。项目包仍不含错误的 Node `require("module")`。
+- 没有启动自动化浏览器、截图或视觉比较。视觉效果待用户手动确认；本轮无提交或推送。预览日志位于被忽略的 `.runtime/workbench-web.log`，构建输出复用原 `lib/`；没有新 worktree、依赖副本或大型留存产物。

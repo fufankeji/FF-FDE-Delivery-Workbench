@@ -65,12 +65,12 @@ export class HostConnectionService extends Service implements HostConnectionHand
    * Provide the Host half over the active HTTP server.
    * @param ctx - owning Connection plugin context.
    * @param trustedHosts - deployment authorities accepted by the Host/Origin fence.
-   * @param browserAuth - process token and persistent browser-session owner.
+   * @param browserAuth - browser-session owner; absent only for explicitly unauthenticated compositions.
    */
   constructor(
     ctx: Context,
     private readonly trustedHosts: readonly string[],
-    private readonly browserAuth: BrowserAuth,
+    private readonly browserAuth: BrowserAuth | undefined,
   ) {
     super(ctx, 'connection')
   }
@@ -93,20 +93,24 @@ export class HostConnectionService extends Service implements HostConnectionHand
     }
   }
 
-  /** Apply the configured Host/Origin fence, then browser authentication. */
+  /** Apply the Host/Origin fence, then authentication when the composition requires it. */
   requestRejection(request: ConnectionTrustRequest): ConnectionRequestRejection {
     if (!isTrustedApiRequest(request, this.trustedHosts)) return 403
-    return this.browserAuth.isAuthenticated(request) ? undefined : 401
+    return this.browserAuth === undefined || this.browserAuth.isAuthenticated(request) ? undefined : 401
   }
 
-  /** Authenticate an index request through the process-token exchange or cookie. */
+  /** Authorize the index under the composition's session or unauthenticated trust policy. */
   authorizeIndex(request: ConnectionIndexRequest, response: ConnectionIndexResponse): boolean {
-    return this.browserAuth.authorizeIndex(request, response)
+    if (this.browserAuth !== undefined) return this.browserAuth.authorizeIndex(request, response)
+    if (isTrustedApiRequest(request, this.trustedHosts)) return true
+    response.writeHead(403, { 'cache-control': 'no-store' })
+    response.end('forbidden')
+    return false
   }
 
-  /** Add this process's launch token to the clean application URL. */
+  /** Add a launch token only when browser authentication is enabled. */
   authenticatedUrl(baseUrl: string): string {
-    return this.browserAuth.authenticatedUrl(baseUrl)
+    return this.browserAuth?.authenticatedUrl(baseUrl) ?? baseUrl
   }
 
   /**

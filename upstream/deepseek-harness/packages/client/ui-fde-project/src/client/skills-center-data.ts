@@ -1,7 +1,8 @@
-/** Read-only stage-one packages derived from the runtime method catalog. */
+/** Read-only platform adaptations and explicitly supplied original course packages. */
 import { strToU8, zipSync } from 'fflate/browser'
 import type { StageSkillCatalogMethod, StageSkillCatalogValue } from './stage-skill-catalog.ts'
 import { ENGINEERING_LICENSE, METHOD_LICENSE, METHOD_NOTICE } from './skills-center-licenses.ts'
+import diagnosis from './course-skills/fde-business-diagnosis.json'
 
 /** Approved display order; other runtime stages remain outside this library. */
 export const STAGE_ONE_SKILL_IDS = [
@@ -15,15 +16,35 @@ export interface SkillFile {
   readonly content: string
 }
 
-/** One immutable, workbench-specific method package. */
-export interface LibrarySkill {
-  readonly id: typeof STAGE_ONE_SKILL_IDS[number]
-  readonly number: number
+/** Content shared by the reader and archive for either source category. */
+interface LibrarySkillContent {
+  readonly id: string
   readonly label: string
   readonly description: string
   readonly whenToUse: string
   readonly files: readonly SkillFile[]
 }
+
+/** A registered method adapted to the workbench's stage-one workflow. */
+export interface PlatformSkill extends LibrarySkillContent {
+  readonly source: 'platform'
+  readonly id: typeof STAGE_ONE_SKILL_IDS[number]
+  readonly number: number
+}
+
+/** A user-provided course snapshot, never registered as an Agent capability. */
+export interface CourseSkill extends LibrarySkillContent {
+  readonly source: 'course'
+  readonly course: { readonly title: string; readonly lessonNumber: number; readonly lessonTitle: string }
+  readonly importedAt: string
+  readonly version: string
+}
+
+/** Source identity remains separate even when two packages share a Skill name. */
+export type LibrarySkill = PlatformSkill | CourseSkill
+
+/** Explicitly approved original packages; no runtime filesystem scan or Skill installation. */
+export const COURSE_SKILLS: readonly CourseSkill[] = [{ ...diagnosis, source: 'course' }]
 
 function filesOf(method: StageSkillCatalogMethod): readonly SkillFile[] {
   const [repository, commit] = method.source.split('@')
@@ -58,7 +79,7 @@ function filesOf(method: StageSkillCatalogMethod): readonly SkillFile[] {
  * @param catalog - Validated runtime catalog.
  * @returns Files and metadata shared by the reader and download actions.
  */
-export function stageOneLibrary(catalog: StageSkillCatalogValue): readonly LibrarySkill[] {
+export function stageOneLibrary(catalog: StageSkillCatalogValue): readonly PlatformSkill[] {
   const methods = catalog.stages.find(stage => stage.id === 'requirements' && stage.index === 0)?.methods
   return STAGE_ONE_SKILL_IDS.map((id, index) => {
     const method = methods?.find(item => item.id === id)
@@ -66,19 +87,75 @@ export function stageOneLibrary(catalog: StageSkillCatalogValue): readonly Libra
     if (!/^(davidahmann\/fde-guide|rpraharaj\/forward-deployed-engineer)@[a-f0-9]{40}$/.test(method.source)) {
       throw new Error(`第一阶段方法来源无法确认：${id}`)
     }
-    return { id, number: index + 1, label: method.label, description: method.description, whenToUse: method.whenToUse, files: filesOf(method) }
+    return { source: 'platform', id, number: index + 1, label: method.label, description: method.description, whenToUse: method.whenToUse, files: filesOf(method) }
   })
 }
 
 /**
  * Match authored names, identifiers and uses without changing the source order.
- * @param skills - Available stage-one packages.
+ * @param skills - Available platform adaptations and course originals.
  * @param query - User search text.
  * @returns Matching real packages.
  */
 export function searchLibrary(skills: readonly LibrarySkill[], query: string): readonly LibrarySkill[] {
   const needle = query.trim().toLocaleLowerCase()
-  return skills.filter(skill => [skill.id, skill.label, skill.description, skill.whenToUse].some(value => value.toLocaleLowerCase().includes(needle)))
+  return skills.filter(skill => [skill.id, skill.label, skill.description, skill.whenToUse,
+    ...(skill.source === 'course' ? [skill.course.title, skill.course.lessonTitle, String(skill.course.lessonNumber)] : []),
+  ].some(value => value.toLocaleLowerCase().includes(needle)))
+}
+
+/** One real file or a directory implied by at least one real file path. */
+export type SkillTreeNode =
+  | { readonly kind: 'file'; readonly path: string; readonly name: string }
+  | { readonly kind: 'directory'; readonly path: string; readonly name: string; readonly children: SkillTreeNode[] }
+
+/**
+ * Preserve file order while forming the package's actual nested directories.
+ * @param files - The same relative file paths used for archive entries.
+ * @returns Root children; no folders without real descendants are added.
+ */
+export function skillFileTree(files: readonly SkillFile[]): SkillTreeNode[] {
+  const root: SkillTreeNode[] = []
+  for (const file of files) {
+    const parts = file.path.split('/')
+    let children = root
+    for (const [index, name] of parts.entries()) {
+      const path = parts.slice(0, index + 1).join('/')
+      if (index === parts.length - 1) children.push({ kind: 'file', name, path })
+      else {
+        let directory = children.find(node => node.kind === 'directory' && node.path === path)
+        if (directory?.kind !== 'directory') {
+          directory = { kind: 'directory', name, path, children: [] }
+          children.push(directory)
+        }
+        children = directory.children
+      }
+    }
+  }
+  return root
+}
+
+/**
+ * Resolve a relative document link only when it names an actual package file.
+ * @param files - Explicit package contents, never user or system filesystem paths.
+ * @param currentPath - The displayed document's package-relative path.
+ * @param value - Authored link destination.
+ * @returns The contained file path, or undefined for external, escaping or missing targets.
+ */
+export function resolveSkillFile(files: readonly SkillFile[], currentPath: string, value: string): string | undefined {
+  let decoded: string
+  try { decoded = decodeURIComponent(value.split(/[?#]/)[0] ?? '') } catch { return undefined }
+  if (decoded === '' || /^(?:[a-z][a-z0-9+.-]*:|\/)/i.test(decoded) || decoded.includes('\\')) return undefined
+  const parts = currentPath.split('/').slice(0, -1)
+  for (const part of decoded.split('/')) {
+    if (part === '' || part === '.') continue
+    if (part === '..') {
+      if (parts.length === 0) return undefined
+      parts.pop()
+    } else parts.push(part)
+  }
+  const path = parts.join('/')
+  return files.some(file => file.path === path) ? path : undefined
 }
 
 /**
@@ -106,6 +183,6 @@ export function saveSkillDownload(filename: string, content: string | Uint8Array
   try { link.click() } finally {
     link.remove()
     // Leave the Blob alive long enough for the browser to begin reading it.
-    setTimeout(() => URL.revokeObjectURL(url), 1_000)
+    setTimeout(() => { URL.revokeObjectURL(url) }, 1_000)
   }
 }
