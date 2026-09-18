@@ -18,6 +18,10 @@
 
 保留原实验室模型路由：`DEEPSEEK_PROVIDER` 默认 `deepseek-official`，`DEEPSEEK_MODEL` 默认 `deepseek-v4-flash`。凭据由已有 Host Provider 配置提供。训练不跟随、不改变项目的模型选择器。
 
+访谈、证据核对和报告均不指定 `reasoningEffort`，沿用所选 Provider/模型的默认配置。不支持推理的模型不会被强制传入档位；省略参数不代表关闭思考。请求准备错误会将原生错误消息保留到访谈回执或辅助任务失败信息中，包括用户消息尚未提交的情况。真正取消时仍使用已有的兜底提示。
+
+自定义 `llm-pi-ai` 网关若拒绝 `developer` 角色，在该 Provider 或模型上设置 `compat.supportsDeveloperRole: false`，不要全局覆盖。只声明模型实际支持的推理档位。若其接口要求 `reasoning_effort: none`，映射写作 `reasoningEfforts: { off: none }`；`none` 不是内部档位名，不支持推理的模型也不需要虚构档位声明。详见 [Provider 推理与兼容配置](../../llm/llm-pi-ai/README.zh.md)。特定网关是否接受请求，仍须在对应网关上验证。
+
 #### KV Cache effect
 
 同一案例版本的岗位提示词保持稳定。每个岗位有独立、持久的原生对话；核对和报告草稿使用单独 Session，会增加模型用量，但不会向项目 Session 注入内容。

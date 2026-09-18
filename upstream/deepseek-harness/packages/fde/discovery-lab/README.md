@@ -18,6 +18,10 @@ Opening the lobby, selecting a role and restoring records do not call a model. S
 
 The original training route is retained: `DEEPSEEK_PROVIDER` defaults to `deepseek-official`, and `DEEPSEEK_MODEL` to `deepseek-v4-flash`. Credentials come from the existing Host provider configuration. Training does not follow or change a project's model picker.
 
+Interviews, evidence checks and reports leave `reasoningEffort` unset and use the selected provider/model defaults. Models without reasoning capability receive no forced effort; omission does not mean reasoning is disabled. Request-preparation errors retain their native error message in the interview receipt or helper failure, including failures before a user message is committed. Actual cancellation retains its existing fallback message.
+
+For a custom `llm-pi-ai` gateway that rejects the `developer` role, set `compat.supportsDeveloperRole: false` on that provider or model, not globally. Declare only the reasoning levels the model supports. If its wire protocol requires `reasoning_effort: none`, the mapping is `reasoningEfforts: { off: none }`; `none` is not an internal effort name, and non-reasoning models do not require a fabricated effort declaration. See [provider reasoning and compatibility](../../llm/llm-pi-ai/README.md). Gateway-specific acceptance still requires validation against that gateway.
+
 #### KV Cache effect
 
 Role prompts are stable within a case version. Each role has its own durable native conversation; evidence checks and report drafts use separate sessions and add model usage, without injecting content into project sessions.

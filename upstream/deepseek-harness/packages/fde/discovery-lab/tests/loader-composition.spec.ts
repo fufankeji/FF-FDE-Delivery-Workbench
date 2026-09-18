@@ -10,7 +10,7 @@ import { sessionDir } from '../../../session/session-persistence-jsonl/src/forma
 import { Context } from '@deepseek-ai/cordis'
 import Loader from '@deepseek-ai/cordis-plugin-loader'
 import Include from '@deepseek-ai/cordis-plugin-include'
-import LlmRuntime, { LlmAdapter, ReasoningEffortId, ToolCallId, createUserMessage, type GenerateOptions, type StreamChunk } from '@deepseek-ai/dsh-llm'
+import LlmRuntime, { LlmAdapter, ReasoningEffortId, ToolCallId, createUserMessage, type GenerateOptions, type LlmResolvedModelInfo, type StreamChunk } from '@deepseek-ai/dsh-llm'
 import SessionStore, { SessionId } from '@deepseek-ai/dsh-session'
 import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
 import ToolRuntime, { defineContentToolFixture } from '@deepseek-ai/dsh-tools'
@@ -56,8 +56,9 @@ class OfflineAdapter extends LlmAdapter {
   steps = 0
   assetId = ''
   forbiddenAssetId = ''
+  reasoning: LlmResolvedModelInfo['reasoning']
   override resolveModel(provider: string, model: string) {
-    return Promise.resolve({ provider, id: model, name: model, reasoning: { efforts: [{ id: ReasoningEffortId('off'), name: 'Off' }] } })
+    return Promise.resolve({ provider, id: model, name: model, ...this.reasoning === undefined ? {} : { reasoning: this.reasoning } })
   }
   override async * stream(options: GenerateOptions): AsyncIterable<StreamChunk> {
     this.requests.push(options)
@@ -172,6 +173,7 @@ it('isolates roles and globals, persists native evidence, restores idle roles an
   expect((await first.response('/runs/' + run.runId + '/assets/' + asset.id)).status).toBe(200)
   expect((await first.response('/runs/' + run.runId + '/reports', {})).status).toBe(409)
   for (const request of adapter.requests) {
+    expect(request.reasoningEffort).toBeUndefined()
     expect(systemOf(request)).not.toContain('WORKSPACE_ONLY_CONTEXT')
     expect(JSON.stringify(request.messages)).not.toContain('WORKSPACE_ONLY_INSTRUCTION')
     expect(request.tools?.map(tool => tool.name) ?? []).not.toContain('workspaceMutator')
@@ -198,3 +200,55 @@ it('isolates roles and globals, persists native evidence, restores idle roles an
   expect(Lab.inject).not.toContain('workspaceRegistry')
   expect(Lab.inject).not.toContain('fdeStage')
 }, 20000)
+
+it('persists preparation errors without a committed user message and permits a fresh interview', async () => {
+  type Snapshot = {
+    sessions: { roleId: string; sessionId: string; messages: unknown[]; error: string | null; evaluationStatus: string }[]
+    evidence: unknown[]
+  }
+  directory = await mkdtemp(join(tmpdir(), 'fde-lab-preparation-'))
+  vi.stubEnv('DSH_HOME', directory)
+  vi.stubEnv('DEEPSEEK_PROVIDER', 'offline-lab')
+  vi.stubEnv('DEEPSEEK_MODEL', 'scripted')
+  const adapter = new OfflineAdapter()
+  const first = await mount(adapter)
+  const run = await first.api('/cases/finance/start', {}) as { runId: string }
+  const failure = '测试网关模型配置无效'
+  vi.spyOn(adapter, 'resolveModel').mockRejectedValueOnce(new Error(failure))
+  const messages = '/runs/' + run.runId + '/roles/employee/messages'
+  const receipt = '/runs/' + run.runId + '/requests/failed-preparation'
+  await first.api(messages, { requestId: 'failed-preparation', text: '本月有多少申请？' })
+  await expect.poll(async () => (await first.api(receipt) as { status: string }).status).toBe('failed')
+  expect((await first.api(receipt) as { error: string }).error).toContain(failure)
+  expect(adapter.requests).toHaveLength(0)
+  const failed = await first.api('/runs/' + run.runId) as Snapshot
+  const role = failed.sessions.find(row => row.roleId === 'employee')!
+  expect(role.messages).toEqual([])
+  expect(role.error).toContain(failure)
+  expect(failed.evidence).toEqual([])
+  const reader = await first.ctx.sessionPersistence.open(SessionId(role.sessionId), 'read')
+  try {
+    const { events } = await reader.read()
+    expect(events.some(event => event.type === 'user/message')).toBe(false)
+    const ended = events.find(event => event.type === 'turn/end')
+    expect(ended?.data.reason.kind).toBe('error')
+    if (ended?.data.reason.kind === 'error') expect(ended.data.reason.error.message).toContain(failure)
+  } finally { await reader.close() }
+
+  adapter.steps = 3
+  adapter.reasoning = { efforts: [{ id: ReasoningEffortId('medium'), name: 'Medium' }], defaultEffort: ReasoningEffortId('medium') }
+  await first.api(messages, { requestId: 'retry', text: '请重新说明申请数量。' })
+  await expect.poll(() => first.api('/runs/' + run.runId + '/requests/retry')).toMatchObject({ status: 'completed', error: null })
+  await expect.poll(async () => (await first.api('/runs/' + run.runId) as Snapshot).sessions.find(row => row.roleId === 'employee')?.evaluationStatus, { timeout: 8000 }).toBe('idle')
+  expect(adapter.requests.length).toBeGreaterThan(0)
+  expect(adapter.requests.every(request => request.reasoningEffort === 'medium')).toBe(true)
+  await first.ctx.fiber.dispose()
+  contexts.pop()
+
+  const restoredAdapter = new OfflineAdapter()
+  const second = await mount(restoredAdapter)
+  const restored = await second.api(receipt) as { status: string; error: string }
+  expect(restored.status).toBe('failed')
+  expect(restored.error).toContain(failure)
+  expect(restoredAdapter.requests).toHaveLength(0)
+})

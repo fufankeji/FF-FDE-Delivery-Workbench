@@ -41,7 +41,7 @@ export class NativeSessions {
           return {...value, messages:value.messages.filter(m => m.source?.kind === 'user' || (m.source?.kind === 'plugin' && m.source.plugin === 'fde-discovery-lab'))};
         }, {prepend:true});
       };
-      const options = {setup, agentOptions:{provider:process.env.DEEPSEEK_PROVIDER || 'deepseek-official', model:process.env.DEEPSEEK_MODEL || 'deepseek-v4-flash', reasoningEffort:'off', maxTokens}};
+      const options = {setup, agentOptions:{provider:process.env.DEEPSEEK_PROVIDER || 'deepseek-official', model:process.env.DEEPSEEK_MODEL || 'deepseek-v4-flash', maxTokens}};
       // This host lazily materializes JSONL: selecting an idle role alone
       // leaves no artifact. Corrupt artifacts still throw; only absence is new.
       resume=(await this.ctx.sessionPersistence.stat(sessionId))!==undefined;
@@ -104,7 +104,14 @@ export class NativeSessions {
     await this.ctx.sessions.flush(agent.session);
     const events = (await this.events(agent.id)).filter(event => event.seq >= fromSeq);
     const consumed = events.find(e => e.type === 'user/message' && e.data.id === messageId);
-    if (!consumed) return {status:'canceled',messageId,events:[]};
+    if (!consumed) {
+      // send starts idle with one active request. Preparation can fail in its
+      // first turn before user/message; older turns are excluded by fromSeq.
+      const started = events.find(e => e.type === 'turn/start');
+      const ended = started && events.find(e => e.type === 'turn/end' && e.data.turn === started.data.turn);
+      if (ended?.data.reason?.kind === 'error') return {status:'failed',messageId,events,reason:ended.data.reason};
+      return {status:'canceled',messageId,events:[]};
+    }
     // One active request per owned session: identify its consumed turn first.
     const turnStart = events.filter(e => e.type === 'turn/start' && e.seq < consumed.seq).at(-1);
     const replies = events.filter(e => e.type === 'assistant/message' && e.data.turn === turnStart?.data.turn && !e.data.interrupted);
@@ -133,7 +140,7 @@ export class NativeSessions {
     try {
       await this.open({sessionId,prompt,maxTokens});
       const result = await this.send(sessionId, input).completion;
-      if (result.status !== 'completed') throw new Error('模型任务未生成完整内容，请重试。');
+      if (result.status !== 'completed') throw new Error(result.reason?.error?.message || '模型任务未生成完整内容，请重试。');
       return {sessionId,text:result.text};
     } finally { await this.dispose(sessionId); this.helperOwners.delete(sessionId); }
   }
