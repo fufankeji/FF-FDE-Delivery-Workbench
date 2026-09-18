@@ -1056,14 +1056,13 @@ export function WorkspaceBrowser({
     setProjectFormOpen(true)
   }, [resetProjectForm])
   useEffect(() => {
-    if (!directoryFlowAvailable) return
     const openFromProjectCenter = (event: Event): void => {
       event.preventDefault()
       openProjectForm()
     }
     window.addEventListener(FDE_PROJECT_CREATE_OPEN_EVENT, openFromProjectCenter)
     return () => { window.removeEventListener(FDE_PROJECT_CREATE_OPEN_EVENT, openFromProjectCenter) }
-  }, [directoryFlowAvailable, openProjectForm])
+  }, [openProjectForm])
   const chooseScheduleMode = (mode: 'pending-confirmation' | 'estimated'): void => {
     setScheduleMode(mode)
     setProjectFormError(null)
@@ -1118,6 +1117,7 @@ export function WorkspaceBrowser({
     if (directoryMode === 'import') importProject(path)
   }
   const confirmCreateProject = (): void => {
+    if (!directoryFlowAvailable) return
     setProjectFormAttempted(true)
     const validationError = projectValidationError()
     if (validationError !== null) {
@@ -1478,7 +1478,7 @@ export function WorkspaceBrowser({
             <Button variant="outline" disabled={creatingProject || directoryBusy} onClick={closeProjectForm}>
               {t('cancel')}
             </Button>
-            <Button variant="primary" disabled={creatingProject || directoryBusy} onClick={confirmCreateProject}>
+            <Button variant="primary" disabled={creatingProject || directoryBusy || !directoryFlowAvailable} onClick={confirmCreateProject}>
               {creatingProject ? t('projectForm.submitting') : t('projectForm.submit')}
             </Button>
           </>
@@ -1622,9 +1622,11 @@ export function WorkspaceBrowser({
             {t('projectForm.import')}
           </Button>
 
-          {(projectFormAttempted || projectFormError !== null) && projectFormError !== null
-            ? <div className={css.projectError} role="alert">{projectFormError}</div>
-            : null}
+          {!directoryFlowAvailable
+            ? <div className={css.projectError} role="alert">{t('projectForm.error.directoryUnavailable')}</div>
+            : (projectFormAttempted || projectFormError !== null) && projectFormError !== null
+              ? <div className={css.projectError} role="alert">{projectFormError}</div>
+              : null}
         </div>
       </Modal>
 

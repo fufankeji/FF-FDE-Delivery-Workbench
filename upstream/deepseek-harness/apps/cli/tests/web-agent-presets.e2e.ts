@@ -103,14 +103,7 @@ async function bootWeb(
     // The always-on reload chain waits for the browser roster and bound port
     // disabled above.
     { id: 'client-hmr', disabled: true },
-    // The shipped `-auto` chooser resolves its interaction from a running
-    // host and so waits for the webserver disabled above; the browse variant
-    // supplies `directoryPicker` without one.
-    { id: 'directory-picker', disabled: true },
-    { insert: [
-      { id: 'directory-picker-browse', name: '@deepseek-ai/dsh-host-directory-picker-browse' },
-      { id: 'ui-directory-picker-browse', name: '@deepseek-ai/dsh-client-ui-directory-picker-browse' },
-    ] },
+    // Use the shipped browse pair unchanged; a test-only insert would hide a missing default surface.
     // Pin the roster away from the developer's machine: `includeUserRoot`
     // false keeps `~/.dsh/.agent-presets` from changing a test's outcome.
     // `default` here is the COMPOSITION default — the base layer the settings

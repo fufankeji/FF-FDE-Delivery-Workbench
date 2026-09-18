@@ -910,6 +910,36 @@ describe('WorkspaceBrowser', () => {
     expect(screen.getByRole('dialog', { name: '新建项目' })).toBeTruthy()
   })
 
+  it('answers Project Center requests with an unavailable message and blocks writes without a directory surface', () => {
+    const b = mount({ useDirectoryFlow: hook(false) })
+    const event = new Event('fde:project-create-open', { cancelable: true })
+    act(() => { window.dispatchEvent(event) })
+    expect(event.defaultPrevented).toBe(true)
+    expect(screen.getByRole('dialog', { name: '新建项目' })).toBeTruthy()
+    expect(screen.getByRole('alert').textContent).toContain('目录选择功能尚未就绪')
+    for (const name of ['创建项目', '更改', '导入已有项目']) {
+      const button = screen.getByRole<HTMLButtonElement>('button', { name })
+      expect(button.disabled).toBe(true)
+      fireEvent.click(button)
+    }
+    expect(b.props.createDirectory).not.toHaveBeenCalled()
+    expect(b.props.createWorkspace).not.toHaveBeenCalled()
+  })
+
+  it('recovers directory availability in the open form without losing the draft', () => {
+    const b = mount({ useDirectoryFlow: hook(false) })
+    act(() => { window.dispatchEvent(new Event('fde:project-create-open', { cancelable: true })) })
+    fireEvent.change(screen.getByPlaceholderText('例如：某企业智能客服升级'), { target: { value: '恢复测试项目' } })
+    rerender(b, { useDirectoryFlow: hook(true) })
+    expect(screen.queryByRole('alert')).toBeNull()
+    expect(screen.getByPlaceholderText<HTMLInputElement>('例如：某企业智能客服升级').value).toBe('恢复测试项目')
+    expect(screen.getByRole<HTMLButtonElement>('button', { name: '更改' }).disabled).toBe(false)
+    expect(screen.getByRole<HTMLButtonElement>('button', { name: '创建项目' }).disabled).toBe(false)
+    rerender(b, { useDirectoryFlow: hook(false) })
+    expect(screen.getByRole('alert').textContent).toContain('目录选择功能尚未就绪')
+    expect(screen.getByRole<HTMLButtonElement>('button', { name: '创建项目' }).disabled).toBe(true)
+  })
+
   it('requires a chosen root, creates with an independent ASCII name, remembers metadata and location, and opens project management', async () => {
     type DirectoryOwner = {
       open: boolean

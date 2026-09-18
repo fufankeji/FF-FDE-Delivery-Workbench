@@ -11,6 +11,8 @@ dsh 浏览器表层组合包。[`cordis.patch.yml`](cordis.patch.yml) 叠加在 
 
 当前下游 FDE profile 固定组合官方 browse 目录选择 Host backend 与 Client surface。结构化项目创建同时需要应用内父目录选择和 `host.createDirectory`；本地 native 选择器只提供选择能力，无法满足该流程。
 
+默认配对使用 `directory-picker` 和 `ui-directory-picker-browse`。Desktop 覆盖配置先禁用两者，再挂载 native 两端。升级前若曾以临时补丁插入 `ui-directory-picker-browse`，升级后应移除这个重复 insert；默认 profile 已提供它。
+
 同一个下游 profile 还会挂载 `fde-source` 与 `ui-fde-sources`：每个真实项目行都可以把一个有界文件批次持久化到该 Workspace 可见的 `fde-resources/` 目录。该动作只负责项目存储，不修改对话草稿，也不启动 Agent 轮次。
 
 它还会挂载 `fde-stage` 与 `ui-fde-stage`：一个 Workspace 级记录从需求调研开始，空白 Session 显示紧凑当前阶段提示，已开始 Session 的标题栏显示当前阶段。当前切片只读，不提供阶段变更动作。

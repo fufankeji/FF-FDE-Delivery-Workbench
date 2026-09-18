@@ -72,6 +72,8 @@ The package is one composition: both target slots are declared by other plugins,
 
 ### The directory-flow hole
 
+Project Center creation requests always open this package's existing project form, even when the directory-flow surface is missing or loading. The form shows an explicit availability message and disables create, location selection and import until the surface returns; recovery retains the draft. A missing surface cannot issue directory or Workspace writes. The sidebar's own unavailable add action remains hidden.
+
 Each registration declares a **directory-flow child hole** (`single` kind: `conversation.hero.workspace.directoryFlow` / `sidebar.workspaces.directoryFlow`) that the composed picker package's client half fills with its picking interaction — the `-native` backend's renderless OS-chooser driver, an in-app browsing dialog under a `-browse` composition. The flat **Add workspace...** action renders only while the surface's hole is occupied; an empty hole means the composition has no picking affordance. This package owns the trigger and the adoption: the occupant reports one picked path per open through the hole's owner conversation (`open`/`busy`/`onPicked`/`onCancel`/`onError`), and the owner adopts it through the object layer, selecting the committed Workspace only after its list projection has refreshed.
 
 ### View state

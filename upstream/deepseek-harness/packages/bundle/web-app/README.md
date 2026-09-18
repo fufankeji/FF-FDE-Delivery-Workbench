@@ -11,6 +11,8 @@ The dsh browser-surface bundle. [`cordis.patch.yml`](cordis.patch.yml) rides ove
 
 This downstream FDE profile pins the official browse directory-picker Host backend and Client surface. Structured project creation needs both in-app parent selection and `host.createDirectory`; the local native chooser supplies selection only and therefore cannot satisfy that flow.
 
+The default pair uses `directory-picker` and `ui-directory-picker-browse`. The Desktop overlay disables both before mounting its native pair. Deployments that previously inserted `ui-directory-picker-browse` as a workaround must remove that redundant insert after upgrading; the shipped profile now supplies it.
+
 The same downstream profile mounts `fde-source` and `ui-fde-sources`: every real project row can persist one bounded file batch into that Workspace's visible `fde-resources/` directory. This action is project storage only and does not alter a conversation draft or start an Agent turn.
 
 It also mounts `fde-stage` and `ui-fde-stage`: one Workspace-scoped record starts at requirements research, blank Sessions show a compact current-stage prompt, and active Session headers show the current stage. The current slice is read-only and provides no stage transition action.

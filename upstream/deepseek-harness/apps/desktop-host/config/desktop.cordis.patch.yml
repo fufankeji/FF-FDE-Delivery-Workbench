@@ -21,6 +21,9 @@
 - id: directory-picker
   disabled: true
 
+- id: ui-directory-picker-browse
+  disabled: true
+
 - id: connection
   inject:
     - credentials
