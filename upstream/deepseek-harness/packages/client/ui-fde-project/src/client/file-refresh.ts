@@ -7,7 +7,10 @@ import type {} from '@deepseek-ai/dsh-api-session-controller/client'
 
 /** Follow only the selected Session and release the stream when it changes. */
 export function installProjectFileRefresh(ctx: Context): void {
-  ctx.inject(['remote.workspaceFiles'], scope => {
+  // Inject the parent `remote` namespace too: the scope accesses
+  // `scope.remote.$stream` below, which the nested-only declaration rejected
+  // with "cannot get property \"remote\" without inject".
+  ctx.inject(['remote', 'remote.workspaceFiles'], scope => {
     let active = true
     let sessionId: string | undefined
     let stop: () => Promise<void> = async () => {}
