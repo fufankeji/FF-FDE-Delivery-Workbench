@@ -10,7 +10,7 @@ export function installProjectFileRefresh(ctx: Context): void {
   // Inject the parent `remote` namespace too: the scope accesses
   // `scope.remote.$stream` below, which the nested-only declaration rejected
   // with "cannot get property \"remote\" without inject".
-  ctx.inject(['remote', 'remote.workspaceFiles'], scope => {
+  ctx.inject(['remote', 'remote.workspaceFiles'], (scope) => {
     let active = true
     let sessionId: string | undefined
     let stop: () => Promise<void> = async () => {}
