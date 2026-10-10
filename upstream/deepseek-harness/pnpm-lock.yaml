@@ -2208,8 +2208,8 @@ importers:
         specifier: 0.2.12
         version: 0.2.12(@deepseek-ai/cordis@vendor+cordis)(@deepseek-ai/dsh-llm@0.1.6-alpha.1(@deepseek-ai/cordis@vendor+cordis))(@deepseek-ai/dsh-session@0.1.6-alpha.1(@deepseek-ai/cordis@vendor+cordis)(@deepseek-ai/dsh-scope@0.1.6-alpha.1(@deepseek-ai/cordis@vendor+cordis)(@deepseek-ai/dsh-invariants@0.1.6-alpha.1(@deepseek-ai/cordis@vendor+cordis))))(@deepseek-ai/dsh-storage-domain@0.1.6-alpha.1(@deepseek-ai/cordis@vendor+cordis)(@deepseek-ai/dsh-invariants@0.1.6-alpha.1(@deepseek-ai/cordis@vendor+cordis))(@deepseek-ai/dsh-storage@0.1.6-alpha.1(@deepseek-ai/cordis@vendor+cordis)))(@deepseek-ai/dsh-storage-json@0.1.6-alpha.1(@deepseek-ai/cordis@vendor+cordis)(@deepseek-ai/dsh-storage@0.1.6-alpha.1(@deepseek-ai/cordis@vendor+cordis)))(@deepseek-ai/dsh-storage@0.1.6-alpha.1(@deepseek-ai/cordis@vendor+cordis))(@deepseek-ai/dsh-typert-protocol@0.1.6-alpha.1(@deepseek-ai/cordis@vendor+cordis))(@deepseek-ai/schemastery@vendor+schemastery)(oxc-resolver@11.20.0)(publint@0.3.21)(tsx@4.22.4)
       dsh-openapi:
-        specifier: git+https://github.com/Degurechaff57/dsh-openapi.git#fb854355b89e495ded090b9e2eb94c33430d2366
-        version: https://codeload.github.com/Degurechaff57/dsh-openapi/tar.gz/fb854355b89e495ded090b9e2eb94c33430d2366(@deepseek-ai/cordis@vendor+cordis)(@deepseek-ai/dsh-tools@0.1.6-alpha.1(022d52395afbb3d3cf8ebe81f2e78927))(@deepseek-ai/schemastery@vendor+schemastery)
+        specifier: file:../../../third-party/dsh-openapi
+        version: file:third-party/dsh-openapi(@deepseek-ai/cordis@vendor+cordis)(@deepseek-ai/dsh-tools@0.1.6-alpha.1(022d52395afbb3d3cf8ebe81f2e78927))(@deepseek-ai/schemastery@vendor+schemastery)
       open:
         specifier: ^11.0.0
         version: 11.0.0
@@ -7094,8 +7094,8 @@ importers:
         specifier: workspace:^
         version: link:../../workspace/workspace
       dsh-openapi:
-        specifier: git+https://github.com/Degurechaff57/dsh-openapi.git#fb854355b89e495ded090b9e2eb94c33430d2366
-        version: https://codeload.github.com/Degurechaff57/dsh-openapi/tar.gz/fb854355b89e495ded090b9e2eb94c33430d2366(@deepseek-ai/cordis@vendor+cordis)(@deepseek-ai/dsh-tools@packages+core+tools)(@deepseek-ai/schemastery@vendor+schemastery)
+        specifier: file:../../../third-party/dsh-openapi
+        version: file:third-party/dsh-openapi(@deepseek-ai/cordis@vendor+cordis)(@deepseek-ai/dsh-tools@packages+core+tools)(@deepseek-ai/schemastery@vendor+schemastery)
 
   packages/fde/semantica:
     dependencies:
@@ -18281,8 +18281,8 @@ packages:
       '@deepseek-ai/dsh-typert-protocol': '>=0.1.2-rc.1 <0.2.0 || >=0.1.5-alpha.1 <0.2.0'
       '@deepseek-ai/schemastery': workspace:*
 
-  dsh-openapi@https://codeload.github.com/Degurechaff57/dsh-openapi/tar.gz/fb854355b89e495ded090b9e2eb94c33430d2366:
-    resolution: {gitHosted: true, integrity: sha512-jM7uhAH8LB7rI8nUDGuJ9TZ+wxTsRh2ycg3uM62wcQcvr1Ycsjy3iKBNR2C5k64OkC+rP3S9DTjw46WuejLUWQ==, tarball: https://codeload.github.com/Degurechaff57/dsh-openapi/tar.gz/fb854355b89e495ded090b9e2eb94c33430d2366}
+  dsh-openapi@file:third-party/dsh-openapi:
+    resolution: {directory: third-party/dsh-openapi, type: directory}
     version: 0.1.0
     engines: {node: ^22.19.0 || >=24.0.0}
     peerDependencies:
@@ -27073,14 +27073,14 @@ snapshots:
       - unrun
       - vue-tsc
 
-  dsh-openapi@https://codeload.github.com/Degurechaff57/dsh-openapi/tar.gz/fb854355b89e495ded090b9e2eb94c33430d2366(@deepseek-ai/cordis@vendor+cordis)(@deepseek-ai/dsh-tools@0.1.6-alpha.1(022d52395afbb3d3cf8ebe81f2e78927))(@deepseek-ai/schemastery@vendor+schemastery):
+  dsh-openapi@file:third-party/dsh-openapi(@deepseek-ai/cordis@vendor+cordis)(@deepseek-ai/dsh-tools@0.1.6-alpha.1(022d52395afbb3d3cf8ebe81f2e78927))(@deepseek-ai/schemastery@vendor+schemastery):
     dependencies:
       '@deepseek-ai/cordis': link:vendor/cordis
       '@deepseek-ai/dsh-tools': 0.1.6-alpha.1(022d52395afbb3d3cf8ebe81f2e78927)
       '@deepseek-ai/schemastery': link:vendor/schemastery
       yaml: 2.9.0
 
-  dsh-openapi@https://codeload.github.com/Degurechaff57/dsh-openapi/tar.gz/fb854355b89e495ded090b9e2eb94c33430d2366(@deepseek-ai/cordis@vendor+cordis)(@deepseek-ai/dsh-tools@packages+core+tools)(@deepseek-ai/schemastery@vendor+schemastery):
+  dsh-openapi@file:third-party/dsh-openapi(@deepseek-ai/cordis@vendor+cordis)(@deepseek-ai/dsh-tools@packages+core+tools)(@deepseek-ai/schemastery@vendor+schemastery):
     dependencies:
       '@deepseek-ai/cordis': link:vendor/cordis
       '@deepseek-ai/dsh-tools': link:packages/core/tools

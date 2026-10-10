@@ -61,7 +61,7 @@
     "@deepseek-ai/dsh-system-prompt": "workspace:^",
     "@deepseek-ai/dsh-tools": "workspace:^",
     "@deepseek-ai/dsh-workspace": "workspace:^",
-    "dsh-openapi": "git+https://github.com/Degurechaff57/dsh-openapi.git#fb854355b89e495ded090b9e2eb94c33430d2366",
+    "dsh-openapi": "file:../../../third-party/dsh-openapi",
     "@deepseek-ai/dsh-session-projection-cache": "workspace:^",
     "@deepseek-ai/dsh-util-values": "workspace:^"
   }

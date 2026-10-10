@@ -1,0 +1,18 @@
+{
+  "name": "dsh-openapi",
+  "version": "0.1.0",
+  "upstreamRepository": "https://github.com/Degurechaff57/dsh-openapi",
+  "upstreamCommit": "fb854355b89e495ded090b9e2eb94c33430d2366",
+  "license": "MIT",
+  "recoveredFrom": "Existing pnpm installation resolved by the pinned project lockfile; upstream is no longer publicly accessible.",
+  "files": {
+    "package.json": "78bf3155955b450127e22ddbc007b716cad63457910a1957f864e87cdb25dab4",
+    "index.js": "74c7e8be062ee0c825c78c9050307bfd209c6769832a072cce17487c29857c9f",
+    "cordis.patch.yml": "b7021524d22baf8d89a7ae75ecb4fdb8f314976fdd3abff06ab2ee820206714f",
+    "README.md": "e09d75378de2afd02862b39d060c06b2134822298324e3c465d01158f2fee5af",
+    "README.zh-CN.md": "df3461dbf36551465c92c30f705b2cb87340b14e3b98de11886f324d5e20ad5f",
+    "LICENSE": "95f81023934b2c5dfcbf215fc8cdb7ac6ab7abcc793109f4246fb2bfd9a480c1",
+    "src/openapi.js": "fd8cff46808ca4500eb58cec15fa1489f4b7c20963da558603765ef8ce33557a",
+    "src/http.js": "04eefd69802e9489c570808dabb0e6a899574b7ed1f2aa20579aeac1f84b14ba"
+  }
+}

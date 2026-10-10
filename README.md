@@ -50,6 +50,8 @@
 
 需要 Node.js 24+、Corepack 和 pnpm。以下为 macOS/Linux Shell 命令；仓库目前为私有仓库，拉取者需先获得访问权限。首次安装和构建需要网络，不需要模型密钥。
 
+OpenAPI 依赖以固定本地包随源码提供，位于 `upstream/deepseek-harness/third-party/dsh-openapi/`；Git 克隆或源码包必须保留该目录及其 MIT 许可证。安装此依赖不需要原作者 GitHub 仓库权限，其余公共依赖仍按锁文件下载。
+
 ```bash
 git clone https://github.com/fufankeji/FF-FDE-Delivery-Workbench.git
 cd FF-FDE-Delivery-Workbench

@@ -1,0 +1,5 @@
+- insert:
+    - id: openapi
+      name: dsh-openapi
+      config:
+        apis: []

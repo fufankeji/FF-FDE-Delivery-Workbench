@@ -136,7 +136,7 @@
     "dsh-eval-harness": "git+https://github.com/BiBoyang/dsh-eval-harness.git#2f59376e2a2f22c151f75de446d5cde764dd5aff",
     "dsh-file-review-tab": "0.5.0",
     "dsh-observe": "0.2.12",
-    "dsh-openapi": "git+https://github.com/Degurechaff57/dsh-openapi.git#fb854355b89e495ded090b9e2eb94c33430d2366"
+    "dsh-openapi": "file:../../../third-party/dsh-openapi"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "workspace:^",

@@ -69,7 +69,7 @@ FF - FDE Web Profile / Bundle
 │   ├── fde-confirmation             确认项与基线提交
 │   ├── fde-stage                    Workspace 级当前阶段；后续交付门与历史
 │   ├── fde-api-docs                 项目 API 文档/OpenAPI 配置和作用域
-│   ├── dsh-openapi                  固定公开插件；Agent OpenAPI 搜索、描述与受控调用
+│   ├── dsh-openapi                  随源码提供的固定本地包；Agent OpenAPI 搜索、描述与受控调用
 │   ├── fde-architecture             项目级架构 schema、版本、状态与 Agent 工具
 │   ├── fde-observability            Workspace 级本地运行聚合与外部详情配置
 │   ├── dsh-observe                  固定公开插件；脱敏 Langfuse/OTLP 导出
@@ -223,7 +223,7 @@ FDE Project (= Harness Workspace)
 
 ### 5.6 API 文档与 OpenAPI 能力
 
-- 直接集成 `dsh-openapi@fb854355b89e495ded090b9e2eb94c33430d2366`（v0.1.0，MIT）。该插件提供 `openapi_list`、`openapi_describe`、`openapi_call`，支持 OpenAPI 3.0/3.1、默认 `GET/HEAD`、声明参数校验、环境凭据注入、私网与重定向检查、超时、文档和响应上限。
+- 直接集成 `dsh-openapi@fb854355b89e495ded090b9e2eb94c33430d2366`（v0.1.0，MIT）的固定本地包，位于 Harness 的 `third-party/dsh-openapi/`。两个消费包均通过 `file:` 安装，来源及逐文件 SHA-256 保存在同级 `dsh-openapi.source.json`；原运行代码和许可不改写，安装不依赖原 GitHub 仓库的可访问性。该插件提供 `openapi_list`、`openapi_describe`、`openapi_call`，支持 OpenAPI 3.0/3.1、默认 `GET/HEAD`、声明参数校验、环境凭据注入、私网与重定向检查、超时、文档和响应上限。
 - 原插件没有 Client UI，且 API 目录是插件级静态配置。`fde-project` 不挂载该全局目录，而是直接复用锁定包的解析、目录、参数、凭据、重定向和有界请求模块；`openapi_list/describe/call` 每次执行都从 calling Agent cwd 解析注册 Workspace，再读取该项目受信任 API 来源。
 - 显式 `.fde/api-docs.json` 保存 `docsUrl`、`openapiSource`、可选 `baseUrl`、允许方法、私网开关、固定 Header 和非秘密凭据环境引用并保持最高优先级；文件缺失时只回退到当前 `running` 记录中由 `project_runtime_report` 提交的来源。默认只允许 `GET/HEAD`，Client 和模型参数都不能临时扩展项目 API 目录。
 - `ui-fde-project` 只有在阶段至少为项目开发、项目状态为 `running` 且 API 快照含真实 `openapiSource` 时通过 `conversation.view` 注册“API 文档”。内嵌使用受限 iframe并保留外部打开；停止、阻塞或无 OpenAPI 时不显示该 View，不猜测 `/docs`、端口或最近运行项目。
