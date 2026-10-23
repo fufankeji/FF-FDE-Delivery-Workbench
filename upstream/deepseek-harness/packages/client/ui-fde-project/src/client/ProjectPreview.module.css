@@ -5,3 +5,6 @@
   border: 0;
   background: var(--dsw-alias-bg-base);
 }
+
+/* Preview content remains owned by the target project, without an extra app frame. */
+.frame { display: block; }

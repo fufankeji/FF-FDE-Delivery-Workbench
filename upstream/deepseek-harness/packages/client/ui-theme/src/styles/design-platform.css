@@ -6,10 +6,10 @@
   --dsw-alias-skills-ink: var(--dsw-alias-label-primary);
   --dsw-alias-skills-muted: var(--dsw-alias-label-secondary);
   --dsw-alias-skills-border: var(--dsw-alias-border-l1);
-  --dsw-alias-skills-accent: #2d7bdc;
-  --dsw-alias-skills-button-border: #a9ceff;
-  --dsw-alias-skills-line-end: #b5d9ff;
-  --dsw-alias-skills-on-accent: #fff;
+  --dsw-alias-skills-accent: var(--dsw-alias-state-business-primary);
+  --dsw-alias-skills-button-border: var(--dsw-alias-border-l2);
+  --dsw-alias-skills-line-end: var(--dsw-alias-border-l2);
+  --dsw-alias-skills-on-accent: var(--dsw-alias-label-primary-foreground);
   --dsw-alias-skills-blue: #397dcc;
   --dsw-alias-skills-purple: #62519a;
   --dsw-alias-skills-green: #468d80;
@@ -23,11 +23,11 @@
 }
 body:not([data-ds-dark-theme]) [data-skills-center],
 body:not([data-ds-dark-theme]) [role='dialog']:has(> [data-skill-reader]) {
-  --dsw-alias-skills-canvas: #f3faff;
-  --dsw-alias-skills-card: #fff;
-  --dsw-alias-skills-ink: #10192c;
-  --dsw-alias-skills-muted: #657694;
-  --dsw-alias-skills-border: #dceafa;
+  --dsw-alias-skills-canvas: var(--dsw-alias-bg-base);
+  --dsw-alias-skills-card: var(--dsw-alias-bg-layer-1);
+  --dsw-alias-skills-ink: var(--dsw-alias-label-primary);
+  --dsw-alias-skills-muted: var(--dsw-alias-label-secondary);
+  --dsw-alias-skills-border: var(--dsw-alias-border-l1);
   --dsw-alias-skills-art-opacity: 1;
   --dsw-alias-skills-source-platform: var(--dsw-alias-skills-accent);
   --dsw-alias-skills-source-course: var(--dsw-alias-skills-purple);

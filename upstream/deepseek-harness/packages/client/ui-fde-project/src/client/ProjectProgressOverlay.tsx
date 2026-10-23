@@ -1,6 +1,7 @@
 /** Full Project Progress page beside the persistent project/session sidebar. */
 
 import { Fragment, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { Button, IconPlusOutlineRegular } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { CSSProperties, RefObject } from 'react'
 import type {
   AcceptanceHandoverDecision,
@@ -3103,6 +3104,7 @@ export function ProjectProgressOverlay({
       ref={rootRef}
       className={`${css.pageOverlay} ${css.projectCenterOverlay}`}
       data-testid="fde-project-progress"
+      data-project-native={page.view !== 'project' || undefined}
     >
       {detailRow !== undefined && metadataStates[detailRow.workspaceId]?.status === 'error' && <p role="alert" className={css.projectMetadataWarning}>
         项目基础信息未同步：{(metadataStates[detailRow.workspaceId] as { message: string }).message}
@@ -3217,9 +3219,6 @@ export function ProjectProgressOverlay({
               <p className={css.projectCenterBreadcrumb} data-project-breadcrumb=""><button type="button" onClick={showWorkbenchOverview}>{t('workbench.back')}</button><i>/</i><strong>项目中心</strong>{page.view === 'timeline' && <><i>/</i><span>交付时间轴</span></>}</p>
               <h1>项目中心</h1>
               <p data-project-center-copy="">掌握交付进展，处理需要你决定的事项。</p>
-              <button type="button" className={css.projectCreateAction} data-project-create="" onClick={openProjectCreation}>
-                <span aria-hidden="true">＋</span>新建项目
-              </button>
             </div>
             <div className={css.projectCenterUtilities} aria-label="本地工作区">
               <button type="button" className={css.projectNotification} title={`${attentionRows.length} 个项目待处理`} aria-label={`查看 ${attentionRows.length} 个待处理项目`} onClick={() => { setProjectScope('attention'); setProjectPage(1); setProjectQuery(''); showProjectOverview() }}>
@@ -3227,6 +3226,7 @@ export function ProjectProgressOverlay({
               </button>
               <details className={css.projectCenterHelp}><summary aria-label="项目中心帮助"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" /><path d="M9.8 9a2.4 2.4 0 1 1 3.15 2.28c-.67.28-.95.72-.95 1.47v.25M12 16.5h.01" /></svg></summary><div><strong>项目中心帮助</strong><p>查看交付文件可审阅项目记录；进入项目可继续交付。项目超过 6 个时支持搜索与分页，筛选和排序不会修改项目数据。</p></div></details>
               <span className={css.projectLocalIdentity} title="本地工作区"><img src="/ff-brand/ff-logo.png" alt="FF - FDE 交付工作台 Logo" /><span>本地工作区</span></span>
+              <Button variant="primary" size="sm" icon={<IconPlusOutlineRegular size={14} />} data-project-create="" onClick={openProjectCreation}>{t('workbench.create')}</Button>
             </div>
           </header>
 

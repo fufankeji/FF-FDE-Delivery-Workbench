@@ -25,6 +25,8 @@ English | [中文](README.zh.md)
 <a id="use-this-package"></a>
 ## Use this package
 
+FDE stage and Skill-reader palette aliases inherit the current shell colors. They do not replace the user's light palette with stage-specific fixed colors; the knowledge graph retains its dedicated dark-scene palette.
+
 Users switch the color scheme, font sizes, and fonts from rows in Settings (General section); the choices persist across restarts in every authenticated browser. Feature plugins consume the current snapshot through `ctx.theme` and read the `--dsw-*` tokens in CSS; they do not manage theme state themselves.
 Without a saved preference, the default is light; following the system remains an explicit choice.
 

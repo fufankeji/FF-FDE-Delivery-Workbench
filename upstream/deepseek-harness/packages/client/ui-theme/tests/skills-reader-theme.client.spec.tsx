@@ -24,8 +24,8 @@ it.each([false, true])('applies the library palette to its portaled reader only 
   for (const name of ['card', 'canvas', 'ink', 'muted', 'border', 'accent']) {
     expect(palette.getPropertyValue(`--dsw-alias-skills-${name}`)).toBe(getComputedStyle(library).getPropertyValue(`--dsw-alias-skills-${name}`))
   }
-  expect(palette.getPropertyValue('--dsw-alias-skills-card')).toBe(dark ? 'var(--dsw-alias-bg-layer-1)' : '#fff')
-  expect(palette.getPropertyValue('--dsw-alias-skills-canvas')).toBe(dark ? 'var(--dsw-alias-bg-base)' : '#f3faff')
-  expect(palette.getPropertyValue('--dsw-alias-skills-ink')).toBe(dark ? 'var(--dsw-alias-label-primary)' : '#10192c')
+  expect(palette.getPropertyValue('--dsw-alias-skills-card')).toBe('var(--dsw-alias-bg-layer-1)')
+  expect(palette.getPropertyValue('--dsw-alias-skills-canvas')).toBe('var(--dsw-alias-bg-base)')
+  expect(palette.getPropertyValue('--dsw-alias-skills-ink')).toBe('var(--dsw-alias-label-primary)')
   expect(getComputedStyle(screen.getByRole('dialog', { name: 'Other dialog' })).getPropertyValue('--dsw-alias-skills-card')).toBe('')
 })

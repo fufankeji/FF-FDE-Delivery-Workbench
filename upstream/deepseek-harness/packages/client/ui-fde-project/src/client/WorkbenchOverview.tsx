@@ -37,7 +37,7 @@ export function WorkbenchOverview({ status, projects, openProjects, openLab, ope
   return <main className={css.dashboard} data-overview-dashboard>
     <header className={css.dashboardHeader} data-overview-header>
       <div><span className={css.breadcrumb}>{t('workbench.local')} <span aria-hidden="true">/</span> {t('workbench.overview')}</span><h1>{t('workbench.title')}</h1><p>{t('workbench.subtitle')}</p></div>
-      <Button className={css.createButton} variant="primary" onClick={createProject} data-overview-create><WorkbenchIcon kind="add" />{t('workbench.create')}</Button>
+      <Button className={css.createButton} variant="primary" size="sm" onClick={createProject} data-overview-create><WorkbenchIcon kind="add" />{t('workbench.create')}</Button>
     </header>
     <div className={css.projectMetric} data-overview-project-metric aria-live="polite">
       <span className={css.metricIcon}><WorkbenchIcon kind="overview" /></span>
@@ -52,7 +52,7 @@ export function WorkbenchOverview({ status, projects, openProjects, openLab, ope
               <span className={css.projectMark} data-variant={index} aria-hidden="true"><ProjectMark index={index} /></span>
               <div className={css.projectName}><strong title={project.title}>{project.title}</strong><span title={project.companyName || t('progress.companyMissing')} data-project-company>{project.companyName || t('progress.companyMissing')}</span></div>
               <div className={css.projectStage}><span>{t('workbench.currentStage')}</span><strong title={project.stage}>{project.stage}</strong></div>
-              <Button className={css.enterButton} variant="outline" disabled={opening !== undefined} onClick={() => { open(project.workspaceId) }}>{opening === project.workspaceId ? t('workbench.loading') : t('workbench.enter')}<WorkbenchIcon kind="arrow" /></Button>
+              <Button className={css.enterButton} variant="ghost" size="sm" disabled={opening !== undefined} onClick={() => { open(project.workspaceId) }}>{opening === project.workspaceId ? t('workbench.loading') : t('workbench.enter')}<WorkbenchIcon kind="arrow" /></Button>
             </li>)}</ul>}
       {error !== undefined && <p className={css.error} role="alert">{error}</p>}
     </section>
@@ -60,7 +60,7 @@ export function WorkbenchOverview({ status, projects, openProjects, openLab, ope
     <article className={css.skillsCard} data-overview-skills>
       <header><span className={css.cardIcon}><WorkbenchIcon kind="skills" /></span><h2>{t('workbench.skills')}</h2><span className={css.pending}>{t('workbench.skillsAvailable')}</span></header>
       <p>{t('workbench.skillsDescription')}</p>
-      <div className={css.cardAction}><Button className={css.skillsButton} variant="outline" onClick={openSkills}>{t('workbench.openSkills')}<WorkbenchIcon kind="arrow" /></Button></div>
+      <div className={css.cardAction}><Button className={css.skillsButton} variant="ghost" size="sm" onClick={openSkills}>{t('workbench.openSkills')}<WorkbenchIcon kind="arrow" /></Button></div>
     </article>
   </main>
 }

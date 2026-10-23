@@ -414,3 +414,10 @@
     padding: 0 4px;
   }
 }
+
+/* Legacy and blank-session stage controls share the native shell surface. */
+.headerStatus, .headerRetry { border-radius: var(--dsw-radius-md); font-size: 12px; line-height: 20px; }
+.blankStatus { border: .5px solid var(--dsw-alias-border-l2); border-radius: var(--dsw-radius-xl); background: var(--dsw-alias-bg-layer-1); box-shadow: none; }
+.stageCard { padding: 10px; border-radius: var(--dsw-radius-lg); box-shadow: none; }
+.headerName { font-weight: 500; }
+.primaryButton { background: var(--dsw-alias-button-primary-fill); color: var(--dsw-alias-label-primary-foreground); border-color: transparent; border-radius: var(--dsw-radius-md); }

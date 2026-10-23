@@ -564,3 +564,6 @@
 @media (prefers-reduced-motion: reduce) {
   .root * { scroll-behavior: auto !important; }
 }
+
+/* Keep the graph's dark canvas and category colors; simplify its surrounding frame. */
+.root { border-width: .5px; border-radius: var(--dsw-radius-xl); box-shadow: none; }

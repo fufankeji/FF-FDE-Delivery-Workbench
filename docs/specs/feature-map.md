@@ -41,7 +41,11 @@ updated: "2026-09-16"
 | F026 | F026-stage-one-skills-center | 平台与课程技能阅读下载 | 七个中文平台 Skill 统一文件加载、正文阅读与完整下载，课程原版独立保留 | REQ-034, PSC-028 | F025, F005 | P0 | in-progress |
 | F027 | F027-harness-021-compatibility | 新基座下继续既有交付 | 在新版基座继续使用项目、阶段、会话、实验室与 Skills，保留权限、历史和回退条件 | REQ-001, REQ-009, REQ-010, REQ-030, REQ-031, REQ-032, REQ-033, REQ-034, REQ-035, REQ-036, NFR-001, NFR-003, NFR-005, NFR-006, NFR-007, PSC-001, PSC-008, PSC-009, PSC-010, PSC-026, PSC-027, PSC-028, PSC-029, PSC-030 | 无 | P0 | in-progress |
 
+| F028 | F028-native-visual-system | 一致的全系统工作体验 | 从公共入口进入阶段、技能和工程页面时保持统一官方风格，既有功能与主题状态不变 | REQ-037, PSC-031 | F025 | P0 | in-progress |
+
 ## 首个验证切片
+
+2026-10-23 用户确认 F025 视觉样板，并明确授权 F028 推广到整个系统。先记录 AC-034/PSC-031 与完整页面覆盖，再实施样式及必要的实验室主题同步；不扩展业务流程、不改官方 Agent Loop。
 
 2026-10-23 用户明确授权兼容官方最新版，并要求先完成 docs 再开发。本轮仅实施 F027：以已存在的 FDE 功能和本地未提交源码为保留基线，不扩展产品范围、不升级项目生命周期、不批量开发其他 Feature。PRD 与 Product Spec 的既有行为合同保持不变；技术目标、会话格式迁移和回退进入 F027 Plan 与 Architecture。人工体验仍是最终验收关卡。
 

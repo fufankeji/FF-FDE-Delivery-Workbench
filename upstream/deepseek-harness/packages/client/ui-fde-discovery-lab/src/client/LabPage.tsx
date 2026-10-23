@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { PropsLocale, PropsRuntime, PropsStore } from '@deepseek-ai/dsh-client-ui-slots'
 import type { createLabStore } from './stores.ts'
 import css from './lab.module.css'
+import { followFrameTheme } from './frame-theme.ts'
 type LabStore = ReturnType<typeof createLabStore>
 type OverlayProps = PropsRuntime<'fde.workbench.lab.page'> & PropsStore<LabStore> & PropsLocale<'fdeProject'>
 
@@ -23,10 +24,12 @@ function LabFrame({ t }: PropsLocale<'fdeProject'>) {
   const [loaded, setLoaded] = useState(false)
   const [failed, setFailed] = useState(false)
   const [attempt, setAttempt] = useState(0)
+  const frame = useRef<HTMLIFrameElement>(null)
+  useEffect(() => frame.current === null ? undefined : followFrameTheme(frame.current), [attempt])
   return <div className={css.content}>
     {!loaded && !failed && <div className={css.status} role="status">{t('lab.loading')}</div>}
     {failed && <div className={css.status} role="alert"><p>{t('lab.failed')}</p><Button variant="outline" onClick={() => { setLoaded(false); setFailed(false); setAttempt(value => value + 1) }}>{t('lab.retry')}</Button></div>}
-    <iframe key={attempt} className={css.frame} title={t('lab.frame')} src="/fde-discovery-lab/" onLoad={() => setLoaded(true)} onErrorCapture={() => setFailed(true)} />
+    <iframe ref={frame} key={attempt} className={css.frame} title={t('lab.frame')} src="/fde-discovery-lab/" onLoad={() => setLoaded(true)} onErrorCapture={() => setFailed(true)} />
   </div>
 }
 
@@ -66,7 +69,7 @@ export function LabSummary({ openLab, t }: PropsRuntime<'fde.workbench.lab.summa
         {summary.status === 'error' && <div className={css.summaryNotice} role="alert"><p>{t('lab.unavailable')}</p><Button variant="ghost" size="sm" onClick={() => { setRetry(value => value + 1) }}>{t('lab.retry')}</Button></div>}
         <div className={css.resume} data-started={summary.status === 'ready' && summary.started > 0 || undefined}>
           {summary.status === 'ready' && summary.started > 0 && <p><span className={css.resumeDot} aria-hidden="true" />{t('lab.resumeDescription', { count: summary.started })}</p>}
-          <Button className={css.summaryButton} variant="outline" onClick={openLab}>{t(summary.status === 'ready' && summary.started > 0 ? 'lab.resume' : 'lab.open')}<SummaryIcon kind="arrow" /></Button>
+          <Button className={css.summaryButton} variant="ghost" size="sm" onClick={openLab}>{t(summary.status === 'ready' && summary.started > 0 ? 'lab.resume' : 'lab.open')}<SummaryIcon kind="arrow" /></Button>
         </div>
       </div>
     </article>

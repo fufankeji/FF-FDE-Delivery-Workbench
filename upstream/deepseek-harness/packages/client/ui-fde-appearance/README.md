@@ -8,6 +8,8 @@ Selecting a card or image changes only the settings preview. `Save and apply` fi
 
 Custom PNG, JPEG, and WebP images up to 16 MiB are decoded, cover-cropped to 1920×1080 WebP, and sampled for four theme colors entirely in the browser. Neither the source nor processed image crosses an RPC, enters a Workspace, Session log, Agent request, or observability backend. Clearing site data removes this personal preference.
 
+The settings page uses the native 20/28 heading and 13/20 description scale, light card borders and stable hover feedback; the image preview and saved preference format remain unchanged.
+
 ## Model Experience
 
 None, as the package registers no message, prompt, schema, tool, request context, or Host call.

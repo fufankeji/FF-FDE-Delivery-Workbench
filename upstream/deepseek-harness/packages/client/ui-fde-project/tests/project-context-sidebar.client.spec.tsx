@@ -136,7 +136,7 @@ describe('ProjectContextSidebar stage methods', () => {
     fireEvent.click(screen.getByRole('button', { name: /核对冲突并调整项目范围/ }))
     const conditionalDialog = screen.getByRole('dialog', { name: '核对冲突并调整项目范围' })
     expect(conditionalDialog.querySelector('[data-template="conditional"]')).toBeTruthy()
-    expect(within(conditionalDialog).getByRole('heading', { name: '发生冲突后，怎样形成新的边界候选' })).toBeTruthy()
+    expect(within(conditionalDialog).getByRole('heading', { name: '项目条件变化后，如何提出范围调整' })).toBeTruthy()
     expect(within(conditionalDialog).getByText('不会直接改写项目边界')).toBeTruthy()
   })
 

@@ -164,6 +164,7 @@ describe('FDE project views', () => {
     }))
     const props = {
       sessionId: todayId,
+      useSessionStatus: hook(new Map()),
       useSession: (() => undefined) as never,
       useProjection: (() => undefined) as never,
       useInput: (() => undefined) as never,

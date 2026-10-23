@@ -6,6 +6,8 @@ Browser presentation for one Workspace project's six-stage FDE progress. One app
 
 This package exposes no stage-completion or advance action. After another authorized FDE surface commits a stage gate, a Workspace-scoped browser invalidation makes both contextual contributions re-read the durable Host value; it does not carry or invent the new stage itself. A failed Host read remains a visible retry state instead of falling back to another project's cache.
 
+Stage status and blank-session controls use the shell's semantic surfaces, compact native sizing and visible keyboard focus. These presentation choices do not change stage identity or available actions.
+
 ## Model Experience
 
 None, as the package renders project state in the browser and registers no message, prompt, schema, tool, or request context.

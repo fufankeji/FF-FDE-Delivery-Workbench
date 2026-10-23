@@ -6,7 +6,7 @@ Browser presentation for the FDE project delivery workspace. The system opens on
 
 ## Behavior
 
-Overview and platform navigation use compact typography: a 26 px page title, 18 px section headings, 16 px project names, 14 px navigation/body/actions, 12–13 px secondary labels, and 28 px metrics. Project rows and card padding follow this scale; responsive layouts retain the same hierarchy without changing destinations or data.
+FDE pages follow the official visual hierarchy: 20/28 work-page titles, 13/20 descriptions, semantic theme surfaces and shared control sizing. Project detail, all eight stages, method readers, Skills, architecture, usage, evaluation, runtime output and preview retain their own information and actions. Public navigation draws the retained skin over an opaque backing; dialogs use the native mask and readable overlay surface. The introduction keeps its display layout, and the graph keeps its dark canvas and category colors. Visual changes do not modify project state or theme preferences.
 
 Skills Center opens the canonical SKILL.md body over the retained cards. The dialog shows the name and content with download, expand and close actions, without a directory tree, raw path, frontmatter code block or upstream attribution panel. Relative references open in the same reader with one Back to Skill action. Focus, independent scrolling, Escape and list restoration remain unchanged.
 

@@ -38,6 +38,7 @@ export function WorkbenchNavigation({ useProjectPage, showWorkbenchOverview, sho
     { id: 'skills', label: t('workbench.skills'), open: showWorkbenchSkills },
   ] as const
   return <>
+    {visible && <div className={css.backdrop} data-fde-workbench-backdrop aria-hidden="true" />}
     {visible && <aside className={css.navigation}>
       <button type="button" className={css.brand} onClick={showWorkbenchOverview} title={t('workbench.brand')}>
         <img src="/ff-brand/ff-logo.png" alt={t('workbench.logo')} />

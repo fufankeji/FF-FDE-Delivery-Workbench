@@ -1,3 +1,6 @@
 .root { height: 100%; overflow: auto; padding: 16px; color: var(--dsw-alias-label-primary); }
 .notice { color: var(--dsw-alias-label-secondary); font-size: 12px; line-height: 1.6; }
 .output { white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--dsh-font-family-terminal, monospace); font-size: var(--dsh-terminal-font-size, 13px); }
+
+.root { box-sizing: border-box; padding: 20px; background: var(--dsw-alias-bg-base); }
+.notice { margin: 0 0 16px; padding: 12px; border: .5px solid var(--dsw-alias-border-l2); border-radius: var(--dsw-radius-lg); background: var(--dsw-alias-bg-layer-1); font-size: 13px; line-height: 20px; }

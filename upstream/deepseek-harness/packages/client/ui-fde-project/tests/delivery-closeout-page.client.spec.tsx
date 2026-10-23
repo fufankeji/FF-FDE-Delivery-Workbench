@@ -34,7 +34,9 @@ function propsFor(stage: 'pilot' | 'handoff' | 'completed', surface: unknown, ac
     } } } }),
     useProjectSurfaces: hook({ byWorkspace: { 'workspace-1': { status: 'ready', value: surface } } }),
     useProjectSources: hook({ byWorkspace: { 'workspace-1': { status: 'ready', files: [] } } }),
-    useWorkspaces: hook({ items: [{
+    useProjectMetadata: hook({ byWorkspace: {} }),
+    loadProjectMetadata: vi.fn(),
+    useWorkspaces: hook({ phase: 'ready', state: 'idle', archivedSessionIds: [], items: [{
       workspaceId: 'workspace-1', title: '数据分析项目', path: '/project/one', sessionIds: ['session-1'],
       createdAt: '2026-08-27T00:00:00.000Z', updatedAt: '2026-08-27T00:06:00.000Z',
     }] }),
@@ -222,7 +224,7 @@ describe('last two project delivery stages', () => {
 
   it('keeps the handoff record visible after the terminal completion state', () => {
     render(<ProjectProgressOverlay {...propsFor('completed', baseSurface)} />)
-    expect(screen.getByText('六阶段已完成 · 项目已交付')).toBeTruthy()
+    expect(screen.getByRole('button', { name: '重新打开项目' })).toBeTruthy()
     expect(screen.getByText('最终交付与责任移交')).toBeTruthy()
     expect(screen.getByText(/项目状态为“项目已完成”/)).toBeTruthy()
   })

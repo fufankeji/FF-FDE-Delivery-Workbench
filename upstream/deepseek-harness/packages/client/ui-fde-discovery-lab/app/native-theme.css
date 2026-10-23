@@ -1,0 +1,60 @@
+/* The shell supplies only these display variables; standalone lab defaults stay intact. */
+html[data-fde-native-theme] body { background: var(--dsw-alias-bg-base); }
+html[data-fde-native-theme] .fde-app {
+  --ink: var(--dsw-alias-label-primary);
+  --muted: var(--dsw-alias-label-secondary);
+  --green: var(--dsw-alias-state-business-primary);
+  --green-dark: var(--dsw-alias-button-primary-hover);
+  --line: var(--dsw-alias-border-l2);
+  --paper: var(--dsw-alias-bg-layer-1);
+  --soft: var(--dsw-alias-bg-layer-2);
+  --sand: var(--dsw-alias-bg-layer-2);
+  color: var(--ink); color-scheme: inherit; background: var(--dsw-alias-bg-base);
+  font-family: var(--dsw-font-family); font-size: 13px; line-height: 1.6;
+}
+html[data-fde-native-theme] .fde-app :is(button, input, textarea, select) { font-family: inherit; font-size: 13px; }
+html[data-fde-native-theme] .fde-app :is(button, a, input, textarea, select):focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+html[data-fde-native-theme] .fde-topbar { padding-inline: 24px; background: var(--dsw-alias-bg-layer-1); border-bottom-width: .5px; }
+html[data-fde-native-theme] .fde-brand h1 { font-size: 20px; line-height: 28px; font-weight: 500; letter-spacing: normal; }
+html[data-fde-native-theme] .fde-brand p { color: var(--muted); letter-spacing: normal; }
+html[data-fde-native-theme] .fde-lobby { padding: 28px 32px; max-width: 1120px; }
+html[data-fde-native-theme] .fde-lobby-heading h2 { font-size: 20px; line-height: 28px; font-weight: 500; letter-spacing: normal; }
+html[data-fde-native-theme] .fde-case-card { border: .5px solid var(--line); border-radius: 12px; background: var(--paper); box-shadow: none; transition: border-color 160ms ease; }
+html[data-fde-native-theme] .fde-case-card:hover { transform: none; box-shadow: none; border-color: var(--green); }
+html[data-fde-native-theme] .fde-case-content h3 { font-size: 16px; line-height: 24px; font-weight: 500; letter-spacing: normal; }
+html[data-fde-native-theme] :is(.fde-lobby-heading > p, .fde-case-content > p, .fde-card-meta, .fde-role-profile p, .fde-company-banner > div > p, .fde-message-meta, .fde-first-greeting p, .fde-first-greeting small, .fde-composer > div > span, .fde-muted, .fde-empty p, .fde-modal > header p) { color: var(--muted); }
+html[data-fde-native-theme] :is(.fde-company-banner, .fde-chat-panel, .fde-bottom-bar, .fde-lobby-process, .fde-case-chip, .fde-asset-card, .fde-material-item, .fde-metric-card, .fde-discovery-item, .fde-progress-summary, .fde-letter, .fde-run-history, .fde-report) { border-color: var(--line); border-width: .5px; border-radius: 12px; background: var(--paper); box-shadow: none; }
+html[data-fde-native-theme] :is(.fde-chat-header, .fde-composer-area, .fde-section-line, .fde-preview-toolbar) { border-color: var(--line); background: var(--paper); }
+html[data-fde-native-theme] :is(.fde-company-banner h2, .fde-role-profile h2, .fde-section-line > strong, .fde-progress-summary h3) { font-size: 14px; line-height: 22px; font-weight: 500; }
+html[data-fde-native-theme] .fde-app .fde-button { min-height: 32px; padding: 6px 12px; border: 0; border-radius: 8px; color: var(--dsw-alias-label-primary-foreground); background: var(--dsw-alias-button-primary-fill); font-weight: 500; box-shadow: none; }
+html[data-fde-native-theme] .fde-app .fde-button:hover:not(:disabled) { background: var(--dsw-alias-button-primary-hover); box-shadow: none; }
+html[data-fde-native-theme] .fde-app .fde-button.secondary { border: .5px solid var(--line); color: var(--ink); background: var(--paper); }
+html[data-fde-native-theme] .fde-app .fde-button.quiet { background: transparent; color: var(--muted); }
+html[data-fde-native-theme] .fde-icon-button:hover { background: var(--dsw-alias-interactive-bg-hover); }
+html[data-fde-native-theme] .fde-message-bubble { color: var(--ink); background: var(--paper); border-color: var(--line); border-radius: 12px; }
+html[data-fde-native-theme] .fde-message.user .fde-message-bubble { color: var(--ink); background: var(--soft); }
+html[data-fde-native-theme] .fde-composer { color: var(--ink); background: var(--paper); border: .5px solid var(--line); border-radius: 12px; }
+html[data-fde-native-theme] .fde-composer textarea { color: var(--ink); background: transparent; }
+html[data-fde-native-theme] .fde-composer textarea::placeholder { color: var(--muted); }
+html[data-fde-native-theme] .fde-send-button { color: var(--dsw-alias-label-primary-foreground); background: var(--dsw-alias-button-primary-fill); border-radius: 8px; }
+html[data-fde-native-theme] .fde-send-button.stop { background: var(--dsw-alias-state-error-primary); }
+html[data-fde-native-theme] .fde-modal-backdrop { background: var(--dsw-alias-bg-mask-1); backdrop-filter: none; }
+html[data-fde-native-theme] .fde-modal { border: 0; border-radius: 16px; color: var(--ink); background: var(--dsw-alias-bg-overlay); box-shadow: var(--dsw-elevation-prominent); }
+html[data-fde-native-theme] .fde-modal h2 { font-size: 20px; line-height: 28px; font-weight: 500; }
+html[data-fde-native-theme] :is(.fde-modal > header, .fde-intro-footer, .fde-report-toolbar) { border-color: var(--line); background: transparent; }
+html[data-fde-native-theme] :is(.fde-search, .fde-text-preview, .fde-json-reader, .fde-table-scroll) { color: var(--ink); background: var(--paper); border-color: var(--line); border-radius: 8px; }
+html[data-fde-native-theme] .fde-search input { color: var(--ink); background: transparent; }
+html[data-fde-native-theme] .fde-app :is(th, td) { color: var(--ink); background: transparent; border-color: var(--line); }
+html[data-fde-native-theme] .fde-app :is(th, tr:nth-child(even) td) { background: var(--soft); }
+html[data-fde-native-theme] .fde-tab-row button { color: var(--muted); background: transparent; border-color: transparent; }
+html[data-fde-native-theme] .fde-tab-row button.active { color: var(--green); border-color: var(--green); }
+html[data-fde-native-theme] :is(.fde-role-roster > button, .fde-case-roles span) { color: var(--muted); background: var(--soft); border-color: var(--line); }
+html[data-fde-native-theme] .fde-role-roster > button.active { color: var(--green); background: var(--dsw-alias-state-business-tertiary); }
+html[data-fde-native-theme] :is(.fde-global-error, .fde-error, .fde-evaluation-note.error) { color: var(--dsw-alias-state-error-primary); background: var(--dsw-alias-state-error-tertiary); }
+html[data-fde-native-theme] :is(.fde-state-label.completed, .fde-state-label.verified_currently_unknown, .fde-resume) { color: var(--dsw-alias-state-success-primary); background: var(--dsw-alias-state-success-tertiary); }
+html[data-fde-native-theme] .fde-state-label.needs_deeper { color: var(--dsw-alias-state-warn-label); background: var(--dsw-alias-state-warn-tertiary); }
+html[data-fde-native-theme] :is(.fde-report-paper, .fde-report-outline, .fde-history-content, .fde-history-report, .fde-metric-details, .fde-json-values, .fde-json-fields, .fde-json-collection, .fde-json-event-heading, .fde-json-versions) { color: var(--ink); background: var(--paper); border-color: var(--line); box-shadow: none; }
+html[data-fde-native-theme] :is(.fde-report-paper h1, .fde-report-paper h2, .fde-report-paper h3, .fde-metric-card h3) { color: var(--ink); font-weight: 500; }
+html[data-fde-native-theme] :is(.fde-report-paper p, .fde-report-paper li, .fde-json-reading-note, .fde-json-metadata, .fde-json-source, .fde-json-scalar, .fde-metric-unit, .fde-metric-card dt, .fde-case-version) { color: var(--muted); }
+html[data-fde-native-theme] .fde-report-success { color: var(--dsw-alias-state-success-primary); background: var(--dsw-alias-state-success-tertiary); border-color: var(--dsw-alias-state-success-primary); }
+html[data-fde-native-theme] .fde-metric-warning { color: var(--dsw-alias-state-warn-label); background: var(--dsw-alias-state-warn-tertiary); }

@@ -347,3 +347,13 @@
 @media (prefers-reduced-motion: reduce) {
   .themeCard { transition: none; }
 }
+
+/* Settings use the same native scale without altering saved skin values or previews. */
+.title { font-size: 20px; line-height: 28px; font-weight: 500; }
+.intro { font-size: 13px; line-height: 20px; }
+.themeHeading { font-size: 14px; line-height: 22px; font-weight: 500; }
+.themeCard { border-width: .5px; border-radius: var(--dsw-radius-xl); transition: border-color 160ms ease, background-color 160ms ease; }
+.themeCard:hover:not(:disabled) { transform: none; }
+.themeDetails strong { font-weight: 500; }
+.preview { border-radius: var(--dsw-radius-xl); box-shadow: none; }
+.secondaryButton, .primaryButton { border-radius: var(--dsw-radius-md); font-size: 13px; line-height: 20px; }
