@@ -21,6 +21,7 @@
 <p align="center">在同一个项目中整理客户资料、与 Agent 协作开发、验证业务结果，并留下可追溯的产物与交付记录。</p>
 
 <p align="center">
+  <a href="#screenshots"><strong>界面速览</strong></a> ·
   <a href="#quick-start"><strong>快速开始</strong></a> ·
   <a href="#example-project"><strong>体验连锁门店示例</strong></a> ·
   <a href="DEPLOYMENT_AGENT.md"><strong>完整部署手册</strong></a> ·
@@ -34,6 +35,15 @@
 </p>
 
 <p align="center"><sub>@赋范空间 独家研发</sub></p>
+
+<p align="center">
+  <a href="docs/assets/readme/project-architecture.webp">
+    <img src="docs/assets/readme/project-architecture.webp" alt="连锁门店设备故障分诊项目的真实工作台：左侧八阶段交付路径，中央展示系统架构与数据流" width="100%">
+  </a>
+  <br><sub>一个项目，一条交付路径：阶段工作、系统架构与工程结果放在同一个工作台中。</sub>
+</p>
+
+<p align="center"><sub>截图来自本地门店示例的既有运行记录，使用仿真数据；历史状态不代表生产验收，部分界面细节可能随版本更新。点击图片可查看大图。</sub></p>
 
 ---
 
@@ -63,6 +73,39 @@ FF - FDE 交付工作台服务于承担企业 AI 项目交付责任的 FDE（For
 | 界面主题与个性化 | 切换内置皮肤、浅色或深色主题，以及仅保存在当前浏览器的自定义背景。 |
 
 资料导入、识别、预览和页面切换不会自动发送 Agent 消息。项目资料的 OCR、版本/删除管理、权限/有效性管理和对话显式引用尚未形成完整功能。
+
+<a id="screenshots"></a>
+
+## 界面速览：从项目现场到交付档案
+
+同一个门店项目，串起工作入口、Agent 产物、知识关系与交接记录。图中展示的是各页面的实际状态，不将历史文件可读或阶段标记等同于当前证据已通过。
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>01 · 从总览继续项目</h3>
+      <a href="docs/assets/readme/workbench-overview.webp"><img src="docs/assets/readme/workbench-overview.webp" alt="工作台总览：最近项目、当前阶段、实验室与技能中心入口" width="100%"></a>
+      <p>先看到当前有哪些工作，再回到具体项目。项目、实验室和技能中心保留清晰的独立入口。</p>
+    </td>
+    <td width="50%" valign="top">
+      <h3>02 · 对话留下可审阅产物</h3>
+      <a href="docs/assets/readme/agent-deliverables.webp"><img src="docs/assets/readme/agent-deliverables.webp" alt="Agent 对话中的阶段二工作结果：已读取的来源、实际创建的文件以及候选与待验证状态" width="100%"></a>
+      <p>查看 Agent 读了什么、生成了哪些文件，以及哪些结论仍是候选或待验证，方便继续核对。</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>03 · 把业务关系展开来看</h3>
+      <a href="docs/assets/readme/project-knowledge-graph.webp"><img src="docs/assets/readme/project-knowledge-graph.webp" alt="第四阶段项目知识图谱：门店、设备、报修、工单等 56 个实体和 56 条关系" width="100%"></a>
+      <p>在需要本体路线的项目中，查看门店、设备、报修和工单之间的关系，并保留图谱版本信息。</p>
+    </td>
+    <td width="50%" valign="top">
+      <h3>04 · 交付材料有明确去处</h3>
+      <a href="docs/assets/readme/delivery-handover.webp"><img src="docs/assets/readme/delivery-handover.webp" alt="第七阶段交付与验收档案：发布、客户验收、培训移交记录，以及仍待核对的证据" width="100%"></a>
+      <p>发布、验收和培训移交记录集中归档。文件是否可读、证据是否有效、人工是否确认分别呈现。</p>
+    </td>
+  </tr>
+</table>
 
 ## 从需求到交付，八个阶段怎么用
 
@@ -103,6 +146,17 @@ FF - FDE 交付工作台服务于承担企业 AI 项目交付责任的 FDE（For
 5. 查看试点、验收交接与改进记录，理解哪些结果由 Agent 产生，哪些决定必须由 FDE 作出。
 
 > 示例使用脱敏仿真数据，部分记录是用于验证交付流程的联调输入，不代表真实客户已上线或签收。导入不重新执行历史测试，也不包含作者的私人会话或模型凭证。
+
+### 看看这个项目实际做出了什么
+
+下图是示例项目中的“门店维修”业务系统，不是工作台本身：选中报修后，可查看关联设备、历史工单与本次使用的资料，再由人工核对并保存本地草稿。这样可以同时看到交付过程和开发出的业务界面。
+
+<p align="center">
+  <a href="docs/assets/readme/maintenance-evidence.webp">
+    <img src="docs/assets/readme/maintenance-evidence.webp" alt="门店维修业务系统的真实界面：报修列表、关联图谱、引用资料和人工核对保存草稿入口" width="100%">
+  </a>
+  <br><sub>示例业务结果：报修 → 规则分析与图谱查询 → 关联与证据 → 人工核对。仅保存本地草稿，不执行正式派单或外部写入。</sub>
+</p>
 
 ### 运行示例业务系统
 
