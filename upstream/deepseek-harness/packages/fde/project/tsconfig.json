@@ -39,9 +39,6 @@
       "path": "../../llm/llm"
     },
     {
-      "path": "../../runtime-diagnostics/invariants"
-    },
-    {
       "path": "../../workspace/workspace"
     },
     {
@@ -49,6 +46,12 @@
     },
     {
       "path": "../../util/values"
+    },
+    {
+      "path": "../../core/agent"
+    },
+    {
+      "path": "../../terminal/terminal"
     }
   ]
 }

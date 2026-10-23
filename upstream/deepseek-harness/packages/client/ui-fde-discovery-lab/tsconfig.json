@@ -24,9 +24,6 @@
       "path": "../ui-fde-project"
     },
     {
-      "path": "../../runtime-diagnostics/invariants"
-    },
-    {
       "path": "../ui-renderer"
     },
     {

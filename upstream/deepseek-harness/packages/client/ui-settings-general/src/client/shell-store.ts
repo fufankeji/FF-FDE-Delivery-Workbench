@@ -1,21 +1,26 @@
-import { defineStore } from '@deepseek-ai/dsh-client-store'
-import type { EngineStoreHandle } from '@deepseek-ai/dsh-client-store'
+/** Shared settings viewing state for its mouse and command entry points. */
+import { defineStore, type EngineStoreHandle } from '@deepseek-ai/dsh-client-store'
 
 type State = { open: boolean; activeId: string | undefined }
 type Actions = {
-  open: (draft: State, section?: string) => void
-  close: (draft: State) => void
-  select: (draft: State, section: string) => void
+  open(draft: State): void
+  close(draft: State): void
+  select(draft: State, id: string): void
+  openSection(draft: State, id: string): void
 }
 
-/** Share viewing state between sidebar triggers; configuration remains feature-owned. */
+/**
+ * Declare the settings dialog state and its complete mutation API.
+ * @returns one root-scoped store handle for the settings shell.
+ */
 export function createSettingsShellStore(): EngineStoreHandle<State, Actions> {
   return defineStore({
-    init: (): State => ({ open: false, activeId: undefined }),
+    init: (): State => ({ open: false, activeId: undefined as string | undefined }),
     actions: {
-      open: (draft, section) => { draft.open = true; draft.activeId = section },
-      close: draft => { draft.open = false; draft.activeId = undefined },
-      select: (draft, section) => { draft.activeId = section },
+      open: (d) => { d.open = true },
+      close: (d) => { d.open = false; d.activeId = undefined },
+      select: (d, id: string) => { d.activeId = id },
+      openSection: (d, id: string) => { d.activeId = id; d.open = true },
     },
   })
 }

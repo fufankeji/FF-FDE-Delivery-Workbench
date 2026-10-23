@@ -12,14 +12,18 @@ afterEach(async () => {
   vi.restoreAllMocks()
 })
 
+function selected(current?: string) {
+  return { byId: current === undefined ? {} : { [current]: { id: current, retainedBy: { mainView: 1 } } } }
+}
+
 async function fixture(current?: string) {
   vi.useFakeTimers()
   const ctx = new Context()
   contexts.push(ctx)
-  const list = createSnapshotStore<{ current: string | undefined }>({ current })
+  const list = createSnapshotStore(selected(current))
   const accepts = vi.fn()
   const disposals: ReturnType<typeof vi.fn>[] = []
-  const changes = vi.fn(async function* (_sessionId: string, _signal: AbortSignal): AsyncGenerator<WorkspaceFileWatchFrame> {
+  const changes = vi.fn(async function* (_sessionId: string, _path: string, _signal: AbortSignal): AsyncGenerator<WorkspaceFileWatchFrame> {
     yield { kind: 'ready' }
     yield { kind: 'change', change: { absolutePath: '/project/result.md', version: 'updated' } }
   })
@@ -55,7 +59,7 @@ it('waits for the file namespace and refreshes the selected project after file c
     expect(f.remote.$stream).not.toHaveBeenCalled()
     await f.mountNamespace()
     await vi.advanceTimersByTimeAsync(300)
-    expect(f.changes).toHaveBeenCalledWith('session-one', expect.any(AbortSignal))
+    expect(f.changes).toHaveBeenCalledWith('session-one', '.', expect.any(AbortSignal))
     expect(f.accepts).toHaveBeenCalledTimes(2)
     expect(refresh).toHaveBeenCalledOnce()
   } finally { window.removeEventListener('dsh-sidebar:refresh-files', refresh) }
@@ -66,15 +70,15 @@ it('releases the previous stream on session switches and removes subscriptions o
   await f.mountNamespace()
   await vi.advanceTimersByTimeAsync(300)
   expect(f.remote.$stream).toHaveBeenCalledOnce()
-  f.list.set({ current: 'session-one' })
+  f.list.set(selected('session-one'))
   expect(f.remote.$stream).toHaveBeenCalledOnce()
-  f.list.set({ current: 'session-two' })
+  f.list.set(selected('session-two'))
   await vi.advanceTimersByTimeAsync(300)
   expect(f.disposals[0]).toHaveBeenCalledOnce()
   expect(f.changes.mock.calls.map(([sessionId]) => sessionId)).toEqual(['session-one', 'session-two'])
   await f.consumer.dispose()
   expect(f.disposals[1]).toHaveBeenCalledOnce()
-  f.list.set({ current: 'session-three' })
+  f.list.set(selected('session-three'))
   window.dispatchEvent(new Event('fde:project-sources-changed'))
   expect(f.remote.$stream).toHaveBeenCalledTimes(2)
   expect(vi.getTimerCount()).toBe(0)
@@ -85,10 +89,10 @@ it('starts no stream without a selected session and cancels pending refresh when
   await f.mountNamespace()
   await vi.advanceTimersByTimeAsync(0)
   expect(f.remote.$stream).not.toHaveBeenCalled()
-  f.list.set({ current: 'session-one' })
+  f.list.set(selected('session-one'))
   await vi.advanceTimersByTimeAsync(0)
   expect(f.remote.$stream).toHaveBeenCalledOnce()
-  f.list.set({ current: undefined })
+  f.list.set(selected(undefined))
   expect(f.disposals[0]).toHaveBeenCalledOnce()
   await f.consumer.dispose()
   expect(vi.getTimerCount()).toBe(0)

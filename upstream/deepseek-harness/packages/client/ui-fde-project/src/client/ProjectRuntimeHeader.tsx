@@ -18,6 +18,7 @@ export function ProjectRuntimeHeader({
   stopProject,
   openProjectPreview,
   showProjectTerminal,
+  openManualTerminal,
   continueDevelopment,
   t,
 }: ProjectRuntimeHeaderProps) {
@@ -135,6 +136,7 @@ export function ProjectRuntimeHeader({
           </button>
         </>
       ) : null}
+      <button type="button" disabled={busy} title={t('runtime.manualNotice')} onClick={() => { void run(() => openManualTerminal(workspaceId, String(sessionId), workspace.path)) }}>{t('runtime.manualTerminal')}</button>
       {error !== undefined && state !== 'blocked' ? <span className={css.runtimeMessage}>{error}</span> : null}
     </span>
   )

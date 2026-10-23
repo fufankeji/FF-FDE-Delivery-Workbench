@@ -128,6 +128,7 @@ export interface ProjectRuntimeHeaderInjected {
   startProject: (workspaceId: string, sessionId: string, workspacePath: string) => Promise<void>
   stopProject: (workspaceId: string, sessionId: string, workspacePath: string) => Promise<void>
   openProjectPreview: (workspaceId: string, sessionId: string, workspacePath: string) => Promise<void>
+  openManualTerminal: (workspaceId: string, sessionId: string, workspacePath: string) => Promise<void>
   showProjectTerminal: (workspaceId: string, sessionId: string, workspacePath: string) => Promise<void>
   continueDevelopment: (sessionId: string) => void
 }

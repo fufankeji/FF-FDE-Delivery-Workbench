@@ -2,6 +2,7 @@
 
 import { MarkdownText } from '@deepseek-ai/dsh-client-ui-primitives'
 import { useState, type ReactNode } from 'react'
+import { resolveSkillFile } from './skills-center-data.ts'
 import type {
   StageSkillCatalogAnswerGroup, StageSkillCatalogArtifact, StageSkillCatalogMethod, StageSkillCatalogReference,
 } from './stage-skill-catalog.ts'
@@ -232,6 +233,9 @@ function SupportingOverview({ method, stageIndex, role }: {
 
 export function StageMethodDialog({ method, methods, stageIndex, onClose, onSelectMethod }: StageMethodDialogProps) {
   const [tab, setTab] = useState<MethodTab>('overview')
+  const [definitionPath, setDefinitionPath] = useState<string>()
+  const definitionFile = method.files?.find(file => file.path === definitionPath)
+  const definition = definitionFile?.content.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, '') ?? method.content
   const source = sourceParts(method.source)
   const role = methodRole(method)
   const tabs: readonly { readonly id: MethodTab; readonly label: string }[] = [
@@ -289,14 +293,20 @@ export function StageMethodDialog({ method, methods, stageIndex, onClose, onSele
         </div>}
 
         {tab === 'definition' && <div className={css.definitionTab}>
-          <section className={css.definition}><span>工作方法说明（中文）</span><MarkdownText text={method.content} labels={{ code: { copyLabel: '复制', copiedLabel: '已复制' }, footnotes: '脚注' }} /></section>
-          <details className={css.technical}><summary>技术信息</summary><dl>
+          <section className={css.definition}><span>工作方法说明（中文）</span>
+            {definitionFile !== undefined && <button type="button" onClick={() => { setDefinitionPath(undefined) }}>{method.label}</button>}
+            <MarkdownText text={definition} labels={{ code: { copyLabel: '复制', copiedLabel: '已复制' }, footnotes: '脚注' }} fileLinks={{ resolve(value) {
+              const target = resolveSkillFile(method.files ?? [], definitionFile?.path ?? method.entryPath ?? '', value)
+              return target === undefined ? undefined : { open: () => { setDefinitionPath(target) }, title: target.split('/').at(-1) ?? target }
+            } }} />
+          </section>
+          {method.source !== 'platform' && <details className={css.technical}><summary>技术信息</summary><dl>
             <div><dt>Skill</dt><dd><code>{method.id}</code></dd></div><div><dt>来源仓库</dt><dd><code>{source.repository}</code></dd></div>
             {source.commit !== undefined && <div><dt>源码提交版本</dt><dd><code>{source.commit}</code></dd></div>}
             {method.license !== undefined && <div><dt>许可证</dt><dd>{method.license}</dd></div>}
             {method.sourceLanguage !== undefined && <div><dt>上游语言</dt><dd>英文</dd></div>}
             {method.adapterLanguage !== undefined && <div><dt>产品适配说明</dt><dd>简体中文</dd></div>}
-          </dl>{method.sourceUrl !== undefined && <a href={method.sourceUrl} target="_blank" rel="noreferrer">查看固定版本上游来源 ↗</a>}</details>
+          </dl>{method.sourceUrl !== undefined && <a href={method.sourceUrl} target="_blank" rel="noreferrer">查看固定版本上游来源 ↗</a>}</details>}
         </div>}
       </div>
     </section>

@@ -1,0 +1,980 @@
+{
+  "baseUrl": "http://127.0.0.1:3080",
+  "authLaunchLog": "../../../../.runtime/workbench-web.log",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "speedup": 1,
+  "subtitleColors": {
+    "text": "#ffffff",
+    "stroke": "#4036a8",
+    "glow": "rgba(90,77,210,0.3)"
+  },
+  "zooms": [],
+  "name": "从进入工作台到方案与产物 · 紧凑字幕修改版",
+  "demonstration": {
+    "kind": "feature-overview"
+  },
+  "steps": [
+    {
+      "action": "navigate",
+      "url": "/",
+      "settleMs": 1500,
+      "subtitle": {
+        "text": "FF - FDE 交付工作台",
+        "position": "mc",
+        "theme": "title-card"
+      },
+      "subtitleHold": 1800
+    },
+    {
+      "action": "moveTo",
+      "selector": "button:has-text(\"进入平台\")",
+      "moveMs": 320,
+      "steps": 16,
+      "subtitle": {
+        "text": "点击进入平台；本片回看脱敏案例",
+        "position": "bl"
+      },
+      "subtitleHold": 4500
+    },
+    {
+      "action": "click",
+      "selector": "button:has-text(\"进入平台\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "waitFor",
+      "selector": "button:has-text(\"项目中心\"):not(:has-text(\"返回\"))",
+      "timeout": 25000
+    },
+    {
+      "action": "scene",
+      "anchor": "h1:has-text(\"工作台总览\")",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "点击项目中心，选择交付项目",
+        "position": "tr"
+      },
+      "hold": 3000
+    },
+    {
+      "action": "moveTo",
+      "selector": "button:has-text(\"项目中心\"):not(:has-text(\"返回\"))",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button:has-text(\"项目中心\"):not(:has-text(\"返回\"))",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "waitFor",
+      "selector": "button:has-text(\"查看对话\")",
+      "timeout": 25000
+    },
+    {
+      "action": "scene",
+      "anchor": "h1:has-text(\"项目中心\")",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "点击查看对话，打开门店项目",
+        "position": "bl"
+      },
+      "hold": 3000
+    },
+    {
+      "action": "moveTo",
+      "selector": "button:has-text(\"查看对话\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button:has-text(\"查看对话\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "waitFor",
+      "selector": "button[role=\"tab\"]:has-text(\"对话\")",
+      "timeout": 25000
+    },
+    {
+      "action": "moveTo",
+      "selector": "[data-fde-project-context-sidebar] nav button:has-text(\"发现高价值问题\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "[data-fde-project-context-sidebar] nav button:has-text(\"发现高价值问题\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "moveTo",
+      "selector": "button[role=\"tab\"]:has-text(\"项目工作台\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button[role=\"tab\"]:has-text(\"项目工作台\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "waitFor",
+      "selector": "[data-stage=\"discovery\"] h1",
+      "timeout": 25000
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-stage-goal]",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "阶段一：点击对话，梳理业务现状",
+        "position": "tr"
+      },
+      "hold": 4200
+    },
+    {
+      "action": "moveTo",
+      "selector": "button[role=\"tab\"]:has-text(\"对话\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button[role=\"tab\"]:has-text(\"对话\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "moveTo",
+      "selector": "div:has(> button[aria-label$=\"跳转到第 1 轮\"])",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "div:has(> button[aria-label$=\"跳转到第 1 轮\"])",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "waitFor",
+      "selector": "[data-chat-turn=\"1\"][data-turn-process-answer]",
+      "timeout": 25000
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-chat-turn=\"1\"]:has-text(\"我刚导入了客户原始简报\"):visible",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "提问示例：梳理原始简报与业务问题",
+        "position": "bl"
+      },
+      "hold": 5000
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-chat-turn=\"1\"][data-turn-process-answer]",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "查看回答：区分客户说法与待核对事实",
+        "position": "tr"
+      },
+      "hold": 5000
+    },
+    {
+      "action": "scrollBy",
+      "y": 300,
+      "duration": 1000
+    },
+    {
+      "action": "wait",
+      "ms": 600
+    },
+    {
+      "action": "moveTo",
+      "selector": "button[role=\"tab\"]:has-text(\"项目工作台\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button[role=\"tab\"]:has-text(\"项目工作台\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-evidence-output]",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "返回项目工作台，打开客户现状记录",
+        "position": "bl"
+      },
+      "hold": 3600
+    },
+    {
+      "action": "moveTo",
+      "selector": "li[data-evidence-row]:has-text(\"客户现状记录\") button",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "li[data-evidence-row]:has-text(\"客户现状记录\") button",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "waitFor",
+      "selector": "[data-dockkit-pane] h1",
+      "timeout": 25000
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-dockkit-pane] h1",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "产物预览：核对现状、来源与未知项",
+        "position": "tr"
+      },
+      "hold": 5000
+    },
+    {
+      "action": "scrollBy",
+      "y": 280,
+      "duration": 1000
+    },
+    {
+      "action": "wait",
+      "ms": 600
+    },
+    {
+      "action": "moveTo",
+      "selector": "button[aria-label=\"关闭\"]:visible",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button[aria-label=\"关闭\"]:visible",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "wait",
+      "ms": 500
+    },
+    {
+      "action": "moveTo",
+      "selector": "[data-fde-project-context-sidebar] nav button:has-text(\"定义结果、范围与责任\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "[data-fde-project-context-sidebar] nav button:has-text(\"定义结果、范围与责任\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "moveTo",
+      "selector": "button[role=\"tab\"]:has-text(\"项目工作台\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button[role=\"tab\"]:has-text(\"项目工作台\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "waitFor",
+      "selector": "[data-stage=\"definition\"] h1",
+      "timeout": 25000
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-stage=\"definition\"] h1",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "阶段二：定义结果、范围与责任",
+        "position": "bl"
+      },
+      "hold": 4200
+    },
+    {
+      "action": "moveTo",
+      "selector": "button[role=\"tab\"]:has-text(\"对话\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button[role=\"tab\"]:has-text(\"对话\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "moveTo",
+      "selector": "div:has(> button[aria-label$=\"跳转到第 14 轮\"])",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "div:has(> button[aria-label$=\"跳转到第 14 轮\"])",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "waitFor",
+      "selector": "[data-chat-turn=\"14\"][data-turn-process-answer]",
+      "timeout": 25000
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-chat-turn=\"14\"]:has-text(\"请从阶段 1 已确认的工作流\"):visible",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "提问示例：要求基线、指标与验证者",
+        "position": "tr"
+      },
+      "hold": 5000
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-chat-turn=\"14\"][data-turn-process-answer]",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "查看回答：明确验收目标与责任人",
+        "position": "bl"
+      },
+      "hold": 5000
+    },
+    {
+      "action": "scrollBy",
+      "y": 300,
+      "duration": 1000
+    },
+    {
+      "action": "wait",
+      "ms": 600
+    },
+    {
+      "action": "moveTo",
+      "selector": "button[role=\"tab\"]:has-text(\"项目工作台\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button[role=\"tab\"]:has-text(\"项目工作台\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "moveTo",
+      "selector": "article:has-text(\"当前基线记录\") button",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "article:has-text(\"当前基线记录\") button",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "waitFor",
+      "selector": "[data-dockkit-pane] h1",
+      "timeout": 25000
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-dockkit-pane] h1",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "打开基线记录，核对目标与停止条件",
+        "position": "tr"
+      },
+      "hold": 5000
+    },
+    {
+      "action": "scrollBy",
+      "y": 280,
+      "duration": 1000
+    },
+    {
+      "action": "wait",
+      "ms": 600
+    },
+    {
+      "action": "moveTo",
+      "selector": "button[aria-label=\"关闭\"]:visible",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button[aria-label=\"关闭\"]:visible",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "wait",
+      "ms": 500
+    },
+    {
+      "action": "moveTo",
+      "selector": "[data-fde-project-context-sidebar] nav button:has-text(\"调查数据、系统、接口、安全与组织\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "[data-fde-project-context-sidebar] nav button:has-text(\"调查数据、系统、接口、安全与组织\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "moveTo",
+      "selector": "button[role=\"tab\"]:has-text(\"项目工作台\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button[role=\"tab\"]:has-text(\"项目工作台\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "waitFor",
+      "selector": "[data-stage=\"investigation\"] h1",
+      "timeout": 25000
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-investigation-hero]",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "阶段三：调查数据、系统与权限",
+        "position": "bl"
+      },
+      "hold": 4200
+    },
+    {
+      "action": "moveTo",
+      "selector": "button[role=\"tab\"]:has-text(\"对话\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button[role=\"tab\"]:has-text(\"对话\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "moveTo",
+      "selector": "div:has(> button[aria-label$=\"跳转到第 21 轮\"])",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "div:has(> button[aria-label$=\"跳转到第 21 轮\"])",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "waitFor",
+      "selector": "[data-chat-turn=\"21\"][data-turn-process-answer]",
+      "timeout": 25000
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-chat-turn=\"21\"]:has-text(\"当前处于阶段 3\"):visible",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "提问示例：逐项调查接口与访问权限",
+        "position": "tr"
+      },
+      "hold": 5000
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-chat-turn=\"21\"][data-turn-process-answer]",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "查看回答：保留证据状态与负责人",
+        "position": "bl"
+      },
+      "hold": 5000
+    },
+    {
+      "action": "scrollBy",
+      "y": 300,
+      "duration": 1000
+    },
+    {
+      "action": "wait",
+      "ms": 600
+    },
+    {
+      "action": "moveTo",
+      "selector": "button[role=\"tab\"]:has-text(\"项目工作台\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button[role=\"tab\"]:has-text(\"项目工作台\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-investigation-primary-grid]",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "返回项目工作台，查看系统关系",
+        "position": "tr"
+      },
+      "hold": 4200
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-investigation-action-row]",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "核对动作边界：可读取不等于可执行",
+        "position": "bl"
+      },
+      "hold": 4200
+    },
+    {
+      "action": "moveTo",
+      "selector": "[data-fde-project-context-sidebar] nav button:has-text(\"设计方案并完成端到端纵向切片\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "[data-fde-project-context-sidebar] nav button:has-text(\"设计方案并完成端到端纵向切片\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "moveTo",
+      "selector": "button[role=\"tab\"]:has-text(\"项目工作台\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button[role=\"tab\"]:has-text(\"项目工作台\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "waitFor",
+      "selector": "[data-stage=\"design\"] h1",
+      "timeout": 25000
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-design-stage-hero]",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "阶段四：比较方案并完成纵向切片",
+        "position": "tr"
+      },
+      "hold": 4200
+    },
+    {
+      "action": "moveTo",
+      "selector": "button[role=\"tab\"]:has-text(\"对话\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button[role=\"tab\"]:has-text(\"对话\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "moveTo",
+      "selector": "div:has(> button[aria-label$=\"跳转到第 24 轮\"])",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "div:has(> button[aria-label$=\"跳转到第 24 轮\"])",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "waitFor",
+      "selector": "[data-chat-turn=\"24\"][data-turn-process-answer]",
+      "timeout": 25000
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-chat-turn=\"24\"]:has-text(\"请读取以下内容\"):visible",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "提问示例：比较方案，不预设技术",
+        "position": "bl"
+      },
+      "hold": 5000
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-chat-turn=\"24\"][data-turn-process-answer]",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "查看回答：依据业务证据选择方案",
+        "position": "tr"
+      },
+      "hold": 5000
+    },
+    {
+      "action": "scrollBy",
+      "y": 300,
+      "duration": 1000
+    },
+    {
+      "action": "wait",
+      "ms": 600
+    },
+    {
+      "action": "moveTo",
+      "selector": "button[role=\"tab\"]:has-text(\"项目工作台\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button[role=\"tab\"]:has-text(\"项目工作台\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-design-route]",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "返回方案页，查看选择理由与排除项",
+        "position": "bl"
+      },
+      "hold": 3600
+    },
+    {
+      "action": "scene",
+      "anchor": "h2:has-text(\"从最小 Schema 到可查询\")",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "查看已有图谱，核对实体关系与来源",
+        "position": "tr"
+      },
+      "hold": 5000
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-design-context]",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "查看纵向切片：核对端到端运行结果",
+        "position": "bl"
+      },
+      "hold": 4200
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-design-run-evidence]",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "运行记录与人工决定分别留存",
+        "position": "tr"
+      },
+      "hold": 3600
+    }
+  ]
+}

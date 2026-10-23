@@ -42,6 +42,7 @@ function propsFor(
       } } } }),
       loadStage: vi.fn(), loadProjectSurface: vi.fn(), pollProjectSurface,
       startProject, stopProject: vi.fn(async () => undefined),
+      openManualTerminal: vi.fn(async () => undefined),
       openProjectPreview, showProjectTerminal: vi.fn(async () => undefined),
       continueDevelopment: vi.fn(), t: makeTranslate(zh),
     } as unknown as ProjectRuntimeHeaderProps,
@@ -83,7 +84,7 @@ describe('ProjectRuntimeHeader', () => {
     expect(screen.getByRole('button', { name: '重试停止' })).toBeTruthy()
     expect(screen.queryByRole('button', { name: '重试启动' })).toBeNull()
     expect(screen.getByRole('button', { name: '打开项目' })).toBeTruthy()
-    expect(screen.getByRole('button', { name: '查看终端' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: '运行输出' })).toBeTruthy()
   })
 
   it('keeps polling a blocked start so the same operation can recover', () => {

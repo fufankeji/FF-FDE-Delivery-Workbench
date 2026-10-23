@@ -10,7 +10,7 @@ import { WorkspaceId } from '@deepseek-ai/dsh-workspace'
 /** Register only when the durable projection services are available. */
 export function registerProjectUsage(ctx: Context): void {
   ctx.inject(['sessions', 'sessionProjections', 'sessionProjectionCache', 'sessionPersistence'], scoped => {
-    const trusted = createWebRequestTrust(scoped.webServer)
+    const trusted = createWebRequestTrust(scoped.connection)
     scoped.effect(() => scoped.webServer.register({
       kind: 'exact', path: '/api/fde-project/usage',
       handler: async (request, response) => {

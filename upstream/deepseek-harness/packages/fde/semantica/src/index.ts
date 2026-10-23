@@ -40,7 +40,7 @@ export { SemanticaBridgeError, runSemantica } from './python.ts'
 export { SemanticaRouteError } from './routes.ts'
 
 export const name = 'fde-semantica'
-export const inject = ['tools', 'webServer', 'workspaceRegistry']
+export const inject = ['connection', 'tools', 'webServer', 'workspaceRegistry']
 
 export const FDE_SEMANTICA_ROUTE_PATH = '/api/fde-semantica/route'
 export const FDE_SEMANTICA_SOURCES_PATH = '/api/fde-semantica/sources'
@@ -51,10 +51,15 @@ export const FDE_SEMANTICA_SLICE_PATH = '/api/fde-semantica/slice/report'
 export const FDE_SEMANTICA_DECISION_PATH = '/api/fde-semantica/decision'
 
 export interface Config {
+  /** Python executable used by the semantic worker. */
   readonly pythonCommand: string
+  /** Optional local Semantica source directory; absent uses the installed module. */
   readonly semanticaSource?: string
+  /** Maximum duration of one worker operation in milliseconds. */
   readonly operationTimeoutMs: number
+  /** Maximum bytes read from one approved source. */
   readonly maxSourceBytes: number
+  /** Maximum approved sources included in one operation. */
   readonly maxSources: number
 }
 
@@ -68,7 +73,7 @@ export const Config: z<Config> = z.object({
 
 /** Register project actions and Agent tools; only browser actions publish, review candidates or submit FDE decisions. */
 export function apply(ctx: Context, input: Config): void {
-  const trusted = createWebRequestTrust(ctx.webServer)
+  const trusted = createWebRequestTrust(ctx.connection)
   const config: SemanticProviderConfig = {
     pythonCommand: input.pythonCommand,
     ...(input.semanticaSource === undefined || input.semanticaSource.trim() === '' ? {} : { semanticaSource: input.semanticaSource }),

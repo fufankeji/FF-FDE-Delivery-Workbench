@@ -1,3 +1,7 @@
+import { RuntimeOutputController } from './runtime-output-controller.ts'
+import { ProjectRuntimeOutput, type ProjectRuntimeOutputInjected } from './ProjectRuntimeOutput.tsx'
+import { createElement } from 'react'
+import { ProjectPreview } from './ProjectPreview.tsx'
 import { installProjectFileRefresh } from './file-refresh.ts'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
 import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
@@ -26,15 +30,12 @@ import { WorkbenchNavigation, WorkbenchLabLauncher } from './WorkbenchNavigation
 import { ProjectRuntimeHeader } from './ProjectRuntimeHeader.tsx'
 import { ProjectContextSidebar } from './ProjectContextSidebar.tsx'
 import { ProjectStageWorkbenchHero, ProjectStageWorkbenchView } from './StageWorkbench.tsx'
-import { latestProjectSessionId } from './project-data.ts'
+import { latestProjectSessionId, mainProjectSessionId } from './project-data.ts'
 import {
   ensureProjectRuntimeSidebar,
   openProjectPreview,
   resolveProjectPreview,
-  projectRuntimeTerminalRecoveryPrompt,
-  projectPreviewAuthority,
   revealProjectSidebar,
-  showProjectRuntimeTerminal,
   waitForProjectSidebarSession,
 } from './project-runtime-sidebar.ts'
 import type {
@@ -60,7 +61,7 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
 }
 
 /** Required browser services and the Slot owners that declare our targets. */
-export const inject = ['slots', 'locale', 'sessions', 'workspaces', 'conversation', 'layout', 'projectMetadata', 'uiWorkspace', 'sidebarRight']
+export const inject = ['slots', 'locale', 'sessions', 'workspaces', 'conversation', 'layout', 'projectMetadata', 'uiWorkspace', 'sidebarRight', 'sidebarRightTabs']
 
 const FDE_PROJECT_PROGRESS_OPEN_EVENT = 'fde:project-progress-open'
 const FDE_PROJECT_CREATE_OPEN_EVENT = 'fde:project-create-open'
@@ -74,6 +75,15 @@ export function apply(ctx: ClientContext): void {
   const stageView = new ProjectStageViewController()
   const sources = new ProjectSourceController()
   const surfaces = new FdeProjectSurfaceController()
+  const output = new RuntimeOutputController()
+  ctx.effect(() => () => output.dispose(), 'ui-fde-project: output observer')
+  ctx.effect(() => ctx.sidebarRightTabs.register({
+    id: 'fde-project-runtime-output', kind: 'fde-runtime-output', multiple: false, title: () => ctx.locale.bind(NS)('runtime.outputTitle'),
+  }), 'ui-fde-project: output tab')
+  ctx.slots.inject('sidebar.right.pane.tab', () => ctx.slots.register({
+    name: 'sidebar.right.pane.tab', key: 'fde-project-runtime-output', locale: NS,
+    inject: (): ProjectRuntimeOutputInjected => ({ hooks: { runtimeOutput: output }, watchOutput: output.watch }),
+  }, ProjectRuntimeOutput))
   const usage = new ProjectUsageController()
   const loadProjectUsage = usage.load.bind(usage)
   ctx.effect(() => () => usage.dispose(), 'ui-fde-project: usage controller')
@@ -130,7 +140,7 @@ export function apply(ctx: ClientContext): void {
     const sessionId = await resolveProjectSession(workspaceId)
     enteredProject = { workspaceId, sessionId: String(sessionId) }
     const targetView = viewId ?? 'fde-stage-workbench'
-    ctx.sessions.open(sessionId)
+    ctx.uiWorkspace.openSession(sessionId)
     const scoped = ctx.sessions.scope(sessionId)
     const conversation = scoped?.get('conversation')
     if (conversation === undefined) throw new Error('当前项目会话暂时无法打开。')
@@ -153,7 +163,7 @@ export function apply(ctx: ClientContext): void {
         || state.archivedSessionIds.includes(sessionId as SessionId) || session === undefined || session.blank || session.origin === 'subagent') {
         throw new Error('这条会话已不存在或不再属于当前项目。')
       }
-      ctx.sessions.open(sessionId as SessionId)
+      ctx.uiWorkspace.openSession(sessionId as SessionId)
       const conversation = ctx.sessions.scope(sessionId as SessionId)?.get('conversation')
       if (conversation === undefined) throw new Error('当前项目会话暂时无法打开。')
       enteredProject = { workspaceId, sessionId }
@@ -246,7 +256,7 @@ export function apply(ctx: ClientContext): void {
       const session = ctx.sessions.binding(sessionId)?.session
       if (session === undefined) throw new Error('当前会话不可用。')
       ctx.sessions.scope(sessionId)?.get('conversation')?.selectView('chat')
-      ctx.sessions.open(sessionId)
+      ctx.uiWorkspace.openSession(sessionId)
       const result = await session.prompt([{
         type: 'text',
         text: '请加载 Skill `fde-validation`，以“评估方案准备”模式为当前项目生成或完善评估方案。必须读取已确认的需求基线、项目 PRD、验收方案、方案基线和研发基线；把每项指标的来源文件与文档内编号写入 `.fde/evaluations/validation.json`（schemaVersion=2、metrics[].sources），并生成 `fde-deliverables/04-validation/validation-plan.md`。本次只准备方案：所有尚未真实执行的结果保持 NOT_RUN，不生成验证报告或验证基线，不修改项目阶段，也不要代替 FDE 确认方案。',
@@ -260,7 +270,7 @@ export function apply(ctx: ClientContext): void {
       const session = ctx.sessions.binding(sessionId)?.session
       if (session === undefined) throw new Error('当前会话不可用。')
       ctx.sessions.scope(sessionId)?.get('conversation')?.selectView('chat')
-      ctx.sessions.open(sessionId)
+      ctx.uiWorkspace.openSession(sessionId)
       const result = await session.prompt([{
         type: 'text',
         text: '请加载 Skill `fde-validation`，以“开始验证”模式执行当前项目已经由 FDE 确认的评估方案。先读取 `.fde/evaluations/validation-plan-approval.json`、`.fde/evaluations/validation.json` 和 `fde-deliverables/04-validation/validation-plan.md`，只执行当前环境已具备且得到授权的真实检查，并把证据保存在项目目录中，再更新指标结果、验证报告和验证基线。不得虚构结果，不得把未执行项标为通过，也不得自行改变指标、阈值或来源；如方案定义必须改变，立即停止执行，更新候选方案并请 FDE 重新确认。不要推进项目阶段。',
@@ -353,7 +363,7 @@ export function apply(ctx: ClientContext): void {
       item.sessionIds.some(id => String(id) === sessionId)
     ))
     ctx.sessions.scope(sessionId as SessionId)?.get('conversation')?.selectView('chat')
-    ctx.sessions.open(sessionId as SessionId)
+    ctx.uiWorkspace.openSession(sessionId as SessionId)
     ctx.layout.collapseSidebar()
     if (projectSidebar !== undefined && workspace !== undefined) {
       revealProjectSidebar(projectSidebar, sessionId, workspace.path)
@@ -433,7 +443,7 @@ export function apply(ctx: ClientContext): void {
     },
     openProjectFile: async (sessionId, workspacePath, relativePath, title) => {
       if (projectSidebar === undefined) throw new Error('右侧项目文件面板暂时不可用。')
-      ctx.sessions.open(sessionId as SessionId)
+      ctx.uiWorkspace.openSession(sessionId as SessionId)
       await waitForProjectSidebarSession(projectSidebar, sessionId)
       revealProjectSidebar(projectSidebar, sessionId, workspacePath)
       const separator = workspacePath.endsWith('/') || relativePath.startsWith('/') ? '' : '/'
@@ -494,7 +504,7 @@ export function apply(ctx: ClientContext): void {
 
   const showProjectConversation = (sessionId: string): void => {
     ctx.sessions.scope(sessionId as SessionId)?.get('conversation')?.selectView('chat')
-    ctx.sessions.open(sessionId as SessionId)
+    ctx.uiWorkspace.openSession(sessionId as SessionId)
   }
 
   const runtimeHeaderInjected = (betterSidebar: BetterSidebarService): ProjectRuntimeHeaderInjected => ({
@@ -511,10 +521,12 @@ export function apply(ctx: ClientContext): void {
       showProjectConversation(sessionId)
       await ensureProjectRuntimeSidebar(betterSidebar)
       revealProjectSidebar(betterSidebar, sessionId, workspacePath)
+      await waitForProjectSidebarSession(betterSidebar, sessionId)
+      ctx.sidebarRight.openTab('fde-runtime-output')
       const runtime = await surfaces.startRuntime(workspaceId, sessionId)
       if (runtime.operationId === undefined) throw new Error('项目启动操作缺少 operationId。')
       try {
-        await queueRuntimePrompt(sessionId, `请启动当前 FDE 项目。本次操作 operationId=${runtime.operationId}。\n\n1. 先读取项目根目录 AGENTS.md；如其中引用 README、运行手册或脚本，继续按项目真实说明执行。不要猜测固定技术栈、启动命令、端口或 /docs。\n2. 在执行启动命令前，先依据上述真实项目说明验证其中声明的服务是否已经运行；若现有服务已可用，直接报告该运行事实，不要重复启动第二份。需要启动时，长时间运行的服务必须使用 Better Sidebar 的 terminal_list / terminal_create / terminal_send / terminal_read / terminal_wait_for / terminal_signal 工具。优先复用当前会话中标题为“项目运行”的终端；不存在时创建一个标题为“项目运行”的持久终端。不要用普通 Bash 启动不可观察的后台服务。\n3. 等待服务就绪并真实验证项目页面。只有验证成功后，才调用 project_runtime_report，传入本 operationId、status=running、previewUrl 和 terminalTitle=项目运行。若同时真实发现 OpenAPI，可一并传 docsUrl、openapiSource、baseUrl；不要猜测。\n4. 如果 AGENTS.md 不存在、项目尚未开发到可启动、终端依赖不可用或启动失败，调用 project_runtime_report，传入本 operationId、status=blocked 和具体原因。不要为了启动而大范围改代码，也不要反复重试。\n5. 无论启动成功还是阻塞，调用 project_runtime_report 后都要在当前对话用简短中文正常说明结果和下一步；阻塞时明确用户可以继续开发。不要只调用工具或只更新页头状态。`)
+        await queueRuntimePrompt(sessionId, `请启动当前 FDE 项目。本次操作 operationId=${runtime.operationId}。\n\n1. 先读取项目根目录 AGENTS.md；如其中引用 README、运行手册或脚本，继续按项目真实说明执行。不要猜测固定技术栈、启动命令、端口或 /docs。\n2. 在执行启动命令前，先依据上述真实项目说明验证其中声明的服务是否已经运行；若现有服务已可用，直接报告该运行事实，不要重复启动第二份。需要启动时，长时间运行的服务必须使用官方 terminal_list / terminal_open / terminal_send / terminal_read / terminal_signal 工具。优先复用当前会话中标题为“项目运行”的终端；不存在时调用 terminal_open，type=shell、name=项目运行、cwd 为当前项目目录；通过 terminal_send 发送真实启动命令，长任务使用 run_in_background=true，并用 job_output 和 terminal_read 查看输出。不要用普通 Bash 启动不可观察的后台服务。\n3. 等待服务就绪并真实验证项目页面。只有验证成功后，才调用 project_runtime_report，传入本 operationId、status=running、previewUrl 和 terminalTitle=项目运行。若同时真实发现 OpenAPI，可一并传 docsUrl、openapiSource、baseUrl；不要猜测。\n4. 如果 AGENTS.md 不存在、项目尚未开发到可启动、终端依赖不可用或启动失败，调用 project_runtime_report，传入本 operationId、status=blocked 和具体原因。不要为了启动而大范围改代码，也不要反复重试。\n5. 无论启动成功还是阻塞，调用 project_runtime_report 后都要在当前对话用简短中文正常说明结果和下一步；阻塞时明确用户可以继续开发。不要只调用工具或只更新页头状态。`)
       } catch (error) {
         await surfaces.abandonRuntime(workspaceId, runtime.operationId, `启动指令未进入项目会话：${promptFailure(error)}`).catch(() => undefined)
         throw error
@@ -528,18 +540,22 @@ export function apply(ctx: ClientContext): void {
         throw new Error('当前项目不在可停止状态。')
       }
       const targetSessionId = state.value.runtime.sessionId
-      if (targetSessionId === undefined || ctx.sessions.binding(targetSessionId as SessionId)?.session === undefined) {
+      const workspace = ctx.workspaces.list.getSnapshot().items.find(item => String(item.workspaceId) === workspaceId)
+      if (targetSessionId === undefined || !workspace?.sessionIds.includes(targetSessionId as SessionId)) {
         throw new Error('原项目运行会话不可用，不能安全定位要停止的终端。')
       }
-      await ensureProjectRuntimeSidebar(betterSidebar)
-      const runtime = await surfaces.stopRuntime(workspaceId, targetSessionId)
-      if (runtime.operationId === undefined) throw new Error('项目停止操作缺少 operationId。')
-      try {
-        await queueRuntimePrompt(targetSessionId, `请停止当前 FDE 项目。本次操作 operationId=${runtime.operationId}。\n\n1. 使用 terminal_list 查找当前项目会话中标题为“项目运行”的持久终端，只处理这个项目终端。\n2. 使用 terminal_signal 向该终端发送 SIGINT，再用 terminal_wait_for / terminal_read 确认服务是否退出。禁止使用无范围的 pkill、killall，也不要调用 terminal_close；终端和输出必须保留。\n3. 确认退出后调用 project_runtime_report，传入本 operationId、status=stopped 和结果说明。若服务仍在运行，报告 status=running；若无法确认，报告 status=blocked 并说明原因。不要把无法确认冒充为停止成功。`)
-      } catch (error) {
-        await surfaces.abandonRuntime(workspaceId, runtime.operationId, `停止指令未进入项目会话：${promptFailure(error)}`).catch(() => undefined)
-        throw error
-      }
+      await ctx.sessions.using(targetSessionId as SessionId, { source: 'workspaceOperation' }, async reference => {
+        await reference.ready
+        await ensureProjectRuntimeSidebar(betterSidebar)
+        const runtime = await surfaces.stopRuntime(workspaceId, targetSessionId)
+        if (runtime.operationId === undefined) throw new Error('项目停止操作缺少 operationId。')
+        try {
+          await queueRuntimePrompt(targetSessionId, `请停止当前 FDE 项目。本次操作 operationId=${runtime.operationId}。\n\n1. 使用 terminal_list 查找当前项目会话中标题为“项目运行”的持久终端，只处理这个项目终端。\n2. 使用 terminal_signal 向该终端发送 SIGINT，再用 terminal_read 和项目真实健康检查确认服务是否退出。禁止使用无范围的 pkill、killall，也不要调用 terminal_close；终端和输出必须保留。\n3. 确认退出后调用 project_runtime_report，传入本 operationId、status=stopped 和结果说明。若服务仍在运行，报告 status=running；若无法确认，报告 status=blocked 并说明原因。不要把无法确认冒充为停止成功。`)
+        } catch (error) {
+          await surfaces.abandonRuntime(workspaceId, runtime.operationId, `停止指令未进入项目会话：${promptFailure(error)}`).catch(() => undefined)
+          throw error
+        }
+      })
     },
     openProjectPreview: async (workspaceId, sessionId, workspacePath) => {
       const state = surfaces.getSnapshot().byWorkspace[workspaceId]
@@ -548,32 +564,24 @@ export function apply(ctx: ClientContext): void {
         : undefined
       if (url === undefined) throw new Error('当前项目没有已验证的运行地址。')
       const previewUrl = await resolveProjectPreview(workspaceId)
-      await ensureProjectRuntimeSidebar(betterSidebar, projectPreviewAuthority(previewUrl))
+      await ensureProjectRuntimeSidebar(betterSidebar)
       openProjectPreview(betterSidebar, sessionId, workspacePath, previewUrl)
     },
-    showProjectTerminal: async (workspaceId, sessionId, workspacePath) => {
+    showProjectTerminal: async (workspaceId, sessionId, _workspacePath) => {
       const state = surfaces.getSnapshot().byWorkspace[workspaceId]
-      const targetSessionId = state?.status === 'ready' ? state.value.runtime.sessionId ?? sessionId : sessionId
+      const target = state?.status === 'ready' ? state.value.runtime.sessionId ?? sessionId : sessionId
       const workspace = ctx.workspaces.list.getSnapshot().items.find(item => String(item.workspaceId) === workspaceId)
-      if (workspace === undefined || !workspace.sessionIds.some(id => String(id) === targetSessionId)) {
-        throw new Error('项目运行会话已经不可用。')
-      }
-      await ensureProjectRuntimeSidebar(betterSidebar)
-      ctx.sessions.open(targetSessionId as SessionId)
-      await waitForProjectSidebarSession(betterSidebar, targetSessionId)
-      const shown = await showProjectRuntimeTerminal(
-        betterSidebar,
-        targetSessionId,
-        workspacePath,
-        state?.status === 'ready' ? state.value.runtime.terminalTitle : undefined,
-      )
-      if (shown) return
-      showProjectConversation(targetSessionId)
-      const runtime = state?.status === 'ready' ? state.value.runtime : undefined
-      await queueRuntimePrompt(targetSessionId, projectRuntimeTerminalRecoveryPrompt(
-        runtime?.previewUrl,
-        runtime?.terminalTitle,
-      ))
+      if (workspace === undefined || !workspace.sessionIds.includes(target as SessionId)) throw new Error('项目运行会话已经不可用。')
+      ctx.uiWorkspace.openSession(target as SessionId)
+      await waitForProjectSidebarSession(betterSidebar, target)
+      ctx.sidebarRight.openTab('fde-runtime-output')
+    },
+    openManualTerminal: async (workspaceId, sessionId, _workspacePath) => {
+      const workspace = ctx.workspaces.list.getSnapshot().items.find(item => String(item.workspaceId) === workspaceId)
+      if (workspace === undefined || !workspace.sessionIds.includes(sessionId as SessionId)) throw new Error('当前会话不属于这个项目。')
+      ctx.uiWorkspace.openSession(sessionId as SessionId)
+      await waitForProjectSidebarSession(betterSidebar, sessionId)
+      ctx.sidebarRight.openTab('terminal')
     },
     continueDevelopment: (sessionId) => {
       showProjectConversation(sessionId)
@@ -621,6 +629,10 @@ export function apply(ctx: ClientContext): void {
 
   ctx.inject(['betterSidebar'], (scope: ClientContext) => {
     projectSidebar = scope.betterSidebar
+    scope.effect(() => scope.betterSidebar.registerTab({
+      id: 'fde-project-preview', title: () => t('runtime.previewTitle'), hidden: true, single: true,
+      component: ({ tab }) => createElement(ProjectPreview, { url: tab.path, title: t('runtime.previewTitle'), unavailable: t('runtime.previewUnavailable') }),
+    }), 'ui-fde-project: isolated preview')
     const dispose = scope.slots.inject('conversation.session.header.utilities', () => scope.slots.register({
       name: 'conversation.session.header.utilities', id: 'fde-project-runtime', order: -10, locale: NS,
       inject: () => runtimeHeaderInjected(scope.betterSidebar),
@@ -649,7 +661,7 @@ export function apply(ctx: ClientContext): void {
       mounted.delete(id)
     }
     const reconcile = (): void => {
-      const current = ctx.sessions.list.getSnapshot().current
+      const current = mainProjectSessionId(ctx.sessions.list.getSnapshot())
       const workspace = current === undefined
         ? undefined
         : ctx.workspaces.list.getSnapshot().items.find(item => item.sessionIds.includes(current))

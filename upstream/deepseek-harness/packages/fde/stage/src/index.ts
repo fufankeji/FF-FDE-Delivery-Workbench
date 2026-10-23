@@ -1,6 +1,7 @@
 /** FDE project-stage Host plugin. @module @deepseek-ai/dsh-fde-stage */
 
 import type { Context } from '@deepseek-ai/cordis'
+import { platformSkillCatalog, readPlatformSkill, registerPlatformSkills } from './platform-skills.ts'
 import type {} from '@deepseek-ai/dsh-agent'
 import { createWebRequestTrust } from '@deepseek-ai/dsh-client-connection'
 import {
@@ -70,7 +71,7 @@ export const FDE_STAGE_SKILL_CATALOG_PATH = '/api/fde-stage/skills'
 /** Cordis plugin name. */
 export const name = 'fde-stage'
 /** Required durable Workspace, model guidance, and same-origin Web services. */
-export const inject = ['skills', 'storageDomain', 'systemPrompt', 'workspaceRegistry', 'webServer']
+export const inject = ['connection', 'skills', 'storageDomain', 'systemPrompt', 'workspaceRegistry', 'webServer']
 
 /**
  * Applies the stage-four human-decision gate on top of evidence readiness.
@@ -102,194 +103,26 @@ export function v2StageCompletionReadiness(
   }
 }
 
-const DISCOVERY_METHOD_SOURCE = 'davidahmann/fde-guide@060ef0f3b67743b2e1fc3705763d423eae980236'
-const DISCOVERY_ENGINEERING_SOURCE = 'rpraharaj/forward-deployed-engineer@ee045a66db5242617ccea9e5e33139a2980ab55e'
-const DISCOVERY_METHOD_COMMIT = '060ef0f3b67743b2e1fc3705763d423eae980236'
-const DISCOVERY_METHOD_URL = `https://github.com/davidahmann/fde-guide/blob/${DISCOVERY_METHOD_COMMIT}/.agents/skills/qualify-ai-workflow/SKILL.md`
+/** File-backed qualify-ai-workflow definition used by the fixed stage catalog. */
+export const QUALIFY_AI_WORKFLOW_SKILL = readPlatformSkill('qualify-ai-workflow')
 
-const discoveryReference = (
-  label: string,
-  path: string,
-  category: 'method' | 'artifact' | 'control',
-  kind: 'markdown' | 'json' | 'pattern' | 'catalog',
-  purpose: string,
-) => ({
-  label, path, category, kind, purpose,
-  url: `https://github.com/davidahmann/fde-guide/blob/${DISCOVERY_METHOD_COMMIT}/${path}`,
-})
+/** File-backed reframe-ai-engagement definition used by the fixed stage catalog. */
+export const REFRAME_AI_ENGAGEMENT_SKILL = readPlatformSkill('reframe-ai-engagement')
 
-const DISCOVERY_STRUCTURED_OUTPUT_CONTRACT = `## 阶段 1 持久化合同
+/** File-backed fde-orient definition used by the fixed stage catalog. */
+export const FDE_ORIENT_SKILL = readPlatformSkill('fde-orient')
 
-只维护同一路径，不创建 final、v2、new 等平行最终稿。Markdown 是给人阅读的候选记录；JSON 是工作台校验来源、结构和证据的索引。
+/** File-backed knowledge-interview definition used by the fixed stage catalog. */
+export const KNOWLEDGE_INTERVIEW_SKILL = readPlatformSkill('knowledge-interview')
 
-### 候选工作流
+/** File-backed ownership-map definition used by the fixed stage catalog. */
+export const OWNERSHIP_MAP_SKILL = readPlatformSkill('ownership-map')
 
-维护 \`.fde/discovery/workflows.json\`，根对象固定为 \`{"schemaVersion":2,"selectedWorkflowId":"可选","workflows":[]}\`。每个 workflow 包含 \`id\`、\`title\`、\`actor\`、\`trigger\`、\`problem\`、\`disposition\` 和非空 \`evidenceRefs\`。\`disposition\` 只能是 candidate、selected、deferred 或 rejected。
+/** File-backed repo-recon definition used by the fixed stage catalog. */
+export const REPO_RECON_SKILL = readPlatformSkill('repo-recon')
 
-每条 evidenceRef 必须包含：
-
-- \`id\`：当前项目内稳定且不重复的引用 ID；
-- \`state\`：confirmed、inferred 或 unverified；
-- \`kind\`：project-file、conversation、interview、observation、system、policy 或 external；
-- \`ref\`：可定位的项目相对路径、会话轮次、访谈编号、观察编号、系统查询或政策条款；
-- \`summary\`：该来源实际支持的简短主张。
-
-不要写 confirmed／inferred／unverified 数字。工作台只从逐条 evidenceRefs 聚合数量；没有来源时也必须保存一条 unverified 引用并写明需要谁、通过什么取得证据，不能虚构证据。
-
-### 三项必备候选产物
-
-1. \`fde-deliverables/01-requirement-research/requirement-research-report.md\`，必须包含“## 来源事实”“## 代表案例”“## 现场观察”“## 未验证事项”。
-2. \`fde-deliverables/01-requirement-research/confirmation-checklist.md\`，必须包含“## 待确认事项”“## 已确认事项”“## 决策权”。
-3. \`fde-deliverables/01-requirement-research/requirement-baseline.md\`，必须包含“## 候选工作流”“## 业务结果”“## 现状基线”“## 范围与非目标”“## 人工回退”“## 停止条件”。
-
-三份记录各负其责，不另建一套业务诊断报告：
-
-- 客户现状记录是主报告。在“来源事实”下写原始诉求、业务背景与范围、数据与系统条件；在“代表案例”下还原真实流程与组织；在“现场观察”下写基线与问题诊断、AI 价值机会、建议与验证优先级；在“未验证事项”下指出会改变结论的缺口，并引用确认清单。
-- 待确认事项只收敛未知、冲突、责任人、核对方式和待决定事项；保留已确认事项及其来源，不复制主报告全文。
-- 业务流程说明从主报告收敛候选工作流、业务结果、现状基线、范围与非目标、人工回退和停止条件；尚未测量或批准的内容明确标注，不把候选建议写成客户决定。
-
-复用项目已有来源索引和原始资料，不复制第二套素材。在主报告或分析附录中列明本次授权范围内已取得、未取得和受限材料，区分原件与派生文件，以项目相对路径引用。材料字段只展开到影响当前判断的部分，字段含义未知时不猜测；第一阶段不强制完整数据字典、接口或系统审计，深入环境调查由第三阶段承接。
-
-### 候选产物目录（Artifact Catalog）
-
-维护 \`.fde/discovery/artifacts.json\`，根对象固定为 \`{"schemaVersion":1,"artifacts":[]}\`。每项必须包含 \`id\`、正整数 \`version\`、固定 \`contentPath\`、\`sourceAdapter\`、\`structureState\`、\`evidenceState\`、非空 \`evidenceRefs\`、\`inputRefs\`、\`decisionRefs\` 和 \`supersedes\`。structureState 只能是 missing、invalid、starter_valid、complete_valid 或 not_applicable；evidenceState 只能是 confirmed、inferred 或 unverified。
-
-三项必备产物的 id 固定为 \`research-report\`、\`confirmation-checklist\`、\`requirement-baseline\`；条件产物固定为 \`engagement-reframe\`。\`inputRefs\`、\`decisionRefs\` 和 \`supersedes\` 必须使用字符串数组；没有引用或被替代版本时写 \`[]\`，不要写 null。
-
-\`artifacts.json\` 只登记以上四种固定阶段记录。决策简报、访谈整理、分析附录等补充文件可以保留在项目目录，但不得作为新 id 加入 Artifact Catalog，也不得改变三项必备记录的完成分母。
-
-固定来源适配器如下，字段和值必须完整保留：
-
-- 现场观察记录：\`{"id":"davidahmann/fde-guide","version":"060ef0f3","commit":"060ef0f3b67743b2e1fc3705763d423eae980236","license":"Apache-2.0","artifact":"field-observation-log"}\`
-- 事实确认清单：\`{"id":"ff-fde-workbench/discovery-contract","version":"F005-v2","commit":"product-spec/F005","license":"project","artifact":"fact-confirmation-list"}\`
-- 工作流章程：\`{"id":"davidahmann/fde-guide","version":"060ef0f3","commit":"060ef0f3b67743b2e1fc3705763d423eae980236","license":"Apache-2.0","artifact":"workflow-charter"}\`
-
-产物的 evidenceRefs 使用与候选工作流相同的逐条结构。文件刚达到上述最小章节时可标为 starter_valid；只有内容确实达到完整合同并经过结构复核时才标 complete_valid。结构有效不等于证据已确认，文件存在也不等于客户或 FDE 已接受。`
-
-/** Method-layer Skill for every stage-one workflow qualification. */
-export const QUALIFY_AI_WORKFLOW_SKILL = {
-  name: 'qualify-ai-workflow',
-  description: '从实际业务、额外劳动和证据出发，核对问题原因与指标口径，比较传统改进和 AI 增量，判断哪个问题值得优先投入。',
-  whenToUse: '当前项目处于发现高价值问题，用户描述客户诉求、引用现场资料、要求梳理真实工作、比较候选问题或形成阶段候选结论时优先使用。',
-  source: DISCOVERY_METHOD_SOURCE,
-  content: `# 业务诊断与 AI 机会判断
-
-本 Skill 以固定版本的 qualify-ai-workflow 为方法来源，业务因果、计量口径与三份记录分工是工作台的本地增强，不冒充上游原文。它是阶段 1 的核心方法，不替代后续价值工程、环境调查或方案设计。
-
-## 先读材料，再还原业务
-
-先读取本次明确授权的材料、已有阶段记录和用户修订，复用来源索引；不要扩大读取范围或重复询问材料已经回答的问题。保留客户原话和来源，先用业务语言讲清楚这项业务为什么发生、由谁执行、经过哪些系统、如何判断、怎样完成，以及正常路径、异常分支和人工回退。区分制度规定、系统实现与实际操作，对比卖出的说法、人员陈述、现场观察和政策授权。
-
-围绕一名真实流程知情者、一个近期正常案例和一个重要异常案例取证；尚未取得时如实登记缺口。每轮只问最影响判断的 1–3 个问题，说明为什么问、应向谁或从什么材料核对，不暗示用户必须发现 AI 痛点，也不要求用户编造数字。信息不足仍可形成有边界的初步报告；用户要求先出稿时不强制多轮访谈。
-
-## 从额外劳动追到原因
-
-逐项建立“发生场景 → 当前做法 → 额外核对、沟通、等待或返工 → 有证据的原因 → 业务影响”的因果链。人工参与或审批本身不是痛点；例如反复查看三个系统，应先核对是信息未关联、语义难判断、规则冲突还是必须由人协商，不直接把它归为缺少 AI。原因没有证据时标为推断，并给出能区分不同原因的最小核对动作。
-
-## 保留证据等级与指标口径
-
-分别标明原始记录或日志支持的事实、未经核实的口述、合理推断、教学／模拟数据和未知项。教学／模拟数据不能作为客户生产事实；写入结构化索引时仍使用既有 state 与 kind 枚举，在 summary 中保留来源性质和限定。计算值必须能回到输入、公式和来源；材料冲突时保留双方、有效范围和采用依据，不能把最新文件自动当成已批准版本。
-
-指标写清来源、单位、时间窗、样本与总体、起止点、分母和公式；区分历史总体、便利样本、专项样本与教学示例。操作耗时不等于端到端时长，也不等于 AI 可节省时间；重叠标签和并行劳动不得重复相加，便利样本不得无依据外推总体，未知不写成零。不编造投资回报、节省比例或准确率；未测量时写“尚未测量”及最小测量办法。输入改变后重算受影响指标。
-
-## 比较传统改进与 AI 增量
-
-先说明流程调整、规则配置、信息关联或现有软件能解决什么，再说明 AI 在理解非结构化信息、辅助判断或有限自动化上额外解决什么。信息贯通、辅助判断、有限自动化是可组合方向，不是必须逐级升级的阶梯；正式本体不是默认方案。只做业务机会判断，不提前选择技术栈或展开详细方案。
-
-按发生频率、可改善劳动、业务影响、数据可得性和验证成本解释优先顺序，不强造综合评分。每项优先建议说明适用场景、事实依据、非 AI 对照、AI 增量、关键未知、最小验证动作、结果验证人、访问边界、预期改善上限、风险上限、人工回退和停止条件；不适合 AI、暂缓或不应建设也可以是有效候选结论。
-
-## 增量修订与质量复核
-
-用户纠正事实后，同步修订受影响的流程、指标、问题原因、优先级和建议，保留来源与版本，不只追加相互矛盾的补充说明。交付前确认报告能回答：业务现在如何完成；额外劳动及原因是什么；为什么优先处理且 AI 比传统改进多解决什么；哪些证据支持结论、哪些未知会改变建议。回答不了时明确缺口，不把目录齐全当成诊断完成。
-
-只有当前任务确实需要时，再加载工程 Skill：首次定向用 fde-orient，向知情者取证用 knowledge-interview，找维护者或决策人用 ownership-map，问题明确落到既有代码用 repo-recon，需要管理者决定用 stakeholder-brief。不得为了显得完整一次加载全部。
-
-${DISCOVERY_STRUCTURED_OUTPUT_CONTRACT}
-
-最终回复用简体中文说明本轮引用、候选结论、未验证主张和下一项最小现场动作。业务说明、建议和操作文案使用中文；Skill ID、文件路径、JSON 字段与枚举、来源标识保持原样。候选建议交由 FDE 选择进入下一阶段、继续补充调查、缩小问题范围或暂停这个问题；不能代替 FDE 决定或推进项目阶段。`,
-} as const
-
-/** Conditional method-layer Skill for material engagement conflicts. */
-export const REFRAME_AI_ENGAGEMENT_SKILL = {
-  name: 'reframe-ai-engagement',
-  description: '当现场事实推翻原始边界、成功标准或停止条件时，保留历史并形成可追溯的项目重新界定候选。',
-  whenToUse: '只有卖出的说法、人员陈述、现场观察、系统行为或政策授权之间出现重大冲突，并且会改变项目边界、成功标准、风险上限或停止条件时使用。',
-  source: DISCOVERY_METHOD_SOURCE,
-  content: `# 重新界定 AI 项目
-
-本 Skill 适配自固定版本的 reframe-ai-engagement，是条件方法，不是普通需求修改工具。先保留原始说法、来源和当时假设，再记录触发冲突的新事实、影响范围、安全回退、哪些候选记录需要重评，以及谁有权接受新边界。没有有权决定的人或可靠证据时保持待处理，不替客户选择。取得明确修订依据后，同步调整受影响的流程、指标和建议，保留历史，不只追加冲突说明。
-
-只有冲突确实改变边界、成功标准或停止条件时，维护 \`fde-deliverables/01-requirement-research/engagement-reframe.md\`，并包含“## 触发事实”“## 原边界”“## 新边界”“## 安全回退”“## 决策人”。同时在 Artifact Catalog 增加或更新 engagement-reframe，来源适配器固定为 \`{"id":"davidahmann/fde-guide","version":"060ef0f3","commit":"060ef0f3b67743b2e1fc3705763d423eae980236","license":"Apache-2.0","artifact":"engagement-reframe"}\`，其余字段遵循以下合同。
-
-${DISCOVERY_STRUCTURED_OUTPUT_CONTRACT}
-
-不能删除原候选、重写历史或推进阶段。`,
-} as const
-
-/** Engineering-layer engagement orientation adapted to the product stage. */
-export const FDE_ORIENT_SKILL = {
-  name: 'fde-orient',
-  description: '在新项目开始或任务性质改变时，用现有资料建立真实任务定向、缺口和后续能力顺序。',
-  whenToUse: '项目第一次开始现场发现，或发起人、目标、时限、项目类型发生变化而现有定向不再适用时使用一次。',
-  source: DISCOVERY_ENGINEERING_SOURCE,
-  content: `# FDE 项目定向
-
-本 Skill 适配自固定版本 fde-orient。先检查当前项目本次授权的已有资料和阶段候选，不重复询问文件已经能回答的问题。记录客户原始要求、发起人与实际项目支持者、时限驱动、成功的当前说法、现有访问和已经尝试过的方法。区分客户表面诉求与可能的真实问题，但不要在此展开完整需求或技术方案。
-
-输出只贡献给阶段 1 的现场观察记录、事实确认清单和下一步 Skill 顺序；所有主张都以逐条 evidenceRef 交给 qualify-ai-workflow 维护。已有有效定向时直接读取并继续，不重新开始。`,
-} as const
-
-/** Engineering-layer human knowledge extraction. */
-export const KNOWLEDGE_INTERVIEW_SKILL = {
-  name: 'knowledge-interview',
-  description: '准备并整理对真实流程知情者的短访谈，把只有人知道的内容转成有来源、可复核的候选事实。',
-  whenToUse: '存在只能由长期参与者、系统负责人或业务专家补齐的未验证缺口，或用户要求准备、整理现场访谈时使用。',
-  source: DISCOVERY_ENGINEERING_SOURCE,
-  content: `# 现场知识访谈
-
-本 Skill 适配自固定版本 knowledge-interview。先从已有候选记录和显式引用资料中找出代码或文件无法回答的缺口，把问题按“必须核对、重要补充、可选了解”排序。每轮只问最影响判断的 1–3 个问题，并说明原因和核对对象；优先追问近期正常案例、重要异常案例、最后一次真实发生、额外劳动及原因、人工回退、谁负责和谁能决定。不要把提问写成寻找 AI 痛点的诱导，也不要要求对方凭空提供数字。
-
-访谈后把“亲眼观察”“近期记忆”“设计时假设”和“未知”分开。每条结论必须生成 interview 类型的逐条 evidenceRef，ref 指向访谈编号或会话轮次；只有得到有权责任人明确答复或权威系统读回时才使用 confirmed。把结果交给 qualify-ai-workflow 更新固定候选产物，不自行推进阶段。`,
-} as const
-
-/** Engineering-layer ownership evidence mapping. */
-export const OWNERSHIP_MAP_SKILL = {
-  name: 'ownership-map',
-  description: '用实际维护、评审和决策证据找到谁知道、谁负责、谁能批准，而不是只相信组织图。',
-  whenToUse: '需要找到访谈对象、维护者、审批人或决策人，或候选工作流跨越职责边界时使用。',
-  source: DISCOVERY_ENGINEERING_SOURCE,
-  content: `# 责任与决策权映射
-
-本 Skill 适配自固定版本 ownership-map。优先读取用户明确授权的责任资料、CODEOWNERS、近期提交和评审记录；区分原作者、当前维护者、偶发贡献者、业务责任人和有权决策者。声明所有权只是候选，必须用近期活动或责任人答复交叉验证。
-
-每项结果必须形成逐条 evidenceRef：kind 使用 project-file、system 或 interview；尚未核实的结论将 state 设为 unverified，并交给 qualify-ai-workflow 更新事实确认清单和工作流章程。不要把提交次数直接解释成审批权。`,
-} as const
-
-/** Engineering-layer bounded codebase reconnaissance. */
-export const REPO_RECON_SKILL = {
-  name: 'repo-recon',
-  description: '当高价值问题明确落到既有系统时，在有限范围内建立入口、边界、数据、集成和风险线索。',
-  whenToUse: '候选工作流已经明确涉及一个现有代码库或系统，而且当前阶段需要系统事实来验证问题是否真实时使用；纯业务发现不使用。',
-  source: DISCOVERY_ENGINEERING_SOURCE,
-  content: `# 有界代码库勘察
-
-本 Skill 适配自固定版本 repo-recon。先确认本轮授权范围和候选工作流，只做回答当前发现问题所需的广度勘察：系统形态、入口、主要边界、持久化、外部集成、测试与配置线索。优先核对会改变问题原因或机会判断的字段和系统行为，不强制完整数据字典、接口清单或环境审计；深入环境调查留给第三阶段。不要把目录数量、技术栈或代码复杂度本身当成业务价值。
-
-代码结论必须形成 project-file 或 system 类型的逐条 evidenceRef，ref 精确到项目相对路径、命令结果或系统读回。把结果交给 qualify-ai-workflow 更新候选记录；不要在阶段 1 开始设计或修改代码。`,
-} as const
-
-/** Engineering-layer decision brief at a real phase boundary. */
-export const STAKEHOLDER_BRIEF_SKILL = {
-  name: 'stakeholder-brief',
-  description: '把当前发现事实转成管理者可在短时间内理解并采取行动的一项决定。',
-  whenToUse: '阶段候选材料已经足以请求项目支持者、业务负责人或交付负责人做一个明确决定时使用；没有变化或没有决定时不使用。',
-  source: DISCOVERY_ENGINEERING_SOURCE,
-  content: `# 阶段一决策简报
-
-本 Skill 适配自固定版本 stakeholder-brief。先识别读者能决定什么，按“建议 → 支撑事实 → 风险与未知 → 需要谁在何时做一件什么事”的顺序写一屏以内的中文候选简报；说明优先原因、传统改进与 AI 增量，不编造收益。所有事实必须引用阶段记录或逐条 evidenceRef，明确区分已确认、合理推断和未知。
-
-简报只帮助 FDE 或客户做决定，不代替项目中心的阶段评审；不要因为生成简报而把候选状态改成已确认。`,
-} as const
+/** File-backed stakeholder-brief definition used by the fixed stage catalog. */
+export const STAKEHOLDER_BRIEF_SKILL = readPlatformSkill('stakeholder-brief')
 
 /** Stage-one methods exposed as a read-only business catalog in the project sidebar. */
 export const DISCOVERY_STAGE_SKILL_CATALOG = {
@@ -301,8 +134,7 @@ export const DISCOVERY_STAGE_SKILL_CATALOG = {
       {
         id: QUALIFY_AI_WORKFLOW_SKILL.name, label: '判断问题是否值得继续投入', role: 'core', group: 'required',
         description: QUALIFY_AI_WORKFLOW_SKILL.description, whenToUse: QUALIFY_AI_WORKFLOW_SKILL.whenToUse,
-        source: QUALIFY_AI_WORKFLOW_SKILL.source, sourceUrl: DISCOVERY_METHOD_URL,
-        sourceLanguage: 'en', adapterLanguage: 'zh-CN', license: 'Apache-2.0', content: QUALIFY_AI_WORKFLOW_SKILL.content,
+        source: QUALIFY_AI_WORKFLOW_SKILL.source, content: QUALIFY_AI_WORKFLOW_SKILL.content,
         answers: [
           '这项业务现在如何完成，边界和触发条件是什么？',
           '谁实际执行流程，谁负责结果，谁有权决定？',
@@ -366,18 +198,6 @@ export const DISCOVERY_STAGE_SKILL_CATALOG = {
             { batch: '第三批', input: '流程知情者访谈与审批事实', finding: '先用规则关联设备，再验证 AI 提取描述的增量；自动派单未获批准，保留人工确认与停止条件。', skills: ['知识访谈', '重新界定'], output: '“建议＋人工确认工单草稿”的候选边界' },
           ],
         },
-        references: [
-          discoveryReference('现场参与与可问责重新界定', 'playbooks/00-field-engagement-and-reframing.md', 'method', 'markdown', '现场参与、问责和边界变化方法。'),
-          discoveryReference('AI 价值工程十二要素', 'library/14-twelve-factors-ai-value-engineering.md', 'method', 'markdown', '判断价值、责任、证据与风险的十二项因素。'),
-          discoveryReference('发现与价值方法', 'playbooks/01-discovery-and-value.md', 'method', 'markdown', '从发现到价值判断的完整方法。'),
-          discoveryReference('现场观察记录模板', 'templates/field-observation-log.md', 'artifact', 'markdown', '记录现场事实、案例和未知项。'),
-          discoveryReference('FDE 发现材料包', 'templates/fde-discovery-pack.md', 'artifact', 'markdown', '组织阶段发现材料和候选结论。'),
-          discoveryReference('项目重新界定模板', 'templates/engagement-reframe.json', 'artifact', 'json', '记录触发事实、原边界、新边界与决策人。'),
-          discoveryReference('工作流章程模板', 'templates/workflow-charter.json', 'artifact', 'json', '定义候选工作流、角色、结果和边界。'),
-          discoveryReference('数据准备度评估', 'templates/data-readiness-assessment.md', 'artifact', 'markdown', '检查数据来源、质量、访问和使用边界。'),
-          discoveryReference('业务流程模式索引', 'solutions/business-flows/README.md', 'control', 'pattern', '浏览可参考的业务流程模式。'),
-          discoveryReference('控制规则目录', 'controls/control-catalog.json', 'control', 'catalog', '查看方法涉及的 FDE、VAL 与 CTX 控制项。'),
-        ],
       },
       { id: FDE_ORIENT_SKILL.name, label: '项目启动与方向确认', role: 'engineering', group: 'required', description: FDE_ORIENT_SKILL.description, whenToUse: FDE_ORIENT_SKILL.whenToUse, source: FDE_ORIENT_SKILL.source, content: FDE_ORIENT_SKILL.content },
       { id: KNOWLEDGE_INTERVIEW_SKILL.name, label: '访谈业务人员，还原真实做法', role: 'engineering', group: 'required', description: KNOWLEDGE_INTERVIEW_SKILL.description, whenToUse: KNOWLEDGE_INTERVIEW_SKILL.whenToUse, source: KNOWLEDGE_INTERVIEW_SKILL.source, content: KNOWLEDGE_INTERVIEW_SKILL.content },
@@ -652,16 +472,10 @@ export function acceptanceHandoverPrompt(stage: FdeProjectState): string {
  */
 export async function apply(ctx: Context): Promise<void> {
   const domain = await ctx.storageDomain.open(fdeStageDomainSpec)
-  const trusted = createWebRequestTrust(ctx.webServer)
+  const trusted = createWebRequestTrust(ctx.connection)
   const state = new FdeStageState(domain.table('projects'))
   ctx.effect(() => async () => { await domain.close() }, 'fde-stage: domain')
-  ctx.skills.register(QUALIFY_AI_WORKFLOW_SKILL)
-  ctx.skills.register(REFRAME_AI_ENGAGEMENT_SKILL)
-  ctx.skills.register(FDE_ORIENT_SKILL)
-  ctx.skills.register(KNOWLEDGE_INTERVIEW_SKILL)
-  ctx.skills.register(OWNERSHIP_MAP_SKILL)
-  ctx.skills.register(REPO_RECON_SKILL)
-  ctx.skills.register(STAKEHOLDER_BRIEF_SKILL)
+  registerPlatformSkills(ctx)
   ctx.skills.register(SOLUTION_DESIGN_SKILL)
   ctx.skills.register(PROJECT_DEVELOPMENT_SKILL)
   ctx.skills.register(VALIDATION_SKILL)
@@ -701,7 +515,7 @@ export async function apply(ctx: Context): Promise<void> {
   }), `fde-stage: ${FDE_STAGE_OPEN_PATH}`)
   const skillCatalog = createStageSkillCatalogRoute({
     trusted,
-    catalog: DISCOVERY_STAGE_SKILL_CATALOG,
+    catalog: () => platformSkillCatalog(DISCOVERY_STAGE_SKILL_CATALOG),
     reportFailure: (error) => { ctx.logger.warn(error instanceof Error ? error : new Error(String(error))) },
   })
   ctx.effect(() => ctx.webServer.register({

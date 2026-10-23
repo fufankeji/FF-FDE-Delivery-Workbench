@@ -19,4 +19,4 @@ None; no provider request is assembled or changed.
 - The current defaults are 25 MiB per file, 20 files, and 100 MiB of file content per batch.
 - Local conversion covers generated DOCX, XLSX, PPTX, PDF, CSV, Markdown, and text samples. OCR, audio transcription, source permissions, version relationships, deletion, and conversation references remain deferred.
 - A changed original marks its derived result stale; local conversion failures retain the original.
-- Local-only binding remains the default. Explicit `--lan` enables local IPv4 and exact-port access through Connection's shared request check; this mode is unauthenticated and restricted to trusted networks by the operator.
+- HTTP routes require Connection's authenticated owner identity and same-origin request checks. Local binding is the default; explicit LAN access uses a concrete `--host` IP and the startup authorization URL. The retired `--lan` flag cannot disable authentication.

@@ -2,7 +2,7 @@
 
 English | [中文](README.zh.md)
 
-HTTP routes share Connection's deployment-aware request check: local-only by default; explicit `--lan` admits same-origin requests to the machine's IPv4 addresses on the listening port. This mode has no login authentication; privileged settings remain local.
+HTTP routes require Connection's authenticated owner identity and same-origin request checks. Local binding is the default; explicit LAN access uses a concrete `--host` IP and the startup authorization URL. The retired `--lan` flag cannot disable authentication.
 
 Workspace-scoped Semantica integration for stage four of an FDE project. The package keeps mechanism selection, semantic design, knowledge candidates, graph construction, independent validation, bounded Agent context, vertical-slice evidence, and the FDE decision as separate facts. It never selects the ontology route, promotes extracted candidates, claims a business task ran, or advances a stage on behalf of the FDE.
 

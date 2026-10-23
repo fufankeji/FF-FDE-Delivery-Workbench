@@ -1,5 +1,5 @@
 ---
-description: "运行时 Typert 注册表：保存生成的包反射、实时 Zod schema 与 Remote 调用描述符，并按需为消费方解析。"
+description: "运行时 Typert 注册表：保存生成的包反射、惰性 Zod schema factory 与 Remote 调用描述符，并按需为消费方解析。"
 kind: "package-reference"
 ---
 
@@ -9,7 +9,7 @@ kind: "package-reference"
 
 ## 概述
 
-`dsh-typert-registry` 让生成的 Typert 产物在运行时可按需查询：每个包的反射——服务、事件与对象——其实时 Zod schema 与 Remote 调用描述符都保存在稳定键下，消费方可以按需查询或解析。注册是原子且按 fiber 作用域的：贡献要么整体落地要么完全不落地，并在注册组件卸载时自动撤销。同一服务还托管 Remote 调用所经由的 lookup 与作用域 Context 提供方注册表。它不执行 TypeScript 分析，也不生成 schema；这些由生成器与 loader 负责。
+`dsh-typert-registry` 让生成的 Typert 产物在运行时可按需查询：每个包的反射、惰性 Zod schema factory 与 Remote 调用描述符都保存在稳定键下。消费方首次请求 schema 时才会物化并缓存它。注册是原子且按 fiber 作用域的：贡献要么整体落地要么完全不落地，并在注册组件卸载时自动撤销。同一服务还托管 Remote 调用所经由的 lookup 与作用域 Context 提供方注册表。它不执行 TypeScript 分析，也不生成 schema；这些由生成器与 loader 负责。
 
 ## 目录
 
@@ -25,7 +25,7 @@ kind: "package-reference"
 <a id="use-this-package"></a>
 ## 使用本包
 
-在存储或消费生成 Typert 产物的任何 Host 或 Client 组合中挂载本注册表；它提供 `ctx.typert`。没有配置。
+在存储或消费生成 Typert 产物的任何 Host 或 Client 组合中挂载本注册表；它提供 `ctx.typert`。没有配置。Node 将 `/client` 解析为供程序化 Cordis 组合使用的独立 ESM bundle `lib/client.node.js`；浏览器通过逻辑 URL `/plugins/.../client.js` 使用 `lib/client.browser.js` loader factory。两个 bundle 使用相同的注册表实现，且与 Host 包根入口分离。
 
 ### 最小设置
 
@@ -37,15 +37,21 @@ kind: "package-reference"
 
 ### 查询 schema 与反射
 
-消费方用 `get(key)`、`resolve(key)` 或 `list(filter?)` 读取 schema，用 `getPackage(name, face?)` 或 `listPackages(filter?)` 读取包反射。`resolve()` 能区分格式错误的键、未注册的包，以及已注册但未以该名称提供 schema 的包，各自给出不同的错误。`toJSONSchema(key)` 把实时 Zod schema 投影为 JSON Schema，且不缓存结果。
+消费方用 `get(key)`、`resolve(key)` 或 `list(filter?)` 读取 schema，用 `getPackage(name, face?)` 或 `listPackages(filter?)` 读取包反射。首次读取会物化一个进程 realm 内的 schema 实例，后续读取复用该实例。`resolve()` 能区分格式错误的键、未注册的包，以及已注册但未以该名称提供 schema 的包，各自给出不同的错误。`toJSONSchema(key)` 把已物化的 Zod schema 投影为 JSON Schema，但不缓存该投影。
+
+调用信息可通过现有的 `ctx.typert.local.get/list` 与 `ctx.typert.remotes.get/list` 查询读取。它们返回已注册的描述符对象，包括带有 `input(options?)`、`result` 和 `invoke` 的生成直接方法；不存在独立的元数据存储或 RPC API。消费方选择 `method.input({ strict: true })`，即可取得匹配的严格解析与 JSON Schema，而不改变注册或 Host 分发。使用 `@deepseek-ai/dsh-typert-protocol/remote-info` 提供的 `isTypertRemoteMethod(descriptor)` 收窄基础描述符。该守卫将输入暴露为 `object`、输出暴露为 `unknown`，不提供依赖端点的泛型。[普通生成产物的 `TYPERT_REMOTE.methods` 索引](<../generator/README.zh.md#ordinary-remote-metadata>)提供精确的各方法静态类型，并在该产物实例内引用同一批描述符。
 
 ### 注册贡献
 
 生成产物在 Loader 组合中通过 [loader](../loader/README.zh.md) 注册；其他所有者直接调用 `ctx.typert.register(contribution)`，并获得撤销它的同一资源释放函数。重复的包与 face 组合键、schema 键、调用 id 或端点会在提交任何内容之前拒绝整个批次。
 
+Harness 离线集成在各自的 profile Context 中通过 `ctx.typert.remotes.register(contribution)` 注册普通 `TYPERT_REMOTE` 贡献。`$mount(contribution)` 已执行该注册，因此在同一个注册表中先注册再挂载同一贡献会因重复而失败。离线元数据所有权应与建立实际连接及挂载的 Context 分离。独立离线消费方也可以直接读取 `TYPERT_REMOTE.methods`，无需任何 Registry。注册表状态归所属 Context 与进程所有，不跨进程共享；注册和查询都不会打开连接。
+
 ### Lookup 与 Context 提供方
 
 Remote 调用通过 `ctx.typert.lookups` 与 `ctx.typert.contexts` 解析 Host 对象与作用域 Context。`registerHost()` 安装 Host wire 声明及其 wire 到 Context 的 resolver，`configureHost()` 只替换该 resolver。`registerClient()` 为同一个 merge-declared kind 安装双向 Client adapter。Host 到 Client 的事件源显式携带领域 identity，而不从 Context 反向投影。
+
+`ctx.typert.resources` 保存 `TypertResourceMap` 中每个资源种类的默认 wire 字段。拥有该种类的领域以 `register(kind, { field })` 登记，登记是调用方 fiber 的 Cordis effect；同一种类重复登记即抛错，登记内置的无身份资源种类 `global` 同样抛错。`get(kind)` 读取一个种类的声明，`entries()` 按登记顺序列出全部已登记的 `{ kind, field }`。lookup provider 与 Host Context adapter 可经 `resource` 声明其 wire 身份所属的资源种类，配置的 resolver 保留该声明。Gateway 解析非 owner 调用的资源时读取这三者。
 
 -----
 
@@ -67,12 +73,13 @@ Remote 调用通过 `ctx.typert.lookups` 与 `ctx.typert.contexts` 解析 Host �
 - `ctx.typert.remotes`——在调用方 fiber 中挂载的、由消费方选中的贡献。
 - `ctx.typert.lookups`——lookup 提供方，以及按键配置的组合方解析器覆盖。
 - `ctx.typert.contexts`——按作用域键配置的 Host Context 提供方与 Client Context 绑定器。
+- `ctx.typert.resources`——每个资源种类的默认 wire 字段。
 
 每个子注册表都会向已订阅的监听器发布 `TypertRegistryChange` 事件；抛异常的监听器会被记录日志，且不会阻止后续监听器。
 
 ### 标识与校验
 
-键是稳定的：反射用 `<package>#<face>`，schema 用 `<package>#<name>`，端点用 `<namespace>/<method>`。校验会拒绝含 `#` 的名称、超出 RPC 端点段文法的 wire 名称、重复键，以及在其注册表生命周期内改变 wire 声明的 lookup 定义；严格编解码器必须携带可解析的 schema。
+键是稳定的：反射用 `<package>#<face>`，schema 用 `<package>#<name>`，端点用 `<namespace>/<method>`。校验会拒绝含 `#` 的名称、超出 RPC 端点段文法的 wire 名称、重复键，以及在其注册表生命周期内改变 wire 声明的 lookup 定义；schema 条目与严格编解码器必须携带 factory。
 
 ### 源码地图
 
@@ -81,7 +88,6 @@ Remote 调用通过 `ctx.typert.lookups` 与 `ctx.typert.contexts` 解析 Host �
 | [`src/service.ts`](src/service.ts) | `TypertRegistry` 服务、存储、校验、effect 接线 |
 | [`src/types.ts`](src/types.ts) | 贡献、记录与过滤器类型 |
 | [`src/client/index.ts`](src/client/index.ts) | 安装同一注册表的 Client face |
-| — | 不发布运行时不变式伴生入口；schema 与 package-reflection record 在 register/dispose 内一起变更，没有独立 event 或第二数据源可供交叉核对；重复 identity 在所属操作处失败。 |
 
 </details>
 

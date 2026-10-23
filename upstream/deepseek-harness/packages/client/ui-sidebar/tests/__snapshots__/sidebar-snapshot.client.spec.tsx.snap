@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`sidebar shell snapshots > renders the collapsed rail after the crossfade settles, in place 1`] = `
+exports[`sidebar shell snapshots > renders Windows caption controls in expanded and collapsed states > windows collapsed 1`] = `
 <div
   data-slot="sidebar"
   style="display: contents;"
@@ -11,6 +11,7 @@ exports[`sidebar shell snapshots > renders the collapsed rail after the crossfad
   >
     <div
       class="logoRow"
+      data-window-drag="true"
     >
       <div
         class="brand wide"
@@ -62,16 +63,23 @@ exports[`sidebar shell snapshots > renders the collapsed rail after the crossfad
         type="button"
       >
         <svg
+          aria-hidden="true"
           class="panelIcon"
-          data-content="35f95b0c"
+          data-content="88020f34"
           fill="none"
           height="16"
+
           viewBox="0 0 16 16"
           width="16"
           xmlns="http://www.w3.org/2000/svg"
         />
+        <div
+          data-slot="sidebar.toggle.badge"
+          style="display: contents;"
+        />
       </button>
     </div>
+
     <div
       class="regionArea"
     >
@@ -104,7 +112,7 @@ exports[`sidebar shell snapshots > renders the collapsed rail after the crossfad
 </div>
 `;
 
-exports[`sidebar shell snapshots > renders the expanded column (wordmark, capsule, empty holes) 1`] = `
+exports[`sidebar shell snapshots > renders Windows caption controls in expanded and collapsed states > windows expanded 1`] = `
 <div
   data-slot="sidebar"
   style="display: contents;"
@@ -115,6 +123,7 @@ exports[`sidebar shell snapshots > renders the expanded column (wordmark, capsul
   >
     <div
       class="logoRow"
+      data-window-drag="true"
     >
       <div
         class="brand wide"
@@ -170,16 +179,19 @@ exports[`sidebar shell snapshots > renders the expanded column (wordmark, capsul
         type="button"
       >
         <svg
+          aria-hidden="true"
           class="panelIcon"
-          data-content="35f95b0c"
+          data-content="88020f34"
           fill="none"
           height="16"
+          stroke-width="1"
           viewBox="0 0 16 16"
           width="16"
           xmlns="http://www.w3.org/2000/svg"
         />
       </button>
     </div>
+
     <div
       class="regionArea"
     >
@@ -223,6 +235,7 @@ exports[`sidebar shell snapshots > renders the expanded column in the default lo
   >
     <div
       class="logoRow"
+      data-window-drag="true"
     >
       <div
         class="brand wide"
@@ -278,16 +291,19 @@ exports[`sidebar shell snapshots > renders the expanded column in the default lo
         type="button"
       >
         <svg
+          aria-hidden="true"
           class="panelIcon"
-          data-content="35f95b0c"
+          data-content="88020f34"
           fill="none"
           height="16"
+          stroke-width="1"
           viewBox="0 0 16 16"
           width="16"
           xmlns="http://www.w3.org/2000/svg"
         />
       </button>
     </div>
+
     <div
       class="regionArea"
     >

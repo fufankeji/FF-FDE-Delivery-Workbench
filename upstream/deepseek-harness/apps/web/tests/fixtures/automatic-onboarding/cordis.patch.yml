@@ -1,0 +1,5 @@
+# Opt into upstream onboarding only for scenarios that exercise it.
+- id: ui-settings-models
+  config:
+    welcomeNotice: true
+    credentialOnboarding: true

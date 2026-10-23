@@ -9,6 +9,7 @@
     "src/index.ts",
     "src/types.ts",
     "src/terminal.ts",
+    "src/retention.ts",
     "src/stream.ts",
     "src/shells.ts"
   ],
@@ -38,6 +39,9 @@
       "path": "../../session/session-projection"
     },
     {
+      "path": "../../session/working-directory"
+    },
+    {
       "path": "../../subprocess/subprocess"
     },
     {
@@ -48,6 +52,12 @@
     },
     {
       "path": "../../util/deque"
+    },
+    {
+      "path": "../../util/lazy-require"
+    },
+    {
+      "path": "../../util/values"
     }
   ]
 }

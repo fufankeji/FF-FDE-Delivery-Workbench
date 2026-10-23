@@ -34,9 +34,11 @@ const useWorkspaces = hook({
 
 function runtime(stageSnapshot: FdeStageProgressSnapshot = ready) {
   return {
+    useRemoteAccess: () => true, useSessionAccess: () => true, useWorkspaceAccess: () => true, useSessionRetainInfo: () => undefined,
     sessionId,
+    useAccess: (() => undefined) as never,
     useSession: (() => undefined) as never,
-    usePanelInfo: (() => undefined) as never, useSessionPendingInteraction: (() => new Map()) as never, useResource: (() => undefined) as never, useConversation: (() => undefined) as never, useChat: (() => undefined) as never, useTrajectory: (() => undefined) as never, useSessions: (() => undefined) as never,
+    usePanelInfo: (() => undefined) as never, useSessionStatus: (() => new Map()) as never, useResource: (() => undefined) as never, useConversation: (() => undefined) as never, useChat: (() => undefined) as never, useTrajectory: (() => undefined) as never, useSessions: (() => undefined) as never,
     useWorkspaces,
     useProjection: (() => undefined) as never,
     useInput: (() => undefined) as never,

@@ -17,11 +17,19 @@ import ToolRuntime, { defineContentToolFixture } from '@deepseek-ai/dsh-tools'
 import AgentRegistry from '@deepseek-ai/dsh-agent'
 import SessionProjections from '@deepseek-ai/dsh-session-projection'
 import AgentLoop from '@deepseek-ai/dsh-agent-loop'
-import JsonlPersistence from '@deepseek-ai/dsh-session-persistence-jsonl'
+import * as JsonlPersistence from '@deepseek-ai/dsh-session-persistence-jsonl'
 import WebServer from '@deepseek-ai/dsh-host-webserver'
+import { Peer } from '../../../client/connection/src/peer.ts'
+import { isTrustedApiRequest } from '../../../client/connection/src/api-request-trust.ts'
+import type { ConnectionTrustRequest } from '../../../client/connection/src/rpc.ts'
 import * as Lab from '../src/index.ts'
 
 const contexts: Context[] = []
+declare module '@deepseek-ai/dsh-llm' {
+  interface MessageSourceMap {
+    'lab-test-unrelated': { kind: 'lab-test-unrelated' }
+  }
+}
 let directory = ''
 afterEach(async () => {
   for (const ctx of contexts.reverse()) await ctx.fiber.dispose()
@@ -79,10 +87,14 @@ async function mount(adapter: OfflineAdapter) {
   const modules = new Map<string, unknown>([
     ['llm', LlmRuntime], ['session', SessionStore], ['prompt', SystemPrompt],
     ['projections', SessionProjections], ['tools', ToolRuntime], ['agents', AgentRegistry], ['loop', AgentLoop],
-    ['persistence', JsonlPersistence], ['web', WebServer], ['lab', Lab],
+    ['connection', { apply(ctx: Context) {
+      const peer = new Peer(ctx, { principal: { kind: 'owner' } })
+      ctx.effect(() => () => peer.dispose(), 'test owner peer')
+      ctx.provide('connection', { admit: (request: ConnectionTrustRequest) => isTrustedApiRequest(request, []) ? { peer } : { rejection: 403 } } as never)
+    } }], ['persistence', JsonlPersistence], ['web', WebServer], ['lab', Lab],
   ])
   await writeFile(configPath, [
-    '- name: llm', '- name: session', '- name: prompt', "  config: { personaPrefix: 'WORKSPACE_ONLY_CONTEXT' }",
+    '- name: connection', '- name: llm', '- name: session', '- name: prompt', "  config: { personaPrefix: 'WORKSPACE_ONLY_CONTEXT' }",
     '- name: projections', '- name: tools', '- name: agents', '- name: loop', '  config: { agents: [] }',
     '- name: persistence', '  config:', '    root: ' + JSON.stringify(join(directory, 'sessions')),
     '- name: web', "  config: { host: '127.0.0.1', port: 0 }", '- name: lab', '',
@@ -98,7 +110,7 @@ async function mount(adapter: OfflineAdapter) {
   } } as unknown as NonNullable<typeof ctx.loader.internal>
   await ctx.loader.create({ name: 'cordis:include', config: { path: pathToFileURL(configPath).href } })
   await ctx.loader.await()
-  expect([...ctx.loader.entries()].filter(e => !e.disabled && !e.fiber)).toEqual([])
+  expect([...ctx.loader.entries()].filter(e => !e.disabled && !e.fiber).length).toBe(0)
   ctx.llm.registerAdapter(['offline-lab'], adapter)
   const base = 'http://127.0.0.1:' + ctx.webServer.port
   const response = (path: string, body?: unknown) => fetch(base + '/api/fde-discovery-lab' + path, body === undefined ? {} : {
@@ -136,7 +148,7 @@ it('isolates roles and globals, persists native evidence, restores idle roles an
     if (value.kind === 'reject') return value
     return { ...value, messages: [...value.messages, createUserMessage({
       content: [{ type: 'text', text: 'WORKSPACE_ONLY_INSTRUCTION' }],
-      source: { kind: 'plugin', plugin: 'unrelated' },
+      source: { kind: 'lab-test-unrelated' },
     })] }
   })
   const cases = await first.api('/cases')
@@ -163,10 +175,12 @@ it('isolates roles and globals, persists native evidence, restores idle roles an
   const { collectFromFile } = await import(/* @vite-ignore */ pathToFileURL(join(evalRoot, 'lib/collector.js')).href)
   const employeeId = completed.sessions.find((row: { roleId: string }) => row.roleId === 'employee').sessionId
   const log = await findSessionFile(sessionDir(join(directory, 'sessions'), join(directory, 'fde-discovery-lab/workspaces'), SessionId(employeeId)), 0)
-  expect(log).toMatch(/session\.v3\.jsonl/)
+  expect(log).toMatch(/session\.v4\.jsonl/)
   const trace = await collectFromFile(log)
   expect(trace.finalText).toContain('已授权的业务原件')
   expect(trace.toolsCalled).toContain('offerCaseAsset')
+  expect(trace.toolResults.find((result: { text: string }) => result.text.includes(asset.id))).toBeDefined()
+  expect(trace.toolErrors.length).toBeGreaterThan(0)
 
   expect(globalExecutions).toBe(0)
   expect((await first.response('/runs/' + run.runId + '/assets/' + other.id)).status).toBe(403)

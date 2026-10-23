@@ -24,7 +24,7 @@
       "path": "../ui-slots"
     },
     {
-      "path": "../ui-conversation"
+      "path": "../ui-conversation/tsconfig.client.json"
     }
   ]
 }

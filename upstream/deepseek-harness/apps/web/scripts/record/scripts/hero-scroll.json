@@ -1,0 +1,69 @@
+{
+  "name": "首页滚动 · 30 秒烟雾测试",
+  "baseUrl": "http://127.0.0.1:3080",
+  "authLaunchLog": "../../../../.runtime/workbench-web.log",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "steps": [
+    {
+      "at": "0:00",
+      "action": "navigate",
+      "url": "/",
+      "settleMs": 1500,
+      "subtitle": {
+        "text": "FF - FDE 交付工作台",
+        "position": "mc",
+        "theme": "title-card"
+      },
+      "subtitleHold": 3500
+    },
+    {
+      "at": "0:06",
+      "action": "moveTo",
+      "x": 960,
+      "y": 700,
+      "steps": 40
+    },
+    {
+      "at": "0:09",
+      "action": "scene",
+      "anchor": {
+        "scrollBy": 700
+      },
+      "settleMs": 300,
+      "subtitle": {
+        "text": "从业务问题开始推进交付",
+        "position": "bl"
+      },
+      "hold": 3500
+    },
+    {
+      "at": "0:16",
+      "action": "scene",
+      "anchor": {
+        "scrollBy": 700
+      },
+      "settleMs": 300,
+      "subtitle": {
+        "text": "每个阶段保留证据与决定",
+        "position": "tr"
+      },
+      "hold": 3500
+    },
+    {
+      "at": "0:23",
+      "action": "scene",
+      "anchor": {
+        "y": 0
+      },
+      "settleMs": 300,
+      "subtitle": {
+        "text": "项目全流程集中查看与协作",
+        "position": "bl"
+      },
+      "hold": 2500
+    }
+  ]
+}

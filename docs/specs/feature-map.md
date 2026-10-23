@@ -38,13 +38,20 @@ updated: "2026-09-16"
 
 | F024 | F024-business-discovery-lab | 独立业务挖掘实验室 | 无需创建项目即可完成五案例访谈、取证、计算和报告训练，返回后项目与八阶段不变 | REQ-030, REQ-031, REQ-032, PSC-026 | 无 | P0 | in-progress |
 | F025 | F025-platform-navigation | 统一工作台导航与总览 | 默认总览、三模块切换、继续项目且保留训练现场 | REQ-033, PSC-027 | F002, F024 | P0 | in-progress |
-| F026 | F026-stage-one-skills-center | 平台与课程技能阅读下载 | 区分七个内置方法与已提供的课程原版，在弹窗阅读真实目录并下载同版本文件 | REQ-034, PSC-028 | F025, F005 | P0 | in-progress |
+| F026 | F026-stage-one-skills-center | 平台与课程技能阅读下载 | 七个中文平台 Skill 统一文件加载、正文阅读与完整下载，课程原版独立保留 | REQ-034, PSC-028 | F025, F005 | P0 | in-progress |
+| F027 | F027-harness-021-compatibility | 新基座下继续既有交付 | 在新版基座继续使用项目、阶段、会话、实验室与 Skills，保留权限、历史和回退条件 | REQ-001, REQ-009, REQ-010, REQ-030, REQ-031, REQ-032, REQ-033, REQ-034, REQ-035, REQ-036, NFR-001, NFR-003, NFR-005, NFR-006, NFR-007, PSC-001, PSC-008, PSC-009, PSC-010, PSC-026, PSC-027, PSC-028, PSC-029, PSC-030 | 无 | P0 | in-progress |
 
 ## 首个验证切片
+
+2026-10-23 用户明确授权兼容官方最新版，并要求先完成 docs 再开发。本轮仅实施 F027：以已存在的 FDE 功能和本地未提交源码为保留基线，不扩展产品范围、不升级项目生命周期、不批量开发其他 Feature。PRD 与 Product Spec 的既有行为合同保持不变；技术目标、会话格式迁移和回退进入 F027 Plan 与 Architecture。人工体验仍是最终验收关卡。
 
 F025 的统一导航由用户于 2026-09-16 确认。2026-09-17 用户确认 F026 第一阶段七个 Skill 的卡片、查看、文件阅读与下载，并授权按定稿图实施；F026 替代技能占位，保留 F025 的侧栏、项目中心及实验室流程。
 
 2026-09-17 后续授权在 F026 同页新增课程原版分类、课次标记与完整原包阅读下载；保持稳定 Feature ID 和已有内置方法，不把课程资料接入 Agent 调用链。
+
+2026-09-18 用户纠正 F026：七个平台内置条目也必须完整收录原版 Skill 及其配套资料，不再展示或下载精简适配包；条目、导航、课程和 Agent 运行适配层保持不变。
+
+2026-09-18 用户进一步授权 F026 统一当前七个 Skill 的中文标准文件、原生加载、阅读与下载，并简化名称/正文界面；F005 的阶段产物和人工决定规则作为保留约束，不扩展其他阶段或课程运行能力。
 
 F001～F004 建立共享能力，F005 用“发现高价值问题”完成第一条端到端产品验证。首个阶段只接入 `qualify-ai-workflow`、条件触发的 `reframe-ai-engagement`，以及 Workflow Charter、Engagement Reframe、Field Observation Log 三类必要 Artifact；不安装完整外部能力库。实施可以在同一切片内增量进行，但只有当前用户明确授权的 Feature 才进入 in-progress。
 

@@ -2,7 +2,7 @@
 
 [English](README.md) | 中文
 
-HTTP 接口共享 Connection 的部署请求检查：默认仅本机；显式 `--lan` 时接受本机 IPv4 与监听端口上的同源请求。此模式无登录鉴权，特权设置仍限本机。
+HTTP 接口要求 Connection 认证后的 owner 身份并遵守同源检查。默认仅本机监听；显式局域网访问使用具体 `--host` IP 和启动授权链接，退役的 `--lan` 不能关闭认证。
 
 FDE 项目交付页面使用的可信 Host 支持。它只解析显式 Harness WorkspaceId，只读取该项目的 `.fde/project-runtime.json`、`.fde/api-docs.json`、`.fde/architecture.json`、`.fde/evaluations/`、`.fde/deployment-trial.json`、`.fde/acceptance-handover.json`、六阶段固定产物和标准项目开发文档，校验有界结构后，通过同源接口返回一个浏览器快照。阶段产物读取器只报告已有、缺失或读取失败，不创建文件，也不把文件存在当成确认；已有的 Markdown 产物会获得有大小限制的同源只读预览地址，Host 按已索引产物标识选择文件，不接受浏览器传入路径。它还适配锁定版本 `dsh-openapi` 的解析和 HTTP 实现，使标准 OpenAPI 工具按调用 Agent 所属的已注册 Workspace 解析配置，而不是使用进程级共享 API 清单。
 
@@ -20,9 +20,11 @@ FDE 项目交付页面使用的可信 Host 支持。它只解析显式 Harness W
 
 ## 项目运行
 
+`GET /api/fde-project/runtime/output?workspaceId=…` 只读项目运行记录指向的真实 Agent 终端，不接受终端 ID、命令或任意路径。无活跃 Agent 或同名 PTY 时返回 missing，不激活 Agent 或创建替代进程；写请求和跨项目归属被拒绝，错误不冒充空输出。
+
 `POST /api/fde-project/runtime/preview` 只接受可信请求中的 Workspace ID，从运行记录解析已启动地址。临时 loopback 代理为每个项目分配随机 `*.localhost` 来源和 OS 分配端口，与工作台存储和其他项目隔离。页面与资源正文保持原样，支持 HTTP 流和 WebSocket 升级；嵌入响应头适配实际工作台父页面，同目标重定向和请求来源映射到对应入口，Cookie 移除 Domain 属性。每次请求重新核对运行记录；观察到停止或地址变化后，已有流最迟在下一次一秒周期检查中关闭。卸载关闭监听与连接。任意目标、工作台端口、跨来源写入和外部重定向均拒绝，不改项目源码或持久状态。对硬编码绝对来源、跨站登录或不支持的 HTTPS 嵌入环境，浏览器保留显式原地址备选。
 
-一次明确的启动或停止请求会在 `.fde/project-runtime.json` 中创建一个精确操作，并绑定必须执行它的 Session。可见 Agent 读取项目自己的 `AGENTS.md`，使用 Better Sidebar 持久终端工具，验证真实 loopback 项目地址，再通过 `project_runtime_report` 结束该操作。启动阻塞后，如果同一 Session 在同一操作中补齐条件并验证了真实预览地址，可以恢复为运行中；Host 仍会拒绝过期 operation id、其他 Session 的报告、非 loopback 或带凭据的 URL、越过项目的 OpenAPI 路径和其他无效状态迁移。停止项目时，只有 Agent 如实报告服务已经退出后，才清除项目预览与 API 运行事实，同时保留终端标题和可回看的输出。停止结果不明确时必须先重试停止，不能再次启动。
+一次明确的启动或停止请求会在 `.fde/project-runtime.json` 中创建一个精确操作，并绑定必须执行它的 Session。可见 Agent 读取项目自己的 `AGENTS.md`，使用官方 Agent 持久终端工具，验证真实 loopback 项目地址，再通过 `project_runtime_report` 结束该操作。启动阻塞后，如果同一 Session 在同一操作中补齐条件并验证了真实预览地址，可以恢复为运行中；Host 仍会拒绝过期 operation id、其他 Session 的报告、非 loopback 或带凭据的 URL、越过项目的 OpenAPI 路径和其他无效状态迁移。停止项目时，只有 Agent 如实报告服务已经退出后，才清除项目预览与 API 运行事实，同时保留终端标题和可回看的输出。停止结果不明确时必须先重试停止，不能再次启动。
 
 ## 验证合同
 

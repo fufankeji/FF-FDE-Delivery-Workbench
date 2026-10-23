@@ -1,0 +1,3 @@
+.root { height: 100%; overflow: auto; padding: 16px; color: var(--dsw-alias-label-primary); }
+.notice { color: var(--dsw-alias-label-secondary); font-size: 12px; line-height: 1.6; }
+.output { white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--dsh-font-family-terminal, monospace); font-size: var(--dsh-terminal-font-size, 13px); }

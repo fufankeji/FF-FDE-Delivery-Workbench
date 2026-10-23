@@ -1,15 +1,19 @@
 /** Project Session aggregates and current-stage labels. */
 
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
-import type { SessionSummary } from '@deepseek-ai/dsh-api-session-controller/client'
+import type { SessionSummary, SessionListState } from '@deepseek-ai/dsh-api-session-controller/client'
 import type { FdeProjectState } from './stage-controller.ts'
 import { STAT_KEYS, TOKEN_KEYS, type ProjectUsage, type UsageNumbers, type UsagePoint } from './usage-controller.ts'
+
+/** Main-view selection belongs to the UI owner, not a global Session singleton. */
+export function mainProjectSessionId(list: SessionListState): SessionId | undefined {
+  return Object.values(list.byId).find(item => (item?.retainedBy.mainView ?? 0) > 0)?.id
+}
 
 /** Numeric whole-project session statistics derived from existing projections. */
 export interface ProjectRuntimeTotals {
   readonly sessions: number
   readonly running: number
-  readonly completed: number
   readonly blank: number
   readonly turns: number
   readonly steps: number
@@ -88,7 +92,6 @@ export function projectRuntimeTotals(sessions: readonly SessionSummary[]): Proje
   return {
     sessions: sessions.length,
     running: sessions.filter(item => item.running).length,
-    completed: sessions.filter(item => item.completed).length,
     blank: sessions.filter(item => item.blank).length,
     turns, steps, uncachedInputTokens, cacheReadTokens, cacheWriteTokens,
     inputTokens, outputTokens, toolMs, llmMs, ttftMs, ttftSteps, decodeMs, decodeTokens,

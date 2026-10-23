@@ -49,6 +49,7 @@ export function ObservabilityView(props: ProjectViewProps) {
   const sessions = props.useSessions(state => workspace === undefined
     ? []
     : workspace.sessionIds.map(id => state.byId[id]).filter(item => item !== undefined))
+  const statuses = props.useSessionStatus(state => state)
   const usageState = props.useProjectUsage(state => workspace === undefined ? undefined : state.byWorkspace[workspace.workspaceId])
   const workspaceId = workspace?.workspaceId
   // Refresh for membership and usage changes, not unrelated session-title/updatedAt edits.
@@ -385,7 +386,7 @@ export function ObservabilityView(props: ProjectViewProps) {
                 const lastCall = row?.status === 'ready' ? Math.max(0, ...row.activity.buckets.map(point => point.start)) : 0
                 return <tr key={session.id}>
                   <td><strong>{session.displayTitle}</strong><small>{String(session.id).slice(0, 8)}</small></td>
-                  <td><span className={css.sessionStatus} data-running={session.running || undefined}>{session.running ? '运行中' : session.completed ? '已完成' : session.blank ? '未开始' : '等待中'}</span></td>
+                  <td><span className={css.sessionStatus} data-running={session.running || undefined}>{session.running ? '运行中' : statuses.get(session.id)?.completionUnread ? '已完成' : session.blank ? '未开始' : '等待中'}</span></td>
                   <td><strong>{one.turns} / {one.steps}</strong><small>{sessionStepDensity.toFixed(1)} 步 / 轮</small></td>
                   <td>
                     <div className={css.observeSessionUsage}>

@@ -1,6 +1,37 @@
-# Bilingual-pair consistency record (docs/i18n/README.md): the git blob hash of each
-# side as of the last confirmed-consistent state. Both languages carry equal authority;
-# after editing either side, bring the other along and re-record with:
+# Bilingual-pair consistency record for README.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write packages/fde/semantica/README.md
-README.md: 8176ef7af9b869d5de993d90f5e7da058bac2c5d
-README.zh.md: 580862b8443b829c8eb67b409ed751f2819ae334
+/deepseek-ai-dsh-fde-semantica:
+  en: 9f2ee864c159f562
+  zh: f3bb65ef752d8065
+/deepseek-ai-dsh-fde-semantica/stage-four-contract:
+  en: 914e21fcf8193e80
+  zh: 9806b41505b972f3
+/deepseek-ai-dsh-fde-semantica/semantica-runtime-boundary:
+  en: 6d5b9205ad0ab884
+  zh: b132e607ec06293c
+/deepseek-ai-dsh-fde-semantica/project-data-and-operations:
+  en: b8374917224ef0ab
+  zh: 937e283fdc3e0d7f
+/deepseek-ai-dsh-fde-semantica/agent-integration:
+  en: ed206e92e93ab48e
+  zh: 928783ead3d1d182
+/deepseek-ai-dsh-fde-semantica/model-experience:
+  en: 215e7ba838619b7b
+  zh: a311da3843709f90
+/deepseek-ai-dsh-fde-semantica/model-experience/semantica-agent-tools:
+  en: 669c8116a8baef5f
+  zh: ef969dee7c2d0fc6
+/deepseek-ai-dsh-fde-semantica/model-experience/semantica-agent-tools/what-the-model-sees:
+  en: 8a8bbe19992d9258
+  zh: 93776744d7aa5a3f
+/deepseek-ai-dsh-fde-semantica/model-experience/semantica-agent-tools/token-effect:
+  en: 84bdb961ab76b9b3
+  zh: 3e549954bb4d601a
+/deepseek-ai-dsh-fde-semantica/model-experience/semantica-agent-tools/kv-cache-effect:
+  en: 19e110524ee4b5bc
+  zh: 47f0651bb40d86f6
+/deepseek-ai-dsh-fde-semantica/known-limitations-and-deferred-work:
+  en: e13ad3c4180a3e7f
+  zh: d60a68bbddea7ea1

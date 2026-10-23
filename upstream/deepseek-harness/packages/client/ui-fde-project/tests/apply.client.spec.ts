@@ -39,6 +39,12 @@ describe('ui-fde-project apply', () => {
     const collapseSidebar = vi.fn()
     const selectView = vi.fn()
     const openSession = vi.fn()
+    let retained = true
+    let runtimeStatus = 'stopped'
+    const using = vi.fn(async (_id: string, _options: { source: string }, operation: (reference: { ready: Promise<void> }) => Promise<void>) => {
+      const previous = retained; retained = true
+      try { await operation({ ready: Promise.resolve() }) } finally { retained = previous }
+    })
     let draft = ''
     const setDraft = vi.fn((nextDraft: string) => { draft = nextDraft })
     const notify = vi.fn()
@@ -54,21 +60,24 @@ describe('ui-fde-project apply', () => {
     }
     ctx.provide('betterSidebar', {
       getSnapshot: () => ({
+        sessionId: 'session-1',
         prefs: {
           agentTerminalTools: true,
           tabsEnabled: { terminal: true, browser: true },
           browserAllowedLoopback: '',
         },
       }),
+      registerTab: vi.fn(() => () => {}),
       openTab,
     } as never)
     ctx.provide('sessions', {
       list: createSnapshotStore({
         ids: ['session-1'],
-        byId: { 'session-1': { id: 'session-1', displayTitle: '会话', running: false, blank: true, updatedAt: 1 } },
+        byId: { 'session-1': { id: 'session-1', retainedBy: { mainView: 1 }, displayTitle: '会话', running: false, blank: true, updatedAt: 1 } },
         current: 'session-1', phase: 'ready', subagentsByParent: {}, jobsBySession: {}, currentAddress: undefined,
       }),
-      binding: () => ({ session: { prompt } }),
+      binding: () => retained ? { session: { prompt } } : undefined,
+      using,
       scope: () => ({ get: () => conversation }),
       open: openSession,
     } as never)
@@ -89,12 +98,12 @@ describe('ui-fde-project apply', () => {
       const path = requestPath(input)
       const completedRequirements = path.endsWith('/requirements/complete')
       const completedSolution = path.endsWith('/solution/complete')
-      if (path.endsWith('/fde-project/runtime/start')) {
+      if (path.endsWith('/fde-project/runtime/start') || path.endsWith('/fde-project/runtime/stop')) {
         return new Response(JSON.stringify({ ok: true, value: {
           workspaceId: 'workspace-1', title: '项目一',
           runtime: {
             schemaVersion: 1, revision: 1, operationId: `runtime_${'a'.repeat(32)}`,
-            action: 'start', status: 'starting', sessionId: 'session-1',
+            action: path.endsWith('/stop') ? 'stop' : 'start', status: path.endsWith('/stop') ? 'stopping' : 'starting', sessionId: 'session-1',
             updatedAt: '2026-08-27T00:00:00.000Z',
           },
           apiDocs: { status: 'unconfigured', message: '未配置' },
@@ -106,7 +115,7 @@ describe('ui-fde-project apply', () => {
       if (path.endsWith('/fde-project/snapshot')) {
         return new Response(JSON.stringify({ ok: true, value: {
           workspaceId: 'workspace-1', title: '项目一',
-          runtime: { schemaVersion: 1, revision: 0, status: 'stopped', updatedAt: '1970-01-01T00:00:00.000Z' },
+          runtime: { schemaVersion: 1, revision: 0, status: runtimeStatus, sessionId: 'session-1', terminalTitle: '项目运行', updatedAt: '1970-01-01T00:00:00.000Z' },
           apiDocs: { status: 'unconfigured', message: '未配置' },
           architecture: null, evaluation: { casesCount: 0, reports: [] },
           requirements: { root: 'fde-deliverables/01-requirement-research', requiredCount: 3, presentCount: 0, artifacts: [] },
@@ -136,8 +145,9 @@ describe('ui-fde-project apply', () => {
         'sidebar.workspaces.projectContext': { kind: 'single', scope: 'root' },
       },
     } as never, () => null)
-    ctx.provide('uiWorkspace', { connectWorkspace: (...args: unknown[]) => (ctx.get('workspaces') as unknown as { connectWorkspace: (...args: unknown[]) => unknown }).connectWorkspace(...args) })
-    ctx.provide('sidebarRight', { isExpanded: () => false, toggleExpanded: vi.fn() })
+    ctx.provide('uiWorkspace', { openSession: openSession, connectWorkspace: (...args: unknown[]) => (ctx.get('workspaces') as unknown as { connectWorkspace: (...args: unknown[]) => unknown }).connectWorkspace(...args) })
+    ctx.provide('sidebarRightTabs', { register: vi.fn(() => () => {}) } as never)
+    ctx.provide('sidebarRight', { isExpanded: () => false, toggleExpanded: vi.fn(), openTab: vi.fn() })
     const fiber = ctx.plugin({ inject: [...inject], apply })
     await fiber.await()
 
@@ -254,6 +264,23 @@ describe('ui-fde-project apply', () => {
     expect(selectView.mock.invocationCallOrder[0]).toBeLessThan(prompt.mock.invocationCallOrder[0]!)
     expect(openSession.mock.invocationCallOrder[0]).toBeLessThan(prompt.mock.invocationCallOrder[0]!)
 
+    expect(prompt.mock.calls[0]?.[0][0]?.text).toContain('terminal_open')
+    expect(prompt.mock.calls[0]?.[0][0]?.text).not.toContain('terminal_create')
+    runtimeStatus = 'running'
+    injected.refreshProjectSurface('workspace-1')
+    await vi.waitFor(() => {
+      const state = runtimeInjected.hooks.projectSurfaces.getSnapshot().byWorkspace['workspace-1']
+      expect(state?.status === 'ready' ? state.value.runtime.status : undefined).toBe('running')
+    })
+    retained = false
+    await runtimeInjected.stopProject('workspace-1', 'different-visible-session', '/project/one')
+    expect(using).toHaveBeenCalledWith('session-1', { source: 'workspaceOperation' }, expect.any(Function))
+    expect(retained).toBe(false)
+    expect(prompt.mock.calls[1]?.[0][0]?.text).toContain('terminal_signal')
+    expect(prompt.mock.calls[1]?.[0][0]?.text).not.toContain('terminal_wait_for')
+    await runtimeInjected.showProjectTerminal('workspace-1', 'session-1', '/project/one')
+    await runtimeInjected.openManualTerminal('workspace-1', 'session-1', '/project/one')
+    expect(prompt).toHaveBeenCalledTimes(2)
     await fiber.dispose()
     expect(slots.entries('conversation.view')).toHaveLength(0)
     window.dispatchEvent(new CustomEvent('fde:project-progress-open', { detail: { workspaceId: 'workspace-2' } }))
@@ -286,11 +313,11 @@ describe('ui-fde-project apply', () => {
       list: createSnapshotStore({
         ids: ['older', 'latest', 'child', 'archived'],
         byId: {
-          older: { id: 'older', displayTitle: '旧会话', running: false, blank: false, updatedAt: 1 },
-          latest: { id: 'latest', displayTitle: '最新会话', running: false, blank: false, updatedAt: 4 },
-          blank: { id: 'blank', displayTitle: '空会话', running: false, blank: true, updatedAt: 12 },
-          child: { id: 'child', displayTitle: '子智能体', origin: 'subagent', running: false, blank: false, updatedAt: 9 },
-          archived: { id: 'archived', displayTitle: '已归档', running: false, blank: false, updatedAt: 10 },
+          older: { id: 'older', retainedBy: {}, displayTitle: '旧会话', running: false, blank: false, updatedAt: 1 },
+          latest: { id: 'latest', retainedBy: {}, displayTitle: '最新会话', running: false, blank: false, updatedAt: 4 },
+          blank: { id: 'blank', retainedBy: {}, displayTitle: '空会话', running: false, blank: true, updatedAt: 12 },
+          child: { id: 'child', retainedBy: {}, displayTitle: '子智能体', origin: 'subagent', running: false, blank: false, updatedAt: 9 },
+          archived: { id: 'archived', retainedBy: {}, displayTitle: '已归档', running: false, blank: false, updatedAt: 10 },
         },
         current: undefined, phase: 'ready', subagentsByParent: {}, jobsBySession: {}, currentAddress: undefined,
       }),
@@ -328,8 +355,9 @@ describe('ui-fde-project apply', () => {
         'conversation.view': { kind: 'list', scope: 'session' },
       },
     } as never, () => null)
-    ctx.provide('uiWorkspace', { connectWorkspace: (...args: unknown[]) => (ctx.get('workspaces') as unknown as { connectWorkspace: (...args: unknown[]) => unknown }).connectWorkspace(...args) })
-    ctx.provide('sidebarRight', { isExpanded: () => false, toggleExpanded: vi.fn() })
+    ctx.provide('uiWorkspace', { openSession: open, connectWorkspace: (...args: unknown[]) => (ctx.get('workspaces') as unknown as { connectWorkspace: (...args: unknown[]) => unknown }).connectWorkspace(...args) })
+    ctx.provide('sidebarRightTabs', { register: vi.fn(() => () => {}) } as never)
+    ctx.provide('sidebarRight', { isExpanded: () => false, toggleExpanded: vi.fn(), openTab: vi.fn() })
     const fiber = ctx.plugin({ inject: [...inject], apply })
     await fiber.await()
     const injected = (slots.entries('shell.overlay')[0]!.inject as unknown as () => ProjectPageInjected)()

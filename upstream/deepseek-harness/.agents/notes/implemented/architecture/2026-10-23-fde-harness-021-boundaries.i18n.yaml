@@ -1,0 +1,19 @@
+# Bilingual-pair consistency record for 2026-10-23-fde-harness-021-boundaries.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write .agents/notes/implemented/architecture/2026-10-23-fde-harness-021-boundaries.md
+/agent-note-fde-authorization-and-terminal-ownership-on-harness-0-2-1:
+  en: 740c0ef88c35e091
+  zh: 200ac8a835b864df
+/agent-note-fde-authorization-and-terminal-ownership-on-harness-0-2-1/problem:
+  en: eef270a29c3308e6
+  zh: 946c0610a0e43865
+/agent-note-fde-authorization-and-terminal-ownership-on-harness-0-2-1/decision:
+  en: 81d9b05bb072b226
+  zh: 34d1fc320962d103
+/agent-note-fde-authorization-and-terminal-ownership-on-harness-0-2-1/alternatives-considered:
+  en: adf4a0a89874e207
+  zh: 2054766fdb370e7a
+/agent-note-fde-authorization-and-terminal-ownership-on-harness-0-2-1/consequences:
+  en: 9210b22fc1cf1d64
+  zh: 8d500e497a3e69ea

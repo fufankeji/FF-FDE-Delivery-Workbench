@@ -1,0 +1,305 @@
+{
+  "schemaVersion": "1.0",
+  "project": {
+    "name": "FF - FDE 交付工作台"
+  },
+  "features": [
+    {
+      "key": "feat-01",
+      "title": "平台进入与项目选择",
+      "core": true,
+      "recordability": "ready",
+      "visibleResult": "平台进入与项目选择的真实界面与已有记录"
+    },
+    {
+      "key": "feat-02",
+      "title": "需求发现与历史对话",
+      "core": true,
+      "recordability": "ready",
+      "visibleResult": "需求发现与历史对话的真实界面与已有记录"
+    },
+    {
+      "key": "feat-03",
+      "title": "业务结果与责任",
+      "core": true,
+      "recordability": "ready",
+      "visibleResult": "业务结果与责任的真实界面与已有记录"
+    },
+    {
+      "key": "feat-04",
+      "title": "系统数据与权限调查",
+      "core": true,
+      "recordability": "ready",
+      "visibleResult": "系统数据与权限调查的真实界面与已有记录"
+    },
+    {
+      "key": "feat-05",
+      "title": "方案图谱与纵向切片",
+      "core": true,
+      "recordability": "ready",
+      "visibleResult": "方案图谱与纵向切片的真实界面与已有记录"
+    },
+    {
+      "key": "feat-06",
+      "title": "报修分析与证据",
+      "core": true,
+      "recordability": "ready",
+      "visibleResult": "报修分析与证据的真实界面与已有记录"
+    },
+    {
+      "key": "feat-07",
+      "title": "人工确认与本地草稿",
+      "core": true,
+      "recordability": "ready",
+      "visibleResult": "人工确认与本地草稿的真实界面与已有记录"
+    },
+    {
+      "key": "feat-08",
+      "title": "PoC 与 Eval 记录",
+      "core": true,
+      "recordability": "mock-visible",
+      "visibleResult": "PoC 与 Eval 记录的真实界面与已有记录"
+    },
+    {
+      "key": "feat-09",
+      "title": "Pilot 范围与恢复",
+      "core": true,
+      "recordability": "mock-visible",
+      "visibleResult": "Pilot 范围与恢复的真实界面与已有记录"
+    },
+    {
+      "key": "feat-10",
+      "title": "验收移交记录",
+      "core": true,
+      "recordability": "mock-visible",
+      "visibleResult": "验收移交记录的真实界面与已有记录"
+    },
+    {
+      "key": "feat-11",
+      "title": "持续改进记录",
+      "core": true,
+      "recordability": "mock-visible",
+      "visibleResult": "持续改进记录的真实界面与已有记录"
+    },
+    {
+      "key": "feat-12",
+      "title": "模型设置与新对话",
+      "core": false,
+      "recordability": "ready",
+      "visibleResult": "模型设置与新对话的真实界面与已有记录"
+    },
+    {
+      "key": "feat-13",
+      "title": "独立实验室与技能中心",
+      "core": false,
+      "recordability": "ready",
+      "visibleResult": "独立实验室与技能中心的真实界面与已有记录"
+    }
+  ],
+  "journeys": [
+    {
+      "key": "journey-repair-to-local-draft",
+      "title": "从门店报修到有依据的人工确认草稿",
+      "featureKeys": [
+        "feat-06",
+        "feat-07"
+      ],
+      "proves": [
+        "本轮分析生成候选、缺口和来源",
+        "未经确认不保存；确认后独立读回本地草稿"
+      ],
+      "selectionRationale": "让观众看到已交付业务系统真正完成一条可复现操作，不把浏览阶段页面当作本轮生成结果。",
+      "precondition": "只读既有门店案例与图谱，录制状态目录为空，4177 服务独立本机运行。",
+      "setup": [
+        "启动 maintenance-preview.mjs，分配独立临时 stateDir"
+      ],
+      "reset": [
+        "停止录制服务；finally 清理专属临时状态目录；重启得到空状态"
+      ],
+      "feasibility": {
+        "status": "verified",
+        "dependencies": [
+          "本机 4177 业务服务",
+          "35 份现有资料与图谱快照"
+        ],
+        "notes": "已通过正常页面分析 R-1002、核对候选、提交确认，界面显示已从本地服务读回；externalWrite=false。"
+      },
+      "operationEvidence": {
+        "mode": "live-result",
+        "evidenceKey": "saved-local-draft",
+        "resultDescription": "录制时完成新的报修分析与人工确认，本地服务返回新增草稿",
+        "preflight": {
+          "status": "verified",
+          "notes": "已通过正常页面分析 R-1002、核对候选、提交确认，界面显示已从本地服务读回；externalWrite=false。"
+        },
+        "sideEffects": {
+          "kind": "local-disposable",
+          "notes": "原业务源码与资料只读；createApp 使用 mkdtemp 的独立 stateDir。每次重录停止服务并清理该目录，再启动空状态。"
+        },
+        "fixtureDisclosure": "业务输入为用户接受的脱敏样本，规则和既有图谱产生本轮结果；不调用模型、不执行生产派单。"
+      },
+      "recordability": "ready",
+      "steps": [
+        {
+          "action": "选择 R-1002 并核对原文",
+          "visibleFeedback": "应急提示和待分析状态出现"
+        },
+        {
+          "action": "点击分析并查看证据",
+          "visibleFeedback": "新的分析结果、候选和未知项出现"
+        },
+        {
+          "action": "填写操作人与备注并确认",
+          "visibleFeedback": "保存后显示已从本地服务读回及 externalWrite=false"
+        }
+      ],
+      "visibleResult": "录制时完成新的报修分析与人工确认，本地服务返回新增草稿",
+      "moneyShot": {
+        "step": 3,
+        "description": "已保存的本地草稿、操作人、运行编号与未执行外部写入同屏"
+      },
+      "clip": {
+        "mode": "single",
+        "durationTargetSec": 110
+      },
+      "plainTakeaway": "建议有来源，保存要确认，结果可读回。",
+      "boundary": "脱敏样本；本地规则与图谱快照，不是实时模型推理，不执行派单或费用承诺。"
+    }
+  ],
+  "standaloneFeatures": [
+    {
+      "featureKey": "feat-01",
+      "reason": "按阶段回看既有对话与产物，不声称本轮生成",
+      "plainTakeaway": "平台进入与项目选择",
+      "durationTargetSec": 40
+    },
+    {
+      "featureKey": "feat-02",
+      "reason": "按阶段回看既有对话与产物，不声称本轮生成",
+      "plainTakeaway": "需求发现与历史对话",
+      "durationTargetSec": 40
+    },
+    {
+      "featureKey": "feat-03",
+      "reason": "按阶段回看既有对话与产物，不声称本轮生成",
+      "plainTakeaway": "业务结果与责任",
+      "durationTargetSec": 40
+    },
+    {
+      "featureKey": "feat-04",
+      "reason": "按阶段回看既有对话与产物，不声称本轮生成",
+      "plainTakeaway": "系统数据与权限调查",
+      "durationTargetSec": 40
+    },
+    {
+      "featureKey": "feat-05",
+      "reason": "按阶段回看既有对话与产物，不声称本轮生成",
+      "plainTakeaway": "方案图谱与纵向切片",
+      "durationTargetSec": 40
+    },
+    {
+      "featureKey": "feat-08",
+      "reason": "按阶段回看既有对话与产物，不声称本轮生成",
+      "plainTakeaway": "PoC 与 Eval 记录",
+      "durationTargetSec": 40
+    },
+    {
+      "featureKey": "feat-09",
+      "reason": "按阶段回看既有对话与产物，不声称本轮生成",
+      "plainTakeaway": "Pilot 范围与恢复",
+      "durationTargetSec": 40
+    },
+    {
+      "featureKey": "feat-10",
+      "reason": "按阶段回看既有对话与产物，不声称本轮生成",
+      "plainTakeaway": "验收移交记录",
+      "durationTargetSec": 40
+    },
+    {
+      "featureKey": "feat-11",
+      "reason": "按阶段回看既有对话与产物，不声称本轮生成",
+      "plainTakeaway": "持续改进记录",
+      "durationTargetSec": 40
+    }
+  ],
+  "coverage": [
+    {
+      "featureKey": "feat-01",
+      "disposition": "standalone",
+      "targetKey": "feat-01",
+      "reason": "既有案例回看，配合阶段字幕说明"
+    },
+    {
+      "featureKey": "feat-02",
+      "disposition": "standalone",
+      "targetKey": "feat-02",
+      "reason": "既有案例回看，配合阶段字幕说明"
+    },
+    {
+      "featureKey": "feat-03",
+      "disposition": "standalone",
+      "targetKey": "feat-03",
+      "reason": "既有案例回看，配合阶段字幕说明"
+    },
+    {
+      "featureKey": "feat-04",
+      "disposition": "standalone",
+      "targetKey": "feat-04",
+      "reason": "既有案例回看，配合阶段字幕说明"
+    },
+    {
+      "featureKey": "feat-05",
+      "disposition": "standalone",
+      "targetKey": "feat-05",
+      "reason": "既有案例回看，配合阶段字幕说明"
+    },
+    {
+      "featureKey": "feat-06",
+      "disposition": "journey",
+      "targetKey": "journey-repair-to-local-draft",
+      "reason": "进入真实本地操作闭环"
+    },
+    {
+      "featureKey": "feat-07",
+      "disposition": "journey",
+      "targetKey": "journey-repair-to-local-draft",
+      "reason": "进入真实本地操作闭环"
+    },
+    {
+      "featureKey": "feat-08",
+      "disposition": "standalone",
+      "targetKey": "feat-08",
+      "reason": "既有案例回看，配合阶段字幕说明"
+    },
+    {
+      "featureKey": "feat-09",
+      "disposition": "standalone",
+      "targetKey": "feat-09",
+      "reason": "既有案例回看，配合阶段字幕说明"
+    },
+    {
+      "featureKey": "feat-10",
+      "disposition": "standalone",
+      "targetKey": "feat-10",
+      "reason": "既有案例回看，配合阶段字幕说明"
+    },
+    {
+      "featureKey": "feat-11",
+      "disposition": "standalone",
+      "targetKey": "feat-11",
+      "reason": "既有案例回看，配合阶段字幕说明"
+    },
+    {
+      "featureKey": "feat-12",
+      "disposition": "excluded",
+      "targetKey": "feat-12",
+      "reason": "不属于本次选定的门店项目交付主线；不新增计费调用"
+    },
+    {
+      "featureKey": "feat-13",
+      "disposition": "excluded",
+      "targetKey": "feat-13",
+      "reason": "不属于本次选定的门店项目交付主线；不新增计费调用"
+    }
+  ]
+}

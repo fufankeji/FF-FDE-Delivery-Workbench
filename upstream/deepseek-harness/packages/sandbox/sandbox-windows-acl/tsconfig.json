@@ -22,6 +22,12 @@
     },
     {
       "path": "../../subprocess/subprocess"
+    },
+    {
+      "path": "../../util/lazy-require"
+    },
+    {
+      "path": "../../skill/skill"
     }
   ]
 }

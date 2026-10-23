@@ -1,0 +1,16 @@
+# Bilingual-pair consistency record for guide.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write docs/upgrade-guide/v0.2.1-rc.2/fde-runtime-terminals/guide.md
+/:
+  en: 3a59886a5b222623
+  zh: 342f9a14fe2c8332
+/fde-runtime-and-manual-terminals:
+  en: c98113b90688a97c
+  zh: 25b4f0f539c759bc
+/fde-runtime-and-manual-terminals/change:
+  en: 64fd2b47fb56c87c
+  zh: 90cd0d95b678dde4
+/fde-runtime-and-manual-terminals/migration:
+  en: 9348ca8a653502f8
+  zh: aef6e83b40042a0a

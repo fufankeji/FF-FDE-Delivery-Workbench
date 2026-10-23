@@ -4,9 +4,8 @@ import type { KeyboardEvent } from 'react'
 import { Button, Input, MarkdownText, Modal } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { PropsLocale } from '@deepseek-ai/dsh-client-ui-slots'
 import { fetchStageSkillCatalog } from './stage-skill-catalog.ts'
-import { COURSE_SKILLS, resolveSkillFile, saveSkillDownload, searchLibrary, skillArchive, stageOneLibrary, type LibrarySkill } from './skills-center-data.ts'
+import { COURSE_SKILLS, resolveSkillFile, saveSkillDownload, searchLibrary, skillArchive, skillFileBytes, stageOneLibrary, type LibrarySkill } from './skills-center-data.ts'
 import { SkillsCenterIcon } from './SkillsCenterIcon.tsx'
-import { SkillFileTree } from './SkillFileTree.tsx'
 import css from './skills-center.module.css'
 
 type CatalogState =
@@ -23,14 +22,14 @@ export function SkillsCenter({ t }: PropsLocale<'fdeProject'>) {
   const [selected, setSelected] = useState<LibrarySkill>()
   const [path, setPath] = useState('SKILL.md')
   const [expanded, setExpanded] = useState(false)
-  const [openFolders, setOpenFolders] = useState<ReadonlySet<string>>(() => new Set(['']))
   const [downloadError, setDownloadError] = useState(false)
   const root = useRef<HTMLElement>(null)
   const dialog = useRef<HTMLDivElement>(null)
   const reader = useRef<HTMLDivElement>(null)
   const openingId = useRef<string>()
   const file = selected?.files.find(item => item.path === path)
-  const summary = (skill: LibrarySkill): string => skill.source === 'platform' ? t(`skills.summary.${skill.id}`) : skill.description
+  const frontmatter = path.endsWith('.md') ? file?.content.match(/^---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$)/)?.[0] ?? '' : ''
+  const summary = (skill: LibrarySkill): string => skill.description
   const courseLabel = (skill: LibrarySkill): string => skill.source === 'course'
     ? `${t('skills.lesson', { number: skill.course.lessonNumber })} · ${skill.course.lessonTitle}` : t('skills.stageTitle')
   const available = [...(catalog.status === 'ready' ? catalog.skills : []), ...COURSE_SKILLS]
@@ -79,9 +78,8 @@ export function SkillsCenter({ t }: PropsLocale<'fdeProject'>) {
 
   const open = (skill: LibrarySkill): void => {
     openingId.current = `${skill.source}:${skill.id}`
-    setPath('SKILL.md')
+    setPath(skill.entryPath)
     setExpanded(false)
-    setOpenFolders(new Set(['']))
     setDownloadError(false)
     setSelected(skill)
   }
@@ -97,7 +95,7 @@ export function SkillsCenter({ t }: PropsLocale<'fdeProject'>) {
       setExpanded(false)
     }
     if (event.key !== 'Tab') return
-    const controls = [...event.currentTarget.querySelectorAll<HTMLElement>('button:not(:disabled), a[href], [tabindex="0"]')]
+    const controls = [...event.currentTarget.querySelectorAll<HTMLElement>(':is(button:not(:disabled), a[href], [tabindex="0"])')]
     const first = controls[0]
     const last = controls.at(-1)
     if (document.activeElement === event.currentTarget
@@ -109,22 +107,8 @@ export function SkillsCenter({ t }: PropsLocale<'fdeProject'>) {
   }
   const selectFile = (nextPath: string): void => {
     setPath(nextPath)
-    setOpenFolders((previous) => {
-      const next = new Set(previous).add('')
-      const parts = nextPath.split('/')
-      for (let index = 1; index < parts.length; index += 1) next.add(parts.slice(0, index).join('/'))
-      return next
-    })
     setDownloadError(false)
     if (reader.current !== null) reader.current.scrollTop = 0
-  }
-  const toggleFolder = (folder: string): void => {
-    setOpenFolders((previous) => {
-      const next = new Set(previous)
-      if (next.has(folder)) next.delete(folder)
-      else next.add(folder)
-      return next
-    })
   }
   const download = (skill: LibrarySkill, currentFile = false): void => {
     setDownloadError(false)
@@ -132,7 +116,8 @@ export function SkillsCenter({ t }: PropsLocale<'fdeProject'>) {
       if (currentFile) {
         if (file === undefined) throw new Error('Missing library file')
         const filename = file.path.split('/').at(-1) ?? file.path
-        saveSkillDownload(filename, file.content, file.path.endsWith('.md') ? 'text/markdown;charset=utf-8' : 'text/plain;charset=utf-8')
+        const content = file.encoding === 'base64' ? skillFileBytes(file) : file.content
+        saveSkillDownload(filename, content, file.mediaType ?? (file.path.endsWith('.md') ? 'text/markdown;charset=utf-8' : 'text/plain;charset=utf-8'))
       } else saveSkillDownload(`${skill.id}.zip`, skillArchive(skill), 'application/zip')
     } catch {
       setDownloadError(true)
@@ -173,8 +158,9 @@ export function SkillsCenter({ t }: PropsLocale<'fdeProject'>) {
     {selected !== undefined && <Modal open onClose={close} title={selected.label} headless className={`${css.readerDialog}${expanded ? ` ${css.readerExpanded}` : ''}`}>
       <div ref={dialog} className={css.dialogBody} tabIndex={-1} onKeyDownCapture={onReaderKeyDown} data-skill-reader>
         <header className={css.detailHeading}>
-          <div><h2>{selected.label}</h2><p><span className={css.sourceBadge} data-source={selected.source}>{t(`skills.source.${selected.source}`)}</span> {t(selected.source === 'platform' ? 'skills.adapter' : 'skills.original')}</p>{selected.source === 'course' && <p>{selected.course.title} · {courseLabel(selected)}</p>}</div>
+          <div><h2>{selected.label}</h2></div>
           <div className={css.dialogActions}>
+            <Button variant="outline" disabled={file === undefined} onClick={() => { download(selected, true) }}>{t('skills.downloadFile')}</Button>
             <Button variant="primary" onClick={() => { download(selected) }}>{t('skills.downloadPackage')}</Button>
             <Button variant="ghost" className={css.iconButton} aria-label={t(expanded ? 'skills.restore' : 'skills.expand')} title={t(expanded ? 'skills.restore' : 'skills.expand')} aria-pressed={expanded} onClick={() => { setExpanded(value => !value) }}>
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={expanded ? 'M9 3v6H3M15 21v-6h6M9 9 3 3M15 15l6 6' : 'M8 3H3v5M16 21h5v-5M3 3l6 6M21 21l-6-6'} /></svg>
@@ -185,26 +171,31 @@ export function SkillsCenter({ t }: PropsLocale<'fdeProject'>) {
           </div>
         </header>
         {downloadError && <div className={css.dialogError} role="alert">{t('skills.downloadError')}</div>}
-        <div className={css.readerGrid}>
-          <aside className={css.files} aria-label={t('skills.files')}><h3>{t('skills.files')}</h3>
-            <SkillFileTree skill={selected} selectedPath={path} openFolders={openFolders}
-              toggleFolder={toggleFolder} selectFile={selectFile} />
-            <p>{t('skills.readOnly')}</p>
-          </aside>
-          <div className={css.reader}>
-            <header className={css.fileHeader}><code>{selected.id}/{path}</code><Button variant="outline" disabled={file === undefined} onClick={() => { download(selected, true) }}>{t('skills.downloadFile')}</Button></header>
-            <div ref={reader} className={css.markdown} data-skill-file={path}>
-              {file === undefined ? <p className={css.message} role="alert">{t('skills.fileMissing')}</p>
+        <div className={css.reader}>
+          {path !== selected.entryPath && <header className={css.fileHeader}>
+            <Button variant="ghost" onClick={() => { selectFile(selected.entryPath) }}>{t('skills.backToContent')}</Button>
+            <span>{path.split('/').at(-1)}</span>
+          </header>}
+          <div ref={reader} className={css.markdown} data-skill-file={path}>
+            {file === undefined ? <p className={css.message} role="alert">{t('skills.fileMissing')}</p>
+              : file.encoding === 'base64'
+                ? file.mediaType === 'image/png'
+                  ? <img className={css.resourceImage} src={`data:image/png;base64,${file.content}`} alt={file.path} />
+                  : <object className={css.resourcePdf} data={`data:application/pdf;base64,${file.content}`} type="application/pdf" aria-label={file.path}><p>{t('skills.previewFallback')}</p></object>
                 : path.endsWith('.md')
-                  ? <><MarkdownText text={path === 'SKILL.md' ? file.content.replace(/^---\n[\s\S]*?\n---\n/, '') : file.content} labels={labels} fileMentions={{ resolve(value) {
-                    const target = selected.files.some(item => item.path === value) ? value : resolveSkillFile(selected.files, path, value)
+                  ? <MarkdownText text={file.content.slice(frontmatter.length)} labels={labels} pathImages={{ resolve(value) {
+                    const target = resolveSkillFile(selected.files, path, value)
+                    const image = selected.files.find(item => item.path === target)
+                    return image?.mediaType === 'image/png' ? `data:image/png;base64,${image.content}` : undefined
+                  } }} fileMentions={{ resolve(value) {
+                    const target = selected.files.some(item => item.path === value)
+                      ? value : resolveSkillFile(selected.files, path, value)
                     return target === undefined ? undefined : { open: () => { selectFile(target) }, label: value, title: `${selected.id}/${target}` }
                   } }} fileLinks={{ resolve(value) {
                     const target = resolveSkillFile(selected.files, path, value)
                     return target === undefined ? undefined : { open: () => { selectFile(target) }, title: `${selected.id}/${target}` }
-                  } }} /></>
+                  } }} />
                   : <pre>{file.content}</pre>}
-            </div>
           </div>
         </div>
       </div>

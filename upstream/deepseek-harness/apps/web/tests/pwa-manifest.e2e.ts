@@ -11,15 +11,17 @@ it('ships install metadata with the built web application', async () => {
   expect(index).toContain('<link rel="manifest" href="./manifest.webmanifest" />')
 
   const manifest: unknown = JSON.parse(await readFile(join(DIST_ROOT, 'manifest.webmanifest'), 'utf8'))
+  // No `id`: a browser resolves an explicit `id` against the start URL's origin,
+  // so only an absent `id`, which defaults to the resolved `start_url`, gives
+  // each mount its own identity. `public-mount.e2e.ts` reads the resolved form.
   expect(manifest).toEqual({
-    id: '/',
     name: 'FF - FDE 交付工作台',
     short_name: 'FF-FDE',
-    start_url: '/',
-    scope: '/',
+    start_url: './',
+    scope: './',
     display: 'fullscreen',
     icons: [{
-      src: '/ff-brand/ff-logo.png',
+      src: 'ff-brand/ff-logo.png',
       sizes: '300x300',
       type: 'image/png',
       purpose: 'any',
@@ -29,7 +31,7 @@ it('ships install metadata with the built web application', async () => {
 
 it('ships the unmodified FF brand icon for browser tabs', async () => {
   const index = await readFile(join(DIST_ROOT, 'index.html'), 'utf8')
-  expect(index).toContain('href="/ff-brand/ff-logo.png"')
+  expect(index).toContain('href="./ff-brand/ff-logo.png"')
   expect(index).not.toContain('href="/favicon.svg"')
   const favicon = await readFile(join(DIST_ROOT, 'ff-brand/ff-logo.png'))
   expect(createHash('sha256').update(favicon).digest('hex')).toBe('522944bbaee48d98190c8c5a0a0ac80f05b71b1975838807742a782e2aeceedc')

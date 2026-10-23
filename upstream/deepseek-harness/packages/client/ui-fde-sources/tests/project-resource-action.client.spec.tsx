@@ -16,7 +16,7 @@ const t = makeTranslate(zh) as never
 function mount(fetchImpl: typeof fetch) {
   vi.stubGlobal('fetch', fetchImpl)
   return render(<ProjectResourceUploadAction
-    usePanelInfo={(() => undefined) as never} useSessionPendingInteraction={(() => new Map()) as never} useResource={(() => undefined) as never} useSessions={(() => undefined) as never}
+    useRemoteAccess={() => true} useSessionAccess={() => true} useWorkspaceAccess={() => true} useSessionRetainInfo={() => undefined} usePanelInfo={(() => undefined) as never} useSessionStatus={(() => new Map()) as never} useResource={(() => undefined) as never} useSessions={(() => undefined) as never}
     useWorkspaces={(() => undefined) as never}
     workspaceId={'workspace-1' as WorkspaceId}
     title="客户项目"
@@ -29,8 +29,9 @@ describe('ProjectResourceUploadAction', () => {
   it('shows one small project-scoped upload action inside the native composer', () => {
     render(<ProjectResourceComposerAction
       sessionId={'session-1' as never}
+      useAccess={(() => undefined) as never}
       useSession={(() => undefined) as never}
-      usePanelInfo={(() => undefined) as never} useSessionPendingInteraction={(() => new Map()) as never} useResource={(() => undefined) as never} useConversation={(() => undefined) as never} useChat={(() => undefined) as never} useTrajectory={(() => undefined) as never} useSessions={(() => undefined) as never}
+      useRemoteAccess={() => true} useSessionAccess={() => true} useWorkspaceAccess={() => true} useSessionRetainInfo={() => undefined} usePanelInfo={(() => undefined) as never} useSessionStatus={(() => new Map()) as never} useResource={(() => undefined) as never} useConversation={(() => undefined) as never} useChat={(() => undefined) as never} useTrajectory={(() => undefined) as never} useSessions={(() => undefined) as never}
       useWorkspaces={((selector: (state: unknown) => unknown) => selector({
         items: [{ workspaceId: 'workspace-1', path: '/projects/customer', sessionIds: ['session-1'] }],
       })) as never}

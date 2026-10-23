@@ -1,0 +1,339 @@
+{
+  "baseUrl": "http://127.0.0.1:4177",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "speedup": 1,
+  "subtitleColors": {
+    "text": "#ffffff",
+    "stroke": "#4036a8",
+    "glow": "rgba(90,77,210,0.3)"
+  },
+  "zooms": [],
+  "name": "从报修分析到本地草稿 · 紧凑字幕修改版",
+  "demonstration": {
+    "kind": "journey",
+    "mode": "live-result",
+    "evidenceKey": "saved-local-draft",
+    "resultDescription": "录制时完成新的报修分析与人工确认，本地服务返回新增草稿"
+  },
+  "steps": [
+    {
+      "action": "navigate",
+      "url": "/",
+      "settleMs": 1500,
+      "subtitle": {
+        "text": "门店维修应用 · 本地操作",
+        "position": "mc",
+        "theme": "title-card"
+      },
+      "subtitleHold": 1800
+    },
+    {
+      "action": "waitFor",
+      "selector": "[data-action=\"select\"][data-id=\"R-1002\"]",
+      "timeout": 25000
+    },
+    {
+      "action": "scene",
+      "anchor": "h1",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "业务应用：从报修列表选择门店案例",
+        "position": "bl"
+      },
+      "hold": 3600
+    },
+    {
+      "action": "moveTo",
+      "selector": "[data-action=\"select\"][data-id=\"R-1002\"]",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "[data-action=\"select\"][data-id=\"R-1002\"]",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "scene",
+      "anchor": ".detail-top",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "脱敏案例；本地规则与图谱，不调用模型",
+        "position": "tr"
+      },
+      "hold": 3600
+    },
+    {
+      "action": "scene",
+      "anchor": ".analysis-start",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "点击分析这条报修，运行本地规则",
+        "position": "bl"
+      },
+      "hold": 3600
+    },
+    {
+      "action": "captureState",
+      "key": "analysis-result",
+      "selector": ".detail-body",
+      "read": "text"
+    },
+    {
+      "action": "moveTo",
+      "selector": "[data-action=\"analyze\"]",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "[data-action=\"analyze\"]",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "waitForStateChange",
+      "key": "analysis-result"
+    },
+    {
+      "action": "waitFor",
+      "selector": "[data-action=\"confirm\"]",
+      "timeout": 25000
+    },
+    {
+      "action": "scene",
+      "anchor": ".detail-body",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "查看分析结果：候选建议与待确认项",
+        "position": "tr"
+      },
+      "hold": 4200
+    },
+    {
+      "action": "scrollBy",
+      "y": 280,
+      "duration": 1000
+    },
+    {
+      "action": "wait",
+      "ms": 600
+    },
+    {
+      "action": "moveTo",
+      "selector": "[data-action=\"tab\"][data-tab=\"context\"]",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "[data-action=\"tab\"][data-tab=\"context\"]",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "scene",
+      "anchor": ".detail-body",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "关联与证据：核对来源后点击存草稿",
+        "position": "bl"
+      },
+      "hold": 4200
+    },
+    {
+      "action": "moveTo",
+      "selector": "[data-action=\"confirm\"]",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "[data-action=\"confirm\"]",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "waitFor",
+      "selector": "#draft-form",
+      "timeout": 25000
+    },
+    {
+      "action": "scene",
+      "anchor": "#draft-form",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "填写操作人和备注，勾选核对确认",
+        "position": "tr"
+      },
+      "hold": 3600
+    },
+    {
+      "action": "moveTo",
+      "selector": "input[name=\"operator\"]",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "input[name=\"operator\"]",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "type",
+      "selector": "input[name=\"operator\"]",
+      "text": "录制核对（示例）",
+      "speed": 80
+    },
+    {
+      "action": "moveTo",
+      "selector": "textarea[name=\"note\"]",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "textarea[name=\"note\"]",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "type",
+      "selector": "textarea[name=\"note\"]",
+      "text": "已核对候选与证据；仅保存演示草稿，不执行派单。",
+      "speed": 50
+    },
+    {
+      "action": "moveTo",
+      "selector": "input[name=\"confirmed\"]",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "input[name=\"confirmed\"]",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "captureState",
+      "key": "saved-local-draft",
+      "selector": ".saved-banner",
+      "read": "count"
+    },
+    {
+      "action": "moveTo",
+      "selector": "#draft-form button[type=\"submit\"]",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "#draft-form button[type=\"submit\"]",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "waitForStateChange",
+      "key": "saved-local-draft"
+    },
+    {
+      "action": "waitFor",
+      "selector": ".saved-banner",
+      "timeout": 25000
+    },
+    {
+      "action": "scene",
+      "anchor": "#sheet",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "保存后读回草稿；未执行正式派单",
+        "position": "bl"
+      },
+      "hold": 5000
+    }
+  ]
+}

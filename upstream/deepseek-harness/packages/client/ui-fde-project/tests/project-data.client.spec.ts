@@ -11,14 +11,14 @@ afterEach(() => { localStorage.clear() })
 describe('FDE project browser data', () => {
   it('aggregates only real Session projection values', () => {
     const session = {
-      id: 's-1' as SessionId, displayTitle: '研发', running: true, blank: false, updatedAt: 1,
+      id: 's-1' as SessionId, retainedBy: {}, displayTitle: '研发', running: true, blank: false, updatedAt: 1,
       projectionValues: {
         sessionStats: { turns: 3, steps: 7, llmMs: 1200, toolMs: 800, ttftMs: 300, ttftSteps: 2, decodeMs: 500, decodeTokens: 18 },
         tokenUsage: { uncachedInputTokens: 100, cacheReadTokens: 40, cacheWriteTokens: 10, outputTokens: 20 },
       } as never,
     } satisfies SessionSummary
     expect(projectRuntimeTotals([session])).toEqual({
-      sessions: 1, running: 1, completed: 0, blank: 0, turns: 3, steps: 7,
+      sessions: 1, running: 1, blank: 0, turns: 3, steps: 7,
       uncachedInputTokens: 100, cacheReadTokens: 40, cacheWriteTokens: 10,
       inputTokens: 150, outputTokens: 20, toolMs: 800, llmMs: 1200,
       ttftMs: 300, ttftSteps: 2, decodeMs: 500, decodeTokens: 18,
@@ -28,7 +28,7 @@ describe('FDE project browser data', () => {
   it('attributes actual request activity rather than session updatedAt to time buckets', () => {
     const now = new Date(2026, 7, 27, 18, 0, 0, 0).getTime()
     const session = (id: string, updatedAt: number, tokens: number): SessionSummary => ({
-      id: id as SessionId, displayTitle: id, running: false, blank: false, updatedAt,
+      id: id as SessionId, retainedBy: {}, displayTitle: id, running: false, blank: false, updatedAt,
       projectionValues: {
         sessionStats: { turns: 1, steps: 2, llmMs: 100, toolMs: 50, ttftMs: 10, ttftSteps: 1, decodeMs: 20, decodeTokens: 5 },
         tokenUsage: { uncachedInputTokens: tokens, cacheReadTokens: 0, cacheWriteTokens: 0, outputTokens: tokens / 2 },
@@ -63,7 +63,7 @@ describe('FDE project browser data', () => {
     const points = [new Date(2024, 0, 1, 12).getTime(), now].map(start => ({ ...stats, ...usage, start }))
     const data = { workspaceId: 'w', sessions: [{ sessionId: 's', status: 'ready' as const,
       stats: { ...stats, turns: 2, steps: 4 }, usage: { ...usage, uncachedInputTokens: 200, cacheReadTokens: 40, outputTokens: 20 }, activity: { buckets: points } }] }
-    const sessions = [{ id: 's' as SessionId, displayTitle: '跨天会话', updatedAt: now, running: false, blank: false }]
+    const sessions = [{ id: 's' as SessionId, retainedBy: {}, displayTitle: '跨天会话', updatedAt: now, running: false, blank: false }]
     const today = projectUsageSessions(sessions, data, 'today', now)
     expect(projectRuntimeTotals(today)).toMatchObject({ turns: 1, steps: 2, inputTokens: 120, outputTokens: 10 })
     expect(projectActivityBuckets(today, 'today', now).reduce((sum, bucket) => sum + bucket.inputTokens, 0)).toBe(120)
@@ -79,7 +79,7 @@ describe('FDE project browser data', () => {
   it('selects the latest visible ordinary project Session', () => {
     const summary = (id: string, updatedAt: number, origin?: 'subagent', blank = false): SessionSummary => ({
       id: id as SessionId,
-      displayTitle: id,
+      retainedBy: {}, displayTitle: id,
       running: false,
       blank,
       updatedAt,

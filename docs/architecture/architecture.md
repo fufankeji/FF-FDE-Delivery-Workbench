@@ -13,7 +13,8 @@ product_spec: docs/specs/product-spec.md
 - 本文记录已经确认的技术方向，以及启动官方 Web 后必须用运行证据验证的架构假设。
 - 强制基座：`https://github.com/deepseek-ai/deepseek-harness` 官方源码。
 - 架构排除：`/Users/muyu/MuYuProjectBuild/DeepSeekHarnessDesktop` 及其他赋范分叉不作为 Agent、Host 或 Web 运行架构基线；F016 仅按用户明确授权复用该 Studio 的主题资源和已经验证的换肤交互，仍接入当前官方 Harness 插件与 ThemeRuntime。
-- 当前官方快照：`deepseek-ai/deepseek-harness@0a15e36e7f82b6ed45af6fa9759f29b40dcd965d`，标签 `dsh-v0.1.6-alpha.1`。上一基线为 `b150a551…` / `0.1.1-rc.2`。本次接口、依赖和运行变化见[升级说明](harness-016-upgrade.md)。
+- 当前官方快照：`deepseek-ai/deepseek-harness@687f282e8625c6b8d11ff58211a90524be2e4317`，标签 `dsh-v0.2.1-rc.2`。上一基线为 `0a15e36e…` / `0.1.6-alpha.1`。接口、依赖和运行变化见[升级说明](harness-021-upgrade.md)。
+- 2026-10-23 已授权 F027 兼容 `dsh-v0.2.1-rc.2`，当前仍未切换。先按[本轮升级方案](harness-021-upgrade.md)完成三方合并、隔离历史数据验证与人工验收；不更改既有产品合同、不自动创建 worktree。
 - 官方状态：developer preview，明确允许破坏性变更；因此 V1 必须固定版本，不自动跟随 `master`。
 - 当前已完成锁定官方源码、官方 Web 基线、FDE 品牌、项目优先导航、结构化项目创建、项目资料持久化/稳定身份/本地识别/双入口预览、六阶段提示、完整独立项目进度与只读项目详情、API 文档、系统架构、用量分析、评估优化页面和浏览器本地界面主题；正在增加由当前 Agent 驱动的项目运行、持久终端和内嵌预览；FDE 行为继续以独立 Host/Client Plugins 和最小下游 UI 适配实现。
 
@@ -23,7 +24,7 @@ product_spec: docs/specs/product-spec.md
 
 ### 独立业务挖掘实验室（F024）
 
-实验室以 `packages/fde/discovery-lab` Host 插件和 `packages/client/ui-fde-discovery-lab` Client 插件接入当前 `0.1.6-alpha.1` 基座，不维护自定义 Agent Loop。Host 复用官方 Agent、Session、Tools、LLM 和持久化；仅维护实验室自己的轮次数据库和岗位会话，不注入 Workspace、FDE Stage 或项目服务。原插件 `0.3.2` 的业务代码保留来源说明，以最小修改适配当前会话事件接口和权限边界。
+实验室以 `packages/fde/discovery-lab` Host 插件和 `packages/client/ui-fde-discovery-lab` Client 插件接入当前 `0.2.1-rc.2` 基座，不维护自定义 Agent Loop。Host 复用官方 Agent、Session、Tools、LLM 和持久化；仅维护实验室自己的轮次数据库和岗位会话，不注入 Workspace、FDE Stage 或项目服务。原插件 `0.3.2` 的业务代码保留来源说明，以最小修改适配当前会话事件接口和权限边界。
 
 Client 在首页及项目中心的 `fde.workbench.module.action` 和原 `sidebar.footer.action` 增加入口，在 `shell.overlay` 挂载独立页面。模块入口槽由 `ui-fde-project` 的全屏页面声明和渲染，不传入项目数据；实验室通过 Slot 注册共享自身导航 Store，不依赖侧栏可见性，也不调用项目控制器。原像素办公室应用由当前宿主的专属路径提供，并在 iframe 中运行，隔离原应用的全局 CSS 与 React 生命周期；不是另起宿主或局域网代理。关闭页面仅改变该插件的浏览状态，不重置项目选择或阶段；返回后保留原工作台。接口采用独立 `/api/fde-discovery-lab` 命名空间，并复用工作台的 Host/Origin/Fetch-Metadata 信任校验。
 
@@ -392,9 +393,11 @@ FDE Workspace 与阶段 2/3 证据
 
 ### 8.3.2 平台与课程技能资产（F026）
 
-平台内置复用既有只读阶段目录，仅选择 requirements/index=0 的七个已确认 ID，组织为 SKILL.md、README.md、LICENSE 与 NOTICE.md。课程原版由 ui-fde-project 的 course-skills 原文 JSON 快照提供，记录真实相对路径、UTF-8 内容、逐文件哈希及课次；项目内只有这一份收录内容，不追加平台文件或新许可证，不在运行时扫描 SSD、用户 Skill 目录或客户 Workspace。浏览器阅读与 fflate ZIP 编码共用文件字符串。来源与 Skill ID 组成界面身份，课程原版未进入 Host Skill 注册或 Agent 路由。
+七个中文平台 Skill 的唯一维护源位于 fde/stage/skills。platform-skills 模块复用原生 FileSystemSkillProvider，按需返回当前完整正文与准确 resourceBase，只扫描固定目录和七个 ID，保留原 rank 250。七个旧内存正文不再注册，其他阶段未迁移。发布文件包含 skills/**/*，源码运行和打包运行均从包目录加载。
 
-目录树由真实文件路径生成，包内相对链接基于当前文件目录解析并限制在包内已知文件。共享安全 MarkdownText 的可选 fileLinks 仅给已确认本地文件提供打开回调，外部及危险协议仍受原规则限制；不配置该入口的调用者和流式输出保持原行为。原七个适配版及所有项目执行流程不变。装饰纹理位于 Web public/fde-skills，来源颜色由 ui-theme 的页面和 body 弹窗作用域别名提供，不改变平台侧栏。
+课程原版继续由 course-skills 原文 JSON 快照提供，保留六个原始文件、路径、哈希及课次，不追加平台文件或新许可证，不在运行时扫描 SSD、用户 Skill 目录或客户 Workspace。来源与 Skill ID 组成界面身份，课程原版未进入 Host Skill 注册或 Agent 路由。
+
+目录接口从同一文件源刷新名称、描述、正文和下载文件及哈希，补齐必要共享引用和许可；前端不维护平台正文副本。平台 ZIP 使用既有 Skill 路径，不增加第二层同名根目录。阅读弹窗只呈现名称、正文及必要动作，不展示树、原始路径、来源面板或元数据块；正文引用可打开真实文件并返回，阶段方法的完整定义也复用这一文件引用解析。焦点、放大与关闭恢复保持；不自动运行模型或修改客户项目，原阶段、证据和人工决定规则不变。
 
 ### 8.4 工作台界面主题
 

@@ -134,7 +134,7 @@ export function EvaluationStagePanel({
         {!historical && <div className={`${css.actions} ${css.runtimeActions}`} data-evaluation-runtime-actions="">
           {runtime && <button type="button" className={css.primary} disabled={busy || transitioning} onClick={() => { runtimeAction(runtime.status === 'running' || (runtime.status === 'blocked' && runtime.action === 'stop') ? 'stopProject' : 'startProject') }}><EvaluationIcon kind="play" />{transitioning ? RUNTIME_LABELS[runtime.status] : runtime.status === 'running' ? '停止项目' : runtime.status === 'blocked' && runtime.action === 'stop' ? '重试停止' : '启动项目'}</button>}
           <button type="button" disabled={busy || !runtime?.previewUrl} onClick={() => { runtimeAction('openProjectPreview') }}><EvaluationIcon kind="terminal" />预览项目</button>
-          <button type="button" disabled={busy || !runtime?.terminalTitle} onClick={() => { runtimeAction('showProjectTerminal') }}><EvaluationIcon kind="terminal" />查看终端</button>
+          <button type="button" disabled={busy || !runtime?.terminalTitle} onClick={() => { runtimeAction('showProjectTerminal') }}><EvaluationIcon kind="terminal" />{props.t('runtime.terminal')}</button>
           <button type="button" disabled={busy} onClick={() => { void perform(() => props.openProjectCapability(workspace.workspaceId, 'fde-architecture')) }}><EvaluationIcon kind="architecture" />系统架构</button>
         </div>}
       </section>

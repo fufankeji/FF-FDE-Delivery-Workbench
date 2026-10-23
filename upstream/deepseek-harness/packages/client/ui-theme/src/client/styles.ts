@@ -3,6 +3,8 @@ import base from '../styles/base.css?inline'
 import cornerShape from '../styles/corner-shape.css?inline'
 import designPlatform from '../styles/design-platform.css?inline'
 import fdeEvaluation from '../styles/fde-evaluation.css?inline'
+import focus from '../styles/focus.css?inline'
+import onboarding from '../styles/onboarding.css?inline'
 import scrollbar from '../styles/scrollbar.css?inline'
 import gradientShadowText from '../styles/gradient-shadow-text.css?inline'
 import shiki from '../styles/shiki.css?inline'
@@ -14,6 +16,8 @@ const STYLES = [
   ['corner-shape.css', cornerShape],
   ['design-platform.css', designPlatform],
   ['fde-evaluation.css', fdeEvaluation],
+  ['focus.css', focus],
+  ['onboarding.css', onboarding],
   ['scrollbar.css', scrollbar],
   ['gradient-shadow-text.css', gradientShadowText],
   ['shiki.css', shiki],

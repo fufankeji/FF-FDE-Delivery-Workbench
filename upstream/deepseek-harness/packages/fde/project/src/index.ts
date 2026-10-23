@@ -6,6 +6,7 @@ import { createWebRequestTrust } from '@deepseek-ai/dsh-client-connection'
 import type {} from '@deepseek-ai/dsh-host-webserver'
 import { WorkspaceId } from '@deepseek-ai/dsh-workspace'
 import { registerProjectArchitectureTools } from './architecture-tools.ts'
+import { registerProjectRuntimeOutput } from './runtime-output.ts'
 import { registerProjectUsage } from './usage.ts'
 import { registerProjectEvaluationGuard } from './evaluation-guard.ts'
 import { registerEvaluationWorkbenchTools } from './evaluation-workbench-tools.ts'
@@ -193,10 +194,11 @@ export const FDE_PROJECT_RUNTIME_STOP_PATH = '/api/fde-project/runtime/stop'
 /** Settle an operation whose visible Agent prompt could not be queued. */
 export const FDE_PROJECT_RUNTIME_ABANDON_PATH = '/api/fde-project/runtime/abandon'
 export const name = 'fde-project'
-export const inject = ['tools', 'webServer', 'workspaceRegistry']
+export const inject = ['connection', 'tools', 'webServer', 'workspaceRegistry']
 
 /** Bounded OpenAPI parsing and request limits enforced by dsh-openapi. */
 export interface Config extends ProjectOpenApiPolicy {
+  /** Maximum bytes returned by a fixed project artifact preview. */
   readonly artifactPreviewMaxBytes: number
 }
 
@@ -216,7 +218,9 @@ function positiveInteger(label: string, value: number, minimum: number): void {
 
 /** Register one trusted read-only endpoint for project API, architecture, and eval artifacts. */
 export function apply(ctx: Context, config: Config): void {
-  const trusted = createWebRequestTrust(ctx.webServer)
+  const trusted = createWebRequestTrust(ctx.connection)
+  const platformPort = ctx.webServer.port
+  if (platformPort === undefined) throw new Error('FDE 项目预览需要 TCP 工作台监听端口；请使用 --host 与 --port 启动。')
   positiveInteger('timeoutMs', config.timeoutMs, 1)
   positiveInteger('maxSpecBytes', config.maxSpecBytes, 1_024)
   positiveInteger('maxResponseBytes', config.maxResponseBytes, 1_024)
@@ -227,6 +231,7 @@ export function apply(ctx: Context, config: Config): void {
   registerProjectArchitectureTools(ctx)
   registerProjectUsage(ctx)
   registerProjectRuntimeTools(ctx)
+  registerProjectRuntimeOutput(ctx)
   registerProjectEvaluationGuard(ctx)
   registerEvaluationWorkbenchTools(ctx)
   const reportFailure = (error: unknown): void => { ctx.logger.warn(error instanceof Error ? error : new Error(String(error))) }
@@ -245,7 +250,7 @@ export function apply(ctx: Context, config: Config): void {
     }),
   }), 'fde-project: project metadata')
   const previews = new ProjectPreviewGateway({
-    platformPort: ctx.webServer.port,
+    platformPort,
     timeoutMs: config.timeoutMs,
     target: async workspaceId => {
       const workspace = ctx.workspaceRegistry.get(WorkspaceId(workspaceId))

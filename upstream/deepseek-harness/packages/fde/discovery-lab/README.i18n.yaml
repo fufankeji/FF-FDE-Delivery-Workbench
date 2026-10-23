@@ -1,6 +1,19 @@
-# Bilingual-pair consistency record (docs/i18n/README.md): the git blob hash of each
-# side as of the last confirmed-consistent state. Both languages carry equal authority;
-# after editing either side, bring the other along and re-record with:
+# Bilingual-pair consistency record for README.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write packages/fde/discovery-lab/README.md
-README.md: 810d7efb417bbbaf69e2457477b5d05a29d0ba96
-README.zh.md: d2d70a49a5b8202377574dac2484a531f443c933
+/deepseek-ai-dsh-fde-discovery-lab:
+  en: 6aadc09dfa30790e
+  zh: d0b3c8ec4fed7b64
+/deepseek-ai-dsh-fde-discovery-lab/setup-and-storage:
+  en: de4840eb369d89dc
+  zh: ce372adcbf19aa58
+/deepseek-ai-dsh-fde-discovery-lab/model-experience:
+  en: 017bf7c409e99db2
+  zh: 2870e443498d001c
+/deepseek-ai-dsh-fde-discovery-lab/model-experience/kv-cache-effect:
+  en: d338fb15e1257fd3
+  zh: f85ab3037b8f22a3
+/deepseek-ai-dsh-fde-discovery-lab/known-limitations-and-deferred-work:
+  en: 9972477bdb375531
+  zh: 439e88214248dac1

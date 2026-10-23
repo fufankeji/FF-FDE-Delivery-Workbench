@@ -1,0 +1,205 @@
+{
+  "project": "FF - FDE 交付工作台",
+  "routes": [
+    {
+      "path": "/",
+      "title": "工作台",
+      "purpose": "同一 SPA 中通过项目、阶段与 Tab 导航"
+    },
+    {
+      "path": "http://127.0.0.1:4177/",
+      "title": "门店维修工作台",
+      "purpose": "独立业务应用中的本地闭环"
+    }
+  ],
+  "features": [
+    {
+      "key": "feat-01",
+      "title": "平台进入与项目选择",
+      "core": true,
+      "recordability": "ready",
+      "visibleResult": "平台进入与项目选择的真实界面与已有记录",
+      "entry": {
+        "clickPath": [
+          "button:has-text(\"进入平台\")",
+          "button:text-is(\"项目中心\")",
+          "button:text-is(\"查看对话\")"
+        ]
+      }
+    },
+    {
+      "key": "feat-02",
+      "title": "需求发现与历史对话",
+      "core": true,
+      "recordability": "ready",
+      "visibleResult": "需求发现与历史对话的真实界面与已有记录",
+      "entry": {
+        "clickPath": [
+          "button:has-text(\"进入平台\")",
+          "button:text-is(\"项目中心\")",
+          "button:text-is(\"查看对话\")"
+        ]
+      }
+    },
+    {
+      "key": "feat-03",
+      "title": "业务结果与责任",
+      "core": true,
+      "recordability": "ready",
+      "visibleResult": "业务结果与责任的真实界面与已有记录",
+      "entry": {
+        "clickPath": [
+          "button:has-text(\"进入平台\")",
+          "button:text-is(\"项目中心\")",
+          "button:text-is(\"查看对话\")"
+        ]
+      }
+    },
+    {
+      "key": "feat-04",
+      "title": "系统数据与权限调查",
+      "core": true,
+      "recordability": "ready",
+      "visibleResult": "系统数据与权限调查的真实界面与已有记录",
+      "entry": {
+        "clickPath": [
+          "button:has-text(\"进入平台\")",
+          "button:text-is(\"项目中心\")",
+          "button:text-is(\"查看对话\")"
+        ]
+      }
+    },
+    {
+      "key": "feat-05",
+      "title": "方案图谱与纵向切片",
+      "core": true,
+      "recordability": "ready",
+      "visibleResult": "方案图谱与纵向切片的真实界面与已有记录",
+      "entry": {
+        "clickPath": [
+          "button:has-text(\"进入平台\")",
+          "button:text-is(\"项目中心\")",
+          "button:text-is(\"查看对话\")"
+        ]
+      }
+    },
+    {
+      "key": "feat-06",
+      "title": "报修分析与证据",
+      "core": true,
+      "recordability": "ready",
+      "visibleResult": "报修分析与证据的真实界面与已有记录",
+      "entry": {
+        "clickPath": [
+          "[data-action=\"select\"][data-id=\"R-1002\"]",
+          "[data-action=\"analyze\"]",
+          "[data-action=\"confirm\"]"
+        ]
+      }
+    },
+    {
+      "key": "feat-07",
+      "title": "人工确认与本地草稿",
+      "core": true,
+      "recordability": "ready",
+      "visibleResult": "人工确认与本地草稿的真实界面与已有记录",
+      "entry": {
+        "clickPath": [
+          "[data-action=\"select\"][data-id=\"R-1002\"]",
+          "[data-action=\"analyze\"]",
+          "[data-action=\"confirm\"]"
+        ]
+      }
+    },
+    {
+      "key": "feat-08",
+      "title": "PoC 与 Eval 记录",
+      "core": true,
+      "recordability": "mock-visible",
+      "visibleResult": "PoC 与 Eval 记录的真实界面与已有记录",
+      "entry": {
+        "clickPath": [
+          "button:has-text(\"进入平台\")",
+          "button:text-is(\"项目中心\")",
+          "button:text-is(\"查看对话\")"
+        ]
+      }
+    },
+    {
+      "key": "feat-09",
+      "title": "Pilot 范围与恢复",
+      "core": true,
+      "recordability": "mock-visible",
+      "visibleResult": "Pilot 范围与恢复的真实界面与已有记录",
+      "entry": {
+        "clickPath": [
+          "button:has-text(\"进入平台\")",
+          "button:text-is(\"项目中心\")",
+          "button:text-is(\"查看对话\")"
+        ]
+      }
+    },
+    {
+      "key": "feat-10",
+      "title": "验收移交记录",
+      "core": true,
+      "recordability": "mock-visible",
+      "visibleResult": "验收移交记录的真实界面与已有记录",
+      "entry": {
+        "clickPath": [
+          "button:has-text(\"进入平台\")",
+          "button:text-is(\"项目中心\")",
+          "button:text-is(\"查看对话\")"
+        ]
+      }
+    },
+    {
+      "key": "feat-11",
+      "title": "持续改进记录",
+      "core": true,
+      "recordability": "mock-visible",
+      "visibleResult": "持续改进记录的真实界面与已有记录",
+      "entry": {
+        "clickPath": [
+          "button:has-text(\"进入平台\")",
+          "button:text-is(\"项目中心\")",
+          "button:text-is(\"查看对话\")"
+        ]
+      }
+    },
+    {
+      "key": "feat-12",
+      "title": "模型设置与新对话",
+      "core": false,
+      "recordability": "ready",
+      "visibleResult": "模型设置与新对话的真实界面与已有记录",
+      "entry": {
+        "clickPath": [
+          "button:has-text(\"进入平台\")",
+          "button:text-is(\"项目中心\")",
+          "button:text-is(\"查看对话\")"
+        ]
+      }
+    },
+    {
+      "key": "feat-13",
+      "title": "独立实验室与技能中心",
+      "core": false,
+      "recordability": "ready",
+      "visibleResult": "独立实验室与技能中心的真实界面与已有记录",
+      "entry": {
+        "clickPath": [
+          "button:has-text(\"进入平台\")",
+          "button:text-is(\"项目中心\")",
+          "button:text-is(\"查看对话\")"
+        ]
+      }
+    }
+  ],
+  "sources": [
+    "project Session 6dc88e20，31 轮历史对话",
+    "项目 .fde/stages 和 fde-deliverables",
+    "项目 backend/server.mjs 与 frontend/app.js"
+  ],
+  "risk": "后续阶段部分证据过期及人工联调输入如实呈现，不修改为通过。"
+}

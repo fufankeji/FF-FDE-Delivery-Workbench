@@ -7,6 +7,7 @@ import type { Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import { clientBuildEnvironmentDefines } from '../../scripts/client-build-environment.ts'
 import { productWebBundleIsolation } from './product-isolation.ts'
+import { katexWoff2Fonts } from './katex-fonts.ts'
 
 const src = (rel: string): string => fileURLToPath(new URL(rel, import.meta.url))
 const require = createRequire(import.meta.url)
@@ -14,7 +15,7 @@ const PPTX_WORKER_SOURCE = require.resolve('@file-viewer/pptx/worker/pptx.worker
 const PPTX_WORKER_TARGET = 'vendor/pptx/pptx.worker.js'
 const STANDALONE_ERROR = 'apps/web is not a standalone application: bare Vite cannot inject window.__DSH_BOOT__. '
   + 'From a repository checkout, run `pnpm dsh web`; an installed package uses `dsh web`. '
-  + 'For client-plugin HMR, run `pnpm dsh web` together with `pnpm run dev:web`.'
+  + 'For client-plugin HMR, run `pnpm run dev:web`, which starts `dsh web` and the rebuild watchers together.'
 const DEFAULT_CLIENT_TITLE = 'FF - FDE 交付工作台'
 
 /** Escape build-time text before placing it in the HTML title element. */
@@ -43,6 +44,20 @@ function fileViewerPptxWorker(): Plugin {
       const target = resolve(src('.'), options.dir, PPTX_WORKER_TARGET)
       await mkdir(dirname(target), { recursive: true })
       await copyFile(PPTX_WORKER_SOURCE, target)
+    },
+  }
+}
+
+/** Keep the redistribution license beside the bundled brand font. */
+function brandFontLicense(): Plugin {
+  return {
+    name: 'dsh-brand-font-license',
+    async generateBundle() {
+      this.emitFile({
+        type: 'asset',
+        fileName: 'assets/fonts/Montserrat-OFL.txt',
+        source: await readFile(src('../../packages/client/ui-theme/src/styles/Montserrat-OFL.txt')),
+      })
     },
   }
 }
@@ -153,7 +168,7 @@ const BOOT_GRAMMAR_FILES: readonly string[] = [
   'dist/json.mjs',
 ]
 
-/** Font asset extensions routed to assets/fonts/ (KaTeX's woff2/woff/ttf faces). */
+/** Font asset extensions routed to assets/fonts/. */
 const FONT_EXTENSIONS: readonly string[] = ['.woff2', '.woff', '.ttf']
 
 /**
@@ -174,7 +189,7 @@ export default defineConfig({
   // directory, and the served index resolves identically from the site root.
   base: './',
   plugins: [
-    rejectStandaloneServe(), clientDocumentTitle(), fileViewerPptxWorker(), react(), emitPreviewPage(),
+    rejectStandaloneServe(), clientDocumentTitle(), brandFontLicense(), katexWoff2Fonts(), fileViewerPptxWorker(), react(), emitPreviewPage(),
     productWebBundleIsolation(src('../..'), src('.')),
   ],
   build: {

@@ -1,7 +1,6 @@
-/** Read-only platform adaptations and explicitly supplied original course packages. */
+/** Canonical platform files from the Host and explicitly supplied course packages. */
 import { strToU8, zipSync } from 'fflate/browser'
 import type { StageSkillCatalogMethod, StageSkillCatalogValue } from './stage-skill-catalog.ts'
-import { ENGINEERING_LICENSE, METHOD_LICENSE, METHOD_NOTICE } from './skills-center-licenses.ts'
 import diagnosis from './course-skills/fde-business-diagnosis.json'
 
 /** Approved display order; other runtime stages remain outside this library. */
@@ -10,10 +9,12 @@ export const STAGE_ONE_SKILL_IDS = [
   'repo-recon', 'stakeholder-brief', 'reframe-ai-engagement',
 ] as const
 
-/** An actual UTF-8 file included in both the reader and the downloaded archive. */
+/** Original file bytes shared by the reader and downloaded archive. */
 export interface SkillFile {
   readonly path: string
   readonly content: string
+  readonly encoding?: string
+  readonly mediaType?: string
 }
 
 /** Content shared by the reader and archive for either source category. */
@@ -22,10 +23,11 @@ interface LibrarySkillContent {
   readonly label: string
   readonly description: string
   readonly whenToUse: string
+  readonly entryPath: string
   readonly files: readonly SkillFile[]
 }
 
-/** A registered method adapted to the workbench's stage-one workflow. */
+/** A standard platform package shared with the native Agent file loader. */
 export interface PlatformSkill extends LibrarySkillContent {
   readonly source: 'platform'
   readonly id: typeof STAGE_ONE_SKILL_IDS[number]
@@ -44,34 +46,13 @@ export interface CourseSkill extends LibrarySkillContent {
 export type LibrarySkill = PlatformSkill | CourseSkill
 
 /** Explicitly approved original packages; no runtime filesystem scan or Skill installation. */
-export const COURSE_SKILLS: readonly CourseSkill[] = [{ ...diagnosis, source: 'course' }]
+export const COURSE_SKILLS: readonly CourseSkill[] = [{ ...diagnosis, source: 'course', entryPath: 'SKILL.md' }]
 
-function filesOf(method: StageSkillCatalogMethod): readonly SkillFile[] {
-  const [repository, commit] = method.source.split('@')
-  const isMethod = repository === 'davidahmann/fde-guide'
-  const license = isMethod ? 'Apache-2.0' : 'MIT'
-  const upstream = `https://github.com/${repository}/tree/${commit}`
-  const definition = [
-    '---', `name: ${method.id}`, `description: ${JSON.stringify(`${method.description} ${method.whenToUse}`)}`,
-    '---', '', method.content.trim(), '',
-  ].join('\n')
-  const readme = [
-    `# ${method.label}`, '', 'FF - FDE 交付工作台 · 第一阶段适配版', '',
-    '## 用途', '', method.description, '', '## 何时使用', '', method.whenToUse, '',
-    '## 包内文件', '', '- `SKILL.md`：含名称、触发说明与工作台实际注册的完整正文。',
-    '- `README.md`：用途、来源与适用边界。', '- `LICENSE`：对应上游许可证。', '- `NOTICE.md`：来源与适配声明。', '',
-    '## 来源与版本', '', `- 来源仓库：[${repository}](${upstream})`, `- 固定提交：${commit}`,
-    `- 上游许可证：${license}`, '- 本包是简体中文工作台适配内容，不是上游原文镜像。', '',
-    '## 使用边界', '',
-    '正文中的工作台目录、阶段产物、证据字段与协作 Skill 依赖原样保留。本包用于阅读和复用工作方法，未验证在其他 Agent 中直接安装或执行的兼容性；下载不等于安装。',
-    '仅在用户明确授权的资料范围内使用；候选结论不能代替客户确认、项目批准或 FDE 阶段决定。包内不包含客户资料、凭据或项目产物。', '',
-    ...(method.references?.length ? ['## 上游参考资料（外部链接，不包含在下载包内）', '', ...method.references.map(ref => `- [${ref.label}](${ref.url})`), ''] : []),
-  ].join('\n')
-  return [
-    { path: 'SKILL.md', content: definition }, { path: 'README.md', content: readme },
-    { path: 'LICENSE', content: isMethod ? METHOD_LICENSE : ENGINEERING_LICENSE },
-    { path: 'NOTICE.md', content: `# 来源与适配声明\n\n${isMethod ? METHOD_NOTICE : 'Copyright (c) 2026 Rajesh Praharaj and FDE Skills contributors\n'}\n来源：${method.source}\n\n本包的中文正文与阶段产物约束由 FF - FDE 交付工作台适配；保留原来源和许可证，不宣称由上游作者认可或背书。\n` },
-  ]
+function filesOf(method: StageSkillCatalogMethod) {
+  if (method.source !== 'platform' || method.entryPath === undefined || method.files === undefined) {
+    throw new Error(`平台 Skill 文件不可用：${method.id}`)
+  }
+  return { entryPath: method.entryPath, files: method.files }
 }
 
 /**
@@ -84,16 +65,14 @@ export function stageOneLibrary(catalog: StageSkillCatalogValue): readonly Platf
   return STAGE_ONE_SKILL_IDS.map((id, index) => {
     const method = methods?.find(item => item.id === id)
     if (method === undefined) throw new Error(`第一阶段方法缺失：${id}`)
-    if (!/^(davidahmann\/fde-guide|rpraharaj\/forward-deployed-engineer)@[a-f0-9]{40}$/.test(method.source)) {
-      throw new Error(`第一阶段方法来源无法确认：${id}`)
-    }
-    return { source: 'platform', id, number: index + 1, label: method.label, description: method.description, whenToUse: method.whenToUse, files: filesOf(method) }
+    return { ...filesOf(method), source: 'platform', id, number: index + 1,
+      label: method.label, description: method.description, whenToUse: method.whenToUse }
   })
 }
 
 /**
  * Match authored names, identifiers and uses without changing the source order.
- * @param skills - Available platform adaptations and course originals.
+ * @param skills - Available platform and course originals.
  * @param query - User search text.
  * @returns Matching real packages.
  */
@@ -159,12 +138,24 @@ export function resolveSkillFile(files: readonly SkillFile[], currentPath: strin
 }
 
 /**
- * Encode the exact displayed UTF-8 files under one named Skill directory.
+ * Encode every original byte under one named Skill directory, preserving source paths.
  * @param skill - Selected library package.
  * @returns A ZIP with a stable file list, without project or filesystem access.
  */
 export function skillArchive(skill: LibrarySkill): Uint8Array {
-  return zipSync(Object.fromEntries(skill.files.map(file => [`${skill.id}/${file.path}`, strToU8(file.content)])), { level: 6 })
+  // fflate identifies entries with instanceof; normalize TextEncoder results from another JS realm.
+  return zipSync(Object.fromEntries(skill.files.map(file => [
+    skill.source === 'platform' ? file.path : `${skill.id}/${file.path}`, new Uint8Array(skillFileBytes(file)),
+  ])), { level: 6 })
+}
+
+/**
+ * Decode the stored original without normalizing text or binary resources.
+ * @param file - Bundled source file.
+ * @returns Original downloadable bytes.
+ */
+export function skillFileBytes(file: SkillFile): Uint8Array {
+  return file.encoding === 'base64' ? strToU8(atob(file.content), true) : strToU8(file.content)
 }
 
 /**

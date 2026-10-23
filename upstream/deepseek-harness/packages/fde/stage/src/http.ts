@@ -36,6 +36,8 @@ export interface StageSkillCatalogMethod {
   readonly whenToUse: string
   readonly source: string
   readonly content: string
+  readonly entryPath?: string
+  readonly files?: readonly { readonly path: string; readonly content: string; readonly sha256: string }[]
   readonly group?: 'required' | 'conditional'
   readonly role?: 'core' | 'conditional' | 'engineering'
   readonly answers?: readonly string[]
@@ -96,7 +98,7 @@ export interface StageSkillCatalogValue {
 /** Dependencies required by the read-only stage Skill catalog route. */
 export interface StageSkillCatalogRouteOptions {
   trusted: (request: IncomingMessage) => boolean
-  catalog: StageSkillCatalogValue
+  catalog: () => StageSkillCatalogValue | Promise<StageSkillCatalogValue>
   reportFailure?: (error: unknown) => void
 }
 
@@ -312,7 +314,7 @@ export function createStageSkillCatalogRoute(
         request.resume()
         throw new FdeStageRequestError('method-not-allowed', 405, '阶段工作方法接口只接受 GET。')
       }
-      writeJson(response, 200, { ok: true, value: options.catalog })
+      writeJson(response, 200, { ok: true, value: await options.catalog() })
     } catch (error) {
       if (error instanceof FdeStageRequestError) {
         writeJson(response, error.status, { ok: false, error: { code: error.code, message: error.message } })

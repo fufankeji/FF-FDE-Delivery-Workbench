@@ -1,6 +1,61 @@
-# Bilingual-pair consistency record (docs/i18n/README.md): the git blob hash of each
-# side as of the last confirmed-consistent state. Both languages carry equal authority;
-# after editing either side, bring the other along and re-record with:
+# Bilingual-pair consistency record for README.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write packages/fde/project/README.md
-README.md: 99ef5a0690f6cdece8240b20bc6f4352248020a2
-README.zh.md: 9afe57a06c2f5ba180435dfe632a512c3ea3c1d7
+/deepseek-ai-dsh-fde-project:
+  en: a7c19161a70f0e2d
+  zh: 2dba195abb889ece
+/deepseek-ai-dsh-fde-project/project-metadata:
+  en: 5552c5ba6c675ef2
+  zh: dbbbaa5ca49b7f82
+/deepseek-ai-dsh-fde-project/project-development-docs:
+  en: ea8d4af4056e2388
+  zh: 39ab69e6fcf44601
+/deepseek-ai-dsh-fde-project/project-runtime:
+  en: 0b0a206a351aa4df
+  zh: 11e0aba70130f73e
+/deepseek-ai-dsh-fde-project/validation-contract:
+  en: b849831a1537e64e
+  zh: a8c0ac86431e2104
+/deepseek-ai-dsh-fde-project/delivery-close-out-contracts:
+  en: b7119295e52fb2cb
+  zh: c2faa1bf4219d042
+/deepseek-ai-dsh-fde-project/v2-delivery-workbenches:
+  en: c20c9c0109abcf9b
+  zh: 8ec5a58ea21e4dfd
+/deepseek-ai-dsh-fde-project/record-integrity-and-review-limits:
+  en: 9f34818a38ac22fe
+  zh: 75aeb5379c812d29
+/deepseek-ai-dsh-fde-project/model-experience:
+  en: 215e7ba838619b7b
+  zh: a311da3843709f90
+/deepseek-ai-dsh-fde-project/model-experience/v2-stage-five-evidence-reader:
+  en: f321b69651380db7
+  zh: 4358dc866c756f9d
+/deepseek-ai-dsh-fde-project/model-experience/project-openapi-and-architecture-tools:
+  en: 0335766306277a9c
+  zh: 876d50b68bc142ab
+/deepseek-ai-dsh-fde-project/model-experience/project-openapi-and-architecture-tools/what-the-model-sees:
+  en: 9233e966792cc6b2
+  zh: 3f606850a3ab6035
+/deepseek-ai-dsh-fde-project/model-experience/project-openapi-and-architecture-tools/token-effect:
+  en: 487be23cc0cabbaa
+  zh: fafdc58daa9011b4
+/deepseek-ai-dsh-fde-project/model-experience/project-openapi-and-architecture-tools/kv-cache-effect:
+  en: ffde5194693289e0
+  zh: da76c5f73bf488bf
+/deepseek-ai-dsh-fde-project/model-experience/project-runtime-report-tool:
+  en: bc87e16da1cd4287
+  zh: e3ec5262662ba8f4
+/deepseek-ai-dsh-fde-project/model-experience/project-runtime-report-tool/what-the-model-sees:
+  en: 7bce412c75598132
+  zh: 07142cc0739432a2
+/deepseek-ai-dsh-fde-project/model-experience/project-runtime-report-tool/token-effect:
+  en: 9ccf78b1d1f47187
+  zh: 6e57f94b0f6b3ac5
+/deepseek-ai-dsh-fde-project/model-experience/project-runtime-report-tool/kv-cache-effect:
+  en: 2a02dd90573830c9
+  zh: 883eed7992d63fa3
+/deepseek-ai-dsh-fde-project/known-limitations-and-deferred-work:
+  en: bcf491dfea4c9a17
+  zh: 3df37a2b9ea4002d

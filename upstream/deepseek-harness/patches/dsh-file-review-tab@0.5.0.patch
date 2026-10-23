@@ -1,0 +1,184 @@
+diff --git a/lib/client.js b/lib/client.js
+--- a/lib/client.js
++++ b/lib/client.js
+@@ -4031,19 +4031,19 @@
+ 		})) });
+ 		const agentCodec = {
+ 			mode: "strict",
+ 			typeSymbol: "@deepseek-ai/dsh-session/types#SessionId",
+-			schema: intersection(string(), unknown())
++			create: () => intersection(string(), unknown())
+ 		};
+ 		const requestCodec = {
+ 			mode: "strict",
+ 			typeSymbol: `${PACKAGE_NAME}#FileReviewRequest`,
+-			schema: requestSchema
++			create: () => requestSchema
+ 		};
+ 		const resultCodec = {
+ 			mode: "strict",
+ 			typeSymbol: `${PACKAGE_NAME}#FileReviewResult`,
+-			schema: resultSchema
++			create: () => resultSchema
+ 		};
+ 		const recordedMutationSchema = object({
+ 			rootCallId: string(),
+ 			name: string(),
+@@ -4055,14 +4055,14 @@
+ 		const recordedResultSchema = object({ mutations: array(recordedMutationSchema) });
+ 		const recordedRequestCodec = {
+ 			mode: "strict",
+ 			typeSymbol: `${PACKAGE_NAME}#RecordedRequest`,
+-			schema: recordedRequestSchema
++			create: () => recordedRequestSchema
+ 		};
+ 		const recordedResultCodec = {
+ 			mode: "strict",
+ 			typeSymbol: `${PACKAGE_NAME}#RecordedResult`,
+-			schema: recordedResultSchema
++			create: () => recordedResultSchema
+ 		};
+ 		function descriptor(method) {
+ 			return {
+ 				id: `${PACKAGE_NAME}#fileReview/${method}`,
+@@ -6496,9 +6496,9 @@
+ 			const content = message.content;
+ 			const first = Array.isArray(content) ? content[0] : void 0;
+ 			return typeof callId === "string" ? {
+ 				callId,
+-				isError: first?.isError === true,
++				isError: message.isError === true || first?.isError === true,
+ 				meta: record.meta
+ 			} : null;
+ 		}
+ 		/**
+@@ -6875,8 +6875,12 @@
+ 				})]
+ 			});
+ 		}
+ 		/** Render one turn's produced files as a summary card opening the sidebar tab. */
++		function ProducedFilesEntry(props) {
++			const matched = selectProducedFiles(props);
++			return matched === null ? null : (0, react_jsx_runtime.jsx)(ProducedFiles, { ...props, matched });
++		}
+ 		function ProducedFiles({ matched: reviews, openFile, turn: turnLocation, inspectChanges = unavailableChanges, applyChanges = unavailableChanges, openInSidebarTab, t }) {
+ 			const turnNumber = turnLocation.turn;
+ 			const [toggleAction, setToggleAction] = (0, react.useState)("undo");
+ 			const [statusPending, setStatusPending] = (0, react.useState)(true);
+@@ -7268,10 +7272,10 @@
+ 			}, "file-review-tab: typert remote");
+ 			ctx.effect(() => ctx.uiConversation.events.register(deliverablesDefinition), "file-review-tab: deliverables definition");
+ 			ctx.effect(() => ctx.slots.inject("conversation.chat.turnTail", () => ctx.slots.register({
+ 				name: "conversation.chat.turnTail",
+-				select: selectProducedFiles,
+-				priority: -2,
++				id: "dsh-file-review-tab",
++				order: -2,
+ 				locale: NS,
+ 				registrant: "dsh-file-review-tab",
+ 				inject: (sessionId) => {
+ 					const sessions = ctx.sessions;
+@@ -7300,9 +7304,9 @@
+ 							sidebar.openTab({ type: "file-review" }, scope);
+ 						}
+ 					};
+ 				}
+-			}, ProducedFiles)), "file-review-tab: turn-tail row");
++			}, ProducedFilesEntry)), "file-review-tab: turn-tail row");
+ 			ctx.effect(() => {
+ 				const tChat = ctx.locale.bind(NS);
+ 				return ctx.provide("chatFileMentions", { forClosing(owner, _sessionId) {
+ 					const reviews = selectProducedFiles(owner);
+diff --git a/lib/typert-descriptors.js b/lib/typert-descriptors.js
+--- a/lib/typert-descriptors.js
++++ b/lib/typert-descriptors.js
+@@ -30,19 +30,19 @@
+ })) });
+ const agentCodec = {
+ 	mode: "strict",
+ 	typeSymbol: "@deepseek-ai/dsh-session/types#SessionId",
+-	schema: z.intersection(z.string(), z.unknown())
++	create: () => z.intersection(z.string(), z.unknown())
+ };
+ const requestCodec = {
+ 	mode: "strict",
+ 	typeSymbol: `${PACKAGE_NAME}#FileReviewRequest`,
+-	schema: requestSchema
++	create: () => requestSchema
+ };
+ const resultCodec = {
+ 	mode: "strict",
+ 	typeSymbol: `${PACKAGE_NAME}#FileReviewResult`,
+-	schema: resultSchema
++	create: () => resultSchema
+ };
+ const recordedMutationSchema = z.object({
+ 	rootCallId: z.string(),
+ 	name: z.string(),
+@@ -54,14 +54,14 @@
+ const recordedResultSchema = z.object({ mutations: z.array(recordedMutationSchema) });
+ const recordedRequestCodec = {
+ 	mode: "strict",
+ 	typeSymbol: `${PACKAGE_NAME}#RecordedRequest`,
+-	schema: recordedRequestSchema
++	create: () => recordedRequestSchema
+ };
+ const recordedResultCodec = {
+ 	mode: "strict",
+ 	typeSymbol: `${PACKAGE_NAME}#RecordedResult`,
+-	schema: recordedResultSchema
++	create: () => recordedResultSchema
+ };
+ function descriptor(method) {
+ 	return {
+ 		id: `${PACKAGE_NAME}#fileReview/${method}`,
+diff --git a/package.json b/package.json
+--- a/package.json
++++ b/package.json
+@@ -79,22 +79,22 @@
+     "zod": "^4.4.3"
+   },
+   "peerDependencies": {
+     "@deepseek-ai/cordis": "^4.0.2",
+-    "@deepseek-ai/dsh-agent": "^0.1.5-rc.1",
+-    "@deepseek-ai/dsh-api-remotes": "^0.1.5-rc.1",
+-    "@deepseek-ai/dsh-api-session-controller": "^0.1.5-rc.1",
+-    "@deepseek-ai/dsh-atomic-write": "^0.1.5-rc.1",
+-    "@deepseek-ai/dsh-client-locale": "^0.1.5-rc.1",
+-    "@deepseek-ai/dsh-client-ui-chat": "^0.1.5-rc.1",
+-    "@deepseek-ai/dsh-client-ui-conversation": "^0.1.5-rc.1",
+-    "@deepseek-ai/dsh-client-ui-primitives": "^0.1.5-rc.1",
+-    "@deepseek-ai/dsh-client-ui-renderer": "^0.1.5-rc.1",
+-    "@deepseek-ai/dsh-client-ui-slots": "^0.1.5-rc.1",
+-    "@deepseek-ai/dsh-session": "^0.1.5-rc.1",
+-    "@deepseek-ai/dsh-system-prompt": "^0.1.5-rc.1",
+-    "@deepseek-ai/dsh-typert-protocol": "^0.1.5-rc.1",
+-    "@deepseek-ai/dsh-typert-registry": "^0.1.5-rc.1",
++    "@deepseek-ai/dsh-agent": "0.2.1-rc.2",
++    "@deepseek-ai/dsh-api-remotes": "0.2.1-rc.2",
++    "@deepseek-ai/dsh-api-session-controller": "0.2.1-rc.2",
++    "@deepseek-ai/dsh-atomic-write": "0.2.1-rc.2",
++    "@deepseek-ai/dsh-client-locale": "0.2.1-rc.2",
++    "@deepseek-ai/dsh-client-ui-chat": "0.2.1-rc.2",
++    "@deepseek-ai/dsh-client-ui-conversation": "0.2.1-rc.2",
++    "@deepseek-ai/dsh-client-ui-primitives": "0.2.1-rc.2",
++    "@deepseek-ai/dsh-client-ui-renderer": "0.2.1-rc.2",
++    "@deepseek-ai/dsh-client-ui-slots": "0.2.1-rc.2",
++    "@deepseek-ai/dsh-session": "0.2.1-rc.2",
++    "@deepseek-ai/dsh-system-prompt": "0.2.1-rc.2",
++    "@deepseek-ai/dsh-typert-protocol": "0.2.1-rc.2",
++    "@deepseek-ai/dsh-typert-registry": "0.2.1-rc.2",
+     "dsh-better-sidebar": ">=0.19.1",
+     "react": "^18.2.0"
+   },
+   "peerDependenciesMeta": {
+@@ -127,6 +127,9 @@
+     "react": "^18.2.0",
+     "react-dom": "^18.2.0",
+     "tsdown": "^0.22.14",
+     "typescript": "^5.9.0"
++  },
++  "engines": {
++    "dsh": "0.2.1-rc.2"
+   }
+ }

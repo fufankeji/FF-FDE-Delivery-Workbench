@@ -3,19 +3,43 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "lib/types",
-    "types": ["node"]
+    "types": [
+      "node"
+    ]
   },
-  "include": ["src"],
+  "include": [
+    "src"
+  ],
   "references": [
-    { "path": "../../../vendor/cordis" },
-    { "path": "../../core/agent" },
-    { "path": "../../core/system-prompt" },
-    { "path": "../../client/connection/tsconfig.host.json" },
-    { "path": "../project" },
-    { "path": "../../host/webserver" },
-    { "path": "../../runtime-diagnostics/invariants" },
-    { "path": "../../skill/skill" },
-    { "path": "../../storage/storage-domain" },
-    { "path": "../../workspace/workspace" }
+    {
+      "path": "../../../vendor/cordis"
+    },
+    {
+      "path": "../../core/agent"
+    },
+    {
+      "path": "../../core/system-prompt"
+    },
+    {
+      "path": "../../client/connection/tsconfig.host.json"
+    },
+    {
+      "path": "../project"
+    },
+    {
+      "path": "../../host/webserver"
+    },
+    {
+      "path": "../../skill/skill"
+    },
+    {
+      "path": "../../skill/skill-filesystem"
+    },
+    {
+      "path": "../../storage/storage-domain"
+    },
+    {
+      "path": "../../workspace/workspace"
+    }
   ]
 }

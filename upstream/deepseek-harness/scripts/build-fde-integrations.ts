@@ -17,6 +17,21 @@ for (const file of await readdir(join(root, 'src'))) {
     if (!source.includes(old)) throw new Error('Pinned eval Session discovery no longer matches the reviewed patch')
     source = source.replace(old, '/^session(?:\\.v\\d+)?\\.jsonl(?:\\.zstd)?$/.test(entry.name)')
   }
+  if (file === 'collector.ts') {
+    // Session v4 carries one first-class tool message instead of a nested block.
+    // Keep the pinned collector's older-generation branches for existing traces.
+    for (const [signature, body] of [
+      ['export function extractToolError(data: Record<string, unknown>): string | null {',
+        `\n  const current = data.message as { role?: unknown; isError?: unknown } | undefined
+  if (current?.role === 'tool' && current.isError === true) return truncate(extractText(current) || 'tool returned error (isError)')\n`],
+      ['export function extractToolResultText(data: Record<string, unknown>): string {',
+        `\n  const current = data.message as { role?: unknown } | undefined
+  if (current?.role === 'tool') return extractText(current) ?? ''\n`],
+    ]) {
+      if (signature === undefined || body === undefined || !source.includes(signature)) throw new Error('Pinned eval collector no longer matches the reviewed Session v4 adapter')
+      source = source.replace(signature, signature + body)
+    }
+  }
   const output = ts.transpileModule(source, {
     fileName: file,
     compilerOptions: { target: ts.ScriptTarget.ES2023, module: ts.ModuleKind.ESNext, verbatimModuleSyntax: true },
@@ -27,4 +42,4 @@ for (const file of await readdir(join(root, 'src'))) {
   }
   await writeFile(join(root, 'lib', file.replace(/\.ts$/, '.js')), output.outputText)
 }
-console.log('FDE integrations: built dsh-eval-harness 0.4.0 with versioned Session discovery')
+console.log('FDE integrations: built dsh-eval-harness 0.4.0 with versioned Session discovery and v4 tool messages')

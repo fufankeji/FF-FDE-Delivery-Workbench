@@ -1,13 +1,12 @@
 {
-  "id": "/",
   "name": "FF - FDE 交付工作台",
   "short_name": "FF-FDE",
-  "start_url": "/",
-  "scope": "/",
+  "start_url": "./",
+  "scope": "./",
   "display": "fullscreen",
   "icons": [
     {
-      "src": "/ff-brand/ff-logo.png",
+      "src": "ff-brand/ff-logo.png",
       "sizes": "300x300",
       "type": "image/png",
       "purpose": "any"

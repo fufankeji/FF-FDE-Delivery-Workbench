@@ -11,6 +11,8 @@ export interface StageSkillCatalogMethod {
   readonly whenToUse: string
   readonly source: string
   readonly content: string
+  readonly entryPath?: string
+  readonly files?: readonly { readonly path: string; readonly content: string; readonly sha256: string }[]
   readonly group?: 'required' | 'conditional'
   readonly role?: 'core' | 'conditional' | 'engineering'
   readonly answers?: readonly string[]
@@ -148,6 +150,12 @@ function isMethod(value: unknown): value is StageSkillCatalogMethod {
     && (value.sourceLanguage === undefined || value.sourceLanguage === 'en')
     && (value.adapterLanguage === undefined || value.adapterLanguage === 'zh-CN')
     && (value.license === undefined || isNonEmptyString(value.license))
+    && (value.entryPath === undefined || isNonEmptyString(value.entryPath))
+    && (value.files === undefined || (Array.isArray(value.files) && value.files.every(file => isRecord(file)
+      && isNonEmptyString(file.path) && !file.path.includes('\\') && !file.path.includes(':')
+      && file.path.split('/').every(part => part !== '' && part !== '.' && part !== '..')
+      && typeof file.content === 'string' && typeof file.sha256 === 'string' && /^[a-f0-9]{64}$/.test(file.sha256))
+      && value.files.some(file => isRecord(file) && file.path === value.entryPath)))
 }
 
 function isStage(value: unknown): value is StageSkillCatalogStage {

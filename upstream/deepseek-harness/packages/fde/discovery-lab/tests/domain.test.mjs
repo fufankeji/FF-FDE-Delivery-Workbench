@@ -351,7 +351,7 @@ test('Recovery retains a durable asset grant when the host stopped before the fi
     {type:'turn/start',seq:1,data:{turn:'turn-1'}},
     {type:'user/message',seq:2,data:{id:'question',source:{kind:'user'},content:[{type:'text',text:'请提供资料'}]}},
     {type:'tool/call',seq:3,data:{turn:'turn-1',callId:'call-1',name:'offerCaseAsset'}},
-    {type:'tool/result',seq:4,data:{turn:'turn-1',message:{id:'tool-message',content:[{type:'tool-result',toolCallId:'call-1',content:[{type:'text',text:JSON.stringify({assetId:'a.asset',title:'a资料',version:'1'})}]}]}}},
+    {type:'tool/result',seq:4,data:{turn:'turn-1',message:{id:'tool-message',role:'tool',toolCallId:'call-1',content:[{type:'text',text:JSON.stringify({assetId:'a.asset',title:'a资料',version:'1'})}]}}},
   ]);
   await service.ensureRole(run.runId,'a');
   assert.equal(service.native.opened[0].resume,true);

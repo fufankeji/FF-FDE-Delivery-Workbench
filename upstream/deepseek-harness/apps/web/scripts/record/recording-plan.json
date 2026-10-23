@@ -1,0 +1,78 @@
+{
+  "mode": "full-project",
+  "confirmationMode": "standalone-staged",
+  "approval": {
+    "status": "approved",
+    "notes": "用户看过素版后明确要求缩短无效停顿并添加逐步操作字幕。本轮按该修改要求直接产出紧凑字幕确认版；不追加另一轮无字幕审阅，不加入未授权的放大，不视为最终验收。",
+    "visualPolicy": "no-zoom",
+    "reviewPolicy": "staged"
+  },
+  "visualPolicyStatus": "本轮仅压缩停顿并加入引导字幕；不添加放大效果",
+  "durationTargetSec": 360,
+  "rawDurationSec": 582.5,
+  "rawReview": "用户反馈首页等无效停顿太久，要求加字幕说明当前步骤和工作台功能；本轮按反馈重录字幕修改版。",
+  "guidedReview": {
+    "status": "ready-for-user-review",
+    "video": "artifacts/recordings/fde-workbench-store-triage-guided.mp4",
+    "subtitleFile": "artifacts/recordings/fde-workbench-store-triage-guided.srt",
+    "durationSec": 344.987,
+    "sizeBytes": 68695472,
+    "captionCount": 46,
+    "chapterCount": 11,
+    "verification": "三段字幕录制与合成退出 0；分析与新增草稿的状态变化断言通过；externalWrite=false。抽帧核对入口、对话、产物、试点说明、确认表单、保存回执和第五阶段拼接。修复录制字幕被原生 dialog backdrop 模糊的问题。临时业务状态与失败录制已清理，平台业务源码未修改。"
+  },
+  "format": "1920×1080，30fps；中文说明字幕，无配音",
+  "journeyMap": "scripts/record/journey-map.json",
+  "recordings": [
+    {
+      "key": "case-history",
+      "kind": "feature-overview",
+      "script": "scripts/record/scripts/01-history.json",
+      "featureKeys": [
+        "feat-01",
+        "feat-02",
+        "feat-03",
+        "feat-04",
+        "feat-05"
+      ]
+    },
+    {
+      "key": "repair-operation",
+      "kind": "journey",
+      "journeyKey": "journey-repair-to-local-draft",
+      "script": "scripts/record/scripts/02-operation.json",
+      "featureKeys": [
+        "feat-06",
+        "feat-07"
+      ],
+      "operationEvidence": {
+        "mode": "live-result",
+        "evidenceKey": "saved-local-draft",
+        "resultDescription": "录制时完成新的报修分析与人工确认，本地服务返回新增草稿",
+        "preflight": {
+          "status": "verified",
+          "notes": "已通过正常页面分析 R-1002、核对候选、提交确认，界面显示已从本地服务读回；externalWrite=false。"
+        },
+        "sideEffects": {
+          "kind": "local-disposable",
+          "notes": "原业务源码与资料只读；createApp 使用 mkdtemp 的独立 stateDir。每次重录停止服务并清理该目录，再启动空状态。"
+        },
+        "fixtureDisclosure": "业务输入为用户接受的脱敏样本，规则和既有图谱产生本轮结果；不调用模型、不执行生产派单。"
+      }
+    },
+    {
+      "key": "delivery-records",
+      "kind": "feature-overview",
+      "script": "scripts/record/scripts/03-delivery.json",
+      "featureKeys": [
+        "feat-08",
+        "feat-09",
+        "feat-10",
+        "feat-11"
+      ]
+    }
+  ],
+  "preservation": "不提交付费模型，不更改八阶段状态、真实资料或原业务运行数据；新草稿只写临时状态目录。",
+  "subtitlePolicy": "关键字幕指出操作、结果与边界；历史对话不是实时生成，示例不代表生产批准。",
+  "output": "artifacts/recordings；素材不入 Git；验收后可删除烟雾测试和 QA 帧，保留成片及源剧本。"
+}

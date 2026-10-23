@@ -8,9 +8,9 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import clsx from 'clsx'
 import {
-  HoverCard, IconAlarmClockOutline16, IconArchiveOutline20, IconBranchOutline16,
-  IconEditOutline16, IconEllipsisOutline16, IconFolderClose16, IconFolderOpen16,
-  IconPlusOutline16, IconTrashOutline16, IconTriangleRightFill14, Menu, relativeTime,
+  HoverCard, IconArchiveOutlineMedium, IconBranchOutlineMedium,
+  IconEditOutlineMedium, IconEllipsisOutlineMedium, IconFolderCloseMedium, IconFolderOpenMedium,
+  IconPlusOutlineMedium, IconTrashOutlineMedium, IconTriangleRightFillMedium, Menu, relativeTime,
   StateDot,
 } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { StateDotState } from '@deepseek-ai/dsh-client-ui-primitives'
@@ -148,8 +148,8 @@ export function ProjectRowItem({ group, onOpen, onToggle, onCreate, projectActio
   const active = group.containsCurrent
   const [menuOpen, setMenuOpen] = useState(false)
   const workspaceMenuItems = [
-    { id: 'rename', label: t('rename'), icon: <IconEditOutline16 /> },
-    { id: 'delete', label: t('delete.workspace'), icon: <IconTrashOutline16 />, danger: true },
+    { id: 'rename', label: t('rename'), icon: <IconEditOutlineMedium /> },
+    { id: 'delete', label: t('delete.workspace'), icon: <IconTrashOutlineMedium />, danger: true },
   ]
   const ownRow = (
     <div
@@ -169,7 +169,7 @@ export function ProjectRowItem({ group, onOpen, onToggle, onCreate, projectActio
       onDragEnd={drag?.end}
     >
       <span className={clsx(css.slot, css.folder, active && css.folderActive)}>
-        {row.expanded ? <IconFolderOpen16 /> : <IconFolderClose16 />}
+        {row.expanded ? <IconFolderOpenMedium /> : <IconFolderCloseMedium />}
       </span>
       <button
         type="button"
@@ -177,7 +177,7 @@ export function ProjectRowItem({ group, onOpen, onToggle, onCreate, projectActio
         aria-label={t('actions.toggleProject.aria', { name: label })}
         onClick={(event) => { event.stopPropagation(); onToggle() }}
       >
-        <IconTriangleRightFill14 className={clsx(css.arrow, row.expanded && css.arrowOpen)} />
+        <IconTriangleRightFillMedium className={clsx(css.arrow, row.expanded && css.arrowOpen)} />
       </button>
       <span className={css.projectText}>
         <span className={css.title}>{label}</span>
@@ -207,7 +207,7 @@ export function ProjectRowItem({ group, onOpen, onToggle, onCreate, projectActio
                 aria-label={t('actions.workspace.aria', { name: label })}
                 onClick={(e) => { e.stopPropagation(); setMenuOpen(v => !v) }}
               >
-                <IconEllipsisOutline16 />
+                <IconEllipsisOutlineMedium />
               </button>
             )}
           />
@@ -218,7 +218,7 @@ export function ProjectRowItem({ group, onOpen, onToggle, onCreate, projectActio
           aria-label={t('actions.newSession.aria', { name: label })}
           onClick={(e) => { e.stopPropagation(); onCreate() }}
         >
-          <IconPlusOutline16 />
+          <IconPlusOutlineMedium />
         </button>
       </span>
     </div>
@@ -309,21 +309,6 @@ function SessionStatusDots({ statuses }: { statuses: readonly [SessionStatus, ..
   )
 }
 
-/** Non-interactive active-Schedule marker; the enclosing row remains the only action. */
-function ActiveScheduleIndicator({ t, search = false }: { t: RowTranslate; search?: boolean }) {
-  const label = t('schedule.active')
-  return (
-    <span
-      className={clsx(css.scheduleIndicator, search && css.searchScheduleIndicator)}
-      role="img"
-      aria-label={label}
-      title={label}
-    >
-      <IconAlarmClockOutline16 />
-    </span>
-  )
-}
-
 /** Hover-card body: full title, relative time, and every relevant live status. */
 function SessionHoverContent({ node, now, t }: { node: SessionNode; now: number; t: RowTranslate }) {
   const statuses = sessionStatuses(node, t)
@@ -353,7 +338,8 @@ function SessionHoverContent({ node, now, t }: { node: SessionNode; now: number;
  * @param props.t - Workspace-browser translation seat.
  * @returns the result button.
  */
-export function SearchResultItem({ result, currentId, onOpen, t }: {
+export function SearchResultItem({ result, currentId, onOpen, t, renderSlot }: {
+  renderSlot?: WorkspaceBrowserProps['renderSlot']
   result: SearchResultNode
   currentId: string | undefined
   onOpen: (id: SearchResultNode['id']) => void
@@ -377,7 +363,7 @@ export function SearchResultItem({ result, currentId, onOpen, t }: {
           )}
         </span>
         <span className={css.searchResultTitle}>{result.title}</span>
-        {result.hasActiveSchedule && <ActiveScheduleIndicator t={t} search />}
+        {renderSlot?.('sidebar.session.row.leading', { sessionId: result.id })}
       </span>
       <span className={css.searchResultMeta}>
         <span className={css.searchResultWorkspace}>{result.workspace || t('group.ungrouped')}</span>
@@ -406,9 +392,10 @@ export function SearchResultItem({ result, currentId, onOpen, t }: {
  * @returns the session row.
  */
 export function SessionNodeItem({
-  node, currentId, now, onOpen, onRename, onFork, onArchive, onReveal, drag, flat = false, t,
+  node, currentId, now, onOpen, onRename, onFork, onArchive, onReveal, drag, flat = false, t, renderSlot,
 }: {
   node: SessionNode
+  renderSlot?: WorkspaceBrowserProps['renderSlot']
   currentId: string | undefined
   now: number
   onOpen: (id: SessionNode['id']) => void
@@ -444,10 +431,10 @@ export function SessionNodeItem({
   // touches the session log, so it is not styled as destructive and needs no
   // confirmation dialog.
   const sessionMenuItems = [
-    { id: 'rename', label: t('rename'), icon: <IconEditOutline16 /> },
-    { id: 'fork', label: t('menu.fork'), icon: <IconBranchOutline16 /> },
+    { id: 'rename', label: t('rename'), icon: <IconEditOutlineMedium /> },
+    { id: 'fork', label: t('menu.fork'), icon: <IconBranchOutlineMedium /> },
     // 20-native glyph in the menu's 16px icon slot (Menu.module.css .itemIcon).
-    { id: 'archive', label: t('menu.archiveSession'), icon: <IconArchiveOutline20 size={16} /> },
+    { id: 'archive', label: t('menu.archiveSession'), icon: <IconArchiveOutlineMedium size={16} /> },
   ]
   // Figma session cell: pad 8, status slot 16, then a 4px title gap.
   const ownRow = (
@@ -495,7 +482,7 @@ export function SessionNodeItem({
         </span>
       )}
       <span className={css.title}>{title}</span>
-      {row.hasActiveSchedule && <ActiveScheduleIndicator t={t} />}
+      {renderSlot?.('sidebar.session.row.leading', { sessionId: row.id })}
       {/* A blank New Session row is a provisional placeholder: nothing has
           happened in it yet, so a "now" timestamp and the row verbs
           (rename/fork/archive) would all act on content that does not
@@ -522,7 +509,7 @@ export function SessionNodeItem({
                 aria-label={t('actions.session.aria', { name: title })}
                 onClick={(e) => { e.stopPropagation(); setMenuOpen(v => !v) }}
               >
-                <IconEllipsisOutline16 />
+                <IconEllipsisOutlineMedium />
               </button>
             )}
           />

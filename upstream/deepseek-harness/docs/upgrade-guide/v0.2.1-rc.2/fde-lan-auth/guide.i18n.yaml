@@ -1,0 +1,16 @@
+# Bilingual-pair consistency record for guide.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write docs/upgrade-guide/v0.2.1-rc.2/fde-lan-auth/guide.md
+/:
+  en: a9aa939e023cd36e
+  zh: 066510cefba28170
+/fde-lan-browser-authorization:
+  en: fafce6d7da8a1364
+  zh: a31f8b8d7cb30e01
+/fde-lan-browser-authorization/change:
+  en: 451be9bbe6bc59ec
+  zh: c531a5e6d7692e36
+/fde-lan-browser-authorization/migration:
+  en: 4f65f1be66001baa
+  zh: 14f165fea1f1702a

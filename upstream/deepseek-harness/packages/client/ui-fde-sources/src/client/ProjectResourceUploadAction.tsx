@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react'
 import {
-  IconPaperclipOutline16, Toast, Tooltip,
+  IconPaperclipOutlineMedium, Toast, Tooltip,
 } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
@@ -160,7 +160,7 @@ function ProjectResourceUploadControl({ workspaceId, path, t, composer = false }
             inputRef.current?.click()
           }}
         >
-          <IconPaperclipOutline16 size={14} />
+          <IconPaperclipOutlineMedium size={14} />
           {composer && <span>{label}</span>}
         </button>
       </Tooltip>

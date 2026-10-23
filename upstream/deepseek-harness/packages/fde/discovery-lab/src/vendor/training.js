@@ -171,8 +171,9 @@ export class TrainingService {
         const text=textContent(event.data.message);if(!text)continue;
         this.store.exec('INSERT OR IGNORE INTO evidence VALUES(?,?,?,?,?,?,?,?,?,?)',uid('ev'),run.id,row.role_id,row.session_id,event.seq,event.data.message.id,null,'interview',text,now());
       }
-      if(event.type==='tool/result')for(const block of event.data.message.content??[]){
-        if(block.type!=='tool-result'||block.isError)continue;
+      if(event.type==='tool/result'){
+        const block=event.data.message;
+        if(block.isError)continue;
         const call=all.find(e=>e.type==='tool/call'&&e.data.callId===block.toolCallId&&e.data.name==='offerCaseAsset');if(!call)continue;
         let value;try{value=JSON.parse(textContent(block));}catch{continue;}
         const asset=c.assets.find(a=>a.id===value.assetId);if(!asset||!role.assetIds.includes(asset.id)||!asset.roleIds.includes(role.id))continue;

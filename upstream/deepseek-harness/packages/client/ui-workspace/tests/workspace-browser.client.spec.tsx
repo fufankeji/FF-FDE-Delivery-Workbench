@@ -37,15 +37,14 @@ const t: WorkspaceBrowserProps['t'] = makeTranslate(zh, commonZh)
 const sid = (id: string) => id as SessionId
 const wid = (id: string) => id as WorkspaceId
 const summary = (id: string, updatedAt: number, overrides: Partial<SessionSummary> = {}): SessionSummary => ({
-  id: sid(id), displayTitle: id, running: false, blank: false, updatedAt, ...overrides,
+  id: sid(id), displayTitle: id, running: false, blank: false, updatedAt, retainedBy: {}, ...overrides,
 })
-const sessionState = (items: readonly SessionSummary[], overrides: Partial<SessionListState> = {}): SessionListState => ({
+const sessionState = (items: readonly SessionSummary[], overrides: Partial<SessionListState> & { current?: SessionId | undefined } = {}): SessionListState => ({
   ids: items.map(item => item.id),
-  byId: Object.fromEntries(items.map(item => [item.id, item])),
-  current: undefined,
+  byId: Object.fromEntries(items.map(item => [item.id, { ...item, retainedBy: item.id === overrides.current ? { mainView: 1 } : item.retainedBy }])),
   phase: 'ready',
-  subagentsByParent: {}, jobsBySession: {},
-  currentAddress: undefined,
+  projectionsBySession: {},
+
   ...overrides,
 })
 const workspace = (id: string, sessionIds: string[], title = id): WorkspaceView => ({
@@ -53,7 +52,7 @@ const workspace = (id: string, sessionIds: string[], title = id): WorkspaceView 
   sessionIds: sessionIds.map(sid), createdAt: '2026-01-01T00:00:00.000Z', updatedAt: '2026-01-01T00:00:00.000Z',
 })
 const workspaceState = (items: readonly WorkspaceView[], archivedSessionIds: readonly SessionId[] = []): WorkspaceListState => ({
-  items, archivedSessionIds, state: 'idle', phase: 'ready', error: null,
+  items, archivedSessionIds, pinnedSessionIds: [], state: 'idle', phase: 'ready', error: null,
 })
 function hook<T>(snapshot: T) {
   return function select<S>(selector: (state: T) => S): S { return selector(snapshot) }
@@ -74,10 +73,16 @@ function dragData(): Pick<DataTransfer, 'effectAllowed' | 'dropEffect' | 'setDat
 function mount(overrides: Partial<WorkspaceBrowserProps> = {}) {
   const store = createWorkspaceViewStore().create()
   const props: WorkspaceBrowserProps = {
+    useRemoteAccess: () => true, useSessionAccess: () => true, useWorkspaceAccess: () => true, useSessionRetainInfo: () => undefined,
     wide: true,
     expandSidebar: vi.fn(),
-    usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([])),
+    usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([])),
     useWorkspaces: hook(workspaceState([])),
+    useWorkspaceShortcuts: (() => undefined) as never,
+    useShortcuts: hook([]),
+    requestSearch: vi.fn(), requestAddWorkspace: vi.fn(), closeAddWorkspace: vi.fn(),
+    setDirectoryBusy: vi.fn(), requestSessionRename: vi.fn(), notifyArchivedNotOpenable: vi.fn(),
+    unarchiveSession: vi.fn(async () => {}),
     useStore: bindSnapshotSelector(store),
     actions: store.actions,
     startSession: vi.fn(),
@@ -122,7 +127,7 @@ describe('WorkspaceBrowser', () => {
       return owner.open === true ? <div data-testid="directory-flow" /> : null
     }) as never
     mount({
-      usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([summary('alpha-s', 2)], { current: sid('alpha-s') })),
+      usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([summary('alpha-s', 2)], { current: sid('alpha-s') })),
       useWorkspaces: hook(workspaceState([
         workspace('alpha', ['alpha-s'], '当前项目'),
         workspace('beta', [], '其他项目'),
@@ -204,7 +209,7 @@ describe('WorkspaceBrowser', () => {
   it('renders the grouped tree by default and switches to the flat list via Group by', () => {
     const sessions = sessionState([summary('alpha-s', 2), summary('beta-s', 1)])
     const b = mount({
-      usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessions),
+      usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessions),
       useWorkspaces: hook(workspaceState([workspace('alpha', ['alpha-s']), workspace('beta', ['beta-s'])])),
     })
     expect(screen.getByText('项目')).toBeTruthy()
@@ -250,7 +255,7 @@ describe('WorkspaceBrowser', () => {
       workspace('beta', ['two']),
     ])
     const b = mount({
-      usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessions),
+      usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessions),
       useWorkspaces: hook(workspaces),
       insertSessionBefore,
     })
@@ -300,7 +305,7 @@ describe('WorkspaceBrowser', () => {
     const open = vi.fn()
     const startSession = vi.fn()
     mount({
-      usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([summary('older', 1), summary('newer', 2)])),
+      usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([summary('older', 1), summary('newer', 2)])),
       useWorkspaces: hook(workspaceState([workspace('alpha', ['older', 'newer'])])),
       open,
       startSession,
@@ -318,7 +323,7 @@ describe('WorkspaceBrowser', () => {
     const open = vi.fn()
     const startSession = vi.fn()
     mount({
-      usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([])),
+      usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([])),
       useWorkspaces: hook(workspaceState([workspace('alpha', [])])),
       open,
       startSession,
@@ -331,7 +336,7 @@ describe('WorkspaceBrowser', () => {
   it('shows five sessions by default and clears transient show-all when the Workspace collapses', () => {
     const items = Array.from({ length: 7 }, (_, index) => summary(`session-${index + 1}`, 7 - index))
     const b = mount({
-      usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState(items)),
+      usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState(items)),
       useWorkspaces: hook(workspaceState([workspace('alpha', items.map(item => item.id))])),
     })
     fireEvent.click(screen.getByText('alpha'))
@@ -355,7 +360,7 @@ describe('WorkspaceBrowser', () => {
   it('shares one editable order across modes and promotes only while Last updated is active', async () => {
     const initial = sessionState([summary('one', 3), summary('two', 2)])
     const b = mount({
-      usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(initial),
+      usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(initial),
       useWorkspaces: hook(workspaceState([workspace('alpha', ['two', 'one'])])),
     })
     fireEvent.click(screen.getByText('alpha'))
@@ -408,7 +413,7 @@ describe('WorkspaceBrowser', () => {
 
     b.view.unmount()
     const restored = mount({
-      usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(promoted),
+      usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(promoted),
       useWorkspaces: hook(workspaceState([workspace('alpha', ['two', 'one'])])),
     })
     expect(restored.store.getSnapshot().sessionOrderByAccount.alpha).toEqual(['two', 'one'])
@@ -418,7 +423,7 @@ describe('WorkspaceBrowser', () => {
   it('archives a session from the row menu and hides archived rows in both modes', async () => {
     const archiveSession = vi.fn(async () => {})
     const b = mount({
-      usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([summary('kept-s', 2), summary('gone-s', 1)])),
+      usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([summary('kept-s', 2), summary('gone-s', 1)])),
       useWorkspaces: hook(workspaceState([workspace('alpha', ['kept-s', 'gone-s'])])),
       archiveSession,
     })
@@ -442,7 +447,7 @@ describe('WorkspaceBrowser', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     try {
       mount({
-        usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([summary('alpha-s', 1)])),
+        usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([summary('alpha-s', 1)])),
         useWorkspaces: hook(workspaceState([workspace('alpha', ['alpha-s'])])),
         archiveSession,
       })
@@ -462,7 +467,7 @@ describe('WorkspaceBrowser', () => {
     const parent = summary('parent-s', 2)
     const child = { ...summary('child-s', 1), parentId: parent.id }
     mount({
-      usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([parent, child])),
+      usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([parent, child])),
       useWorkspaces: hook(workspaceState([workspace('alpha', ['parent-s', 'child-s'])])),
     })
     fireEvent.click(screen.getByText('alpha'))
@@ -475,7 +480,7 @@ describe('WorkspaceBrowser', () => {
   it('expands the target group before starting a session from its ＋', () => {
     const startSession = vi.fn()
     const b = mount({
-      usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([summary('alpha-s', 1)])),
+      usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([summary('alpha-s', 1)])),
       useWorkspaces: hook(workspaceState([workspace('alpha', ['alpha-s'])])),
       startSession,
     })
@@ -492,7 +497,7 @@ describe('WorkspaceBrowser', () => {
   it('auto-expands the Ungrouped bucket for a loose current session; its header has no menu and its ＋ is inert', () => {
     const startSession = vi.fn()
     mount({
-      usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([summary('loose', 1)], { current: sid('loose') })),
+      usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([summary('loose', 1)], { current: sid('loose') })),
       useWorkspaces: hook(workspaceState([workspace('alpha', [])])),
       startSession,
     })
@@ -506,7 +511,7 @@ describe('WorkspaceBrowser', () => {
   it('keeps an already-expanded group when the selection moves within it', () => {
     const first = sessionState([summary('a', 2), summary('b', 1)], { current: sid('a') })
     const b = mount({
-      usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(first),
+      usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(first),
       useWorkspaces: hook(workspaceState([workspace('alpha', ['a', 'b'])])),
     })
     expect(screen.getByText('a')).toBeTruthy()
@@ -526,7 +531,7 @@ describe('WorkspaceBrowser', () => {
       { current: currentBlank.id },
     )
     const b = mount({
-      usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessions),
+      usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessions),
       useWorkspaces: hook(workspaceState([
         workspace('alpha', ['alpha-blank']), workspace('beta', ['beta-blank']),
       ])),
@@ -556,7 +561,7 @@ describe('WorkspaceBrowser', () => {
     ]
     const startSession = vi.fn()
     const b = mount({
-      usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState(items)),
+      usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState(items)),
       useWorkspaces: hook(workspaceState([workspace('alpha', ['old', 'blank', 'mid'])])),
       startSession,
     })
@@ -581,7 +586,7 @@ describe('WorkspaceBrowser', () => {
   it('does not repeat blank promotion after a manual drag or the first prompt', async () => {
     const insertSessionBefore = vi.fn(async () => {})
     const b = mount({
-      usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([
+      usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([
         summary('old', 100),
         summary('blank', 150, { blank: true }),
         summary('mid', 200),
@@ -603,7 +608,7 @@ describe('WorkspaceBrowser', () => {
     expect(insertSessionBefore).toHaveBeenCalledWith(wid('alpha'), sid('blank'), undefined)
 
     rerender(b, {
-      usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([
+      usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([
         summary('old', 100),
         summary('blank', 150),
         summary('mid', 200),
@@ -622,7 +627,7 @@ describe('WorkspaceBrowser', () => {
         summary('other-row', 1, { displayTitle: 'Other row' }),
       ])
       mount({
-        usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessions),
+        usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessions),
         useWorkspaces: hook(workspaceState([workspace('alpha', ['needle-row', 'other-row'])])),
       })
       fireEvent.click(screen.getByRole('button', { name: '搜索会话' }))
@@ -679,7 +684,7 @@ describe('WorkspaceBrowser', () => {
         hasMore: true,
       }))
       mount({
-        usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([
+        usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([
           summary('body-hit', 1, { displayTitle: 'Research notes' }),
         ])),
         useWorkspaces: hook(workspaceState([
@@ -738,7 +743,7 @@ describe('WorkspaceBrowser', () => {
     try {
       const searchSessions = vi.fn(async () => { throw new Error('index unavailable') })
       mount({
-        usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([
+        usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([
           summary('local-hit', 1, { displayTitle: 'Needle title' }),
         ])),
         useWorkspaces: hook(workspaceState([workspace('alpha', ['local-hit'])])),
@@ -775,7 +780,7 @@ describe('WorkspaceBrowser', () => {
           hasMore: false,
         }))
       mount({
-        usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([
+        usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([
           summary('first-hit', 2, { displayTitle: 'Old result' }),
           summary('second-hit', 1, { displayTitle: 'Fresh result' }),
         ])),
@@ -1108,7 +1113,7 @@ describe('WorkspaceBrowser', () => {
     const insertWorkspaceBefore = vi.fn(async () => {})
     const sessions = sessionState(Array.from({ length: 5 }, (_, index) => summary(`beta-${index}`, index)))
     mount({
-      usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessions),
+      usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessions),
       useWorkspaces: hook(workspaceState([
         workspace('alpha', []),
         workspace('beta', sessions.ids),
@@ -1186,7 +1191,7 @@ describe('WorkspaceBrowser', () => {
     const insertSessionBefore = vi.fn(async () => {})
     const sessions = sessionState([summary('one', 3), summary('two', 2), summary('three', 1)])
     mount({
-      usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessions),
+      usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessions),
       useWorkspaces: hook(workspaceState([workspace('alpha', ['one', 'two', 'three'])])),
       insertSessionBefore,
     })
@@ -1221,7 +1226,7 @@ describe('WorkspaceBrowser', () => {
     const insertSessionBefore = vi.fn(async () => {})
     const sessions = sessionState([summary('one', 3), summary('two', 2), summary('three', 1)])
     const b = mount({
-      usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessions),
+      usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessions),
       useWorkspaces: hook(workspaceState([])),
       insertSessionBefore,
     })
@@ -1254,7 +1259,7 @@ describe('WorkspaceBrowser', () => {
 
     b.view.unmount()
     const restored = mount({
-      usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessions),
+      usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessions),
       useWorkspaces: hook(workspaceState([])),
       insertSessionBefore,
     })
@@ -1270,7 +1275,7 @@ describe('WorkspaceBrowser', () => {
     const insertSessionBefore = vi.fn(async () => {})
     const sessions = sessionState([summary('one', 2), summary('two', 1)])
     const b = mount({
-      usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessions),
+      usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessions),
       useWorkspaces: hook(workspaceState([workspace('alpha', ['one', 'two'])])),
       insertSessionBefore,
     })
@@ -1292,7 +1297,7 @@ describe('WorkspaceBrowser', () => {
     const insertSessionBefore = vi.fn(async () => {})
     const sessions = sessionState([summary('one', 2), summary('two', 1)])
     mount({
-      usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessions),
+      usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessions),
       useWorkspaces: hook(workspaceState([workspace('alpha', ['one', 'two'])])),
       insertSessionBefore,
     })
@@ -1318,7 +1323,7 @@ describe('WorkspaceBrowser', () => {
   it('accepts a document-level drop and commits the last Session marker on drag end', () => {
     const insertSessionBefore = vi.fn(async () => {})
     mount({
-      usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([summary('one', 2), summary('two', 1)])),
+      usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([summary('one', 2), summary('two', 1)])),
       useWorkspaces: hook(workspaceState([workspace('alpha', ['one', 'two'])])),
       insertSessionBefore,
     })
@@ -1343,7 +1348,7 @@ describe('WorkspaceBrowser', () => {
       const insertSessionBefore = vi.fn(async () => { throw new Error('stale anchor') })
       const sessions = sessionState([summary('one', 2), summary('two', 1)])
       mount({
-        usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessions),
+        usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessions),
         useWorkspaces: hook(workspaceState([workspace('alpha', ['one', 'two'])])),
         insertSessionBefore,
       })
@@ -1504,7 +1509,7 @@ describe('WorkspaceBrowser', () => {
   it('search hides drag affordances (rows are not draggable during search)', () => {
     const sessions = sessionState([summary('needle-a', 2, { displayTitle: 'Needle A' })])
     mount({
-      usePanelInfo: selector => selector({ activePanelId: null }), useSessionPendingInteraction: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessions),
+      usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessions),
       useWorkspaces: hook(workspaceState([workspace('alpha', ['needle-a'])])),
     })
     fireEvent.change(screen.getByPlaceholderText('搜索会话…'), { target: { value: 'needle' } })

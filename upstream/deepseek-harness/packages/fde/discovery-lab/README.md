@@ -30,6 +30,6 @@ Role prompts are stable within a case version. Each role has its own durable nat
 
 - One current run per case is shared by users of the same Host, matching the source delivery. No accounts, classroom isolation or concurrent-user permissions.
 - No report backflow, project creation or automatic stage advancement.
-- Explicit LAN mode remains unauthenticated and is appropriate only for a trusted network.
+- HTTP routes require Connection's authenticated owner identity and same-origin request checks. Local binding is the default; explicit LAN access uses a concrete `--host` IP and the startup authorization URL. The retired `--lan` flag cannot disable authentication.
 - Deterministic tests and scripted native integration do not establish live-model answer quality or visual acceptance.
 - Source delivery has no declared overall public redistribution license; the integration packages remain private.

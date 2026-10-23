@@ -1,0 +1,604 @@
+{
+  "baseUrl": "http://127.0.0.1:3080",
+  "authLaunchLog": "../../../../.runtime/workbench-web.log",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "speedup": 1,
+  "subtitleColors": {
+    "text": "#ffffff",
+    "stroke": "#4036a8",
+    "glow": "rgba(90,77,210,0.3)"
+  },
+  "zooms": [],
+  "name": "从验证证据到持续改进 · 紧凑字幕修改版",
+  "demonstration": {
+    "kind": "feature-overview"
+  },
+  "steps": [
+    {
+      "action": "navigate",
+      "url": "/",
+      "settleMs": 1500,
+      "subtitle": {
+        "text": "验证、交接与持续改进",
+        "position": "mc",
+        "theme": "title-card"
+      },
+      "subtitleHold": 800
+    },
+    {
+      "action": "moveTo",
+      "selector": "button:has-text(\"进入平台\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button:has-text(\"进入平台\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "waitFor",
+      "selector": "button:has-text(\"项目中心\"):not(:has-text(\"返回\"))",
+      "timeout": 25000
+    },
+    {
+      "action": "moveTo",
+      "selector": "button:has-text(\"项目中心\"):not(:has-text(\"返回\"))",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button:has-text(\"项目中心\"):not(:has-text(\"返回\"))",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "waitFor",
+      "selector": "button:has-text(\"查看对话\")",
+      "timeout": 25000
+    },
+    {
+      "action": "moveTo",
+      "selector": "button:has-text(\"查看对话\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button:has-text(\"查看对话\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "waitFor",
+      "selector": "button[role=\"tab\"]:has-text(\"对话\")",
+      "timeout": 25000
+    },
+    {
+      "action": "moveTo",
+      "selector": "[data-fde-project-context-sidebar] nav button:has-text(\"运行 PoC 与 Eval\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "[data-fde-project-context-sidebar] nav button:has-text(\"运行 PoC 与 Eval\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "moveTo",
+      "selector": "button[role=\"tab\"]:has-text(\"项目工作台\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button[role=\"tab\"]:has-text(\"项目工作台\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "waitFor",
+      "selector": "[data-stage=\"evaluation\"] h1",
+      "timeout": 25000
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-stage=\"evaluation\"] h1",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "阶段五：对照指标检查验证证据",
+        "position": "bl"
+      },
+      "hold": 3600
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-stage=\"evaluation\"] table",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "证据过期需复核，再打开验证报告",
+        "position": "tr"
+      },
+      "hold": 4200
+    },
+    {
+      "action": "moveTo",
+      "selector": "button:has-text(\"验证报告\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button:has-text(\"验证报告\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "waitFor",
+      "selector": "[data-dockkit-pane] h1",
+      "timeout": 25000
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-dockkit-pane] h1",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "验证报告：查看测试结果与适用范围",
+        "position": "bl"
+      },
+      "hold": 5000
+    },
+    {
+      "action": "scrollBy",
+      "y": 280,
+      "duration": 1000
+    },
+    {
+      "action": "wait",
+      "ms": 600
+    },
+    {
+      "action": "moveTo",
+      "selector": "button[aria-label=\"关闭\"]:visible",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button[aria-label=\"关闭\"]:visible",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "wait",
+      "ms": 500
+    },
+    {
+      "action": "moveTo",
+      "selector": "[data-fde-project-context-sidebar] nav button:has-text(\"企业集成、可靠性改造与受控 Pilot\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "[data-fde-project-context-sidebar] nav button:has-text(\"企业集成、可靠性改造与受控 Pilot\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "moveTo",
+      "selector": "button[role=\"tab\"]:has-text(\"项目工作台\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button[role=\"tab\"]:has-text(\"项目工作台\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "waitFor",
+      "selector": "[data-stage=\"pilot\"] h1",
+      "timeout": 25000
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-stage=\"pilot\"] h1",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "阶段六：核对试点授权与范围",
+        "position": "tr"
+      },
+      "hold": 3600
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-stage=\"pilot\"] h2:has-text(\"核对试点授权\")",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "联调示例：试点记录不代表生产批准",
+        "position": "bl"
+      },
+      "hold": 3600
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-stage=\"pilot\"] h2:has-text(\"查看已保存\")",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "查看试点范围、运行手册与结果",
+        "position": "tr"
+      },
+      "hold": 3600
+    },
+    {
+      "action": "moveTo",
+      "selector": "[data-fde-project-context-sidebar] nav button:has-text(\"进入生产、推动采用并验收交接\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "[data-fde-project-context-sidebar] nav button:has-text(\"进入生产、推动采用并验收交接\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "moveTo",
+      "selector": "button[role=\"tab\"]:has-text(\"项目工作台\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button[role=\"tab\"]:has-text(\"项目工作台\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "waitFor",
+      "selector": "[data-stage=\"production\"] h1",
+      "timeout": 25000
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-stage=\"production\"] h1",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "阶段七：查看验收与责任移交",
+        "position": "bl"
+      },
+      "hold": 3600
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-stage=\"production\"] h2:has-text(\"交付与验收档案\")",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "查看交付档案；示例不代表客户签收",
+        "position": "tr"
+      },
+      "hold": 3600
+    },
+    {
+      "action": "moveTo",
+      "selector": "[data-fde-project-context-sidebar] nav button:has-text(\"持续改进并沉淀可复用能力\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "[data-fde-project-context-sidebar] nav button:has-text(\"持续改进并沉淀可复用能力\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "moveTo",
+      "selector": "button[role=\"tab\"]:has-text(\"项目工作台\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button[role=\"tab\"]:has-text(\"项目工作台\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "waitFor",
+      "selector": "[data-stage=\"improvement\"] h1",
+      "timeout": 25000
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-stage=\"improvement\"] h1",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "阶段八：查看反馈与持续改进",
+        "position": "bl"
+      },
+      "hold": 3600
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-stage=\"improvement\"] table",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "核对问题、负责人，再打开改进记录",
+        "position": "tr"
+      },
+      "hold": 3600
+    },
+    {
+      "action": "moveTo",
+      "selector": "button[aria-label=\"查看改进与验证记录\"]",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button[aria-label=\"查看改进与验证记录\"]",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "waitFor",
+      "selector": "[data-dockkit-pane] h1",
+      "timeout": 25000
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-dockkit-pane] h1",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "改进记录：查看验证结论与发布边界",
+        "position": "bl"
+      },
+      "hold": 5000
+    },
+    {
+      "action": "scrollBy",
+      "y": 280,
+      "duration": 1000
+    },
+    {
+      "action": "wait",
+      "ms": 600
+    },
+    {
+      "action": "moveTo",
+      "selector": "button[aria-label=\"关闭\"]:visible",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button[aria-label=\"关闭\"]:visible",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "wait",
+      "ms": 500
+    },
+    {
+      "action": "moveTo",
+      "selector": "button[role=\"tab\"]:has-text(\"系统架构\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button[role=\"tab\"]:has-text(\"系统架构\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "waitFor",
+      "selector": "svg",
+      "timeout": 25000
+    },
+    {
+      "action": "scene",
+      "anchor": "button[role=\"tab\"]:has-text(\"系统架构\")",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "切到系统架构，查看方案整体关系",
+        "position": "tr"
+      },
+      "hold": 3600
+    },
+    {
+      "action": "moveTo",
+      "selector": "button[role=\"tab\"]:has-text(\"项目工作台\")",
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "click",
+      "selector": "button[role=\"tab\"]:has-text(\"项目工作台\")",
+      "moveMs": 80,
+      "steps": 8,
+      "preClickMs": 100
+    },
+    {
+      "action": "moveTo",
+      "x": 1120,
+      "y": 520,
+      "moveMs": 320,
+      "steps": 16
+    },
+    {
+      "action": "scene",
+      "anchor": "[data-stage=\"improvement\"] h1",
+      "framing": "top",
+      "scrollDuration": 900,
+      "settleMs": 300,
+      "subtitle": {
+        "text": "使用路径：资料、对话、产物、人工审阅",
+        "position": "bl"
+      },
+      "hold": 4200
+    }
+  ]
+}

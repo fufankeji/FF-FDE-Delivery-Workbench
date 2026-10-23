@@ -1,4 +1,5 @@
 /** Keep the retained Files tree current using the official filesystem change stream. */
+import { mainProjectSessionId } from './project-data.ts'
 import type { Context } from '@deepseek-ai/cordis'
 import type {} from '@deepseek-ai/dsh-api-remotes/client'
 import type {} from '@deepseek-ai/dsh-api-workspace-files/remote'
@@ -22,7 +23,7 @@ export function installProjectFileRefresh(ctx: Context): void {
       timer = setTimeout(() => { window.dispatchEvent(new Event('dsh-sidebar:refresh-files')) }, 300)
     }
     const switchSession = (): void => {
-      const next = scope.sessions.list.getSnapshot().current
+      const next = mainProjectSessionId(scope.sessions.list.getSnapshot())
       if (next === sessionId) return
       const previous = stop()
       closing.add(previous)
@@ -32,7 +33,7 @@ export function installProjectFileRefresh(ctx: Context): void {
       if (next === undefined) return
       const stream = scope.remote.$stream<WorkspaceFileWatchFrame>({
         name: 'FDE project files',
-        open: signal => scope.remote.workspaceFiles.changes(next, signal),
+        open: signal => scope.remote.workspaceFiles.changes(next, '.', signal),
         ended: () => new Error('Project file stream ended'),
       })
       stop = () => stream.dispose()

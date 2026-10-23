@@ -1,7 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { boot, healProfilesModuleFallback, loadOverlayPatches } from '@deepseek-ai/dsh-app-boot'
+import { boot, loadOverlayPatches } from '@deepseek-ai/dsh-app-boot'
 import type {} from '@deepseek-ai/dsh-host-webserver'
 import type {} from '@deepseek-ai/dsh-tools'
 
@@ -10,7 +10,6 @@ const overlay = process.argv[2]
 if (!overlay) throw new Error('FDE snapshot requires an overlay')
 const runtimeHome = process.env.DSH_HOME
 if (!runtimeHome) throw new Error('FDE snapshot requires an isolated DSH_HOME')
-await healProfilesModuleFallback({ installAnchor: join(repository, 'apps/cli/package.json'), home: runtimeHome })
 const rootConfig = join(runtimeHome, 'profiles', 'generality', 'cordis.yml')
 await mkdir(dirname(rootConfig), { recursive: true })
 await writeFile(rootConfig, '[]\n')

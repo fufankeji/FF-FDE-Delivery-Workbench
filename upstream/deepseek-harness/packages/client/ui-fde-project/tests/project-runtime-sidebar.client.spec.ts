@@ -1,88 +1,37 @@
-// @vitest-environment jsdom
-import { afterEach, describe, expect, it, vi } from 'vitest'
-import type { BetterSidebarService } from 'dsh-better-sidebar'
-import {
-  projectRuntimeTerminalRecoveryPrompt,
-  showProjectRuntimeTerminal,
-} from '../src/client/project-runtime-sidebar.ts'
+import { afterEach, expect, it, vi } from 'vitest'
+import { RuntimeOutputController } from '../src/client/runtime-output-controller.ts'
 
-afterEach(() => { vi.useRealTimers() })
+afterEach(() => vi.useRealTimers())
 
-interface TestTab { readonly id: string; readonly type: string; readonly title: string }
+it('shares visible readers and stops polling when the last view leaves', async () => {
+  vi.useFakeTimers()
+  const fetcher = vi.fn<typeof fetch>().mockImplementation(async () => new Response(JSON.stringify({ workspaceId: 'project', status: 'ready', text: '<script>text</script>', title: '项目运行', truncated: false, processStatus: 'running' })))
+  const output = new RuntimeOutputController(fetcher)
+  const first = output.watch('project')
+  const second = output.watch('project')
+  await vi.advanceTimersByTimeAsync(0)
+  expect(fetcher).toHaveBeenCalledTimes(1)
+  expect(output.getSnapshot().project).toMatchObject({ status: 'ready', text: '<script>text</script>' })
+  first()
+  await vi.advanceTimersByTimeAsync(1_500)
+  expect(fetcher).toHaveBeenCalledTimes(2)
+  second()
+  const signal = fetcher.mock.calls.at(-1)?.[1]?.signal
+  expect(signal?.aborted).toBe(true)
+  await vi.advanceTimersByTimeAsync(5_000)
+  expect(fetcher).toHaveBeenCalledTimes(2)
+  expect(output.getSnapshot().project).toBeUndefined()
+  output.dispose()
+})
 
-function serviceFor(initialTabs: readonly TestTab[]) {
-  let tabs = [...initialTabs]
-  const listeners = new Set<() => void>()
-  const openTab = vi.fn()
-  const activateTab = vi.fn()
-  const service = {
-    getSnapshot: () => ({
-      sessionId: 'session-1',
-      prefs: {},
-      state: {
-        bottomSplits: { kind: 'leaf', tabs },
-      },
-    }),
-    openTab,
-    activateTab,
-    subscribeState: (listener: () => void) => {
-      listeners.add(listener)
-      return () => { listeners.delete(listener) }
-    },
-  } as unknown as BetterSidebarService
-  return {
-    service,
-    openTab,
-    activateTab,
-    replaceTabs(next: readonly TestTab[]) {
-      tabs = [...next]
-      for (const listener of listeners) listener()
-    },
-  }
-}
-
-describe('project runtime terminal navigation', () => {
-  it('opens an already-visible same-title terminal before an unrelated Agent terminal', async () => {
-    const fixture = serviceFor([
-      { id: 'agent:other', type: 'terminal', title: '其他任务' },
-      { id: 'terminal:visible', type: 'terminal', title: '项目运行' },
-    ])
-
-    await expect(showProjectRuntimeTerminal(fixture.service, 'session-1', '/project/one')).resolves.toBe(true)
-    expect(fixture.activateTab).toHaveBeenCalledWith(
-      'terminal:visible',
-      { sessionId: 'session-1', cwd: '/project/one' },
-    )
-  })
-
-  it('waits for the current Session Agent terminal push before activating it', async () => {
-    const fixture = serviceFor([])
-    const shown = showProjectRuntimeTerminal(fixture.service, 'session-1', '/project/one', '项目运行', 1_000)
-    fixture.replaceTabs([{ id: 'agent:run-1', type: 'terminal', title: '项目运行' }])
-
-    await expect(shown).resolves.toBe(true)
-    expect(fixture.activateTab).toHaveBeenCalledWith(
-      'agent:run-1',
-      { sessionId: 'session-1', cwd: '/project/one' },
-    )
-  })
-
-  it('returns a recoverable miss when the old Host no longer owns the terminal', async () => {
-    vi.useFakeTimers()
-    const fixture = serviceFor([])
-    const shown = showProjectRuntimeTerminal(fixture.service, 'session-1', '/project/one', '项目运行', 1_000)
-    await vi.advanceTimersByTimeAsync(1_000)
-
-    await expect(shown).resolves.toBe(false)
-    expect(fixture.activateTab).not.toHaveBeenCalled()
-  })
-
-  it('keeps the recovery prompt observational and explicit about lost output', () => {
-    const prompt = projectRuntimeTerminalRecoveryPrompt('http://127.0.0.1:5173/')
-    expect(prompt).toContain('terminal_list')
-    expect(prompt).toContain('只调用一次 terminal_create')
-    expect(prompt).toContain('不要重复启动、停止或修改服务')
-    expect(prompt).toContain('不要调用 project_runtime_report')
-    expect(prompt).toContain('旧 Host 中的终端输出无法恢复')
-  })
+it('rejects mismatched output and does not revive a request after disposal', async () => {
+  vi.useFakeTimers()
+  const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(JSON.stringify({ workspaceId: 'other', status: 'missing' })))
+  const output = new RuntimeOutputController(fetcher)
+  output.watch('project')
+  await vi.advanceTimersByTimeAsync(0)
+  expect(output.getSnapshot().project).toEqual({ status: 'error' })
+  output.dispose()
+  await vi.advanceTimersByTimeAsync(3_000)
+  expect(fetcher).toHaveBeenCalledTimes(1)
 })

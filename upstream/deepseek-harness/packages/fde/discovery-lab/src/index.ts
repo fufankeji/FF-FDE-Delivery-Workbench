@@ -13,7 +13,7 @@ import { createApiHandler } from './vendor/http.js'
 /** Stable Host identity. */
 export const name = 'fde-discovery-lab'
 /** Only native training and Web services; no project or stage service. */
-export const inject = ['webServer', 'agents', 'sessions', 'sessionPersistence']
+export const inject = ['connection', 'webServer', 'agents', 'sessions', 'sessionPersistence']
 /** Persona prompts and role-limited business tools belong only to lab agents. */
 export const modelExperience = 'Training-only personas, evidence evaluation and report prompts.'
 
@@ -25,7 +25,7 @@ export function apply(ctx: Context): void {
   const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
   const root = join(packageRoot, '.assets')
   const appRoot = resolve(packageRoot, '../../client/ui-fde-discovery-lab/lib/app')
-  const trusted = createWebRequestTrust(ctx.webServer)
+  const trusted = createWebRequestTrust(ctx.connection)
   let service: TrainingService | undefined
   if (existsSync(join(root, 'cases/finance/case.json'))) {
     const dataDir = resolve(home, 'fde-discovery-lab')

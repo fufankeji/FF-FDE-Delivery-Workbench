@@ -65,7 +65,7 @@ export type {
 /** Stable plugin id used by the FDE Web bundle. */
 export const name = 'fde-source'
 /** The route requires the real Web server and durable Workspace registry. */
-export const inject = ['webServer', 'workspaceRegistry']
+export const inject = ['connection', 'webServer', 'workspaceRegistry']
 
 /** Exact same-origin route used by the project-row client action. */
 export const PROJECT_RESOURCE_UPLOAD_PATH = '/api/fde-project-resources/upload'
@@ -99,7 +99,7 @@ export const Config: z<Config> = z.object({
  * @param config - deployment limits after Loader defaulting.
  */
 export function apply(ctx: Context, config: Config = {}): void {
-  const trusted = createWebRequestTrust(ctx.webServer)
+  const trusted = createWebRequestTrust(ctx.connection)
   const limits: ProjectResourceLimits = {
     maxFileBytes: config.maxFileBytes ?? DEFAULT_MAX_FILE_BYTES,
     maxFiles: config.maxFiles ?? DEFAULT_MAX_FILES,

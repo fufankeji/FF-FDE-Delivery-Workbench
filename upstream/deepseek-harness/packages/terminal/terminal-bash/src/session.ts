@@ -1,8 +1,8 @@
 /** Persistent PTY session with bounded output, readiness, and terminal-protocol replies. */
 
 import { Buffer } from 'node:buffer'
-import { createRequire } from 'node:module'
 import type { IDisposable, Terminal as HeadlessTerminalType } from '@xterm/headless'
+import { createLazyRequire } from '@deepseek-ai/dsh-lazy-require'
 import type {
   SubprocessOutcome,
   SubprocessTerminalForeground,
@@ -25,8 +25,7 @@ import type {
 import type { ResolvedConfig } from './config.ts'
 import { CONTROLLED_PROMPT, TerminalSanitizer } from './sanitize.ts'
 
-// Node exposes this package's CommonJS main as default-only, so load its named export through require.
-const { Terminal: HeadlessTerminal } = createRequire(import.meta.url)('@xterm/headless') as typeof import('@xterm/headless')
+const requireHeadless = createLazyRequire<typeof import('@xterm/headless')>('@xterm/headless', import.meta.url)
 
 function utf8Tail(text: string, maxBytes: number): { text: string; truncated: boolean } {
   if (Buffer.byteLength(text) <= maxBytes) return { text, truncated: false }
@@ -281,6 +280,7 @@ export class LocalPtySession implements TerminalBackendSession {
     private readonly config: ResolvedConfig,
   ) {
     this.pid = terminal.pid
+    const { Terminal: HeadlessTerminal } = requireHeadless()
     this.emulator = new HeadlessTerminal({ cols: config.cols, rows: config.rows, scrollback: 0 })
     this.emulatorData = this.emulator.onData((data) => {
       this.pendingResponseWrites += 1
@@ -584,7 +584,15 @@ export class LocalPtySession implements TerminalBackendSession {
       // on waiting for shell ownership instead of letting a child marker suppress
       // readiness until the absolute timeout.
       const handoffGrace = this.promptSeen ? this.config.handoffGraceMs : 0
-      if (startupHasOutput && idleFor >= this.config.idleSilenceMs + handoffGrace) {
+      // A seen marker whose printable tail has not arrived yet is the prompt function's own
+      // evidence that the shell reached its prompt: the tail is written by the same render, so
+      // its absence within the bound is a delivery delay rather than an absent prompt. The
+      // configured tolerance holds the send on the exact path for that state alone: a tail that
+      // arrived and was then invalidated by later output can no longer complete, so it keeps the
+      // plain bound. Zero leaves the bound at `idleSilenceMs + handoffGraceMs`.
+      const tailPending = this.promptSeen && !this.promptTextSeen && CONTROLLED_PROMPT.startsWith(this.promptTail)
+      const tailGrace = tailPending ? this.config.promptTailGraceMs : 0
+      if (startupHasOutput && idleFor >= this.config.idleSilenceMs + handoffGrace + tailGrace) {
         this.settleActive('inferred_idle')
       }
     } catch (error: unknown) {

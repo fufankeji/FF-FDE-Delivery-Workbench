@@ -1,4 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
+import { readFileSync } from 'node:fs'
 import { describe, expect, it, vi } from 'vitest'
 import type { KvTable } from '@deepseek-ai/dsh-storage-domain'
 import type { WorkspaceId } from '@deepseek-ai/dsh-workspace'
@@ -422,9 +423,9 @@ describe('requirement-research model guidance', () => {
       'fde-deliverables/01-requirement-research/confirmation-checklist.md',
       'fde-deliverables/01-requirement-research/requirement-baseline.md',
     ])
-    for (const heading of ['## 来源事实', '## 代表案例', '## 现场观察', '## 未验证事项']) {
-      expect(core.content).toContain(heading)
-    }
+    const records = readFileSync(new URL('../skills/qualify-ai-workflow/references/stage-records.md', import.meta.url), 'utf8')
+    expect(core.content).toContain('references/stage-records.md')
+    for (const heading of ['## 来源事实', '## 代表案例', '## 现场观察', '## 未验证事项']) expect(records).toContain(heading)
     expect(core.answers).toEqual(core.answerGroups.flatMap(group => group.answers))
     expect(core.answers.join('\n')).toContain('传统改进能解决什么，AI 增量与优先顺序是什么？')
     expect(core.workflow.at(-1)).toBe('由 FDE 决定进入下一阶段、继续调查、缩小范围或暂停')
@@ -511,7 +512,7 @@ describe('project-stage route', () => {
   it('serves only the fixed registered method catalog through a trusted GET', async () => {
     const handler = createStageSkillCatalogRoute({
       trusted: () => true,
-      catalog: DISCOVERY_STAGE_SKILL_CATALOG,
+      catalog: () => DISCOVERY_STAGE_SKILL_CATALOG,
     })
     const ok = response()
     await handler(request({}, 'GET'), ok.value)
@@ -522,12 +523,12 @@ describe('project-stage route', () => {
     expect(body.value.stages[0]).toMatchObject({ id: 'requirements' })
     expect(body.value.stages[0]?.methods).toHaveLength(7)
     expect(body.value.stages[0]?.methods[0]).toMatchObject({
-      id: 'qualify-ai-workflow', role: 'core', group: 'required', license: 'Apache-2.0',
+      id: 'qualify-ai-workflow', role: 'core', group: 'required', source: 'platform',
     })
     expect(body.value.stages[0]?.methods[0]?.answers).toHaveLength(7)
     expect(body.value.stages[0]?.methods[0]?.workflow).toHaveLength(8)
     expect(body.value.stages[0]?.methods[0]?.collaborators).toHaveLength(6)
-    expect(body.value.stages[0]?.methods[0]?.references).toHaveLength(10)
+    expect(body.value.stages[0]?.methods[0]?.references).toBeUndefined()
     expect(body.value.stages[0]?.methods[0]?.example?.steps).toHaveLength(3)
     expect(body.value.stages.slice(1).map(stage => stage.id)).toEqual([
       'definition', 'investigation', 'design', 'evaluation', 'pilot', 'production', 'improvement',

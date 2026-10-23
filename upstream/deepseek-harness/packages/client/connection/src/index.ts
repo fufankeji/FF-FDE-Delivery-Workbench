@@ -1,11 +1,13 @@
 /** Host HTTP bridge for browser-client RPC. */
 import type { Context } from '@deepseek-ai/cordis'
+import type { IncomingMessage, ServerResponse } from 'node:http'
 import z from '@deepseek-ai/schemastery'
 import type {} from '@deepseek-ai/dsh-attachment'
 import type {} from '@deepseek-ai/dsh-credentials'
 // Activates the webServer Context merge used below.
 import type { WebRoute } from '@deepseek-ai/dsh-host-webserver'
 import { API_PATH } from './api-path.ts'
+import { CONNECT_PATH } from './connect-protocol.ts'
 import { bridge, DEFAULT_MAX_REQUEST_BODY_BYTES } from './http-bridge.ts'
 import { assertTrustedAuthority } from './api-request-trust.ts'
 import { BrowserAuth } from './browser-auth.ts'
@@ -13,14 +15,18 @@ import { HostConnectionService } from './rpc-host.ts'
 import { ConnectionRecoveryConfigSchema, resolveConnectionConfig, type ConnectionRecoveryConfig } from './recovery-config.ts'
 
 export type {
+  PeerAdmission,
+  ConnectionAdmission,
   ConnectionFetchMethod,
   ConnectionFetchHandler,
   ConnectionFetchRoute,
   ConnectionIndexRequest,
   ConnectionIndexResponse,
   ConnectionRpcEndpointMatcher,
+  ConnectionRpcAttachment,
   ConnectionRpcFailure,
   ConnectionRpcHandler,
+  ConnectionRpcHandlerResult,
   ConnectionRequestRejection,
   ConnectionRpcResult,
   ConnectionRequestBodyMode,
@@ -32,7 +38,11 @@ export type {
   RpcMessage,
   ServerResponse,
 } from './rpc.ts'
+export type { PeerId, PeerScope, Principal, RemoteInvocation } from '@deepseek-ai/dsh-typert-protocol'
 export { RpcId, transportError } from './rpc.ts'
+export { Peer } from './peer.ts'
+export type { PeerOptions } from './peer.ts'
+export { CONNECT_PATH, type ConnectionInteractions } from './connect-protocol.ts'
 export {
   clientRequestSchema,
   rpcErrorSchema,
@@ -49,6 +59,20 @@ export { API_PATH } from './api-path.ts'
 
 /** Stable Cordis plugin name. */
 export const name = 'client-connection'
+
+declare module '@deepseek-ai/cordis' {
+  interface Events {
+    /**
+     * Admit or wrap an authenticated shared API request, including body transfer.
+     * Existing requests continue when a listener refuses subsequent requests.
+     * @param request - Authenticated incoming HTTP request.
+     * @param response - Response owned until the delegated bridge settles.
+     * @param next - Delegate to the next listener or the shared API bridge.
+     * @mode waterfall
+     */
+    'connection/request'(request: IncomingMessage, response: ServerResponse, next: () => Promise<void>): Promise<void>
+  }
+}
 
 /** Headroom for RPC JSON fields around aggregate base64 image payloads. */
 const REQUEST_ENVELOPE_HEADROOM_BYTES = 1024 * 1024
@@ -72,27 +96,22 @@ export const inject = ['credentials']
 
 /** Browser authentication, request limits, and connection recovery configuration. */
 export interface ConnectionConfig {
-  /** Require a browser session. Defaults to true; false trusts every accepted caller with the complete Host API. */
-  browserAuthentication?: boolean
   /** Browser recovery timing, injected into each served page. */
   recovery?: ConnectionRecoveryConfig
   /**
    * Authorities this deployment serves beyond loopback: exact `host:port`, or
-   * port-less `host` matching any port. The /api trust fence refuses any
-   * request whose Host is neither loopback nor listed here, so a
-   * non-loopback (`0.0.0.0`) deployment must declare the names it is reached
-   * by; the Web runtime derives LAN IP literals from an active all-interface
-   * bind. An entry that is not a bare, canonical authority fails plugin load.
+   * port-less `host` matching any port. The fence accepts loopback and the
+   * listener's own bind IP independently; other remote authorities require
+   * an entry here. A non-canonical or non-bare authority fails plugin load.
    */
   trustedHosts?: string[]
-  /** Absolute browser-session lifetime in days. Default: 30. */
+  /** Absolute browser and API cookie lifetime in days. Default: 30. */
   cookieMaxAgeDays?: number
   /** Maximum buffered JSON body for every `/api` request. Default: 300 MiB. */
   maxRequestBodyBytes?: number
 }
 
 export const Config: z<ConnectionConfig> = z.object({
-  browserAuthentication: z.boolean().default(true),
   recovery: ConnectionRecoveryConfigSchema.default({}),
   trustedHosts: z.array(String).default([]),
   cookieMaxAgeDays: z.natural().min(1).default(30),
@@ -119,9 +138,7 @@ export async function apply(ctx: Context, config?: ConnectionConfig): Promise<vo
   const connection = new HostConnectionService(
     ctx,
     trustedHosts,
-    config?.browserAuthentication === false
-      ? undefined
-      : await BrowserAuth.create(ctx.root, ctx.credentials, cookieMaxAgeDays),
+    await BrowserAuth.create(ctx.root, ctx.credentials, cookieMaxAgeDays),
   )
   ctx.inject(['webServer'], (webCtx) => {
     assertImageBodyCapacity(webCtx, maxRequestBodyBytes)
@@ -133,16 +150,20 @@ export async function apply(ctx: Context, config?: ConnectionConfig): Promise<vo
       kind: 'prefix',
       path: API_PATH,
       handler: async (req, res) => {
-        const rejection = connection.requestRejection(req)
-        if (rejection !== undefined) {
-          res.writeHead(rejection)
-          res.end(rejection === 401 ? 'unauthorized' : 'forbidden')
+        const admission = connection.admit(req)
+        if ('rejection' in admission) {
+          res.writeHead(admission.rejection)
+          res.end(admission.rejection === 401 ? 'unauthorized' : 'forbidden')
           return
         }
-        await bridge(req, res, fetchHandler, maxRequestBodyBytes)
+        await webCtx.waterfall('connection/request', req, res, () => bridge(req, res, fetchHandler, admission.peer, maxRequestBodyBytes))
       },
     }
     webCtx.effect(() => webCtx.webServer.register(route), 'client-connection: /api route')
+    webCtx.effect(() => webCtx.webServer.register({
+      kind: 'exact', path: CONNECT_PATH,
+      handler: (req, res) => { connection.authorizeConnect(req, res) },
+    }), 'client-connection: /connect route')
   })
   ctx.inject(['attachments'], (attachmentCtx) => {
     assertImageBodyCapacity(attachmentCtx, maxRequestBodyBytes)

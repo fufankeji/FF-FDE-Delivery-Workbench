@@ -1,6 +1,6 @@
 import { clientBundle } from '../tsdown.client.ts'
 
-const base = clientBundle('@deepseek-ai/dsh-client-ui-fde-document-preview', ['lib/types/index.js', 'lib/types/invariant.js'])
+const base = clientBundle(import.meta.dirname, ['lib/types/index.js'])
 
 /** Dynamic Office renderers must remain inside the module-table client artifact. */
 export default (input: Parameters<typeof base>[0]) => base(input).map(config =>

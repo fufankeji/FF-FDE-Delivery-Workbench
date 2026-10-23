@@ -237,7 +237,7 @@ engineering_source: rpraharaj/forward-deployed-engineer@ee045a66db5242617ccea9e5
 
 ## 9. 阶段 1 运行时合同
 
-- 运行时分别注册 `qualify-ai-workflow`、`reframe-ai-engagement`、`fde-orient`、`knowledge-interview`、`ownership-map`、`repo-recon` 和 `stakeholder-brief`；不得再注册一个覆盖所有第一阶段工作的 `fde-requirement-research`。
+- 第一阶段七个方法 `qualify-ai-workflow`、`reframe-ai-engagement`、`fde-orient`、`knowledge-interview`、`ownership-map`、`repo-recon` 和 `stakeholder-brief` 维护于 fde/stage/skills 的中文标准文件，原生文件 provider 按需加载；目录阅读与下载使用同一文件源，不再注册独立硬编码正文，也不合成覆盖整个阶段的 `fde-requirement-research`。阶段与证据规则保留，名称或触发元数据的维护变更随服务重新加载，不承诺在线编辑热更新。
 - 系统提示只说明路由顺序和触发条件。普通发现默认加载 `qualify-ai-workflow`；只有边界冲突才追加 `reframe-ai-engagement`；工程 Skill 按任务缺口选择，不得一次加载全部。
 - `.fde/discovery/workflows.json` schemaVersion 2 保存逐条证据引用，计数由 Host 聚合。
 - `.fde/discovery/artifacts.json` schemaVersion 1 保存 Artifact 来源版本、内容版本、结构成熟度、证据状态和上下游引用。工作台与阶段门必须读取同一校验结果。
