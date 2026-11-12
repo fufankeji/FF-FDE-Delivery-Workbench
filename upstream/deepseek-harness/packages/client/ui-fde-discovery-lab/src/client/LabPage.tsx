@@ -1,23 +1,37 @@
 import { useEffect, useRef, useState } from 'react'
 import { Button } from '@deepseek-ai/dsh-client-ui-primitives'
-import type { PropsLocale, PropsRuntime, PropsStore } from '@deepseek-ai/dsh-client-ui-slots'
+import type { PropsLocale, PropsRenderSlots, PropsRuntime, PropsStore } from '@deepseek-ai/dsh-client-ui-slots'
 import type { createLabStore } from './stores.ts'
 import css from './lab.module.css'
 import { followFrameTheme } from './frame-theme.ts'
 type LabStore = ReturnType<typeof createLabStore>
-type OverlayProps = PropsRuntime<'fde.workbench.lab.page'> & PropsStore<LabStore> & PropsLocale<'fdeProject'>
+type OverlayProps = PropsRuntime<'fde.workbench.lab.page'> & PropsStore<LabStore> & PropsLocale<'fdeProject'> & PropsRenderSlots<'fde.workbench.lab.challenge'>
 
 /** Keep the isolated training frame alive after its first explicit navigation. */
-export function LabOverlay({ active, back, useStore, actions, t }: OverlayProps) {
+export function LabOverlay({ active, back, useStore, actions, renderSlot, t }: OverlayProps) {
   const opened = useStore(state => state.open)
+  const view = useStore(state => state.view)
+  const discoveryOpened = useStore(state => state.discoveryOpened)
   useEffect(() => { if (active && !opened) actions.open() }, [active, opened, actions])
   if (!active && !opened) return null
   return <section className={css.page} hidden={!active} aria-label={t('lab.title')}>
     <header className={css.header}>
       <div><strong>{t('lab.title')}</strong><span>{t('lab.independent')}</span></div>
-      <button type="button" onClick={back}>{t('lab.return')}</button>
+      <div className={css.headerActions}>
+        {view !== 'catalog' && <Button variant="ghost" size="sm" onClick={() => actions.select('catalog')}>{t('lab.backToCatalog')}</Button>}
+        <Button variant="outline" size="sm" onClick={back}>{t('lab.return')}</Button>
+      </div>
     </header>
-    <LabFrame t={t} />
+    {view === 'catalog' && <div className={css.catalog}>
+      <h1>{t('lab.catalogTitle')}</h1><p>{t('lab.catalogDescription')}</p>
+      <div className={css.moduleGrid}>
+        <article className={css.moduleCard}><span>{t('lab.discoveryTag')}</span><h2>{t('lab.discoveryTitle')}</h2><p>{t('lab.discoveryDescription')}</p><Button variant="outline" onClick={() => actions.select('discovery')}>{t('lab.discoveryOpen')}</Button></article>
+        <article className={css.moduleCard}><span>{t('lab.challengeTag')}</span><h2>{t('lab.challengeTitle')}</h2><p>{t('lab.challengeDescription')}</p><Button onClick={() => actions.select('challenge')}>{t('lab.challengeOpen')}</Button></article>
+      </div>
+      <p className={css.catalogBoundary}>{t('lab.catalogBoundary')}</p>
+    </div>}
+    {discoveryOpened && <div className={css.modulePanel} hidden={view !== 'discovery'}><LabFrame t={t} /></div>}
+    {view === 'challenge' && <div className={css.challengePanel}>{renderSlot('fde.workbench.lab.challenge', { active, openDiscovery: () => actions.select('discovery') })}</div>}
   </section>
 }
 function LabFrame({ t }: PropsLocale<'fdeProject'>) {
@@ -54,7 +68,7 @@ export function LabSummary({ openLab, t }: PropsRuntime<'fde.workbench.lab.summa
   return <>
     <div className={css.labMetric} data-overview-lab-metric aria-live="polite">
       <span className={css.metricIcon}><SummaryIcon kind="lab" /></span>
-      {summary.status === 'ready' ? <div><strong>1</strong><span>{t('lab.count')}</span></div> : <span className={css.metricStatus}>{t(summary.status === 'loading' ? 'workbench.loading' : 'workbench.failed')}</span>}
+      <div><strong>2</strong><span>{t('lab.count')}</span></div>
     </div>
     <div className={css.casesMetric} data-overview-cases-metric aria-live="polite">
       <span className={css.metricIcon}><SummaryIcon kind="cases" /></span>
@@ -62,7 +76,7 @@ export function LabSummary({ openLab, t }: PropsRuntime<'fde.workbench.lab.summa
     </div>
     <article className={css.summaryCard} data-overview-lab>
       <header><span className={css.cardIcon}><SummaryIcon kind="lab" /></span><h2>{t('workbench.lab')}</h2>
-        {summary.status === 'ready' && <p className={css.cardTotals}><strong>1</strong> {t('lab.count')}<span aria-hidden="true">·</span><strong>{summary.cases}</strong> {t('lab.cases')}</p>}
+        {summary.status === 'ready' && <p className={css.cardTotals}><strong>2</strong> {t('lab.count')}<span aria-hidden="true">·</span><strong>{summary.cases}</strong> {t('lab.cases')}</p>}
       </header>
       <p className={css.summaryDescription}>{t('lab.description')}</p>
       <div className={css.summaryActions}>

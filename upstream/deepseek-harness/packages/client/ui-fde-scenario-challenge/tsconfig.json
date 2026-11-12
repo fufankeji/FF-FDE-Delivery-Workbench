@@ -1,0 +1,15 @@
+{
+  "extends": "../../../tsconfig.base.client.json",
+  "compilerOptions": { "rootDir": "src", "outDir": "lib/types" },
+  "include": ["src"],
+  "references": [
+    { "path": "../../../vendor/cordis" },
+    { "path": "../ui-slots" },
+    { "path": "../ui-renderer" },
+    { "path": "../locale/tsconfig.client.json" },
+    { "path": "../resources" },
+    { "path": "../ui-fde-discovery-lab" },
+    { "path": "../../fde/scenario-challenge" },
+    { "path": "../../typert/protocol" }
+  ]
+}

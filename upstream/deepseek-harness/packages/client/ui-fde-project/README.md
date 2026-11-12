@@ -6,6 +6,8 @@ Browser presentation for the FDE project delivery workspace. The system opens on
 
 ## Behavior
 
+In windowed macOS Desktop, the workbench rail adds the host caption clearance to its existing top padding so native window controls do not cover the brand logo. The compact rail does the same; fullscreen and ordinary browsers retain their original spacing. The logo asset, dimensions and navigation actions are unchanged.
+
 FDE pages follow the official visual hierarchy: 20/28 work-page titles, 13/20 descriptions, semantic theme surfaces and shared control sizing. Project detail, all eight stages, method readers, Skills, architecture, usage, evaluation, runtime output and preview retain their own information and actions. Public navigation draws the retained skin over an opaque backing; dialogs use the native mask and readable overlay surface. The introduction keeps its display layout, and the graph keeps its dark canvas and category colors. Visual changes do not modify project state or theme preferences.
 
 Skills Center opens the canonical SKILL.md body over the retained cards. The dialog shows the name and content with download, expand and close actions, without a directory tree, raw path, frontmatter code block or upstream attribution panel. Relative references open in the same reader with one Back to Skill action. Focus, independent scrolling, Escape and list restoration remain unchanged.
@@ -18,7 +20,7 @@ The browser has no independent platform-content snapshot or upstream importer. P
 
 The platform sidebar places Settings below the return-home action and attribution. Its `sidebar.settings.shortcut` outlet opens the existing Settings panel, including the Models/API-key section; it neither duplicates configuration nor removes the project sidebar's original Settings entry.
 
-Overview uses a compact three-metric strip, the three most recently updated projects, and separate Lab and platform/course Skills cards. Counts, project order, company and stage labels remain source-driven. The lab summary contributes two top metrics and a bottom card through its existing slot; one request supplies all three. Both packages coordinate numeric grid tracks at the same breakpoints because CSS Module area names are package-local. Decorative project marks do not classify projects. The sidebar owns the overview's footer attribution.
+Overview uses a compact three-metric strip, the three most recently updated projects, and separate Lab and platform/course Skills cards. Project order, company and stage labels remain source-driven. Through the existing slot, the lab summary distinguishes two practice modules from the business case count; one catalog request supplies case data to both metric and card. Labs offers business discovery and the Chinese scenario challenge. Both packages coordinate numeric grid tracks at the same breakpoints because CSS Module area names are package-local. Decorative project marks do not classify projects. The sidebar owns the overview's footer attribution.
 
 Stage headings, instructions, dialogs, and review conditions name concrete delivery tasks. Established lifecycle titles and technical identifiers remain unchanged. Technical editors explain ontology terms in Chinese; graph status and query modes have readable labels. Reported selection, test evidence, and human approval remain distinct. Saved customer content is displayed without terminology rewriting, and read-only historical views do not claim files are immutable snapshots.
 

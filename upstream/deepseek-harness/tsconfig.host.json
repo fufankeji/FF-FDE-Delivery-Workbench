@@ -362,6 +362,7 @@
     { "path": "./packages/fde/stage" },
     { "path": "./packages/fde/project" },
     { "path": "./packages/fde/discovery-lab" },
+    { "path": "./packages/fde/scenario-challenge" },
     { "path": "./packages/fde/source" },
     { "path": "./packages/fde/semantica" },
     { "path": "./packages/session/session-title" },

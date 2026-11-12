@@ -106,6 +106,9 @@
     - id: fde-discovery-lab
       name: '@deepseek-ai/dsh-fde-discovery-lab'
 
+    - id: fde-scenario-challenge
+      name: '@deepseek-ai/dsh-fde-scenario-challenge'
+
     - id: fde-project
       name: '@deepseek-ai/dsh-fde-project'
       config:
@@ -415,6 +418,9 @@
 
     - id: ui-fde-discovery-lab
       name: '@deepseek-ai/dsh-client-ui-fde-discovery-lab'
+
+    - id: ui-fde-scenario-challenge
+      name: '@deepseek-ai/dsh-client-ui-fde-scenario-challenge'
 
     - id: ui-settings-models
       name: '@deepseek-ai/dsh-client-ui-settings-models'

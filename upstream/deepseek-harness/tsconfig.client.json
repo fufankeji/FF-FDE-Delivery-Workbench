@@ -107,6 +107,7 @@
     { "path": "./packages/client/ui-workspace" },
     { "path": "./packages/client/ui-fde-appearance" },
     { "path": "./packages/client/ui-fde-discovery-lab" },
+    { "path": "./packages/client/ui-fde-scenario-challenge" },
     { "path": "./packages/client/ui-fde-stage" },
     { "path": "./packages/client/ui-fde-project" },
     { "path": "./packages/client/ui-fde-document-preview" },

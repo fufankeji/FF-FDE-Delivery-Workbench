@@ -9,6 +9,21 @@
 /* Appearance skins can make the base token translucent; a full page must occlude the page beneath it. */
 .page { position:fixed; inset:0 0 0 var(--fde-navigation-width, 0px); z-index:50; display:flex; flex-direction:column; background:Canvas; background:rgb(from var(--dsw-alias-bg-base) r g b / 1); color:var(--dsw-alias-label-primary); }
 .page[hidden] { display:none; }
+.modulePanel { display:flex; flex:1; min-height:0; }
+.modulePanel[hidden] { display:none; }
+.challengePanel { flex:1; min-height:0; overflow:auto; }
+.catalog { flex:1; min-height:0; overflow:auto; box-sizing:border-box; width:100%; max-width:1120px; margin:0 auto; padding:36px 28px; }
+.catalog h1 { font:500 24px/1.5 var(--dsw-font-family); margin:0 0 12px; }
+.catalog>p { color:var(--dsw-alias-label-secondary); font:400 14px/1.7 var(--dsw-font-family); }
+.moduleGrid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; margin:28px 0; }
+.moduleCard { display:flex; flex-direction:column; align-items:flex-start; padding:28px; border:.5px solid var(--dsw-alias-border-l2); border-radius:var(--dsw-radius-lg); background:var(--dsw-alias-bg-layer-1); }
+.moduleCard>span { font:400 12px/1.6 var(--dsw-font-family); color:var(--dsw-alias-label-secondary); }
+.moduleCard h2 { margin:12px 0; font:500 19px/1.5 var(--dsw-font-family); }
+.moduleCard p { flex:1; margin:0 0 24px; font:400 14px/1.8 var(--dsw-font-family); color:var(--dsw-alias-label-secondary); }
+.catalog .catalogBoundary { font-size:12px; }
+.headerActions { display:flex; flex-wrap:wrap; gap:8px; }
+:global(html[data-platform='darwin']) .page { padding-top:var(--dsh-frame-top-clearance, 0px); }
+@media(max-width:760px) { .moduleGrid { grid-template-columns:minmax(0,1fr); } .catalog { padding:24px 16px; } .moduleCard { padding:24px; } }
 .header { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 20px; border-bottom:1px solid var(--dsw-alias-border-l1); background:var(--dsw-alias-bg-base); }
 .header>div { display:flex; align-items:center; gap:16px; }
 .header span { opacity:.65; font-size:12px; }

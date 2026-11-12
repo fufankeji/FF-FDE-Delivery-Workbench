@@ -3,7 +3,7 @@ document: feature-map
 status: confirmed
 prd: docs/PRD.md
 product_spec: docs/specs/product-spec.md
-updated: "2026-09-16"
+updated: "2026-11-02"
 ---
 
 # FF - FDE 交付工作台 V2 Feature Map
@@ -43,7 +43,11 @@ updated: "2026-09-16"
 
 | F028 | F028-native-visual-system | 一致的全系统工作体验 | 从公共入口进入阶段、技能和工程页面时保持统一官方风格，既有功能与主题状态不变 | REQ-037, PSC-031 | F025 | P0 | in-progress |
 
+| F029 | F029-chinese-scenario-challenge | 中文 FDE 场景判断挑战 | 从实验室完成十题限时自测、恢复答题并回看解析，原业务训练与项目状态不变 | REQ-038, REQ-039, REQ-040, PSC-032 | F024, F025 | P0 | in-progress |
+
 ## 首个验证切片
+
+2026-11-02 用户确认实验室接入中文五分钟挑战，并明确要求先写 Spec 再实施。本轮只新增 F029；F024/F025 仅调整直接关联的入口、返回、保活与总览文案，不扩展访谈业务、账号、考试认证或项目流程。
 
 2026-10-23 用户确认 F025 视觉样板，并明确授权 F028 推广到整个系统。先记录 AC-034/PSC-031 与完整页面覆盖，再实施样式及必要的实验室主题同步；不扩展业务流程、不改官方 Agent Loop。
 

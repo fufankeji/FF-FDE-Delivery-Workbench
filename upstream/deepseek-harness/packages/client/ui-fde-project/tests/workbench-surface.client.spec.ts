@@ -1,6 +1,21 @@
 import { readFileSync } from 'node:fs'
 import { expect, it } from 'vitest'
 
+it('adds native caption clearance only to windowed macOS navigation at both rail widths', () => {
+  const css = readFileSync(new URL('../src/client/workbench.module.css', import.meta.url), 'utf8')
+  const selector = ":global(html[data-platform='darwin']:not([data-fullscreen])) .navigation"
+  const rules = css.split(selector).slice(1).map(part => part.slice(part.indexOf('{') + 1, part.indexOf('}')).trim())
+  expect(rules).toEqual([
+    'padding-top: calc(20px + var(--dsh-frame-top-clearance, 0px));',
+    'padding-top: calc(22px + var(--dsh-frame-top-clearance, 0px));',
+  ])
+  expect(css.indexOf(selector, css.indexOf(selector) + selector.length)).toBeGreaterThan(css.indexOf('@media (max-width: 640px)'))
+  expect(css.match(/\.navigation\s*\{([^}]+)\}/)?.[1]).toContain('padding: 20px 12px')
+  expect(css).toContain('.navigation { padding: 22px 8px 12px; }')
+  expect(css).not.toMatch(/--dsh-frame-top-clearance\s*:/)
+  expect(css.match(/\.brand img\s*\{([^}]+)\}/)?.[1]).toContain('width: 35px; height: 35px;')
+})
+
 it.each([
   ['ui-fde-project', 'workbench', '.projectMetric'],
   ['ui-fde-project', 'workbench', '.recent'],

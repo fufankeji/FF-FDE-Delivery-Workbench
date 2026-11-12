@@ -390,6 +390,10 @@
       "@deepseek-ai/dsh-client-ui-fde-discovery-lab": ["./packages/client/ui-fde-discovery-lab/src"],
       "@deepseek-ai/dsh-client-ui-fde-discovery-lab/client": ["./packages/client/ui-fde-discovery-lab/src/client/index.ts"],
       "@deepseek-ai/dsh-native-command/types": ["./packages/util/native-command/src/types.ts"],
+      "@deepseek-ai/dsh-fde-scenario-challenge": ["./packages/fde/scenario-challenge/src/index.ts"],
+      "@deepseek-ai/dsh-fde-scenario-challenge/types": ["./packages/fde/scenario-challenge/src/types.ts"],
+      "@deepseek-ai/dsh-client-ui-fde-scenario-challenge": ["./packages/client/ui-fde-scenario-challenge/src/index.ts"],
+      "@deepseek-ai/dsh-client-ui-fde-scenario-challenge/client": ["./packages/client/ui-fde-scenario-challenge/src/client/index.ts"],
       // BEGIN generated package aliases — pnpm run gen-tsconfig-paths
       "@deepseek-ai/dsh-acp": ["./packages/acp/acp/src"],
       "@deepseek-ai/dsh-acp-app": ["./packages/bundle/acp-app/src"],

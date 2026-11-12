@@ -22,6 +22,12 @@ product_spec: docs/specs/product-spec.md
 
 ## 2. 架构目标与原则
 
+### 中文场景判断挑战（F029）
+
+新增 `packages/fde/scenario-challenge` 与 `packages/client/ui-fde-scenario-challenge`，分别拥有独立答题数据/HTTP 操作与原生挑战页面，通过现有 Web Bundle 同时用于桌面和 Web。数据只位于显式 `DSH_HOME/fde-scenario-challenge/state.json`，原子文件写入与文件锁保护一个进行中轮次和最近 20 次已完成结果，不进入项目、Session 或原实验室 SQLite。服务端绝对截止时间与修订号决定是否可以保存；客户端只显示计时，资源提供者统一读取、错误和重新获取。新接口复用 Connection owner 与同源信任校验。
+
+实验室原页面槽扩展为双模块入口，挑战内容通过子插槽注册；原业务训练 iframe 在首次进入后保持挂载。导航和总览同步模块/案例文案，不引入通用插件市场或全局状态。题库和逐项解释为平台自编中文内容，固定版本随轮次保存，答题前不返回标准答案；无模型、凭据或外部题库依赖。完整行为与验证见 [F029 规格](../specs/F029-chinese-scenario-challenge/spec.md) 和 [实施计划](../specs/F029-chinese-scenario-challenge/plan.md)。
+
 ### 独立业务挖掘实验室（F024）
 
 实验室以 `packages/fde/discovery-lab` Host 插件和 `packages/client/ui-fde-discovery-lab` Client 插件接入当前 `0.2.1-rc.2` 基座，不维护自定义 Agent Loop。Host 复用官方 Agent、Session、Tools、LLM 和持久化；仅维护实验室自己的轮次数据库和岗位会话，不注入 Workspace、FDE Stage 或项目服务。原插件 `0.3.2` 的业务代码保留来源说明，以最小修改适配当前会话事件接口和权限边界。

@@ -23,7 +23,7 @@ it('offers four peer destinations, preserves the project shortcut, and removes l
   expect(screen.queryByRole('navigation')).toBeNull()
   view.rerender(<><WorkbenchNavigation {...props} />
     <WorkbenchLabLauncher {...props as unknown as ComponentProps<typeof WorkbenchLabLauncher>} wide /></>)
-  fireEvent.click(screen.getByRole('button', { name: '业务挖掘实验室' }))
+  fireEvent.click(screen.getByRole('button', { name: '实验室' }))
   const nav = screen.getByRole('navigation', { name: '工作台导航' })
   expect(within(nav).getAllByRole('button').map(button => button.textContent)).toEqual(['总览', '项目中心', '实验室', '技能中心'])
   expect(document.body.dataset.fdeWorkbench).toBe('open')

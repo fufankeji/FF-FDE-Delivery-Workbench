@@ -1,6 +1,10 @@
 /* The platform rail and module pages share one responsive layout width. */
 :global(body[data-fde-workbench='open']) { --fde-navigation-width: 232px; }
 .navigation { position: fixed; inset: 0 auto 0 0; z-index: 60; width: var(--fde-navigation-width); display: flex; flex-direction: column; padding: 20px 12px; box-sizing: border-box; border-right: .5px solid var(--dsw-alias-border-l2); background: var(--dsw-specific-sidebar-fill); backdrop-filter: blur(14px); color: var(--dsw-alias-label-primary); }
+/* Windowed macOS reserves the native caption strip; browser and fullscreen spacing stay unchanged. */
+:global(html[data-platform='darwin']:not([data-fullscreen])) .navigation {
+  padding-top: calc(20px + var(--dsh-frame-top-clearance, 0px));
+}
 .brand { display: flex; align-items: center; gap: 10px; padding: 0 6px; border: 0; background: transparent; color: inherit; text-align: left; cursor: pointer; }
 .brand img { width: 35px; height: 35px; flex-shrink: 0; object-fit: contain; border-radius: 8px; }
 .brand span { white-space: nowrap; font: 600 15.5px/24px var(--dsw-font-family); letter-spacing: -.04em; }
@@ -127,6 +131,9 @@
 @media (max-width: 640px) {
   :global(body[data-fde-workbench='open']) { --fde-navigation-width: 76px; }
   .navigation { padding: 22px 8px 12px; }
+  :global(html[data-platform='darwin']:not([data-fullscreen])) .navigation {
+    padding-top: calc(22px + var(--dsh-frame-top-clearance, 0px));
+  }
   .brand { justify-content: center; } .brand span, .workspaceLabel, .navBottom small { display: none; }
   .navigation nav { margin-top: 32px; gap: 12px; }
   .navItem { flex-direction: column; gap: 6px; padding: 10px 2px; font-size: 11px; line-height: 18px; }

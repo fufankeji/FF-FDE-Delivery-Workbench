@@ -2854,6 +2854,9 @@ importers:
       '@deepseek-ai/dsh-client-ui-fde-project':
         specifier: workspace:*
         version: link:../../client/ui-fde-project
+      '@deepseek-ai/dsh-client-ui-fde-scenario-challenge':
+        specifier: workspace:*
+        version: link:../../client/ui-fde-scenario-challenge
       '@deepseek-ai/dsh-client-ui-fde-sources':
         specifier: workspace:*
         version: link:../../client/ui-fde-sources
@@ -3016,6 +3019,9 @@ importers:
       '@deepseek-ai/dsh-fde-project':
         specifier: workspace:*
         version: link:../../fde/project
+      '@deepseek-ai/dsh-fde-scenario-challenge':
+        specifier: workspace:*
+        version: link:../../fde/scenario-challenge
       '@deepseek-ai/dsh-fde-semantica':
         specifier: workspace:*
         version: link:../../fde/semantica
@@ -4495,6 +4501,48 @@ importers:
       react-dom:
         specifier: ^18.2.0
         version: 18.3.1(react@18.3.1)
+
+  packages/client/ui-fde-scenario-challenge:
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:~
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-client-locale':
+        specifier: workspace:*
+        version: link:../locale
+      '@deepseek-ai/dsh-client-resources':
+        specifier: workspace:*
+        version: link:../resources
+      '@deepseek-ai/dsh-client-test-runtime':
+        specifier: workspace:*
+        version: link:../../test-support/client-runtime
+      '@deepseek-ai/dsh-client-ui-fde-discovery-lab':
+        specifier: workspace:*
+        version: link:../ui-fde-discovery-lab
+      '@deepseek-ai/dsh-client-ui-primitives':
+        specifier: workspace:*
+        version: link:../ui-primitives
+      '@deepseek-ai/dsh-client-ui-renderer':
+        specifier: workspace:*
+        version: link:../ui-renderer
+      '@deepseek-ai/dsh-client-ui-slots':
+        specifier: workspace:*
+        version: link:../ui-slots
+      '@deepseek-ai/dsh-fde-scenario-challenge':
+        specifier: workspace:*
+        version: link:../../fde/scenario-challenge
+      '@deepseek-ai/dsh-typert-protocol':
+        specifier: workspace:*
+        version: link:../../typert/protocol
+      react:
+        specifier: 18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: 18.3.1
+        version: 18.3.1(react@18.3.1)
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
 
   packages/client/ui-fde-sources:
     devDependencies:
@@ -10504,6 +10552,37 @@ importers:
       dsh-openapi:
         specifier: file:../../../third-party/dsh-openapi
         version: file:third-party/dsh-openapi(@deepseek-ai/cordis@vendor+cordis)(@deepseek-ai/dsh-tools@packages+core+tools)(@deepseek-ai/schemastery@vendor+schemastery)
+
+  packages/fde/scenario-challenge:
+    dependencies:
+      '@deepseek-ai/dsh-atomic-write':
+        specifier: workspace:*
+        version: link:../../util/atomic-write
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:~
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/cordis-plugin-include':
+        specifier: workspace:~
+        version: link:../../../vendor/include
+      '@deepseek-ai/cordis-plugin-loader':
+        specifier: workspace:~
+        version: link:../../../vendor/loader
+      '@deepseek-ai/dsh-brand':
+        specifier: workspace:*
+        version: link:../../util/brand
+      '@deepseek-ai/dsh-client-connection':
+        specifier: workspace:*
+        version: link:../../client/connection
+      '@deepseek-ai/dsh-credentials':
+        specifier: workspace:*
+        version: link:../../credentials/credentials
+      '@deepseek-ai/dsh-host-webserver':
+        specifier: workspace:*
+        version: link:../../host/webserver
 
   packages/fde/semantica:
     dependencies:

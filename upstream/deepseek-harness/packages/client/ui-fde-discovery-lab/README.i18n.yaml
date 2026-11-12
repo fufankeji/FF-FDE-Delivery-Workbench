@@ -3,11 +3,11 @@
 # After editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write packages/client/ui-fde-discovery-lab/README.md
 /deepseek-ai-dsh-client-ui-fde-discovery-lab:
-  en: 7472b6f81492a693
-  zh: 816d7f3863f57283
+  en: eca4fdf08b6e12cb
+  zh: 80f7aa47af02168b
 /deepseek-ai-dsh-client-ui-fde-discovery-lab/model-experience:
-  en: 8a92d303e8b66bd6
-  zh: 498a7a8eb3384abe
+  en: 2a5cd15640b2cc78
+  zh: 5cf8d7546f85d498
 /deepseek-ai-dsh-client-ui-fde-discovery-lab/model-experience/kv-cache-effect:
   en: 183584021be563ad
   zh: 69046d12dd79d783

@@ -1,0 +1,19 @@
+# Bilingual-pair consistency record for README.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write packages/client/ui-fde-scenario-challenge/README.md
+/deepseek-ai-dsh-client-ui-fde-scenario-challenge:
+  en: b595c9cd7fd98de7
+  zh: 817b26c01f4aaefd
+/deepseek-ai-dsh-client-ui-fde-scenario-challenge/behavior:
+  en: 09454a31829c1931
+  zh: 82ec4095c3c5d10a
+/deepseek-ai-dsh-client-ui-fde-scenario-challenge/model-experience:
+  en: c227759772458e10
+  zh: 004f99140026c1f4
+/deepseek-ai-dsh-client-ui-fde-scenario-challenge/model-experience/kv-cache-effect:
+  en: 4f0eadf94828e66e
+  zh: 20d9ec88aee4d703
+/deepseek-ai-dsh-client-ui-fde-scenario-challenge/known-limitations-and-deferred-work:
+  en: 770532b81d677610
+  zh: be7ff36f9135f8f7
