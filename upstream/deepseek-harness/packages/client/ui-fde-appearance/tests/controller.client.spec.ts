@@ -29,13 +29,13 @@ function bench(storage: AppearanceStorage | undefined = window.localStorage) {
 }
 
 describe('AppearanceController', () => {
-  it('applies the cloud cat skin by default and restores a saved bundled choice', () => {
+  it('starts with the original interface without skin overrides and restores a saved bundled choice', () => {
     const first = bench()
     const disposeFirst = first.controller.start()
-    expect(first.controller.getSnapshot()).toMatchObject({ status: 'ready', settings: { builtinTheme: 'cloud-cat' } })
-    expect(document.body.getAttribute('data-fde-skin')).toBe('active')
-    expect(document.body.style.getPropertyValue('--fde-background-image'))
-      .toContain(BUNDLED_APPEARANCE_THEMES['cloud-cat'].imageUrl)
+    expect(first.controller.getSnapshot()).toMatchObject({ status: 'ready', settings: { builtinTheme: 'official' } })
+    expect(document.body.hasAttribute('data-fde-skin')).toBe(false)
+    expect(document.body.style.getPropertyValue('--fde-background-image')).toBe('')
+    expect(first.overrideTokens).not.toHaveBeenCalled()
 
     const whale = BUNDLED_APPEARANCE_THEMES['whale-maid']
     first.controller.save({
@@ -56,6 +56,8 @@ describe('AppearanceController', () => {
     document.body.setAttribute('data-foreign', 'kept')
     const fixture = bench()
     const dispose = fixture.controller.start()
+    const cat = BUNDLED_APPEARANCE_THEMES['cloud-cat']
+    fixture.controller.save({ ...DEFAULT_APPEARANCE, builtinTheme: cat.id, palette: cat.palette })
     const official = BUNDLED_APPEARANCE_THEMES.official
     fixture.controller.save({
       builtinTheme: official.id, imageDataUrl: null, focusY: official.focusY,
@@ -87,10 +89,10 @@ describe('AppearanceController', () => {
       glassStrength: whale.glassStrength, palette: whale.palette,
     }) }).toThrow('quota')
     expect(fixture.controller.getSnapshot()).toMatchObject({
-      status: 'error', issue: 'save-failed', settings: { builtinTheme: 'cloud-cat' },
+      status: 'error', issue: 'save-failed', settings: { builtinTheme: 'official' },
     })
     expect(document.body.style.getPropertyValue('--fde-background-image')).toBe(beforeImage)
-    expect(normalizeSettings(JSON.parse(stored) as unknown)).toMatchObject({ builtinTheme: 'cloud-cat' })
+    expect(normalizeSettings(JSON.parse(stored) as unknown)).toMatchObject({ builtinTheme: 'official' })
   })
 
   it('falls back atomically from invalid storage and validates custom settings', () => {
@@ -101,7 +103,7 @@ describe('AppearanceController', () => {
     const fixture = bench(storage)
     fixture.controller.start()
     expect(fixture.controller.getSnapshot()).toMatchObject({
-      status: 'error', issue: 'invalid-stored-value', settings: { builtinTheme: 'cloud-cat' },
+      status: 'error', issue: 'invalid-stored-value', settings: { builtinTheme: 'official' },
     })
     expect(() => normalizeSettings({ ...DEFAULT_APPEARANCE, builtinTheme: 'unknown' })).toThrow('appearance-theme-invalid')
     expect(normalizeSettings({

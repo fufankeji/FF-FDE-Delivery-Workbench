@@ -21,6 +21,8 @@
 
 ## 应用参数
 
+FDE 发行层将 `dsh-context@0.83.1` 固定为运行依赖。新建 Web 配置通过共用模板启用该 bundle，Desktop 也复用此模板；已有用户组合和显式禁用 patch 保持不变。Headless、ACP 与 SDK 的默认组合不启用它。
+
 启动器只解析自身的 flag，并将其后的所有内容交给已启动的 profile；注入该 profile 的任意应用插件都可以解析这份共享的不可变快照（[`dsh-cmdline`](../../packages/boot/cmdline/README.zh.md)）。启动器无法识别的第一个 token 标志着应用参数的开始：
 
 ```sh

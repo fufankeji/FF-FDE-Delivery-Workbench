@@ -729,6 +729,7 @@
 }
 
 .panelGlyph {
+  min-width: var(--dsh-sidebar-panel-glyph-size, 16px);
   flex: none;
   display: inline-flex;
   align-items: center;
@@ -740,6 +741,11 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.compactPanels .panelRow {
+  justify-content: center;
+  padding-inline: 0;
 }
 
 .collapsed .panelList {

@@ -32,6 +32,8 @@ Edit this package when the installation's bundle selection or the plugin manager
 
 ### Optional and retired bundles
 
+The FDE Web template also enables the third-party `dsh-context` bundle, supplied by the CLI's pinned runtime dependency; Desktop reuses this template. It is not added to other modes or to existing user bundle lists. Desktop recovery still disables it with other third-party plugins.
+
 `OPTIONAL_BUNDLES` names the bundles the installation ships for a person to switch on. Each must be a runtime dependency of the `dsh` app that declares `dsh.bundle.patch`, an icon, and `./locale/*.json` display metadata, and no template may select it; [`verify-default-product-isolation`](../../../scripts/verify-default-product-isolation.ts) checks these rules. The [plugin manager](../../boot/plugin-manager/README.md#use-this-package) reports these bundles as `optional`. `RETIRED_BUNDLES` names bundles the installation no longer carries; app-boot removes them from a profile's bundle list when it loads the profile.
 
 <a id="plugin-manager-lists"></a>

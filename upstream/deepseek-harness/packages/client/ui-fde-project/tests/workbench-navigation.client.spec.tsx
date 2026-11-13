@@ -1,35 +1,52 @@
 // @vitest-environment jsdom
-import { afterEach, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { afterEach, beforeEach, expect, it, vi } from 'vitest'
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { bindSnapshotSelector, makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
+import { createSnapshotStore } from '@deepseek-ai/dsh-client-store'
+import type { MainPanelId } from '@deepseek-ai/dsh-client-ui-layout/client'
 import type { ComponentProps } from 'react'
-import { WorkbenchNavigation, WorkbenchLabLauncher } from '../src/client/WorkbenchNavigation.tsx'
+import { WorkbenchNavigation, WorkbenchLabLauncher, WorkbenchNativeReturn } from '../src/client/WorkbenchNavigation.tsx'
 import { WorkbenchOverview } from '../src/client/WorkbenchOverview.tsx'
 import { ProjectPageController } from '../src/client/page-controller.ts'
 import { zh } from '../src/client/locales.ts'
 
 const t = makeTranslate(zh)
+beforeEach(() => {
+  vi.stubGlobal('matchMedia', (media: string) => Object.assign(new EventTarget(), { media, matches: false }))
+})
 afterEach(() => { cleanup(); vi.unstubAllGlobals() })
+
+type NavigationProps = ComponentProps<typeof WorkbenchNavigation>
+function navigationProps(page: ProjectPageController, renderSlot: NavigationProps['renderSlot'], renderFactorySlot: NavigationProps['renderFactorySlot'] = () => null, panelInfo = createSnapshotStore<{ activePanelId: MainPanelId | null }>({ activePanelId: null })): NavigationProps {
+  return {
+    usePanelInfo: bindSnapshotSelector(panelInfo),
+    useProjectPage: bindSnapshotSelector(page), showWorkbenchOverview: page.showDashboard,
+    showProjectOverview: page.showOverview, showWorkbenchLab: page.showLab, showWorkbenchSkills: page.showSkills,
+    showProjectHome: page.showHome, returnFromWorkbenchLab: page.returnFromLab, renderSlot, renderFactorySlot, t,
+    suspendWorkbenchForNative: page.suspendForNative, returnFromNativePanel: () => { panelInfo.set({ activePanelId: null }); page.returnFromNative() },
+  } as unknown as NavigationProps
+}
 
 it('offers four peer destinations, preserves the project shortcut, and removes layout ownership on exit', () => {
   const page = new ProjectPageController()
   const renderSlot = vi.fn((key: string) => key === 'sidebar.settings.shortcut' ? <button type="button">设置</button> : null)
-  const props = {
-    useProjectPage: bindSnapshotSelector(page), showWorkbenchOverview: page.showDashboard,
-    showProjectOverview: page.showOverview, showWorkbenchLab: page.showLab, showWorkbenchSkills: page.showSkills,
-    showProjectHome: page.showHome, returnFromWorkbenchLab: page.returnFromLab, renderSlot, t,
-  } as unknown as ComponentProps<typeof WorkbenchNavigation>
+  const props = navigationProps(page, renderSlot)
   const view = render(<WorkbenchNavigation {...props} />)
   expect(screen.queryByRole('navigation')).toBeNull()
   view.rerender(<><WorkbenchNavigation {...props} />
-    <WorkbenchLabLauncher {...props as unknown as ComponentProps<typeof WorkbenchLabLauncher>} wide /></>)
+    <WorkbenchLabLauncher {...props} wide /></>)
   fireEvent.click(screen.getByRole('button', { name: '实验室' }))
   const nav = screen.getByRole('navigation', { name: '工作台导航' })
   expect(within(nav).getAllByRole('button').map(button => button.textContent)).toEqual(['总览', '项目中心', '实验室', '技能中心'])
   expect(document.body.dataset.fdeWorkbench).toBe('open')
   expect(document.querySelector('[data-fde-workbench-backdrop]')?.getAttribute('aria-hidden')).toBe('true')
+  expect(screen.getByText('本地工作区')).toBeTruthy()
+  expect(screen.getByRole('region', { name: 'Harness 原生功能' })).toBeTruthy()
   const settings = screen.getByRole('button', { name: '设置' })
-  expect(screen.getByText('@赋范空间 独家研发').compareDocumentPosition(settings) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  const home = screen.getByRole('button', { name: '产品介绍' })
+  expect(settings.compareDocumentPosition(home) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  expect(home.compareDocumentPosition(screen.getByText('@赋范空间 独家研发')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  expect(screen.queryByRole('button', { name: '返回工作台' })).toBeNull()
   expect(renderSlot).toHaveBeenCalledWith('sidebar.settings.shortcut', { wide: true })
   for (const [label, destination] of [['总览', 'dashboard'], ['项目中心', 'overview'], ['技能中心', 'skills'], ['实验室', 'lab']] as const) {
     const button = within(nav).getByRole('button', { name: label })
@@ -37,15 +54,75 @@ it('offers four peer destinations, preserves the project shortcut, and removes l
     expect(page.getSnapshot().view).toBe(destination)
     expect(button.getAttribute('aria-current')).toBe('page')
   }
-  const home = screen.getByRole('button', { name: '返回介绍首页' })
-  expect(home.querySelectorAll('svg')).toHaveLength(1)
-  expect(home.textContent).toBe('返回介绍首页')
+  expect(home.querySelectorAll('svg')).toHaveLength(0)
+  expect(home.textContent).toBe('产品介绍')
   fireEvent.click(home)
   expect(page.getSnapshot().view).toBe('home')
   expect(document.body.dataset.fdeWorkbench).toBeUndefined()
   expect(document.querySelector('[data-fde-workbench-backdrop]')).toBeNull()
   expect(screen.queryByRole('button', { name: '设置' })).toBeNull()
   expect(renderSlot).toHaveBeenLastCalledWith('fde.workbench.lab.page', { active: false, back: page.returnFromLab })
+})
+
+it('keeps the rail but releases the content backdrop for native pages and restores the mounted lab', () => {
+  const page = new ProjectPageController()
+  page.showLab()
+  const renderSlot = vi.fn((key: string) => key === 'sidebar.settings.shortcut' ? <button type="button">设置</button> : null)
+  const renderFactorySlot = vi.fn(() => null)
+  const panelInfo = createSnapshotStore<{ activePanelId: MainPanelId | null }>({ activePanelId: null })
+  const props = navigationProps(page, renderSlot, renderFactorySlot, panelInfo)
+  render(<WorkbenchNavigation {...props} />)
+  expect(renderFactorySlot).toHaveBeenLastCalledWith('sidebar.panels', { wide: true, beforeNavigate: page.suspendForNative })
+  fireEvent.click(screen.getByRole('button', { name: '实验室' }))
+  act(() => { page.suspendForNative(); panelInfo.set({ activePanelId: 'plugins' as MainPanelId }) })
+  expect(document.body.dataset.fdeWorkbench).toBe('open')
+  expect(document.body.dataset.fdeNativePanel).toBe('open')
+  const nav = screen.getByRole('navigation', { name: '工作台导航' })
+  expect(within(nav).getAllByRole('button').every(button => !button.hasAttribute('aria-current'))).toBe(true)
+  const back = screen.getByRole('button', { name: '返回工作台' })
+  expect(screen.getAllByRole('button', { name: '返回工作台' })).toHaveLength(1)
+  expect(screen.queryByRole('button', { name: '返回介绍首页' })).toBeNull()
+  expect(back.compareDocumentPosition(screen.getByRole('button', { name: '设置' })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  expect(document.querySelector('[data-fde-workbench-backdrop]')).toBeNull()
+  expect(renderSlot).toHaveBeenLastCalledWith('fde.workbench.lab.page', { active: false, back: page.returnFromLab })
+  fireEvent.click(back)
+  expect(page.getSnapshot().view).toBe('lab')
+  expect(panelInfo.getSnapshot().activePanelId).toBeNull()
+  expect(document.body.dataset.fdeNativePanel).toBeUndefined()
+  expect(document.querySelector('[data-fde-workbench-backdrop]')).not.toBeNull()
+  expect(renderSlot).toHaveBeenLastCalledWith('fde.workbench.lab.page', { active: true, back: page.returnFromLab })
+})
+
+it('uses the same global rail when a native page is opened from the project sidebar', () => {
+  const page = new ProjectPageController()
+  page.close()
+  const panelInfo = createSnapshotStore<{ activePanelId: MainPanelId | null }>({ activePanelId: null })
+  const props = navigationProps(page, () => null, () => null, panelInfo)
+  render(<WorkbenchNavigation {...props} />)
+  expect(screen.queryByRole('navigation')).toBeNull()
+  for (const id of ['plugins', 'schedules']) {
+    act(() => { panelInfo.set({ activePanelId: id as MainPanelId }) })
+    expect(screen.getByRole('navigation', { name: '工作台导航' })).toBeTruthy()
+    expect(document.body.dataset.fdeNativePanel).toBe('open')
+    expect(document.querySelector('[data-fde-workbench-backdrop]')).toBeNull()
+  }
+  fireEvent.click(screen.getByRole('button', { name: '返回工作台' }))
+  expect(page.getSnapshot()).toEqual({ open: false, view: 'closed' })
+  expect(screen.queryByRole('navigation')).toBeNull()
+  expect(document.body.dataset.fdeWorkbench).toBeUndefined()
+  expect(document.body.dataset.fdeNativePanel).toBeUndefined()
+})
+
+it('leaves the native session draft visible when More starts plugin creation', () => {
+  const page = new ProjectPageController()
+  page.showSkills()
+  const props = navigationProps(page, () => null)
+  render(<><WorkbenchNavigation {...props} /><WorkbenchNativeReturn {...props} wide /></>)
+  act(() => { page.suspendForNative() })
+  expect(screen.queryByRole('navigation')).toBeNull()
+  expect(document.querySelector('[data-fde-workbench-backdrop]')).toBeNull()
+  fireEvent.click(screen.getByRole('button', { name: '返回工作台' }))
+  expect(page.getSnapshot().view).toBe('skills')
 })
 
 function overviewProps(): ComponentProps<typeof WorkbenchOverview> {
@@ -58,6 +135,25 @@ function overviewProps(): ComponentProps<typeof WorkbenchOverview> {
     enterProject: vi.fn(async () => {}), renderSlot: vi.fn(() => <><h2>实验室</h2><p>实验室概况</p></>), t,
   }
 }
+
+it('uses the compact official navigation at the same breakpoint and releases its media listener', () => {
+  const media = Object.assign(new EventTarget(), { media: '(max-width: 640px)', matches: true })
+  const remove = vi.spyOn(media, 'removeEventListener')
+  vi.stubGlobal('matchMedia', () => media)
+  const page = new ProjectPageController()
+  page.showDashboard()
+  const factory = vi.fn(() => null)
+  const renderSlot = vi.fn(() => null)
+  const view = render(<WorkbenchNavigation {...navigationProps(page, renderSlot, factory)} />)
+  expect(factory).toHaveBeenLastCalledWith('sidebar.panels', { wide: false, beforeNavigate: page.suspendForNative })
+  expect(renderSlot).toHaveBeenCalledWith('sidebar.settings.shortcut', { wide: false })
+  expect(screen.getByRole('region', { name: 'Harness 原生功能' })).toBeTruthy()
+  expect(screen.getByRole('button', { name: '产品介绍' })).toBeTruthy()
+  act(() => { media.matches = false; media.dispatchEvent(new Event('change')) })
+  expect(factory).toHaveBeenLastCalledWith('sidebar.panels', { wide: true, beforeNavigate: page.suspendForNative })
+  view.unmount()
+  expect(remove).toHaveBeenCalledWith('change', expect.any(Function))
+})
 
 it('shows real projects ordered by update and opens the exact project without an intermediate selector', async () => {
   const props = overviewProps()

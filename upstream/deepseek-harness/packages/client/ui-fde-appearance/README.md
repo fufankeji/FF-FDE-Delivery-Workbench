@@ -6,6 +6,8 @@ Browser presentation and local persistence for the FDE workbench's interface the
 
 Selecting a card or image changes only the settings preview. `Save and apply` first validates and serializes the complete value into the versioned `fde.appearance.v1` localStorage entry, then replaces the active background and tokens. Failed image processing or storage leaves the prior persisted value and active DOM untouched. Choosing the original interface or disposing the plugin removes only this package's background and token effects.
 
+The original interface is the default for a new or invalid preference and for Restore default. It adds no image or skin token overrides. Valid saved skins and custom images remain unchanged at startup; the default badge and reset message follow this choice.
+
 Custom PNG, JPEG, and WebP images up to 16 MiB are decoded, cover-cropped to 1920×1080 WebP, and sampled for four theme colors entirely in the browser. Neither the source nor processed image crosses an RPC, enters a Workspace, Session log, Agent request, or observability backend. Clearing site data removes this personal preference.
 
 The settings page uses the native 20/28 heading and 13/20 description scale, light card borders and stable hover feedback; the image preview and saved preference format remain unchanged.

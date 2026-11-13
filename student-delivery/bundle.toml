@@ -73,6 +73,12 @@ command = "node --test source-materials/fde-agent/load.test.mjs source-materials
 required = true
 timeout_seconds = 180
 [[validation.commands]]
+id = "navigation-and-defaults"
+stage = "test"
+command = "cd upstream/deepseek-harness && corepack pnpm exec vitest run packages/client/ui-fde-appearance/tests packages/client/ui-fde-project/tests/workbench-navigation.client.spec.tsx packages/client/ui-fde-project/tests/workbench-surface.client.spec.ts apps/cli/tests/default-context-profile.spec.ts packages/util/official-bundles/tests/official-bundles.spec.ts"
+required = true
+timeout_seconds = 180
+[[validation.commands]]
 id = "sample-import"
 stage = "diagnostic"
 command = "node source-materials/fde-agent/load.mjs"

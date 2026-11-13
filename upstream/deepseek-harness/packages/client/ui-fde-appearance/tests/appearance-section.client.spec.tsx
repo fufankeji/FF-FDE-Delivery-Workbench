@@ -48,11 +48,12 @@ describe('AppearanceSection', () => {
   it('shows six bundled skins and applies an explicitly saved choice', async () => {
     renderSection()
     expect(screen.getAllByRole('button', { name: /官方原版|大肥鱼拟人|云端猫咪|九天·/ })).toHaveLength(6)
+    expect(screen.getByRole('button', { name: /官方原版/ }).textContent).toContain('默认')
     const whale = screen.getByRole('button', { name: /大肥鱼拟人/ })
     fireEvent.click(whale)
     expect(whale.getAttribute('aria-pressed')).toBe('true')
     expect(screen.getByText(/已更新预览/)).toBeTruthy()
-    expect(document.body.style.getPropertyValue('--fde-background-image')).toContain('cloud-cat-background.webp')
+    expect(document.body.style.getPropertyValue('--fde-background-image')).toBe('')
 
     fireEvent.click(screen.getByRole('button', { name: '保存并应用' }))
     await waitFor(() => {
@@ -63,14 +64,16 @@ describe('AppearanceSection', () => {
 
   it('restores the default and keeps image validation local', async () => {
     renderSection()
-    fireEvent.click(screen.getByRole('button', { name: /官方原版/ }))
+    fireEvent.click(screen.getByRole('button', { name: /云端猫咪/ }))
     fireEvent.click(screen.getByRole('button', { name: '保存并应用' }))
-    await waitFor(() => { expect(document.body.hasAttribute('data-fde-skin')).toBe(false) })
+    await waitFor(() => { expect(document.body.style.getPropertyValue('--fde-background-image')).toContain('cloud-cat-background.webp') })
 
     fireEvent.click(screen.getByRole('button', { name: '恢复默认' }))
     await waitFor(() => {
-      expect(document.body.style.getPropertyValue('--fde-background-image')).toContain('cloud-cat-background.webp')
+      expect(document.body.style.getPropertyValue('--fde-background-image')).toBe('')
+      expect(document.body.hasAttribute('data-fde-skin')).toBe(false)
     })
+    expect(screen.getByText('已恢复官方原版默认皮肤。')).toBeTruthy()
 
     const input = screen.getByLabelText('选择图片') as HTMLInputElement
     fireEvent.change(input, { target: { files: [new File(['text'], 'note.txt', { type: 'text/plain' })] } })

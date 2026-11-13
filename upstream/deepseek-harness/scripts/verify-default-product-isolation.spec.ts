@@ -48,6 +48,25 @@ afterEach(() => {
 })
 
 describe('default product isolation', () => {
+  it.each(['0.83.1', '^0.83.1', undefined])('requires external defaults to have an exact installation dependency (%s)', (version) => {
+    const root = fixture()
+    manifest(root, 'apps/cli/package.json', { dependencies: { [core]: 'workspace:^', ...(version === undefined ? {} : { 'dsh-context': version }) } })
+    write(root, profile, `export const PROFILE_TEMPLATES = { web: { bundles: ['${base}', 'dsh-context'] } }\n`
+      + `export const DEFAULT_PROFILE_BUNDLES = ['${base}']\n`)
+    const result = verifyDefaultProductIsolation(root)
+    if (version === '0.83.1') expect(result.failures).toEqual([])
+    else expect(result.failures.join('\n')).toContain('external default bundle dsh-context must be an exact runtime dependency of apps/cli')
+  })
+
+  it('does not treat an unknown workspace default as an external package', () => {
+    const root = fixture()
+    const missing = '@deepseek-ai/dsh-missing'
+    manifest(root, 'apps/cli/package.json', { dependencies: { [missing]: '1.0.0' } })
+    write(root, profile, `export const PROFILE_TEMPLATES = { web: { bundles: ['${base}', '${missing}'] } }\n`
+      + `export const DEFAULT_PROFILE_BUNDLES = ['${base}']\n`)
+    expect(verifyDefaultProductIsolation(root).failures.join('\n')).toContain(`default bundle ${missing} must declare dsh.bundle.patch`)
+  })
+
   describe.each(Object.entries(EXPERIMENTAL_PACKAGE_NAME_EXCEPTIONS))('retained experimental identity %s', (directory, name) => {
     it.each(['direct dependency', 'transitive dependency', 'npm alias', 'value import', 'subpath import', 'profile row', 'preset row'])(
       'rejects default product use through a %s', (route) => {

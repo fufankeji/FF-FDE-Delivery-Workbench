@@ -33,7 +33,7 @@ type EntryMenuContentProps = PropsRuntime<'sidebar.panellist.actions'>
  * @returns Menu rows for the region's More menu.
  */
 export function EntryMenuContent({
-  entries, onOpen, onPinnedChange, region, onDismiss, usePluginNavigation, browsePlugins, createPlugin, t, renderFactorySlot,
+  entries, onOpen, onPinnedChange, region, onDismiss, beforeNavigate, usePluginNavigation, browsePlugins, createPlugin, t, renderFactorySlot,
 }: EntryMenuContentProps) {
   const moreEntries = region === 'sidebar' ? entries.filter(entry => !entry.pinned) : region === 'conversation' ? entries : []
   const browsable = usePluginNavigation(present => present)
@@ -60,11 +60,11 @@ export function EntryMenuContent({
       </span>}
     </div>)}
     {browsable && <MenuItemButton separatorBefore={moreEntries.length > 0} icon={<IconPluginPinwheelOutlineRegular size={16} />}
-      onSelect={() => { onDismiss(); browsePlugins() }}>
+      onSelect={() => { onDismiss(); beforeNavigate?.(); browsePlugins() }}>
       {t('install')}
     </MenuItemButton>}
     <MenuItemButton icon={<IconPlusOutlineRegular size={16} />} separatorBefore={!browsable && moreEntries.length > 0}
-      onSelect={() => { onDismiss(); createPlugin() }}>
+      onSelect={() => { onDismiss(); beforeNavigate?.(); createPlugin() }}>
       {t('create')}
     </MenuItemButton>
   </>

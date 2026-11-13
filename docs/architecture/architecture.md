@@ -23,6 +23,14 @@ product_spec: docs/specs/product-spec.md
 
 ## 2. 架构目标与原则
 
+### 官方功能导航（F032）
+
+`ui-sidebar` 以共享 `sidebar.panels` Factory 维护面板列表、图标、固定状态和更多菜单，原侧栏与 FDE 全局导航只负责放置，不复制业务入口。FDE 在实际导航前保存来源快照，释放右侧覆盖面并保留统一导航；依据官方 `activePanelId`，从项目内部进入全局页同样隐藏项目专属区域。`ui-layout` 只增加外壳与左列标记，FDE 限定样式将全局页网格对齐统一导航宽度，隐藏项目侧栏、工具栏和拖柄，不改保存的项目布局。“返回工作台”关闭原生面板并恢复来源或原会话；实验室仍常驻并保留其返回面板。固定或关闭更多不触发导航，创建插件草稿仍进入官方会话视图。数据、权限与自动化执行器不变。
+
+### 默认安装体验（F033）
+
+`ui-fde-appearance` 的单一默认值改为 `official`，无有效持久值与主动重置均沿现有无背景/无覆盖 Token 路径；不迁移合法的 `fde.appearance.v1`。CLI 运行依赖精确声明 `dsh-context@0.83.1`，Web 默认模板包含其 bundle；桌面复用同一模板。插件沿自身 patch 注册 Host/Client，不重复插入 web-app 的配置层。已有 profile 不重写，禁用选择保留；桌面故障恢复仍排除这个第三方默认插件。源码默认组合检查验证外部包的 CLI 精确依赖，真实外部 patch 由全新 profile 装配验证。插件自身会查询公开价格与版本元数据，默认不产生模型调用；本轮不配置提示词前后缀、付费模型或外发观测平台。
+
 ### 中文场景判断挑战（F029）
 
 新增 `packages/fde/scenario-challenge` 与 `packages/client/ui-fde-scenario-challenge`，分别拥有独立答题数据/HTTP 操作与原生挑战页面，通过现有 Web Bundle 同时用于桌面和 Web。数据只位于显式 `DSH_HOME/fde-scenario-challenge/state.json`，原子文件写入与文件锁保护一个进行中轮次和最近 20 次已完成结果，不进入项目、Session 或原实验室 SQLite。服务端绝对截止时间与修订号决定是否可以保存；客户端只显示计时，资源提供者统一读取、错误和重新获取。新接口复用 Connection owner 与同源信任校验。

@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { LocaleRuntime } from '@deepseek-ai/dsh-client-locale/client'
 import { SlotRegistry } from '@deepseek-ai/dsh-client-ui-renderer/client'
 import { createSnapshotStore } from '@deepseek-ai/dsh-client-store'
+import type { MainPanelId } from '@deepseek-ai/dsh-client-ui-layout/client'
 import { apply, inject } from '../src/client/index.ts'
 import { ArchitectureView } from '../src/client/ArchitectureView.tsx'
 import { ObservabilityView } from '../src/client/ObservabilityView.tsx'
@@ -91,7 +92,10 @@ describe('ui-fde-project apply', () => {
       }),
     } as never)
     ctx.provide('conversation', {} as never)
+    const panelInfo = createSnapshotStore<{ activePanelId: MainPanelId | null }>({ activePanelId: 'schedules' as MainPanelId })
+    const selectPanel = vi.fn((activePanelId: MainPanelId | null) => { panelInfo.set({ activePanelId }) })
     ctx.provide('layout', {
+      panelInfo, selectPanel,
       toggleSidebar: vi.fn(), collapseSidebar, openDetails: vi.fn(), closeDetails: vi.fn(),
     } as never)
     const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
@@ -151,7 +155,7 @@ describe('ui-fde-project apply', () => {
     const fiber = ctx.plugin({ inject: [...inject], apply })
     await fiber.await()
 
-    expect(slots.entries('sidebar.footer.action')[0]?.component).toBe(ProjectProgressLauncher)
+    expect(slots.entries('sidebar.footer.action').find(entry => entry.options.id === 'fde-project-progress')?.component).toBe(ProjectProgressLauncher)
     expect(slots.entries('shell.overlay')[0]?.component).toBe(ProjectProgressOverlay)
     expect(slots.spec('fde.project.source.preview')).toEqual({ kind: 'single', scope: 'root' })
     expect(slots.spec('fde.workbench.lab.summary')).toEqual({ kind: 'single', scope: 'root' })
@@ -210,6 +214,29 @@ describe('ui-fde-project apply', () => {
     expect(notify).toHaveBeenCalledWith('info', '输入框已有内容，已为你保留。请补充完整后再发送。')
 
     const injected = (slots.entries('shell.overlay')[0]!.inject as unknown as () => ProjectPageInjected)()
+    injected.showProjectDetail('workspace-1')
+    const openedBeforeNavigation = openSession.mock.calls.length
+    injected.suspendWorkbenchForNative()
+    selectPanel('plugins' as MainPanelId)
+    injected.returnFromNativePanel()
+    expect(selectPanel).toHaveBeenLastCalledWith(null)
+    expect(openSession).toHaveBeenCalledTimes(openedBeforeNavigation)
+    expect(injected.hooks.projectPage.getSnapshot()).toEqual({ open: true, view: 'project', workspaceId: 'workspace-1' })
+    injected.closeProjectPage()
+    selectPanel('plugins' as MainPanelId)
+    injected.showWorkbenchLab()
+    expect(panelInfo.getSnapshot().activePanelId).toBeNull()
+    injected.showWorkbenchLab()
+    injected.returnFromWorkbenchLab()
+    expect(panelInfo.getSnapshot().activePanelId).toBe('plugins')
+    expect(injected.hooks.projectPage.getSnapshot().open).toBe(false)
+    injected.returnFromNativePanel()
+    expect(panelInfo.getSnapshot().activePanelId).toBeNull()
+    expect(openSession).toHaveBeenCalledTimes(openedBeforeNavigation)
+    selectPanel('schedules' as MainPanelId)
+    injected.showWorkbenchOverview()
+    expect(panelInfo.getSnapshot().activePanelId).toBeNull()
+    expect(injected.hooks.projectPage.getSnapshot().view).toBe('dashboard')
     const progressEvent = new CustomEvent('fde:project-progress-open', {
       cancelable: true,
       detail: { workspaceId: 'workspace-1' },

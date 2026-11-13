@@ -241,9 +241,17 @@ export function verifyDefaultProductIsolation(root: string): ProductIsolationRes
     if (path.startsWith('apps/') || path === 'python/sdk-runtime') add(pkg, path)
   }
   if (selection !== undefined) {
+    const externalBundles = new Set<string>()
     for (const name of selection.packages) {
       reference(name, PROFILE_SOURCE)
-      if (packages.get(name)?.manifest.dsh?.bundle?.patch === undefined) {
+      const pkg = packages.get(name)
+      if (pkg === undefined && !name.startsWith('@deepseek-ai/')) {
+        // Registry packages have no source-plane patch to scan. Their installed
+        // profile composition is checked separately; the launcher must pin them.
+        const version = cli?.manifest.dependencies?.[name]
+        if (version !== undefined && /^\d+\.\d+\.\d+(?:-[\w.-]+)?$/.test(version)) externalBundles.add(name)
+        else failures.push(`${PROFILE_SOURCE}: external default bundle ${name} must be an exact runtime dependency of apps/cli`)
+      } else if (pkg?.manifest.dsh?.bundle?.patch === undefined) {
         failures.push(`${PROFILE_SOURCE}: default bundle ${name} must declare dsh.bundle.patch`)
       }
       if (optionalBundles.has(name)) failures.push(`${PROFILE_SOURCE}: optional bundle ${name} must not be a default bundle`)
@@ -254,7 +262,7 @@ export function verifyDefaultProductIsolation(root: string): ProductIsolationRes
       if (pkg === undefined || bundle === undefined) return []
       return [bundlePatchPaths(pkg.directory, bundle).flatMap(file => loadOverlayPatches('verify-default-product-isolation', file))]
     })
-    if (webLayers.length !== selection.webBundles.length) {
+    if (webLayers.length !== selection.webBundles.filter(name => !externalBundles.has(name)).length) {
       failures.push(`${PROFILE_SOURCE}: default Web bundle layers are incomplete`)
     } else {
       const entries = composeEntries(webLayers)
@@ -366,7 +374,7 @@ function profilePackages(source: string): { packages: string[]; webBundles: stri
   const literals = (node: ts.Node, path: string[]): void => {
     if (ts.isStringLiteralLike(node)) {
       if (path[0] === 'OPTIONAL_BUNDLES') optionalBundles.push(node.text)
-      else if (node.text.startsWith('@')) packages.push(node.text)
+      else packages.push(node.text)
       if (path.join('.') === 'PROFILE_TEMPLATES.web.bundles') webBundles.push(node.text)
     } else if (ts.isArrayLiteralExpression(node)) node.elements.forEach((child) => { literals(child, path) })
     else if (ts.isObjectLiteralExpression(node)) node.properties.forEach((child) => { literals(child, path) })

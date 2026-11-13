@@ -56,6 +56,7 @@ Windows 原生未在本轮实测。若需要本机编译原生依赖，依据具
 
 - 首次通过 Host 输出的授权链接建立 Cookie，随后才能访问普通 3080 地址。不得将授权参数、Cookie、API Key 粘贴到公共消息或提交。
 - 授权后的首页应为 200 且含 `__DSH_BOOT__`，其中包括 ui-fde-project、ui-fde-discovery-lab 等实际插件；请求其中的同源资源应成功。未认证的 curl 响应不代表 Host 失败。
+- 新建默认配置的 Boot Manifest 应包含唯一 `dsh-context`，无需再次安装上下文洞察。默认皮肤为“官方原版”；恢复已有数据时保留合法个人皮肤和插件禁用配置，不强制重置。
 - 新导入的 `.runtime/fde-agent-sample/dsh-home/storages/workspace.json` 仅登记本次门店示例，项目路径在本包的 `.runtime/fde-agent-sample/project`。不应出现讲师个人项目或其他实例。
 - 工作台没有约定 `/api/health`；这个接口属于可选维修业务系统的 4177 端口。
 - 打开平台、进入示例、阅读资料与 Skills 不需要模型。让用户人工查看导航、阶段材料及设置，不能把 HTTP 200 宣称为全部视觉或模型能力验收。

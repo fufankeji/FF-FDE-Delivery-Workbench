@@ -2,6 +2,36 @@ import { describe, expect, it, vi } from 'vitest'
 import { ProjectPageController } from '../src/client/page-controller.ts'
 
 describe('ProjectPageController', () => {
+  it('restores the exact native-panel origin without replacing the lab return chain', () => {
+    const page = new ProjectPageController()
+    page.showProject('workspace-one')
+    page.showLab()
+    page.suspendForNative()
+    page.suspendForNative()
+    expect(page.getSnapshot()).toEqual({ open: false, view: 'closed', nativeReturn: true })
+    page.returnFromNative()
+    expect(page.getSnapshot()).toEqual({ open: true, view: 'lab' })
+    page.returnFromLab()
+    expect(page.getSnapshot()).toEqual({ open: true, view: 'project', workspaceId: 'workspace-one' })
+    page.suspendForNative()
+    page.returnFromNative()
+    expect(page.getSnapshot()).toEqual({ open: true, view: 'project', workspaceId: 'workspace-one' })
+  })
+
+  it('drops an obsolete native return when the user explicitly chooses a different workbench page', () => {
+    const page = new ProjectPageController()
+    page.showSkills()
+    page.suspendForNative()
+    page.showDashboard()
+    page.returnFromNative()
+    expect(page.getSnapshot()).toEqual({ open: true, view: 'dashboard' })
+    page.suspendForNative()
+    page.showLab()
+    page.returnFromLab()
+    expect(page.getSnapshot()).toEqual({ open: false, view: 'closed' })
+    page.returnFromNative()
+    expect(page.getSnapshot()).toEqual({ open: false, view: 'closed' })
+  })
   it('keeps module navigation independent and restores the exact lab entry page', () => {
     const controller = new ProjectPageController()
     controller.showDashboard()

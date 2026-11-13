@@ -1,6 +1,25 @@
 import { readFileSync } from 'node:fs'
 import { expect, it } from 'vitest'
 
+it('distinguishes selected destinations and keeps group captions out of the compact rail', () => {
+  const css = readFileSync(new URL('../src/client/workbench.module.css', import.meta.url), 'utf8')
+  expect(css).toContain(".navItem[aria-current='page'] { background: var(--dsw-alias-interactive-bg-active); }")
+  expect(css).toContain(".nativeNavigation :global(button[aria-current='page']) { color: var(--dsw-alias-state-business-primary); font-weight: 500; }")
+  const compact = css.slice(css.indexOf('@media (max-width: 640px)'))
+  expect(compact).toContain('.groupLabel, .navBottom small { display: none; }')
+  expect(compact).toContain('.introLink { width: 100%; margin: 8px 0 0; font-size: 11px; text-align: center; }')
+})
+
+it('keeps the extra native entries scrollable and hides the covered original sidebar from interaction', () => {
+  const css = readFileSync(new URL('../src/client/workbench.module.css', import.meta.url), 'utf8')
+  expect(css).toContain('.navScroll { flex: 1; min-height: 0; overflow-y: auto; }')
+  expect(css).toContain(":global(body[data-fde-workbench='open'] [data-native-sidebar]) { visibility: hidden; pointer-events: none; }")
+  expect(css).toContain('.nativeNavigation nav { margin-top: 0; }')
+  expect(css).toContain(":global(body[data-fde-native-panel='open'] [data-shell-frame])")
+  expect(css).toContain('grid-template-columns: var(--fde-navigation-width) minmax(0, 1fr) 0 !important;')
+  expect(css).toContain('[data-shell-sidebar], [data-rightbar-col], [data-side], [data-shell-leading], [data-sidebar-mask], [data-shell-bottom]')
+})
+
 it('adds native caption clearance only to windowed macOS navigation at both rail widths', () => {
   const css = readFileSync(new URL('../src/client/workbench.module.css', import.meta.url), 'utf8')
   const selector = ":global(html[data-platform='darwin']:not([data-fullscreen])) .navigation"

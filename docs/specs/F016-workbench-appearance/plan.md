@@ -2,7 +2,7 @@
 document: feature-plan
 feature: F016
 status: ready
-updated: "2026-08-27"
+updated: "2026-11-13"
 ---
 
 # F016 · 工作台界面主题实施计划
@@ -30,11 +30,11 @@ updated: "2026-08-27"
 
 建立独立动态 Client 插件 `@deepseek-ai/dsh-client-ui-fde-appearance`。插件注入 `slots`、`theme` 和 `locale`，注册中文/英文设置文案，并通过 declaration-aware `settings.section` 添加“界面主题”。组件只接收框架绑定的控制器观察 hook 和操作回调，不读取 ctx、不直接订阅外部状态。
 
-`AppearanceController` 在 apply 时启动：保存其将要覆盖的 body 标记和 CSS 属性，从 `fde.appearance.v1` 读取并校验完整 JSON，无有效值时采用 `whale-maid`，然后调用统一 `apply()`。图片皮肤设置 `body[data-fde-skin='active']`、背景 URL/焦点自定义属性，并通过 `ctx.theme.overrideTokens('fde-appearance', tokens)` 提交明暗成对 Token；`official` 和 dispose 路径撤销该插件自己的写入。
+`AppearanceController` 在 apply 时启动：保存其将要覆盖的 body 标记和 CSS 属性，从 `fde.appearance.v1` 读取并校验完整 JSON，无有效值时采用 `official`，然后调用统一 `apply()`。图片皮肤设置 `body[data-fde-skin='active']`、背景 URL/焦点自定义属性，并通过 `ctx.theme.overrideTokens('fde-appearance', tokens)` 提交明暗成对 Token；`official` 和 dispose 路径撤销该插件自己的写入。2026-11-13 默认值调整由 F033 实施，不迁移合法用户偏好。
 
 设置组件复用 Studio 的卡片、预览、文件选择、焦点和玻璃层交互，并改用 `FF - FDE 交付工作台` 文案。内置选择直接引用 `/fde-themes/*.webp`；自定义文件使用 Object URL 预览，保存时执行 1920×1080 cover 裁切、WebP 编码和配色提取。持久 JSON 在写入前检查编码长度，`localStorage.setItem()` 成功后控制器才应用并发布；失败时不触碰旧快照和 DOM。
 
-CSS Module 同时拥有设置组件样式和 F016 全局背景选择器；组件颜色只消费官方语义 Token，背景叠层和预览特有蒙层保留在主题所有者中。默认大肥鱼拟人、官方原版和五张静态资源的身份、路径、配色固定在一个定义表内。
+CSS Module 同时拥有设置组件样式和 F016 全局背景选择器；组件颜色只消费官方语义 Token，背景叠层和预览特有蒙层保留在主题所有者中。默认官方原版和五张静态资源的身份、路径、配色固定在一个定义表内。
 
 AppFrame 与 SidebarRoot 会各自使用 `--dsw-specific-sidebar-fill`，同一较高透明度在两层叠加后会近似不透明。F016 把该 Token 收敛为较轻的明暗成对半透明值，并通过 Slot 系统稳定提供的 `[data-slot='sidebar']` 地址只撤去 SidebarRoot 的重复填充、增加轻量背景模糊；AppFrame 仍保留单层侧栏表面和右边界，因此背景进入左栏且文字、选中行与控件继续可辨识，不修改 `ui-layout` 或 `ui-sidebar` 源码。
 

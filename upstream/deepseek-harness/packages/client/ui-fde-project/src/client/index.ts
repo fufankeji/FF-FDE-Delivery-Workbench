@@ -12,7 +12,7 @@ import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { WorkspaceId } from '@deepseek-ai/dsh-workspace'
 import type {} from '@deepseek-ai/dsh-client-locale/client'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
-import type {} from '@deepseek-ai/dsh-client-ui-layout/client'
+import type { MainPanelId } from '@deepseek-ai/dsh-client-ui-layout/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
 import type {} from '@deepseek-ai/dsh-client-ui-workspace/client'
 import type { BetterSidebarService } from 'dsh-better-sidebar'
@@ -26,7 +26,7 @@ import { ObservabilityView } from './ObservabilityView.tsx'
 import { ProjectPageController } from './page-controller.ts'
 import { ProjectProgressLauncher } from './ProjectProgressLauncher.tsx'
 import { ProjectProgressOverlay } from './ProjectProgressOverlay.tsx'
-import { WorkbenchNavigation, WorkbenchLabLauncher } from './WorkbenchNavigation.tsx'
+import { WorkbenchNavigation, WorkbenchLabLauncher, WorkbenchNativeReturn } from './WorkbenchNavigation.tsx'
 import { ProjectRuntimeHeader } from './ProjectRuntimeHeader.tsx'
 import { ProjectContextSidebar } from './ProjectContextSidebar.tsx'
 import { ProjectStageWorkbenchHero, ProjectStageWorkbenchView } from './StageWorkbench.tsx'
@@ -95,6 +95,7 @@ export function apply(ctx: ClientContext): void {
       const detail = (event as CustomEvent<{ workspaceId?: unknown } | undefined>).detail
       if (typeof detail?.workspaceId === 'string' && detail.workspaceId.length > 0) {
         event.preventDefault()
+        ctx.layout.selectPanel(null)
         page.showProject(detail.workspaceId)
       }
     }
@@ -104,6 +105,12 @@ export function apply(ctx: ClientContext): void {
   const t = ctx.locale.bind(NS)
   let projectSidebar: BetterSidebarService | undefined
   let enteredProject: { workspaceId: string; sessionId: string } | undefined
+  let labReturnPanel: MainPanelId | null = null
+
+  const showWorkbenchPage = (show: () => void): void => {
+    ctx.layout.selectPanel(null)
+    show()
+  }
 
   const resolveProjectSession = async (workspaceId: string): Promise<SessionId> => {
     const workspaceState = ctx.workspaces.list.getSnapshot()
@@ -153,6 +160,13 @@ export function apply(ctx: ClientContext): void {
   }
 
   const pageInjected = (): ProjectPageInjected => ({
+    suspendWorkbenchForNative: () => {
+      page.suspendForNative()
+    },
+    returnFromNativePanel: () => {
+      ctx.layout.selectPanel(null)
+      page.returnFromNative()
+    },
     hooks: { projectPage: page, stageProgress: stages, projectSurfaces: surfaces, projectSources: sources, projectMetadata: ctx.projectMetadata },
     loadProjectMetadata: (id, path, force) => { ctx.projectMetadata.load(id, path, force) },
     openActivitySession: async (workspaceId, sessionId) => {
@@ -236,15 +250,24 @@ export function apply(ctx: ClientContext): void {
     enterProject: async (workspaceId) => { await enterProject(workspaceId) },
     reviewProjectArchitecture: async (workspaceId) => { await enterProject(workspaceId, 'fde-architecture') },
     closeProjectPage: page.close,
-    openProjectPage: page.open,
-    showProjectHome: page.showHome,
-    showWorkbenchOverview: page.showDashboard,
-    showWorkbenchLab: page.showLab,
-    returnFromWorkbenchLab: page.returnFromLab,
-    showWorkbenchSkills: page.showSkills,
-    showProjectOverview: page.showOverview,
-    showProjectTimeline: page.showTimeline,
-    showProjectDetail: page.showProject,
+    openProjectPage: () => { showWorkbenchPage(page.open) },
+    showProjectHome: () => { showWorkbenchPage(page.showHome) },
+    showWorkbenchOverview: () => { showWorkbenchPage(page.showDashboard) },
+    showWorkbenchLab: () => {
+      if (page.getSnapshot().view === 'lab') return
+      labReturnPanel = ctx.layout.panelInfo.getSnapshot().activePanelId
+      showWorkbenchPage(page.showLab)
+    },
+    returnFromWorkbenchLab: () => {
+      if (page.getSnapshot().view !== 'lab') return
+      page.returnFromLab()
+      if (!page.getSnapshot().open) ctx.layout.selectPanel(labReturnPanel)
+      labReturnPanel = null
+    },
+    showWorkbenchSkills: () => { showWorkbenchPage(page.showSkills) },
+    showProjectOverview: () => { showWorkbenchPage(page.showOverview) },
+    showProjectTimeline: () => { showWorkbenchPage(page.showTimeline) },
+    showProjectDetail: (workspaceId) => { showWorkbenchPage(() => { page.showProject(workspaceId) }) },
   })
 
   const projectViewInjected = (sessionId: SessionId): ProjectViewInjected => ({
@@ -587,6 +610,10 @@ export function apply(ctx: ClientContext): void {
       showProjectConversation(sessionId)
     },
   })
+
+  ctx.slots.inject('sidebar.footer.action', () => ctx.slots.register({
+    name: 'sidebar.footer.action', id: 'fde-native-return', order: -21, locale: NS, inject: pageInjected,
+  }, WorkbenchNativeReturn))
 
   ctx.slots.inject('sidebar.footer.action', () => ctx.slots.register({
     name: 'sidebar.footer.action', id: 'fde-project-progress', order: -20, locale: NS, inject: pageInjected,

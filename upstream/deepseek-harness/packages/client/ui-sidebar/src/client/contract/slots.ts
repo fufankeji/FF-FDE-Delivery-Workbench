@@ -18,6 +18,14 @@ import type { ProductEventMap } from '@deepseek-ai/dsh-client-product-analytics/
 
 declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface SlotFactoryMap {
+    /** Shared official panel navigation with the same registration and pin state in every shell. */
+    'sidebar.panels': {
+      scope: 'root'
+      props: SidebarPanelNavigationOwnerProps
+      inject: SidebarPanelsInjected
+      locale: 'sidebar'
+      children: { 'sidebar.panellist.actions': { kind: 'list'; scope: 'root' } }
+    }
     /** Reuse a registered panel icon in navigation rows and menus. */
     'sidebar.panel.icon': {
       scope: 'root'
@@ -121,6 +129,8 @@ export interface SidebarPanelActionEntry {
 
 /** Owner share of the panel list's More menu rows. */
 export interface SidebarPanelActionsOwnerProps {
+  /** Optional shell handoff before discovery or Creator navigation; absent keeps the current shell. Never called for pinning or dismissal. */
+  readonly beforeNavigate?: (() => void) | undefined
   /** Customizable panels in registration order; Plugins is never listed. */
   readonly entries: readonly SidebarPanelActionEntry[]
   /**
@@ -219,6 +229,18 @@ export type SidebarRootInjected = {
   }
 }
 
+/** Presentation and optional navigation handoff supplied by the embedding shell. */
+export interface SidebarPanelNavigationOwnerProps {
+  readonly wide: boolean
+  /** Release an outer page before a real navigation; absent leaves normal sidebar navigation unchanged. */
+  readonly beforeNavigate?: (() => void) | undefined
+}
+
+/** Shared panel metadata and pin state; no second registry is created for alternate shells. */
+export type SidebarPanelsInjected = Pick<SidebarRootInjected, 'selectPanel' | 'setPinned' | 'trackEntryClick'> & {
+  hooks: Pick<SidebarRootInjected['hooks'], 'panels' | 'entryPins' | 'entryActions'>
+}
+
 /**
  * Full component props: layout owner state/actions plus the declared holes'
  * render shares, this package's injected callbacks, and the standard locale
@@ -230,7 +252,6 @@ export type SidebarRootComponentProps =
     | 'sidebar.brand.mark'
     | 'sidebar.brand.name'
     | 'sidebar.toggle.badge'
-    | 'sidebar.panellist.actions'
     | 'sidebar.workspaces'
     | 'sidebar.settings'
     | 'sidebar.footer.action'

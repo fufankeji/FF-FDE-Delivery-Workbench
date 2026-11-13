@@ -79,7 +79,8 @@ function mountShell({ collapsed = false, width = 300, drawer = false, shortcuts 
       useContextMenu={contextMenuHook()} useResource={useResource} useWorkspaces={neverHook}
       {...allowAllAccess}
       startSession={startSession} toggleSidebar={toggleSidebar} trackEntryClick={trackEntryClick} t={t}
-      renderFactorySlot={() => null}
+      // This fixture checks shell placement; real panel behavior is covered by panel-list.client.spec.tsx.
+      renderFactorySlot={name => name === 'sidebar.panels' && panels.length > 0 ? <nav aria-label="Panels" /> : null}
       renderSlot={((
         key: string,
         owner: SidebarFooterActionOwnerProps | SidebarSectionOwnerProps | SidebarSettingsOwnerProps,
@@ -137,7 +138,7 @@ describe('SidebarRoot shell', () => {
     const viewport = document.querySelector('[data-sidebar-scrollport]')!
     expect(viewport.contains(screen.getByRole('navigation'))).toBe(true)
     expect(viewport.contains(screen.getByTestId('region'))).toBe(true)
-    for (const button of screen.getAllByRole('button', { name: 'New session' })) {
+    for (const button of screen.getAllByRole('button', { name: 'Collapse sidebar' })) {
       expect(viewport.contains(button)).toBe(false)
     }
     expect(viewport.contains(screen.getByTestId('settings-seat'))).toBe(false)

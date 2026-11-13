@@ -3,8 +3,8 @@
 # After editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write packages/client/ui-fde-appearance/README.md
 /deepseek-ai-dsh-client-ui-fde-appearance:
-  en: 743be85851d18efb
-  zh: 01d3e57e885f6db5
+  en: dfd29d1066fa4b31
+  zh: c770c910cd8e3460
 /deepseek-ai-dsh-client-ui-fde-appearance/model-experience:
   en: 41973aedbbd48dd4
   zh: 19ef3b04770fefac

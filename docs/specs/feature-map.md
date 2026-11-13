@@ -3,7 +3,7 @@ document: feature-map
 status: confirmed
 prd: docs/PRD.md
 product_spec: docs/specs/product-spec.md
-updated: "2026-11-12"
+updated: "2026-11-13"
 ---
 
 # FF - FDE 交付工作台 V2 Feature Map
@@ -76,6 +76,20 @@ F001～F004 建立共享能力，F005 用“发现高价值问题”完成第一
 | F031 | F031-lab-source-delivery | 新安装直接使用五案例实验室 | GitHub 克隆与学员包均自带必需素材，安装后不再索要额外 ZIP；不分发个人数据 | REQ-030, REQ-031, REQ-032, REQ-010, NFR-003, NFR-004, NFR-006, PSC-026, PSC-009 | F024, F030 | P0 | in-progress |
 
 2026-11-13 用户明确要求补齐素材、重新提交 GitHub，并在桌面交付新版源码包；此指令确认上述范围。只交付源码，不扩展为宣传媒体、真实模型调用或用户数据迁移。
+
+## F032 · 已确认的官方功能导航
+
+| Feature ID | 目录 | Feature | 用户可观察结果 | 来源合同 | 依赖 | 优先级 | 状态 |
+|---|---|---|---|---|---|:---:|---|
+| F032 | F032-native-panel-navigation | 从统一侧栏使用官方功能 | 插件、自动化任务和更多可从一级工作台进入，并返回原项目或实验室上下文 | REQ-033, REQ-038, NFR-001, NFR-007, PSC-027, PSC-032 | F025, F030 | P0 | in-progress |
+
+## 默认安装体验补充
+
+| ID | 目录 | Feature | 用户结果 | 覆盖 | 依赖 | 优先级 | 状态 |
+|---|---|---|---|---|---|---|---|
+| F033 | F033-default-install-experience | 默认官方外观与上下文洞察 | 新安装采用官方原版皮肤，并直接使用上下文洞察；已有选择不被覆盖 | REQ-033, REQ-037, NFR-007, PSC-027, PSC-031 | F030, F032 | P0 | in-progress |
+
+2026-11-13 用户确认本范围；不默认启用实验性能力、不发起真实任务，不包含 GitHub 推送或重新打包。
 
 ## 范围外与延期项
 

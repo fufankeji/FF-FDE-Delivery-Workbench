@@ -45,6 +45,18 @@ function content(overrides: Partial<ContentProps> = {}) {
 }
 
 describe('More menu rows', () => {
+  it('hands off the outer shell only for discovery or Creator actions, never for pinning or dismissal', () => {
+    const beforeNavigate = vi.fn()
+    const b = content({ beforeNavigate })
+    fireEvent.click(b.view.getByRole('menuitem', { name: 'Pin Tasks to sidebar' }))
+    expect(beforeNavigate).not.toHaveBeenCalled()
+    fireEvent.click(b.view.getByRole('menuitem', { name: 'Browse other plugins' }))
+    expect(beforeNavigate).toHaveBeenCalledOnce()
+    expect(beforeNavigate.mock.invocationCallOrder[0]).toBeLessThan(b.browsePlugins.mock.invocationCallOrder[0]!)
+    fireEvent.click(b.view.getByRole('menuitem', { name: 'Create your plugin' }))
+    expect(beforeNavigate).toHaveBeenCalledTimes(2)
+    expect(beforeNavigate.mock.invocationCallOrder[1]).toBeLessThan(b.createPlugin.mock.invocationCallOrder[0]!)
+  })
   it.each(['rightbar'] as const)('shows only discovery and creation in %s regardless of entries', (region) => {
     const b = content({ region, entries: [
       { id: 'notes', label: 'Notes', pinned: true, active: true },

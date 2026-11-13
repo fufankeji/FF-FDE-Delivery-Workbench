@@ -289,6 +289,7 @@ export function AppFrame({
     <div
       ref={frameRef}
       className={css.frame}
+      data-shell-frame
       style={{
         ...(windowsTitlebar
           ? { '--dsh-windows-sidebar-width': `${cols.sidebar}px` } : {}),
@@ -311,7 +312,7 @@ export function AppFrame({
       />
       {drawer && <div className={css.drawerMask} data-sidebar-mask aria-hidden="true"
         onClick={drawerOpen ? () => { actions.toggleSidebar() } : undefined} />}
-      <div className={css.sidebarCol}
+      <div className={css.sidebarCol} data-shell-sidebar
         style={drawer ? { width: sidebarWidth } : undefined}
         {...{ inert: drawer && sidebarCollapsed ? '' : undefined }}>
         {sidebar}

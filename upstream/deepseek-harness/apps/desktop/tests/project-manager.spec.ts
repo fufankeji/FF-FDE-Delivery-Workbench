@@ -97,6 +97,9 @@ describe('desktop external plugin profile', () => {
     expect((JSON.parse(readFileSync(join(manager.paths.profile, 'package.json'), 'utf8')) as {
       dsh: { profile: { bundles: string[] } }
     }).dsh.profile.bundles).not.toContain('plugin')
+    expect((JSON.parse(readFileSync(join(manager.paths.profile, 'package.json'), 'utf8')) as {
+      dsh: { profile: { bundles: string[] } }
+    }).dsh.profile.bundles).not.toContain('dsh-context')
     expect(existsSync(join(manager.paths.profile, 'node_modules/plugin/package.json'))).toBe(true)
     await expect(manager.applyRelease()).resolves.toBeUndefined()
   })
@@ -146,6 +149,10 @@ describe('desktop external plugin profile', () => {
   it('initializes the same pnpm settings as a Web profile without a Desktop build allowlist', async () => {
     const { manager } = setup()
     await manager.applyRelease()
+    const manifest = JSON.parse(readFileSync(join(manager.paths.profile, 'package.json'), 'utf8')) as {
+      dsh: { profile: { bundles: string[] } }
+    }
+    expect(manifest.dsh.profile.bundles.filter(name => name === 'dsh-context')).toEqual(['dsh-context'])
     expect(readFileSync(join(manager.paths.profile, 'pnpm-workspace.yaml'), 'utf8'))
       .toBe('packages:\n  - .\n\nnodeLinker: hoisted\nautoInstallPeers: false\n')
   })

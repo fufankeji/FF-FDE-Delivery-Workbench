@@ -6,6 +6,8 @@ import { SlotRegistry } from '@deepseek-ai/dsh-client-ui-renderer/client'
 import { LocaleRuntime } from '@deepseek-ai/dsh-client-locale/client'
 import { AppearanceSection } from '../src/client/AppearanceSection.tsx'
 import { apply, inject } from '../src/client/index.ts'
+import { APPEARANCE_STORAGE_KEY, DEFAULT_APPEARANCE } from '../src/client/controller.ts'
+import { BUNDLED_APPEARANCE_THEMES } from '../src/client/appearance-themes.ts'
 
 afterEach(() => {
   window.localStorage.clear()
@@ -15,6 +17,8 @@ afterEach(() => {
 
 describe('ui-fde-appearance apply', () => {
   it('registers one localized settings section and retracts its theme effects', async () => {
+    const cat = BUNDLED_APPEARANCE_THEMES['cloud-cat']
+    window.localStorage.setItem(APPEARANCE_STORAGE_KEY, JSON.stringify({ ...DEFAULT_APPEARANCE, builtinTheme: cat.id, palette: cat.palette }))
     const ctx = new Context()
     await ctx.plugin(SlotRegistry).await()
     const locale = new LocaleRuntime(ctx)

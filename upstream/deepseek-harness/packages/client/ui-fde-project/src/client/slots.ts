@@ -38,6 +38,10 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
 
 /** Root-page callbacks and observables injected into the launcher and overlay. */
 export interface ProjectPageInjected {
+  /** Release page content before native navigation; global pages retain the unified rail. */
+  suspendWorkbenchForNative: () => void
+  /** Restore the retained FDE page and close the native global panel. */
+  returnFromNativePanel: () => void
   hooks: {
     projectPage: ProjectPageController
     stageProgress: ProjectStageController

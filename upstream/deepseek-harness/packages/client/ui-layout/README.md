@@ -35,6 +35,8 @@ The drawer mask fades with the panel’s transition duration and easing on both 
 
 Global panels occupy the root-scoped `main` keyed slot; `conversation` is the reserved key for the Conversation. `ctx.layout.selectPanel(id)` selects a registered panel, and `null` selects the Conversation without changing the current Session. The Plugins page contributes one of the shipped global panels.
 
+`data-shell-frame` and `data-shell-sidebar` identify the frame and its left column. The FDE navigation extension uses these markers to align global pages with its rail without changing stored column widths.
+
 The single root-scoped `shell.bottom` slot spans the full width below the three columns. Its occupant controls its own height and visibility; the columns shrink by that height, and empty content reserves no space. Main-panel navigation preserves the bottom component. Column resize handles stop above it, while `shell.overlay` covers the whole frame. The default composition leaves this slot empty.
 
 <a id="window-chrome-seat"></a>

@@ -21,6 +21,8 @@ The invoking directory is the default workspace root. The `web`, `headless`, `sd
 
 ## App arguments
 
+The FDE distribution carries `dsh-context@0.83.1` as a pinned runtime dependency. New Web profiles enable its bundle through the shared Web template, also used by Desktop. Existing profile lists and explicit disable patches remain unchanged. Headless, ACP and SDK defaults do not enable it.
+
 The launcher parses only its own flags and hands everything after them to the booted profile, where any injected app plugin may parse the shared immutable snapshot ([`dsh-cmdline`](../../packages/boot/cmdline/README.md)). The first token the launcher does not recognize starts the app's arguments:
 
 ```sh

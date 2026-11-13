@@ -7,6 +7,8 @@ export interface ProjectPageSnapshot {
   readonly open: boolean
   readonly view: ProjectPageView
   readonly workspaceId?: string
+  /** A temporarily hidden workbench page can be restored from navigation. */
+  readonly nativeReturn?: boolean
 }
 
 /** Apply-scoped page navigation shared by the sidebar launcher and page. */
@@ -14,6 +16,7 @@ export class ProjectPageController {
   private snapshot: ProjectPageSnapshot = { open: true, view: 'home' }
   private readonly listeners = new Set<() => void>()
   private labReturn: ProjectPageSnapshot = { open: true, view: 'dashboard' }
+  private nativeReturn: ProjectPageSnapshot | undefined
 
   /** Read the current immutable page state. */
   getSnapshot = (): ProjectPageSnapshot => this.snapshot
@@ -33,7 +36,7 @@ export class ProjectPageController {
   /** Open independent training and remember the page to restore. */
   showLab = (): void => {
     if (this.snapshot.view === 'lab') return
-    this.labReturn = this.snapshot
+    this.labReturn = this.snapshot.nativeReturn ? { open: false, view: 'closed' } : this.snapshot
     this.set({ open: true, view: 'lab' })
   }
   /** Restore the page from which independent training was opened. */
@@ -48,13 +51,25 @@ export class ProjectPageController {
   showProject = (workspaceId: string): void => { this.set({ open: true, view: 'project', workspaceId }) }
   /** Close Project Progress and restore Project Delivery. */
   close = (): void => { this.set({ open: false, view: 'closed' }) }
+  /** Hide page content for official navigation, retaining the exact return position. */
+  suspendForNative = (): void => {
+    if (!this.snapshot.open) return
+    this.nativeReturn = this.snapshot
+    this.set({ open: false, view: 'closed', nativeReturn: true })
+  }
+  /** Restore the retained page without modifying the independent lab return chain. */
+  returnFromNative = (): void => {
+    if (this.nativeReturn !== undefined) this.set(this.nativeReturn)
+  }
   /** Release subscribers at plugin disposal. */
-  dispose(): void { this.listeners.clear() }
+  dispose(): void { this.listeners.clear(); this.nativeReturn = undefined }
 
   private set(snapshot: ProjectPageSnapshot): void {
+    if (!snapshot.nativeReturn) this.nativeReturn = undefined
     if (this.snapshot.open === snapshot.open
       && this.snapshot.view === snapshot.view
-      && this.snapshot.workspaceId === snapshot.workspaceId) return
+      && this.snapshot.workspaceId === snapshot.workspaceId
+      && this.snapshot.nativeReturn === snapshot.nativeReturn) return
     this.snapshot = snapshot
     for (const listener of this.listeners) listener()
   }

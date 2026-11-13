@@ -10,7 +10,7 @@ import { en as commonEn } from '@deepseek-ai/dsh-client-locale/src/locales/en.ts
 import { zh as commonZh } from '@deepseek-ai/dsh-client-locale/src/locales/zh.ts'
 import { IconGlobeOutlineRegular } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { ILayout, MainPanelId } from '@deepseek-ai/dsh-client-ui-layout/client'
-import type { PropsRenderSlots, PropsRuntime, SlotLabel } from '@deepseek-ai/dsh-client-ui-slots'
+import type { PropsRenderFactories, PropsRenderSlots, PropsRuntime, SlotLabel } from '@deepseek-ai/dsh-client-ui-slots'
 import type { TrackProductEvent } from '@deepseek-ai/dsh-client-product-analytics/client'
 import { apply, inject } from '../src/client/index.ts'
 
@@ -36,7 +36,7 @@ afterEach(async () => {
   }
 })
 
-async function bench(collapsed = false, track?: TrackProductEvent) {
+async function bench(collapsed = false, track?: TrackProductEvent, beforeNavigate?: () => void) {
   const runtime = await SlotTestRuntime.create()
   runtimes.add(runtime)
   const locale = new LocaleRuntime(runtime.ctx)
@@ -67,11 +67,12 @@ async function bench(collapsed = false, track?: TrackProductEvent) {
       )))
     },
   })
-  function Frame({ usePanelInfo, renderSlot }: PropsRuntime<'root'> & PropsRenderSlots<'sidebar' | 'main'>) {
+  function Frame({ usePanelInfo, renderSlot, renderFactorySlot }: PropsRuntime<'root'> & PropsRenderSlots<'sidebar' | 'main'> & PropsRenderFactories) {
     const activePanelId = usePanelInfo(info => info.activePanelId)
     return (
       <>
-        <aside>{renderSlot('sidebar', { collapsed, width: collapsed ? 56 : 300, drawer: false })}</aside>
+        <aside data-testid="native-navigation">{renderSlot('sidebar', { collapsed, width: collapsed ? 56 : 300, drawer: false })}</aside>
+        {beforeNavigate !== undefined && <aside data-testid="alternate-navigation">{renderFactorySlot('sidebar.panels', { wide: true, beforeNavigate })}</aside>}
         <main>{renderSlot('main', {}, { entryKey: activePanelId ?? 'conversation' })}</main>
       </>
     )
@@ -170,6 +171,24 @@ async function mountPanels(runtime: SlotTestRuntime, locale: LocaleRuntime, beta
 }
 
 describe('sidebar global panels', () => {
+  it('shares live panel registration and pin choices with an alternate shell without duplicating declarations', async () => {
+    const beforeNavigate = vi.fn()
+    const { runtime, locale, layout, view } = await bench(false, undefined, beforeNavigate)
+    const { alpha } = await mountPanels(runtime, locale)
+    await mountProbeActions(runtime)
+    const native = within(view.getByTestId('native-navigation'))
+    const alternate = within(view.getByTestId('alternate-navigation'))
+    fireEvent.click(alternate.getByRole('button', { name: 'Alpha panel' }))
+    expect(beforeNavigate).toHaveBeenCalledOnce()
+    expect(layout.selectPanel).toHaveBeenLastCalledWith(ALPHA)
+    fireEvent.click(alternate.getByRole('button', { name: 'Unpin Alpha panel from sidebar' }))
+    expect(beforeNavigate).toHaveBeenCalledOnce()
+    expect(native.queryByRole('button', { name: 'Alpha panel' })).toBeNull()
+    expect(alternate.queryByRole('button', { name: 'Alpha panel' })).toBeNull()
+    expect(native.getByRole('button', { name: 'More' })).toBeTruthy()
+    await alpha.dispose()
+    expect(alternate.queryByTestId(`${ALPHA}-icon`)).toBeNull()
+  })
   it('adds late registrations, removes each plugin contribution, and leaves no empty panel-list DOM', async () => {
     const { runtime, locale, view } = await bench()
     expect(runtime.slots.entries('sidebar.panellist')).toEqual([])

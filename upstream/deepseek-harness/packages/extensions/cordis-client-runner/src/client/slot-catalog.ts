@@ -4361,7 +4361,7 @@ export const CLIENT_SLOT_API: readonly ClientSlotEntry[] = [
     ],
     replaceRisk: 'shadows-shipped-ui',
     example: 'return {\n  inject: [\'slots\'],\n  apply(ctx) {\n    ctx.slots.inject(\'sidebar.brand.mark\', () => ctx.slots.register(\n      { name: \'sidebar.brand.mark\' },\n      () => React.createElement(\'div\', null, \'hello\'),\n    ))\n  },\n}',
-    source: 'packages/client/ui-sidebar/src/client/contract/slots.ts:36',
+    source: 'packages/client/ui-sidebar/src/client/contract/slots.ts:44',
   },
   {
     key: 'sidebar.brand.name',
@@ -4396,7 +4396,7 @@ export const CLIENT_SLOT_API: readonly ClientSlotEntry[] = [
     ],
     replaceRisk: 'shadows-shipped-ui',
     example: 'return {\n  inject: [\'slots\'],\n  apply(ctx) {\n    ctx.slots.inject(\'sidebar.brand.name\', () => ctx.slots.register(\n      { name: \'sidebar.brand.name\' },\n      () => React.createElement(\'div\', null, \'hello\'),\n    ))\n  },\n}',
-    source: 'packages/client/ui-sidebar/src/client/contract/slots.ts:41',
+    source: 'packages/client/ui-sidebar/src/client/contract/slots.ts:49',
   },
   {
     key: 'sidebar.chat.conversation',
@@ -4486,13 +4486,14 @@ export const CLIENT_SLOT_API: readonly ClientSlotEntry[] = [
     slotInject: '',
     declaredBy: 'an entry in \'sidebar\' (client-ui-sidebar), so it exists while that entry is mounted',
     occupants: [
+      'client-ui-fde-project WorkbenchNativeReturn id \'fde-native-return\'',
       'client-ui-fde-project ProjectProgressLauncher id \'fde-project-progress\'',
       'client-ui-fde-project WorkbenchLabLauncher id \'fde-discovery-lab\'',
       'client-ui-cordis CordisPanel id \'cordis-panel\'',
     ],
     replaceRisk: 'none',
     example: 'return {\n  inject: [\'slots\'],\n  apply(ctx) {\n    ctx.slots.inject(\'sidebar.footer.action\', () => ctx.slots.register(\n      { name: \'sidebar.footer.action\', id: \'my-entry\', order: 100, label: \'My entry\' },\n      () => React.createElement(\'div\', null, \'hello\'),\n    ))\n  },\n}',
-    source: 'packages/client/ui-sidebar/src/client/contract/slots.ts:76',
+    source: 'packages/client/ui-sidebar/src/client/contract/slots.ts:84',
   },
   {
     key: 'sidebar.panellist',
@@ -4546,7 +4547,7 @@ export const CLIENT_SLOT_API: readonly ClientSlotEntry[] = [
     ],
     replaceRisk: 'none',
     example: 'return {\n  inject: [\'slots\'],\n  apply(ctx) {\n    ctx.slots.inject(\'sidebar.panellist\', () => ctx.slots.register(\n      { name: \'sidebar.panellist\', id: \'my-entry\', order: 100, label: \'My entry\' },\n      () => React.createElement(\'div\', null, \'hello\'),\n    ))\n  },\n}',
-    source: 'packages/client/ui-sidebar/src/client/contract/slots.ts:46',
+    source: 'packages/client/ui-sidebar/src/client/contract/slots.ts:54',
   },
   {
     key: 'sidebar.panellist.actions',
@@ -4575,7 +4576,7 @@ export const CLIENT_SLOT_API: readonly ClientSlotEntry[] = [
       },
     ],
     ownerProps: [
-      '/** Owner share of the panel list\'s More menu rows. */\nexport interface SidebarPanelActionsOwnerProps {\n  /** Customizable panels in registration order; Plugins is never listed. */\n  readonly entries: readonly SidebarPanelActionEntry[]\n  /**\n   * Open a panel without changing its pin state.\n   * @param id - Listed panel id.\n   */\n  readonly onOpen: (id: string) => void\n  /**\n   * Show (true) or unpin (false) a panel launcher.\n   * @param id - Listed panel id.\n   * @param pinned - Whether the launcher shows in the sidebar.\n   */\n  readonly onPinnedChange: (id: string, pinned: boolean) => void\n  /** Close the More menu. */\n  readonly onDismiss: () => void\n}',
+      '/** Owner share of the panel list\'s More menu rows. */\nexport interface SidebarPanelActionsOwnerProps {\n  /** Optional shell handoff before discovery or Creator navigation; absent keeps the current shell. Never called for pinning or dismissal. */\n  readonly beforeNavigate?: (() => void) | undefined\n  /** Customizable panels in registration order; Plugins is never listed. */\n  readonly entries: readonly SidebarPanelActionEntry[]\n  /**\n   * Open a panel without changing its pin state.\n   * @param id - Listed panel id.\n   */\n  readonly onOpen: (id: string) => void\n  /**\n   * Show (true) or unpin (false) a panel launcher.\n   * @param id - Listed panel id.\n   * @param pinned - Whether the launcher shows in the sidebar.\n   */\n  readonly onPinnedChange: (id: string, pinned: boolean) => void\n  /** Close the More menu. */\n  readonly onDismiss: () => void\n}',
     ],
     ownerPropsReferences: [
       'SidebarPanelActionEntry',
@@ -4595,13 +4596,13 @@ export const CLIENT_SLOT_API: readonly ClientSlotEntry[] = [
     keyDomain: '',
     hookContext: '',
     slotInject: '',
-    declaredBy: 'an entry in \'sidebar\' (client-ui-sidebar), so it exists while that entry is mounted',
+    declaredBy: 'factory \'sidebar.panels\' (client-ui-sidebar), so it exists while that definition is registered',
     occupants: [
       'client-ui-entry-customization EntryMenuContent id \'entry-customization\'',
     ],
     replaceRisk: 'none',
     example: 'return {\n  inject: [\'slots\'],\n  apply(ctx) {\n    ctx.slots.inject(\'sidebar.panellist.actions\', () => ctx.slots.register(\n      { name: \'sidebar.panellist.actions\', id: \'my-entry\', order: 100, label: \'My entry\' },\n      () => React.createElement(\'div\', null, \'hello\'),\n    ))\n  },\n}',
-    source: 'packages/client/ui-sidebar/src/client/contract/slots.ts:48',
+    source: 'packages/client/ui-sidebar/src/client/contract/slots.ts:56',
   },
   {
     key: 'sidebar.right.pane.tab',
@@ -5475,7 +5476,7 @@ export const CLIENT_SLOT_API: readonly ClientSlotEntry[] = [
     ],
     replaceRisk: 'shadows-shipped-ui',
     example: 'return {\n  inject: [\'slots\'],\n  apply(ctx) {\n    ctx.slots.inject(\'sidebar.settings\', () => ctx.slots.register(\n      { name: \'sidebar.settings\' },\n      () => React.createElement(\'div\', null, \'hello\'),\n    ))\n  },\n}',
-    source: 'packages/client/ui-sidebar/src/client/contract/slots.ts:69',
+    source: 'packages/client/ui-sidebar/src/client/contract/slots.ts:77',
   },
   {
     key: 'sidebar.settings.shortcut',
@@ -5509,7 +5510,7 @@ export const CLIENT_SLOT_API: readonly ClientSlotEntry[] = [
     ],
     replaceRisk: 'shadows-shipped-ui',
     example: 'return {\n  inject: [\'slots\'],\n  apply(ctx) {\n    ctx.slots.inject(\'sidebar.settings.shortcut\', () => ctx.slots.register(\n      { name: \'sidebar.settings.shortcut\' },\n      () => React.createElement(\'div\', null, \'hello\'),\n    ))\n  },\n}',
-    source: 'packages/client/ui-sidebar/src/client/contract/slots.ts:71',
+    source: 'packages/client/ui-sidebar/src/client/contract/slots.ts:79',
   },
   {
     key: 'sidebar.toggle.badge',
@@ -5541,7 +5542,7 @@ export const CLIENT_SLOT_API: readonly ClientSlotEntry[] = [
     ],
     replaceRisk: 'shadows-shipped-ui',
     example: 'return {\n  inject: [\'slots\'],\n  apply(ctx) {\n    ctx.slots.inject(\'sidebar.toggle.badge\', () => ctx.slots.register(\n      { name: \'sidebar.toggle.badge\' },\n      () => React.createElement(\'div\', null, \'hello\'),\n    ))\n  },\n}',
-    source: 'packages/client/ui-sidebar/src/client/contract/slots.ts:30',
+    source: 'packages/client/ui-sidebar/src/client/contract/slots.ts:38',
   },
   {
     key: 'sidebar.workspaces',
@@ -5575,7 +5576,7 @@ export const CLIENT_SLOT_API: readonly ClientSlotEntry[] = [
     ],
     replaceRisk: 'shadows-shipped-ui',
     example: 'return {\n  inject: [\'slots\'],\n  apply(ctx) {\n    ctx.slots.inject(\'sidebar.workspaces\', () => ctx.slots.register(\n      { name: \'sidebar.workspaces\' },\n      () => React.createElement(\'div\', null, \'hello\'),\n    ))\n  },\n}',
-    source: 'packages/client/ui-sidebar/src/client/contract/slots.ts:57',
+    source: 'packages/client/ui-sidebar/src/client/contract/slots.ts:65',
   },
   {
     key: 'sidebar.workspaces.directoryFlow',

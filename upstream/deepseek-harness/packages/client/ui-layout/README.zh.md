@@ -35,6 +35,8 @@ kind: "package-reference"
 
 全局面板占据 root 作用域的 `main` keyed slot；`conversation` 是为会话界面保留的 key。`ctx.layout.selectPanel(id)` 选中已注册面板，`null` 则选中会话界面，但不改变当前会话。Plugins 页面是默认组合中的一个全局面板。
 
+`data-shell-frame` 与 `data-shell-sidebar` 分别标记框架和左列。FDE 导航扩展据此让全局页面与统一侧栏对齐，不改写已保存的列宽。
+
 root 作用域的单一 `shell.bottom` slot 横跨三列下方的整行。占用方控制自身高度与显隐；三列按该高度缩短，空内容不预留空间。切换主面板时保留底部组件。列宽拖拽手柄止于底部内容上方，`shell.overlay` 仍覆盖整个框架。默认组合不占用此 slot。
 
 <a id="window-chrome-seat"></a>

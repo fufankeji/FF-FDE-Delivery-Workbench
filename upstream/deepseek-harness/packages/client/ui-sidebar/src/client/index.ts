@@ -15,6 +15,7 @@ import { createPanelPins } from './panel-pins.ts'
 import { HeaderLeadingControls } from './HeaderLeadingControls.tsx'
 import { SidebarRoot } from './SidebarRoot.tsx'
 import { PanelIcon } from './PanelIcon.tsx'
+import { SidebarPanels } from './SidebarPanels.tsx'
 import { en, ja, es, fr, de, ru, pt, zh, type SidebarKey } from './locales.ts'
 
 export type {
@@ -87,6 +88,16 @@ export function apply(ctx: ClientContext): void {
       name: 'sidebar.panel.icon', scope: 'root',
       children: { 'sidebar.panellist': { kind: 'list', scope: 'root' } },
     }, PanelIcon)
+    yield ctx.slots.registerFactory({
+      name: 'sidebar.panels', scope: 'root', locale: NS,
+      children: { 'sidebar.panellist.actions': { kind: 'list', scope: 'root' } },
+      inject: () => ({
+        selectPanel: (id) => { ctx.layout.selectPanel(id) },
+        setPinned: panelPins.setPinned,
+        trackEntryClick: (attributes) => { ctx.get('productAnalytics')?.track('sidebar_menu_click', attributes) },
+        hooks: { panels, entryPins: panelPins.unpinned, entryActions },
+      }),
+    }, SidebarPanels)
     yield ctx.slots.register({
       name: 'sidebar',
       locale: NS,
@@ -94,7 +105,6 @@ export function apply(ctx: ClientContext): void {
         'sidebar.brand.mark': { kind: 'single', scope: 'root' },
         'sidebar.brand.name': { kind: 'single', scope: 'root' },
         'sidebar.toggle.badge': { kind: 'single', scope: 'root' },
-        'sidebar.panellist.actions': { kind: 'list', scope: 'root' },
         'sidebar.workspaces': { kind: 'single', scope: 'root', inject: SIDEBAR_SECTION_INJECT },
         'sidebar.settings': { kind: 'single', scope: 'root' },
         'sidebar.footer.action': { kind: 'list', scope: 'root' },

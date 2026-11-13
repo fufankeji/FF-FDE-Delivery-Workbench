@@ -1,12 +1,15 @@
 /** Root module navigation, separate from project-scoped stage navigation. */
-import { useLayoutEffect } from 'react'
-import type { InjectFace, PropsLocale, PropsRenderSlots, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
+import { useLayoutEffect, useState } from 'react'
+import type { InjectFace, PropsLocale, PropsRenderFactories, PropsRenderSlots, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
+import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
+import { Tooltip } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { ProjectPageInjected, ProjectProgressLauncherProps } from './slots.ts'
 import css from './workbench.module.css'
 import projectCss from './project.module.css'
 
 type NavigationProps = PropsRuntime<'shell.overlay'>
   & PropsRenderSlots<'fde.workbench.lab.page' | 'sidebar.settings.shortcut'>
+  & PropsRenderFactories
   & InjectFace<ProjectPageInjected> & PropsLocale<'fdeProject'>
 
 /** A compact, consistent glyph for each platform destination. */
@@ -22,15 +25,29 @@ export function WorkbenchIcon({ kind }: { readonly kind: 'dashboard' | 'overview
 }
 
 /** Render the shared rail and keep the lab occupant mounted across navigation. */
-export function WorkbenchNavigation({ useProjectPage, showWorkbenchOverview, showProjectOverview, showWorkbenchLab, showWorkbenchSkills, showProjectHome, returnFromWorkbenchLab, renderSlot, t }: NavigationProps) {
+export function WorkbenchNavigation({ useProjectPage, usePanelInfo, showWorkbenchOverview, showProjectOverview, showWorkbenchLab, showWorkbenchSkills, showProjectHome, returnFromWorkbenchLab, suspendWorkbenchForNative, returnFromNativePanel, renderSlot, renderFactorySlot, t }: NavigationProps) {
   const page = useProjectPage(state => state)
-  const visible = page.open && page.view !== 'home'
-  const selected = page.view === 'timeline' || page.view === 'project' ? 'overview' : page.view
+  const panelId = usePanelInfo(info => info.activePanelId)
+  const [wide, setWide] = useState(true)
+  useLayoutEffect(() => {
+    const media = window.matchMedia('(max-width: 640px)')
+    const update = (): void => { setWide(!media.matches) }
+    update()
+    media.addEventListener('change', update)
+    return () => { media.removeEventListener('change', update) }
+  }, [])
+  const nativePanel = !page.open && panelId !== null
+  const visible = nativePanel || page.open && page.view !== 'home'
+  const selected = !page.open ? undefined : page.view === 'timeline' || page.view === 'project' ? 'overview' : page.view
   useLayoutEffect(() => {
     if (!visible) return
     document.body.dataset.fdeWorkbench = 'open'
-    return () => { delete document.body.dataset.fdeWorkbench }
-  }, [visible])
+    if (nativePanel) document.body.dataset.fdeNativePanel = 'open'
+    return () => {
+      delete document.body.dataset.fdeWorkbench
+      delete document.body.dataset.fdeNativePanel
+    }
+  }, [visible, nativePanel])
   const items = [
     { id: 'dashboard', label: t('workbench.overview'), open: showWorkbenchOverview },
     { id: 'overview', label: t('workbench.projects'), open: showProjectOverview },
@@ -38,26 +55,44 @@ export function WorkbenchNavigation({ useProjectPage, showWorkbenchOverview, sho
     { id: 'skills', label: t('workbench.skills'), open: showWorkbenchSkills },
   ] as const
   return <>
-    {visible && <div className={css.backdrop} data-fde-workbench-backdrop aria-hidden="true" />}
+    {visible && !nativePanel && <div className={css.backdrop} data-fde-workbench-backdrop aria-hidden="true" />}
     {visible && <aside className={css.navigation} data-window-drag-exclude>
       <button type="button" className={css.brand} onClick={showWorkbenchOverview} title={t('workbench.brand')}>
         <img src="/ff-brand/ff-logo.png" alt={t('workbench.logo')} />
         <span>{t('workbench.brand')}</span>
       </button>
-      <div className={css.workspaceLabel}><span />{t('workbench.local')}</div>
-      <nav aria-label={t('workbench.nav')}>
+      <div className={css.navScroll}>
+        <div className={css.workspaceLabel}><span />{t('workbench.local')}</div>
+        <nav aria-label={t('workbench.nav')}>
         {items.map(item => <button key={item.id} type="button" className={css.navItem} aria-current={selected === item.id ? 'page' : undefined} title={item.label} onClick={item.open}>
           <WorkbenchIcon kind={item.id} /><span>{item.label}</span>
         </button>)}
-      </nav>
+        </nav>
+        <section className={css.nativeNavigation} aria-label={t('workbench.native')}>
+          <div className={css.groupLabel} aria-hidden="true">{t('workbench.native')}</div>
+          {renderFactorySlot('sidebar.panels', { wide, beforeNavigate: suspendWorkbenchForNative })}
+        </section>
+      </div>
       <div className={css.navBottom}>
-        <button type="button" className={css.homeButton} onClick={showProjectHome} title={t('workbench.home')}><WorkbenchIcon kind="arrow" /><span>{t('workbench.home')}</span></button>
+        {nativePanel && <Tooltip label={t('workbench.return')} disabled={wide} portal><button type="button" className={css.returnButton} onClick={returnFromNativePanel} aria-label={t('workbench.return')}><WorkbenchIcon kind="arrow" />{wide && <span>{t('workbench.return')}</span>}</button></Tooltip>}
+        <div className={css.settingsEntry}>{renderSlot('sidebar.settings.shortcut', { wide })}</div>
+        <button type="button" className={css.introLink} onClick={showProjectHome}>{t('workbench.home')}</button>
         <small>{t('workbench.footer')}</small>
-        <div className={css.settingsEntry}>{renderSlot('sidebar.settings.shortcut', { wide: true })}</div>
       </div>
     </aside>}
     {renderSlot('fde.workbench.lab.page', { active: page.open && page.view === 'lab', back: returnFromWorkbenchLab })}
   </>
+}
+
+/** Return from an official panel to the retained FDE page without reopening a project. */
+export function WorkbenchNativeReturn({ wide, useProjectPage, returnFromNativePanel, t }: ProjectProgressLauncherProps) {
+  const available = useProjectPage(state => state.nativeReturn === true)
+  if (!available) return null
+  return <Tooltip label={t('workbench.return')} disabled={wide} portal><button type="button" className={projectCss.launcher} data-wide={wide || undefined}
+    aria-label={t('workbench.return')} onClick={returnFromNativePanel}>
+    <span className={css.returnIcon}><WorkbenchIcon kind="arrow" /></span>
+    {wide && <span className={projectCss.launcherLabel}>{t('workbench.return')}</span>}
+  </button></Tooltip>
 }
 
 /** Retain the lab shortcut inside the existing project/session sidebar. */

@@ -21,16 +21,13 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import clsx from 'clsx'
 import {
-  FishLogo, IconAppsAddOutlineRegular,
-  IconPanelLeftOutlineRegular, IconPinFillRegular, focusWithoutRing, isBehindModal, isDarwinDesktop, Menu, Toast,
+  FishLogo,
+  IconPanelLeftOutlineRegular, focusWithoutRing, isBehindModal, isDarwinDesktop, Toast,
   Tooltip, useModalLayer, writeClipboard,
 } from '@deepseek-ai/dsh-client-ui-primitives'
-import type { InjectFace, PropsRenderFactories, PropsRenderSlots, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {
-  SidebarPanelActionsOwnerProps, SidebarPanelMetadata, SidebarRootComponentProps, SidebarRootInjected, SidebarSectionHookContext,
-  SidebarSectionOwnerProps,
+  SidebarRootComponentProps, SidebarSectionHookContext,
 } from './contract/slots.ts'
-import { FIXED_PANEL_ID } from './panel-pins.ts'
 import { createScrollHandoff } from './scroll-handoff.ts'
 import css from './SidebarRoot.module.css'
 
@@ -55,93 +52,6 @@ function localBuildVersion(): string | undefined {
     + (process.env.DSH_CLIENT_GIT_DIRTY === 'true' ? '-dirty' : '')
 }
 
-type PanelRowProps =
-  Pick<SidebarPanelMetadata, 'id' | 'label'>
-  & Pick<SidebarSectionOwnerProps, 'wide'>
-  & Pick<PropsRuntime<'sidebar'>, 'usePanelInfo'>
-  & Pick<InjectFace<SidebarRootInjected>, 'selectPanel' | 'trackEntryClick' | 'setPinned'>
-  & { readonly unpinLabel: string; readonly unpinTooltip: string; readonly canUnpin: boolean }
-  & PropsRenderFactories
-
-/** Analytics category of an official panel; other panels are never reported. */
-function officialEntry(id: string): 'plugin' | 'cron' | undefined {
-  if (id === 'plugins') return 'plugin'
-  return id === 'schedules' ? 'cron' : undefined
-}
-
-/** Each panel row subscribes only to its own selection state. */
-function PanelRow({
-  id, label, wide, unpinLabel, unpinTooltip, canUnpin, usePanelInfo, selectPanel, setPinned, trackEntryClick, renderFactorySlot,
-}: PanelRowProps) {
-  const active = usePanelInfo(info => info.activePanelId === id)
-  return (
-    <div className={clsx(css.panelEntry, wide && css.panelEntryWide, active && css.panelEntryActive)}>
-      <Tooltip label={label} delayMs={500} disabled={wide}>
-        <button
-          type="button"
-          className={css.panelRow}
-          aria-label={label}
-          aria-current={active ? 'page' : undefined}
-          onClick={() => {
-            const entry = officialEntry(id)
-            if (entry !== undefined) trackEntryClick({ menu_name: entry, position: 'sidebar' })
-            selectPanel(id)
-          }}
-        >
-          <span className={css.panelGlyph} aria-hidden="true">
-            {renderFactorySlot('sidebar.panel.icon', { id, size: wide ? 16 : 18, active })}
-          </span>
-          {wide && (
-            <span className={clsx(css.panelTitle, css.wide)}>
-              {label}
-            </span>
-          )}
-        </button>
-      </Tooltip>
-      {wide && canUnpin && <Tooltip label={unpinTooltip} side="bottom" align="end" delayMs={500} portal>
-        <button type="button" className={css.panelUnpin} aria-label={unpinLabel} onClick={(event) => {
-          // Unpin is rendered only while this navigation also renders More.
-          const navigation = event.currentTarget.closest('nav') as HTMLElement
-          const more = navigation.querySelector('button[aria-haspopup="menu"]') as HTMLButtonElement
-          focusWithoutRing(more)
-          setPinned(id, false)
-        }}>
-          <IconPinFillRegular size={14} />
-        </button>
-      </Tooltip>}
-    </div>
-  )
-}
-
-type PanelMoreMenuProps =
-  Pick<SidebarSectionOwnerProps, 'wide'>
-  & Omit<SidebarPanelActionsOwnerProps, 'onDismiss'>
-  & PropsRenderSlots<'sidebar.panellist.actions'>
-  & Pick<InjectFace<SidebarRootInjected>, 'trackEntryClick'>
-  & { readonly label: string }
-
-/** The panel list's More launcher: a panel-row button whose menu rows come from `sidebar.panellist.actions`. */
-function PanelMoreMenu({ wide, label, entries, onOpen, onPinnedChange, trackEntryClick, renderSlot }: PanelMoreMenuProps) {
-  const [open, setOpen] = useState(false)
-  const onDismiss = (): void => { setOpen(false) }
-  return (
-    <Menu open={open} onClose={onDismiss} portal autoFocus className={css.moreAnchor} listClassName={css.moreMenu}
-      anchor={(
-        <Tooltip label={label} delayMs={500} disabled={wide}>
-          <button type="button" className={css.panelRow} aria-label={label} aria-haspopup="menu" aria-expanded={open}
-            onClick={() => {
-              trackEntryClick({ menu_name: 'more', position: 'sidebar' })
-              setOpen(value => !value)
-            }}>
-            <span className={css.panelGlyph} aria-hidden="true"><IconAppsAddOutlineRegular size={wide ? 16 : 18} /></span>
-            {wide && <span className={clsx(css.panelTitle, css.wide)}>{label}</span>}
-          </button>
-        </Tooltip>
-      )}>
-      {renderSlot('sidebar.panellist.actions', { entries, onOpen, onPinnedChange, onDismiss })}
-    </Menu>
-  )
-}
 
 /**
  * Render the sidebar column shell.
@@ -153,22 +63,11 @@ export function SidebarRoot({
   width,
   drawer,
   toggleSidebar,
-  selectPanel,
-  setPinned,
-  trackEntryClick,
-  usePanels,
-  useEntryPins,
-  useEntryActions,
   useShortcuts,
-  usePanelInfo,
   t,
   renderSlot,
   renderFactorySlot,
 }: SidebarRootComponentProps) {
-  const panels = usePanels(snapshot => snapshot)
-  const unpinned = useEntryPins(ids => ids)
-  const activePanelId = usePanelInfo(info => info.activePanelId)
-  const hasEntryActions = useEntryActions(registered => registered)
   const shortcut = useShortcuts(rows => rows.find(row => row.id === 'sidebar.left.toggle'))
   const toggleLabel = collapsed ? t('toggle.open') : t('toggle.collapse')
   // Wide content stays mounted while the collapse animates (fading via
@@ -297,6 +196,7 @@ export function SidebarRoot({
   return (
     <div
       ref={column}
+      data-native-sidebar
       onFocusCapture={(event) => { sidebarFocus.current = event.target }}
       role={drawer ? 'dialog' : undefined}
       data-shortcut-modal={drawer ? 'sidebar' : undefined}
@@ -355,43 +255,7 @@ export function SidebarRoot({
           className={css.scrollArea}
           data-sidebar-scrollport={wide ? '' : undefined}
         >
-          {panels.length > 0 && (
-            <nav className={css.panelList} aria-label={t('panels.label')}>
-              {panels.filter(({ id }) => id === FIXED_PANEL_ID || !hasEntryActions || !unpinned.includes(id)).map(({ id, label }) => (
-                <PanelRow
-                  key={id}
-                  id={id}
-                  label={label}
-                  wide={wide}
-                  unpinLabel={t('panels.unpin', { name: label })}
-                  unpinTooltip={t('panels.unpinTooltip')}
-                  canUnpin={hasEntryActions && id !== FIXED_PANEL_ID}
-                  setPinned={setPinned}
-                  usePanelInfo={usePanelInfo}
-                  selectPanel={selectPanel}
-                  trackEntryClick={trackEntryClick}
-                  renderFactorySlot={renderFactorySlot}
-                />
-              ))}
-              {hasEntryActions && (
-                <PanelMoreMenu
-                  wide={wide}
-                  label={t('panels.more')}
-                  entries={panels.filter(({ id }) => id !== FIXED_PANEL_ID)
-                    .map(({ id, label }) => ({ id, label, pinned: !unpinned.includes(id), active: id === activePanelId }))}
-                  onOpen={(id) => {
-                    const entry = officialEntry(id)
-                    if (entry !== undefined) trackEntryClick({ menu_name: entry, position: 'sidebar_more' })
-                    const panel = panels.find(candidate => candidate.id === id)
-                    if (panel !== undefined) selectPanel(panel.id)
-                  }}
-                  onPinnedChange={setPinned}
-                  trackEntryClick={trackEntryClick}
-                  renderSlot={renderSlot}
-                />
-              )}
-            </nav>
-          )}
+          {renderFactorySlot('sidebar.panels', { wide })}
           <div className={css.regionArea}>
             {renderSlot('sidebar.workspaces', {
               wide,

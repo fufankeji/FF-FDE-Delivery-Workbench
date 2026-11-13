@@ -6,6 +6,6 @@
   "nodeMajor": 24,
   "nodeMinimum": "24.9.0",
   "packageManager": "pnpm@11.28.5",
-  "scope": "工作台完整源码、门店仿真示例、五案例实验室完整运行素材和中文挑战；不含个人运行数据、依赖与凭据",
+  "scope": "工作台完整源码、统一原生导航、默认官方皮肤与上下文洞察、门店仿真示例、五案例实验室完整运行素材和中文挑战；不含个人运行数据、依赖与凭据",
   "deliveryAdditions": ["README.md", "AGENTS.md", "DEPLOYMENT_AGENT.md", "SOURCE_VERSION.json", "verify-source.mjs", "MANIFEST.json", "SHA256SUMS.txt"]
 }

@@ -1,5 +1,14 @@
 /* The platform rail and module pages share one responsive layout width. */
 :global(body[data-fde-workbench='open']) { --fde-navigation-width: 232px; }
+:global(body[data-fde-workbench='open'] [data-native-sidebar]) { visibility: hidden; pointer-events: none; }
+/* Global pages retain the platform rail without mutating the saved project layout. */
+:global(body[data-fde-native-panel='open'] [data-shell-frame]) {
+  grid-template-columns: var(--fde-navigation-width) minmax(0, 1fr) 0 !important;
+  --dsh-frame-leading-clearance: 0px;
+}
+:global(body[data-fde-native-panel='open'] [data-shell-frame] > :is([data-shell-sidebar], [data-rightbar-col], [data-side], [data-shell-leading], [data-sidebar-mask], [data-shell-bottom])) {
+  display: none;
+}
 .navigation { position: fixed; inset: 0 auto 0 0; z-index: 60; width: var(--fde-navigation-width); display: flex; flex-direction: column; padding: 20px 12px; box-sizing: border-box; border-right: .5px solid var(--dsw-alias-border-l2); background: var(--dsw-specific-sidebar-fill); backdrop-filter: blur(14px); color: var(--dsw-alias-label-primary); }
 /* Windowed macOS reserves the native caption strip; browser and fullscreen spacing stay unchanged. */
 :global(html[data-platform='darwin']:not([data-fullscreen])) .navigation {
@@ -11,26 +20,27 @@
 .workspaceLabel { display: flex; align-items: center; gap: 8px; margin: 24px 12px 14px; font: 400 12px/20px var(--dsw-font-family); color: var(--dsw-alias-label-tertiary); }
 .workspaceLabel>span { width: 6px; height: 6px; border-radius: 50%; corner-shape: round; background: var(--dsw-alias-state-success-primary); }
 .navigation nav { display: grid; gap: 4px; }
+.navScroll { flex: 1; min-height: 0; overflow-y: auto; }
+.nativeNavigation { --dsh-sidebar-row-padding: 12px; --dsh-sidebar-label-gap: 10px; --dsh-sidebar-paint-inset: 0px; --dsh-sidebar-panel-glyph-size: 20px; margin-top: 24px; font: 400 14px/22px var(--dsw-font-family); }
+.groupLabel { margin: 0 12px 10px 26px; color: var(--dsw-alias-label-tertiary); font: 400 12px/20px var(--dsw-font-family); }
+.returnIcon { display: inline-flex; transform: rotate(180deg); }
 .navItem { width: 100%; display: flex; align-items: center; gap: 10px; min-height: 36px; padding: 0 12px; border: 0; border-radius: var(--dsw-radius-lg); background: transparent; color: var(--dsw-alias-label-secondary); font: 400 14px/22px var(--dsw-font-family); text-align: left; cursor: pointer; }
 .navItem svg { width: 20px; height: 20px; flex-shrink: 0; }
 .navItem:hover { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
-.navItem[aria-current='page'] { color: var(--dsw-alias-label-primary); background: var(--dsw-alias-interactive-bg-hover); font-weight: 500; }
+.navItem[aria-current='page'] { background: var(--dsw-alias-interactive-bg-active); }
+.navItem[aria-current='page'], .nativeNavigation :global(button[aria-current='page']) { color: var(--dsw-alias-state-business-primary); font-weight: 500; }
 .navigation button:focus-visible { outline: 2px solid var(--dsw-alias-state-business-primary); outline-offset: 3px; }
-.navBottom { margin-top: auto; padding-top: 24px; }
-.navBottom button { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 0; background: transparent; color: var(--dsw-alias-label-secondary); font: 400 14px/22px var(--dsw-font-family); cursor: pointer; }
-.navBottom .homeButton { width: 100%; min-height: 44px; padding: 0 16px; border-radius: 8px; text-align: left; font-size: 14px; line-height: 22px; }
-.homeButton svg { flex-shrink: 0; transform: rotate(180deg); }
-.homeButton:active { background: var(--dsw-alias-interactive-bg-hover); }
-.homeButton:active:not(:focus-visible) { transform: scale(.98); }
+.navBottom { margin-top: 12px; padding-top: 12px; border-top: .5px solid var(--dsw-alias-border-l2); flex-shrink: 0; }
+.navBottom .returnButton, .navBottom .settingsEntry button { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 36px; padding: 0 12px; border: 0; border-radius: var(--dsw-radius-lg); background: transparent; color: var(--dsw-alias-label-secondary); font: 400 14px/22px var(--dsw-font-family); text-align: left; cursor: pointer; }
+.returnButton svg { flex-shrink: 0; transform: rotate(180deg); }
+.returnButton:active { background: var(--dsw-alias-interactive-bg-active); }
 @media (hover: hover) and (pointer: fine) {
-  .navBottom .homeButton:hover { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
+  .navBottom .returnButton:hover, .navBottom .settingsEntry button:hover { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
+  .introLink:hover { color: var(--dsw-alias-label-primary); text-decoration: underline; }
 }
-@media (prefers-reduced-motion: reduce) {
-  .homeButton:active:not(:focus-visible) { transform: none; }
-}
-.navBottom small { display: block; margin: 8px 16px 10px; color: var(--dsw-alias-label-tertiary); font: 400 12px/18px var(--dsw-font-family); }
-.settingsEntry { margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--dsw-alias-border-l2); }
-.navBottom .settingsEntry button { width: 100%; padding: 0 16px; font-size: 14px; }
+.introLink { display: block; min-height: 28px; margin: 10px 12px 0; padding: 4px 0; border: 0; background: transparent; color: var(--dsw-alias-label-tertiary); font: 400 12px/20px var(--dsw-font-family); cursor: pointer; }
+.navBottom small { display: block; margin: 2px 12px 0; color: var(--dsw-alias-label-tertiary); font: 400 11px/18px var(--dsw-font-family); }
+.settingsEntry { margin-top: 4px; }
 .settingsEntry svg { flex-shrink: 0; }
 .frame { position: fixed; inset: 0 0 0 var(--fde-navigation-width, 0px); z-index: 40; overflow: auto; background: transparent; color: var(--dsw-alias-label-primary); }
 
@@ -134,12 +144,12 @@
   :global(html[data-platform='darwin']:not([data-fullscreen])) .navigation {
     padding-top: calc(22px + var(--dsh-frame-top-clearance, 0px));
   }
-  .brand { justify-content: center; } .brand span, .workspaceLabel, .navBottom small { display: none; }
+  .brand { justify-content: center; } .brand span, .workspaceLabel, .groupLabel, .navBottom small { display: none; }
   .navigation nav { margin-top: 32px; gap: 12px; }
+  .nativeNavigation nav { margin-top: 0; }
   .navItem { flex-direction: column; gap: 6px; padding: 10px 2px; font-size: 11px; line-height: 18px; }
-  .navBottom button { flex-direction: column; gap: 4px; padding: 8px 4px; font-size: 10px; }
-  .navBottom .homeButton { min-height: 52px; padding: 8px 4px; font-size: 11px; text-align: center; }
-  .navBottom .settingsEntry button { height: auto; min-height: 52px; padding: 8px 4px; font-size: 11px; }
+  .navBottom .returnButton, .navBottom .settingsEntry button { height: auto; min-height: 40px; justify-content: center; padding: 8px 4px; }
+  .introLink { width: 100%; margin: 8px 0 0; font-size: 11px; text-align: center; }
   .dashboard { grid-template-columns: 1fr; grid-template-areas: 'heading' 'projects' 'labs' 'cases' 'recent' 'lab' 'skills'; padding: 24px 16px; }
   .dashboardHeader { flex-direction: column; align-items: flex-start; gap: 18px; margin-bottom: 0; }
   .dashboardHeader h1 { font-size: 24px; line-height: 32px; }
