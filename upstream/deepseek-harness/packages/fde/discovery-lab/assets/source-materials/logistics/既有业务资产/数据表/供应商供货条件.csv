@@ -1,0 +1,4 @@
+﻿supplier_id,supplier_name,style_id,regular_price_cny,freight_cny_per_unit,moq_per_sku,pack_multiple,preparation_days,linehaul_days,receipt_days,buffer_days,total_lead_days,scope
+S1,针织供应商甲,T01,32,3,48,12,3,8,2,1,14,本案例普通供货条件；非市场报价
+S2,衬衫供应商乙,S02,58,4,24,12,3,8,2,1,14,本案例普通供货条件；非市场报价
+S3,短裤供应商丙,P03,45,3,36,12,3,8,2,1,14,本案例普通供货条件；非市场报价

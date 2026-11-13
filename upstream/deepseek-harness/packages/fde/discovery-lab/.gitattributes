@@ -1,0 +1,2 @@
+# Pinned teaching originals retain exact bytes, including Markdown hard breaks and final blank lines.
+assets/** -text whitespace=-blank-at-eol,-blank-at-eof

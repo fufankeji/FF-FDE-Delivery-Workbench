@@ -1,0 +1,4 @@
+﻿option_id,name,supplier_id,from_node,to_node,lead_days,price_cny,freight_cny,moq,pack_multiple,stock_limit,saleable_if_approved_today,condition
+RT01,普通采购,S1,W-CN,W-KL,14,32,3,48,12,,2026-09-24,供应商确认后才作为确定供给
+RT02,新山调拨候选,,W-JB,W-KL,3,0,2,12,12,48,2026-09-13,上限96可售减48保护线；本次提案24未批准
+RT03,现货加急特批报价,S1,W-CN,W-KL,8,36,10,24,12,24,2026-09-18,仅T01-BL-M本次24件；不能修改常规起订量

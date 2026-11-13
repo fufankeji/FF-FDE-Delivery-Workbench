@@ -1,0 +1,5 @@
+﻿period_id,metric_version,session_count,order_count,conversion,label_on_screen
+W1,CVR-v1,980,273,0.278571,成交转化率
+W2,CVR-v1,980,273,0.278571,成交转化率
+W3,CVR-v1,1400,301,0.215,成交转化率
+W4,CVR-v1,1400,301,0.215,成交转化率

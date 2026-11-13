@@ -24,8 +24,9 @@ export const inject = ['sessionProjections']
  * Register the `sessionStats` unit; the registration is an effect on this
  * plugin's fiber, so unloading removes the key.
  * @param ctx - registrant context carrying the projection registry.
+ * @returns when the plugin is ready.
  */
-export function apply(ctx: Context): void {
-  ctx.sessionProjections.register(sessionStatsProjectionDefinition)
-  ctx.sessionProjections.register(sessionActivityProjectionDefinition)
+export async function apply(ctx: Context): Promise<void> {
+  await ctx.sessionProjections.register(sessionStatsProjectionDefinition)
+  await ctx.sessionProjections.register(sessionActivityProjectionDefinition)
 }

@@ -14,7 +14,7 @@ export function LabOverlay({ active, back, useStore, actions, renderSlot, t }: O
   const discoveryOpened = useStore(state => state.discoveryOpened)
   useEffect(() => { if (active && !opened) actions.open() }, [active, opened, actions])
   if (!active && !opened) return null
-  return <section className={css.page} hidden={!active} aria-label={t('lab.title')}>
+  return <section className={css.page} hidden={!active} aria-label={t('lab.title')} data-window-drag-exclude>
     <header className={css.header}>
       <div><strong>{t('lab.title')}</strong><span>{t('lab.independent')}</span></div>
       <div className={css.headerActions}>

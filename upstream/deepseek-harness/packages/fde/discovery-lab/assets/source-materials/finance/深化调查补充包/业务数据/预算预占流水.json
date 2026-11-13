@@ -1,0 +1,95 @@
+{
+  "snapshot_at": "2026-09-13T23:00:00+08:00",
+  "rows": [
+    {
+      "event_id": "BR01-LOCK",
+      "reservation_id": "BR01",
+      "project_id": "P101",
+      "business_id": "C009",
+      "event_at": "2026-09-11T12:00:00+08:00",
+      "delta_yuan": 2186,
+      "action": "RESERVE",
+      "note": "C009-v1，v2尚未获批，尚未执行预占转移"
+    },
+    {
+      "event_id": "BR02-LOCK",
+      "reservation_id": "BR02",
+      "project_id": "P101",
+      "business_id": "BQ101-A",
+      "event_at": "2026-09-11T12:00:00+08:00",
+      "delta_yuan": 6000,
+      "action": "RESERVE",
+      "note": "其他已批准未入账业务，非新增可用预算"
+    },
+    {
+      "event_id": "BR03-LOCK",
+      "reservation_id": "BR03",
+      "project_id": "P101",
+      "business_id": "BQ101-B",
+      "event_at": "2026-09-11T12:00:00+08:00",
+      "delta_yuan": 3814,
+      "action": "RESERVE",
+      "note": "其他已批准未入账业务，非新增可用预算"
+    },
+    {
+      "event_id": "BR04-LOCK",
+      "reservation_id": "BR04",
+      "project_id": "P102",
+      "business_id": "BQ102-A",
+      "event_at": "2026-09-11T12:00:00+08:00",
+      "delta_yuan": 5000,
+      "action": "RESERVE",
+      "note": "其他已批准未入账业务，非新增可用预算"
+    },
+    {
+      "event_id": "BR05-LOCK",
+      "reservation_id": "BR05",
+      "project_id": "P102",
+      "business_id": "BQ102-B",
+      "event_at": "2026-09-11T12:00:00+08:00",
+      "delta_yuan": 3000,
+      "action": "RESERVE",
+      "note": "其他已批准未入账业务，非新增可用预算"
+    },
+    {
+      "event_id": "BR06-LOCK",
+      "reservation_id": "BR06",
+      "project_id": "P103",
+      "business_id": "BQ103-A",
+      "event_at": "2026-09-11T12:00:00+08:00",
+      "delta_yuan": 4000,
+      "action": "RESERVE",
+      "note": "其他已批准未入账业务，非新增可用预算"
+    },
+    {
+      "event_id": "BR07-LOCK",
+      "reservation_id": "BR07",
+      "project_id": "P103",
+      "business_id": "BQ103-B",
+      "event_at": "2026-09-11T12:00:00+08:00",
+      "delta_yuan": 2000,
+      "action": "RESERVE",
+      "note": "其他已批准未入账业务，非新增可用预算"
+    },
+    {
+      "event_id": "BR08-LOCK",
+      "reservation_id": "BR08",
+      "project_id": "P101",
+      "business_id": "BQ101-C",
+      "event_at": "2026-09-10T10:00:00+08:00",
+      "delta_yuan": 2000,
+      "action": "RESERVE",
+      "note": "已撤回业务"
+    },
+    {
+      "event_id": "BR08-RELEASE",
+      "reservation_id": "BR08",
+      "project_id": "P101",
+      "business_id": "BQ101-C",
+      "event_at": "2026-09-12T10:00:00+08:00",
+      "delta_yuan": -2000,
+      "action": "RELEASE",
+      "note": "撤回后释放，不重复计算为新增收入"
+    }
+  ]
+}

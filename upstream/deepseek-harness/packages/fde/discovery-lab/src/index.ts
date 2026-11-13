@@ -9,6 +9,7 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { TrainingService } from './vendor/training.js'
 import { createApiHandler } from './vendor/http.js'
+import { verifyBundledAssets } from './assets.ts'
 
 /** Stable Host identity. */
 export const name = 'fde-discovery-lab'
@@ -23,16 +24,21 @@ export function apply(ctx: Context): void {
   if (!home) throw new Error('fde-discovery-lab requires explicit DSH_HOME')
   // Both emitted entries (lib/index.js) and source-level tests resolve the package root.
   const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-  const root = join(packageRoot, '.assets')
+  const root = join(packageRoot, 'assets')
   const appRoot = resolve(packageRoot, '../../client/ui-fde-discovery-lab/lib/app')
   const trusted = createWebRequestTrust(ctx.connection)
   let service: TrainingService | undefined
-  if (existsSync(join(root, 'cases/finance/case.json'))) {
+  let assetsReady = false
+  try {
+    verifyBundledAssets(packageRoot)
+    assetsReady = true
+  } catch (error) {
+    ctx.logger.warn('实验室内置素材不完整；请重新获取完整源码后构建并重启，不要删除训练数据。', error)
+  }
+  if (assetsReady) {
     const dataDir = resolve(home, 'fde-discovery-lab')
     mkdirSync(dataDir, { recursive: true })
     service = new TrainingService(ctx, { root, dataDir })
-  } else {
-    ctx.logger.warn('业务挖掘实验室素材未导入；运行该包的 import:assets 后重启。')
   }
   const api = service ? createApiHandler(service) : undefined
   ctx.effect(() => ctx.webServer.register({
@@ -45,7 +51,7 @@ export function apply(ctx: Context): void {
       }
       if (!api) {
         res.writeHead(503, { 'Content-Type': 'application/json; charset=utf-8' })
-        res.end(JSON.stringify({ error: '实验室素材未安装，请按 README 导入交付包后重启服务。' }))
+        res.end(JSON.stringify({ error: '实验室内置素材缺失或损坏，请重新获取完整源码，构建后重启。已有训练记录无需删除。' }))
         return
       }
       await api(req, res)

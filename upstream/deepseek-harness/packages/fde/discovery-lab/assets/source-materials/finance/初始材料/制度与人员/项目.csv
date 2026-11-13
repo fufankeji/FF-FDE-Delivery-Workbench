@@ -1,0 +1,4 @@
+﻿project_id,name,owner_id,department_id,budget_yuan,available_yuan,status
+P101,工业振动监测样机验证,M01,D01,240000,56300,执行中
+P102,设备健康联合试验,M02,D02,180000,31400,执行中
+P103,高温传感模块验证,M03,D03,160000,18900,执行中

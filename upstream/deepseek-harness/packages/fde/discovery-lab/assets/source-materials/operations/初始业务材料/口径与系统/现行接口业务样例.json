@@ -1,0 +1,55 @@
+{
+  "artifact_id": "API-SAMPLE-01",
+  "note": "现有内部聚合服务业务样例，虚拟，无可调用域名和凭证；不是新产品接口设计",
+  "request": {
+    "method": "POST",
+    "path": "/internal/metrics/query",
+    "actor_role": "business_owner",
+    "business_unit": "BU-01",
+    "period": {
+      "start": "2026-09-07",
+      "end_exclusive": "2026-09-14"
+    },
+    "metric_ids": [
+      "SESSION-v1",
+      "PAID-v2",
+      "GMV-v2"
+    ],
+    "group_by": []
+  },
+  "response": {
+    "query_id": "Q-0914-001",
+    "status": "complete",
+    "data_as_of": "2026-09-13T23:59:59+08:00",
+    "source_watermarks": {
+      "sessions": "2026-09-13",
+      "orders": "2026-09-13",
+      "refunds": "2026-09-13",
+      "channel_spend": "2026-09-13"
+    },
+    "rows": [
+      {
+        "sessions": 1400,
+        "paid_orders": 182,
+        "paid_gmv_fen": 3072300
+      }
+    ],
+    "currency": "CNY",
+    "amount_unit": "fen",
+    "metric_version_attached": true
+  },
+  "error_examples": [
+    {
+      "code": "METRIC_VERSION_REQUIRED",
+      "message": "成交率存在旧新定义，请指定口径"
+    },
+    {
+      "code": "FORBIDDEN_DIMENSION",
+      "message": "当前岗位不可按 user_id 分组"
+    },
+    {
+      "code": "DATA_NOT_READY",
+      "message": "9月14日分区未完成，可先查询截至9月13日的数据"
+    }
+  ]
+}

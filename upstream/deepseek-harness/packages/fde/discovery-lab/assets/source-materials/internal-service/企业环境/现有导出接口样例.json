@@ -1,0 +1,20 @@
+{
+  "nature": "教学导出样例，无实际服务地址",
+  "source": "SYS-REG",
+  "exported_at": "2026-09-10T09:00:00+08:00",
+  "request": {
+    "request_id": "C003",
+    "user_id": "U07",
+    "project_id": "PRJ-A",
+    "original_request": "实施验收清单希望支持批量导出，昨天在群里说过，算登记了吗？",
+    "status": "尚未确认登记",
+    "related_document": "K05",
+    "referenced_version": "1.0"
+  },
+  "source_note": "字段空字符串表示尚未取得，不能当作已确认；需使用request_id与demand_id分别关联",
+  "permission_context": {
+    "requester": "U07",
+    "project": "PRJ-A",
+    "allowed": "自己的请求和已授权项目资料"
+  }
+}

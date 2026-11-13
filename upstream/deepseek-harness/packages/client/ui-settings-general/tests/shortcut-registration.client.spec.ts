@@ -3,7 +3,7 @@ import { Context } from '@deepseek-ai/cordis'
 import { LocaleRuntime } from '@deepseek-ai/dsh-client-locale/client'
 import { SlotRegistry } from '@deepseek-ai/dsh-client-ui-renderer/client'
 import { createSnapshotStore } from '@deepseek-ai/dsh-client-store'
-import { TestRemote } from '@deepseek-ai/dsh-client-test-runtime'
+import { TestRemote, StaticRemoteAccess } from '@deepseek-ai/dsh-client-test-runtime'
 import { expect, it, vi } from 'vitest'
 import { apply, inject } from '../src/client/index.ts'
 import { SettingsRoot, SettingsShortcut } from '../src/client/SettingsRoot.tsx'
@@ -15,7 +15,10 @@ it('binds the optional trigger to the original settings store and retracts it in
   ctx.provide('connection', { state: createSnapshotStore('connected'), reconnect: vi.fn() } as never)
   const remote = new TestRemote(ctx, { settings: {} })
   remote.$host.isLoopback = false
-  ctx.provide('settingsScope', {} as never)
+  ctx.provide('configForms', {} as never)
+  ctx.provide('shortcuts', { catalog: createSnapshotStore([]), register: () => () => {} } as never)
+  ctx.provide('modules', { entries: { releaseChange: createSnapshotStore(undefined) } } as never)
+  await ctx.plugin(StaticRemoteAccess)
   const slots = ctx.get('slots') as SlotRegistry
   slots.register({ name: 'root', children: {
     'sidebar.settings': { kind: 'single', scope: 'root' },

@@ -1,0 +1,28 @@
+{
+  "snapshot_at": "2026-09-13T23:00:00+08:00",
+  "currency": "CNY",
+  "scope": "三项目完整预算汇总；开账累计含此前已入账历史费用，不再扣减旧180单",
+  "rows": [
+    {
+      "project_id": "P101",
+      "total_yuan": 240000,
+      "posted_yuan": 171700,
+      "reserved_yuan": 12000,
+      "available_yuan": 56300
+    },
+    {
+      "project_id": "P102",
+      "total_yuan": 180000,
+      "posted_yuan": 140600,
+      "reserved_yuan": 8000,
+      "available_yuan": 31400
+    },
+    {
+      "project_id": "P103",
+      "total_yuan": 160000,
+      "posted_yuan": 135100,
+      "reserved_yuan": 6000,
+      "available_yuan": 18900
+    }
+  ]
+}

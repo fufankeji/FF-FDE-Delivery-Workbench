@@ -1,0 +1,22 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://service.example.invalid/projects/P07/attachments/IMG-CUSTOMER-07",
+    "identity": "E04"
+  },
+  "response": {
+    "http_status": 403,
+    "error": {
+      "code": "PROJECT_SCOPE_DENIED",
+      "message": "当前身份没有此项目附件读取权限"
+    },
+    "request_id": "SIM-Q-0914-002"
+  },
+  "log": {
+    "actor": "E04",
+    "resource": "P07/attachments/IMG-CUSTOMER-07",
+    "decision": "deny",
+    "at": "2026-09-14T08:58:00+08:00",
+    "content_not_logged": true
+  }
+}

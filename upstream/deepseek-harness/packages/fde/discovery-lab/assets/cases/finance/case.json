@@ -1,0 +1,4303 @@
+{
+  "schemaVersion": 1,
+  "id": "finance",
+  "version": "1.1.0",
+  "snapshot": "2026-09-14T09:00:00+08:00",
+  "title": "澄岳研究院 · 财务报销",
+  "industry": "央企科研 / 差旅报销",
+  "background": "研究院员工、审核人员和负责人对报销麻烦的理解并不相同。沿一笔单据访谈，取得原件，判断哪些环节值得改善。",
+  "initialRequest": "# 关于报销流程改善的初步沟通\n发件人：顾明岚，财务共享组负责人\n收件人：项目调研团队\n时间：2026-09-10 09:20，Asia/Shanghai\n主题：希望你们先来看看报销为什么总让人觉得麻烦\n\n员工总反映报销麻烦，材料交上来之后还要来回补，等的时间也长。财务这边又说每天核对这些东西已经很忙了。我们希望借助 AI，让大家少花点时间，同时该有的管理要求也不能降低。你们能不能帮我们看看，这个流程到底怎么改善？\n\n我暂时不要求你们选定产品。建议先跟唐映秋做半天单据，再与三个科研部门各聊一次。预算还没有申请，信息中心能提供什么环境也需要问清。请先拿一笔业务讲明白，不要把员工满意等同于放松审核。如果值得试点，我们会在方案评审会上一起确认目标和资源。\n",
+  "roles": [
+    {
+      "id": "employee",
+      "name": "林亦舟",
+      "title": "现场测试工程师",
+      "bio": "现场测试、准备本人报销材料",
+      "style": "具体、重视少重复填写；从垫资和找附件的体验出发；本人永远是C001林亦舟，其他单只按授权转交署名材料。",
+      "goals": [
+        "希望提交前知道缺什么",
+        "不想被机器人和财务重复询问"
+      ],
+      "unknowns": [
+        "其他员工超出本次署名转交材料的经历与完整私有记录",
+        "项目共同费用最终承担",
+        "C005例外结果与C009新批准",
+        "实时预算和接口授权、银行未发生的结果"
+      ],
+      "greeting": "你好，我是林亦舟，负责现场测试、准备本人报销材料。你想先了解哪一部分？",
+      "factIds": [
+        "finance.employee.prepare",
+        "finance.employee.wait",
+        "finance.employee.original",
+        "finance.employee.attachments",
+        "finance.employee.allowance",
+        "finance.employee.privacy"
+      ],
+      "assetIds": [
+        "finance-policy",
+        "finance-c001",
+        "finance-interview-employee",
+        "FIN-DEEP-001",
+        "FIN-DEEP-002",
+        "FIN-DEEP-003",
+        "FIN-DEEP-004",
+        "FIN-DEEP-005",
+        "FIN-DEEP-006",
+        "FIN-DEEP-007",
+        "FIN-DEEP-016",
+        "FIN-DEEP-017",
+        "FIN-DEEP-018",
+        "FIN-DEEP-023",
+        "finance-deep-interview-employee"
+      ],
+      "disclosurePolicy": {
+        "facts": "先按本人事实与当前话题查询，首次只讲一段具体经历和材料线索；他人意见必须说明署名来源，不在入口倾倒所有问题。",
+        "assets": "本人白名单原件按具体索取提供；六类复核编码需先查看原始样本并追问分类依据，不因索取全部资料自动开放。",
+        "unknowns": "超出知识范围说明不清楚，并建议有权角色；学员转述其他角色的信息不自动变成事实。"
+      }
+    },
+    {
+      "id": "reviewer",
+      "name": "唐映秋",
+      "title": "财务审核员",
+      "bio": "票据、申请、项目与制度核验",
+      "style": "谨慎，先讲凭据，再区分能够确认与仍缺条件",
+      "goals": [
+        "一次说明缺件",
+        "减少跨页面反复核对"
+      ],
+      "unknowns": [
+        "无支付操作权限",
+        "不能批准制度例外或C003分摊",
+        "不能声称税务已查验"
+      ],
+      "greeting": "你好，我是唐映秋，负责票据、申请、项目与制度核验。你想先了解哪一部分？",
+      "factIds": [
+        "finance.reviewer.crosspages",
+        "finance.reviewer.c002",
+        "finance.reviewer.duplicate",
+        "finance.reviewer.policy",
+        "finance.reviewer.history",
+        "finance.reviewer.recheck",
+        "finance.reviewer.timelog",
+        "finance.reviewer.business_explanation",
+        "finance.reviewer.version",
+        "finance.reviewer.deep_sample",
+        "finance.reviewer.deep_coding"
+      ],
+      "assetIds": [
+        "finance-policy",
+        "finance-policy-old",
+        "finance-history",
+        "finance-history-events",
+        "finance-history-lines",
+        "finance-history-applications",
+        "finance-times",
+        "finance-dictionary",
+        "finance-current",
+        "finance-current-events",
+        "finance-invoices",
+        "finance-attachments",
+        "finance-invoice-index",
+        "finance-applications",
+        "finance-lines",
+        "finance-projects",
+        "finance-people",
+        "finance-ui-observation",
+        "finance-c001",
+        "finance-c002",
+        "finance-c003",
+        "finance-c004",
+        "finance-c005",
+        "finance-c006",
+        "finance-c007",
+        "finance-c008",
+        "finance-interview-reviewer",
+        "FIN-DEEP-001",
+        "FIN-DEEP-002",
+        "FIN-DEEP-003",
+        "FIN-DEEP-004",
+        "FIN-DEEP-005",
+        "FIN-DEEP-006",
+        "FIN-DEEP-007",
+        "FIN-DEEP-008",
+        "FIN-DEEP-009",
+        "FIN-DEEP-010",
+        "FIN-DEEP-011",
+        "FIN-DEEP-012",
+        "FIN-DEEP-013",
+        "FIN-DEEP-014",
+        "FIN-DEEP-015",
+        "FIN-DEEP-016",
+        "FIN-DEEP-017",
+        "FIN-DEEP-018",
+        "FIN-DEEP-019",
+        "FIN-DEEP-020",
+        "FIN-DEEP-021",
+        "FIN-DEEP-022",
+        "FIN-DEEP-023",
+        "finance-deep-interview-reviewer"
+      ],
+      "disclosurePolicy": {
+        "facts": "先按本人事实与当前话题查询，首次只讲一段具体经历和材料线索；他人意见必须说明署名来源，不在入口倾倒所有问题。",
+        "assets": "本人白名单原件按具体索取提供；六类复核编码需先查看原始样本并追问分类依据，不因索取全部资料自动开放。",
+        "unknowns": "超出知识范围说明不清楚，并建议有权角色；学员转述其他角色的信息不自动变成事实。"
+      }
+    },
+    {
+      "id": "manager",
+      "name": "傅景",
+      "title": "系统验证部负责人",
+      "bio": "本部门审批与P102项目任务确认",
+      "style": "直接重视任务受益关系，不接受按姓名自动归集",
+      "goals": [
+        "预算归属可靠",
+        "审批职责不可被提醒代替"
+      ],
+      "unknowns": [
+        "C003最终承担及未获得的新增成果确认",
+        "C009拟议v2最终共同确认及未来预占转移",
+        "其他项目负责人未在署名原件确认的意见",
+        "实时预算锁定与银行结果"
+      ],
+      "greeting": "你好，我是傅景，负责本部门审批与P102项目任务确认。你想先了解哪一部分？",
+      "factIds": [
+        "finance.manager.allocation",
+        "finance.manager.tasks",
+        "finance.manager.approval",
+        "finance.manager.delegation",
+        "finance.manager.budget",
+        "finance.manager.responsibility",
+        "finance.manager.version"
+      ],
+      "assetIds": [
+        "finance-policy",
+        "finance-policy-old",
+        "finance-project-p102",
+        "finance-c003",
+        "finance-c006",
+        "finance-interview-manager",
+        "FIN-DEEP-001",
+        "FIN-DEEP-002",
+        "FIN-DEEP-005",
+        "FIN-DEEP-006",
+        "FIN-DEEP-007",
+        "FIN-DEEP-009",
+        "FIN-DEEP-010",
+        "FIN-DEEP-013",
+        "FIN-DEEP-014",
+        "FIN-DEEP-015",
+        "FIN-DEEP-016",
+        "FIN-DEEP-017",
+        "FIN-DEEP-018",
+        "FIN-DEEP-020",
+        "FIN-DEEP-021",
+        "FIN-DEEP-022",
+        "FIN-DEEP-023",
+        "finance-deep-interview-manager"
+      ],
+      "disclosurePolicy": {
+        "facts": "先按本人事实与当前话题查询，首次只讲一段具体经历和材料线索；他人意见必须说明署名来源，不在入口倾倒所有问题。",
+        "assets": "本人白名单原件按具体索取提供；六类复核编码需先查看原始样本并追问分类依据，不因索取全部资料自动开放。",
+        "unknowns": "超出知识范围说明不清楚，并建议有权角色；学员转述其他角色的信息不自动变成事实。"
+      }
+    },
+    {
+      "id": "cashier",
+      "name": "叶书",
+      "title": "出纳",
+      "bio": "批准后付款安排与支付结果核对",
+      "style": "简洁，严格区分审核、审批、批次、银行结果",
+      "goals": [
+        "员工看到真实支付状态",
+        "避免重复付款"
+      ],
+      "unknowns": [
+        "不能代替业务审批",
+        "不能承诺计划批次必然到账",
+        "不能核验所有票据的业务真实性"
+      ],
+      "greeting": "你好，我是叶书，负责批准后付款安排与支付结果核对。你想先了解哪一部分？",
+      "factIds": [
+        "finance.cashier.batches",
+        "finance.cashier.c007",
+        "finance.cashier.receipt",
+        "finance.cashier.separation",
+        "finance.cashier.clock",
+        "finance.cashier.visibility",
+        "finance.cashier.version_chain"
+      ],
+      "assetIds": [
+        "finance-policy",
+        "finance-payment-api",
+        "finance-cashier-current",
+        "finance-cashier-events",
+        "finance-interview-cashier",
+        "FIN-DEEP-005",
+        "FIN-DEEP-006",
+        "FIN-DEEP-007",
+        "FIN-DEEP-009",
+        "FIN-DEEP-013",
+        "FIN-DEEP-015",
+        "FIN-DEEP-016",
+        "FIN-DEEP-017",
+        "FIN-DEEP-018",
+        "FIN-DEEP-020",
+        "FIN-DEEP-023",
+        "finance-deep-interview-cashier"
+      ],
+      "disclosurePolicy": {
+        "facts": "先按本人事实与当前话题查询，首次只讲一段具体经历和材料线索；他人意见必须说明署名来源，不在入口倾倒所有问题。",
+        "assets": "本人白名单原件按具体索取提供；六类复核编码需先查看原始样本并追问分类依据，不因索取全部资料自动开放。",
+        "unknowns": "超出知识范围说明不清楚，并建议有权角色；学员转述其他角色的信息不自动变成事实。"
+      }
+    },
+    {
+      "id": "it",
+      "name": "秦芮",
+      "title": "信息中心管理员",
+      "bio": "系统接口、访问权限与试验环境",
+      "style": "边界明确，区分样例、申请中和已开通",
+      "goals": [
+        "最小权限和审计",
+        "可靠恢复与幂等"
+      ],
+      "unknowns": [
+        "无业务审批权",
+        "没有已经批准的生产写入",
+        "外部模型生产数据出域未批准"
+      ],
+      "greeting": "你好，我是秦芮，负责系统接口、访问权限与试验环境。你想先了解哪一部分？",
+      "factIds": [
+        "finance.it.systems",
+        "finance.it.interfaces",
+        "finance.it.access",
+        "finance.it.attachments",
+        "finance.it.recovery",
+        "finance.it.environment",
+        "finance.it.budget",
+        "finance.it.versions"
+      ],
+      "assetIds": [
+        "finance-systems",
+        "finance-ui-observation",
+        "finance-api",
+        "finance-payment-api",
+        "finance-interview-it",
+        "FIN-DEEP-009",
+        "FIN-DEEP-010",
+        "FIN-DEEP-013",
+        "FIN-DEEP-014",
+        "FIN-DEEP-015",
+        "FIN-DEEP-016",
+        "FIN-DEEP-017",
+        "FIN-DEEP-018",
+        "FIN-DEEP-020",
+        "FIN-DEEP-021",
+        "FIN-DEEP-022",
+        "FIN-DEEP-023",
+        "finance-deep-interview-it"
+      ],
+      "disclosurePolicy": {
+        "facts": "先按本人事实与当前话题查询，首次只讲一段具体经历和材料线索；他人意见必须说明署名来源，不在入口倾倒所有问题。",
+        "assets": "本人白名单原件按具体索取提供；六类复核编码需先查看原始样本并追问分类依据，不因索取全部资料自动开放。",
+        "unknowns": "超出知识范围说明不清楚，并建议有权角色；学员转述其他角色的信息不自动变成事实。"
+      }
+    },
+    {
+      "id": "director",
+      "name": "顾明岚",
+      "title": "财务共享组负责人",
+      "bio": "流程改善目标与试点资源协调",
+      "style": "关注可测量价值，反对把投诉直接变成功能清单",
+      "goals": [
+        "员工一次交齐和审核少返工",
+        "保留管理要求并用同批可比样本评价"
+      ],
+      "unknowns": [
+        "预算尚未立项",
+        "没有试点后收益数据",
+        "不能保证所有单据两天到账"
+      ],
+      "greeting": "你好，我是顾明岚，负责流程改善目标与试点资源协调。你想先了解哪一部分？",
+      "factIds": [
+        "finance.director.need",
+        "finance.director.success",
+        "finance.director.baseline",
+        "finance.director.resources",
+        "finance.director.governance",
+        "finance.director.alternatives",
+        "finance.director.exception",
+        "finance.director.budget"
+      ],
+      "assetIds": [
+        "finance-policy",
+        "finance-policy-old",
+        "finance-history",
+        "finance-history-events",
+        "finance-times",
+        "finance-dictionary",
+        "finance-current",
+        "finance-projects",
+        "finance-people",
+        "finance-letter",
+        "finance-interview-director",
+        "FIN-DEEP-001",
+        "FIN-DEEP-002",
+        "FIN-DEEP-003",
+        "FIN-DEEP-004",
+        "FIN-DEEP-005",
+        "FIN-DEEP-006",
+        "FIN-DEEP-007",
+        "FIN-DEEP-008",
+        "FIN-DEEP-009",
+        "FIN-DEEP-010",
+        "FIN-DEEP-011",
+        "FIN-DEEP-012",
+        "FIN-DEEP-013",
+        "FIN-DEEP-014",
+        "FIN-DEEP-015",
+        "FIN-DEEP-016",
+        "FIN-DEEP-017",
+        "FIN-DEEP-018",
+        "FIN-DEEP-019",
+        "FIN-DEEP-020",
+        "FIN-DEEP-021",
+        "FIN-DEEP-022",
+        "FIN-DEEP-023",
+        "finance-deep-interview-director"
+      ],
+      "disclosurePolicy": {
+        "facts": "先按本人事实与当前话题查询，首次只讲一段具体经历和材料线索；他人意见必须说明署名来源，不在入口倾倒所有问题。",
+        "assets": "本人白名单原件按具体索取提供；六类复核编码需先查看原始样本并追问分类依据，不因索取全部资料自动开放。",
+        "unknowns": "超出知识范围说明不清楚，并建议有权角色；学员转述其他角色的信息不自动变成事实。"
+      }
+    }
+  ],
+  "facts": [
+    {
+      "id": "finance.employee.prepare",
+      "roleIds": [
+        "employee"
+      ],
+      "topic": "本人准备材料与重复录入",
+      "text": "本人从邮件下载三张票、手机导出住宿订单，再把申请编号抄入费用系统。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/沟通记录/02-多角色初访.md",
+          "locator": "原文段落",
+          "quote": "邮件里下载三张票，手机导出住宿订单，把申请编号抄到费用系统。",
+          "assetId": "finance-interview-employee"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.employee.wait",
+      "roleIds": [
+        "employee"
+      ],
+      "topic": "员工等待感受与实际投入",
+      "text": "员工从垫资开始感觉在等待，系统周期从提交起；补件两天仅实际打了两次电话，不能把两天当人工工时。",
+      "kind": "opinion",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/沟通记录/02-多角色初访.md",
+          "locator": "原文段落",
+          "quote": "我从垫钱那天开始觉得在等，系统从提交才算。上次补件花了两天，但实际只打了两次电话。",
+          "assetId": "finance-interview-employee"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.employee.original",
+      "roleIds": [
+        "employee"
+      ],
+      "topic": "本人一笔业务的完整原件链",
+      "text": "C001是本人已处理完的一单，可以沿申请、票据、工作确认、审核和支付记录查证。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/沟通记录/03-第二轮补充说明.md",
+          "locator": "原文段落",
+          "quote": "C001 是上周处理完成的一单，可以把从申请到支付的材料给你们看。",
+          "assetId": "finance-interview-employee"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.employee.attachments",
+      "roleIds": [
+        "employee"
+      ],
+      "topic": "材料缺项与需要澄清的业务内容",
+      "text": "希望提交前知道已有什么、缺什么及谁能提供；标准材料仍包括申请、行程票据、住宿票据及明细、工作确认和供餐声明。助手应让员工核实关联申请，不能在背后选择项目或把提醒无缺项说成已批准。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/制度与人员/内部差旅制度-V2.1.md",
+          "locator": "原文段落",
+          "quote": "标准报销附件为批准的出差申请、实际行程票据、住宿票据及明细、现场工作确认、供餐声明。",
+          "assetId": "finance-interview-employee"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/岗位访谈/01-employee-林亦舟.md",
+          "locator": "本人署名访谈原话",
+          "quote": "我不希望它在背后帮我选项目，出了错还让我向负责人解释。",
+          "assetId": "finance-deep-interview-employee"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.employee.allowance",
+      "roleIds": [
+        "employee"
+      ],
+      "topic": "定额补助与费用凭据的区别",
+      "text": "伙食补助按出差自然日且首尾均计，统一供餐日不申领；需供餐声明，不应为定额补助虚构发票。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/制度与人员/内部差旅制度-V2.1.md",
+          "locator": "原文段落",
+          "quote": "员工提交供餐声明，不要求为定额补助虚构发票。",
+          "assetId": "finance-interview-employee"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.employee.privacy",
+      "roleIds": [
+        "employee"
+      ],
+      "topic": "本人经历与署名材料转交",
+      "text": "林亦舟仅亲历C001；C003沈嘉禾、C005许闻岚、C009程见微、C010温书白是其他员工，只能在本次调查授权范围转交明确署名原件，不能冒充亲历或自行查询他人全部单据。预算、归属、例外和支付判断转向有权岗位。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/旧系统/现状与可用条件.md",
+          "locator": "原文段落",
+          "quote": "员工只读本人申请与单据",
+          "assetId": "finance-interview-employee"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/C003-01-原始任务邮件与现场变更记录.md",
+          "locator": "署名原件对应段落",
+          "quote": "提供人：沈嘉禾 E03",
+          "assetId": "FIN-DEEP-001"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/C005-01-现场住宿安排与员工事后说明.md",
+          "locator": "署名原件对应段落",
+          "quote": "经办人：许闻岚 E07",
+          "assetId": "FIN-DEEP-003"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/C009-新增出差与费用材料.md",
+          "locator": "署名原件对应段落",
+          "quote": "员工E09程见微",
+          "assetId": "FIN-DEEP-006"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/C010-正常对照原件链.md",
+          "locator": "署名原件对应段落",
+          "quote": "E10温书白",
+          "assetId": "FIN-DEEP-007"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/岗位访谈/01-employee-林亦舟.md",
+          "locator": "本人署名访谈原话",
+          "quote": "不是我的单子。",
+          "assetId": "finance-deep-interview-employee"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.reviewer.crosspages",
+      "roleIds": [
+        "reviewer"
+      ],
+      "topic": "审核跨页面核对过程",
+      "text": "主要负担是申请、项目和票据跨页面查证，并非电子票看不清；项目简称不能猜。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/沟通记录/02-多角色初访.md",
+          "locator": "原文段落",
+          "quote": "费时间的是申请在一个页面，项目在另一个页面，票据又在附件里。",
+          "assetId": "finance-interview-reviewer"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.reviewer.c002",
+      "roleIds": [
+        "reviewer"
+      ],
+      "topic": "票面事实与尚缺住宿明细",
+      "text": "C002票面quantity=2、unit_price_yuan=380、gross_yuan=760，已能读出两晚每晚380合计760；仍缺独立住宿明细，旧留言无法确认夜数不应覆盖新票面。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/业务台账/当前票据.csv",
+          "locator": "原文段落",
+          "quote": "SIM-C002-3,C002,住宿费,2026-09-09,周舒宁,澄岳工业技术研究院,南京栖禾商务酒店（虚拟）,760.00,2,380.00,2026-09-07入住至2026-09-09退房,未提供；不计算税率税额或抵扣,教学模拟未接税务验真",
+          "assetId": "finance-interview-reviewer"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.reviewer.duplicate",
+      "roleIds": [
+        "reviewer"
+      ],
+      "topic": "重复票据的可靠依据",
+      "text": "C004上传的住宿票与历史H023相同，应核对票据ID、金额、日期和历史单号，不能只凭文件名，也不能声称税务验真。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/沟通记录/03-第二轮补充说明.md",
+          "locator": "原文段落",
+          "quote": "当前上传的票确实与历史单 H023 相同。",
+          "assetId": "finance-interview-reviewer"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.reviewer.policy",
+      "roleIds": [
+        "reviewer"
+      ],
+      "topic": "C005规则核定与例外证据",
+      "text": "C005按出发日适用V2.1；南京两晚每晚520、普通上限420，原申请2386、普通标准待确认2186、差200。原住宿票与明细齐全；展会涨价是员工转述，现场任务紧凑不证明必须住超标酒店，没有完整比价和指定住宿通知。员工及邵宁均未办事前两级例外批准，收悉通知不是接受调整，当前退回且例外未批准；审核员只能整理核对，不能代员工确认或替负责人批准。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/制度与人员/内部差旅制度-V2.1.md",
+          "locator": "原文段落",
+          "quote": "费用按出发日选择有效制度版本",
+          "assetId": "finance-interview-reviewer"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/C005-02-财务复核材料与待确认金额通知.md",
+          "locator": "署名原件对应段落",
+          "quote": "本次并不是缺住宿明细，请不要把已经收到的同一组票重新上传来替代金额确认。",
+          "assetId": "FIN-DEEP-004"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/C005-02-财务复核材料与待确认金额通知.md",
+          "locator": "署名原件对应段落",
+          "quote": "本次只确认收到通知，暂未确认按2186元调整，也没有新的例外批准。",
+          "assetId": "FIN-DEEP-004"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/C005-01-现场住宿安排与员工事后说明.md",
+          "locator": "署名原件对应段落",
+          "quote": "现场时间紧凑与指定超标酒店不是一件事，现有材料未显示必须入住该酒店。",
+          "assetId": "FIN-DEEP-003"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/岗位访谈/02-reviewer-唐映秋.md",
+          "locator": "本人署名访谈原话",
+          "quote": "现有说明是事后交的，没有事前例外批准。",
+          "assetId": "finance-deep-interview-reviewer"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.reviewer.history",
+      "roleIds": [
+        "reviewer"
+      ],
+      "topic": "旧180笔队列与新增独立样本",
+      "text": "原历史队列为6月至8月首次提交180笔，重提沿用单号，退回按至少一次RETURNED的不同业务单计数；原8笔与新增C009/C010是当前材料层，EXH24笔为另一组独立目的抽样，均不得混进原分母或宣称204笔全量。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/业务台账/字段与统计口径.md",
+          "locator": "原文段落",
+          "quote": "退回率=至少一次RETURNED的业务单数/180，不能用事件数作为分母。",
+          "assetId": "finance-interview-reviewer"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/历史样本移交与计时说明.md",
+          "locator": "署名原件对应段落",
+          "quote": "它们不是原180笔导出的补列，也不代表全院全部业务发生比例。",
+          "assetId": "FIN-DEEP-008"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.reviewer.recheck",
+      "roleIds": [
+        "reviewer"
+      ],
+      "topic": "补交复核与当前排队事实",
+      "text": "C008周六补回工作确认，周一09:00仍财务待审；只复核新增资料及受影响检查，不要求重复填未变费用行。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/沟通记录/03-第二轮补充说明.md",
+          "locator": "原文段落",
+          "quote": "C008 周六补回了工作确认，周一九点还在财务待审队列。",
+          "assetId": "finance-interview-reviewer"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.reviewer.timelog",
+      "roleIds": [
+        "reviewer"
+      ],
+      "topic": "净操作工时与样本外推限制",
+      "text": "12笔陪跑工时为便利抽样的操作分钟；没有覆盖假设、成本与试点后测量，不可外推全院年度节约。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/业务台账/字段与统计口径.md",
+          "locator": "原文段落",
+          "quote": "陪跑工时样本为12笔便利抽样，仅有操作分钟数",
+          "assetId": "finance-interview-reviewer"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.manager.allocation",
+      "roleIds": [
+        "manager"
+      ],
+      "topic": "C003任务事实与未决费用承担",
+      "text": "联合测试涉及P101和P102；A003批的是行程，员工填P101不代表全部归属。傅景只以P102及D02职责提供本人意见，贺衡的P101意见须以署名材料转交。原件确认现场工作发生，但专属成果、共用准备及共同支出依据尚需双方核对，当前没有共同认可的分摊说明，C003仍项目待确认。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/沟通记录/03-第二轮补充说明.md",
+          "locator": "原文段落",
+          "quote": "员工先填 P101 不代表我认可归属。请把“已填一个编号”和“已明确费用承担”区分开。我暂时只能确认现场工作发生过。",
+          "assetId": "finance-interview-manager"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/C003-02-双方项目负责人沟通原文.md",
+          "locator": "署名原件对应段落",
+          "quote": "当前我尚未与贺衡形成共同认可的费用分摊说明，请保留项目待确认。",
+          "assetId": "FIN-DEEP-002"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/C003-02-双方项目负责人沟通原文.md",
+          "locator": "署名原件对应段落",
+          "quote": "不能把我确认现场工作发生过解释成已经确认比例。",
+          "assetId": "FIN-DEEP-002"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/岗位访谈/03-manager-傅景.md",
+          "locator": "本人署名访谈原话",
+          "quote": "现在你问我最后是多少，我给不了。",
+          "assetId": "finance-deep-interview-manager"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.manager.tasks",
+      "roleIds": [
+        "manager"
+      ],
+      "topic": "受益依据与共同费用分配",
+      "text": "项目预算不可按姓名选择；分清专属任务、共同准备、共用数据与各自接收成果。不能用上午下午、文件条数或项目余额推比例；共同费用的承担需要相关负责人共同认可且合计闭合，不能为凑预算分摊。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/制度与人员/内部差旅制度-V2.1.md",
+          "locator": "原文段落",
+          "quote": "分摊和为100%，不得为凑预算随意分配。",
+          "assetId": "finance-interview-manager"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/C003-02-双方项目负责人沟通原文.md",
+          "locator": "署名原件对应段落",
+          "quote": "也不能直接按日历天切开。",
+          "assetId": "FIN-DEEP-002"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/C003-02-双方项目负责人沟通原文.md",
+          "locator": "署名原件对应段落",
+          "quote": "同一个片段可能被两边使用，文件数量也不等于工作量。",
+          "assetId": "FIN-DEEP-002"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/岗位访谈/03-manager-傅景.md",
+          "locator": "本人署名访谈原话",
+          "quote": "不能拿上午下午直接换比例，也不能按照哪边预算足去分。",
+          "assetId": "finance-deep-interview-manager"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.manager.approval",
+      "roleIds": [
+        "manager"
+      ],
+      "topic": "出差批准与费用批准区别",
+      "text": "批准出差不等于所有费用已确认归属；申请预算是估算，报销需项目归属确认、财务审核和部门审批。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/沟通记录/02-多角色初访.md",
+          "locator": "原文段落",
+          "quote": "批准出差不等于每项费用都确认归属。",
+          "assetId": "finance-interview-manager"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.manager.delegation",
+      "roleIds": [
+        "manager"
+      ],
+      "topic": "部门审批等待与代理授权",
+      "text": "负责人现场外出时可能无法及时审批，代理必须正式登记；提醒不能替人批准，C006未登记代理。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/沟通记录/03-第二轮补充说明.md",
+          "locator": "原文段落",
+          "quote": "C006 部门负责人未登记代理，不能为了试点临时共享密码。",
+          "assetId": "finance-interview-manager"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.manager.budget",
+      "roleIds": [
+        "manager"
+      ],
+      "topic": "预算快照与可取得的组成台账",
+      "text": "预算可用额是23:00快照，已扣累计入账和净预占；深化调查可取得组成与预占流水，不再把缺明细当永久事实。未预占待批申请另列，条件测算不能作为当前余额或实时锁定；不能拿预算余额决定C003归属，也不能把拟议C009分摊自动转移预占。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/预算导出与办理口径说明.md",
+          "locator": "署名原件对应段落",
+          "quote": "当前看板不提供实时预算锁定。",
+          "assetId": "FIN-DEEP-010"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/预算导出与办理口径说明.md",
+          "locator": "署名原件对应段落",
+          "quote": "净预占由锁定与释放流水合计；已释放金额不得重复扣除。",
+          "assetId": "FIN-DEEP-010"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.manager.responsibility",
+      "roleIds": [
+        "manager"
+      ],
+      "topic": "审批分工与本人单据约束",
+      "text": "申请人不得自批；同人兼任项目和部门负责人仍须留两份职责记录，制度例外另加财务负责人意见。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/制度与人员/内部差旅制度-V2.1.md",
+          "locator": "原文段落",
+          "quote": "申请人不得审批自己的单据；同人兼任项目与部门负责人也要保留两个职责的记录。",
+          "assetId": "finance-interview-manager"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.cashier.batches",
+      "roleIds": [
+        "cashier"
+      ],
+      "topic": "付款批次与截止窗口",
+      "text": "每周二周五15:00发起集中支付，13:00截单，错过顺延下一批；不是发票识别能缩短的等待。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/制度与人员/内部差旅制度-V2.1.md",
+          "locator": "原文段落",
+          "quote": "出纳每周二、周五15:00发起集中支付，当日13:00截单",
+          "assetId": "finance-interview-cashier"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.cashier.c007",
+      "roleIds": [
+        "cashier"
+      ],
+      "topic": "计划付款与实际到账",
+      "text": "C007周五16:00才审批，已排下周二批次，快照时没有银行成功回执，不能记为已支付。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/沟通记录/03-第二轮补充说明.md",
+          "locator": "原文段落",
+          "quote": "C007 周五十六点才完成审批，已排下周二批次，目前没有银行成功回执。",
+          "assetId": "finance-interview-cashier"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.cashier.receipt",
+      "roleIds": [
+        "cashier"
+      ],
+      "topic": "支付成功依据与失败恢复",
+      "text": "银行成功回执后才标PAID；失败保留原请求标识、核原因再重试，网络超时不能触发重复付款。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/制度与人员/内部差旅制度-V2.1.md",
+          "locator": "原文段落",
+          "quote": "银行成功回执后标记PAID；失败单保留原支付请求标识，核实失败原因后再重试，不能因网络超时重复付款。",
+          "assetId": "finance-interview-cashier"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.cashier.separation",
+      "roleIds": [
+        "cashier"
+      ],
+      "topic": "出纳与审批职责分离",
+      "text": "出纳读取批准金额与收款对象安排支付，不兼任报销审批，审核通过不等于已审批或已到账。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/制度与人员/内部差旅制度-V2.0及组织职责.md",
+          "locator": "原文段落",
+          "quote": "出纳不兼任报销审批人。",
+          "assetId": "finance-interview-cashier"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.cashier.clock",
+      "roleIds": [
+        "cashier"
+      ],
+      "topic": "日历等待与人工工时",
+      "text": "付款记录保留时区；周末等待计日历时长，不计人工工时，没有周末值班承诺。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/沟通记录/03-第二轮补充说明.md",
+          "locator": "原文段落",
+          "quote": "我们没有周末值班承诺。付款时点请保留时区，周末等待不能计成人工工时。",
+          "assetId": "finance-interview-cashier"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.cashier.visibility",
+      "roleIds": [
+        "cashier"
+      ],
+      "topic": "员工可理解的支付状态",
+      "text": "向员工说明审核、审批、付款排队、银行结果分别在哪一步，不能只显示审核通过。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/沟通记录/02-多角色初访.md",
+          "locator": "原文段落",
+          "quote": "提交银行不等于到账。员工不该只看到“审核通过”。",
+          "assetId": "finance-interview-cashier"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.it.systems",
+      "roleIds": [
+        "it"
+      ],
+      "topic": "现有系统分工与人工衔接",
+      "text": "OA存出差申请，PRJ人员项目，EXP报销审核，PAY支付，ARC原件；人工搜索下载录入串接，没有统一申请附件目录。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/旧系统/现状与可用条件.md",
+          "locator": "原文段落",
+          "quote": "系统没有统一申请附件目录。",
+          "assetId": "finance-interview-it"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.it.interfaces",
+      "roleIds": [
+        "it"
+      ],
+      "topic": "可用导出与尚未开通的接口",
+      "text": "OA/PRJ脱敏只读导出可用、每天23:00刷新；EXP沙箱草稿需审批尚未开通，生产创建提交审批支付税务未授权，JSON仅样例。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/旧系统/现状与可用条件.md",
+          "locator": "原文段落",
+          "quote": "当前未开通。生产创建、提交、审批、银行付款、税务查验都未授权",
+          "assetId": "finance-interview-it"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.it.access",
+      "roleIds": [
+        "it"
+      ],
+      "topic": "服务账号与业务权限边界",
+      "text": "不能用个人财务账号或未批准RPA绕过；需服务账号、调用范围和审计，管理员配置接口但无业务批准权。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/旧系统/现状与可用条件.md",
+          "locator": "原文段落",
+          "quote": "信息管理员配置接口但无业务批准权。",
+          "assetId": "finance-interview-it"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.it.attachments",
+      "roleIds": [
+        "it"
+      ],
+      "topic": "附件短链与稳定归档标识",
+      "text": "附件链接15分钟过期，业务主键与归档引用稳定；失效重新申请，不当成附件不存在；外部模型不能访问集团网段。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/旧系统/现状与可用条件.md",
+          "locator": "原文段落",
+          "quote": "短期下载链接15分钟过期，业务主键和归档引用稳定",
+          "assetId": "finance-interview-it"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.it.recovery",
+      "roleIds": [
+        "it"
+      ],
+      "topic": "限流与超时幂等恢复",
+      "text": "附件限制20MB、沙箱每分钟30次；返回超时不代表草稿未创建，要以幂等键查询原请求。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/旧系统/现状与可用条件.md",
+          "locator": "原文段落",
+          "quote": "返回超时不代表草稿未创建，需要用幂等键查询原请求。",
+          "assetId": "finance-interview-it"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.it.environment",
+      "roleIds": [
+        "it"
+      ],
+      "topic": "试验资源与模型出域待确认",
+      "text": "有16核64GB500GB隔离服务器，无专用GPU和生产模型服务；可申请内网推理试用，模型费用并发与生产数据外部调用未批准。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/旧系统/现状与可用条件.md",
+          "locator": "原文段落",
+          "quote": "生产数据是否能调用外部服务未经批准。",
+          "assetId": "finance-interview-it"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.director.need",
+      "roleIds": [
+        "director"
+      ],
+      "topic": "原始模糊诉求与管理要求",
+      "text": "诉求是员工财务少花时间且管理要求不降，先调研而不是预选产品；预算尚未申请。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/沟通记录/01-负责人来信.md",
+          "locator": "原文段落",
+          "quote": "预算还没有申请，信息中心能提供什么环境也需要问清。",
+          "assetId": "finance-interview-director"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.director.success",
+      "roleIds": [
+        "director"
+      ],
+      "topic": "试点成功标准与对照测量",
+      "text": "一次交更完整、审核少查资料值得验证，需同批可比样本前后证据；不承诺两天到账，不以减员作为立项。",
+      "kind": "opinion",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/沟通记录/02-多角色初访.md",
+          "locator": "原文段落",
+          "quote": "但需要同一批样本的前后证据。不能承诺所有单据两天到账，也不把少了几个人当立项目标。",
+          "assetId": "finance-interview-director"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.director.baseline",
+      "roleIds": [
+        "director"
+      ],
+      "topic": "流程周期与主动工时基线",
+      "text": "从历史台账与事件计算分阶段日历耗时，不重复叠加补件等待；陪跑分钟另算，不能把日历等待当净工时。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/业务台账/字段与统计口径.md",
+          "locator": "原文段落",
+          "quote": "中间补件等待可用RETURNED到RESUBMITTED单独计算，但该等待包含在审核阶段，汇总时不能重复相加。",
+          "assetId": "finance-interview-director"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.director.resources",
+      "roleIds": [
+        "director"
+      ],
+      "topic": "试点人员与反馈资源意向",
+      "text": "拟与D01/D02试点；负责人每周30分钟反馈、审核每周2小时陪跑、两部门各2名工程师属于资源意向非正式立项。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/旧系统/现状与可用条件.md",
+          "locator": "原文段落",
+          "quote": "这是资源意向，未等同立项。",
+          "assetId": "finance-interview-director"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.director.governance",
+      "roleIds": [
+        "director"
+      ],
+      "topic": "制度维护与错误恢复责任",
+      "text": "资源申请须明确制度维护负责人、错误恢复办法、相近复杂度样本比较，制度归财务负责人管理。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/沟通记录/03-第二轮补充说明.md",
+          "locator": "原文段落",
+          "quote": "资源申请需要明确谁负责维护制度，出现错误如何恢复，以及如何对比相近复杂度的样本。",
+          "assetId": "finance-interview-director"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.director.alternatives",
+      "roleIds": [
+        "director"
+      ],
+      "topic": "按问题证据比较AI、规则与组织改善",
+      "text": "根据调查证据比较材料识别、跨任务理解、澄清及证据组织的AI用途；预算算术、版本校验、状态展示及审批路由应同时比较确定规则、数据集成和组织职责改善。不是六类问题都要用AI，不代替有权审批，不预设采购一体机；当前未实施AI，没有实测收益或全公司年度ROI依据。",
+      "kind": "opinion",
+      "sources": [
+        {
+          "path": "source-materials/finance/初始材料/沟通记录/03-第二轮补充说明.md",
+          "locator": "原文段落",
+          "quote": "调查时要比较规则提醒、数据关联和 AI 理解各自的价值。",
+          "assetId": "finance-interview-director"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/岗位访谈/04-director-顾明岚.md",
+          "locator": "本人署名访谈原话",
+          "quote": "把规则提醒、资料关联、AI整理分别能做的事拿实际材料说清楚。",
+          "assetId": "finance-deep-interview-director"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.reviewer.business_explanation",
+      "roleIds": [
+        "reviewer"
+      ],
+      "topic": "C003材料存在与业务说明充分",
+      "text": "C003工作确认可以证明任务发生，不能证明费用全归P101；任务邮件与现场变更显示联合受益，仍缺双方认可的成果及共同费用承担决定。这与C002缺独立住宿明细不同：分别是文件、事实与决定层面的缺口，不可都归为OCR或员工漏传票。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/C003-02-双方项目负责人沟通原文.md",
+          "locator": "署名原件对应段落",
+          "quote": "当前待回收项：双方确认的任务及成果受益说明、共同费用处理依据、能核对到本单费用行的承担意见。",
+          "assetId": "FIN-DEEP-002"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/岗位访谈/02-reviewer-唐映秋.md",
+          "locator": "本人署名访谈原话",
+          "quote": "工作确认只能支持现场任务发生。",
+          "assetId": "finance-deep-interview-reviewer"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.reviewer.version",
+      "roleIds": [
+        "reviewer"
+      ],
+      "topic": "C009同额变更影响核验",
+      "text": "C009原v1核定2186且员工接受差额；v2总额未变，但新增联合诊断记录并提出P101/P102分摊，尚未共同确认。旧批准保留为历史，不能自动覆盖新归属；先识别变更影响，再由项目与有权审批人确认，不必重查未变车票，也不能以60/40算术闭合判为批准。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/系统版本与复核职责说明.md",
+          "locator": "署名原件对应段落",
+          "quote": "金额、费用承担项目或例外条件改变时，必须确认原批准是否覆盖当前内容；不能仅比较总金额。",
+          "assetId": "FIN-DEEP-009"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/C009-批准与暂停付款记录.md",
+          "locator": "署名原件对应段落",
+          "quote": "归属变化无需重查没有变化的车票金额，但需确认新任务是否影响原有业务结论。",
+          "assetId": "FIN-DEEP-005"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.manager.version",
+      "roleIds": [
+        "manager"
+      ],
+      "topic": "C009历史批准范围与新归属",
+      "text": "C009贺衡以P101负责人确认v1项目归属，傅景以D02负责人批准v1；两项职责分别留存。程见微后来提出v2联合分摊，总额未变也需核实原批准是否覆盖新项目范围，P102共同承担尚未确认，傅景不能代贺衡批准P101或把拟议60/40当最终比例。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/C009-批准与暂停付款记录.md",
+          "locator": "署名原件对应段落",
+          "quote": "两项记录作用不同。",
+          "assetId": "FIN-DEEP-005"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/C009-新增出差与费用材料.md",
+          "locator": "署名原件对应段落",
+          "quote": "这是填报建议，不能用任务条数直接证明分摊比例。当前两个项目尚未完成共同确认。",
+          "assetId": "FIN-DEEP-006"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.cashier.version_chain",
+      "roleIds": [
+        "cashier"
+      ],
+      "topic": "C009暂停与C010一致付款对照",
+      "text": "C009付款候选仍v1/P101，EXP已有v2，叶书已人工暂停，尚未生成银行支付请求或收到回执；须取得项目归属及受影响批准重新确认后的有效清单。C010从申请到成功回执始终v1/2106/P101，是新增当前正常对照且已支付。C007只是错过正常批次，不等于版本冲突；C009没有真实错付或AI自动防损结果。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/C009-批准与暂停付款记录.md",
+          "locator": "署名原件对应段落",
+          "quote": "已人工暂停本项。尚未生成银行支付请求，未收到银行回执。",
+          "assetId": "FIN-DEEP-005"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/C010-正常对照原件链.md",
+          "locator": "署名原件对应段落",
+          "quote": "各环节始终指向v1/2106元/P101。",
+          "assetId": "FIN-DEEP-007"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/系统版本与复核职责说明.md",
+          "locator": "署名原件对应段落",
+          "quote": "不是自动拦截成功，也未发生错付。",
+          "assetId": "FIN-DEEP-009"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/岗位访谈/05-cashier-叶书.md",
+          "locator": "本人署名访谈原话",
+          "quote": "如果前面有新调整，就要确认对应的是新结论，不是拿原申请额来付。",
+          "assetId": "finance-deep-interview-cashier"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.it.budget",
+      "roleIds": [
+        "it"
+      ],
+      "topic": "预算组成、预占流水与条件口径",
+      "text": "预算批次9月13日23:00、业务观察9月14日09:00，非实时；可用额=总预算-累计入账-净预占，流水正锁负释按符号汇总，BR08已全额释放不重复占。原历史与已付C010已含累计入账不再扣。C009预占仍在P101，拟议v2未转移；未批未占申请只能另做全部获批条件余额，清单不含C003归属或未来C009转移，不能等同锁定。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/预算导出与办理口径说明.md",
+          "locator": "署名原件对应段落",
+          "quote": "预算表的可用额=项目总预算－累计已入账－净预占。",
+          "assetId": "FIN-DEEP-010"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/预算导出与办理口径说明.md",
+          "locator": "署名原件对应段落",
+          "quote": "C009仍按v1占用P101的2186元，拟议v2未批准，不应重复计入两个项目。",
+          "assetId": "FIN-DEEP-010"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/预算导出与办理口径说明.md",
+          "locator": "署名原件对应段落",
+          "quote": "该清单不是已经发生的支出。",
+          "assetId": "FIN-DEEP-010"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/岗位访谈/06-it-秦芮.md",
+          "locator": "本人署名访谈原话",
+          "quote": "离线材料可以读CSV，但别写成实时查询。",
+          "assetId": "finance-deep-interview-it"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.it.versions",
+      "roleIds": [
+        "it"
+      ],
+      "topic": "各系统版本截面与同步边界",
+      "text": "EXP保存C009新v2，OA仍旧v1批准，PRJ保留旧P101预占，PAY保留旧候选但人工暂停；接口不会因新材料自动撤回OA批准或替换付款清单。差异应保留用以核实批准覆盖，不能清洗成全是最新版；只读样例不代表生产审批、实时锁预算或支付权限，版本订阅、写入、撤销需另行确认。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/系统版本与复核职责说明.md",
+          "locator": "署名原件对应段落",
+          "quote": "当前接口不会因EXP出现新版本自动撤回OA旧记录，也不会自动将PAY付款清单替换为新版本。",
+          "assetId": "FIN-DEEP-009"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/系统版本与复核职责说明.md",
+          "locator": "署名原件对应段落",
+          "quote": "后台是否支持版本订阅、幂等写入和撤销，要作为后续方案条件另行确认。",
+          "assetId": "FIN-DEEP-009"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.reviewer.deep_sample",
+      "roleIds": [
+        "reviewer"
+      ],
+      "topic": "独立调查样本与原事件取证",
+      "text": "EXH001—EXH024是24笔独立目的抽样，包含普通对照，非原180笔补列、非全院发生率。先取得样本与原事件判断跟踪范围及问题证据；办理结束只代表跟踪事项结束，不代表原申报全获批，EXH不能加入预算过账。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/历史样本移交与计时说明.md",
+          "locator": "署名原件对应段落",
+          "quote": "它们不是原180笔导出的补列，也不代表全院全部业务发生比例。",
+          "assetId": "FIN-DEEP-008"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/历史样本移交与计时说明.md",
+          "locator": "署名原件对应段落",
+          "quote": "办理结束只说明跟踪事项结束，不代表每项费用均按申报金额批准。",
+          "assetId": "FIN-DEEP-008"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.reviewer.deep_coding",
+      "roleIds": [
+        "reviewer"
+      ],
+      "topic": "问题分类依据与已记录处理投入",
+      "text": "查看原样本后可询问审核员按原事件复核的六类编码；每单可多标签，异常业务按sample_id去重，标签数不能当异常单数，无标签只代表无本轮六问题。工时是事后回填的已记录核实动作，按work_id去重且有回忆及覆盖缺口；自然历时含夜间周末，不能当持续人工投入，不能替换旧12笔工时或推算AI收益。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/历史样本移交与计时说明.md",
+          "locator": "署名原件对应段落",
+          "quote": "一笔可有多个标签，不能相加当成异常单数。",
+          "assetId": "FIN-DEEP-008"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/历史样本移交与计时说明.md",
+          "locator": "署名原件对应段落",
+          "quote": "人工操作分钟由参与者事后回填，排除了其自报的等待，但仍有回忆误差，只覆盖列出的核实动作。",
+          "assetId": "FIN-DEEP-008"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.director.exception",
+      "roleIds": [
+        "director"
+      ],
+      "topic": "C005例外证据与有权判断",
+      "text": "普通标准调整与制度例外分开；C005事前没有两级超标批准，员工事后说明和邵宁收悉不等于补签同意。已有任务和住宿事实、200元差额可以解释，但展会口述没有完整比价或指定住宿证明，不能自动批准；员工尚未接受2186调整，顾明岚没有给例外结论，需现有同期材料和部门工作约束供有权复核。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/C005-02-财务复核材料与待确认金额通知.md",
+          "locator": "署名原件对应段落",
+          "quote": "事后说明可以被接收，但接收不等于获准例外，也不承诺差额一定可以由项目承担。",
+          "assetId": "FIN-DEEP-004"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/C005-01-现场住宿安排与员工事后说明.md",
+          "locator": "署名原件对应段落",
+          "quote": "本批注仅确认所知情况，不表示补签同意，也不形成新的批准金额。",
+          "assetId": "FIN-DEEP-003"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/岗位访谈/04-director-顾明岚.md",
+          "locator": "本人署名访谈原话",
+          "quote": "我还没有给例外结论，不能在材料上写成我已同意补签。",
+          "assetId": "finance-deep-interview-director"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance.director.budget",
+      "roleIds": [
+        "director"
+      ],
+      "topic": "预算时效与潜在承诺的管理含义",
+      "text": "三项目可用额描述导出时点已入账和净预占之后的余额；未批未占清单是潜在承诺，全部批准后的数值仅条件测算，不是当前可用或锁定成功，亦非所有潜在支出的全集。不能按余额分C003，不可将C009拟议分摊当已批准或双重扣款，C010已入账不再扣。应区分算术、业务受益决定和有权批准。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/预算导出与办理口径说明.md",
+          "locator": "署名原件对应段落",
+          "quote": "将其金额全部扣除，只能得到“假设这些申请全部批准”的测算，不得回写成当前余额，也不能证明本次请求已成功获得预算。",
+          "assetId": "FIN-DEEP-010"
+        },
+        {
+          "path": "source-materials/finance/深化调查补充包/业务原件/预算导出与办理口径说明.md",
+          "locator": "署名原件对应段落",
+          "quote": "C003归属尚未明确，没有分配到具体项目的预占；不要因为员工填写P101就扣P101。",
+          "assetId": "FIN-DEEP-010"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    }
+  ],
+  "assets": [
+    {
+      "id": "finance-policy",
+      "path": "source-materials/finance/初始材料/制度与人员/内部差旅制度-V2.1.md",
+      "title": "内部差旅制度-V2.1",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "b6681cc7036b25791d5bd5d4370431e142300da5bf1fd8a4eda7588d3c054bc5",
+      "sizeBytes": 4568,
+      "roleIds": [
+        "employee",
+        "reviewer",
+        "manager",
+        "cashier",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-policy-old",
+      "path": "source-materials/finance/初始材料/制度与人员/内部差旅制度-V2.0及组织职责.md",
+      "title": "内部差旅制度-V2.0及组织职责",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "9e2b190c64585f38ac83c086ad9b8219ab41a83cb1ca96ded362ae10fbd01fcb",
+      "sizeBytes": 1207,
+      "roleIds": [
+        "reviewer",
+        "manager",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-history",
+      "path": "source-materials/finance/初始材料/业务台账/历史报销单.csv",
+      "title": "历史报销单",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "836f033f2cd60088ecbb129b6a54da6d7cd3a265201c8562807a47e78abd7fcb",
+      "sizeBytes": 21652,
+      "roleIds": [
+        "reviewer",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-history-events",
+      "path": "source-materials/finance/初始材料/业务台账/历史状态事件.csv",
+      "title": "历史状态事件",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "68f01035101ac630f5fb0e44b5abd70f41169d64fab907bcc5934eab7cd19360",
+      "sizeBytes": 104790,
+      "roleIds": [
+        "reviewer",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-history-lines",
+      "path": "source-materials/finance/初始材料/业务台账/历史费用行.csv",
+      "title": "历史费用行",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "d14391975db815e3e67393e5511106f1a9a0efea025cf557e06403268cc25871",
+      "sizeBytes": 37714,
+      "roleIds": [
+        "reviewer"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-history-applications",
+      "path": "source-materials/finance/初始材料/业务台账/历史出差申请.csv",
+      "title": "历史出差申请",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "5c3873536c253d323b4abb78b11f36a02d0cf57e6bde268259e00ab9d4f6f3cb",
+      "sizeBytes": 14505,
+      "roleIds": [
+        "reviewer"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-times",
+      "path": "source-materials/finance/初始材料/业务台账/陪跑工时样本.csv",
+      "title": "陪跑工时样本",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "c2d1a8bfcd9a2336f2b6cd953f6f1de10996cd9e8df44b6c65ec1c57ed1e8e12",
+      "sizeBytes": 1573,
+      "roleIds": [
+        "reviewer",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-dictionary",
+      "path": "source-materials/finance/初始材料/业务台账/字段与统计口径.md",
+      "title": "字段与统计口径",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "b17622d008a791368ffca5079a6f31ac1da70418056af499350f59a3ccbc7ecd",
+      "sizeBytes": 2530,
+      "roleIds": [
+        "reviewer",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-current",
+      "path": "source-materials/finance/初始材料/业务台账/当前报销单.csv",
+      "title": "当前报销单",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "13f999928b7feed5c6d5966397c4dc936c178b7add64b470e53c8a5c09e075fd",
+      "sizeBytes": 1028,
+      "roleIds": [
+        "reviewer",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-current-events",
+      "path": "source-materials/finance/初始材料/业务台账/当前状态事件.csv",
+      "title": "当前状态事件",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "fce57b6a0905a5ca26917880f5ce7f09d5199295e5cedf68e12294817ad69b83",
+      "sizeBytes": 2911,
+      "roleIds": [
+        "reviewer"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-invoices",
+      "path": "source-materials/finance/初始材料/业务台账/当前票据.csv",
+      "title": "当前票据",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "952e8cd0a6d2f4aff376163b11ac4a8010cacef6dcabdc05d74f413152e3f3ec",
+      "sizeBytes": 5742,
+      "roleIds": [
+        "reviewer"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-attachments",
+      "path": "source-materials/finance/初始材料/业务台账/附件索引.csv",
+      "title": "附件索引",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "bee46cf4b5a0ff3326bab85ebeeb7a63739a9d01bd9910ddae264664850dcba4",
+      "sizeBytes": 3997,
+      "roleIds": [
+        "reviewer"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-invoice-index",
+      "path": "source-materials/finance/初始材料/业务台账/已报销票据索引.csv",
+      "title": "已报销票据索引",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "4e812528a60ba9250bacfa07fb473f557f0fd4139f0401b60c92640c925ffa1d",
+      "sizeBytes": 33043,
+      "roleIds": [
+        "reviewer"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-applications",
+      "path": "source-materials/finance/初始材料/业务台账/当前出差申请.csv",
+      "title": "当前出差申请",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "84addedb2fa2195c2c9910c89bd867af1c0ac09fe1b05f75e5f9be870818bc35",
+      "sizeBytes": 1428,
+      "roleIds": [
+        "reviewer"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-lines",
+      "path": "source-materials/finance/初始材料/业务台账/当前费用行.csv",
+      "title": "当前费用行",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "9301264bb3d6cbdd4fe2b476ea1a50c153f3aac788f4f9a000e020de220e5737",
+      "sizeBytes": 1746,
+      "roleIds": [
+        "reviewer"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-projects",
+      "path": "source-materials/finance/初始材料/制度与人员/项目.csv",
+      "title": "项目",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "051781c37f1f89f8db9c6b7be9890d5e5c5d2045c9fb4bfb832c68f9b422f797",
+      "sizeBytes": 269,
+      "roleIds": [
+        "reviewer",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-people",
+      "path": "source-materials/finance/初始材料/制度与人员/员工.csv",
+      "title": "员工",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "2ccd7fa46560ef8b1a8b6c3cbfad765d9a677dbf1f7d44836101297d8d112980",
+      "sizeBytes": 374,
+      "roleIds": [
+        "reviewer",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-systems",
+      "path": "source-materials/finance/初始材料/旧系统/现状与可用条件.md",
+      "title": "现状与可用条件",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "0f6ee8068b8ff3b5d2320637cb6521da0707d2671f108a8bca57d480e16821d4",
+      "sizeBytes": 2229,
+      "roleIds": [
+        "it"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-ui-observation",
+      "path": "source-materials/finance/初始材料/旧系统/旧网页操作记录.md",
+      "title": "旧网页操作记录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "b65a8decfc7e7ef7eb790592016ed012b3ae765802cb1fc9ca9f6642707fbbdb",
+      "sizeBytes": 1100,
+      "roleIds": [
+        "reviewer",
+        "it"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-api",
+      "path": "source-materials/finance/初始材料/旧系统/只读与草稿接口样例.json",
+      "title": "只读与草稿接口样例",
+      "mime": "application/json",
+      "version": "snapshot-2026-09-14",
+      "sha256": "ead6b32682a4cbb220e12996540a3363152221355b9eb9c4ae9b45fa19bfda06",
+      "sizeBytes": 2446,
+      "roleIds": [
+        "it"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-payment-api",
+      "path": "source-materials/finance/初始材料/旧系统/票据查验与支付状态样例.json",
+      "title": "票据查验与支付状态样例",
+      "mime": "application/json",
+      "version": "snapshot-2026-09-14",
+      "sha256": "b039db798e4386dc9bf04ae2388a9f6086f06c8f94719ccb4c686de6c2ea3749",
+      "sizeBytes": 606,
+      "roleIds": [
+        "it",
+        "cashier"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-letter",
+      "path": "source-materials/finance/初始材料/沟通记录/01-负责人来信.md",
+      "title": "01-负责人来信",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "d2b34f834be530d792a8e59e510683f2a37c26adece6f35aa1d27255cec5c16e",
+      "sizeBytes": 901,
+      "roleIds": [
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-cashier-current",
+      "path": "source-materials/finance/角色摘录/出纳已批准-当前报销单.csv",
+      "title": "出纳已批准单据状态（授权摘录）",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "e99a135ea64231f3964766f6297f3a1d5aa4fc3a7a9244cb1365c65806725b2e",
+      "sizeBytes": 380,
+      "roleIds": [
+        "cashier"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-cashier-events",
+      "path": "source-materials/finance/角色摘录/出纳已批准-当前状态事件.csv",
+      "title": "出纳已批准单据事件（授权摘录）",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "f35943bb77ea6748d36b1641041dc239833f90812d0a48b7e4051ce03bfa8f64",
+      "sizeBytes": 1036,
+      "roleIds": [
+        "cashier"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-project-p102",
+      "path": "source-materials/finance/角色摘录/P102项目预算快照.csv",
+      "title": "P102项目预算快照（授权摘录）",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "46ae28d78218bc2453b781b358159bf9978c3cdc2af6f9799447af7d21d35bc0",
+      "sizeBytes": 136,
+      "roleIds": [
+        "manager"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-c001",
+      "path": "source-materials/finance/初始材料/当前单据/C001-报销原件链.pdf",
+      "title": "C001-报销原件链",
+      "mime": "application/pdf",
+      "version": "snapshot-2026-09-14",
+      "sha256": "2df9f126254ea64d1c0dc6774df4752bd8b87a21fd34957b38b3f580869d2b32",
+      "sizeBytes": 14253,
+      "roleIds": [
+        "reviewer",
+        "employee"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-c002",
+      "path": "source-materials/finance/初始材料/当前单据/C002-报销原件链.pdf",
+      "title": "C002-报销原件链",
+      "mime": "application/pdf",
+      "version": "snapshot-2026-09-14",
+      "sha256": "c91373d948f1bf9c589e9cd3f8008feae34ffebdb7fc69ea0b886038dd2af5e0",
+      "sizeBytes": 12846,
+      "roleIds": [
+        "reviewer"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-c003",
+      "path": "source-materials/finance/初始材料/当前单据/C003-报销原件链.pdf",
+      "title": "C003-报销原件链",
+      "mime": "application/pdf",
+      "version": "snapshot-2026-09-14",
+      "sha256": "f5d1609bf272fc5a87c0ee57aa6d003ed7235a10ca9bcfcac5048222a569a3a8",
+      "sizeBytes": 14083,
+      "roleIds": [
+        "reviewer",
+        "manager"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-c004",
+      "path": "source-materials/finance/初始材料/当前单据/C004-报销原件链.pdf",
+      "title": "C004-报销原件链",
+      "mime": "application/pdf",
+      "version": "snapshot-2026-09-14",
+      "sha256": "09c26a62b9701951546caf5d70dee892c5b3e7411028d39c38f5050bc08b7287",
+      "sizeBytes": 14149,
+      "roleIds": [
+        "reviewer"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-c005",
+      "path": "source-materials/finance/初始材料/当前单据/C005-报销原件链.pdf",
+      "title": "C005-报销原件链",
+      "mime": "application/pdf",
+      "version": "snapshot-2026-09-14",
+      "sha256": "91d2178afb2f1dec795bf50e1e42fee13a4f460c43bec79f24316eeb445f188f",
+      "sizeBytes": 13991,
+      "roleIds": [
+        "reviewer"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-c006",
+      "path": "source-materials/finance/初始材料/当前单据/C006-报销原件链.pdf",
+      "title": "C006-报销原件链",
+      "mime": "application/pdf",
+      "version": "snapshot-2026-09-14",
+      "sha256": "c903049509b091c1d85ed8d8eac0d3c5e57216f01f9446dd25571e1121938ce4",
+      "sizeBytes": 14150,
+      "roleIds": [
+        "reviewer",
+        "manager"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-c007",
+      "path": "source-materials/finance/初始材料/当前单据/C007-报销原件链.pdf",
+      "title": "C007-报销原件链",
+      "mime": "application/pdf",
+      "version": "snapshot-2026-09-14",
+      "sha256": "cd4d989cfc4f1e77552ccee0e30ced3227cb54dd1c94c424b7159adcbdffe1f3",
+      "sizeBytes": 14152,
+      "roleIds": [
+        "reviewer"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-c008",
+      "path": "source-materials/finance/初始材料/当前单据/C008-报销原件链.pdf",
+      "title": "C008-报销原件链",
+      "mime": "application/pdf",
+      "version": "snapshot-2026-09-14",
+      "sha256": "589887645639868d37629bcc77024a41095ad07befe65c2a067c19157749e76a",
+      "sizeBytes": 14079,
+      "roleIds": [
+        "reviewer"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-interview-employee",
+      "path": "source-materials/finance/角色摘录/employee.md",
+      "title": "林亦舟岗位访谈摘录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "9992eb65e33786a1cf2e99223b69301539d7047c79ac429c2a93bf857b7403a2",
+      "sizeBytes": 2360,
+      "roleIds": [
+        "employee"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-interview-reviewer",
+      "path": "source-materials/finance/角色摘录/reviewer.md",
+      "title": "唐映秋岗位访谈摘录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "7995cb98f6eac07fb8efb75bf044f81978ab29d678d9315cffac3c069a6adf26",
+      "sizeBytes": 2817,
+      "roleIds": [
+        "reviewer"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-interview-manager",
+      "path": "source-materials/finance/角色摘录/manager.md",
+      "title": "傅景岗位访谈摘录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "d2440230433763be3f1f84596825c7e0f1595d3a6caa69e88680719bc77ced8f",
+      "sizeBytes": 2434,
+      "roleIds": [
+        "manager"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-interview-cashier",
+      "path": "source-materials/finance/角色摘录/cashier.md",
+      "title": "叶书岗位访谈摘录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "853f5424c55acbb17ada2fee4d3e8803b4a0a09dc95af39f16ff5d92d79a477c",
+      "sizeBytes": 2242,
+      "roleIds": [
+        "cashier"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-interview-it",
+      "path": "source-materials/finance/角色摘录/it.md",
+      "title": "秦芮岗位访谈摘录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "07fda8ff15cc384199498211f6caf509bcacb97715de27c59dbcecc95da65fc2",
+      "sizeBytes": 2256,
+      "roleIds": [
+        "it"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-interview-director",
+      "path": "source-materials/finance/角色摘录/director.md",
+      "title": "顾明岚岗位访谈摘录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "da700ab0e98a267b3473b74fcfd4778883444ba18e358705584b3720b01f2f34",
+      "sizeBytes": 2399,
+      "roleIds": [
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "FIN-DEEP-001",
+      "path": "source-materials/finance/深化调查补充包/业务原件/C003-01-原始任务邮件与现场变更记录.md",
+      "title": "C003-01-原始任务邮件与现场变更记录",
+      "mime": "text/markdown",
+      "version": "finance-deep-20260915",
+      "sha256": "559fc45b88533c8371ee75e05c3cabd044616f3c589aa58c88d94e97c2f777ab",
+      "sizeBytes": 5298,
+      "roleIds": [
+        "employee",
+        "reviewer",
+        "manager",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "FIN-DEEP-002",
+      "path": "source-materials/finance/深化调查补充包/业务原件/C003-02-双方项目负责人沟通原文.md",
+      "title": "C003-02-双方项目负责人沟通原文",
+      "mime": "text/markdown",
+      "version": "finance-deep-20260915",
+      "sha256": "29b81319e9ddf7b53c44278b428f52c2a5128218f3d73619e612751a9ba91397",
+      "sizeBytes": 3815,
+      "roleIds": [
+        "employee",
+        "reviewer",
+        "manager",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "FIN-DEEP-003",
+      "path": "source-materials/finance/深化调查补充包/业务原件/C005-01-现场住宿安排与员工事后说明.md",
+      "title": "C005-01-现场住宿安排与员工事后说明",
+      "mime": "text/markdown",
+      "version": "finance-deep-20260915",
+      "sha256": "03084a3955d587af07a72ef39a9ef684cfa51c18fb474d233d94cff23adaa879",
+      "sizeBytes": 3916,
+      "roleIds": [
+        "employee",
+        "reviewer",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "FIN-DEEP-004",
+      "path": "source-materials/finance/深化调查补充包/业务原件/C005-02-财务复核材料与待确认金额通知.md",
+      "title": "C005-02-财务复核材料与待确认金额通知",
+      "mime": "text/markdown",
+      "version": "finance-deep-20260915",
+      "sha256": "d88d7f7afb7b85820cc9dd472b11d4865470bb3081f7af8fa122ec2484750222",
+      "sizeBytes": 3775,
+      "roleIds": [
+        "employee",
+        "reviewer",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "FIN-DEEP-005",
+      "path": "source-materials/finance/深化调查补充包/业务原件/C009-批准与暂停付款记录.md",
+      "title": "C009-批准与暂停付款记录",
+      "mime": "text/markdown",
+      "version": "finance-deep-20260915",
+      "sha256": "b089840d1c13f87104eb06172b79fa4dc5fcab6d300b95e6471745f3c1afe3e7",
+      "sizeBytes": 1266,
+      "roleIds": [
+        "employee",
+        "reviewer",
+        "manager",
+        "cashier",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "FIN-DEEP-006",
+      "path": "source-materials/finance/深化调查补充包/业务原件/C009-新增出差与费用材料.md",
+      "title": "C009-新增出差与费用材料",
+      "mime": "text/markdown",
+      "version": "finance-deep-20260915",
+      "sha256": "02a65aedadbc49f576f24991a2d1aecd31166679ea97569e39d8da888210c2bd",
+      "sizeBytes": 1513,
+      "roleIds": [
+        "employee",
+        "reviewer",
+        "manager",
+        "cashier",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "FIN-DEEP-007",
+      "path": "source-materials/finance/深化调查补充包/业务原件/C010-正常对照原件链.md",
+      "title": "C010-正常对照原件链",
+      "mime": "text/markdown",
+      "version": "finance-deep-20260915",
+      "sha256": "8846d85e3ddca132a6d6f69b9e6cec248377f63ef3c9fbccfda080aaa9e53e38",
+      "sizeBytes": 996,
+      "roleIds": [
+        "employee",
+        "reviewer",
+        "manager",
+        "cashier",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "FIN-DEEP-008",
+      "path": "source-materials/finance/深化调查补充包/业务原件/历史样本移交与计时说明.md",
+      "title": "历史样本移交与计时说明",
+      "mime": "text/markdown",
+      "version": "finance-deep-20260915",
+      "sha256": "23458a5370caf7ff45b05390284372a0e6be95a091a5a11c6ca6028f3d824824",
+      "sizeBytes": 1200,
+      "roleIds": [
+        "reviewer",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "FIN-DEEP-009",
+      "path": "source-materials/finance/深化调查补充包/业务原件/系统版本与复核职责说明.md",
+      "title": "系统版本与复核职责说明",
+      "mime": "text/markdown",
+      "version": "finance-deep-20260915",
+      "sha256": "893764252308917e26f325b57b4cd53160bc1a15e32be93a78ea45baa4fff72f",
+      "sizeBytes": 1313,
+      "roleIds": [
+        "it",
+        "reviewer",
+        "manager",
+        "cashier",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "FIN-DEEP-010",
+      "path": "source-materials/finance/深化调查补充包/业务原件/预算导出与办理口径说明.md",
+      "title": "预算导出与办理口径说明",
+      "mime": "text/markdown",
+      "version": "finance-deep-20260915",
+      "sha256": "7006106916cdc176f02b50dc34b9ce69a8c1a73da51cc8503883b28d052a802d",
+      "sizeBytes": 1248,
+      "roleIds": [
+        "it",
+        "director",
+        "reviewer",
+        "manager"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "FIN-DEEP-011",
+      "path": "source-materials/finance/深化调查补充包/业务数据/人工操作回填.json",
+      "title": "人工操作回填",
+      "mime": "application/json",
+      "version": "finance-deep-20260915",
+      "sha256": "c82568a537ee13243617c52bf6b2b1503791e73fdee58fb56e1fa5c7c28e9398",
+      "sizeBytes": 7755,
+      "roleIds": [
+        "reviewer",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "FIN-DEEP-012",
+      "path": "source-materials/finance/深化调查补充包/业务数据/六类问题复核编码.json",
+      "title": "六类问题复核编码",
+      "mime": "application/json",
+      "version": "finance-deep-20260915",
+      "sha256": "6d32dd0a4c861acd79e22b703ee2794197c86934d41e014d84a39ebcab022c48",
+      "sizeBytes": 7080,
+      "roleIds": [
+        "reviewer",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00",
+      "releaseGate": {
+        "viewedAssetIds": [
+          "FIN-DEEP-019"
+        ],
+        "questionTerms": [
+          "分类",
+          "编码",
+          "复核",
+          "六类",
+          "判定",
+          "归类"
+        ]
+      },
+      "releaseCondition": "本轮查看原始调查样本后，明确追问分类依据，才提供复核编码。"
+    },
+    {
+      "id": "FIN-DEEP-013",
+      "path": "source-materials/finance/深化调查补充包/业务数据/各系统所见截面.json",
+      "title": "各系统所见截面",
+      "mime": "application/json",
+      "version": "finance-deep-20260915",
+      "sha256": "60a180f88ec4f124d2c4d390061aef396c34c93f9329023691ac8c1505102c75",
+      "sizeBytes": 1214,
+      "roleIds": [
+        "it",
+        "reviewer",
+        "manager",
+        "cashier",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "FIN-DEEP-014",
+      "path": "source-materials/finance/深化调查补充包/业务数据/待批且未预占申请.json",
+      "title": "待批且未预占申请",
+      "mime": "application/json",
+      "version": "finance-deep-20260915",
+      "sha256": "b53c10be68cb457ad9763ed966ee4ae5d79e71696e0cf1ad9a7f335b83386d5e",
+      "sizeBytes": 1639,
+      "roleIds": [
+        "it",
+        "director",
+        "reviewer",
+        "manager"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "FIN-DEEP-015",
+      "path": "source-materials/finance/深化调查补充包/业务数据/报销版本与分摊.json",
+      "title": "报销版本与分摊",
+      "mime": "application/json",
+      "version": "finance-deep-20260915",
+      "sha256": "43855125ff46201622f55549d4ffcf0596cbfcf7b0774a7fad984d12376e84f3",
+      "sizeBytes": 1580,
+      "roleIds": [
+        "it",
+        "reviewer",
+        "manager",
+        "cashier",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "FIN-DEEP-016",
+      "path": "source-materials/finance/深化调查补充包/业务数据/新增人员与申请.json",
+      "title": "新增人员与申请",
+      "mime": "application/json",
+      "version": "finance-deep-20260915",
+      "sha256": "a5e749ae4097fdb0c48054cff7d7601e9f0e7bd468e78ce45b7d150019b1165a",
+      "sizeBytes": 1199,
+      "roleIds": [
+        "employee",
+        "reviewer",
+        "manager",
+        "cashier",
+        "it",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "FIN-DEEP-017",
+      "path": "source-materials/finance/深化调查补充包/业务数据/新增费用明细.json",
+      "title": "新增费用明细",
+      "mime": "application/json",
+      "version": "finance-deep-20260915",
+      "sha256": "18ac7c4c1430f9f10526fbbb017fe8defef096e84bc102315f2eece64c617668",
+      "sizeBytes": 1253,
+      "roleIds": [
+        "employee",
+        "reviewer",
+        "manager",
+        "cashier",
+        "it",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "FIN-DEEP-018",
+      "path": "source-materials/finance/深化调查补充包/业务数据/深化调查事件原文.json",
+      "title": "深化调查事件原文",
+      "mime": "application/json",
+      "version": "finance-deep-20260915",
+      "sha256": "3b1e21625401374b120b382c4aa49d46410b5bd75cde4d81e291966e12a9eb7f",
+      "sizeBytes": 29706,
+      "roleIds": [
+        "employee",
+        "reviewer",
+        "manager",
+        "cashier",
+        "it",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "FIN-DEEP-019",
+      "path": "source-materials/finance/深化调查补充包/业务数据/深化调查历史样本.json",
+      "title": "深化调查历史样本",
+      "mime": "application/json",
+      "version": "finance-deep-20260915",
+      "sha256": "07eff39e247a9b463f7e96f151a8284cf8d4585e1b5ad029e9364f5969f7ac2e",
+      "sizeBytes": 10007,
+      "roleIds": [
+        "reviewer",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "FIN-DEEP-020",
+      "path": "source-materials/finance/深化调查补充包/业务数据/版本审批与支付事件.json",
+      "title": "版本审批与支付事件",
+      "mime": "application/json",
+      "version": "finance-deep-20260915",
+      "sha256": "9c2dc35231505ca3f3cc575110d5a20868d1273cbca8fb9c824d9b10460edf3b",
+      "sizeBytes": 3825,
+      "roleIds": [
+        "it",
+        "reviewer",
+        "manager",
+        "cashier",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "FIN-DEEP-021",
+      "path": "source-materials/finance/深化调查补充包/业务数据/预算截面.json",
+      "title": "预算截面",
+      "mime": "application/json",
+      "version": "finance-deep-20260915",
+      "sha256": "8e269a78968ba01b79e124d5ac26d8930552fd0ec29f957a04911711d01f91dc",
+      "sizeBytes": 669,
+      "roleIds": [
+        "it",
+        "director",
+        "reviewer",
+        "manager"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "FIN-DEEP-022",
+      "path": "source-materials/finance/深化调查补充包/业务数据/预算预占流水.json",
+      "title": "预算预占流水",
+      "mime": "application/json",
+      "version": "finance-deep-20260915",
+      "sha256": "15e7f2f281845ebf6e6e41f076aad0d11a273939ff8bfe48d56520648b97b735",
+      "sizeBytes": 2781,
+      "roleIds": [
+        "it",
+        "director",
+        "reviewer",
+        "manager"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "FIN-DEEP-023",
+      "path": "source-materials/finance/深化调查补充包/数据说明与字段口径.md",
+      "title": "数据说明与字段口径",
+      "mime": "text/markdown",
+      "version": "finance-deep-20260915",
+      "sha256": "b3aa81d65aa6b7e56c5b6b60ce6a105eda42548bea48236593e6ebe01caef2d2",
+      "sizeBytes": 4436,
+      "roleIds": [
+        "employee",
+        "reviewer",
+        "manager",
+        "cashier",
+        "it",
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-deep-interview-employee",
+      "path": "source-materials/finance/岗位摘录/深化/访谈摘录-employee.md",
+      "title": "访谈摘录-employee",
+      "mime": "text/markdown",
+      "version": "finance-deep-20260915",
+      "sha256": "4486b0d4d773339dcda3174a919f103247bfde606a0db8190fa604fca2149644",
+      "sizeBytes": 340,
+      "roleIds": [
+        "employee"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-deep-interview-reviewer",
+      "path": "source-materials/finance/岗位摘录/深化/访谈摘录-reviewer.md",
+      "title": "访谈摘录-reviewer",
+      "mime": "text/markdown",
+      "version": "finance-deep-20260915",
+      "sha256": "fd2cbee05aa09c588eaac4a596e8aa0963cdc654d74db23fb1b7ca1f7ce15f50",
+      "sizeBytes": 340,
+      "roleIds": [
+        "reviewer"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-deep-interview-manager",
+      "path": "source-materials/finance/岗位摘录/深化/访谈摘录-manager.md",
+      "title": "访谈摘录-manager",
+      "mime": "text/markdown",
+      "version": "finance-deep-20260915",
+      "sha256": "76c183fa84878e683198d8321fcbde76b1d2062ec63c2f3c4b2015fa02b4504b",
+      "sizeBytes": 357,
+      "roleIds": [
+        "manager"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-deep-interview-cashier",
+      "path": "source-materials/finance/岗位摘录/深化/访谈摘录-cashier.md",
+      "title": "访谈摘录-cashier",
+      "mime": "text/markdown",
+      "version": "finance-deep-20260915",
+      "sha256": "8cefa56bb746a6a0c635b35f257fe4701666d1536fbcb93b84fc5b056fc5945e",
+      "sizeBytes": 320,
+      "roleIds": [
+        "cashier"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-deep-interview-it",
+      "path": "source-materials/finance/岗位摘录/深化/访谈摘录-it.md",
+      "title": "访谈摘录-it",
+      "mime": "text/markdown",
+      "version": "finance-deep-20260915",
+      "sha256": "e21dfdc5dcd4740e576dbade0e833c44a688320c7ded796bc32a0f0cc78e357d",
+      "sizeBytes": 276,
+      "roleIds": [
+        "it"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "finance-deep-interview-director",
+      "path": "source-materials/finance/岗位摘录/深化/访谈摘录-director.md",
+      "title": "访谈摘录-director",
+      "mime": "text/markdown",
+      "version": "finance-deep-20260915",
+      "sha256": "b7fedb514157092fdac4d3742a25a2394b7dc520dbed9c9d355db35be3a634ce",
+      "sizeBytes": 399,
+      "roleIds": [
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    }
+  ],
+  "discoveries": [
+    {
+      "id": "finance.employee.prepare",
+      "roleId": "employee",
+      "title": "本人准备材料与重复录入",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.employee.prepare"
+      ],
+      "requiredAssetIds": [],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：本人从邮件下载三张票、手机导出住宿订单，再把申请编号抄入费用系统。",
+      "positiveExample": "你从出差回来到提交，分别在哪些地方拿材料、填哪些重复信息？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解本人准备材料与重复录入。",
+        "你从出差回来到提交，分别在哪些地方拿材料、填哪些重复信息？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.employee.wait",
+      "roleId": "employee",
+      "title": "员工等待感受与实际投入",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.employee.wait"
+      ],
+      "requiredAssetIds": [],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：员工从垫资开始感觉在等待，系统周期从提交起；补件两天仅实际打了两次电话，不能把两天当人工工时。",
+      "positiveExample": "请具体解释员工等待感受与实际投入，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解员工等待感受与实际投入。",
+        "可以向林亦舟询问：员工等待感受与实际投入具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.employee.original",
+      "roleId": "employee",
+      "title": "本人一笔业务的完整原件链",
+      "type": "document",
+      "required": true,
+      "factIds": [
+        "finance.employee.original"
+      ],
+      "requiredAssetIds": [
+        "finance-c001"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：C001是本人已处理完的一单，可以沿申请、票据、工作确认、审核和支付记录查证。；并成功取得指定资料：finance-c001",
+      "positiveExample": "请具体解释本人一笔业务的完整原件链，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解本人一笔业务的完整原件链。",
+        "可以向林亦舟询问：本人一笔业务的完整原件链具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.employee.attachments",
+      "roleId": "employee",
+      "title": "材料缺项与需要澄清的业务内容",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.employee.attachments"
+      ],
+      "requiredAssetIds": [
+        "finance-policy"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答结合对应原件明确确认：希望提交前知道已有什么、缺什么及谁能提供；标准材料仍包括申请、行程票据、住宿票据及明细、工作确认和供餐声明。助手应让员工核实关联申请，不能在背后选择项目或把提醒无缺项说成已批准。 已获得本项指定资料；不得用学员自行断言或未获原件代替。",
+      "positiveExample": "沿C001说明原件怎样关联，提交前提醒应具体到什么程度，能替你选项目或批准吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以继续了解材料缺项与需要澄清的业务内容。",
+        "沿C001说明原件怎样关联，提交前提醒应具体到什么程度，能替你选项目或批准吗？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.employee.allowance",
+      "roleId": "employee",
+      "title": "定额补助与费用凭据的区别",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.employee.allowance"
+      ],
+      "requiredAssetIds": [],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：伙食补助按出差自然日且首尾均计，统一供餐日不申领；需供餐声明，不应为定额补助虚构发票。",
+      "positiveExample": "请具体解释定额补助与费用凭据的区别，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解定额补助与费用凭据的区别。",
+        "可以向林亦舟询问：定额补助与费用凭据的区别具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.employee.privacy",
+      "roleId": "employee",
+      "title": "本人经历与署名材料转交",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.employee.privacy"
+      ],
+      "requiredAssetIds": [
+        "FIN-DEEP-016"
+      ],
+      "allowUnknown": true,
+      "completionRule": "角色本人已提交回答结合对应原件明确确认：林亦舟仅亲历C001；C003沈嘉禾、C005许闻岚、C009程见微、C010温书白是其他员工，只能在本次调查授权范围转交明确署名原件，不能冒充亲历或自行查询他人全部单据。预算、归属、例外和支付判断转向有权岗位。 已获得本项指定资料；不得用学员自行断言或未获原件代替。",
+      "positiveExample": "这些是你自己的单据吗？如果要追问其他经办人，能否转交明确署名的材料并说明提供路径？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以继续了解本人经历与署名材料转交。",
+        "这些是你自己的单据吗？如果要追问其他经办人，能否转交明确署名的材料并说明提供路径？"
+      ],
+      "reportSections": [
+        "数据系统与企业条件"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.reviewer.crosspages",
+      "roleId": "reviewer",
+      "title": "审核跨页面核对过程",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.reviewer.crosspages"
+      ],
+      "requiredAssetIds": [
+        "finance-ui-observation"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：主要负担是申请、项目和票据跨页面查证，并非电子票看不清；项目简称不能猜。；并成功取得指定资料：finance-ui-observation",
+      "positiveExample": "请具体解释审核跨页面核对过程，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解审核跨页面核对过程。",
+        "可以向唐映秋询问：审核跨页面核对过程具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.reviewer.c002",
+      "roleId": "reviewer",
+      "title": "票面事实与尚缺住宿明细",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "finance.reviewer.c002"
+      ],
+      "requiredAssetIds": [
+        "finance-c002",
+        "finance-invoices",
+        "finance-attachments"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：C002票面quantity=2、unit_price_yuan=380、gross_yuan=760，已能读出两晚每晚380合计760；仍缺独立住宿明细，旧留言无法确认夜数不应覆盖新票面。；并成功取得指定资料：finance-c002, finance-invoices, finance-attachments",
+      "positiveExample": "C002当前已经收到了什么？请对照票面和附件登记，区分已明确内容与仍缺原件。",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解票面事实与尚缺住宿明细。",
+        "C002当前已经收到了什么？请对照票面和附件登记，区分已明确内容与仍缺原件。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [
+        2,
+        380,
+        760
+      ],
+      "deterministicChecks": [
+        {
+          "operation": "finance_c002_invoice_and_missing_detail",
+          "inputs": [
+            "finance-invoices",
+            "finance-attachments"
+          ],
+          "expected": {
+            "invoice_id": "SIM-C002-3",
+            "quantity": 2,
+            "unit_price_yuan": 380,
+            "gross_yuan": 760,
+            "missingAttachmentType": "住宿明细"
+          }
+        }
+      ]
+    },
+    {
+      "id": "finance.reviewer.duplicate",
+      "roleId": "reviewer",
+      "title": "重复票据的可靠依据",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "finance.reviewer.duplicate"
+      ],
+      "requiredAssetIds": [
+        "finance-c004",
+        "finance-invoice-index"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：C004上传的住宿票与历史H023相同，应核对票据ID、金额、日期和历史单号，不能只凭文件名，也不能声称税务验真。；并成功取得指定资料：finance-c004, finance-invoice-index",
+      "positiveExample": "请具体解释重复票据的可靠依据，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解重复票据的可靠依据。",
+        "可以向唐映秋询问：重复票据的可靠依据具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.reviewer.policy",
+      "roleId": "reviewer",
+      "title": "C005规则核定与例外证据",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "finance.reviewer.policy"
+      ],
+      "requiredAssetIds": [
+        "finance-c005",
+        "finance-policy",
+        "finance-policy-old",
+        "FIN-DEEP-003",
+        "FIN-DEEP-004"
+      ],
+      "allowUnknown": true,
+      "completionRule": "角色本人已提交回答结合对应原件明确确认：C005按出发日适用V2.1；南京两晚每晚520、普通上限420，原申请2386、普通标准待确认2186、差200。原住宿票与明细齐全；展会涨价是员工转述，现场任务紧凑不证明必须住超标酒店，没有完整比价和指定住宿通知。员工及邵宁均未办事前两级例外批准，收悉通知不是接受调整，当前退回且例外未批准；审核员只能整理核对，不能代员工确认或替负责人批准。 已获得本项指定资料；不得用学员自行断言或未获原件代替。",
+      "positiveExample": "C005为什么退回？请给原票、现场署名说明与金额通知，区分普通核定、差额、已有事实和例外还缺的判断。",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以继续了解C005规则核定与例外证据。",
+        "C005为什么退回？请给原票、现场署名说明与金额通知，区分普通核定、差额、已有事实和例外还缺的判断。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.reviewer.history",
+      "roleId": "reviewer",
+      "title": "旧180笔队列与新增独立样本",
+      "type": "quantitative",
+      "required": true,
+      "factIds": [
+        "finance.reviewer.history"
+      ],
+      "requiredAssetIds": [
+        "finance-history",
+        "finance-history-events",
+        "finance-dictionary"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答结合对应原件明确确认：原历史队列为6月至8月首次提交180笔，重提沿用单号，退回按至少一次RETURNED的不同业务单计数；原8笔与新增C009/C010是当前材料层，EXH24笔为另一组独立目的抽样，均不得混进原分母或宣称204笔全量。 已获得本项指定资料；不得用学员自行断言或未获原件代替。",
+      "positiveExample": "旧历史退回统计与新增两笔当前单、新调查样本是什么关系，分别能回答什么问题？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以继续了解旧180笔队列与新增独立样本。",
+        "旧历史退回统计与新增两笔当前单、新调查样本是什么关系，分别能回答什么问题？"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.reviewer.recheck",
+      "roleId": "reviewer",
+      "title": "补交复核与当前排队事实",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.reviewer.recheck"
+      ],
+      "requiredAssetIds": [
+        "finance-c008",
+        "finance-current-events"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：C008周六补回工作确认，周一09:00仍财务待审；只复核新增资料及受影响检查，不要求重复填未变费用行。；并成功取得指定资料：finance-c008, finance-current-events",
+      "positiveExample": "请具体解释补交复核与当前排队事实，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解补交复核与当前排队事实。",
+        "可以向唐映秋询问：补交复核与当前排队事实具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.reviewer.timelog",
+      "roleId": "reviewer",
+      "title": "净操作工时与样本外推限制",
+      "type": "quantitative",
+      "required": true,
+      "factIds": [
+        "finance.reviewer.timelog"
+      ],
+      "requiredAssetIds": [
+        "finance-times"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：12笔陪跑工时为便利抽样的操作分钟；没有覆盖假设、成本与试点后测量，不可外推全院年度节约。；并成功取得指定资料：finance-times",
+      "positiveExample": "请具体解释净操作工时与样本外推限制，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解净操作工时与样本外推限制。",
+        "可以向唐映秋询问：净操作工时与样本外推限制具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.manager.allocation",
+      "roleId": "manager",
+      "title": "C003任务事实与未决费用承担",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "finance.manager.allocation"
+      ],
+      "requiredAssetIds": [
+        "finance-c003",
+        "FIN-DEEP-001",
+        "FIN-DEEP-002"
+      ],
+      "allowUnknown": true,
+      "completionRule": "角色本人已提交回答结合对应原件明确确认：联合测试涉及P101和P102；A003批的是行程，员工填P101不代表全部归属。傅景只以P102及D02职责提供本人意见，贺衡的P101意见须以署名材料转交。原件确认现场工作发生，但专属成果、共用准备及共同支出依据尚需双方核对，当前没有共同认可的分摊说明，C003仍项目待确认。 已获得本项指定资料；不得用学员自行断言或未获原件代替。",
+      "positiveExample": "C003已填项目为什么还需补说明？请对照原申请、任务变更和双方署名沟通，哪些是你能确认的，哪些尚未决定？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以继续了解C003任务事实与未决费用承担。",
+        "C003已填项目为什么还需补说明？请对照原申请、任务变更和双方署名沟通，哪些是你能确认的，哪些尚未决定？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [
+        {
+          "operation": "finance_c003_unconfirmed_allocation",
+          "inputs": [
+            "finance-c003"
+          ],
+          "expected": {
+            "claim_id": "C003",
+            "filledProject": "P101",
+            "allocationConfirmed": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "finance.manager.tasks",
+      "roleId": "manager",
+      "title": "受益依据与共同费用分配",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.manager.tasks"
+      ],
+      "requiredAssetIds": [
+        "finance-project-p102",
+        "FIN-DEEP-002"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答结合对应原件明确确认：项目预算不可按姓名选择；分清专属任务、共同准备、共用数据与各自接收成果。不能用上午下午、文件条数或项目余额推比例；共同费用的承担需要相关负责人共同认可且合计闭合，不能为凑预算分摊。 已获得本项指定资料；不得用学员自行断言或未获原件代替。",
+      "positiveExample": "双方各自接收哪些成果，共用准备与差旅支出怎样形成承担依据？能按天数、文件数量或余额分吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以继续了解受益依据与共同费用分配。",
+        "双方各自接收哪些成果，共用准备与差旅支出怎样形成承担依据？能按天数、文件数量或余额分吗？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.manager.approval",
+      "roleId": "manager",
+      "title": "出差批准与费用批准区别",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.manager.approval"
+      ],
+      "requiredAssetIds": [],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：批准出差不等于所有费用已确认归属；申请预算是估算，报销需项目归属确认、财务审核和部门审批。",
+      "positiveExample": "请具体解释出差批准与费用批准区别，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解出差批准与费用批准区别。",
+        "可以向傅景询问：出差批准与费用批准区别具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.manager.delegation",
+      "roleId": "manager",
+      "title": "部门审批等待与代理授权",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.manager.delegation"
+      ],
+      "requiredAssetIds": [
+        "finance-c006"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：负责人现场外出时可能无法及时审批，代理必须正式登记；提醒不能替人批准，C006未登记代理。；并成功取得指定资料：finance-c006",
+      "positiveExample": "请具体解释部门审批等待与代理授权，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解部门审批等待与代理授权。",
+        "可以向傅景询问：部门审批等待与代理授权具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.manager.budget",
+      "roleId": "manager",
+      "title": "预算快照与可取得的组成台账",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.manager.budget"
+      ],
+      "requiredAssetIds": [
+        "finance-policy-old",
+        "finance-project-p102",
+        "FIN-DEEP-010"
+      ],
+      "allowUnknown": true,
+      "completionRule": "角色本人已提交回答结合对应原件明确确认：预算可用额是23:00快照，已扣累计入账和净预占；深化调查可取得组成与预占流水，不再把缺明细当永久事实。未预占待批申请另列，条件测算不能作为当前余额或实时锁定；不能拿预算余额决定C003归属，也不能把拟议C009分摊自动转移预占。 已获得本项指定资料；不得用学员自行断言或未获原件代替。",
+      "positiveExample": "项目可用余额是什么时点、包含哪些占用？现在能拿到什么组成台账，哪些仍不能据此决定？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以继续了解预算快照与可取得的组成台账。",
+        "项目可用余额是什么时点、包含哪些占用？现在能拿到什么组成台账，哪些仍不能据此决定？"
+      ],
+      "reportSections": [
+        "数据系统与企业条件"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.manager.responsibility",
+      "roleId": "manager",
+      "title": "审批分工与本人单据约束",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.manager.responsibility"
+      ],
+      "requiredAssetIds": [
+        "finance-policy"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：申请人不得自批；同人兼任项目和部门负责人仍须留两份职责记录，制度例外另加财务负责人意见。；并成功取得指定资料：finance-policy",
+      "positiveExample": "请具体解释审批分工与本人单据约束，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解审批分工与本人单据约束。",
+        "可以向傅景询问：审批分工与本人单据约束具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.cashier.batches",
+      "roleId": "cashier",
+      "title": "付款批次与截止窗口",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.cashier.batches"
+      ],
+      "requiredAssetIds": [
+        "finance-policy"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：每周二周五15:00发起集中支付，13:00截单，错过顺延下一批；不是发票识别能缩短的等待。；并成功取得指定资料：finance-policy",
+      "positiveExample": "请具体解释付款批次与截止窗口，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解付款批次与截止窗口。",
+        "可以向叶书询问：付款批次与截止窗口具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.cashier.c007",
+      "roleId": "cashier",
+      "title": "计划付款与实际到账",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "finance.cashier.c007"
+      ],
+      "requiredAssetIds": [
+        "finance-cashier-current",
+        "finance-cashier-events"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：C007周五16:00才审批，已排下周二批次，快照时没有银行成功回执，不能记为已支付。；并成功取得指定资料：finance-cashier-current, finance-cashier-events",
+      "positiveExample": "请具体解释计划付款与实际到账，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解计划付款与实际到账。",
+        "可以向叶书询问：计划付款与实际到账具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [
+        {
+          "operation": "finance_c007_queued_not_paid",
+          "inputs": [
+            "finance-cashier-current",
+            "finance-cashier-events"
+          ],
+          "expected": {
+            "claim_id": "C007",
+            "paid_yuan": 0,
+            "hasSuccessfulBankReceipt": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "finance.cashier.receipt",
+      "roleId": "cashier",
+      "title": "支付成功依据与失败恢复",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.cashier.receipt"
+      ],
+      "requiredAssetIds": [
+        "finance-payment-api"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：银行成功回执后才标PAID；失败保留原请求标识、核原因再重试，网络超时不能触发重复付款。；并成功取得指定资料：finance-payment-api",
+      "positiveExample": "请具体解释支付成功依据与失败恢复，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解支付成功依据与失败恢复。",
+        "可以向叶书询问：支付成功依据与失败恢复具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.cashier.separation",
+      "roleId": "cashier",
+      "title": "出纳与审批职责分离",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.cashier.separation"
+      ],
+      "requiredAssetIds": [],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：出纳读取批准金额与收款对象安排支付，不兼任报销审批，审核通过不等于已审批或已到账。",
+      "positiveExample": "请具体解释出纳与审批职责分离，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解出纳与审批职责分离。",
+        "可以向叶书询问：出纳与审批职责分离具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.cashier.clock",
+      "roleId": "cashier",
+      "title": "日历等待与人工工时",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.cashier.clock"
+      ],
+      "requiredAssetIds": [],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：付款记录保留时区；周末等待计日历时长，不计人工工时，没有周末值班承诺。",
+      "positiveExample": "请具体解释日历等待与人工工时，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解日历等待与人工工时。",
+        "可以向叶书询问：日历等待与人工工时具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.cashier.visibility",
+      "roleId": "cashier",
+      "title": "员工可理解的支付状态",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.cashier.visibility"
+      ],
+      "requiredAssetIds": [],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：向员工说明审核、审批、付款排队、银行结果分别在哪一步，不能只显示审核通过。",
+      "positiveExample": "请具体解释员工可理解的支付状态，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解员工可理解的支付状态。",
+        "可以向叶书询问：员工可理解的支付状态具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.it.systems",
+      "roleId": "it",
+      "title": "现有系统分工与人工衔接",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.it.systems"
+      ],
+      "requiredAssetIds": [
+        "finance-systems"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：OA存出差申请，PRJ人员项目，EXP报销审核，PAY支付，ARC原件；人工搜索下载录入串接，没有统一申请附件目录。；并成功取得指定资料：finance-systems",
+      "positiveExample": "请具体解释现有系统分工与人工衔接，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解现有系统分工与人工衔接。",
+        "可以向秦芮询问：现有系统分工与人工衔接具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "数据系统与企业条件"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.it.interfaces",
+      "roleId": "it",
+      "title": "可用导出与尚未开通的接口",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.it.interfaces"
+      ],
+      "requiredAssetIds": [
+        "finance-api"
+      ],
+      "allowUnknown": true,
+      "completionRule": "角色本人已提交回答明确确认：OA/PRJ脱敏只读导出可用、每天23:00刷新；EXP沙箱草稿需审批尚未开通，生产创建提交审批支付税务未授权，JSON仅样例。；并成功取得指定资料：finance-api。已确认缺口与有权核实岗位，允许记为 verified_currently_unknown。",
+      "positiveExample": "请具体解释可用导出与尚未开通的接口，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解可用导出与尚未开通的接口。",
+        "可以向秦芮询问：可用导出与尚未开通的接口具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "数据系统与企业条件"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.it.access",
+      "roleId": "it",
+      "title": "服务账号与业务权限边界",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.it.access"
+      ],
+      "requiredAssetIds": [],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：不能用个人财务账号或未批准RPA绕过；需服务账号、调用范围和审计，管理员配置接口但无业务批准权。",
+      "positiveExample": "请具体解释服务账号与业务权限边界，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解服务账号与业务权限边界。",
+        "可以向秦芮询问：服务账号与业务权限边界具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "数据系统与企业条件"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.it.attachments",
+      "roleId": "it",
+      "title": "附件短链与稳定归档标识",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.it.attachments"
+      ],
+      "requiredAssetIds": [
+        "finance-systems"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：附件链接15分钟过期，业务主键与归档引用稳定；失效重新申请，不当成附件不存在；外部模型不能访问集团网段。；并成功取得指定资料：finance-systems",
+      "positiveExample": "请具体解释附件短链与稳定归档标识，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解附件短链与稳定归档标识。",
+        "可以向秦芮询问：附件短链与稳定归档标识具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "数据系统与企业条件"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.it.recovery",
+      "roleId": "it",
+      "title": "限流与超时幂等恢复",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.it.recovery"
+      ],
+      "requiredAssetIds": [
+        "finance-api"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：附件限制20MB、沙箱每分钟30次；返回超时不代表草稿未创建，要以幂等键查询原请求。；并成功取得指定资料：finance-api",
+      "positiveExample": "请具体解释限流与超时幂等恢复，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解限流与超时幂等恢复。",
+        "可以向秦芮询问：限流与超时幂等恢复具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "数据系统与企业条件"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.it.environment",
+      "roleId": "it",
+      "title": "试验资源与模型出域待确认",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.it.environment"
+      ],
+      "requiredAssetIds": [
+        "finance-systems"
+      ],
+      "allowUnknown": true,
+      "completionRule": "角色本人已提交回答明确确认：有16核64GB500GB隔离服务器，无专用GPU和生产模型服务；可申请内网推理试用，模型费用并发与生产数据外部调用未批准。；并成功取得指定资料：finance-systems。已确认缺口与有权核实岗位，允许记为 verified_currently_unknown。",
+      "positiveExample": "请具体解释试验资源与模型出域待确认，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解试验资源与模型出域待确认。",
+        "可以向秦芮询问：试验资源与模型出域待确认具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "数据系统与企业条件"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.director.need",
+      "roleId": "director",
+      "title": "原始模糊诉求与管理要求",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.director.need"
+      ],
+      "requiredAssetIds": [
+        "finance-letter"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：诉求是员工财务少花时间且管理要求不降，先调研而不是预选产品；预算尚未申请。；并成功取得指定资料：finance-letter",
+      "positiveExample": "请具体解释原始模糊诉求与管理要求，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解原始模糊诉求与管理要求。",
+        "可以向顾明岚询问：原始模糊诉求与管理要求具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "原始诉求与调查范围"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.director.success",
+      "roleId": "director",
+      "title": "试点成功标准与对照测量",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.director.success"
+      ],
+      "requiredAssetIds": [],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：一次交更完整、审核少查资料值得验证，需同批可比样本前后证据；不承诺两天到账，不以减员作为立项。",
+      "positiveExample": "请具体解释试点成功标准与对照测量，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解试点成功标准与对照测量。",
+        "可以向顾明岚询问：试点成功标准与对照测量具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "AI价值分析与推荐方向"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.director.baseline",
+      "roleId": "director",
+      "title": "流程周期与主动工时基线",
+      "type": "quantitative",
+      "required": true,
+      "factIds": [
+        "finance.director.baseline"
+      ],
+      "requiredAssetIds": [
+        "finance-history",
+        "finance-history-events",
+        "finance-times",
+        "finance-dictionary"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：从历史台账与事件计算分阶段日历耗时，不重复叠加补件等待；陪跑分钟另算，不能把日历等待当净工时。；并成功取得指定资料：finance-history, finance-history-events, finance-times, finance-dictionary",
+      "positiveExample": "请具体解释流程周期与主动工时基线，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解流程周期与主动工时基线。",
+        "可以向顾明岚询问：流程周期与主动工时基线具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.director.resources",
+      "roleId": "director",
+      "title": "试点人员与反馈资源意向",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.director.resources"
+      ],
+      "requiredAssetIds": [],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：拟与D01/D02试点；负责人每周30分钟反馈、审核每周2小时陪跑、两部门各2名工程师属于资源意向非正式立项。",
+      "positiveExample": "请具体解释试点人员与反馈资源意向，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解试点人员与反馈资源意向。",
+        "可以向顾明岚询问：试点人员与反馈资源意向具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "数据系统与企业条件"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.director.governance",
+      "roleId": "director",
+      "title": "制度维护与错误恢复责任",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.director.governance"
+      ],
+      "requiredAssetIds": [
+        "finance-policy"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：资源申请须明确制度维护负责人、错误恢复办法、相近复杂度样本比较，制度归财务负责人管理。；并成功取得指定资料：finance-policy",
+      "positiveExample": "请具体解释制度维护与错误恢复责任，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解制度维护与错误恢复责任。",
+        "可以向顾明岚询问：制度维护与错误恢复责任具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "AI价值分析与推荐方向"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.director.alternatives",
+      "roleId": "director",
+      "title": "按问题证据比较AI、规则与组织改善",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "finance.director.alternatives"
+      ],
+      "requiredAssetIds": [],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答结合对应原件明确确认：根据调查证据比较材料识别、跨任务理解、澄清及证据组织的AI用途；预算算术、版本校验、状态展示及审批路由应同时比较确定规则、数据集成和组织职责改善。不是六类问题都要用AI，不代替有权审批，不预设采购一体机；当前未实施AI，没有实测收益或全公司年度ROI依据。 已获得本项指定资料；不得用学员自行断言或未获原件代替。",
+      "positiveExample": "沿已核实的问题比较AI、规则、系统集成和组织改善各能做什么，如何验证价值，哪些不能自动化？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以继续了解按问题证据比较AI、规则与组织改善。",
+        "沿已核实的问题比较AI、规则、系统集成和组织改善各能做什么，如何验证价值，哪些不能自动化？"
+      ],
+      "reportSections": [
+        "AI价值分析与推荐方向"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.reviewer.business_explanation",
+      "roleId": "reviewer",
+      "title": "C003材料存在与业务说明充分",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "finance.reviewer.business_explanation"
+      ],
+      "requiredAssetIds": [
+        "FIN-DEEP-001",
+        "FIN-DEEP-002"
+      ],
+      "allowUnknown": true,
+      "completionRule": "角色本人已提交回答结合对应署名原件明确确认：C003工作确认可以证明任务发生，不能证明费用全归P101；任务邮件与现场变更显示联合受益，仍缺双方认可的成果及共同费用承担决定。这与C002缺独立住宿明细不同：分别是文件、事实与决定层面的缺口，不可都归为OCR或员工漏传票。 须取得本项指定资料，保留已知与尚待决定事项。",
+      "positiveExample": "为什么C003有工作确认仍需补问？请给任务邮件和双方沟通，与C002缺件作对照。",
+      "negativeExample": "只复述问题名、学员自行给结论、缺原件、把待确认说成批准、把他人经历说成亲历，均不通过。",
+      "hints": [
+        "可以沿C003材料存在与业务说明充分继续核实。",
+        "为什么C003有工作确认仍需补问？请给任务邮件和双方沟通，与C002缺件作对照。"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.reviewer.version",
+      "roleId": "reviewer",
+      "title": "C009同额变更影响核验",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "finance.reviewer.version"
+      ],
+      "requiredAssetIds": [
+        "FIN-DEEP-015",
+        "FIN-DEEP-020",
+        "FIN-DEEP-009"
+      ],
+      "allowUnknown": true,
+      "completionRule": "角色本人已提交回答结合对应署名原件明确确认：C009原v1核定2186且员工接受差额；v2总额未变，但新增联合诊断记录并提出P101/P102分摊，尚未共同确认。旧批准保留为历史，不能自动覆盖新归属；先识别变更影响，再由项目与有权审批人确认，不必重查未变车票，也不能以60/40算术闭合判为批准。 须取得本项指定资料，保留已知与尚待决定事项。",
+      "positiveExample": "C009金额相同为什么需重核？请给版本、审批事件与职责说明，指出应核哪些变化、哪些原检查可以保留。",
+      "negativeExample": "只复述问题名、学员自行给结论、缺原件、把待确认说成批准、把他人经历说成亲历，均不通过。",
+      "hints": [
+        "可以沿C009同额变更影响核验继续核实。",
+        "C009金额相同为什么需重核？请给版本、审批事件与职责说明，指出应核哪些变化、哪些原检查可以保留。"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.manager.version",
+      "roleId": "manager",
+      "title": "C009历史批准范围与新归属",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "finance.manager.version"
+      ],
+      "requiredAssetIds": [
+        "FIN-DEEP-005",
+        "FIN-DEEP-006",
+        "FIN-DEEP-015"
+      ],
+      "allowUnknown": true,
+      "completionRule": "角色本人已提交回答结合对应署名原件明确确认：C009贺衡以P101负责人确认v1项目归属，傅景以D02负责人批准v1；两项职责分别留存。程见微后来提出v2联合分摊，总额未变也需核实原批准是否覆盖新项目范围，P102共同承担尚未确认，傅景不能代贺衡批准P101或把拟议60/40当最终比例。 须取得本项指定资料，保留已知与尚待决定事项。",
+      "positiveExample": "C009原来是谁以什么身份批了哪一版，新任务和项目变化之后哪些意见仍缺？",
+      "negativeExample": "只复述问题名、学员自行给结论、缺原件、把待确认说成批准、把他人经历说成亲历，均不通过。",
+      "hints": [
+        "可以沿C009历史批准范围与新归属继续核实。",
+        "C009原来是谁以什么身份批了哪一版，新任务和项目变化之后哪些意见仍缺？"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.cashier.version_chain",
+      "roleId": "cashier",
+      "title": "C009暂停与C010一致付款对照",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "finance.cashier.version_chain"
+      ],
+      "requiredAssetIds": [
+        "FIN-DEEP-005",
+        "FIN-DEEP-007",
+        "FIN-DEEP-013",
+        "FIN-DEEP-017"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答结合对应署名原件明确确认：C009付款候选仍v1/P101，EXP已有v2，叶书已人工暂停，尚未生成银行支付请求或收到回执；须取得项目归属及受影响批准重新确认后的有效清单。C010从申请到成功回执始终v1/2106/P101，是新增当前正常对照且已支付。C007只是错过正常批次，不等于版本冲突；C009没有真实错付或AI自动防损结果。 须取得本项指定资料，保留已知与尚待决定事项。",
+      "positiveExample": "有旧批准为什么还未付？请给C009暂停记录、当前所见截面和C010一致对照，与C007等待有什么不同？",
+      "negativeExample": "只复述问题名、学员自行给结论、缺原件、把待确认说成批准、把他人经历说成亲历，均不通过。",
+      "hints": [
+        "可以沿C009暂停与C010一致付款对照继续核实。",
+        "有旧批准为什么还未付？请给C009暂停记录、当前所见截面和C010一致对照，与C007等待有什么不同？"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.it.budget",
+      "roleId": "it",
+      "title": "预算组成、预占流水与条件口径",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "finance.it.budget"
+      ],
+      "requiredAssetIds": [
+        "FIN-DEEP-021",
+        "FIN-DEEP-022",
+        "FIN-DEEP-014",
+        "FIN-DEEP-010",
+        "FIN-DEEP-023"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答结合对应署名原件明确确认：预算批次9月13日23:00、业务观察9月14日09:00，非实时；可用额=总预算-累计入账-净预占，流水正锁负释按符号汇总，BR08已全额释放不重复占。原历史与已付C010已含累计入账不再扣。C009预占仍在P101，拟议v2未转移；未批未占申请只能另做全部获批条件余额，清单不含C003归属或未来C009转移，不能等同锁定。 须取得本项指定资料，保留已知与尚待决定事项。",
+      "positiveExample": "请给同批预算截面、预占流水、未占待批申请和口径说明，怎样核对释放、重复扣款、导出时点和条件余额？",
+      "negativeExample": "只复述问题名、学员自行给结论、缺原件、把待确认说成批准、把他人经历说成亲历，均不通过。",
+      "hints": [
+        "可以沿预算组成、预占流水与条件口径继续核实。",
+        "请给同批预算截面、预占流水、未占待批申请和口径说明，怎样核对释放、重复扣款、导出时点和条件余额？"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.it.versions",
+      "roleId": "it",
+      "title": "各系统版本截面与同步边界",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "finance.it.versions"
+      ],
+      "requiredAssetIds": [
+        "FIN-DEEP-013",
+        "FIN-DEEP-009",
+        "FIN-DEEP-020"
+      ],
+      "allowUnknown": true,
+      "completionRule": "角色本人已提交回答结合对应署名原件明确确认：EXP保存C009新v2，OA仍旧v1批准，PRJ保留旧P101预占，PAY保留旧候选但人工暂停；接口不会因新材料自动撤回OA批准或替换付款清单。差异应保留用以核实批准覆盖，不能清洗成全是最新版；只读样例不代表生产审批、实时锁预算或支付权限，版本订阅、写入、撤销需另行确认。 须取得本项指定资料，保留已知与尚待决定事项。",
+      "positiveExample": "请对照C009在费用、审批、项目和付款系统各看到的版本，哪些会同步，哪些需要业务重新确认？",
+      "negativeExample": "只复述问题名、学员自行给结论、缺原件、把待确认说成批准、把他人经历说成亲历，均不通过。",
+      "hints": [
+        "可以沿各系统版本截面与同步边界继续核实。",
+        "请对照C009在费用、审批、项目和付款系统各看到的版本，哪些会同步，哪些需要业务重新确认？"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.reviewer.deep_sample",
+      "roleId": "reviewer",
+      "title": "独立调查样本与原事件取证",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "finance.reviewer.deep_sample"
+      ],
+      "requiredAssetIds": [
+        "FIN-DEEP-019",
+        "FIN-DEEP-018",
+        "FIN-DEEP-008"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答结合对应署名原件明确确认：EXH001—EXH024是24笔独立目的抽样，包含普通对照，非原180笔补列、非全院发生率。先取得样本与原事件判断跟踪范围及问题证据；办理结束只代表跟踪事项结束，不代表原申报全获批，EXH不能加入预算过账。 须取得本项指定资料，保留已知与尚待决定事项。",
+      "positiveExample": "请给新增调查样本与事件原文，它如何选取、覆盖什么，普通对照和结束记录能证明什么？",
+      "negativeExample": "只复述问题名、学员自行给结论、缺原件、把待确认说成批准、把他人经历说成亲历，均不通过。",
+      "hints": [
+        "可以沿独立调查样本与原事件取证继续核实。",
+        "请给新增调查样本与事件原文，它如何选取、覆盖什么，普通对照和结束记录能证明什么？"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.reviewer.deep_coding",
+      "roleId": "reviewer",
+      "title": "问题分类依据与已记录处理投入",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "finance.reviewer.deep_coding"
+      ],
+      "requiredAssetIds": [
+        "FIN-DEEP-012",
+        "FIN-DEEP-011",
+        "FIN-DEEP-023"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答结合对应署名原件明确确认：查看原样本后可询问审核员按原事件复核的六类编码；每单可多标签，异常业务按sample_id去重，标签数不能当异常单数，无标签只代表无本轮六问题。工时是事后回填的已记录核实动作，按work_id去重且有回忆及覆盖缺口；自然历时含夜间周末，不能当持续人工投入，不能替换旧12笔工时或推算AI收益。 须取得本项指定资料，保留已知与尚待决定事项。",
+      "positiveExample": "看过原样本后，这些问题怎样分类复核？请给编码依据、事件关联与操作回填，如何避免重复计单或混淆等待？",
+      "negativeExample": "只复述问题名、学员自行给结论、缺原件、把待确认说成批准、把他人经历说成亲历，均不通过。",
+      "hints": [
+        "可以沿问题分类依据与已记录处理投入继续核实。",
+        "看过原样本后，这些问题怎样分类复核？请给编码依据、事件关联与操作回填，如何避免重复计单或混淆等待？"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.director.exception",
+      "roleId": "director",
+      "title": "C005例外证据与有权判断",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "finance.director.exception"
+      ],
+      "requiredAssetIds": [
+        "FIN-DEEP-003",
+        "FIN-DEEP-004",
+        "finance-policy"
+      ],
+      "allowUnknown": true,
+      "completionRule": "角色本人已提交回答结合对应署名原件明确确认：普通标准调整与制度例外分开；C005事前没有两级超标批准，员工事后说明和邵宁收悉不等于补签同意。已有任务和住宿事实、200元差额可以解释，但展会口述没有完整比价或指定住宿证明，不能自动批准；员工尚未接受2186调整，顾明岚没有给例外结论，需现有同期材料和部门工作约束供有权复核。 须取得本项指定资料，保留已知与尚待决定事项。",
+      "positiveExample": "C005金额差额算清后，专门复核还要什么证据、由谁判断？现在已有批准或员工确认吗？",
+      "negativeExample": "只复述问题名、学员自行给结论、缺原件、把待确认说成批准、把他人经历说成亲历，均不通过。",
+      "hints": [
+        "可以沿C005例外证据与有权判断继续核实。",
+        "C005金额差额算清后，专门复核还要什么证据、由谁判断？现在已有批准或员工确认吗？"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "finance.director.budget",
+      "roleId": "director",
+      "title": "预算时效与潜在承诺的管理含义",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "finance.director.budget"
+      ],
+      "requiredAssetIds": [
+        "FIN-DEEP-021",
+        "FIN-DEEP-022",
+        "FIN-DEEP-014",
+        "FIN-DEEP-010"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答结合对应署名原件明确确认：三项目可用额描述导出时点已入账和净预占之后的余额；未批未占清单是潜在承诺，全部批准后的数值仅条件测算，不是当前可用或锁定成功，亦非所有潜在支出的全集。不能按余额分C003，不可将C009拟议分摊当已批准或双重扣款，C010已入账不再扣。应区分算术、业务受益决定和有权批准。 须取得本项指定资料，保留已知与尚待决定事项。",
+      "positiveExample": "预算复算后应怎样解释当前余额、未占申请和条件测算？它能决定项目承担或证明新申请已获批吗？",
+      "negativeExample": "只复述问题名、学员自行给结论、缺原件、把待确认说成批准、把他人经历说成亲历，均不通过。",
+      "hints": [
+        "可以沿预算时效与潜在承诺的管理含义继续核实。",
+        "预算复算后应怎样解释当前余额、未占申请和条件测算？它能决定项目承担或证明新申请已获批吗？"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    }
+  ],
+  "calculations": [
+    {
+      "id": "finance.return-rate",
+      "title": "历史退回比例",
+      "operation": "finance_return_rate",
+      "inputs": [
+        "finance-history",
+        "finance-history-events",
+        "finance-dictionary"
+      ],
+      "columns": {
+        "join": "claim_id",
+        "state": "state",
+        "submittedAt": "first_submitted_at"
+      },
+      "unit": "%",
+      "definition": "历史队列不同claim_id中，至少有一次RETURNED事件的数量÷历史队列数量×100；不按事件行数计分母。",
+      "denominator": "6月1日至8月31日首次提交且保留业务单号的历史报销单",
+      "filter": {
+        "first_submitted_at_gte": "2026-06-01T00:00:00+08:00",
+        "first_submitted_at_lte": "2026-08-31T23:59:59+08:00"
+      },
+      "version": "1.0.0",
+      "requiresAllInputsGranted": true,
+      "allowArbitraryCode": false
+    },
+    {
+      "id": "finance.stages",
+      "title": "历史各阶段日历耗时",
+      "operation": "finance_stage_hours",
+      "inputs": [
+        "finance-history",
+        "finance-history-events",
+        "finance-dictionary"
+      ],
+      "columns": {
+        "join": "claim_id",
+        "at": "at",
+        "state": "state"
+      },
+      "unit": "小时",
+      "definition": "依每单事件计算首次提交→首次开始审核→最终财务通过→最终审批→成功付款。补件已在审核区间，不重复相加；保留时区。",
+      "denominator": "历史队列中该阶段两端事件齐备的业务单；同时报告缺失样本数",
+      "filter": {},
+      "version": "1.0.0",
+      "requiresAllInputsGranted": true,
+      "allowArbitraryCode": false
+    },
+    {
+      "id": "finance.active-time",
+      "title": "陪跑操作工时",
+      "operation": "finance_active_minutes",
+      "inputs": [
+        "finance-times"
+      ],
+      "columns": {
+        "employee": "employee_preparation_minutes",
+        "finance": "finance_active_minutes"
+      },
+      "unit": "分钟",
+      "definition": "分别计算12笔便利抽样员工准备与财务主动操作分钟均值，明确便利抽样不得外推全院年收益。",
+      "denominator": "已授权陪跑样本有效记录行数",
+      "filter": {},
+      "version": "1.0.0",
+      "requiresAllInputsGranted": true,
+      "allowArbitraryCode": false
+    },
+    {
+      "id": "finance.budget-composition",
+      "title": "预算组成与条件测算",
+      "operation": "finance_budget_composition",
+      "inputs": [
+        "FIN-DEEP-021",
+        "FIN-DEEP-022",
+        "FIN-DEEP-014",
+        "FIN-DEEP-010",
+        "FIN-DEEP-023"
+      ],
+      "columns": {
+        "project": "project_id",
+        "reservation": "reservation_id",
+        "delta": "delta_yuan"
+      },
+      "unit": "元",
+      "definition": "按项目对带符号预占流水求净值，核对总预算-累计入账-净预占；另列未批未占金额及全部获批条件余额，非当前余额或实时锁定。",
+      "denominator": "预算导出批次三个项目；未占清单不是全部潜在支出",
+      "filter": {
+        "snapshot": "2026-09-14T09:00:00+08:00"
+      },
+      "version": "1.1.0",
+      "requiresAllInputsGranted": true,
+      "allowArbitraryCode": false
+    },
+    {
+      "id": "finance.version-payment",
+      "title": "版本及付款依据核对",
+      "operation": "finance_version_payment",
+      "inputs": [
+        "FIN-DEEP-015",
+        "FIN-DEEP-020",
+        "FIN-DEEP-013",
+        "FIN-DEEP-017",
+        "FIN-DEEP-009",
+        "FIN-DEEP-023"
+      ],
+      "columns": {
+        "claim": "claim_id",
+        "version": "version",
+        "allocation": "allocation",
+        "event": "event_id"
+      },
+      "unit": "元/版本/状态",
+      "definition": "按单号与版本对费用、分摊、审批事件和各系统所见关联；金额算术成立与有效批准分开，保持旧批准和当前暂停，正常对照单独列示。",
+      "denominator": "新增C009/C010当前样本，不改变原八笔和180笔历史",
+      "filter": {
+        "snapshot": "2026-09-14T09:00:00+08:00"
+      },
+      "version": "1.1.0",
+      "requiresAllInputsGranted": true,
+      "allowArbitraryCode": false
+    },
+    {
+      "id": "finance.deep-issues",
+      "title": "六类问题发生与处理投入",
+      "operation": "finance_issue_history",
+      "inputs": [
+        "FIN-DEEP-019",
+        "FIN-DEEP-018",
+        "FIN-DEEP-012",
+        "FIN-DEEP-011",
+        "FIN-DEEP-008",
+        "FIN-DEEP-023"
+      ],
+      "columns": {
+        "sample": "sample_id",
+        "event": "event_id",
+        "work": "work_id",
+        "active": "active_minutes"
+      },
+      "unit": "笔/%/分钟/小时",
+      "definition": "按sample_id去重异常业务和正常对照；六类频率非互斥，work_id去重累计已记录动作，日历跟踪历时独立计算，不替换旧陪跑数据或外推收益。",
+      "denominator": "EXH24笔独立目的样本及其已记录动作，非全公司发生率",
+      "filter": {
+        "snapshot": "2026-09-14T09:00:00+08:00"
+      },
+      "version": "1.1.0",
+      "requiresAllInputsGranted": true,
+      "allowArbitraryCode": false
+    }
+  ],
+  "report": {
+    "version": "1.1.0",
+    "title": "业务现状诊断与 AI 机会评估报告",
+    "sections": [
+      "原始诉求与调查范围",
+      "业务背景与组织职责",
+      "现状流程与协作关系",
+      "数据系统与企业条件",
+      "问题量化与基线",
+      "AI价值分析与推荐方向",
+      "证据索引与数据字典"
+    ],
+    "requirements": [
+      "区分受访者意见、文件事实、确定性计算和仍未知条件",
+      "仅使用当前训练轮次已获得的证据和资料",
+      "任何收益估算必须说明测量前提，不作真实收益承诺",
+      "不强制唯一技术方案，比较规则、组织改善、数据关联与AI的适用边界",
+      "保留共同七部分结构，第三部分写现状流程与组织；第五部分将材料与业务说明、项目承担、预算口径、制度例外、变更后批准、付款依据衔接组织成关联主线，引用各自原件，不堆六段模板。",
+      "只从本轮实际取得的证据确认：C003归属未决；C005例外未批准且普通核定不等于批准；C009金额未变但归属改变、当前暂停且没有银行请求；预算非实时。若证据不足必须说明缺口，不能由模板补成已访谈事实。",
+      "原8笔与新增2笔当前业务、原180笔历史、旧12笔陪跑与EXH24笔分别说明，不能合并成204笔全量，不能用新增动作投入替换旧基线；新样本非全院发生率。",
+      "预算净预占按带符号流水，已释放不重复占，C010已入账不再扣，C009旧P101预占不按拟议比例转移；未批未占清单全部获批余额只是条件情境。",
+      "第六部分比较AI材料理解、澄清及证据组织与规则计算、版本校验、系统状态和审批路由；第七部分除字段与引用索引，可补有证据的分工建议及待核实条件。审批仍需有权岗位，当前未实施AI所以没有实测收益。",
+      "保持C002票面两晚每晚380共760但缺独立住宿明细、C007候选批次不是到账、员工只亲历C001及项目负责人不代批他人项目的旧边界。"
+    ],
+    "allowQuantitativeNarrative": true
+  },
+  "sourcePolicy": {
+    "snapshot": "2026-09-14T09:00:00+08:00",
+    "teacherExcluded": [
+      "教师专用",
+      "90-内部教师资料",
+      "研发依据",
+      "教师与研发"
+    ],
+    "futureExcluded": [
+      "后续事件"
+    ],
+    "laterInterviews": "第二轮10:00记录仅作为回顾性说明来源，不能用于导入快照后事件；不发放混合角色访谈全文。",
+    "roleExtracts": "角色摘录明确标注为编制摘录并逐条引原件；完整原始材料按原目录存档。",
+    "dataNature": "企业、人物、数据与业务单据均为教学拟制，非真实企业资料。",
+    "materialRevision": "finance-deep-20260915",
+    "budgetSnapshot": "2026-09-13T23:00:00+08:00",
+    "baseSnapshotSha256": "4e9a27b59b36dc632234fd68a4d46ff96fb1f5230490afc29fc2af3674cfc03b"
+  },
+  "materialScope": "当前材料：原8笔＋新增2笔；历史180笔、旧12笔陪跑与新增24笔独立调查样本分别观察。",
+  "simulationNotice": "本案例为模拟企业调查材料，人物、单据及支付记录均为教学拟制；访谈与计算不会操作真实报销、预算或支付。",
+  "investigationFocus": "沿单据与岗位逐步核实反复补问、审核投入和等待，判断改善方向。"
+}

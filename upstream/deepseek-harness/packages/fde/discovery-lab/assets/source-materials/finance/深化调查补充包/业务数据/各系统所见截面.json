@@ -1,0 +1,50 @@
+{
+  "snapshot_at": "2026-09-14T09:00:00+08:00",
+  "rows": [
+    {
+      "claim_id": "C009",
+      "system": "EXP",
+      "version": "v2",
+      "amount_yuan": 2186,
+      "allocation": "P10160%;P10240%拟议",
+      "status": "待归属复核",
+      "updated_at": "2026-09-14T08:20:00+08:00"
+    },
+    {
+      "claim_id": "C009",
+      "system": "OA",
+      "version": "v1",
+      "amount_yuan": 2186,
+      "allocation": "P101100%",
+      "status": "旧版已批准",
+      "updated_at": "2026-09-11T11:00:00+08:00"
+    },
+    {
+      "claim_id": "C009",
+      "system": "PRJ",
+      "version": "v1",
+      "amount_yuan": 2186,
+      "allocation": "P101100%预占",
+      "status": "未执行分摊转移",
+      "updated_at": "2026-09-13T23:00:00+08:00"
+    },
+    {
+      "claim_id": "C009",
+      "system": "PAY",
+      "version": "v1",
+      "amount_yuan": 2186,
+      "allocation": "P101100%",
+      "status": "HOLD人工暂停",
+      "updated_at": "2026-09-14T08:35:00+08:00"
+    },
+    {
+      "claim_id": "C010",
+      "system": "PAY",
+      "version": "v1",
+      "amount_yuan": 2106,
+      "allocation": "P101100%",
+      "status": "PAID",
+      "updated_at": "2026-09-11T15:10:00+08:00"
+    }
+  ]
+}

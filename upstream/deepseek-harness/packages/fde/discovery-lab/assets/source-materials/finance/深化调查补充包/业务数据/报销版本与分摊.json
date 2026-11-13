@@ -1,0 +1,64 @@
+{
+  "snapshot_at": "2026-09-14T09:00:00+08:00",
+  "rows": [
+    {
+      "claim_id": "C009",
+      "application_id": "A009",
+      "version": "v1",
+      "employee_id": "E09",
+      "created_at": "2026-09-11T09:00:00+08:00",
+      "submitted_yuan": 2386,
+      "reviewed_yuan": 2186,
+      "allocation": [
+        {
+          "project_id": "P101",
+          "ratio": 1,
+          "yuan": 2186
+        }
+      ],
+      "allocation_status": "已确认v1；后续事实需重新审视",
+      "approval_status": "APPROVED_FOR_V1"
+    },
+    {
+      "claim_id": "C009",
+      "application_id": "A009",
+      "version": "v2",
+      "employee_id": "E09",
+      "created_at": "2026-09-12T10:00:00+08:00",
+      "submitted_yuan": 2386,
+      "reviewed_yuan": 2186,
+      "allocation": [
+        {
+          "project_id": "P101",
+          "ratio": 0.6,
+          "yuan": 1311.6
+        },
+        {
+          "project_id": "P102",
+          "ratio": 0.4,
+          "yuan": 874.4
+        }
+      ],
+      "allocation_status": "员工拟议比例，两个项目尚未完成共同确认",
+      "approval_status": "PENDING_RECONFIRMATION"
+    },
+    {
+      "claim_id": "C010",
+      "application_id": "A010",
+      "version": "v1",
+      "employee_id": "E10",
+      "created_at": "2026-09-10T09:00:00+08:00",
+      "submitted_yuan": 2106,
+      "reviewed_yuan": 2106,
+      "allocation": [
+        {
+          "project_id": "P101",
+          "ratio": 1,
+          "yuan": 2106
+        }
+      ],
+      "allocation_status": "已确认",
+      "approval_status": "APPROVED_FOR_V1"
+    }
+  ]
+}

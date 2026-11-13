@@ -1,0 +1,50 @@
+{
+  "snapshot_at": "2026-09-13T23:00:00+08:00",
+  "rows": [
+    {
+      "request_id": "BP01",
+      "project_id": "P101",
+      "requested_yuan": 30000,
+      "reserved": false,
+      "status": "PENDING_APPROVAL",
+      "submitted_at": "2026-09-11T09:00:00+08:00",
+      "note": "尚未获批，不计入当前已占预算；不含归属未定C003和待改分摊C009"
+    },
+    {
+      "request_id": "BP02",
+      "project_id": "P101",
+      "requested_yuan": 15000,
+      "reserved": false,
+      "status": "PENDING_APPROVAL",
+      "submitted_at": "2026-09-11T09:00:00+08:00",
+      "note": "尚未获批，不计入当前已占预算；不含归属未定C003和待改分摊C009"
+    },
+    {
+      "request_id": "BP03",
+      "project_id": "P102",
+      "requested_yuan": 20000,
+      "reserved": false,
+      "status": "PENDING_APPROVAL",
+      "submitted_at": "2026-09-11T09:00:00+08:00",
+      "note": "尚未获批，不计入当前已占预算；不含归属未定C003和待改分摊C009"
+    },
+    {
+      "request_id": "BP04",
+      "project_id": "P102",
+      "requested_yuan": 8000,
+      "reserved": false,
+      "status": "PENDING_APPROVAL",
+      "submitted_at": "2026-09-11T09:00:00+08:00",
+      "note": "尚未获批，不计入当前已占预算；不含归属未定C003和待改分摊C009"
+    },
+    {
+      "request_id": "BP05",
+      "project_id": "P103",
+      "requested_yuan": 12000,
+      "reserved": false,
+      "status": "PENDING_APPROVAL",
+      "submitted_at": "2026-09-11T09:00:00+08:00",
+      "note": "尚未获批，不计入当前已占预算；不含归属未定C003和待改分摊C009"
+    }
+  ]
+}

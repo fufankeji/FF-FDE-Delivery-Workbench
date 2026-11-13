@@ -52,6 +52,7 @@ function table() {
       get size() { return records.size },
       put,
       delete: async (key: WorkspaceId) => records.delete(key),
+      deleteMany: async (keys: readonly WorkspaceId[]) => keys.reduce((count, key) => count + Number(records.delete(key)), 0),
       update: async (key: WorkspaceId, fn: (current: ProjectStageRecord) => ProjectStageRecord) => {
         const current = records.get(key)
         if (current === undefined) throw new Error('missing')

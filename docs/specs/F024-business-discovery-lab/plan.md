@@ -32,7 +32,7 @@ updated: "2026-09-16"
 
 原 React/Pixi 应用保留为 Client 包的独立应用源码，由自有构建输出到 `lib/app/`；页面由当前 Host 提供，在插件页面内用 iframe 隔离 CSS 与运行时。工作台侧仅增加导航和返回，不重写像素场景、不建立新宿主进程。
 
-素材导入脚本核对运行包摘要并按包内白名单导入 `.assets/`，保留案例定义、授权原件、固定 Python 计算程序及字体。该目录被忽略且可重建；可变 SQLite 和工作区在显式 `DSH_HOME/fde-discovery-lab/`，不能当素材缓存删除。接口采用 `/api/fde-discovery-lab`，不拦截既有 FDE 路径。
+素材交付方式由 2026-11-13 的 [F031](../F031-lab-source-delivery/plan.md) 更新：运行白名单内容以 `assets/` 随源码提供并校验，原导入器只保留维护用途；正常安装无需额外 ZIP。可变 SQLite 和工作区仍在显式 `DSH_HOME/fde-discovery-lab/`，不能当素材缓存删除。接口采用 `/api/fde-discovery-lab`，不拦截既有 FDE 路径。
 
 ## 实施顺序
 

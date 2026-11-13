@@ -1,0 +1,140 @@
+{
+  "snapshot_at": "2026-09-14T09:00:00+08:00",
+  "rows": [
+    {
+      "event_id": "V01",
+      "claim_id": "C009",
+      "event_at": "2026-09-11T09:00:00+08:00",
+      "action": "SUBMITTED",
+      "version": "v1",
+      "actor_id": "E09",
+      "content": "2386元；原填P101"
+    },
+    {
+      "event_id": "V02",
+      "claim_id": "C009",
+      "event_at": "2026-09-11T10:00:00+08:00",
+      "action": "FINANCE_REVIEWED",
+      "version": "v1",
+      "actor_id": "F02",
+      "content": "按普通标准核定2186元，员工同意承担200元差额"
+    },
+    {
+      "event_id": "V03",
+      "claim_id": "C009",
+      "event_at": "2026-09-11T10:30:00+08:00",
+      "action": "PROJECT_CONFIRMED",
+      "version": "v1",
+      "actor_id": "M01",
+      "content": "依据当时任务说明确认P101"
+    },
+    {
+      "event_id": "V04",
+      "claim_id": "C009",
+      "event_at": "2026-09-11T11:00:00+08:00",
+      "action": "APPROVED",
+      "version": "v1",
+      "actor_id": "M02",
+      "content": "部门批准2186元，范围为P101单项目v1"
+    },
+    {
+      "event_id": "V05",
+      "claim_id": "C009",
+      "event_at": "2026-09-11T12:00:00+08:00",
+      "action": "RESERVED",
+      "version": "v1",
+      "actor_id": "PRJ",
+      "content": "P101预占2186元；本次支付队列尚未完成制单"
+    },
+    {
+      "event_id": "V06",
+      "claim_id": "C009",
+      "event_at": "2026-09-11T14:00:00+08:00",
+      "action": "QUEUE_EXPORTED",
+      "version": "v1",
+      "actor_id": "C01",
+      "content": "13:00截单后完成制单，计划9月15日批次"
+    },
+    {
+      "event_id": "V07",
+      "claim_id": "C009",
+      "event_at": "2026-09-12T10:00:00+08:00",
+      "action": "REVISION_SUBMITTED",
+      "version": "v2",
+      "actor_id": "E09",
+      "content": "上传现场联合任务记录，拟P10160%/P10240%，金额不变"
+    },
+    {
+      "event_id": "V08",
+      "claim_id": "C009",
+      "event_at": "2026-09-14T08:20:00+08:00",
+      "action": "REVIEW_REQUIRED",
+      "version": "v2",
+      "actor_id": "F02",
+      "content": "发现归属变化，发送出纳复核通知"
+    },
+    {
+      "event_id": "V09",
+      "claim_id": "C009",
+      "event_at": "2026-09-14T08:35:00+08:00",
+      "action": "PAYMENT_HOLD",
+      "version": "v1",
+      "actor_id": "C01",
+      "content": "旧队列仍存v1，人工暂停；无支付请求，无银行回执"
+    },
+    {
+      "event_id": "V10",
+      "claim_id": "C010",
+      "event_at": "2026-09-10T09:00:00+08:00",
+      "action": "SUBMITTED",
+      "version": "v1",
+      "actor_id": "E10",
+      "content": "2106元，P101"
+    },
+    {
+      "event_id": "V11",
+      "claim_id": "C010",
+      "event_at": "2026-09-10T11:00:00+08:00",
+      "action": "FINANCE_REVIEWED",
+      "version": "v1",
+      "actor_id": "F02",
+      "content": "金额及材料一致"
+    },
+    {
+      "event_id": "V12",
+      "claim_id": "C010",
+      "event_at": "2026-09-10T12:00:00+08:00",
+      "action": "PROJECT_CONFIRMED",
+      "version": "v1",
+      "actor_id": "M01",
+      "content": "任务与归属一致"
+    },
+    {
+      "event_id": "V13",
+      "claim_id": "C010",
+      "event_at": "2026-09-11T10:00:00+08:00",
+      "action": "APPROVED",
+      "version": "v1",
+      "actor_id": "M01",
+      "content": "项目确认与部门批准分别记录"
+    },
+    {
+      "event_id": "V14",
+      "claim_id": "C010",
+      "event_at": "2026-09-11T10:20:00+08:00",
+      "action": "QUEUE_EXPORTED",
+      "version": "v1",
+      "actor_id": "C01",
+      "content": "9月11日批次"
+    },
+    {
+      "event_id": "V15",
+      "claim_id": "C010",
+      "event_at": "2026-09-11T15:10:00+08:00",
+      "action": "PAID",
+      "version": "v1",
+      "actor_id": "C01",
+      "content": "PAY010；RCPT010教学回执成功"
+    }
+  ]
+}

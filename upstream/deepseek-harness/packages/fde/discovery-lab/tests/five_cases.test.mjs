@@ -9,7 +9,7 @@ import {isRestrictedSource,loadCases} from '../src/vendor/cases.js';
 import {calculationEvidence} from '../src/vendor/metrics.js';
 import {quantitativeBaseline} from '../src/vendor/reports.js';
 import {expandReportReferences,validateReport} from '../src/vendor/reports.js';
-const root=join(dirname(fileURLToPath(import.meta.url)),'../.assets');
+const root=join(dirname(fileURLToPath(import.meta.url)),'../assets');
 test('Bare report source labels expand to exact evidence while unknown labels and unsupported numbers are rejected',()=>{
  const references=[{id:'E001',sourceId:'original-1'}];
  assert.equal(expandReportReferences('事实[E001]、原件[证据:E001]',references),'事实[证据:original-1]、原件[证据:original-1]');

@@ -154,20 +154,20 @@ diff --git a/package.json b/package.json
 -    "@deepseek-ai/dsh-system-prompt": "^0.1.5-rc.1",
 -    "@deepseek-ai/dsh-typert-protocol": "^0.1.5-rc.1",
 -    "@deepseek-ai/dsh-typert-registry": "^0.1.5-rc.1",
-+    "@deepseek-ai/dsh-agent": "0.2.1-rc.2",
-+    "@deepseek-ai/dsh-api-remotes": "0.2.1-rc.2",
-+    "@deepseek-ai/dsh-api-session-controller": "0.2.1-rc.2",
-+    "@deepseek-ai/dsh-atomic-write": "0.2.1-rc.2",
-+    "@deepseek-ai/dsh-client-locale": "0.2.1-rc.2",
-+    "@deepseek-ai/dsh-client-ui-chat": "0.2.1-rc.2",
-+    "@deepseek-ai/dsh-client-ui-conversation": "0.2.1-rc.2",
-+    "@deepseek-ai/dsh-client-ui-primitives": "0.2.1-rc.2",
-+    "@deepseek-ai/dsh-client-ui-renderer": "0.2.1-rc.2",
-+    "@deepseek-ai/dsh-client-ui-slots": "0.2.1-rc.2",
-+    "@deepseek-ai/dsh-session": "0.2.1-rc.2",
-+    "@deepseek-ai/dsh-system-prompt": "0.2.1-rc.2",
-+    "@deepseek-ai/dsh-typert-protocol": "0.2.1-rc.2",
-+    "@deepseek-ai/dsh-typert-registry": "0.2.1-rc.2",
++    "@deepseek-ai/dsh-agent": "0.2.2-rc.2",
++    "@deepseek-ai/dsh-api-remotes": "0.2.2-rc.2",
++    "@deepseek-ai/dsh-api-session-controller": "0.2.2-rc.2",
++    "@deepseek-ai/dsh-atomic-write": "0.2.2-rc.2",
++    "@deepseek-ai/dsh-client-locale": "0.2.2-rc.2",
++    "@deepseek-ai/dsh-client-ui-chat": "0.2.2-rc.2",
++    "@deepseek-ai/dsh-client-ui-conversation": "0.2.2-rc.2",
++    "@deepseek-ai/dsh-client-ui-primitives": "0.2.2-rc.2",
++    "@deepseek-ai/dsh-client-ui-renderer": "0.2.2-rc.2",
++    "@deepseek-ai/dsh-client-ui-slots": "0.2.2-rc.2",
++    "@deepseek-ai/dsh-session": "0.2.2-rc.2",
++    "@deepseek-ai/dsh-system-prompt": "0.2.2-rc.2",
++    "@deepseek-ai/dsh-typert-protocol": "0.2.2-rc.2",
++    "@deepseek-ai/dsh-typert-registry": "0.2.2-rc.2",
      "dsh-better-sidebar": ">=0.19.1",
      "react": "^18.2.0"
    },
@@ -179,6 +179,6 @@ diff --git a/package.json b/package.json
      "typescript": "^5.9.0"
 +  },
 +  "engines": {
-+    "dsh": "0.2.1-rc.2"
++    "dsh": "0.2.2-rc.2"
    }
  }

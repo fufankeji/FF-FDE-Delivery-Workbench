@@ -41,6 +41,7 @@
     "@deepseek-ai/dsh-workspace": "workspace:*"
   },
   "devDependencies": {
+    "@deepseek-ai/dsh-tool-executor-native": "workspace:*",
     "@deepseek-ai/cordis": "workspace:~",
     "@deepseek-ai/dsh-client-connection": "workspace:*",
     "@deepseek-ai/dsh-host-webserver": "workspace:*",

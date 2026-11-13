@@ -1,0 +1,25 @@
+{
+  "tax_check": {
+    "available": false,
+    "invoice_id": "SIM-C001-3",
+    "status": "NOT_VERIFIED",
+    "reason": "教学票无法税务验真，未开真实查验接口"
+  },
+  "payment_examples": [
+    {
+      "claim_id": "C001",
+      "request_id": "SIM-PAY-C001",
+      "status": "SUCCEEDED",
+      "paid_yuan": "2106.00",
+      "completed_at": "2026-09-11T15:00:00+08:00",
+      "bank_receipt": "SIM-BANK-C001"
+    },
+    {
+      "claim_id": "C007",
+      "request_id": null,
+      "status": "QUEUED",
+      "planned_batch_at": "2026-09-15T15:00:00+08:00",
+      "bank_receipt": null
+    }
+  ]
+}

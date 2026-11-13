@@ -1,0 +1,28 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://inventory.example.invalid/api/parts/PT-BELT-B",
+    "identity": "E08",
+    "scope": "inventory.read"
+  },
+  "response": {
+    "http_status": 200,
+    "request_id": "SIM-Q-0914-001",
+    "as_of": "2026-09-14T08:45:00+08:00",
+    "part_id": "PT-BELT-B",
+    "unit": "条",
+    "on_hand": 4,
+    "reserved": 4,
+    "quarantined": 0,
+    "available_to_promise": 0,
+    "incoming": [
+      {
+        "po_id": "PO-0910-B",
+        "qty": 6,
+        "eta": "2026-09-15T15:00:00+08:00",
+        "certainty": "estimated"
+      }
+    ],
+    "can_write_reservation": false
+  }
+}

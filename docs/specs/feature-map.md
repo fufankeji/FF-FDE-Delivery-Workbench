@@ -3,7 +3,7 @@ document: feature-map
 status: confirmed
 prd: docs/PRD.md
 product_spec: docs/specs/product-spec.md
-updated: "2026-11-02"
+updated: "2026-11-12"
 ---
 
 # FF - FDE 交付工作台 V2 Feature Map
@@ -45,7 +45,13 @@ updated: "2026-11-02"
 
 | F029 | F029-chinese-scenario-challenge | 中文 FDE 场景判断挑战 | 从实验室完成十题限时自测、恢复答题并回看解析，原业务训练与项目状态不变 | REQ-038, REQ-039, REQ-040, PSC-032 | F024, F025 | P0 | in-progress |
 
+| F030 | F030-harness-022-compatibility | 官方 0.2.2 下继续既有交付 | 在新版基座继续项目、会话、中文实验室和桌面工作，不丢历史或扩大权限 | REQ-001, REQ-009, REQ-010, REQ-030, REQ-031, REQ-032, REQ-033, REQ-034, REQ-035, REQ-036, REQ-037, REQ-038, REQ-039, REQ-040, NFR-001, NFR-003, NFR-005, NFR-006, NFR-007, PSC-001, PSC-008, PSC-009, PSC-010, PSC-026, PSC-027, PSC-028, PSC-029, PSC-030, PSC-031, PSC-032 | F027, F029 | P0 | in-progress |
+
 ## 首个验证切片
+
+2026-11-12 用户明确要求升级已核实的官方 `0.2.2-rc.2`。本轮 F030 保留现有产品合同，先保护当前中文挑战与桌面修复，再进行精确三方合并、依赖/API 适配和隔离数据验证；不把官方新增可选能力变成默认启用、付费执行或项目流程变更。
+
+F030 的技术实现、构建、核心定向回归与桌面启动已完成，T007 人工体验仍待确认；验证边界和剩余限制见 [2026-11-12 验证记录](../verification/2026-11-12-harness-022-compatibility.md)。
 
 2026-11-02 用户确认实验室接入中文五分钟挑战，并明确要求先写 Spec 再实施。本轮只新增 F029；F024/F025 仅调整直接关联的入口、返回、保活与总览文案，不扩展访谈业务、账号、考试认证或项目流程。
 
@@ -62,6 +68,14 @@ F025 的统一导航由用户于 2026-09-16 确认。2026-09-17 用户确认 F02
 2026-09-18 用户进一步授权 F026 统一当前七个 Skill 的中文标准文件、原生加载、阅读与下载，并简化名称/正文界面；F005 的阶段产物和人工决定规则作为保留约束，不扩展其他阶段或课程运行能力。
 
 F001～F004 建立共享能力，F005 用“发现高价值问题”完成第一条端到端产品验证。首个阶段只接入 `qualify-ai-workflow`、条件触发的 `reframe-ai-engagement`，以及 Workflow Charter、Engagement Reframe、Field Observation Log 三类必要 Artifact；不安装完整外部能力库。实施可以在同一切片内增量进行，但只有当前用户明确授权的 Feature 才进入 in-progress。
+
+## F031 · 已确认的实验室完整源码交付
+
+| Feature ID | 目录 | Feature | 用户可观察结果 | 来源合同 | 依赖 | 优先级 | 状态 |
+|---|---|---|---|---|---|:---:|---|
+| F031 | F031-lab-source-delivery | 新安装直接使用五案例实验室 | GitHub 克隆与学员包均自带必需素材，安装后不再索要额外 ZIP；不分发个人数据 | REQ-030, REQ-031, REQ-032, REQ-010, NFR-003, NFR-004, NFR-006, PSC-026, PSC-009 | F024, F030 | P0 | in-progress |
+
+2026-11-13 用户明确要求补齐素材、重新提交 GitHub，并在桌面交付新版源码包；此指令确认上述范围。只交付源码，不扩展为宣传媒体、真实模型调用或用户数据迁移。
 
 ## 范围外与延期项
 

@@ -1,0 +1,4 @@
+﻿receipt_line_id,receipt_id,shipment_id,carton_id,sku_id,warehouse_id,declared_qty,counted_qty,accepted_qty,quarantine_qty,shortage_qty,posted,occurred_at
+RC02-1,RC02,SH02,CTN-2401,S02-SD-M,W-KL,24,24,0,24,0,True,2026-09-09T17:00:00+08:00
+RC02-2,RC02,SH02,CTN-2402,S02-SD-M,W-KL,24,24,24,0,0,True,2026-09-09T17:00:00+08:00
+RC02-3,RC02,SH02,CTN-2403,S02-SD-M,W-KL,24,20,20,0,4,True,2026-09-09T17:00:00+08:00

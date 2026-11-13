@@ -1,0 +1,1246 @@
+{
+  "schemaVersion": 1,
+  "materialVersion": "0.3.2",
+  "files": [
+    {
+      "path": "cases/calculate_reference.py",
+      "bytes": 8333,
+      "sha256": "48f51035c207062f7f2f28117ade949722a459632e33858f6b452f68831fab2c"
+    },
+    {
+      "path": "cases/calculations_finance_deepening.py",
+      "bytes": 23036,
+      "sha256": "bf72b0c02f0e0802dbdc29c4fc5e4cf75f1be44fc0b7dbe67ec33b1e4c90951a"
+    },
+    {
+      "path": "cases/calculations_internal_service.py",
+      "bytes": 20103,
+      "sha256": "7f5bb31eb907383c84bb2a313f58498fd9b51f9b222b20cddbe60fdd47d9a6ae"
+    },
+    {
+      "path": "cases/calculations_logistics.py",
+      "bytes": 12906,
+      "sha256": "d7da1089cbd65a2826b5c2095347d24a8b83a1a12ff74466c04a09829fb492bf"
+    },
+    {
+      "path": "cases/calculations_operations.py",
+      "bytes": 20948,
+      "sha256": "1e15826e5417cc5294cd2340e53826feb98ae59a53cbacc32ba2481667101c14"
+    },
+    {
+      "path": "cases/check_discoveries.py",
+      "bytes": 11940,
+      "sha256": "3b3294888e72348c00e0b46e10fd3b75a87c9cef8a87201644acd2ee86d38afb"
+    },
+    {
+      "path": "cases/finance/case.json",
+      "bytes": 180919,
+      "sha256": "5328f49879b66dea8252354e19bfcad7387392a62c7879aad5ae10930ca837b3"
+    },
+    {
+      "path": "cases/internal-service/case.json",
+      "bytes": 142852,
+      "sha256": "3e0ff9b6fbc9d42b71c1cb39e560488345308932da636d14f0d86ae9ba2c993a"
+    },
+    {
+      "path": "cases/logistics/case.json",
+      "bytes": 87607,
+      "sha256": "ee827ede7a4b4d274a9772ef5500f3e71798589a39177a298baa98ba2eac289a"
+    },
+    {
+      "path": "cases/manufacturing/case.json",
+      "bytes": 129622,
+      "sha256": "c3d504e390d842d4bced816857bb9e26e148e99ab1e2c4d37d32bb79e3076787"
+    },
+    {
+      "path": "cases/operations/case.json",
+      "bytes": 104766,
+      "sha256": "c6b7666c5539a11028a0fb3f26ccddffc82ca3e1557b4152a0965fe82def1846"
+    },
+    {
+      "path": "development/fonts/LICENSE",
+      "bytes": 4301,
+      "sha256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2"
+    },
+    {
+      "path": "development/fonts/NotoSansCJKsc-Regular.otf",
+      "bytes": 16437364,
+      "sha256": "2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b"
+    },
+    {
+      "path": "source-materials/finance/初始材料/业务台账/历史出差申请.csv",
+      "bytes": 14505,
+      "sha256": "5c3873536c253d323b4abb78b11f36a02d0cf57e6bde268259e00ab9d4f6f3cb"
+    },
+    {
+      "path": "source-materials/finance/初始材料/业务台账/历史报销单.csv",
+      "bytes": 21652,
+      "sha256": "836f033f2cd60088ecbb129b6a54da6d7cd3a265201c8562807a47e78abd7fcb"
+    },
+    {
+      "path": "source-materials/finance/初始材料/业务台账/历史状态事件.csv",
+      "bytes": 104790,
+      "sha256": "68f01035101ac630f5fb0e44b5abd70f41169d64fab907bcc5934eab7cd19360"
+    },
+    {
+      "path": "source-materials/finance/初始材料/业务台账/历史费用行.csv",
+      "bytes": 37714,
+      "sha256": "d14391975db815e3e67393e5511106f1a9a0efea025cf557e06403268cc25871"
+    },
+    {
+      "path": "source-materials/finance/初始材料/业务台账/字段与统计口径.md",
+      "bytes": 2530,
+      "sha256": "b17622d008a791368ffca5079a6f31ac1da70418056af499350f59a3ccbc7ecd"
+    },
+    {
+      "path": "source-materials/finance/初始材料/业务台账/已报销票据索引.csv",
+      "bytes": 33043,
+      "sha256": "4e812528a60ba9250bacfa07fb473f557f0fd4139f0401b60c92640c925ffa1d"
+    },
+    {
+      "path": "source-materials/finance/初始材料/业务台账/当前出差申请.csv",
+      "bytes": 1428,
+      "sha256": "84addedb2fa2195c2c9910c89bd867af1c0ac09fe1b05f75e5f9be870818bc35"
+    },
+    {
+      "path": "source-materials/finance/初始材料/业务台账/当前报销单.csv",
+      "bytes": 1028,
+      "sha256": "13f999928b7feed5c6d5966397c4dc936c178b7add64b470e53c8a5c09e075fd"
+    },
+    {
+      "path": "source-materials/finance/初始材料/业务台账/当前状态事件.csv",
+      "bytes": 2911,
+      "sha256": "fce57b6a0905a5ca26917880f5ce7f09d5199295e5cedf68e12294817ad69b83"
+    },
+    {
+      "path": "source-materials/finance/初始材料/业务台账/当前票据.csv",
+      "bytes": 5742,
+      "sha256": "952e8cd0a6d2f4aff376163b11ac4a8010cacef6dcabdc05d74f413152e3f3ec"
+    },
+    {
+      "path": "source-materials/finance/初始材料/业务台账/当前费用行.csv",
+      "bytes": 1746,
+      "sha256": "9301264bb3d6cbdd4fe2b476ea1a50c153f3aac788f4f9a000e020de220e5737"
+    },
+    {
+      "path": "source-materials/finance/初始材料/业务台账/附件索引.csv",
+      "bytes": 3997,
+      "sha256": "bee46cf4b5a0ff3326bab85ebeeb7a63739a9d01bd9910ddae264664850dcba4"
+    },
+    {
+      "path": "source-materials/finance/初始材料/业务台账/陪跑工时样本.csv",
+      "bytes": 1573,
+      "sha256": "c2d1a8bfcd9a2336f2b6cd953f6f1de10996cd9e8df44b6c65ec1c57ed1e8e12"
+    },
+    {
+      "path": "source-materials/finance/初始材料/制度与人员/内部差旅制度-V2.0及组织职责.md",
+      "bytes": 1207,
+      "sha256": "9e2b190c64585f38ac83c086ad9b8219ab41a83cb1ca96ded362ae10fbd01fcb"
+    },
+    {
+      "path": "source-materials/finance/初始材料/制度与人员/内部差旅制度-V2.1.md",
+      "bytes": 4568,
+      "sha256": "b6681cc7036b25791d5bd5d4370431e142300da5bf1fd8a4eda7588d3c054bc5"
+    },
+    {
+      "path": "source-materials/finance/初始材料/制度与人员/员工.csv",
+      "bytes": 374,
+      "sha256": "2ccd7fa46560ef8b1a8b6c3cbfad765d9a677dbf1f7d44836101297d8d112980"
+    },
+    {
+      "path": "source-materials/finance/初始材料/制度与人员/项目.csv",
+      "bytes": 269,
+      "sha256": "051781c37f1f89f8db9c6b7be9890d5e5c5d2045c9fb4bfb832c68f9b422f797"
+    },
+    {
+      "path": "source-materials/finance/初始材料/当前单据/C001-报销原件链.pdf",
+      "bytes": 14253,
+      "sha256": "2df9f126254ea64d1c0dc6774df4752bd8b87a21fd34957b38b3f580869d2b32"
+    },
+    {
+      "path": "source-materials/finance/初始材料/当前单据/C002-报销原件链.pdf",
+      "bytes": 12846,
+      "sha256": "c91373d948f1bf9c589e9cd3f8008feae34ffebdb7fc69ea0b886038dd2af5e0"
+    },
+    {
+      "path": "source-materials/finance/初始材料/当前单据/C003-报销原件链.pdf",
+      "bytes": 14083,
+      "sha256": "f5d1609bf272fc5a87c0ee57aa6d003ed7235a10ca9bcfcac5048222a569a3a8"
+    },
+    {
+      "path": "source-materials/finance/初始材料/当前单据/C004-报销原件链.pdf",
+      "bytes": 14149,
+      "sha256": "09c26a62b9701951546caf5d70dee892c5b3e7411028d39c38f5050bc08b7287"
+    },
+    {
+      "path": "source-materials/finance/初始材料/当前单据/C005-报销原件链.pdf",
+      "bytes": 13991,
+      "sha256": "91d2178afb2f1dec795bf50e1e42fee13a4f460c43bec79f24316eeb445f188f"
+    },
+    {
+      "path": "source-materials/finance/初始材料/当前单据/C006-报销原件链.pdf",
+      "bytes": 14150,
+      "sha256": "c903049509b091c1d85ed8d8eac0d3c5e57216f01f9446dd25571e1121938ce4"
+    },
+    {
+      "path": "source-materials/finance/初始材料/当前单据/C007-报销原件链.pdf",
+      "bytes": 14152,
+      "sha256": "cd4d989cfc4f1e77552ccee0e30ced3227cb54dd1c94c424b7159adcbdffe1f3"
+    },
+    {
+      "path": "source-materials/finance/初始材料/当前单据/C008-报销原件链.pdf",
+      "bytes": 14079,
+      "sha256": "589887645639868d37629bcc77024a41095ad07befe65c2a067c19157749e76a"
+    },
+    {
+      "path": "source-materials/finance/初始材料/旧系统/只读与草稿接口样例.json",
+      "bytes": 2446,
+      "sha256": "ead6b32682a4cbb220e12996540a3363152221355b9eb9c4ae9b45fa19bfda06"
+    },
+    {
+      "path": "source-materials/finance/初始材料/旧系统/旧网页操作记录.md",
+      "bytes": 1100,
+      "sha256": "b65a8decfc7e7ef7eb790592016ed012b3ae765802cb1fc9ca9f6642707fbbdb"
+    },
+    {
+      "path": "source-materials/finance/初始材料/旧系统/现状与可用条件.md",
+      "bytes": 2229,
+      "sha256": "0f6ee8068b8ff3b5d2320637cb6521da0707d2671f108a8bca57d480e16821d4"
+    },
+    {
+      "path": "source-materials/finance/初始材料/旧系统/票据查验与支付状态样例.json",
+      "bytes": 606,
+      "sha256": "b039db798e4386dc9bf04ae2388a9f6086f06c8f94719ccb4c686de6c2ea3749"
+    },
+    {
+      "path": "source-materials/finance/初始材料/沟通记录/01-负责人来信.md",
+      "bytes": 901,
+      "sha256": "d2b34f834be530d792a8e59e510683f2a37c26adece6f35aa1d27255cec5c16e"
+    },
+    {
+      "path": "source-materials/finance/岗位摘录/深化/访谈摘录-cashier.md",
+      "bytes": 320,
+      "sha256": "8cefa56bb746a6a0c635b35f257fe4701666d1536fbcb93b84fc5b056fc5945e"
+    },
+    {
+      "path": "source-materials/finance/岗位摘录/深化/访谈摘录-director.md",
+      "bytes": 399,
+      "sha256": "b7fedb514157092fdac4d3742a25a2394b7dc520dbed9c9d355db35be3a634ce"
+    },
+    {
+      "path": "source-materials/finance/岗位摘录/深化/访谈摘录-employee.md",
+      "bytes": 340,
+      "sha256": "4486b0d4d773339dcda3174a919f103247bfde606a0db8190fa604fca2149644"
+    },
+    {
+      "path": "source-materials/finance/岗位摘录/深化/访谈摘录-it.md",
+      "bytes": 276,
+      "sha256": "e21dfdc5dcd4740e576dbade0e833c44a688320c7ded796bc32a0f0cc78e357d"
+    },
+    {
+      "path": "source-materials/finance/岗位摘录/深化/访谈摘录-manager.md",
+      "bytes": 357,
+      "sha256": "76c183fa84878e683198d8321fcbde76b1d2062ec63c2f3c4b2015fa02b4504b"
+    },
+    {
+      "path": "source-materials/finance/岗位摘录/深化/访谈摘录-reviewer.md",
+      "bytes": 340,
+      "sha256": "fd2cbee05aa09c588eaac4a596e8aa0963cdc654d74db23fb1b7ca1f7ce15f50"
+    },
+    {
+      "path": "source-materials/finance/深化调查补充包/业务原件/C003-01-原始任务邮件与现场变更记录.md",
+      "bytes": 5298,
+      "sha256": "559fc45b88533c8371ee75e05c3cabd044616f3c589aa58c88d94e97c2f777ab"
+    },
+    {
+      "path": "source-materials/finance/深化调查补充包/业务原件/C003-02-双方项目负责人沟通原文.md",
+      "bytes": 3815,
+      "sha256": "29b81319e9ddf7b53c44278b428f52c2a5128218f3d73619e612751a9ba91397"
+    },
+    {
+      "path": "source-materials/finance/深化调查补充包/业务原件/C005-01-现场住宿安排与员工事后说明.md",
+      "bytes": 3916,
+      "sha256": "03084a3955d587af07a72ef39a9ef684cfa51c18fb474d233d94cff23adaa879"
+    },
+    {
+      "path": "source-materials/finance/深化调查补充包/业务原件/C005-02-财务复核材料与待确认金额通知.md",
+      "bytes": 3775,
+      "sha256": "d88d7f7afb7b85820cc9dd472b11d4865470bb3081f7af8fa122ec2484750222"
+    },
+    {
+      "path": "source-materials/finance/深化调查补充包/业务原件/C009-批准与暂停付款记录.md",
+      "bytes": 1266,
+      "sha256": "b089840d1c13f87104eb06172b79fa4dc5fcab6d300b95e6471745f3c1afe3e7"
+    },
+    {
+      "path": "source-materials/finance/深化调查补充包/业务原件/C009-新增出差与费用材料.md",
+      "bytes": 1513,
+      "sha256": "02a65aedadbc49f576f24991a2d1aecd31166679ea97569e39d8da888210c2bd"
+    },
+    {
+      "path": "source-materials/finance/深化调查补充包/业务原件/C010-正常对照原件链.md",
+      "bytes": 996,
+      "sha256": "8846d85e3ddca132a6d6f69b9e6cec248377f63ef3c9fbccfda080aaa9e53e38"
+    },
+    {
+      "path": "source-materials/finance/深化调查补充包/业务原件/历史样本移交与计时说明.md",
+      "bytes": 1200,
+      "sha256": "23458a5370caf7ff45b05390284372a0e6be95a091a5a11c6ca6028f3d824824"
+    },
+    {
+      "path": "source-materials/finance/深化调查补充包/业务原件/系统版本与复核职责说明.md",
+      "bytes": 1313,
+      "sha256": "893764252308917e26f325b57b4cd53160bc1a15e32be93a78ea45baa4fff72f"
+    },
+    {
+      "path": "source-materials/finance/深化调查补充包/业务原件/预算导出与办理口径说明.md",
+      "bytes": 1248,
+      "sha256": "7006106916cdc176f02b50dc34b9ce69a8c1a73da51cc8503883b28d052a802d"
+    },
+    {
+      "path": "source-materials/finance/深化调查补充包/业务数据/人工操作回填.json",
+      "bytes": 7755,
+      "sha256": "c82568a537ee13243617c52bf6b2b1503791e73fdee58fb56e1fa5c7c28e9398"
+    },
+    {
+      "path": "source-materials/finance/深化调查补充包/业务数据/六类问题复核编码.json",
+      "bytes": 7080,
+      "sha256": "6d32dd0a4c861acd79e22b703ee2794197c86934d41e014d84a39ebcab022c48"
+    },
+    {
+      "path": "source-materials/finance/深化调查补充包/业务数据/各系统所见截面.json",
+      "bytes": 1214,
+      "sha256": "60a180f88ec4f124d2c4d390061aef396c34c93f9329023691ac8c1505102c75"
+    },
+    {
+      "path": "source-materials/finance/深化调查补充包/业务数据/待批且未预占申请.json",
+      "bytes": 1639,
+      "sha256": "b53c10be68cb457ad9763ed966ee4ae5d79e71696e0cf1ad9a7f335b83386d5e"
+    },
+    {
+      "path": "source-materials/finance/深化调查补充包/业务数据/报销版本与分摊.json",
+      "bytes": 1580,
+      "sha256": "43855125ff46201622f55549d4ffcf0596cbfcf7b0774a7fad984d12376e84f3"
+    },
+    {
+      "path": "source-materials/finance/深化调查补充包/业务数据/新增人员与申请.json",
+      "bytes": 1199,
+      "sha256": "a5e749ae4097fdb0c48054cff7d7601e9f0e7bd468e78ce45b7d150019b1165a"
+    },
+    {
+      "path": "source-materials/finance/深化调查补充包/业务数据/新增费用明细.json",
+      "bytes": 1253,
+      "sha256": "18ac7c4c1430f9f10526fbbb017fe8defef096e84bc102315f2eece64c617668"
+    },
+    {
+      "path": "source-materials/finance/深化调查补充包/业务数据/深化调查事件原文.json",
+      "bytes": 29706,
+      "sha256": "3b1e21625401374b120b382c4aa49d46410b5bd75cde4d81e291966e12a9eb7f"
+    },
+    {
+      "path": "source-materials/finance/深化调查补充包/业务数据/深化调查历史样本.json",
+      "bytes": 10007,
+      "sha256": "07eff39e247a9b463f7e96f151a8284cf8d4585e1b5ad029e9364f5969f7ac2e"
+    },
+    {
+      "path": "source-materials/finance/深化调查补充包/业务数据/版本审批与支付事件.json",
+      "bytes": 3825,
+      "sha256": "9c2dc35231505ca3f3cc575110d5a20868d1273cbca8fb9c824d9b10460edf3b"
+    },
+    {
+      "path": "source-materials/finance/深化调查补充包/业务数据/预算截面.json",
+      "bytes": 669,
+      "sha256": "8e269a78968ba01b79e124d5ac26d8930552fd0ec29f957a04911711d01f91dc"
+    },
+    {
+      "path": "source-materials/finance/深化调查补充包/业务数据/预算预占流水.json",
+      "bytes": 2781,
+      "sha256": "15e7f2f281845ebf6e6e41f076aad0d11a273939ff8bfe48d56520648b97b735"
+    },
+    {
+      "path": "source-materials/finance/深化调查补充包/数据说明与字段口径.md",
+      "bytes": 4436,
+      "sha256": "b3aa81d65aa6b7e56c5b6b60ce6a105eda42548bea48236593e6ebe01caef2d2"
+    },
+    {
+      "path": "source-materials/finance/角色摘录/cashier.md",
+      "bytes": 2242,
+      "sha256": "853f5424c55acbb17ada2fee4d3e8803b4a0a09dc95af39f16ff5d92d79a477c"
+    },
+    {
+      "path": "source-materials/finance/角色摘录/director.md",
+      "bytes": 2399,
+      "sha256": "da700ab0e98a267b3473b74fcfd4778883444ba18e358705584b3720b01f2f34"
+    },
+    {
+      "path": "source-materials/finance/角色摘录/employee.md",
+      "bytes": 2360,
+      "sha256": "9992eb65e33786a1cf2e99223b69301539d7047c79ac429c2a93bf857b7403a2"
+    },
+    {
+      "path": "source-materials/finance/角色摘录/it.md",
+      "bytes": 2256,
+      "sha256": "07fda8ff15cc384199498211f6caf509bcacb97715de27c59dbcecc95da65fc2"
+    },
+    {
+      "path": "source-materials/finance/角色摘录/manager.md",
+      "bytes": 2434,
+      "sha256": "d2440230433763be3f1f84596825c7e0f1595d3a6caa69e88680719bc77ced8f"
+    },
+    {
+      "path": "source-materials/finance/角色摘录/P102项目预算快照.csv",
+      "bytes": 136,
+      "sha256": "46ae28d78218bc2453b781b358159bf9978c3cdc2af6f9799447af7d21d35bc0"
+    },
+    {
+      "path": "source-materials/finance/角色摘录/reviewer.md",
+      "bytes": 2817,
+      "sha256": "7995cb98f6eac07fb8efb75bf044f81978ab29d678d9315cffac3c069a6adf26"
+    },
+    {
+      "path": "source-materials/finance/角色摘录/出纳已批准-当前报销单.csv",
+      "bytes": 380,
+      "sha256": "e99a135ea64231f3964766f6297f3a1d5aa4fc3a7a9244cb1365c65806725b2e"
+    },
+    {
+      "path": "source-materials/finance/角色摘录/出纳已批准-当前状态事件.csv",
+      "bytes": 1036,
+      "sha256": "f35943bb77ea6748d36b1641041dc239833f90812d0a48b7e4051ce03bfa8f64"
+    },
+    {
+      "path": "source-materials/internal-service/业务数据/历史处理事件.csv",
+      "bytes": 81553,
+      "sha256": "96ba638e51faf4c47e20209dc67e754be8a86d715c06fcdd3b16785406ae9167"
+    },
+    {
+      "path": "source-materials/internal-service/业务数据/历史服务请求.csv",
+      "bytes": 67538,
+      "sha256": "b36b508d4de667e1de49235a2db33ab44ecb4c6720eaa0e213afa28a8ed82db9"
+    },
+    {
+      "path": "source-materials/internal-service/业务数据/岗位账号.csv",
+      "bytes": 1272,
+      "sha256": "f5beed27ebc1fee8a547a278538ef4e5920e7ce27224c47b07280e1c470f0220"
+    },
+    {
+      "path": "source-materials/internal-service/业务数据/已有需求登记.csv",
+      "bytes": 212,
+      "sha256": "8b2b088be1f554bc86373214ccf1260c6c884912fd1eb556d2db69dd105494e2"
+    },
+    {
+      "path": "source-materials/internal-service/业务数据/当前未完事项.csv",
+      "bytes": 836,
+      "sha256": "82d23bd37db886a65e6574f215cf5cef1114e87d2349fd94cca9f32af9ed3634"
+    },
+    {
+      "path": "source-materials/internal-service/业务数据/文件目录与版本.csv",
+      "bytes": 1333,
+      "sha256": "78598e50855dd3d8ed4f55dc32c0ee8b3378dee06074cc1c3b6addd1cf5385bc"
+    },
+    {
+      "path": "source-materials/internal-service/业务数据/项目成员.csv",
+      "bytes": 160,
+      "sha256": "1caba89230c0728a285356ab47ff35fc36e1f6ed552f66ef73ac9e56f912a5a2"
+    },
+    {
+      "path": "source-materials/internal-service/业务文件/01-内部资料导航.md",
+      "bytes": 522,
+      "sha256": "58a12abdd5ace59c7efed45b99d45594ab3256f3727f184109ada2fa231639f6"
+    },
+    {
+      "path": "source-materials/internal-service/业务文件/02-项目看板访问申请-现行.md",
+      "bytes": 607,
+      "sha256": "b2e3be673c3bf0d46c1cc70725d151380a6f9dd18e888ca1e15c366c74b5c54b"
+    },
+    {
+      "path": "source-materials/internal-service/业务文件/03-项目看板访问申请-历史.md",
+      "bytes": 476,
+      "sha256": "33258bfd0a431da6a341ff063586b28cb204343563c35e19a2a592ab92a2d372"
+    },
+    {
+      "path": "source-materials/internal-service/业务文件/04-服务周报口径.md",
+      "bytes": 617,
+      "sha256": "861f718eddbb673c03310d1b404f3d01d3a92e33c2e05f73f058486c504da680"
+    },
+    {
+      "path": "source-materials/internal-service/业务文件/05-9月维护窗口.md",
+      "bytes": 518,
+      "sha256": "c3cea96af1516862eef92b872f382f879fec948121beacbda46f198a1c35996b"
+    },
+    {
+      "path": "source-materials/internal-service/业务文件/06-业务需求登记办法.md",
+      "bytes": 621,
+      "sha256": "89072e9c1cb42eefb22cdbfb2c9a48abbea5e60eaea7b64bc4e85837ec49378a"
+    },
+    {
+      "path": "source-materials/internal-service/业务文件/07-新员工操作说明.md",
+      "bytes": 552,
+      "sha256": "f3e1ffb803313164bc6c64cf6556d4eda5aa25c79db185195d4608222c7442b0"
+    },
+    {
+      "path": "source-materials/internal-service/业务文件/08-PRJ-A交付周报.md",
+      "bytes": 644,
+      "sha256": "f5b5508856f762684996dfc2a33e42c15bdf11bc599634e0fff4e119c06c4cbd"
+    },
+    {
+      "path": "source-materials/internal-service/业务文件/09-经营附件访问说明.md",
+      "bytes": 549,
+      "sha256": "9a21156e2a08cb596c7bf12494b5d9e1981369db1eb374f8d67406e742700fd5"
+    },
+    {
+      "path": "source-materials/internal-service/业务文件/10-服务额度分摊-草稿.md",
+      "bytes": 541,
+      "sha256": "7cc2ab9c8abe462cd91f575b0c683e5eb66f283d91cdf3fd8c12e435c6c1437f"
+    },
+    {
+      "path": "source-materials/internal-service/业务文件/11-服务组交接要求.md",
+      "bytes": 579,
+      "sha256": "f4ba68555def75901a6aae3ce5b2e644cfe0210135b04eb8348a71208fb24205"
+    },
+    {
+      "path": "source-materials/internal-service/业务表单/事项登记空表与填写示例.md",
+      "bytes": 790,
+      "sha256": "be438f47afdb214ab1bb9d17135924bacd3387bfa2bee90ab75a1ea50a6b3e2d"
+    },
+    {
+      "path": "source-materials/internal-service/企业环境/现有导出接口样例.json",
+      "bytes": 702,
+      "sha256": "29958a2f94ab64b5781088a467e1d31413a876326b9f784995ceb13e90ec3f22"
+    },
+    {
+      "path": "source-materials/internal-service/企业环境/现有系统与权限.md",
+      "bytes": 1543,
+      "sha256": "1a6136265c6083e76356fb5b320a3364b8e47b9f1ebd0f894727391fd8907998"
+    },
+    {
+      "path": "source-materials/internal-service/初始材料/01-负责人委托.md",
+      "bytes": 948,
+      "sha256": "90516fa19ad063c921f8fc551723ef250eb60b6b997394b799eae712c9478cac"
+    },
+    {
+      "path": "source-materials/internal-service/初始材料/02-组织与工作安排.md",
+      "bytes": 1200,
+      "sha256": "e29bc60435f9117894c1e60a598870c3179063f6f272c904f1d298f127b7ca59"
+    },
+    {
+      "path": "source-materials/internal-service/初始材料/03-历史导出说明.md",
+      "bytes": 960,
+      "sha256": "8b1bb83c5a84c8e42dc49083d96bd496be30cf1d2870d91a7bad27135c4503c2"
+    },
+    {
+      "path": "source-materials/internal-service/派生岗位摘录/consultant-current.csv",
+      "bytes": 243,
+      "sha256": "ef5996c13f1ab2c52408dcb42bca8ab8039930acbac46ae2d6ded0a9a7788f76"
+    },
+    {
+      "path": "source-materials/internal-service/派生岗位摘录/duty-current.csv",
+      "bytes": 358,
+      "sha256": "03b5b2d8d750b5472349672cfd71441dbee53283c0312e68f384780d22b3a3dd"
+    },
+    {
+      "path": "source-materials/internal-service/派生岗位摘录/duty-events.csv",
+      "bytes": 27221,
+      "sha256": "0a5f08fa0147befb7583efd3192ae2da8d7e5b948086f1dde1b86310f0cda414"
+    },
+    {
+      "path": "source-materials/internal-service/派生岗位摘录/duty-history.csv",
+      "bytes": 22902,
+      "sha256": "b7756041306562aad6eab9c8ba1214e4419df7a004c06ffd50fa5811a70ba737"
+    },
+    {
+      "path": "source-materials/internal-service/派生岗位摘录/interview-consultant.md",
+      "bytes": 1430,
+      "sha256": "ee107979478c0f21f1819f0bf7da3fc97434b3580d6b5bf28f51b81068a52f00"
+    },
+    {
+      "path": "source-materials/internal-service/派生岗位摘录/interview-director.md",
+      "bytes": 4018,
+      "sha256": "743055fd2731bc4e5eefa015b5ade70350fbef88a2110649aab7baa66ec00515"
+    },
+    {
+      "path": "source-materials/internal-service/派生岗位摘录/interview-duty.md",
+      "bytes": 2693,
+      "sha256": "9fbd848ce1c4f8be7a37841e691990fa96c433ae2be9dc58df58ca05f5dada1c"
+    },
+    {
+      "path": "source-materials/internal-service/派生岗位摘录/interview-hr.md",
+      "bytes": 1265,
+      "sha256": "ec5cd96e3104cdf61c16a64bbd588b6d951910d67d0784a3212ec80e0f7f1b6e"
+    },
+    {
+      "path": "source-materials/internal-service/派生岗位摘录/interview-operations.md",
+      "bytes": 2507,
+      "sha256": "93db43240f84acd4923a3feb8f1591ff1d3f6c4beb7007a9b43d90ced973bea0"
+    },
+    {
+      "path": "source-materials/internal-service/派生岗位摘录/interview-product.md",
+      "bytes": 2217,
+      "sha256": "332133fab582752c255940c63069972188668eb91d2269dceafd989d1e9b0d6f"
+    },
+    {
+      "path": "source-materials/internal-service/派生岗位摘录/interview-project.md",
+      "bytes": 2153,
+      "sha256": "f710741cd639fcdbc085901649a6ebfb5538db479889ea6bd8d6296804b8cdfe"
+    },
+    {
+      "path": "source-materials/internal-service/派生岗位摘录/operations-current.csv",
+      "bytes": 232,
+      "sha256": "abf2cdf79c52d5239ad81543ec915347d76056f95d7d75d6a32230d9e2347e59"
+    },
+    {
+      "path": "source-materials/internal-service/派生岗位摘录/product-current.csv",
+      "bytes": 225,
+      "sha256": "2a5bf91c13a5ccabcb6af208d28c200ac99e7cd937d5fc064114b6605ccc2836"
+    },
+    {
+      "path": "source-materials/internal-service/派生岗位摘录/project-current.csv",
+      "bytes": 358,
+      "sha256": "03b5b2d8d750b5472349672cfd71441dbee53283c0312e68f384780d22b3a3dd"
+    },
+    {
+      "path": "source-materials/internal-service/派生岗位摘录/project-members.csv",
+      "bytes": 103,
+      "sha256": "41bc2eb9b2634ea7745ca90d8b7f4f560fe852425a390f578f2ce5845bd360d1"
+    },
+    {
+      "path": "source-materials/internal-service/派生岗位摘录/status-events.csv",
+      "bytes": 55656,
+      "sha256": "aae2f1460fc06abaa62e54f464c6102adea58528aab9b2f8179f5dfc11bc7b11"
+    },
+    {
+      "path": "source-materials/internal-service/派生岗位摘录/status-history.csv",
+      "bytes": 42673,
+      "sha256": "bd1dd2aab55c28618353155d64b04555fb4de78d56fc94e0e2f6d8256a58cef7"
+    },
+    {
+      "path": "source-materials/internal-service/补充调研/C001-沟通记录.md",
+      "bytes": 516,
+      "sha256": "ebe6bbba8e66d700cbee68abdbe2dcfd560aa269346cd5a9e6f2979add18d8eb"
+    },
+    {
+      "path": "source-materials/internal-service/补充调研/C002-沟通记录.md",
+      "bytes": 474,
+      "sha256": "10fbe0bb5d10d1f83f2e7e5de78e5dc8f939c6d4113ff6239fb29d50935ea394"
+    },
+    {
+      "path": "source-materials/internal-service/补充调研/C003-沟通记录.md",
+      "bytes": 438,
+      "sha256": "2be39a7d32189febf076fe42c9776b622b7f14515f14e4c5cb710278a4fc25bf"
+    },
+    {
+      "path": "source-materials/internal-service/补充调研/C004-沟通记录.md",
+      "bytes": 430,
+      "sha256": "884452cb0c16bd4be85f5eb404f53119bdbd7fbc94fc84dd7f3c169ac2493249"
+    },
+    {
+      "path": "source-materials/internal-service/补充调研/C005-沟通记录.md",
+      "bytes": 454,
+      "sha256": "be7055c5ece2839144252d2b19dac423a09bf244c35ebacca08a80cba712908e"
+    },
+    {
+      "path": "source-materials/internal-service/补充调研/C006-沟通记录.md",
+      "bytes": 421,
+      "sha256": "eeeab6954de618ea234d6547067fe61bc145c7503b1f10e9bb42da76cf08304e"
+    },
+    {
+      "path": "source-materials/logistics/企业环境/系统与访问条件.md",
+      "bytes": 1360,
+      "sha256": "0a88d46ed20a1cb38c0919e6deb35b27fa15dd323393914ed14f0a22b38c5079"
+    },
+    {
+      "path": "source-materials/logistics/初始材料/01-负责人委托.md",
+      "bytes": 990,
+      "sha256": "bfa840b995229ed8e5f8a655d7de92bb31fe9d49a9c75507b738ff3e9e637b5f"
+    },
+    {
+      "path": "source-materials/logistics/初始材料/02-岗位与现状流程.md",
+      "bytes": 1442,
+      "sha256": "414df29f09b49935a2d622858fc764419489b58ffeb1df4ad85367f2e539e318"
+    },
+    {
+      "path": "source-materials/logistics/初始材料/03-资料交接与口径提醒.md",
+      "bytes": 1403,
+      "sha256": "1fe31f668629373f6d55cbd8abc10b5a0f2ccf8ac20eaa0418c0e41e43b067d6"
+    },
+    {
+      "path": "source-materials/logistics/岗位摘录/buyer-访谈原话.md",
+      "bytes": 1225,
+      "sha256": "0735704e42adc53ef706a9761b988fab9bf55c32a905dcf97736d2007d17f453"
+    },
+    {
+      "path": "source-materials/logistics/岗位摘录/finance-访谈原话.md",
+      "bytes": 375,
+      "sha256": "5c6270741ead09b29c3f613fef59b6ef8448024559a1ab100f1d278c5bff2bdf"
+    },
+    {
+      "path": "source-materials/logistics/岗位摘录/lead-访谈原话.md",
+      "bytes": 814,
+      "sha256": "961f7a0552dcb10eab651074b4c9562f5add1bf91069ab2db0e5cc46df5e881b"
+    },
+    {
+      "path": "source-materials/logistics/岗位摘录/logistics-访谈原话.md",
+      "bytes": 574,
+      "sha256": "8b986624c8b3ef1b22f91fd2ee6d0f4a5da35bb271806fbd5ea19fccbffb52de"
+    },
+    {
+      "path": "source-materials/logistics/岗位摘录/operations-访谈原话.md",
+      "bytes": 1476,
+      "sha256": "fd7d68956aacd689ed474063c27f39377abcb63bd6a807b94a3820270b41f415"
+    },
+    {
+      "path": "source-materials/logistics/岗位摘录/warehouse-访谈原话.md",
+      "bytes": 1284,
+      "sha256": "23a0ecc835815edb0e4a920fd929196bc8e54099f743c0b1fc6b828d2613a3f0"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/业务原件/DOC01-SH01采购与装箱单.md",
+      "bytes": 2388,
+      "sha256": "b390a28e03067697700df2c5f9f992ed0e64b70ee65cf82a64722b728acd2d49"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/业务原件/DOC02-SH01物流延误通知.md",
+      "bytes": 1793,
+      "sha256": "f5b65bb16753484b7f3ed3a3b5e927ed0ed892da877fe570061908a114a7549e"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/业务原件/DOC03-SH02收货清点与短少登记.md",
+      "bytes": 2148,
+      "sha256": "d949a57ba0f499d1c250fb905cf8c45d635ef7975f604da0b296dd2229fd63f4"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/业务原件/DOC04-SH02隔离与质检待办.md",
+      "bytes": 1978,
+      "sha256": "c89eb5141366fde50d197522f4a6bb0eea347996df30a686e8f9fa905bfcf185"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/业务原件/DOC05-运营活动与广告咨询.md",
+      "bytes": 2063,
+      "sha256": "f198ce69a6806df4c477ee76c9deb8d681f5b6a326c4c7fc00247b5f1a063a5c"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/业务原件/DOC06-S1普通采购报价.md",
+      "bytes": 1878,
+      "sha256": "e6a4945d2731f970826539cf5b553a7697f217b3b335790ed289b37a58ba585a"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/业务原件/DOC07-S1加急现货报价.md",
+      "bytes": 1476,
+      "sha256": "fdc0c90928189694ea1ef4cf2c95483a7fcc16f6c44a1acb3ac9c07facada7dd"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/业务原件/DOC08-新山至吉隆坡调拨核实.md",
+      "bytes": 1919,
+      "sha256": "37f5b34a7fcf7a9534b2d6b954158f1975f9984e65fe48f0ab831610ebe587fa"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/业务原件/DOC09-专项预算与采购批复规则.md",
+      "bytes": 2277,
+      "sha256": "2dd6c14a8412926ce8311e471bbad9d42dbeafd3021ea90ad089cc670d797885"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/业务原件/DOC10-采购物流当前交接单.md",
+      "bytes": 2752,
+      "sha256": "6f64be9d9d677489be42df4ab4b812764249ff5aa62c83093acbcb7a9e46f19b"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/图片/IMG01.png",
+      "bytes": 2405188,
+      "sha256": "8dfb158a174efa7360393b47aca7033e2d8fe18f72b84acefdd5e68c24720c0c"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/图片/IMG02.png",
+      "bytes": 2189087,
+      "sha256": "41ecb3b8305f03982fc762e948196e3dbc20ea458feafa9b44cc0cf87603a177"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/图片/IMG03.png",
+      "bytes": 2623332,
+      "sha256": "44fc04f6fbddf0fe8f55b21fb4dafe9f326111431cbb8ad83250887d06683f57"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/图片/IMG04.png",
+      "bytes": 2512526,
+      "sha256": "1cfbaf6221fc8e3d1b5d6af53d42e1267becb97fc8017b2bfd5ad05a7624e085"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/图片/IMG05.png",
+      "bytes": 2374463,
+      "sha256": "2d96adfb97fad05cc949d954d977f0c09daf52e15ac8d03489c7e4041f4651d9"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/图片/IMG06.png",
+      "bytes": 2520497,
+      "sha256": "5b45aaa9eb9245d2c430e18c55fe029548d959c0ed22d85242d359f89a0064b9"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/数据表/SH02库存衔接.csv",
+      "bytes": 244,
+      "sha256": "7ec36880bc4f1000ed864f81d2fc045992d4bf1a3aa7afc12893ce9298068ed3"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/数据表/仓库与店铺.csv",
+      "bytes": 325,
+      "sha256": "f36395b2170842382422f2c8abde7b0ccfa34472f90128a9d864a1ef83144cdb"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/数据表/供应商供货条件.csv",
+      "bytes": 467,
+      "sha256": "d831134cf656ab449a0426a9724b2da771334167f0efab005166c9a940c0650f"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/数据表/商品主数据.csv",
+      "bytes": 2059,
+      "sha256": "b08c9db204e57ec8b32bfaddf2b0c9ba0b671ff4da0ceb49f09fa2428fca1b8f"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/数据表/商品别名对应.csv",
+      "bytes": 1915,
+      "sha256": "6e4d49e8e77aef228e66fa2f5e8b0d57d3891aeb93d20f86aaf99a9bccfc654d"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/数据表/广告与SKU贡献.csv",
+      "bytes": 717,
+      "sha256": "52d47cbd3f7b945c29667389a9dae1171ebde4ea9344ece535666df369debbf9"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/数据表/收货与质量结果.csv",
+      "bytes": 413,
+      "sha256": "ab691bbb7308fbd8856be053002019b5f13b3f47c0ba1f1f0205e22ec3a6fd6f"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/数据表/数据批次与时效.csv",
+      "bytes": 565,
+      "sha256": "a06806801671cf47d44828f7f6c479cbff35de389c513d7a4eff5131239aebad"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/数据表/每日履约与可售记录.csv",
+      "bytes": 28701,
+      "sha256": "99bb88fdab65f9d1b917cc14cf531d93aa2a4182bb8594d4ca8cacf7385e581f"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/数据表/海外仓库存快照.csv",
+      "bytes": 6223,
+      "sha256": "29a1c7e336827b6ee50085d7e10b59dace3ae3b55f379b52958845e30da8e0b0"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/数据表/箱件清单.csv",
+      "bytes": 772,
+      "sha256": "c2d442d6a24ebde450b5435c9467084b45ad6dadfaff3e19458651a34101ecd7"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/数据表/货运批次.csv",
+      "bytes": 456,
+      "sha256": "2d64c62e03492db8cca97ef2a3d1ca68b222359a84cc512a4f4d5c6c25121da6"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/数据表/运输与调拨选项.csv",
+      "bytes": 488,
+      "sha256": "5e47ba59ba2810e5847048bdd1a0597eae6eee164644dbb3882bbf1096d06848"
+    },
+    {
+      "path": "source-materials/logistics/既有业务资产/数据表/采购行与履约余额.csv",
+      "bytes": 420,
+      "sha256": "d89f764717d04efe8fb0f15f319c7f8182f19dd902addf3496143b251866d681"
+    },
+    {
+      "path": "source-materials/logistics/调查工具/一次供货问题观察表.md",
+      "bytes": 777,
+      "sha256": "b4fee29636f32047b609c04534ee26426868cdfcc26648efd810998fd7b95cff"
+    },
+    {
+      "path": "source-materials/logistics/调查数据/历史供货协作请求.csv",
+      "bytes": 12745,
+      "sha256": "6d4055da785b4acae6120df68e0e22c576d334257195344e59936f6f902608df"
+    },
+    {
+      "path": "source-materials/logistics/调查数据/历史协作节点.csv",
+      "bytes": 15737,
+      "sha256": "bba3a3ea5dff3926442480dfedb946e4a530b7209a019a5c0546b9cd088b8ad4"
+    },
+    {
+      "path": "source-materials/logistics/调查数据/尚缺资料登记.csv",
+      "bytes": 832,
+      "sha256": "b6855d7f459995c6d12a4f4ff66d7c2f49a1893cb34575ff7cf9a0719fdba60b"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/公司委托来信.md",
+      "bytes": 917,
+      "sha256": "9725e40c03c19093698085f77b601477035670d1cce4713f9cf957e24888a711"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/台账/人员与岗位.csv",
+      "bytes": 1684,
+      "sha256": "3f16a9b9a14f0f01e78fd8ff18d398a2eee8bccea0ee10493c10909055fad49b"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/台账/客户角色与作业权限.md",
+      "bytes": 1714,
+      "sha256": "4c4f3511a394ed2775c121b6c63a644d6ddedf930f9c16dccef3aa98eda23f71"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/台账/当前库存预留.csv",
+      "bytes": 507,
+      "sha256": "5ea51a014ee20e2e3506317f5cbb364a44aa24bf957c7d6c0931c98157d32bd9"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/台账/当日人员安排.csv",
+      "bytes": 743,
+      "sha256": "fe8533871f5818809923e66fe8275795cbd8e5baad13de58a50b6f9ecc6dfc79"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/台账/文档版本索引.csv",
+      "bytes": 819,
+      "sha256": "1e2d3aa87ffda6eef4eb6b17f14fb2f5fac41aaeb832feb0d69507b27f56f0b8"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/台账/月度服务范围.csv",
+      "bytes": 372,
+      "sha256": "c732864d9e93d85c127282d758b54aabf39ea07d99680bde887f1c048435f17b"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/台账/设备装机台账.csv",
+      "bytes": 2388,
+      "sha256": "a049ac2b250dec9cd4ac3f779aee9d8c78790041db5bf998306577b9eff9626c"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/台账/配件在途.csv",
+      "bytes": 266,
+      "sha256": "140511288df0bf17bec4178108b465c2d4835fcec248a72f27062277f85af3f4"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/台账/配件库存.csv",
+      "bytes": 693,
+      "sha256": "d53a5520d1b1baac80bac90d75551516d211bb1ab1420f255d7149b7ecdaaefc"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/服务记录/历史事件流水.csv",
+      "bytes": 95049,
+      "sha256": "7445635aa7b18bd507c57716dbb9f75b3afb4e9ddfed40c2e07640537873e218"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/服务记录/历史服务台账.csv",
+      "bytes": 34968,
+      "sha256": "64e1769ff3e0814272aeaa2a51c8e44ab4f504ffd7f84a9df2c969eb0515fec3"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/服务记录/历史过程原件.jsonl",
+      "bytes": 190659,
+      "sha256": "0d564cdb9d27046f3c2b68d1fa3df4ec6383477ade69094c896038389e97a735"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/服务记录/当前任务队列.csv",
+      "bytes": 1927,
+      "sha256": "7e1859ab56c9f2d6e434a67773ea755da1ece20dea3a4648ef336b0794fadbf1"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/服务记录/试机检查单-C008.md",
+      "bytes": 1318,
+      "sha256": "0c2c70f2aa65b338aa16321362d74c3fa676b1f84b56ecae7d8e0fbe4e1a7287"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/现场附件/IMG-现场设备与包装现象.png",
+      "bytes": 2615963,
+      "sha256": "3c50b4718be6942dfeb9b1d83b184dc5f865b146682d565eb5be094741c0f18c"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/现场附件/入厂申请-C005.md",
+      "bytes": 749,
+      "sha256": "625fc9c5765ed2db75b1e9e753d7d1a647c70698e3e412218e3920ef4b022f70"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/现场附件/备件沟通-C006.md",
+      "bytes": 639,
+      "sha256": "0780a41613434a1afca904cc78f46fc4fc570cba884b6976e5c7d1db3840cf82"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/现场附件/备件沟通-C007.md",
+      "bytes": 710,
+      "sha256": "d672b8b1dfc4dc45fd65a2d3700abd89f82ef2ff9ce6b013867ed506f81035a1"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/现场附件/确认追踪-C008.md",
+      "bytes": 646,
+      "sha256": "d01e217651bbe7eec03342dd95d8a1cb401f13955862f281a3aaba0cf1686e86"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/现场附件/铭牌样本-D003.svg",
+      "bytes": 728,
+      "sha256": "53ad3daabe331a434e7a386d220ec873d32fe5459148f44b53f45e0a5e33234a"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/系统与权限/库存接口成功样本.json",
+      "bytes": 626,
+      "sha256": "57265a38a1f41fc632eb8c7552860373e01f9b64a9ae63b4fa4ed958eedfd8b0"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/系统与权限/当前系统与数据环境.md",
+      "bytes": 1297,
+      "sha256": "b9243958fb7f9e211d350c6c2b599ae9c02ca59398925eaf60a020b63b0a644b"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/系统与权限/服务记录导出样本.json",
+      "bytes": 616,
+      "sha256": "54018f6da30ddc9d9e5ec5feaf98aa26cf11c47ed4229fa91e25108e7d2dbfa6"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/系统与权限/角色权限矩阵.csv",
+      "bytes": 941,
+      "sha256": "0581915b6734461dd30cc245652a465297581fa210f5fd989cc352d79990af83"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/系统与权限/超时与旧缓存样本.json",
+      "bytes": 469,
+      "sha256": "bc106fdfa02cb8d8a7eb6049eae312a3ddfedbefa482b07a63eed67b86a81ca7"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/系统与权限/项目权限拒绝样本.json",
+      "bytes": 539,
+      "sha256": "7b9a45915110ffca51468784a1ceccb77483a2cb1178fbf5fdaf37357b745917"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/设备资料/ECN-0820-D001改造通知.md",
+      "bytes": 763,
+      "sha256": "c58a717e42c3c2412fdea801c21e6a5538418a9d42bcdfaa8a067ba406f293f8"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/设备资料/SOP-F48-1.4-A型换型与检查.md",
+      "bytes": 1291,
+      "sha256": "f309e28b74eac6e366229ab90edd092f3df680334b6c3251b20bcba2616fd5a8"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/设备资料/SOP-F48-2.1-B型换型与检查.md",
+      "bytes": 1422,
+      "sha256": "fb41cca5ff24e9f6b7e2845f3c14d93864f947e31c9023ebcf96fe967c17e924"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/设备资料/服务处理规则.md",
+      "bytes": 1485,
+      "sha256": "d8c44581dda4ba0a4c3f547b384bde257bf04769f942b3cc0eab5a7f738af3a2"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/设备资料/班组交接经验簿.md",
+      "bytes": 1284,
+      "sha256": "ec7e064d2913725247265a7d48b1476fb99927c5ad7437688e47569c5ddcecdd"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/设备资料/设备基础与服务边界.md",
+      "bytes": 1929,
+      "sha256": "2548812ebafc5f683355e4d6006f07dab2b79d5222600e03560e63a9dbe0f820"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/设备资料/配件适配表.md",
+      "bytes": 915,
+      "sha256": "6b1f843f8e7fce17eb7b642ba7d9f601fb978fbb9880eb543425234f90782fd3"
+    },
+    {
+      "path": "source-materials/manufacturing/01-初始业务材料/资料索引与字段说明.md",
+      "bytes": 2099,
+      "sha256": "38f350ecfd7f0585771fe948c27a973f90de766c45caa64ecf3f84a94a42f2c9"
+    },
+    {
+      "path": "source-materials/manufacturing/角色摘录/dispatch.md",
+      "bytes": 2300,
+      "sha256": "054d32babcfae62f2113f3770abcbdd4c78949c3364f2e821cfab6a603fb2a2e"
+    },
+    {
+      "path": "source-materials/manufacturing/角色摘录/docs.md",
+      "bytes": 2296,
+      "sha256": "cfe28618535916441631b323d7bb7d49be6523400902b443766107b29ef99ac5"
+    },
+    {
+      "path": "source-materials/manufacturing/角色摘录/it.md",
+      "bytes": 2393,
+      "sha256": "296cb7fa61539c3246c98128f7bb8b54ade190a8d4645c639ff9a25a6d1bdacb"
+    },
+    {
+      "path": "source-materials/manufacturing/角色摘录/junior.md",
+      "bytes": 2228,
+      "sha256": "0127004e17f71e833e12091bceb49781eedc4649887a89def4d93e6b1bd4a8d4"
+    },
+    {
+      "path": "source-materials/manufacturing/角色摘录/lead.md",
+      "bytes": 2390,
+      "sha256": "edd5d7b30b707fe78c61d18b532102689f1f527364282898d9aaf7ddfa3aba21"
+    },
+    {
+      "path": "source-materials/manufacturing/角色摘录/senior.md",
+      "bytes": 2278,
+      "sha256": "a0dc7dcecbb25dae095ddee9d0ada4b9325ce2a244c259350725d9d90ab2eb90"
+    },
+    {
+      "path": "source-materials/manufacturing/角色摘录/warehouse.md",
+      "bytes": 2133,
+      "sha256": "bd98c4e605c5ae80324883628433638a8d4346af19b2c1ff8e73c7e6a475f207"
+    },
+    {
+      "path": "source-materials/operations/初始业务材料/口径与系统/指标词典与版本.md",
+      "bytes": 2723,
+      "sha256": "29226c12f4739513599fe18744a4741a6c347940c4ffcf08422a998b330e2f3a"
+    },
+    {
+      "path": "source-materials/operations/初始业务材料/口径与系统/数据字典与关联.md",
+      "bytes": 3182,
+      "sha256": "e203e03c8eee387c332476295b9f0be8368604511eb7de53b5372d924466d474"
+    },
+    {
+      "path": "source-materials/operations/初始业务材料/口径与系统/数据权限与更新限制.md",
+      "bytes": 2204,
+      "sha256": "d8de21b078b07b26a0b1c48c5c25a16e69a05e1f90da00ed00bf45c60dcac69d"
+    },
+    {
+      "path": "source-materials/operations/初始业务材料/口径与系统/现行SQL样例.sql",
+      "bytes": 1262,
+      "sha256": "298e28c4c44cc04f560bd27527198c6ef2f4491ecb14aefe5d79bb3db9980c11"
+    },
+    {
+      "path": "source-materials/operations/初始业务材料/口径与系统/现行接口业务样例.json",
+      "bytes": 1363,
+      "sha256": "e1404dfe35a87aecbc9fa3bb1a2d8e2d11996c7ad72d162bac0c201831b8be47"
+    },
+    {
+      "path": "source-materials/operations/初始业务材料/已有报表/BI-0914-经营周报.csv",
+      "bytes": 549,
+      "sha256": "17ecdde7af66dfa3f356af31cf43d3b5dd2672e62608335cd7a41da634233d77"
+    },
+    {
+      "path": "source-materials/operations/初始业务材料/已有报表/BI-0914-经营周报.md",
+      "bytes": 1369,
+      "sha256": "ab61420853e33b089005f0c5f9ff1881240963ce78449d078970b2d7a3a46aab"
+    },
+    {
+      "path": "source-materials/operations/初始业务材料/已有报表/BI-OLD-历史看板导出.csv",
+      "bytes": 254,
+      "sha256": "e99cf1450c523ab00213221ef02b60a4e3c76bba550f966aeca85d7a82a4355e"
+    },
+    {
+      "path": "source-materials/operations/初始业务材料/经营数据/channel_spend.csv",
+      "bytes": 2954,
+      "sha256": "7ccc29047dc326540eb2771a8080b2b79c393aafe8bb7cf2c854e4525255d305"
+    },
+    {
+      "path": "source-materials/operations/初始业务材料/经营数据/channels.csv",
+      "bytes": 149,
+      "sha256": "3509d60946622fee9dfff30e72a220a81ed1dd6562afdbf455d9685e80538717"
+    },
+    {
+      "path": "source-materials/operations/初始业务材料/经营数据/daily_kpi.csv",
+      "bytes": 986,
+      "sha256": "8752890737c164a2af7f2526e4e6151db7483855e65317158205bef437af912a"
+    },
+    {
+      "path": "source-materials/operations/初始业务材料/经营数据/order_items.csv",
+      "bytes": 45196,
+      "sha256": "a0bce944244cb3ad309f93d4ff52b464ba78024b35bd3f55a2f6cccc6e01d14c"
+    },
+    {
+      "path": "source-materials/operations/初始业务材料/经营数据/orders.csv",
+      "bytes": 140901,
+      "sha256": "341552fbf652eadc1cab10d3986e2f12ffe90a690b32012fdaa6b0ab3024dab9"
+    },
+    {
+      "path": "source-materials/operations/初始业务材料/经营数据/payments.csv",
+      "bytes": 76382,
+      "sha256": "fcf8b2bf7a2e8f161d3a1364d515fbc903fe8683804d5432017f6218ed917e4c"
+    },
+    {
+      "path": "source-materials/operations/初始业务材料/经营数据/products.csv",
+      "bytes": 173,
+      "sha256": "a3ca2141d75bfd13b8f323208d93d0b1cec4a0c164fb6af22f6dbd944634c13b"
+    },
+    {
+      "path": "source-materials/operations/初始业务材料/经营数据/refunds.csv",
+      "bytes": 4251,
+      "sha256": "45b6687b6d32bd366119aa72dbe4174e3cf3c96ea4b9e501288ef58a8c896ade"
+    },
+    {
+      "path": "source-materials/operations/初始业务材料/经营数据/sessions.csv",
+      "bytes": 392726,
+      "sha256": "a82f702d4003147a5a0c666f8b76f651b92de73fed3e9c0252d3b05934f0cbfc"
+    },
+    {
+      "path": "source-materials/operations/初始业务材料/经营数据/users.csv",
+      "bytes": 154102,
+      "sha256": "ee31995f5cf6eecafad82708ff26c0c04dfa87a915e0f7edd288679a778c2307"
+    },
+    {
+      "path": "source-materials/operations/初始业务材料/需求与工作现场/ANA-0907-分析员原始笔记.md",
+      "bytes": 1288,
+      "sha256": "96c346c426e68866957e53d87e40293ff911a0fb6dcb00c304aa9edf0fdd9985"
+    },
+    {
+      "path": "source-materials/operations/初始业务材料/需求与工作现场/ANA-历史分析工作记录.csv",
+      "bytes": 1181,
+      "sha256": "884820940c55028a41b5e54f75a64d0507894fdf9e0453bfabe89eff2423d5a2"
+    },
+    {
+      "path": "source-materials/operations/初始业务材料/需求与工作现场/REQ-0914-负责人来信.md",
+      "bytes": 806,
+      "sha256": "d91c222e63de7baf6afbd1e8e24679a72063cb89463f260d02c60ae7f67b89bc"
+    },
+    {
+      "path": "source-materials/operations/岗位派生摘录/MEET-0907-会议事实与行动.md",
+      "bytes": 1049,
+      "sha256": "ea2e945cbcf3fc7d5620832bd974024eb1ab8486394f66caef67ed1a4f461c95"
+    },
+    {
+      "path": "source-materials/operations/岗位派生摘录/REQ-analyst.md",
+      "bytes": 325,
+      "sha256": "697abf39cf8e1deed1ba92c1432b22fcb41fbe3ab965e764140093c3274f298c"
+    },
+    {
+      "path": "source-materials/operations/岗位派生摘录/REQ-finance.md",
+      "bytes": 351,
+      "sha256": "b6ae9e20e7dbf82455313cdb78b753fde52ba3a86f7c53a85660bf185448cadc"
+    },
+    {
+      "path": "source-materials/operations/岗位派生摘录/REQ-goods.md",
+      "bytes": 330,
+      "sha256": "d8667d1a49c60f4e6339825cc8ca6254dd06c1c8c6e9ca9153d7f76a2243819c"
+    },
+    {
+      "path": "source-materials/operations/岗位派生摘录/REQ-growth.md",
+      "bytes": 425,
+      "sha256": "b48260f78ef61990fda9611fe914549281102720d9fa982d6f3bbc96f007e1c0"
+    },
+    {
+      "path": "source-materials/operations/岗位派生摘录/REQ-lead.md",
+      "bytes": 265,
+      "sha256": "6661174eb8391c5b31a9c271f10022b3fbb15f0ccce37aa575c31a83a8b97851"
+    },
+    {
+      "path": "source-materials/operations/岗位派生摘录/REQ-member.md",
+      "bytes": 319,
+      "sha256": "b513a035b618d5442d51ffda04aecfee093716c33733609a61456be12a1c22ca"
+    },
+    {
+      "path": "source-materials/operations/岗位派生摘录/SUP-04-analyst.md",
+      "bytes": 833,
+      "sha256": "82ef89a6288f5d96b5c36c4e421147684632d6e5f0968d6cb7d646248dec304e"
+    },
+    {
+      "path": "source-materials/operations/岗位派生摘录/SUP-04-finance.md",
+      "bytes": 787,
+      "sha256": "f0df4cabc83bcfe15fdba61d04cebd0d3768a7dacd1eeec166028c61f93d91ca"
+    },
+    {
+      "path": "source-materials/operations/补充访谈与业务原件/SUP-01-增长访谈与活动台账.md",
+      "bytes": 1763,
+      "sha256": "ea7d31c54138b28ce5ccdae5dda09bed20270e835a090cd949c0f4c348c553a2"
+    },
+    {
+      "path": "source-materials/operations/补充访谈与业务原件/SUP-02-支付平台值班记录.md",
+      "bytes": 1472,
+      "sha256": "708232b5d09c132c76b11d9fec2239a1b23050322d9d9113437f2946bf35440b"
+    },
+    {
+      "path": "source-materials/operations/补充访谈与业务原件/SUP-03-商品与客服往来.md",
+      "bytes": 1396,
+      "sha256": "fa441f9097a0d6fc9ff6606af8c955c107a3cdfa6f8b34e7b6d32206b191e923"
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "bytes": 103151,
+      "sha256": "f3b90d1894bde8a1926e568adf4ea2c8c759b6ed631ccb58909c32ebda5605bc"
+    }
+  ]
+}

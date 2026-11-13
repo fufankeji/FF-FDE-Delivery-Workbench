@@ -10,7 +10,7 @@
 **/build/
 **/.cache/
 **/.artifacts/
-# Rebuildable discovery-lab material payload imported from the delivery archive.
+# Legacy local-only payload; shipped discovery-lab/assets is versioned source.
 /upstream/deepseek-harness/packages/fde/discovery-lab/.assets/
 **/.dsh-build/
 **/coverage/
@@ -20,6 +20,7 @@
 # Local caches and transient files.
 **/.DS_Store
 **/.pytest_cache/
+**/__pycache__/
 **/.mypy_cache/
 **/.ruff_cache/
 **/.uv-cache/

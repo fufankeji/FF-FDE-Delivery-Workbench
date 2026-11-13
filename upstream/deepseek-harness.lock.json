@@ -1,10 +1,10 @@
 {
   "repository": "https://github.com/deepseek-ai/deepseek-harness.git",
-  "commit": "687f282e8625c6b8d11ff58211a90524be2e4317",
-  "release": "0.2.1-rc.2",
-  "tag": "dsh-v0.2.1-rc.2",
-  "previousCommit": "0a15e36e7f82b6ed45af6fa9759f29b40dcd965d",
-  "previousRelease": "0.1.6-alpha.1",
+  "commit": "ddac96760b6edf8fa0fe17cbdcf0b512f4c12b2c",
+  "release": "0.2.2-rc.2",
+  "tag": "dsh-v0.2.2-rc.2",
+  "previousCommit": "687f282e8625c6b8d11ff58211a90524be2e4317",
+  "previousRelease": "0.2.1-rc.2",
   "checkout": "upstream/deepseek-harness",
-  "lockedAt": "2026-10-23"
+  "lockedAt": "2026-11-12"
 }

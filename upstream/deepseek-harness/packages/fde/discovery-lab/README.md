@@ -6,15 +6,17 @@ Independent Host plugin for business-discovery training. It serves five versione
 
 ## Setup and storage
 
-From the Harness root, run `corepack pnpm --filter @deepseek-ai/dsh-fde-discovery-lab import:assets /absolute/path/to/FDE-业务挖掘实验室-完整交付-v0.3.2-2026-09-15.zip` before starting the existing Web profile. The importer verifies the pinned runtime digest and every authorized asset. See [source and adaptation notes](SOURCE.md). Node 24+ and Python 3.9+ are required; `FDE_PYTHON` can select the Python executable.
+Required material for all five cases ships in the source and package `assets/` directory; normal installation needs no extra ZIP. Before installing dependencies, run `node packages/fde/discovery-lab/scripts/verify-assets.mjs` from the Harness root; the complete build also verifies the material. See [source and adaptation notes](SOURCE.md). Node 24.9+ and Python 3.9+ are required; `FDE_PYTHON` can select the Python executable. `import:assets` remains a maintainer tool for reproducing identical content from the pinned original delivery, not an installation prerequisite.
 
-Start with explicit `DSH_HOME`. Case assets reside in package-local `.assets/` (about 36 MB, regenerable); mutable training state resides in `$DSH_HOME/fde-discovery-lab/training.sqlite`. Native logs stay in the Host session backend. Keep both database and native logs when preserving training. Re-importing assets never overwrites training.
+Start with explicit `DSH_HOME`. Fixed material resides in package-local `assets/` (248 files, about 36.7 MB); `assets-manifest.json` checks sizes, digests and the 234 case-original references. Mutable training state resides in `$DSH_HOME/fde-discovery-lab/training.sqlite`, and native logs stay in the Host session backend. Keep both database and native logs when preserving training; restoring static material never overwrites training.
 
-Routes are `/api/fde-discovery-lab` and `/fde-discovery-lab`. The latter serves only the three built Client application files, never case definitions. The shared Host/Origin/Fetch-Metadata check applies to both routes. Missing assets produce an explicit 503 for this module without removing existing workbench routes.
+Routes are `/api/fde-discovery-lab` and `/fde-discovery-lab`. The latter serves only the three built Client application files, never case definitions. The shared Host/Origin/Fetch-Metadata check applies to both routes. Missing or damaged material produces an explicit 503 for this module: obtain the complete source, build and restart without deleting training data. This state is not a successful installation.
 
 ## Model Experience
 
 Opening the lobby, selecting a role and restoring records do not call a model. Submitting an interview invokes a role-owned native Agent restricted to `lookupRoleFacts` and `offerCaseAsset`; committed replies can trigger a separate evidence-check Agent. Report generation also uses a separate Agent, after required evidence is complete. Helpers have no business or workspace tools. These actions can incur provider charges.
+
+Each training Agent mounts `dsh-tool-executor-native` in its own scope and retains its tool allowlist and guard. It does not inherit a project's PTC mode or change global tool configuration.
 
 The original training route is retained: `DEEPSEEK_PROVIDER` defaults to `deepseek-official`, and `DEEPSEEK_MODEL` to `deepseek-v4-flash`. Credentials come from the existing Host provider configuration. Training does not follow or change a project's model picker.
 
@@ -32,4 +34,4 @@ Role prompts are stable within a case version. Each role has its own durable nat
 - No report backflow, project creation or automatic stage advancement.
 - HTTP routes require Connection's authenticated owner identity and same-origin request checks. Local binding is the default; explicit LAN access uses a concrete `--host` IP and the startup authorization URL. The retired `--lan` flag cannot disable authentication.
 - Deterministic tests and scripted native integration do not establish live-model answer quality or visual acceptance.
-- Source delivery has no declared overall public redistribution license; the integration packages remain private.
+- The user authorized this repository and student bundles to carry the runtime-allowlisted material. Original notices and font licensing remain; the integration packages stay private / UNLICENSED without a new blanket MIT license.

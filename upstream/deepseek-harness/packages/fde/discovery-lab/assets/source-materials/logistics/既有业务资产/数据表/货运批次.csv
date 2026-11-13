@@ -1,0 +1,4 @@
+﻿shipment_id,po_line_id,from_node,to_warehouse,declared_qty,received_qty,carton_count,status,old_saleable_date,current_saleable_date,status_time
+SH01,PO-260901-01-L1,W-CN,W-KL,48,0,2,跨境运输中,2026-09-18,2026-09-22,2026-09-10T08:30:00+08:00
+SH02,PO-260903-02-L1,W-CN,W-KL,72,68,3,已清点有差异待结案,2026-09-09,,2026-09-09T17:00:00+08:00
+SH03,PO-260905-03-L1,W-CN,W-KL,96,0,4,计划批次未发运,,2026-09-25,2026-09-09T16:00:00+08:00

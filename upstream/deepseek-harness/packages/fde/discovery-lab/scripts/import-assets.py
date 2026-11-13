@@ -11,7 +11,7 @@ import zipfile
 RUNTIME_SHA256 = "2c68c7b2ef51f6e92c1cb00e796dbbdb249362eb249821152a9f26128e057678"
 RUNTIME_ENTRY = "FDE-业务挖掘实验室-v0.3.2/安装包/jiutian-fde-discovery-lab-0.3.2.tgz"
 CASE_IDS = {"finance", "manufacturing", "operations", "internal-service", "logistics"}
-TARGET = Path(__file__).resolve().parents[1] / ".assets"
+TARGET = Path(__file__).resolve().parents[1] / "assets"
 
 def main():
     if len(sys.argv) != 2:

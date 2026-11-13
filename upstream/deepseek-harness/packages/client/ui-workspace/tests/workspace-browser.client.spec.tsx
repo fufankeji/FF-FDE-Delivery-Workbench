@@ -2,7 +2,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, createEvent, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { ReactNode } from 'react'
-import { bindSnapshotSelector } from '@deepseek-ai/dsh-client-test-runtime'
+import { bindSnapshotSelector, contextMenuHook } from '@deepseek-ai/dsh-client-test-runtime'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { SessionListState, SessionSummary } from '@deepseek-ai/dsh-api-session-controller/client'
 import type { WorkspaceId, WorkspaceSnapshot as WorkspaceListState, WorkspaceView } from '@deepseek-ai/dsh-api-workspace-controller/client'
@@ -15,6 +15,7 @@ import {
   defaultProjectDirectoryName, isValidProjectDirectoryName, WorkspaceBrowser,
 } from '../src/client/rows/WorkspaceBrowser.tsx'
 import { zh } from '../src/client/locales.ts'
+import { SECTION_HOOK_CONTEXT } from './section-scroller.client.ts'
 
 const projectProgressListeners: EventListener[] = []
 
@@ -73,9 +74,15 @@ function dragData(): Pick<DataTransfer, 'effectAllowed' | 'dropEffect' | 'setDat
 function mount(overrides: Partial<WorkspaceBrowserProps> = {}) {
   const store = createWorkspaceViewStore().create()
   const props: WorkspaceBrowserProps = {
+    ...SECTION_HOOK_CONTEXT,
+    useContextMenu: contextMenuHook(),
     useRemoteAccess: () => true, useSessionAccess: () => true, useWorkspaceAccess: () => true, useSessionRetainInfo: () => undefined,
     wide: true,
     expandSidebar: vi.fn(),
+    renderFactorySlot: () => null,
+    settleWorkspaceAction: vi.fn(),
+    useWorkspaceActionRequest: hook(null),
+    useContextMenuTarget: hook(null),
     usePanelInfo: selector => selector({ activePanelId: null }), useSessionStatus: selector => selector(new Map()), useResource: (() => undefined) as never, useSessions: hook(sessionState([])),
     useWorkspaces: hook(workspaceState([])),
     useWorkspaceShortcuts: (() => undefined) as never,

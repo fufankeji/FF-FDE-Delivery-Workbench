@@ -1,0 +1,202 @@
+{
+  "coded_by": "财务审核与调查人员共同复核",
+  "method": "Q1业务说明不足/Q2归属不明/Q3预算口径待核/Q4制度例外/Q5变更后待重确认/Q6付款依据衔接；非互斥",
+  "rows": [
+    {
+      "sample_id": "EXH001",
+      "issue_code": "Q1",
+      "observation_event_id": "EXH001-E01",
+      "resolution_event_id": "EXH001-R01",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    },
+    {
+      "sample_id": "EXH001",
+      "issue_code": "Q2",
+      "observation_event_id": "EXH001-E02",
+      "resolution_event_id": "EXH001-R02",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    },
+    {
+      "sample_id": "EXH002",
+      "issue_code": "Q2",
+      "observation_event_id": "EXH002-E01",
+      "resolution_event_id": "EXH002-R01",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    },
+    {
+      "sample_id": "EXH002",
+      "issue_code": "Q3",
+      "observation_event_id": "EXH002-E02",
+      "resolution_event_id": "EXH002-R02",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    },
+    {
+      "sample_id": "EXH003",
+      "issue_code": "Q4",
+      "observation_event_id": "EXH003-E01",
+      "resolution_event_id": "EXH003-R01",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    },
+    {
+      "sample_id": "EXH004",
+      "issue_code": "Q5",
+      "observation_event_id": "EXH004-E01",
+      "resolution_event_id": "EXH004-R01",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    },
+    {
+      "sample_id": "EXH004",
+      "issue_code": "Q6",
+      "observation_event_id": "EXH004-E02",
+      "resolution_event_id": "EXH004-R02",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    },
+    {
+      "sample_id": "EXH006",
+      "issue_code": "Q1",
+      "observation_event_id": "EXH006-E01",
+      "resolution_event_id": "EXH006-R01",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    },
+    {
+      "sample_id": "EXH007",
+      "issue_code": "Q2",
+      "observation_event_id": "EXH007-E01",
+      "resolution_event_id": "EXH007-R01",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    },
+    {
+      "sample_id": "EXH008",
+      "issue_code": "Q3",
+      "observation_event_id": "EXH008-E01",
+      "resolution_event_id": "EXH008-R01",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    },
+    {
+      "sample_id": "EXH009",
+      "issue_code": "Q4",
+      "observation_event_id": "EXH009-E01",
+      "resolution_event_id": "EXH009-R01",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    },
+    {
+      "sample_id": "EXH009",
+      "issue_code": "Q5",
+      "observation_event_id": "EXH009-E02",
+      "resolution_event_id": "EXH009-R02",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    },
+    {
+      "sample_id": "EXH011",
+      "issue_code": "Q1",
+      "observation_event_id": "EXH011-E01",
+      "resolution_event_id": "EXH011-R01",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    },
+    {
+      "sample_id": "EXH011",
+      "issue_code": "Q2",
+      "observation_event_id": "EXH011-E02",
+      "resolution_event_id": "EXH011-R02",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    },
+    {
+      "sample_id": "EXH012",
+      "issue_code": "Q5",
+      "observation_event_id": "EXH012-E01",
+      "resolution_event_id": "EXH012-R01",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    },
+    {
+      "sample_id": "EXH012",
+      "issue_code": "Q6",
+      "observation_event_id": "EXH012-E02",
+      "resolution_event_id": "EXH012-R02",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    },
+    {
+      "sample_id": "EXH013",
+      "issue_code": "Q3",
+      "observation_event_id": "EXH013-E01",
+      "resolution_event_id": "EXH013-R01",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    },
+    {
+      "sample_id": "EXH015",
+      "issue_code": "Q1",
+      "observation_event_id": "EXH015-E01",
+      "resolution_event_id": "EXH015-R01",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    },
+    {
+      "sample_id": "EXH015",
+      "issue_code": "Q4",
+      "observation_event_id": "EXH015-E02",
+      "resolution_event_id": "EXH015-R02",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    },
+    {
+      "sample_id": "EXH016",
+      "issue_code": "Q2",
+      "observation_event_id": "EXH016-E01",
+      "resolution_event_id": "EXH016-R01",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    },
+    {
+      "sample_id": "EXH016",
+      "issue_code": "Q3",
+      "observation_event_id": "EXH016-E02",
+      "resolution_event_id": "EXH016-R02",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    },
+    {
+      "sample_id": "EXH017",
+      "issue_code": "Q5",
+      "observation_event_id": "EXH017-E01",
+      "resolution_event_id": "EXH017-R01",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    },
+    {
+      "sample_id": "EXH019",
+      "issue_code": "Q1",
+      "observation_event_id": "EXH019-E01",
+      "resolution_event_id": "EXH019-R01",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    },
+    {
+      "sample_id": "EXH020",
+      "issue_code": "Q2",
+      "observation_event_id": "EXH020-E01",
+      "resolution_event_id": "EXH020-R01",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    },
+    {
+      "sample_id": "EXH020",
+      "issue_code": "Q4",
+      "observation_event_id": "EXH020-E02",
+      "resolution_event_id": "EXH020-R02",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    },
+    {
+      "sample_id": "EXH021",
+      "issue_code": "Q3",
+      "observation_event_id": "EXH021-E01",
+      "resolution_event_id": "EXH021-R01",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    },
+    {
+      "sample_id": "EXH021",
+      "issue_code": "Q5",
+      "observation_event_id": "EXH021-E02",
+      "resolution_event_id": "EXH021-R02",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    },
+    {
+      "sample_id": "EXH021",
+      "issue_code": "Q6",
+      "observation_event_id": "EXH021-E03",
+      "resolution_event_id": "EXH021-R03",
+      "classification_basis": "按本事件描述记录的问题机制；六类可重叠"
+    }
+  ]
+}

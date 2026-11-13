@@ -1,0 +1,91 @@
+{
+  "notice": "教学样例，未连接服务；所有URL为不可调用示意",
+  "snapshot_at": "2026-09-14T09:00:00+08:00",
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/oa/v1/trips/A001",
+      "scope": "oa.trip.read:self",
+      "response": {
+        "application_id": "A001",
+        "employee_id": "E01",
+        "department_id": "D01",
+        "destination": "南京",
+        "departure_date": "2026-09-07",
+        "return_date": "2026-09-09",
+        "task": "工业振动监测样机验证现场联调",
+        "project_id": "P101",
+        "project_condition": "项目负责人已确认",
+        "approved_at": "2026-09-04T16:00:00+08:00",
+        "approver_id": "M01",
+        "estimated_yuan": "2600.00",
+        "policy_version": "V2.1"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/prj/v1/projects/P101",
+      "scope": "prj.read:assigned",
+      "response": {
+        "project_id": "P101",
+        "name": "工业振动监测样机验证",
+        "owner_id": "M01",
+        "department_id": "D01",
+        "budget_yuan": "240000",
+        "available_yuan": "56300",
+        "status": "执行中"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/exp/sandbox/drafts",
+      "availability": "待集团授权",
+      "headers": {
+        "Idempotency-Key": "demo-C001-revision-1"
+      },
+      "body": {
+        "external_claim_id": "C001",
+        "application_id": "A001",
+        "employee_id": "E01",
+        "project_id": "P101",
+        "gross_yuan": "2106.00",
+        "attachment_refs": [
+          "DOC-C001-出差申请-v1"
+        ]
+      },
+      "response_example": {
+        "draft_id": "DEMO-DRAFT-001",
+        "state": "DRAFT",
+        "version": 1,
+        "submission_authorized": false
+      }
+    }
+  ],
+  "failures": [
+    {
+      "http": 403,
+      "code": "SCOPE_NOT_GRANTED",
+      "meaning": "审批权限未授予；不重试为更高权限"
+    },
+    {
+      "http": 409,
+      "code": "VERSION_CONFLICT",
+      "meaning": "原单已变化；读取后比较，保留人工修改"
+    },
+    {
+      "http": 429,
+      "code": "RATE_LIMIT",
+      "retry_after_seconds": 30
+    },
+    {
+      "http": 504,
+      "code": "UPSTREAM_TIMEOUT",
+      "meaning": "先凭幂等键查原请求，不能盲目重复创建"
+    },
+    {
+      "http": 410,
+      "code": "ATTACHMENT_LINK_EXPIRED",
+      "meaning": "用稳定附件ID重新申请授权链接"
+    }
+  ]
+}

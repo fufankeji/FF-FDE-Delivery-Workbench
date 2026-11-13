@@ -1,9 +1,10 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import type { SessionEvent } from '@deepseek-ai/dsh-session'
-import type { SessionProjectionStateMap } from '@deepseek-ai/dsh-session-projection/types'
 import { createMessage } from '@deepseek-ai/dsh-llm'
 import { sessionActivityProjectionDefinition as definition } from '../src/activity.ts'
 import type { SessionActivityBucket } from '../src/types.ts'
+
+type ActivityState = Parameters<typeof definition.apply>[0]
 
 const at = (time: number, type: string, data: unknown) => {
   const payload = data as { turn: number; step: number; chunk?: unknown }
@@ -15,9 +16,9 @@ const fold = (events: SessionEvent[]) => definition.wire.view(events.reduce(defi
 
 describe('request-dated activity', () => {
   it('keeps the registered state and checkpoint schema concrete', () => {
-    expectTypeOf<SessionProjectionStateMap['sessionActivity']>().not.toBeAny()
+    expectTypeOf<ActivityState>().not.toBeAny()
     expectTypeOf<ReturnType<typeof definition.stateSchema.parse>>()
-      .toEqualTypeOf<SessionProjectionStateMap['sessionActivity']>()
+      .toEqualTypeOf<ActivityState>()
     expectTypeOf<ReturnType<typeof definition.wire.view>['buckets'][number]>()
       .toEqualTypeOf<SessionActivityBucket>()
     expect(definition.stateSchema.parse(definition.init())).toEqual(definition.init())

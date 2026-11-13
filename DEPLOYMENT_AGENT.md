@@ -4,14 +4,14 @@
 >
 > 本文是部署操作指南，不是让 Agent 继续开发产品的需求书。默认不修改业务代码、不开放公网、不调用付费模型、不迁移作者的个人运行数据。
 
-快速导航：[Agent 提示词](#2-可以直接交给-agent-的任务提示词) · [部署范围](#3-先选择部署范围) · [环境检查](#5-环境检查与安装前报告) · [Git / ZIP](#6-获取完整源码git-与-zip-两条路径) · [macOS / Linux](#7-macos--linux标准部署流程) · [Windows](#8-windows-powershell对应流程) · [实验室](#9-实验室素材与-python-的详细规则) · [模型配置](#10-模型配置部署与计费验证分开) · [部署验收](#11-最小部署验收只读技术检查--人工体验) · [故障处理](#16-常见故障与最小处理) · [交付记录](#17-agent-最终部署记录模板)
+快速导航：[Agent 提示词](#2-可以直接交给-agent-的任务提示词) · [部署范围](#3-先选择部署范围) · [环境检查](#5-环境检查与安装前报告) · [Git / ZIP](#6-获取完整源码git-与-zip-两条路径) · [macOS / Linux](#7-macos--linux标准部署流程) · [Windows](#8-windows-powershell对应流程) · [实验室](#9-实验室内置素材与-python) · [模型配置](#10-模型配置部署与计费验证分开) · [部署验收](#11-最小部署验收只读技术检查--人工体验) · [故障处理](#16-常见故障与最小处理) · [交付记录](#17-agent-最终部署记录模板)
 
 ## 1. 适用版本与完成标准
 
-本文已于 **2026-10-23** 随兼容升级更新，锁定官方基座为 `dsh-v0.2.1-rc.2`：
+本文已于 **2026-11-12** 随兼容升级更新，锁定官方基座为 `dsh-v0.2.2-rc.2`：
 
 ```text
-687f282e8625c6b8d11ff58211a90524be2e4317
+ddac96760b6edf8fa0fe17cbdcf0b512f4c12b2c
 ```
 
 这不是要求所有接收者强制切换到该提交。实际分享版本以交付者提供的 Git 提交或源码包版本为准；如果依赖版本、脚本或目录已经变化，先对照实际源码调整部署计划，不要照抄过期命令。
@@ -24,7 +24,7 @@
 2. 启动的是这份源码对应的 Host，显式使用本次部署的 `DSH_HOME`。
 3. 首页返回 `200`，Boot Manifest 存在，关键在线插件与本地构建产物一致。
 4. 项目登记和用户选择的部署范围一致，没有误读作者或其他实例的数据。
-5. 若选择实验室，五个案例可读取；若缺少授权素材，必须标记实验室未完成。
+5. 若选择实验室，五个案例可读取；若内置素材缺失或损坏，必须标记安装未完成。
 6. 交付访问地址、实际数据路径、停止及重启方法，并说明模型、视觉与可选能力哪些尚未验证。
 
 不要把“网页能打开”“安装命令执行过”或“示例自带通过记录”等同于全部功能验收通过。
@@ -40,15 +40,15 @@
 本次任务是部署与验收，不是修改产品功能。
 
 默认范围：本机访问 + 导入仓库附带的 FDE-Agent 示例项目。
-如果我另行提供了获授权的业务挖掘实验室 0.3.2 完整交付 ZIP，增加实验室素材导入；
-没有 ZIP 时先完成工作台，不下载来历不明的素材、不伪造案例。
+五案例实验室素材已随源码提供，必须检查完整性，不再索取额外素材 ZIP；
+未配置模型时也应能读取案例列表和岗位说明，不伪造访谈或模型结果。
 
 请按以下顺序执行：
 1. 检查源码完整性、操作系统、Node、Corepack/pnpm、端口及已有运行数据。
 2. 告诉我将使用的源码路径、部署范围、端口、DSH_HOME 和缺失依赖。
 3. 在 upstream/deepseek-harness 中按锁文件安装并完整构建。
 4. 如需示例，仅用仓库导入脚本写入一个不存在的新目标目录。
-5. 必要时导入授权实验室素材，然后显式指定 DSH_HOME，以 127.0.0.1 启动。
+5. 校验内置实验室素材，然后显式指定 DSH_HOME，以 127.0.0.1 启动。
 6. 完成本文的只读技术验收，给我地址进行人工体验；没有授权不做自动浏览器回放。
 7. 按本文模板输出部署记录，明确哪些通过、哪些未配置、哪些待人工确认。
 
@@ -68,24 +68,17 @@
 | --- | --- | --- | --- |
 | A：空白工作台 | 完整仓库源码 | 打开工作台、使用无密钥界面与本地能力 | 自行创建或选择项目；真实 Agent 对话需模型 |
 | B：工作台 + FDE-Agent 示例，默认推荐 | 完整源码，含 `source-materials/fde-agent/` | 查看八阶段材料、原件、历史图谱；运行示例业务系统 | 用导入脚本创建独立 Workspace |
-| C：A 或 B + 业务挖掘实验室 | 以上内容 + 单独获授权的实验室 ZIP | 进入实验室、浏览案例与已有资料 | Python；访谈、核对、报告等模型操作另需授权配置 |
+| C：A 或 B + 完整实验室训练能力 | 完整源码内已包含五案例素材 | 进入实验室、浏览案例和岗位；训练资料仍按岗位授权取得 | 计算需要 Python；访谈、核对、报告等模型操作另需授权配置 |
 | 可选：重新运行 Semantica | A 或 B + 接收者自己的兼容 SDK 环境 | 不影响原有历史图谱展示 | Semantica `0.6.7` 及其依赖；见第 13 节 |
 
 ### 3.1 源码不包含什么
 
 - 不包含作者的模型密钥、个人会话、全局 `~/.dsh`、生产账号。
 - 不包含可直接沿用的 `node_modules`、编译产物或 Python 虚拟环境。
-- 不包含业务挖掘实验室约 **36 MB** 的导入后授权素材；该目录被 Git 忽略。
 - 不包含 Semantica SDK 源码或它的完整 Python 环境。
 - 不包含可直接宣称为客户验收结果的真实生产数据。
 
-完整实验室交付 ZIP 的名称为：
-
-```text
-FDE-业务挖掘实验室-完整交付-v0.3.2-2026-09-15.zip
-```
-
-没有这个获授权的交付物，仍可完成 A/B，但不能将 C 标为完成。拥有工作台源码访问权限，不自动代表拥有实验室素材的公开再分发权。
+五案例运行素材约 36.7 MB，已随源码提供；A/B 同样应通过素材完整性与案例列表检查。原第三方声明和字体许可继续适用，本次发放不意味着给所有内容另行授予整体开源许可。
 
 ## 4. 认识目录：不要从错误的入口启动
 
@@ -105,7 +98,7 @@ FDEDeliveryWorkbench/                         ← 本文所说的仓库根目录
 │   ├── patches/
 │   ├── apps/
 │   └── packages/
-│       ├── fde/discovery-lab/.assets/         ← 导入后的可重建实验室素材
+│       ├── fde/discovery-lab/assets/          ← 随源码提供的固定实验室素材
 │       └── client/ui-fde-discovery-lab/       ← 实验室界面及构建入口
 └── .runtime/                                 ← 本机可变数据，不进 Git
     ├── dsh-home/                             ← A：空白工作台运行区
@@ -128,14 +121,14 @@ FDEDeliveryWorkbench/                         ← 本文所说的仓库根目录
 
 | 项目 | 本文采用的基线 | 说明 |
 | --- | --- | --- |
-| Node.js | **24.x** | 用作统一部署基线；实验室使用 `node:sqlite` |
+| Node.js | **24.x，且不低于 24.9.0** | Harness 新版要求；实验室使用 `node:sqlite` |
 | pnpm | **11.28.5** | 以 Harness `package.json` 的 `packageManager` 为准，通过 Corepack 调用 |
 | Corepack | 能执行锁定的 pnpm | 是否随 Node 发行包提供取决于安装方式；缺失时先确认安装方案 |
 | Git | 克隆、更新时需要 | 仓库 Hook 安装器要求 Git 2.26+；源码 ZIP 不强制包含 `.git` |
 | Python | 实验室需要 **3.9+** | 导入器与固定计算脚本使用；普通示例浏览不需要 |
 | 浏览器 | 目标机可用的现代浏览器 | 默认由用户手动打开，不要求安装额外自动化浏览器 |
 
-Harness 包声明的 Node 范围为 `^22.19.0 || >=24.0.0`，但本文涉及实验室，因此统一使用 24.x，避免把“满足部分包的 engines”误当作全部所选功能兼容。
+Harness 包声明的 Node 范围为 `>=24.9.0`；本手册以满足此下限的 24.x 为部署基线，不再支持沿用 Node 22 或早于 24.9 的运行环境。
 
 安装需要访问包注册表及锁文件引用的 GitHub 下载地址。构建依赖和产物会占用明显多于源码的磁盘空间；先检查剩余容量。本文不把未经目标环境测量的内存、磁盘数值写成硬性最低要求。
 
@@ -329,9 +322,9 @@ export FDE_DSH_HOME="$FDE_REPO_ROOT/.runtime/fde-agent-second/dsh-home"
 
 不允许通过复制一个 `project/` 文件夹、上传附件或手改阶段 JSON 来替代导入流程。
 
-### 7.4 仅 C：导入实验室素材
+### 7.4 校验内置实验室素材
 
-按第 9 节完成素材导入。如果不部署实验室，直接进入下一步。
+按第 9 节执行素材完整性检查；不得因未配置模型而跳过必需静态内容。需要计算时再准备 Python。
 
 ### 7.5 启动工作台
 
@@ -389,14 +382,12 @@ if ($LASTEXITCODE -ne 0) { throw '示例导入失败，保留现场并检查原�
 
 ### 8.3 Python 与实验室
 
-如果系统有真正可执行的 `python3`，可以采用第 9 节的 pnpm 导入入口。
-
-若只有 Windows Python Launcher `py`，可直接调用同一个导入脚本：
+素材校验使用 Node，不需要 Python 或额外 ZIP。确定性计算需要 Python 3.9+；若使用 Windows Python Launcher `py`，可按下列方式指定真正的解释器：
 
 ```powershell
 Set-Location (Join-Path $FdeRepoRoot 'upstream\deepseek-harness')
-py -3 packages/fde/discovery-lab/scripts/import-assets.py 'C:\Packages\FDE-业务挖掘实验室-完整交付-v0.3.2-2026-09-15.zip'
-if ($LASTEXITCODE -ne 0) { throw '实验室素材导入失败。' }
+node packages/fde/discovery-lab/scripts/verify-assets.mjs
+if ($LASTEXITCODE -ne 0) { throw '实验室内置素材不完整。' }
 
 # FDE_PYTHON 需要真实的可执行文件路径，不能填成字符串 "py -3"。
 $FdePythonExe = (py -3 -c 'import sys; print(sys.executable)').Trim()
@@ -415,42 +406,25 @@ corepack pnpm dsh web --no-open --host 127.0.0.1 --port $FdeWebPort
 
 Windows 若遇到原生依赖编译问题，先判断包是否提供当前平台预构建；只有明确需要编译时，再说明并安装对应 C++/Python 工具链。不要为了消除报错而禁用整个安全策略、删除原生依赖或大范围修改包版本。
 
-## 9. 实验室素材与 Python 的详细规则
+## 9. 实验室内置素材与 Python
 
-### 9.1 导入命令
+### 9.1 素材自带与只读检查
 
-macOS/Linux，在 Harness 目录执行，替换为真实绝对路径并保留引号：
+完整 GitHub 源码和学员 ZIP 已包含五案例运行素材，无需另行领取或导入旧交付 ZIP。从仓库根执行：
 
 ```bash
-cd "$FDE_REPO_ROOT/upstream/deepseek-harness"
-corepack pnpm --filter @deepseek-ai/dsh-fde-discovery-lab import:assets \
-  "/absolute/path/to/FDE-业务挖掘实验室-完整交付-v0.3.2-2026-09-15.zip"
+node upstream/deepseek-harness/packages/fde/discovery-lab/scripts/verify-assets.mjs
 ```
 
-pnpm 入口调用 `python3`。如果 Python 安装在其他路径，可以直接用其可执行文件运行 `packages/fde/discovery-lab/scripts/import-assets.py`；设置运行时 `FDE_PYTHON` 不会改变这个 pnpm 导入脚本对 `python3` 的调用。
+正常结果是 5 案例、234 份引用资料、248 个文件（36,654,779 字节）。检查不调用模型、不写训练数据，完整构建也会执行同一检查。
 
-导入器读取 ZIP 内的固定运行包：
+### 9.2 完整性与恢复
 
-```text
-FDE-业务挖掘实验室-v0.3.2/安装包/jiutian-fde-discovery-lab-0.3.2.tgz
-```
-
-该内部 TGZ 的预期 SHA-256：
-
-```text
-2c68c7b2ef51f6e92c1cb00e796dbbdb249362eb249821152a9f26128e057678
-```
-
-导入器会执行固定摘要及文件校验，不需要另行手动解包整个交付 ZIP，更不能移入其中的个人配置、历史记录或无关素材。
-
-### 9.2 导入结果与重复执行
-
-- 目标为 `upstream/deepseek-harness/packages/fde/discovery-lab/.assets/`。
-- 当前基线正常导入为 248 个文件、约 36.7 MB，包含五案例资料、案例定义、计算脚本与字体许可等。文件数量是此基线的参考，不代替导入器校验。
-- 已有文件完全一致时可以跳过；同名内容不同会拒绝，不静默覆盖。
-- 缺少 ZIP、内部路径不符、摘要不符时停止该模块部署，向交付者索取匹配文件；不得改脚本绕过校验。
-- 如果 Host 已启动，导入后必须重启同一个实例，插件初始化才会重新读取素材。
-- 素材导入和训练数据不同：重新导入不会重建或恢复训练历史。
+- 固定内容位于 `upstream/deepseek-harness/packages/fde/discovery-lab/assets/`，由同包 `assets-manifest.json` 校验。
+- 缺少、改坏或漏包的素材必须修复，不删除校验、不将 503 当作可选能力跳过。
+- 重新取得完整源码、构建后重启同一实例；静态内容恢复不要求删除训练数据库或 Session。
+- 原 `import:assets` 仅作为维护者用已锁定原 ZIP 重建同版本内容的工具，不是普通安装步骤。
+- 第三方声明与字体许可随源码保留；教师材料、个人历史和凭据不发放。
 
 ### 9.3 运行时 Python
 
@@ -594,8 +568,8 @@ for (const [id] of plugins) {
 
 const lab = await get(new URL('/api/fde-discovery-lab/cases', base));
 if (lab.status === 503) {
-  console.log('实验室 API 503：模块未就绪；A/B 可以继续，C 不能验收通过。');
-  if (process.env.FDE_EXPECT_LAB === '1') process.exitCode = 1;
+  console.log('实验室 API 503：内置素材不完整，不能验收通过。');
+  process.exitCode = 1;
 } else {
   if (!lab.ok) fail(`实验室接口异常：${lab.status}`);
   const cases = await lab.json();
@@ -629,7 +603,7 @@ $env:FDE_EXPECT_LAB = '1'
 node .runtime/deployment-check.mjs
 ```
 
-上面示例要求 C 完成。只部署 A/B 时将 `FDE_EXPECT_LAB` 设为 `0`。即使实验室可用，也不因此触发真实访谈。
+所有部署均须通过五案例只读检查，不以是否配置模型为跳过理由。即使实验室可用，也不因此触发真实访谈。
 
 该工作台没有在本文中约定通用 `/api/health` 路由；不要把第 12 节业务系统的健康接口用到工作台端口上。检查脚本若因后续版本 Boot 格式变化而失败，先核对实际源码，不能用 `eval` 或关闭所有检查来绕过。
 
@@ -762,7 +736,7 @@ LAN 完成标准需增加：实际另一台设备能打开页面、读取相关 
 | 示例导入后的 `project/` | 用户可工作的项目与阶段证据 | 单独保留；只备份 `DSH_HOME` 不等于备份项目文件 |
 | 项目自己的 `.fde/`、`fde-resources/` | 阶段证据与原件等 | 随实际项目一起保存 |
 | `DSH_HOME/fde-discovery-lab/` | 训练数据库与相关状态 | 保留训练时不能删除；还要保留 Host 原生 Session 记录 |
-| 实验室包 `.assets/` | 可由授权 ZIP 重新导入的素材 | 保留合法来源与许可；不是训练历史 |
+| 实验室包 `assets/` | 随源码提供的固定素材 | 保留完整清单与许可；不是训练历史，不按缓存删除 |
 | `node_modules/`、`lib/`、Web 构建目录 | 可由源码与锁文件重建 | 不进普通 Git 历史；清理后需重装/重建 |
 | `.runtime/deployment-check.mjs`、可选 `workspace-check.cjs` | 本文检查脚本的本地副本 | 交付后可移除，不影响工作台 |
 
@@ -805,7 +779,7 @@ git pull --ff-only
 重要区别：
 
 - Git 更新不会自动升级已经导入的示例项目，也不会迁移 `.runtime/` 数据。
-- `.assets/` 不在 Git，实验室素材版本变化需要对应授权交付物和明确迁移方案。
+- `assets/` 与逐文件清单随 Git 和源码包管理，更新不能覆盖或重置训练历史。
 - Client 改动需要重新 bundle；仅重启 Host 不会把 TypeScript 源码自动变成新浏览器代码。
 - 有针对性开发时可按包说明只构建受影响包；首次部署与一般接收者更新使用完整构建更直接。
 - 数据迁移不一定能通过回退源码撤销，不能把 `git checkout` 当作完整数据回滚。
@@ -828,7 +802,7 @@ git pull --ff-only
 | 示例导入提示目标已存在 | 是成功旧实例还是失败残留 | 保留现场，复用成功实例或选新路径；不自动删除 |
 | 刚复制资料就显示 `stale` | 原始内容与 `mtimeMs` | 用正确导入或保精度迁移；不直接修改证据状态 |
 | 工作台端口被占用 | 监听 PID 是否属于本任务 | 复用明确的本次服务或换空闲端口；不杀其他项目 |
-| 实验室 API 返回 503 | 素材是否导入、Host 初始化日志 | 导入授权包并重启；A/B 仍可单独交付，C 不通过 |
+| 实验室 API 返回 503 | 内置素材清单、Host 初始化日志 | 重新获取完整源码、构建后重启；不能以可选模块为由跳过 |
 | 实验室 UI 提示未构建 | Client 完整构建是否成功 | 重新构建实验室 Client/完整工程；不修改原始 HTML 冒充修复 |
 | ZIP 摘要或内部路径不符 | 交付版本和文件完整性 | 索取正确包；不关闭校验、不改名假装版本匹配 |
 | `python3` 找不到 | 导入入口与运行时解释器各自配置 | 导入用真实解释器；运行设置 `FDE_PYTHON` |
@@ -885,7 +859,7 @@ FF - FDE 交付工作台部署结果
 - 剩余问题及最小下一步：
 ```
 
-如 C 缺少素材或模型尚未授权，应明确区分“工作台部署完成”“实验室素材未就绪”“模型调用未验证”，不要统一写成“全功能正常”。
+若内置素材不完整，部署验收不通过；模型尚未授权则单独标为“模型调用未验证”，不要统一写成“全功能正常”。
 
 ## 18. 源码分享者的交付清单
 
@@ -895,7 +869,7 @@ FF - FDE 交付工作台部署结果
 - 写明实际源码版本；无 `.git` 的 ZIP 必须另附其真实提交哈希。
 - 保留锁文件、Workspace 配置、`vendor/`、`patches/`、必要点文件与第三方许可。
 - 需要示例时保留 `source-materials/fde-agent/`，不把作者实际 `.runtime/` 当作示例替代品。
-- 需要完整实验室时，另行提供有权交付的匹配 ZIP，说明其授权范围；不承诺 Git 克隆会带上它。
+- 源码必须包含实验室完整运行白名单素材与许可；Git 克隆和学员 ZIP 均检查此项，不另行索要旧交付 ZIP。
 - 不附带 `node_modules`、构建目录、私人配置、密钥、会话日志、虚拟环境或机器专属绝对路径。
 - 原项目包与依赖的 LICENSE / NOTICE / 来源说明继续保留；私有源码分享不代表所有嵌入素材可公开发布。
 - 先由一个接收环境按本文实际走完，再将该环境结果作为对应平台部署证据，不用作者现有机器的运行结果代替。
@@ -917,7 +891,7 @@ FF - FDE 交付工作台部署结果
 | 示例数据与导入合同 | [素材说明](source-materials/fde-agent/README.md)、[load.mjs](source-materials/fde-agent/load.mjs) |
 | 实验室安装、模型与限制 | [实验室说明](upstream/deepseek-harness/packages/fde/discovery-lab/README.zh.md) |
 | 实验室来源与素材许可边界 | [SOURCE.md](upstream/deepseek-harness/packages/fde/discovery-lab/SOURCE.md) |
-| 实验室授权素材导入 | [import-assets.py](upstream/deepseek-harness/packages/fde/discovery-lab/scripts/import-assets.py) |
+| 实验室内置素材校验 | [verify-assets.mjs](upstream/deepseek-harness/packages/fde/discovery-lab/scripts/verify-assets.mjs) |
 | Semantica 可选运行环境 | [Semantica 说明](upstream/deepseek-harness/packages/fde/semantica/README.zh.md) |
 | 凭据读取与保存规则 | [Credentials 说明](upstream/deepseek-harness/packages/credentials/credentials-local/README.zh.md) |
 

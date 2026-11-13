@@ -39,7 +39,7 @@ export function WorkbenchNavigation({ useProjectPage, showWorkbenchOverview, sho
   ] as const
   return <>
     {visible && <div className={css.backdrop} data-fde-workbench-backdrop aria-hidden="true" />}
-    {visible && <aside className={css.navigation}>
+    {visible && <aside className={css.navigation} data-window-drag-exclude>
       <button type="button" className={css.brand} onClick={showWorkbenchOverview} title={t('workbench.brand')}>
         <img src="/ff-brand/ff-logo.png" alt={t('workbench.logo')} />
         <span>{t('workbench.brand')}</span>

@@ -1,0 +1,53 @@
+{
+  "currency": "CNY",
+  "rows": [
+    {
+      "claim_id": "C009",
+      "line_id": "C009-L1",
+      "category": "往返高铁二等座",
+      "claimed_yuan": 1106,
+      "ordinary_review_yuan": 1106,
+      "evidence_id": "T009-RAIL"
+    },
+    {
+      "claim_id": "C009",
+      "line_id": "C009-L2",
+      "category": "两晚住宿",
+      "claimed_yuan": 1040,
+      "ordinary_review_yuan": 840,
+      "evidence_id": "T009-HOTEL"
+    },
+    {
+      "claim_id": "C009",
+      "line_id": "C009-L3",
+      "category": "三天伙食补助",
+      "claimed_yuan": 240,
+      "ordinary_review_yuan": 240,
+      "evidence_id": "T009-MEAL"
+    },
+    {
+      "claim_id": "C010",
+      "line_id": "C010-L1",
+      "category": "往返高铁二等座",
+      "claimed_yuan": 1106,
+      "ordinary_review_yuan": 1106,
+      "evidence_id": "T010-RAIL"
+    },
+    {
+      "claim_id": "C010",
+      "line_id": "C010-L2",
+      "category": "两晚住宿",
+      "claimed_yuan": 760,
+      "ordinary_review_yuan": 760,
+      "evidence_id": "T010-HOTEL"
+    },
+    {
+      "claim_id": "C010",
+      "line_id": "C010-L3",
+      "category": "三天伙食补助",
+      "claimed_yuan": 240,
+      "ordinary_review_yuan": 240,
+      "evidence_id": "T010-MEAL"
+    }
+  ]
+}

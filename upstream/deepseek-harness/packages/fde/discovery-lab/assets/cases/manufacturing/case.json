@@ -1,0 +1,3215 @@
+{
+  "schemaVersion": 1,
+  "id": "manufacturing",
+  "version": "1.0.0",
+  "snapshot": "2026-09-14T09:00:00+08:00",
+  "title": "岑砾衡装备 · 现场服务",
+  "industry": "制造业 / 设备售后",
+  "background": "项目增长后，现场新人、资深工程师、调度与仓库在不同环节等待。通过真实工单和设备资料，判断如何稳定服务质量。",
+  "initialRequest": "# 2026-09-14｜负责人给项目组的初步委托\n\n我们现在服务的项目越来越多，客户现场有问题，希望尽快处理。但很多事情还是要找公司里那几个熟悉设备的人，他们经常同时被好几个项目叫过去。新人也在增加，客户却还是觉得响应不够快。能不能用 AI 帮我们提高一下现场服务能力，不要业务一增长，就只能不断增加老师傅？\n\n先与服务、项目、仓库、质量和信息系统同事了解情况，也需要听听客户现场的说法。我们希望知道哪些事情最值得先做、现有资料和系统够不够，以及投入后应该怎样判断有效。现在没有指定采购哪种系统，也没有决定先开发哪些功能。\n\n管理关注：服务增长时的响应、人员投入、客户确认和重复问题。请不要只统计回答速度，也不要把预计节省当成已实现收益。\n",
+  "roles": [
+    {
+      "id": "lead",
+      "name": "裴稷",
+      "title": "服务主管兼资深工程师",
+      "bio": "服务优先级、维修审核与重大客诉",
+      "style": "关注可执行下一步和客户是否收到更新",
+      "goals": [
+        "增长中稳定服务质量",
+        "分别衡量响应、取证、资深打断与最终确认"
+      ],
+      "unknowns": [
+        "没有试点后真实收益",
+        "不能承诺每个问题远程解决",
+        "无其他客户完整价格授权"
+      ],
+      "greeting": "你好，我是裴稷，负责服务优先级、维修审核与重大客诉。你想先了解哪一部分？",
+      "factIds": [
+        "manufacturing.lead.need",
+        "manufacturing.lead.baseline",
+        "manufacturing.lead.wait",
+        "manufacturing.lead.evidence",
+        "manufacturing.lead.success",
+        "manufacturing.lead.closure"
+      ],
+      "assetIds": [
+        "manufacturing-letter",
+        "manufacturing-site-image",
+        "manufacturing-nameplate-d003",
+        "manufacturing-rules",
+        "manufacturing-manual",
+        "manufacturing-experience",
+        "manufacturing-history",
+        "manufacturing-history-events",
+        "manufacturing-history-originals",
+        "manufacturing-scope",
+        "manufacturing-dictionary",
+        "manufacturing-current",
+        "manufacturing-people",
+        "manufacturing-roster",
+        "manufacturing-documents",
+        "manufacturing-devices",
+        "manufacturing-customer-permissions",
+        "manufacturing-interview-lead"
+      ],
+      "disclosurePolicy": {
+        "facts": "先按角色过滤，再按学员话题返回相关事实；首次招呼不倾倒全部事实。",
+        "assets": "明确提出材料请求后可发放本角色assetIds中的文件。",
+        "unknowns": "超出知识范围说明不清楚，并建议有权角色；学员转述其他角色的信息不自动变成事实。"
+      }
+    },
+    {
+      "id": "senior",
+      "name": "唐序安",
+      "title": "资深机械工程师",
+      "bio": "胶带头、传动与复杂换型技术支持",
+      "style": "先问身份和变化，区分经验线索与根因证明",
+      "goals": [
+        "减少反复补问",
+        "在安全可用窗口专注支持"
+      ],
+      "unknowns": [
+        "不能替客户批准停机",
+        "不能保证配件出库",
+        "不独立批准电气作业"
+      ],
+      "greeting": "你好，我是唐序安，负责胶带头、传动与复杂换型技术支持。你想先了解哪一部分？",
+      "factIds": [
+        "manufacturing.senior.intake",
+        "manufacturing.senior.identity",
+        "manufacturing.senior.window",
+        "manufacturing.senior.safety",
+        "manufacturing.senior.parts",
+        "manufacturing.senior.verification"
+      ],
+      "assetIds": [
+        "manufacturing-rules",
+        "manufacturing-manual",
+        "manufacturing-experience",
+        "manufacturing-people",
+        "manufacturing-roster",
+        "manufacturing-stock",
+        "manufacturing-compatibility",
+        "manufacturing-documents",
+        "manufacturing-devices",
+        "manufacturing-sop-a",
+        "manufacturing-sop-b",
+        "manufacturing-ecn",
+        "manufacturing-customer-permissions",
+        "manufacturing-interview-senior"
+      ],
+      "disclosurePolicy": {
+        "facts": "先按角色过滤，再按学员话题返回相关事实；首次招呼不倾倒全部事实。",
+        "assets": "明确提出材料请求后可发放本角色assetIds中的文件。",
+        "unknowns": "超出知识范围说明不清楚，并建议有权角色；学员转述其他角色的信息不自动变成事实。"
+      }
+    },
+    {
+      "id": "junior",
+      "name": "沈砚初",
+      "title": "初级现场工程师",
+      "bio": "P01/P02基础检查、取证与已批准操作",
+      "style": "朴实，愿意说明不确定和现场网络限制",
+      "goals": [
+        "知道何种资料适合眼前设备",
+        "少重复补问并及时告知现场下一步"
+      ],
+      "unknowns": [
+        "不独立拆胶带头或电气部件",
+        "不能读其他项目私有照片和价格",
+        "不能把疑似设备ID当已确认"
+      ],
+      "greeting": "你好，我是沈砚初，负责P01/P02基础检查、取证与已批准操作。你想先了解哪一部分？",
+      "factIds": [
+        "manufacturing.junior.scope",
+        "manufacturing.junior.c001",
+        "manufacturing.junior.version",
+        "manufacturing.junior.network",
+        "manufacturing.junior.permission",
+        "manufacturing.junior.result"
+      ],
+      "assetIds": [
+        "manufacturing-nameplate-d003",
+        "manufacturing-rules",
+        "manufacturing-manual",
+        "manufacturing-experience",
+        "manufacturing-people",
+        "manufacturing-sop-a",
+        "manufacturing-sop-b",
+        "manufacturing-ecn",
+        "manufacturing-customer-permissions",
+        "manufacturing-interview-junior"
+      ],
+      "disclosurePolicy": {
+        "facts": "先按角色过滤，再按学员话题返回相关事实；首次招呼不倾倒全部事实。",
+        "assets": "明确提出材料请求后可发放本角色assetIds中的文件。",
+        "unknowns": "超出知识范围说明不清楚，并建议有权角色；学员转述其他角色的信息不自动变成事实。"
+      }
+    },
+    {
+      "id": "dispatch",
+      "name": "钟棠",
+      "title": "服务调度",
+      "bio": "建单、排班与客户进度通知",
+      "style": "以队列、负责人和状态时间讲事实",
+      "goals": [
+        "队列与实际安排一致",
+        "客户按时得到状态更新"
+      ],
+      "unknowns": [
+        "不能修改技术结论",
+        "私聊插单不一定已登记",
+        "计划排班不能保证现场授权"
+      ],
+      "greeting": "你好，我是钟棠，负责建单、排班与客户进度通知。你想先了解哪一部分？",
+      "factIds": [
+        "manufacturing.dispatch.response",
+        "manufacturing.dispatch.stages",
+        "manufacturing.dispatch.roster",
+        "manufacturing.dispatch.c005",
+        "manufacturing.dispatch.c008",
+        "manufacturing.dispatch.updates"
+      ],
+      "assetIds": [
+        "manufacturing-rules",
+        "manufacturing-history",
+        "manufacturing-history-events",
+        "manufacturing-scope",
+        "manufacturing-dictionary",
+        "manufacturing-current",
+        "manufacturing-people",
+        "manufacturing-roster",
+        "manufacturing-customer-permissions",
+        "manufacturing-c005-entry",
+        "manufacturing-c008-confirmation",
+        "manufacturing-c008-trial",
+        "manufacturing-interview-dispatch"
+      ],
+      "disclosurePolicy": {
+        "facts": "先按角色过滤，再按学员话题返回相关事实；首次招呼不倾倒全部事实。",
+        "assets": "明确提出材料请求后可发放本角色assetIds中的文件。",
+        "unknowns": "超出知识范围说明不清楚，并建议有权角色；学员转述其他角色的信息不自动变成事实。"
+      }
+    },
+    {
+      "id": "warehouse",
+      "name": "徐芩",
+      "title": "仓库管理员",
+      "bio": "库存、预留、发运与收货",
+      "style": "精确区分料号、单位、实物与可承诺量",
+      "goals": [
+        "不超额承诺",
+        "每次释放和出库可追溯"
+      ],
+      "unknowns": [
+        "不能替技术确认替代配件",
+        "不能自行释放尚未核实的预留",
+        "在途到仓不等于客户收货"
+      ],
+      "greeting": "你好，我是徐芩，负责库存、预留、发运与收货。你想先了解哪一部分？",
+      "factIds": [
+        "manufacturing.warehouse.available",
+        "manufacturing.warehouse.reservation",
+        "manufacturing.warehouse.inbound",
+        "manufacturing.warehouse.cache",
+        "manufacturing.warehouse.authority",
+        "manufacturing.warehouse.compatibility"
+      ],
+      "assetIds": [
+        "manufacturing-people",
+        "manufacturing-stock",
+        "manufacturing-reservations",
+        "manufacturing-inbound",
+        "manufacturing-compatibility",
+        "manufacturing-api-stock",
+        "manufacturing-api-failure",
+        "manufacturing-c006-parts",
+        "manufacturing-c007-parts",
+        "manufacturing-interview-warehouse"
+      ],
+      "disclosurePolicy": {
+        "facts": "先按角色过滤，再按学员话题返回相关事实；首次招呼不倾倒全部事实。",
+        "assets": "明确提出材料请求后可发放本角色assetIds中的文件。",
+        "unknowns": "超出知识范围说明不清楚，并建议有权角色；学员转述其他角色的信息不自动变成事实。"
+      }
+    },
+    {
+      "id": "docs",
+      "name": "莫汐远",
+      "title": "技术文档员",
+      "bio": "版本发布与旧卡回收",
+      "style": "关心适用序列号、审批与图像信息完整性",
+      "goals": [
+        "让现场拿到适用版本",
+        "保留原图与权限"
+      ],
+      "unknowns": [
+        "不能确认未拍清的设备标签",
+        "不能把文档发送等同现场已知悉",
+        "客户私有资料需授权"
+      ],
+      "greeting": "你好，我是莫汐远，负责版本发布与旧卡回收。你想先了解哪一部分？",
+      "factIds": [
+        "manufacturing.docs.version",
+        "manufacturing.docs.oldcard",
+        "manufacturing.docs.images",
+        "manufacturing.docs.permissions",
+        "manufacturing.docs.missing",
+        "manufacturing.docs.scope"
+      ],
+      "assetIds": [
+        "manufacturing-rules",
+        "manufacturing-manual",
+        "manufacturing-people",
+        "manufacturing-compatibility",
+        "manufacturing-documents",
+        "manufacturing-devices",
+        "manufacturing-sop-a",
+        "manufacturing-sop-b",
+        "manufacturing-ecn",
+        "manufacturing-interview-docs"
+      ],
+      "disclosurePolicy": {
+        "facts": "先按角色过滤，再按学员话题返回相关事实；首次招呼不倾倒全部事实。",
+        "assets": "明确提出材料请求后可发放本角色assetIds中的文件。",
+        "unknowns": "超出知识范围说明不清楚，并建议有权角色；学员转述其他角色的信息不自动变成事实。"
+      }
+    },
+    {
+      "id": "it",
+      "name": "池问川",
+      "title": "信息系统管理员",
+      "bio": "身份、日志、接口与备份",
+      "style": "区分读取、写回、缓存和授权条件",
+      "goals": [
+        "保证项目隔离",
+        "避免覆盖人工更新和跨项目泄露"
+      ],
+      "unknowns": [
+        "业务正文只在临时授权内可见",
+        "没有远程启停和连续遥测",
+        "外部模型出网未批准"
+      ],
+      "greeting": "你好，我是池问川，负责身份、日志、接口与备份。你想先了解哪一部分？",
+      "factIds": [
+        "manufacturing.it.systems",
+        "manufacturing.it.permission",
+        "manufacturing.it.writeback",
+        "manufacturing.it.freshness",
+        "manufacturing.it.model",
+        "manufacturing.it.telemetry"
+      ],
+      "assetIds": [
+        "manufacturing-dictionary",
+        "manufacturing-people",
+        "manufacturing-systems",
+        "manufacturing-permissions",
+        "manufacturing-api-stock",
+        "manufacturing-api-failure",
+        "manufacturing-api-denied",
+        "manufacturing-api-export",
+        "manufacturing-interview-it"
+      ],
+      "disclosurePolicy": {
+        "facts": "先按角色过滤，再按学员话题返回相关事实；首次招呼不倾倒全部事实。",
+        "assets": "明确提出材料请求后可发放本角色assetIds中的文件。",
+        "unknowns": "超出知识范围说明不清楚，并建议有权角色；学员转述其他角色的信息不自动变成事实。"
+      }
+    }
+  ],
+  "facts": [
+    {
+      "id": "manufacturing.lead.need",
+      "roleIds": [
+        "lead"
+      ],
+      "topic": "增长背景与原始诉求",
+      "text": "当前服务12个项目24台设备，7名技术人员中3名能独立复杂维修；希望增长时稳定现场能力而非简单不断加老师傅，尚未选定系统。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/00-业务背景.md",
+          "locator": "原文段落",
+          "quote": "服务团队有7名能够参与技术支持的人员，其中3名可以独立承担较复杂的排查与维修。",
+          "assetId": "manufacturing-interview-lead"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.lead.baseline",
+      "roleIds": [
+        "lead"
+      ],
+      "topic": "历史窗口与服务增长基线",
+      "text": "历史6至8月126张已关闭工单，按接报月分30/42/54；服务单包含故障、辅导、支持、保养，不等于设备故障率。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/01-初始业务材料/资料索引与字段说明.md",
+          "locator": "原文段落",
+          "quote": "6/7/8月分别30/42/54条。",
+          "assetId": "manufacturing-interview-lead"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.lead.wait",
+      "roleIds": [
+        "lead"
+      ],
+      "topic": "客户响应与等待原因区别",
+      "text": "报表平均关单时间不能区分没人接手、配件没到等原因；希望减少客户等不到更新，不要求全部远程解决。",
+      "kind": "opinion",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/02-第二轮访谈材料/服务与调度访谈.md",
+          "locator": "原文段落",
+          "quote": "报表只看平均关单时长，无法说是人没接还是配件没到。",
+          "assetId": "manufacturing-interview-lead"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.lead.evidence",
+      "roleIds": [
+        "lead"
+      ],
+      "topic": "原始工单与标签的证据边界",
+      "text": "主要等待类型只有一项、可能漏掉并行原因，须回到工单过程原件；相近症状复发不能直接证明同一根因。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/01-初始业务材料/资料索引与字段说明.md",
+          "locator": "原文段落",
+          "quote": "一个工单可能包含其他等待，深入分析需回到沟通记录。",
+          "assetId": "manufacturing-interview-lead"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.lead.success",
+      "roleIds": [
+        "lead"
+      ],
+      "topic": "多指标试点成功标准",
+      "text": "分别观察取证完整、资深打断、响应和最终确认，需要团队同意实际记录办法；预期节省不等于已实现收益。",
+      "kind": "opinion",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/02-第二轮访谈材料/服务与调度访谈.md",
+          "locator": "原文段落",
+          "quote": "把取证完整、资深打断、响应和最终确认分别看；别只做一个满意度。需要团队同意实际记录办法。",
+          "assetId": "manufacturing-interview-lead"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.lead.closure",
+      "roleIds": [
+        "lead"
+      ],
+      "topic": "服务关闭与临时恢复",
+      "text": "关闭需处理记录、文档版本、实际物料、验证、客户确认及遗留事项；运行恢复不自动关闭，部分产能应标临时恢复。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/01-初始业务材料/设备资料/服务处理规则.md",
+          "locator": "原文段落",
+          "quote": "现场运行恢复不自动关闭；只恢复部分产能时标临时恢复。",
+          "assetId": "manufacturing-interview-lead"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.senior.intake",
+      "roleIds": [
+        "senior"
+      ],
+      "topic": "技术接手前的必要取证",
+      "text": "先确认设备ID/序列号、部件版本、箱型胶带、变更和现象，图片与同样的投诉措辞不能证明同一故障。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/01-初始业务材料/设备资料/服务处理规则.md",
+          "locator": "原文段落",
+          "quote": "设备异常优先收集ID/序列号、部件版本、箱型胶带、变更及现象",
+          "assetId": "manufacturing-interview-senior"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.senior.identity",
+      "roleIds": [
+        "senior"
+      ],
+      "topic": "设备身份与适用文档",
+      "text": "同型号不同部件版本需匹配序列号和改造记录；台账与贴签冲突须保留两方证据，不能任意覆盖。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/01-初始业务材料/设备资料/班组交接经验簿.md",
+          "locator": "原文段落",
+          "quote": "设备台账与贴签冲突时保留两方证据，不任意覆盖。",
+          "assetId": "manufacturing-interview-senior"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.senior.window",
+      "roleIds": [
+        "senior"
+      ],
+      "topic": "资深占用与远程支持窗口",
+      "text": "背景齐了仍可能因自己在维修无法接电话，应预约窗口；不能同时指导两处维修，文档无法消除此类等待。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/02-第二轮访谈材料/服务与调度访谈.md",
+          "locator": "原文段落",
+          "quote": "那类等待不是再给我一篇文档就能消失。",
+          "assetId": "manufacturing-interview-senior"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.senior.safety",
+      "roleIds": [
+        "senior"
+      ],
+      "topic": "授权维修与客户许可",
+      "text": "护罩、内部机构、换件与电气检查必须由授权人员遵守停机隔离程序；资深远程同意不等于客户作业许可。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/01-初始业务材料/设备资料/设备基础与服务边界.md",
+          "locator": "原文段落",
+          "quote": "按客户与厂家适用的停机隔离程序由授权人员实施",
+          "assetId": "manufacturing-interview-senior"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.senior.parts",
+      "roleIds": [
+        "senior"
+      ],
+      "topic": "维修方案与配件承诺分工",
+      "text": "技术确认适配，仓库确认实物可用与预留；工程师不能单独保证出库，仓库不能代替工程师确认适配。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/01-初始业务材料/设备资料/服务处理规则.md",
+          "locator": "原文段落",
+          "quote": "仓库不能替工程师确认适配。",
+          "assetId": "manufacturing-interview-senior"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.senior.verification",
+      "roleIds": [
+        "senior"
+      ],
+      "topic": "试封检查与持续恢复验证",
+      "text": "10只同批样箱是本案例内部检查，仍需客户认可实际试运行和遗留条件；不同箱型班次不可自动继承确认。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/01-初始业务材料/设备资料/设备基础与服务边界.md",
+          "locator": "原文段落",
+          "quote": "10只为本案例内部检查样本数，不是行业通用验收标准。",
+          "assetId": "manufacturing-interview-senior"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.junior.scope",
+      "roleIds": [
+        "junior"
+      ],
+      "topic": "新人能力与当前权限",
+      "text": "自己可以身份取证、基础换型核对和样箱检查，不独立拆胶带头或电气部件，仅负责P01/P02。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/02-第二轮访谈材料/现场与客户访谈.md",
+          "locator": "原文段落",
+          "quote": "我能完成身份取证、基础换型核对、样箱检查，但不独立拆胶带头或电气部件。",
+          "assetId": "manufacturing-interview-junior"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.junior.c001",
+      "roleIds": [
+        "junior"
+      ],
+      "topic": "现场口头设备名与身份未知",
+      "text": "P01客户同车间两台同型机器，靠门那台不能定位ID；需要铭牌、胶带头、箱型及换型记录，当前不能把D001或D002猜成已确认。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/00-业务背景.md",
+          "locator": "原文段落",
+          "quote": "客户同一车间有两台外形相近的设备，其中一台更换过胶带头。",
+          "assetId": "manufacturing-interview-junior"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.junior.version",
+      "roleIds": [
+        "junior"
+      ],
+      "topic": "旧卡片适用范围与改造",
+      "text": "群里最终版名称不可靠；设备改造后要匹配当前操作卡和版本，不因群里有截图就认作现行。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/02-第二轮访谈材料/现场与客户访谈.md",
+          "locator": "原文段落",
+          "quote": "最近有旧卡片发在群里，名字写最终版，我不知道是否适合现场。",
+          "assetId": "manufacturing-interview-junior"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.junior.network",
+      "roleIds": [
+        "junior"
+      ],
+      "topic": "现场取证负担与弱网",
+      "text": "网络差时图片难上传，客户不愿一直等填表；需要明确拍哪里、哪些关键信息，而非要求重复发模糊图片。",
+      "kind": "opinion",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/02-第二轮访谈材料/现场与客户访谈.md",
+          "locator": "原文段落",
+          "quote": "网络差时图片很难传，客户又不愿意一直等我填表。",
+          "assetId": "manufacturing-interview-junior"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.junior.permission",
+      "roleIds": [
+        "junior"
+      ],
+      "topic": "出货目标与维修许可区别",
+      "text": "11点出货目标不代表整上午停机获准，停设备拆护罩需客户认可作业范围和合格人员。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/02-第二轮访谈材料/现场与客户访谈.md",
+          "locator": "原文段落",
+          "quote": "11点是出货目标，不是已经批准整上午停机。",
+          "assetId": "manufacturing-interview-junior"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.junior.result",
+      "roleIds": [
+        "junior"
+      ],
+      "topic": "现场恢复与客户确认",
+      "text": "服务结束应说明稳定运行、是否临时处理和后续更换安排；截图不等于恢复，10只试封后仍需实际运行确认。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/02-第二轮访谈材料/现场与客户访谈.md",
+          "locator": "原文段落",
+          "quote": "不是收到一张截图就算好了。",
+          "assetId": "manufacturing-interview-junior"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.dispatch.response",
+      "roleIds": [
+        "dispatch"
+      ],
+      "topic": "首次有效响应与补录时间",
+      "text": "首次有效响应是有人明确接手并给下一步，自动收条不算；服务表有事后补录，历史响应按群消息回填。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/01-初始业务材料/设备资料/服务处理规则.md",
+          "locator": "原文段落",
+          "quote": "首次有效响应是人明确接手并给出可执行的下一步，自动收条不计。",
+          "assetId": "manufacturing-interview-dispatch"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.dispatch.stages",
+      "roleIds": [
+        "dispatch"
+      ],
+      "topic": "自然时长与净投入口径",
+      "text": "全过程五段不重叠；实际处理区间包含协调观察，不等于净维修分钟，资深介入另记不能再加全过程。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/01-初始业务材料/资料索引与字段说明.md",
+          "locator": "原文段落",
+          "quote": "本表“实际处理”指占用业务处置区间，不能直接当工程师净工时。",
+          "assetId": "manufacturing-interview-dispatch"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.dispatch.roster",
+      "roleIds": [
+        "dispatch"
+      ],
+      "topic": "计划排班与实际占用",
+      "text": "排班按经验位置并用群确认，计划中断不总更新，资深被私聊叫走调度可能不知道；需要确认真实窗口。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/02-第二轮访谈材料/服务与调度访谈.md",
+          "locator": "原文段落",
+          "quote": "计划被打断后不总更新。唐工常被私聊叫走，我看不到。",
+          "assetId": "manufacturing-interview-dispatch"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.dispatch.c005",
+      "roleIds": [
+        "dispatch"
+      ],
+      "topic": "等待进厂与等待技术区别",
+      "text": "C005人员到门岗、备件已预留但培训名单和许可收货未完成，不能归为缺知识或等老师傅。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/02-第二轮访谈材料/仓库与项目访谈.md",
+          "locator": "原文段落",
+          "quote": "人员到了门岗，但缺许可和收货安排。",
+          "assetId": "manufacturing-interview-dispatch"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.dispatch.c008",
+      "roleIds": [
+        "dispatch"
+      ],
+      "topic": "试机通过但客户未确认",
+      "text": "C008十只试机已通过但夜班长未确认，不能代签或直接关闭；需要约定谁在什么时候确认。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/02-第二轮访谈材料/现场与客户访谈.md",
+          "locator": "原文段落",
+          "quote": "昨天C00810只通过，但夜班长没确认，我不能替他签。",
+          "assetId": "manufacturing-interview-dispatch"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.dispatch.updates",
+      "roleIds": [
+        "dispatch"
+      ],
+      "topic": "状态责任人与下一次更新",
+      "text": "接报确认接手人、安全、影响和下一更新时间；保留待配件、待客户窗口、待确认等状态，不删等待或修改技术结论。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/01-初始业务材料/设备资料/服务处理规则.md",
+          "locator": "原文段落",
+          "quote": "接报时先确认有人接手、现场安全状态、业务影响和下次更新时间。",
+          "assetId": "manufacturing-interview-dispatch"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.warehouse.available",
+      "roleIds": [
+        "warehouse"
+      ],
+      "topic": "实物库存与可承诺量",
+      "text": "B型皮带实物4条，C003两条C007两条已全预留，可承诺0；不可把实物直接答应新客户。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/02-第二轮访谈材料/仓库与项目访谈.md",
+          "locator": "原文段落",
+          "quote": "B型皮带实物4条，C003两条、C007两条，全部被预留。",
+          "assetId": "manufacturing-interview-warehouse"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.warehouse.reservation",
+      "roleIds": [
+        "warehouse"
+      ],
+      "topic": "预留释放与型号待核实",
+      "text": "C007可能错报型号尚未确认，仓库不能自行释放该预留给别单，需技术和业务核实后原系统留痕。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/02-第二轮访谈材料/仓库与项目访谈.md",
+          "locator": "原文段落",
+          "quote": "C007可能错报型号，还没确认，我不能自己把它释放给别人。",
+          "assetId": "manufacturing-interview-warehouse"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.warehouse.inbound",
+      "roleIds": [
+        "warehouse"
+      ],
+      "topic": "在途预计与交付承诺",
+      "text": "在途预计15点到仓是承运估计，尚需验数量型号；不能当客户收货时间，也未计入当前实物。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/02-第二轮访谈材料/仓库与项目访谈.md",
+          "locator": "原文段落",
+          "quote": "不能把预计到仓时间当客户收到的时间。",
+          "assetId": "manufacturing-interview-warehouse"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.warehouse.cache",
+      "roleIds": [
+        "warehouse"
+      ],
+      "topic": "缓存时效与失败处理",
+      "text": "库存接口每15分钟刷新；失败时不能把昨日截图当当前可用，应说明状态未知并重新核实。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/02-第二轮访谈材料/仓库与项目访谈.md",
+          "locator": "原文段落",
+          "quote": "库存接口每15分钟刷新，失败时有人拿昨天的截图继续用。",
+          "assetId": "manufacturing-interview-warehouse"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.warehouse.authority",
+      "roleIds": [
+        "warehouse"
+      ],
+      "topic": "领料释放出库的授权边界",
+      "text": "当前没有批准自动代写，草稿和整理可辅助，实际领料释放出库必须仓库账号在原系统留痕。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/02-第二轮访谈材料/仓库与项目访谈.md",
+          "locator": "原文段落",
+          "quote": "实际领料、释放与出库在原系统留痕，由仓库账号完成。",
+          "assetId": "manufacturing-interview-warehouse"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.warehouse.compatibility",
+      "roleIds": [
+        "warehouse"
+      ],
+      "topic": "配件适配与费用授权分工",
+      "text": "仓库不能替工程师确认适配；质保不代表所有磨损免费，需证据和采购确认，不能先把责任归客户。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/02-第二轮访谈材料/仓库与项目访谈.md",
+          "locator": "原文段落",
+          "quote": "客户质保不代表所有磨损都免费",
+          "assetId": "manufacturing-interview-warehouse"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.docs.version",
+      "roleIds": [
+        "docs"
+      ],
+      "topic": "文档索引与设备改造对应",
+      "text": "同名文件不够，要按设备序列号、部件版本、文档ID和版本关联；D001改造通知发送不代表每位轮班人已知。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/02-第二轮访谈材料/文档质量与IT访谈.md",
+          "locator": "原文段落",
+          "quote": "D001改造通知发给项目经理了，不代表每位轮班操作员看过。",
+          "assetId": "manufacturing-interview-docs"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.docs.oldcard",
+      "roleIds": [
+        "docs"
+      ],
+      "topic": "已审批发布与群内旧卡回收",
+      "text": "共享盘文件有审批，群里旧附件不能自动撤回，文件名最终版不可靠；只有审核通过才发布。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/02-第二轮访谈材料/文档质量与IT访谈.md",
+          "locator": "原文段落",
+          "quote": "共享盘文件有审批，但项目群里无法自动撤销旧附件。",
+          "assetId": "manufacturing-interview-docs"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.docs.images",
+      "roleIds": [
+        "docs"
+      ],
+      "topic": "图像证据与纯文字抽取局限",
+      "text": "胶带路径和配件外观常在图中；抽取图像丢失只剩段落会误以为步骤完整，必须保留原图供核对。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/02-第二轮访谈材料/文档质量与IT访谈.md",
+          "locator": "原文段落",
+          "quote": "图像抽取丢失时，只剩段落会让人误以为这一步已经解释完整。",
+          "assetId": "manufacturing-interview-docs"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.docs.permissions",
+      "roleIds": [
+        "docs"
+      ],
+      "topic": "文档检索继承来源权限",
+      "text": "合同价格、客户工艺、通用设备资料权限不同；客户私有附件需授权，检索结果必须继承原权限。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/02-第二轮访谈材料/文档质量与IT访谈.md",
+          "locator": "原文段落",
+          "quote": "合同价格、客户工艺与设备通用资料权限不同，检索结果也要继承。",
+          "assetId": "manufacturing-interview-docs"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.docs.missing",
+      "roleIds": [
+        "docs"
+      ],
+      "topic": "未拍清标签的事实缺口",
+      "text": "照片标签不清时人也无法读出，须补拍确认；文档员不能猜现场铭牌或以台账覆盖现场冲突。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/02-第二轮访谈材料/文档质量与IT访谈.md",
+          "locator": "原文段落",
+          "quote": "照片没有清晰标签时，人也看不出来，需要补拍。",
+          "assetId": "manufacturing-interview-docs"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.docs.scope",
+      "roleIds": [
+        "docs"
+      ],
+      "topic": "设备手册适用边界",
+      "text": "F48为固定规格人工换型、侧皮带上下胶带封合，不自动识别箱型；不同现象要分开，通用手册不是现实维修授权。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/01-初始业务材料/设备资料/设备基础与服务边界.md",
+          "locator": "原文段落",
+          "quote": "设备不负责称重、判定内容物或自动挑选箱型。",
+          "assetId": "manufacturing-interview-docs"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.it.systems",
+      "roleIds": [
+        "it"
+      ],
+      "topic": "现状数据入口与人工导出",
+      "text": "项目群接报、共享盘文档、服务表CSV人工导出、进销存库存；不能把补录时间看成自动采集。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/01-初始业务材料/系统与权限/当前系统与数据环境.md",
+          "locator": "原文段落",
+          "quote": "记录经常由调度事后补录，不能把每一条表格时间假定为自动采集。",
+          "assetId": "manufacturing-interview-it"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.it.permission",
+      "roleIds": [
+        "it"
+      ],
+      "topic": "项目身份与业务正文权限",
+      "text": "项目共享盘按项目授权，通用手册内部可读，群照片不意味着可发所有人；系统管理员只在临时授权内读正文。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/02-第二轮访谈材料/文档质量与IT访谈.md",
+          "locator": "原文段落",
+          "quote": "客户照片即使在群里，也不等于可发给所有人。",
+          "assetId": "manufacturing-interview-it"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.it.writeback",
+      "roleIds": [
+        "it"
+      ],
+      "topic": "已可读与未授权回写",
+      "text": "服务表导出可读但回写未批准，需要字段、并发和审计，不能用测试脚本覆盖人工刚更新的状态。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/02-第二轮访谈材料/文档质量与IT访谈.md",
+          "locator": "原文段落",
+          "quote": "回写没有批准接口，需要和表格负责人确认字段、并发更新和审计。",
+          "assetId": "manufacturing-interview-it"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.it.freshness",
+      "roleIds": [
+        "it"
+      ],
+      "topic": "库存刷新与接口失败边界",
+      "text": "进销存只读库存15分钟缓存；查询须考虑更新时间分页权限失败，JSON仅教学样例，不能声称已联通。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/01-初始业务材料/系统与权限/当前系统与数据环境.md",
+          "locator": "原文段落",
+          "quote": "必须调查更新时间、分页、失败、权限过滤与状态回写责任，不能把API示例当成已经实现的集成。",
+          "assetId": "manufacturing-interview-it"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.it.model",
+      "roleIds": [
+        "it"
+      ],
+      "topic": "内网试验条件与出网待审批",
+      "text": "可提供内部服务器，具体模型框架部署和外部模型出网未定；客户资料发送要明确内容授权和内网处理条件。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/02-第二轮访谈材料/文档质量与IT访谈.md",
+          "locator": "原文段落",
+          "quote": "外部模型出网还没批准，要先明确发送什么、由谁授权、是否可在内网处理。",
+          "assetId": "manufacturing-interview-it"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing.it.telemetry",
+      "roleIds": [
+        "it"
+      ],
+      "topic": "尚不存在的遥测和远程控制",
+      "text": "目前没有设备遥测与远程启停接口，不能把材料样例当已建平台或承诺直接远程操作。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/manufacturing/02-第二轮访谈材料/文档质量与IT访谈.md",
+          "locator": "原文段落",
+          "quote": "现在没有设备遥测，没有远程启停接口。",
+          "assetId": "manufacturing-interview-it"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    }
+  ],
+  "assets": [
+    {
+      "id": "manufacturing-letter",
+      "path": "source-materials/manufacturing/01-初始业务材料/公司委托来信.md",
+      "title": "公司委托来信",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "9725e40c03c19093698085f77b601477035670d1cce4713f9cf957e24888a711",
+      "sizeBytes": 917,
+      "roleIds": [
+        "lead"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-site-image",
+      "path": "source-materials/manufacturing/01-初始业务材料/现场附件/IMG-现场设备与包装现象.png",
+      "title": "IMG-现场设备与包装现象",
+      "mime": "image/png",
+      "version": "snapshot-2026-09-14",
+      "sha256": "3c50b4718be6942dfeb9b1d83b184dc5f865b146682d565eb5be094741c0f18c",
+      "sizeBytes": 2615963,
+      "roleIds": [
+        "lead"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-nameplate-d003",
+      "path": "source-materials/manufacturing/01-初始业务材料/现场附件/铭牌样本-D003.svg",
+      "title": "铭牌样本-D003",
+      "mime": "image/svg+xml",
+      "version": "snapshot-2026-09-14",
+      "sha256": "53ad3daabe331a434e7a386d220ec873d32fe5459148f44b53f45e0a5e33234a",
+      "sizeBytes": 728,
+      "roleIds": [
+        "junior",
+        "lead"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-rules",
+      "path": "source-materials/manufacturing/01-初始业务材料/设备资料/服务处理规则.md",
+      "title": "服务处理规则",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "d8c44581dda4ba0a4c3f547b384bde257bf04769f942b3cc0eab5a7f738af3a2",
+      "sizeBytes": 1485,
+      "roleIds": [
+        "lead",
+        "senior",
+        "junior",
+        "dispatch",
+        "docs"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-manual",
+      "path": "source-materials/manufacturing/01-初始业务材料/设备资料/设备基础与服务边界.md",
+      "title": "设备基础与服务边界",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "2548812ebafc5f683355e4d6006f07dab2b79d5222600e03560e63a9dbe0f820",
+      "sizeBytes": 1929,
+      "roleIds": [
+        "lead",
+        "senior",
+        "junior",
+        "docs"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-experience",
+      "path": "source-materials/manufacturing/01-初始业务材料/设备资料/班组交接经验簿.md",
+      "title": "班组交接经验簿",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "ec7e064d2913725247265a7d48b1476fb99927c5ad7437688e47569c5ddcecdd",
+      "sizeBytes": 1284,
+      "roleIds": [
+        "lead",
+        "senior",
+        "junior"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-history",
+      "path": "source-materials/manufacturing/01-初始业务材料/服务记录/历史服务台账.csv",
+      "title": "历史服务台账",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "64e1769ff3e0814272aeaa2a51c8e44ab4f504ffd7f84a9df2c969eb0515fec3",
+      "sizeBytes": 34968,
+      "roleIds": [
+        "lead",
+        "dispatch"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-history-events",
+      "path": "source-materials/manufacturing/01-初始业务材料/服务记录/历史事件流水.csv",
+      "title": "历史事件流水",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "7445635aa7b18bd507c57716dbb9f75b3afb4e9ddfed40c2e07640537873e218",
+      "sizeBytes": 95049,
+      "roleIds": [
+        "lead",
+        "dispatch"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-history-originals",
+      "path": "source-materials/manufacturing/01-初始业务材料/服务记录/历史过程原件.jsonl",
+      "title": "历史过程原件",
+      "mime": "application/x-ndjson",
+      "version": "snapshot-2026-09-14",
+      "sha256": "0d564cdb9d27046f3c2b68d1fa3df4ec6383477ade69094c896038389e97a735",
+      "sizeBytes": 190659,
+      "roleIds": [
+        "lead"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-scope",
+      "path": "source-materials/manufacturing/01-初始业务材料/台账/月度服务范围.csv",
+      "title": "月度服务范围",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "c732864d9e93d85c127282d758b54aabf39ea07d99680bde887f1c048435f17b",
+      "sizeBytes": 372,
+      "roleIds": [
+        "lead",
+        "dispatch"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-dictionary",
+      "path": "source-materials/manufacturing/01-初始业务材料/资料索引与字段说明.md",
+      "title": "资料索引与字段说明",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "38f350ecfd7f0585771fe948c27a973f90de766c45caa64ecf3f84a94a42f2c9",
+      "sizeBytes": 2099,
+      "roleIds": [
+        "lead",
+        "dispatch",
+        "it"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-current",
+      "path": "source-materials/manufacturing/01-初始业务材料/服务记录/当前任务队列.csv",
+      "title": "当前任务队列",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "7e1859ab56c9f2d6e434a67773ea755da1ece20dea3a4648ef336b0794fadbf1",
+      "sizeBytes": 1927,
+      "roleIds": [
+        "lead",
+        "dispatch"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-people",
+      "path": "source-materials/manufacturing/01-初始业务材料/台账/人员与岗位.csv",
+      "title": "人员与岗位",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "3f16a9b9a14f0f01e78fd8ff18d398a2eee8bccea0ee10493c10909055fad49b",
+      "sizeBytes": 1684,
+      "roleIds": [
+        "lead",
+        "senior",
+        "junior",
+        "dispatch",
+        "warehouse",
+        "docs",
+        "it"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-roster",
+      "path": "source-materials/manufacturing/01-初始业务材料/台账/当日人员安排.csv",
+      "title": "当日人员安排",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "fe8533871f5818809923e66fe8275795cbd8e5baad13de58a50b6f9ecc6dfc79",
+      "sizeBytes": 743,
+      "roleIds": [
+        "lead",
+        "dispatch",
+        "senior"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-stock",
+      "path": "source-materials/manufacturing/01-初始业务材料/台账/配件库存.csv",
+      "title": "配件库存",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "d53a5520d1b1baac80bac90d75551516d211bb1ab1420f255d7149b7ecdaaefc",
+      "sizeBytes": 693,
+      "roleIds": [
+        "warehouse",
+        "senior"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-reservations",
+      "path": "source-materials/manufacturing/01-初始业务材料/台账/当前库存预留.csv",
+      "title": "当前库存预留",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "5ea51a014ee20e2e3506317f5cbb364a44aa24bf957c7d6c0931c98157d32bd9",
+      "sizeBytes": 507,
+      "roleIds": [
+        "warehouse"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-inbound",
+      "path": "source-materials/manufacturing/01-初始业务材料/台账/配件在途.csv",
+      "title": "配件在途",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "140511288df0bf17bec4178108b465c2d4835fcec248a72f27062277f85af3f4",
+      "sizeBytes": 266,
+      "roleIds": [
+        "warehouse"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-compatibility",
+      "path": "source-materials/manufacturing/01-初始业务材料/设备资料/配件适配表.md",
+      "title": "配件适配表",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "6b1f843f8e7fce17eb7b642ba7d9f601fb978fbb9880eb543425234f90782fd3",
+      "sizeBytes": 915,
+      "roleIds": [
+        "warehouse",
+        "senior",
+        "docs"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-documents",
+      "path": "source-materials/manufacturing/01-初始业务材料/台账/文档版本索引.csv",
+      "title": "文档版本索引",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "1e2d3aa87ffda6eef4eb6b17f14fb2f5fac41aaeb832feb0d69507b27f56f0b8",
+      "sizeBytes": 819,
+      "roleIds": [
+        "docs",
+        "senior",
+        "lead"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-devices",
+      "path": "source-materials/manufacturing/01-初始业务材料/台账/设备装机台账.csv",
+      "title": "设备装机台账",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "a049ac2b250dec9cd4ac3f779aee9d8c78790041db5bf998306577b9eff9626c",
+      "sizeBytes": 2388,
+      "roleIds": [
+        "docs",
+        "senior",
+        "lead"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-sop-a",
+      "path": "source-materials/manufacturing/01-初始业务材料/设备资料/SOP-F48-1.4-A型换型与检查.md",
+      "title": "SOP-F48-1.4-A型换型与检查",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "f309e28b74eac6e366229ab90edd092f3df680334b6c3251b20bcba2616fd5a8",
+      "sizeBytes": 1291,
+      "roleIds": [
+        "docs",
+        "senior",
+        "junior"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-sop-b",
+      "path": "source-materials/manufacturing/01-初始业务材料/设备资料/SOP-F48-2.1-B型换型与检查.md",
+      "title": "SOP-F48-2.1-B型换型与检查",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "fb41cca5ff24e9f6b7e2845f3c14d93864f947e31c9023ebcf96fe967c17e924",
+      "sizeBytes": 1422,
+      "roleIds": [
+        "docs",
+        "senior",
+        "junior"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-ecn",
+      "path": "source-materials/manufacturing/01-初始业务材料/设备资料/ECN-0820-D001改造通知.md",
+      "title": "ECN-0820-D001改造通知",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "c58a717e42c3c2412fdea801c21e6a5538418a9d42bcdfaa8a067ba406f293f8",
+      "sizeBytes": 763,
+      "roleIds": [
+        "docs",
+        "senior",
+        "junior"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-systems",
+      "path": "source-materials/manufacturing/01-初始业务材料/系统与权限/当前系统与数据环境.md",
+      "title": "当前系统与数据环境",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "b9243958fb7f9e211d350c6c2b599ae9c02ca59398925eaf60a020b63b0a644b",
+      "sizeBytes": 1297,
+      "roleIds": [
+        "it"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-permissions",
+      "path": "source-materials/manufacturing/01-初始业务材料/系统与权限/角色权限矩阵.csv",
+      "title": "角色权限矩阵",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "0581915b6734461dd30cc245652a465297581fa210f5fd989cc352d79990af83",
+      "sizeBytes": 941,
+      "roleIds": [
+        "it"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-api-stock",
+      "path": "source-materials/manufacturing/01-初始业务材料/系统与权限/库存接口成功样本.json",
+      "title": "库存接口成功样本",
+      "mime": "application/json",
+      "version": "snapshot-2026-09-14",
+      "sha256": "57265a38a1f41fc632eb8c7552860373e01f9b64a9ae63b4fa4ed958eedfd8b0",
+      "sizeBytes": 626,
+      "roleIds": [
+        "it",
+        "warehouse"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-api-failure",
+      "path": "source-materials/manufacturing/01-初始业务材料/系统与权限/超时与旧缓存样本.json",
+      "title": "超时与旧缓存样本",
+      "mime": "application/json",
+      "version": "snapshot-2026-09-14",
+      "sha256": "bc106fdfa02cb8d8a7eb6049eae312a3ddfedbefa482b07a63eed67b86a81ca7",
+      "sizeBytes": 469,
+      "roleIds": [
+        "it",
+        "warehouse"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-api-denied",
+      "path": "source-materials/manufacturing/01-初始业务材料/系统与权限/项目权限拒绝样本.json",
+      "title": "项目权限拒绝样本",
+      "mime": "application/json",
+      "version": "snapshot-2026-09-14",
+      "sha256": "7b9a45915110ffca51468784a1ceccb77483a2cb1178fbf5fdaf37357b745917",
+      "sizeBytes": 539,
+      "roleIds": [
+        "it"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-api-export",
+      "path": "source-materials/manufacturing/01-初始业务材料/系统与权限/服务记录导出样本.json",
+      "title": "服务记录导出样本",
+      "mime": "application/json",
+      "version": "snapshot-2026-09-14",
+      "sha256": "54018f6da30ddc9d9e5ec5feaf98aa26cf11c47ed4229fa91e25108e7d2dbfa6",
+      "sizeBytes": 616,
+      "roleIds": [
+        "it"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-customer-permissions",
+      "path": "source-materials/manufacturing/01-初始业务材料/台账/客户角色与作业权限.md",
+      "title": "客户角色与作业权限",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "4c4f3511a394ed2775c121b6c63a644d6ddedf930f9c16dccef3aa98eda23f71",
+      "sizeBytes": 1714,
+      "roleIds": [
+        "lead",
+        "senior",
+        "junior",
+        "dispatch"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-c005-entry",
+      "path": "source-materials/manufacturing/01-初始业务材料/现场附件/入厂申请-C005.md",
+      "title": "入厂申请-C005",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "625fc9c5765ed2db75b1e9e753d7d1a647c70698e3e412218e3920ef4b022f70",
+      "sizeBytes": 749,
+      "roleIds": [
+        "dispatch"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-c008-confirmation",
+      "path": "source-materials/manufacturing/01-初始业务材料/现场附件/确认追踪-C008.md",
+      "title": "确认追踪-C008",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "d01e217651bbe7eec03342dd95d8a1cb401f13955862f281a3aaba0cf1686e86",
+      "sizeBytes": 646,
+      "roleIds": [
+        "dispatch"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-c008-trial",
+      "path": "source-materials/manufacturing/01-初始业务材料/服务记录/试机检查单-C008.md",
+      "title": "试机检查单-C008",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "0c2c70f2aa65b338aa16321362d74c3fa676b1f84b56ecae7d8e0fbe4e1a7287",
+      "sizeBytes": 1318,
+      "roleIds": [
+        "dispatch"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-c006-parts",
+      "path": "source-materials/manufacturing/01-初始业务材料/现场附件/备件沟通-C006.md",
+      "title": "备件沟通-C006",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "0780a41613434a1afca904cc78f46fc4fc570cba884b6976e5c7d1db3840cf82",
+      "sizeBytes": 639,
+      "roleIds": [
+        "warehouse"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-c007-parts",
+      "path": "source-materials/manufacturing/01-初始业务材料/现场附件/备件沟通-C007.md",
+      "title": "备件沟通-C007",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "d672b8b1dfc4dc45fd65a2d3700abd89f82ef2ff9ce6b013867ed506f81035a1",
+      "sizeBytes": 710,
+      "roleIds": [
+        "warehouse"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-interview-lead",
+      "path": "source-materials/manufacturing/角色摘录/lead.md",
+      "title": "裴稷岗位访谈摘录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "edd5d7b30b707fe78c61d18b532102689f1f527364282898d9aaf7ddfa3aba21",
+      "sizeBytes": 2390,
+      "roleIds": [
+        "lead"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-interview-senior",
+      "path": "source-materials/manufacturing/角色摘录/senior.md",
+      "title": "唐序安岗位访谈摘录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "a0dc7dcecbb25dae095ddee9d0ada4b9325ce2a244c259350725d9d90ab2eb90",
+      "sizeBytes": 2278,
+      "roleIds": [
+        "senior"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-interview-junior",
+      "path": "source-materials/manufacturing/角色摘录/junior.md",
+      "title": "沈砚初岗位访谈摘录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "0127004e17f71e833e12091bceb49781eedc4649887a89def4d93e6b1bd4a8d4",
+      "sizeBytes": 2228,
+      "roleIds": [
+        "junior"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-interview-dispatch",
+      "path": "source-materials/manufacturing/角色摘录/dispatch.md",
+      "title": "钟棠岗位访谈摘录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "054d32babcfae62f2113f3770abcbdd4c78949c3364f2e821cfab6a603fb2a2e",
+      "sizeBytes": 2300,
+      "roleIds": [
+        "dispatch"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-interview-warehouse",
+      "path": "source-materials/manufacturing/角色摘录/warehouse.md",
+      "title": "徐芩岗位访谈摘录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "bd98c4e605c5ae80324883628433638a8d4346af19b2c1ff8e73c7e6a475f207",
+      "sizeBytes": 2133,
+      "roleIds": [
+        "warehouse"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-interview-docs",
+      "path": "source-materials/manufacturing/角色摘录/docs.md",
+      "title": "莫汐远岗位访谈摘录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "cfe28618535916441631b323d7bb7d49be6523400902b443766107b29ef99ac5",
+      "sizeBytes": 2296,
+      "roleIds": [
+        "docs"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "manufacturing-interview-it",
+      "path": "source-materials/manufacturing/角色摘录/it.md",
+      "title": "池问川岗位访谈摘录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "296cb7fa61539c3246c98128f7bb8b54ade190a8d4645c639ff9a25a6d1bdacb",
+      "sizeBytes": 2393,
+      "roleIds": [
+        "it"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    }
+  ],
+  "discoveries": [
+    {
+      "id": "manufacturing.lead.need",
+      "roleId": "lead",
+      "title": "增长背景与原始诉求",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.lead.need"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-letter",
+        "manufacturing-people",
+        "manufacturing-scope"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：当前服务12个项目24台设备，7名技术人员中3名能独立复杂维修；希望增长时稳定现场能力而非简单不断加老师傅，尚未选定系统。；并成功取得指定资料：manufacturing-letter, manufacturing-people, manufacturing-scope",
+      "positiveExample": "请具体解释增长背景与原始诉求，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解增长背景与原始诉求。",
+        "可以向裴稷询问：增长背景与原始诉求具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "原始诉求与调查范围"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.lead.baseline",
+      "roleId": "lead",
+      "title": "历史窗口与服务增长基线",
+      "type": "quantitative",
+      "required": true,
+      "factIds": [
+        "manufacturing.lead.baseline"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-history",
+        "manufacturing-scope",
+        "manufacturing-dictionary"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：历史6至8月126张已关闭工单，按接报月分30/42/54；服务单包含故障、辅导、支持、保养，不等于设备故障率。；并成功取得指定资料：manufacturing-history, manufacturing-scope, manufacturing-dictionary",
+      "positiveExample": "请具体解释历史窗口与服务增长基线，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解历史窗口与服务增长基线。",
+        "可以向裴稷询问：历史窗口与服务增长基线具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.lead.wait",
+      "roleId": "lead",
+      "title": "客户响应与等待原因区别",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.lead.wait"
+      ],
+      "requiredAssetIds": [],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：报表平均关单时间不能区分没人接手、配件没到等原因；希望减少客户等不到更新，不要求全部远程解决。",
+      "positiveExample": "请具体解释客户响应与等待原因区别，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解客户响应与等待原因区别。",
+        "可以向裴稷询问：客户响应与等待原因区别具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.lead.evidence",
+      "roleId": "lead",
+      "title": "原始工单与标签的证据边界",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "manufacturing.lead.evidence"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-history-originals",
+        "manufacturing-history-events"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：主要等待类型只有一项、可能漏掉并行原因，须回到工单过程原件；相近症状复发不能直接证明同一根因。；并成功取得指定资料：manufacturing-history-originals, manufacturing-history-events",
+      "positiveExample": "请具体解释原始工单与标签的证据边界，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解原始工单与标签的证据边界。",
+        "可以向裴稷询问：原始工单与标签的证据边界具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.lead.success",
+      "roleId": "lead",
+      "title": "多指标试点成功标准",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.lead.success"
+      ],
+      "requiredAssetIds": [],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：分别观察取证完整、资深打断、响应和最终确认，需要团队同意实际记录办法；预期节省不等于已实现收益。",
+      "positiveExample": "请具体解释多指标试点成功标准，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解多指标试点成功标准。",
+        "可以向裴稷询问：多指标试点成功标准具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "AI价值分析与推荐方向"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.lead.closure",
+      "roleId": "lead",
+      "title": "服务关闭与临时恢复",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.lead.closure"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-rules"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：关闭需处理记录、文档版本、实际物料、验证、客户确认及遗留事项；运行恢复不自动关闭，部分产能应标临时恢复。；并成功取得指定资料：manufacturing-rules",
+      "positiveExample": "请具体解释服务关闭与临时恢复，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解服务关闭与临时恢复。",
+        "可以向裴稷询问：服务关闭与临时恢复具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.senior.intake",
+      "roleId": "senior",
+      "title": "技术接手前的必要取证",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.senior.intake"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-experience"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：先确认设备ID/序列号、部件版本、箱型胶带、变更和现象，图片与同样的投诉措辞不能证明同一故障。；并成功取得指定资料：manufacturing-experience",
+      "positiveExample": "请具体解释技术接手前的必要取证，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解技术接手前的必要取证。",
+        "可以向唐序安询问：技术接手前的必要取证具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.senior.identity",
+      "roleId": "senior",
+      "title": "设备身份与适用文档",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "manufacturing.senior.identity"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-devices",
+        "manufacturing-documents",
+        "manufacturing-ecn"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：同型号不同部件版本需匹配序列号和改造记录；台账与贴签冲突须保留两方证据，不能任意覆盖。；并成功取得指定资料：manufacturing-devices, manufacturing-documents, manufacturing-ecn",
+      "positiveExample": "请具体解释设备身份与适用文档，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解设备身份与适用文档。",
+        "可以向唐序安询问：设备身份与适用文档具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.senior.window",
+      "roleId": "senior",
+      "title": "资深占用与远程支持窗口",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.senior.window"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-roster"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：背景齐了仍可能因自己在维修无法接电话，应预约窗口；不能同时指导两处维修，文档无法消除此类等待。；并成功取得指定资料：manufacturing-roster",
+      "positiveExample": "请具体解释资深占用与远程支持窗口，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解资深占用与远程支持窗口。",
+        "可以向唐序安询问：资深占用与远程支持窗口具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.senior.safety",
+      "roleId": "senior",
+      "title": "授权维修与客户许可",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.senior.safety"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-manual",
+        "manufacturing-customer-permissions"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：护罩、内部机构、换件与电气检查必须由授权人员遵守停机隔离程序；资深远程同意不等于客户作业许可。；并成功取得指定资料：manufacturing-manual, manufacturing-customer-permissions",
+      "positiveExample": "请具体解释授权维修与客户许可，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解授权维修与客户许可。",
+        "可以向唐序安询问：授权维修与客户许可具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.senior.parts",
+      "roleId": "senior",
+      "title": "维修方案与配件承诺分工",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.senior.parts"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-compatibility"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：技术确认适配，仓库确认实物可用与预留；工程师不能单独保证出库，仓库不能代替工程师确认适配。；并成功取得指定资料：manufacturing-compatibility",
+      "positiveExample": "请具体解释维修方案与配件承诺分工，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解维修方案与配件承诺分工。",
+        "可以向唐序安询问：维修方案与配件承诺分工具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.senior.verification",
+      "roleId": "senior",
+      "title": "试封检查与持续恢复验证",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.senior.verification"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-manual"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：10只同批样箱是本案例内部检查，仍需客户认可实际试运行和遗留条件；不同箱型班次不可自动继承确认。；并成功取得指定资料：manufacturing-manual",
+      "positiveExample": "请具体解释试封检查与持续恢复验证，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解试封检查与持续恢复验证。",
+        "可以向唐序安询问：试封检查与持续恢复验证具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.junior.scope",
+      "roleId": "junior",
+      "title": "新人能力与当前权限",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.junior.scope"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-people"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：自己可以身份取证、基础换型核对和样箱检查，不独立拆胶带头或电气部件，仅负责P01/P02。；并成功取得指定资料：manufacturing-people",
+      "positiveExample": "请具体解释新人能力与当前权限，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解新人能力与当前权限。",
+        "可以向沈砚初询问：新人能力与当前权限具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.junior.c001",
+      "roleId": "junior",
+      "title": "现场口头设备名与身份未知",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.junior.c001"
+      ],
+      "requiredAssetIds": [],
+      "allowUnknown": true,
+      "completionRule": "角色本人已提交回答明确确认：P01客户同车间两台同型机器，靠门那台不能定位ID；需要铭牌、胶带头、箱型及换型记录，当前不能把D001或D002猜成已确认。。已确认缺口与有权核实岗位，允许记为 verified_currently_unknown。",
+      "positiveExample": "客户说靠门那台就够了吗？目前还缺哪些可核对的设备身份信息？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解现场口头设备名与身份未知。",
+        "客户说靠门那台就够了吗？目前还缺哪些可核对的设备身份信息？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.junior.version",
+      "roleId": "junior",
+      "title": "旧卡片适用范围与改造",
+      "type": "document",
+      "required": true,
+      "factIds": [
+        "manufacturing.junior.version"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-sop-a",
+        "manufacturing-sop-b",
+        "manufacturing-ecn"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：群里最终版名称不可靠；设备改造后要匹配当前操作卡和版本，不因群里有截图就认作现行。；并成功取得指定资料：manufacturing-sop-a, manufacturing-sop-b, manufacturing-ecn",
+      "positiveExample": "请具体解释旧卡片适用范围与改造，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解旧卡片适用范围与改造。",
+        "可以向沈砚初询问：旧卡片适用范围与改造具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.junior.network",
+      "roleId": "junior",
+      "title": "现场取证负担与弱网",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.junior.network"
+      ],
+      "requiredAssetIds": [],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：网络差时图片难上传，客户不愿一直等填表；需要明确拍哪里、哪些关键信息，而非要求重复发模糊图片。",
+      "positiveExample": "请具体解释现场取证负担与弱网，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解现场取证负担与弱网。",
+        "可以向沈砚初询问：现场取证负担与弱网具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.junior.permission",
+      "roleId": "junior",
+      "title": "出货目标与维修许可区别",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.junior.permission"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-customer-permissions"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：11点出货目标不代表整上午停机获准，停设备拆护罩需客户认可作业范围和合格人员。；并成功取得指定资料：manufacturing-customer-permissions",
+      "positiveExample": "请具体解释出货目标与维修许可区别，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解出货目标与维修许可区别。",
+        "可以向沈砚初询问：出货目标与维修许可区别具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.junior.result",
+      "roleId": "junior",
+      "title": "现场恢复与客户确认",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.junior.result"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-manual"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：服务结束应说明稳定运行、是否临时处理和后续更换安排；截图不等于恢复，10只试封后仍需实际运行确认。；并成功取得指定资料：manufacturing-manual",
+      "positiveExample": "请具体解释现场恢复与客户确认，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解现场恢复与客户确认。",
+        "可以向沈砚初询问：现场恢复与客户确认具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.dispatch.response",
+      "roleId": "dispatch",
+      "title": "首次有效响应与补录时间",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.dispatch.response"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-rules",
+        "manufacturing-history-events"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：首次有效响应是有人明确接手并给下一步，自动收条不算；服务表有事后补录，历史响应按群消息回填。；并成功取得指定资料：manufacturing-rules, manufacturing-history-events",
+      "positiveExample": "请具体解释首次有效响应与补录时间，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解首次有效响应与补录时间。",
+        "可以向钟棠询问：首次有效响应与补录时间具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.dispatch.stages",
+      "roleId": "dispatch",
+      "title": "自然时长与净投入口径",
+      "type": "quantitative",
+      "required": true,
+      "factIds": [
+        "manufacturing.dispatch.stages"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-history",
+        "manufacturing-dictionary"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：全过程五段不重叠；实际处理区间包含协调观察，不等于净维修分钟，资深介入另记不能再加全过程。；并成功取得指定资料：manufacturing-history, manufacturing-dictionary",
+      "positiveExample": "请具体解释自然时长与净投入口径，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解自然时长与净投入口径。",
+        "可以向钟棠询问：自然时长与净投入口径具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.dispatch.roster",
+      "roleId": "dispatch",
+      "title": "计划排班与实际占用",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.dispatch.roster"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-roster"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：排班按经验位置并用群确认，计划中断不总更新，资深被私聊叫走调度可能不知道；需要确认真实窗口。；并成功取得指定资料：manufacturing-roster",
+      "positiveExample": "请具体解释计划排班与实际占用，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解计划排班与实际占用。",
+        "可以向钟棠询问：计划排班与实际占用具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.dispatch.c005",
+      "roleId": "dispatch",
+      "title": "等待进厂与等待技术区别",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "manufacturing.dispatch.c005"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-c005-entry",
+        "manufacturing-current"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：C005人员到门岗、备件已预留但培训名单和许可收货未完成，不能归为缺知识或等老师傅。；并成功取得指定资料：manufacturing-c005-entry, manufacturing-current",
+      "positiveExample": "请具体解释等待进厂与等待技术区别，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解等待进厂与等待技术区别。",
+        "可以向钟棠询问：等待进厂与等待技术区别具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.dispatch.c008",
+      "roleId": "dispatch",
+      "title": "试机通过但客户未确认",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "manufacturing.dispatch.c008"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-c008-trial",
+        "manufacturing-c008-confirmation"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：C008十只试机已通过但夜班长未确认，不能代签或直接关闭；需要约定谁在什么时候确认。；并成功取得指定资料：manufacturing-c008-trial, manufacturing-c008-confirmation",
+      "positiveExample": "请具体解释试机通过但客户未确认，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解试机通过但客户未确认。",
+        "可以向钟棠询问：试机通过但客户未确认具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.dispatch.updates",
+      "roleId": "dispatch",
+      "title": "状态责任人与下一次更新",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.dispatch.updates"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-current"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：接报确认接手人、安全、影响和下一更新时间；保留待配件、待客户窗口、待确认等状态，不删等待或修改技术结论。；并成功取得指定资料：manufacturing-current",
+      "positiveExample": "请具体解释状态责任人与下一次更新，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解状态责任人与下一次更新。",
+        "可以向钟棠询问：状态责任人与下一次更新具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.warehouse.available",
+      "roleId": "warehouse",
+      "title": "实物库存与可承诺量",
+      "type": "quantitative",
+      "required": true,
+      "factIds": [
+        "manufacturing.warehouse.available"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-stock",
+        "manufacturing-reservations"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：B型皮带实物4条，C003两条C007两条已全预留，可承诺0；不可把实物直接答应新客户。；并成功取得指定资料：manufacturing-stock, manufacturing-reservations",
+      "positiveExample": "请具体解释实物库存与可承诺量，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解实物库存与可承诺量。",
+        "可以向徐芩询问：实物库存与可承诺量具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.warehouse.reservation",
+      "roleId": "warehouse",
+      "title": "预留释放与型号待核实",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.warehouse.reservation"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-c007-parts"
+      ],
+      "allowUnknown": true,
+      "completionRule": "角色本人已提交回答明确确认：C007可能错报型号尚未确认，仓库不能自行释放该预留给别单，需技术和业务核实后原系统留痕。；并成功取得指定资料：manufacturing-c007-parts。已确认缺口与有权核实岗位，允许记为 verified_currently_unknown。",
+      "positiveExample": "请具体解释预留释放与型号待核实，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解预留释放与型号待核实。",
+        "可以向徐芩询问：预留释放与型号待核实具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.warehouse.inbound",
+      "roleId": "warehouse",
+      "title": "在途预计与交付承诺",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.warehouse.inbound"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-inbound"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：在途预计15点到仓是承运估计，尚需验数量型号；不能当客户收货时间，也未计入当前实物。；并成功取得指定资料：manufacturing-inbound",
+      "positiveExample": "请具体解释在途预计与交付承诺，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解在途预计与交付承诺。",
+        "可以向徐芩询问：在途预计与交付承诺具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.warehouse.cache",
+      "roleId": "warehouse",
+      "title": "缓存时效与失败处理",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.warehouse.cache"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-api-stock",
+        "manufacturing-api-failure"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：库存接口每15分钟刷新；失败时不能把昨日截图当当前可用，应说明状态未知并重新核实。；并成功取得指定资料：manufacturing-api-stock, manufacturing-api-failure",
+      "positiveExample": "请具体解释缓存时效与失败处理，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解缓存时效与失败处理。",
+        "可以向徐芩询问：缓存时效与失败处理具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.warehouse.authority",
+      "roleId": "warehouse",
+      "title": "领料释放出库的授权边界",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.warehouse.authority"
+      ],
+      "requiredAssetIds": [],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：当前没有批准自动代写，草稿和整理可辅助，实际领料释放出库必须仓库账号在原系统留痕。",
+      "positiveExample": "请具体解释领料释放出库的授权边界，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解领料释放出库的授权边界。",
+        "可以向徐芩询问：领料释放出库的授权边界具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.warehouse.compatibility",
+      "roleId": "warehouse",
+      "title": "配件适配与费用授权分工",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.warehouse.compatibility"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-compatibility",
+        "manufacturing-c006-parts"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：仓库不能替工程师确认适配；质保不代表所有磨损免费，需证据和采购确认，不能先把责任归客户。；并成功取得指定资料：manufacturing-compatibility, manufacturing-c006-parts",
+      "positiveExample": "请具体解释配件适配与费用授权分工，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解配件适配与费用授权分工。",
+        "可以向徐芩询问：配件适配与费用授权分工具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.docs.version",
+      "roleId": "docs",
+      "title": "文档索引与设备改造对应",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "manufacturing.docs.version"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-documents",
+        "manufacturing-devices",
+        "manufacturing-ecn"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：同名文件不够，要按设备序列号、部件版本、文档ID和版本关联；D001改造通知发送不代表每位轮班人已知。；并成功取得指定资料：manufacturing-documents, manufacturing-devices, manufacturing-ecn",
+      "positiveExample": "请具体解释文档索引与设备改造对应，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解文档索引与设备改造对应。",
+        "可以向莫汐远询问：文档索引与设备改造对应具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.docs.oldcard",
+      "roleId": "docs",
+      "title": "已审批发布与群内旧卡回收",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.docs.oldcard"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-sop-a",
+        "manufacturing-sop-b"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：共享盘文件有审批，群里旧附件不能自动撤回，文件名最终版不可靠；只有审核通过才发布。；并成功取得指定资料：manufacturing-sop-a, manufacturing-sop-b",
+      "positiveExample": "请具体解释已审批发布与群内旧卡回收，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解已审批发布与群内旧卡回收。",
+        "可以向莫汐远询问：已审批发布与群内旧卡回收具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.docs.images",
+      "roleId": "docs",
+      "title": "图像证据与纯文字抽取局限",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.docs.images"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-manual"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：胶带路径和配件外观常在图中；抽取图像丢失只剩段落会误以为步骤完整，必须保留原图供核对。；并成功取得指定资料：manufacturing-manual",
+      "positiveExample": "请具体解释图像证据与纯文字抽取局限，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解图像证据与纯文字抽取局限。",
+        "可以向莫汐远询问：图像证据与纯文字抽取局限具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.docs.permissions",
+      "roleId": "docs",
+      "title": "文档检索继承来源权限",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.docs.permissions"
+      ],
+      "requiredAssetIds": [],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：合同价格、客户工艺、通用设备资料权限不同；客户私有附件需授权，检索结果必须继承原权限。",
+      "positiveExample": "请具体解释文档检索继承来源权限，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解文档检索继承来源权限。",
+        "可以向莫汐远询问：文档检索继承来源权限具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "数据系统与企业条件"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.docs.missing",
+      "roleId": "docs",
+      "title": "未拍清标签的事实缺口",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.docs.missing"
+      ],
+      "requiredAssetIds": [],
+      "allowUnknown": true,
+      "completionRule": "角色本人已提交回答明确确认：照片标签不清时人也无法读出，须补拍确认；文档员不能猜现场铭牌或以台账覆盖现场冲突。。已确认缺口与有权核实岗位，允许记为 verified_currently_unknown。",
+      "positiveExample": "请具体解释未拍清标签的事实缺口，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解未拍清标签的事实缺口。",
+        "可以向莫汐远询问：未拍清标签的事实缺口具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.docs.scope",
+      "roleId": "docs",
+      "title": "设备手册适用边界",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.docs.scope"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-manual"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：F48为固定规格人工换型、侧皮带上下胶带封合，不自动识别箱型；不同现象要分开，通用手册不是现实维修授权。；并成功取得指定资料：manufacturing-manual",
+      "positiveExample": "请具体解释设备手册适用边界，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解设备手册适用边界。",
+        "可以向莫汐远询问：设备手册适用边界具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.it.systems",
+      "roleId": "it",
+      "title": "现状数据入口与人工导出",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.it.systems"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-systems",
+        "manufacturing-api-export"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：项目群接报、共享盘文档、服务表CSV人工导出、进销存库存；不能把补录时间看成自动采集。；并成功取得指定资料：manufacturing-systems, manufacturing-api-export",
+      "positiveExample": "请具体解释现状数据入口与人工导出，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解现状数据入口与人工导出。",
+        "可以向池问川询问：现状数据入口与人工导出具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "数据系统与企业条件"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.it.permission",
+      "roleId": "it",
+      "title": "项目身份与业务正文权限",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.it.permission"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-permissions",
+        "manufacturing-api-denied"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：项目共享盘按项目授权，通用手册内部可读，群照片不意味着可发所有人；系统管理员只在临时授权内读正文。；并成功取得指定资料：manufacturing-permissions, manufacturing-api-denied",
+      "positiveExample": "请具体解释项目身份与业务正文权限，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解项目身份与业务正文权限。",
+        "可以向池问川询问：项目身份与业务正文权限具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "数据系统与企业条件"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.it.writeback",
+      "roleId": "it",
+      "title": "已可读与未授权回写",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.it.writeback"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-systems"
+      ],
+      "allowUnknown": true,
+      "completionRule": "角色本人已提交回答明确确认：服务表导出可读但回写未批准，需要字段、并发和审计，不能用测试脚本覆盖人工刚更新的状态。；并成功取得指定资料：manufacturing-systems。已确认缺口与有权核实岗位，允许记为 verified_currently_unknown。",
+      "positiveExample": "请具体解释已可读与未授权回写，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解已可读与未授权回写。",
+        "可以向池问川询问：已可读与未授权回写具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "数据系统与企业条件"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.it.freshness",
+      "roleId": "it",
+      "title": "库存刷新与接口失败边界",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.it.freshness"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-api-stock",
+        "manufacturing-api-failure"
+      ],
+      "allowUnknown": false,
+      "completionRule": "角色本人已提交回答明确确认：进销存只读库存15分钟缓存；查询须考虑更新时间分页权限失败，JSON仅教学样例，不能声称已联通。；并成功取得指定资料：manufacturing-api-stock, manufacturing-api-failure",
+      "positiveExample": "请具体解释库存刷新与接口失败边界，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解库存刷新与接口失败边界。",
+        "可以向池问川询问：库存刷新与接口失败边界具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "数据系统与企业条件"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.it.model",
+      "roleId": "it",
+      "title": "内网试验条件与出网待审批",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.it.model"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-systems"
+      ],
+      "allowUnknown": true,
+      "completionRule": "角色本人已提交回答明确确认：可提供内部服务器，具体模型框架部署和外部模型出网未定；客户资料发送要明确内容授权和内网处理条件。；并成功取得指定资料：manufacturing-systems。已确认缺口与有权核实岗位，允许记为 verified_currently_unknown。",
+      "positiveExample": "请具体解释内网试验条件与出网待审批，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解内网试验条件与出网待审批。",
+        "可以向池问川询问：内网试验条件与出网待审批具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "数据系统与企业条件"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "manufacturing.it.telemetry",
+      "roleId": "it",
+      "title": "尚不存在的遥测和远程控制",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "manufacturing.it.telemetry"
+      ],
+      "requiredAssetIds": [
+        "manufacturing-systems"
+      ],
+      "allowUnknown": true,
+      "completionRule": "角色本人已提交回答明确确认：目前没有设备遥测与远程启停接口，不能把材料样例当已建平台或承诺直接远程操作。；并成功取得指定资料：manufacturing-systems。已确认缺口与有权核实岗位，允许记为 verified_currently_unknown。",
+      "positiveExample": "请具体解释尚不存在的遥测和远程控制，能给一个事实或资料依据吗？",
+      "negativeExample": "仅问忙不忙、泛泛询问有什么问题、学员自行宣称结论、流式未提交文字均不足。",
+      "hints": [
+        "可以了解尚不存在的遥测和远程控制。",
+        "可以向池问川询问：尚不存在的遥测和远程控制具体怎样发生，有什么证据？"
+      ],
+      "reportSections": [
+        "数据系统与企业条件"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    }
+  ],
+  "calculations": [
+    {
+      "id": "manufacturing.monthly",
+      "title": "历史服务量与增长",
+      "operation": "manufacturing_monthly",
+      "inputs": [
+        "manufacturing-history",
+        "manufacturing-scope",
+        "manufacturing-dictionary"
+      ],
+      "columns": {
+        "openedAt": "opened_at",
+        "id": "ticket_id"
+      },
+      "unit": "单 / %",
+      "definition": "按接报月份计不同ticket_id，给出6/7/8月数量和8月相对6月增幅；月末设备数不是设备暴露天数，不计算故障率。",
+      "denominator": "各接报月份的历史关闭工单；增幅分母为6月单量",
+      "filter": {},
+      "version": "1.0.0",
+      "requiresAllInputsGranted": true,
+      "allowArbitraryCode": false
+    },
+    {
+      "id": "manufacturing.stages",
+      "title": "服务阶段与资深投入",
+      "operation": "manufacturing_stage_minutes",
+      "inputs": [
+        "manufacturing-history",
+        "manufacturing-dictionary"
+      ],
+      "columns": {
+        "stages": [
+          "first_response_min",
+          "取证_min",
+          "等待_min",
+          "实际处理_min",
+          "等待确认_min"
+        ],
+        "total": "全过程_min",
+        "senior": "资深介入_min",
+        "followups": "补问轮数"
+      },
+      "unit": "分钟 / 轮",
+      "definition": "五阶段均值与全过程核对；资深介入为单独净投入不再相加；按主要等待类型汇总仅描述主要标签，不推断完整因果或SLA违约。",
+      "denominator": "全部126张已关闭历史工单，缺失列或不守恒必须报错",
+      "filter": {},
+      "version": "1.0.0",
+      "requiresAllInputsGranted": true,
+      "allowArbitraryCode": false
+    },
+    {
+      "id": "manufacturing.stock",
+      "title": "可承诺配件数量",
+      "operation": "manufacturing_stock",
+      "inputs": [
+        "manufacturing-stock",
+        "manufacturing-reservations"
+      ],
+      "columns": {
+        "id": "part_id",
+        "physical": "实物数量",
+        "quarantine": "隔离待检",
+        "promised": "可承诺数量",
+        "reservationQuantity": "quantity",
+        "reservationState": "状态"
+      },
+      "unit": "原库存表单位",
+      "definition": "按料号将实物减有效预留减隔离待检，并与可承诺数量核对；不重复扣历史耗用，不加入在途。",
+      "denominator": "每个料号独立计算，不混用条/套等单位",
+      "filter": {},
+      "version": "1.0.0",
+      "requiresAllInputsGranted": true,
+      "allowArbitraryCode": false
+    }
+  ],
+  "report": {
+    "version": "1.0.0",
+    "title": "业务现状诊断与 AI 机会评估报告",
+    "sections": [
+      "原始诉求与调查范围",
+      "业务背景与组织职责",
+      "现状流程与协作关系",
+      "数据系统与企业条件",
+      "问题量化与基线",
+      "AI价值分析与推荐方向",
+      "证据索引与数据字典"
+    ],
+    "requirements": [
+      "区分受访者意见、文件事实、确定性计算和仍未知条件",
+      "仅使用当前训练轮次已获得的证据和资料",
+      "任何收益估算必须说明测量前提，不作真实收益承诺",
+      "不强制唯一技术方案，比较规则、组织改善、数据关联与AI的适用边界"
+    ]
+  },
+  "sourcePolicy": {
+    "snapshot": "2026-09-14T09:00:00+08:00",
+    "teacherExcluded": [
+      "教师专用",
+      "90-内部教师资料",
+      "研发依据"
+    ],
+    "futureExcluded": [
+      "后续事件"
+    ],
+    "laterInterviews": "第二轮10:00记录仅作为回顾性说明来源，不能用于导入快照后事件；不发放混合角色访谈全文。",
+    "roleExtracts": "角色摘录明确标注为编制摘录并逐条引原件；完整原始材料按原目录存档。",
+    "dataNature": "企业、人物、数据与业务单据均为教学拟制，非真实企业资料。"
+  }
+}

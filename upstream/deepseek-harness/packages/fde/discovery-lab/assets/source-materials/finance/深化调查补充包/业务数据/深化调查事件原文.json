@@ -1,0 +1,836 @@
+{
+  "rows": [
+    {
+      "event_id": "EXH001-E00",
+      "sample_id": "EXH001",
+      "event_at": "2026-08-03T09:00:00+08:00",
+      "actor": "服务登记岗",
+      "action": "RECEIVED",
+      "content": "工作确认已上传，为什么还要我解释联合测试属于哪个项目？"
+    },
+    {
+      "event_id": "EXH001-E01",
+      "sample_id": "EXH001",
+      "event_at": "2026-08-03T13:00:00+08:00",
+      "actor": "财务审核",
+      "action": "OBSERVED",
+      "content": "员工说已上传工作确认，审核留言仍要求说明实际任务；打开附件发现只列到场日期。"
+    },
+    {
+      "event_id": "EXH001-R01",
+      "sample_id": "EXH001",
+      "event_at": "2026-08-03T17:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "补充了具体工作内容，审核记录注明不再重复索取原票据。"
+    },
+    {
+      "event_id": "EXH001-E02",
+      "sample_id": "EXH001",
+      "event_at": "2026-08-03T22:00:00+08:00",
+      "actor": "项目负责人",
+      "action": "OBSERVED",
+      "content": "填报一个项目编号，但任务记录出现两个项目；负责人尚未确认受益关系。"
+    },
+    {
+      "event_id": "EXH001-R02",
+      "sample_id": "EXH001",
+      "event_at": "2026-08-04T03:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "取得双方项目意见后才完成归属确认；不从姓名或所属部门直接确定。"
+    },
+    {
+      "event_id": "EXH001-END",
+      "sample_id": "EXH001",
+      "event_at": "2026-08-04T09:00:00+08:00",
+      "actor": "调查记录岗",
+      "action": "CLOSED",
+      "content": "本次跟踪的待核事项已处理；不据此推定所有经营问题消失。"
+    },
+    {
+      "event_id": "EXH002-E00",
+      "sample_id": "EXH002",
+      "event_at": "2026-08-04T09:00:00+08:00",
+      "actor": "服务登记岗",
+      "action": "RECEIVED",
+      "content": "两个项目都参加了，负责人让我先看余额再确定怎么填。"
+    },
+    {
+      "event_id": "EXH002-E01",
+      "sample_id": "EXH002",
+      "event_at": "2026-08-04T14:00:00+08:00",
+      "actor": "项目负责人",
+      "action": "OBSERVED",
+      "content": "填报一个项目编号，但任务记录出现两个项目；负责人尚未确认受益关系。"
+    },
+    {
+      "event_id": "EXH002-R01",
+      "sample_id": "EXH002",
+      "event_at": "2026-08-04T19:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "取得双方项目意见后才完成归属确认；不从姓名或所属部门直接确定。"
+    },
+    {
+      "event_id": "EXH002-E02",
+      "sample_id": "EXH002",
+      "event_at": "2026-08-04T21:00:00+08:00",
+      "actor": "信息中心",
+      "action": "OBSERVED",
+      "content": "项目页面余额可见，制单人未确认预占是否已经扣除；另有待批申请。"
+    },
+    {
+      "event_id": "EXH002-R02",
+      "sample_id": "EXH002",
+      "event_at": "2026-08-05T04:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "信息人员提供导出时点及预占口径，财务按同一截面复核。"
+    },
+    {
+      "event_id": "EXH002-END",
+      "sample_id": "EXH002",
+      "event_at": "2026-08-05T11:00:00+08:00",
+      "actor": "调查记录岗",
+      "action": "CLOSED",
+      "content": "本次跟踪的待核事项已处理；不据此推定所有经营问题消失。"
+    },
+    {
+      "event_id": "EXH003-E00",
+      "sample_id": "EXH003",
+      "event_at": "2026-08-05T09:00:00+08:00",
+      "actor": "服务登记岗",
+      "action": "RECEIVED",
+      "content": "现场让我们留在原酒店配合夜间测试，住宿超过标准如何说明？"
+    },
+    {
+      "event_id": "EXH003-E01",
+      "sample_id": "EXH003",
+      "event_at": "2026-08-05T11:00:00+08:00",
+      "actor": "财务负责人",
+      "action": "OBSERVED",
+      "content": "住宿超过普通标准，员工说明与现场安排有关，但尚未提供安排记录。"
+    },
+    {
+      "event_id": "EXH003-R01",
+      "sample_id": "EXH003",
+      "event_at": "2026-08-05T17:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "补充现场安排后按例外程序复核；记录只证明完成复核，不代表全部超标获准。"
+    },
+    {
+      "event_id": "EXH003-END",
+      "sample_id": "EXH003",
+      "event_at": "2026-08-06T01:00:00+08:00",
+      "actor": "调查记录岗",
+      "action": "CLOSED",
+      "content": "本次跟踪的待核事项已处理；不据此推定所有经营问题消失。"
+    },
+    {
+      "event_id": "EXH004-E00",
+      "sample_id": "EXH004",
+      "event_at": "2026-08-06T09:00:00+08:00",
+      "actor": "服务登记岗",
+      "action": "RECEIVED",
+      "content": "我补了项目意见，审批页面还是原来的项目，出纳说暂时不能付。"
+    },
+    {
+      "event_id": "EXH004-E01",
+      "sample_id": "EXH004",
+      "event_at": "2026-08-06T12:00:00+08:00",
+      "actor": "审批岗位",
+      "action": "OBSERVED",
+      "content": "补充材料改变项目或核定金额，现有批准仍对应旧版。"
+    },
+    {
+      "event_id": "EXH004-R01",
+      "sample_id": "EXH004",
+      "event_at": "2026-08-06T19:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "补齐受影响事项的确认后形成新批准，保留旧版本。"
+    },
+    {
+      "event_id": "EXH004-E02",
+      "sample_id": "EXH004",
+      "event_at": "2026-08-06T23:00:00+08:00",
+      "actor": "出纳",
+      "action": "OBSERVED",
+      "content": "付款候选表引用的版本与费用系统不同，出纳暂不能据此付款。"
+    },
+    {
+      "event_id": "EXH004-R02",
+      "sample_id": "EXH004",
+      "event_at": "2026-08-07T10:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "出纳核对有效批准及新清单后结束差异核对；未发生重复付款。"
+    },
+    {
+      "event_id": "EXH004-END",
+      "sample_id": "EXH004",
+      "event_at": "2026-08-07T15:00:00+08:00",
+      "actor": "调查记录岗",
+      "action": "CLOSED",
+      "content": "本次跟踪的待核事项已处理；不据此推定所有经营问题消失。"
+    },
+    {
+      "event_id": "EXH005-E00",
+      "sample_id": "EXH005",
+      "event_at": "2026-08-07T09:00:00+08:00",
+      "actor": "服务登记岗",
+      "action": "RECEIVED",
+      "content": "南京联调结束，资料按清单提交，想核对一次是否完整。"
+    },
+    {
+      "event_id": "EXH005-END",
+      "sample_id": "EXH005",
+      "event_at": "2026-08-07T15:00:00+08:00",
+      "actor": "调查记录岗",
+      "action": "CLOSED",
+      "content": "本次跟踪结束；普通对照无所列六类异常。"
+    },
+    {
+      "event_id": "EXH006-E00",
+      "sample_id": "EXH006",
+      "event_at": "2026-08-08T09:00:00+08:00",
+      "actor": "服务登记岗",
+      "action": "RECEIVED",
+      "content": "接收方只给我写了到场日期，财务还要具体任务记录。"
+    },
+    {
+      "event_id": "EXH006-E01",
+      "sample_id": "EXH006",
+      "event_at": "2026-08-08T14:00:00+08:00",
+      "actor": "财务审核",
+      "action": "OBSERVED",
+      "content": "员工说已上传工作确认，审核留言仍要求说明实际任务；打开附件发现只列到场日期。"
+    },
+    {
+      "event_id": "EXH006-R01",
+      "sample_id": "EXH006",
+      "event_at": "2026-08-08T23:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "补充了具体工作内容，审核记录注明不再重复索取原票据。"
+    },
+    {
+      "event_id": "EXH006-END",
+      "sample_id": "EXH006",
+      "event_at": "2026-08-09T06:00:00+08:00",
+      "actor": "调查记录岗",
+      "action": "CLOSED",
+      "content": "本次跟踪的待核事项已处理；不据此推定所有经营问题消失。"
+    },
+    {
+      "event_id": "EXH007-E00",
+      "sample_id": "EXH007",
+      "event_at": "2026-08-09T09:00:00+08:00",
+      "actor": "服务登记岗",
+      "action": "RECEIVED",
+      "content": "采集数据和接口联调一起完成，两个项目负责人各自只确认一部分。"
+    },
+    {
+      "event_id": "EXH007-E01",
+      "sample_id": "EXH007",
+      "event_at": "2026-08-09T11:00:00+08:00",
+      "actor": "项目负责人",
+      "action": "OBSERVED",
+      "content": "填报一个项目编号，但任务记录出现两个项目；负责人尚未确认受益关系。"
+    },
+    {
+      "event_id": "EXH007-R01",
+      "sample_id": "EXH007",
+      "event_at": "2026-08-09T21:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "取得双方项目意见后才完成归属确认；不从姓名或所属部门直接确定。"
+    },
+    {
+      "event_id": "EXH007-END",
+      "sample_id": "EXH007",
+      "event_at": "2026-08-10T05:00:00+08:00",
+      "actor": "调查记录岗",
+      "action": "CLOSED",
+      "content": "本次跟踪的待核事项已处理；不据此推定所有经营问题消失。"
+    },
+    {
+      "event_id": "EXH008-E00",
+      "sample_id": "EXH008",
+      "event_at": "2026-08-10T09:00:00+08:00",
+      "actor": "服务登记岗",
+      "action": "RECEIVED",
+      "content": "余额看起来够用，同事说还有一笔在审批，我需要再扣一次吗？"
+    },
+    {
+      "event_id": "EXH008-E01",
+      "sample_id": "EXH008",
+      "event_at": "2026-08-10T12:00:00+08:00",
+      "actor": "信息中心",
+      "action": "OBSERVED",
+      "content": "项目页面余额可见，制单人未确认预占是否已经扣除；另有待批申请。"
+    },
+    {
+      "event_id": "EXH008-R01",
+      "sample_id": "EXH008",
+      "event_at": "2026-08-10T23:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "信息人员提供导出时点及预占口径，财务按同一截面复核。"
+    },
+    {
+      "event_id": "EXH008-END",
+      "sample_id": "EXH008",
+      "event_at": "2026-08-11T04:00:00+08:00",
+      "actor": "调查记录岗",
+      "action": "CLOSED",
+      "content": "本次跟踪的待核事项已处理；不据此推定所有经营问题消失。"
+    },
+    {
+      "event_id": "EXH009-E00",
+      "sample_id": "EXH009",
+      "event_at": "2026-08-11T09:00:00+08:00",
+      "actor": "服务登记岗",
+      "action": "RECEIVED",
+      "content": "按普通标准调整后我补了现场说明，现在该按哪个金额审批？"
+    },
+    {
+      "event_id": "EXH009-E01",
+      "sample_id": "EXH009",
+      "event_at": "2026-08-11T13:00:00+08:00",
+      "actor": "财务负责人",
+      "action": "OBSERVED",
+      "content": "住宿超过普通标准，员工说明与现场安排有关，但尚未提供安排记录。"
+    },
+    {
+      "event_id": "EXH009-R01",
+      "sample_id": "EXH009",
+      "event_at": "2026-08-11T16:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "补充现场安排后按例外程序复核；记录只证明完成复核，不代表全部超标获准。"
+    },
+    {
+      "event_id": "EXH009-E02",
+      "sample_id": "EXH009",
+      "event_at": "2026-08-11T21:00:00+08:00",
+      "actor": "审批岗位",
+      "action": "OBSERVED",
+      "content": "补充材料改变项目或核定金额，现有批准仍对应旧版。"
+    },
+    {
+      "event_id": "EXH009-R02",
+      "sample_id": "EXH009",
+      "event_at": "2026-08-12T00:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "补齐受影响事项的确认后形成新批准，保留旧版本。"
+    },
+    {
+      "event_id": "EXH009-END",
+      "sample_id": "EXH009",
+      "event_at": "2026-08-12T06:00:00+08:00",
+      "actor": "调查记录岗",
+      "action": "CLOSED",
+      "content": "本次跟踪的待核事项已处理；不据此推定所有经营问题消失。"
+    },
+    {
+      "event_id": "EXH010-E00",
+      "sample_id": "EXH010",
+      "event_at": "2026-08-12T09:00:00+08:00",
+      "actor": "服务登记岗",
+      "action": "RECEIVED",
+      "content": "武汉测试任务没有变化，按原申请报销。"
+    },
+    {
+      "event_id": "EXH010-END",
+      "sample_id": "EXH010",
+      "event_at": "2026-08-12T16:00:00+08:00",
+      "actor": "调查记录岗",
+      "action": "CLOSED",
+      "content": "本次跟踪结束；普通对照无所列六类异常。"
+    },
+    {
+      "event_id": "EXH011-E00",
+      "sample_id": "EXH011",
+      "event_at": "2026-08-13T09:00:00+08:00",
+      "actor": "服务登记岗",
+      "action": "RECEIVED",
+      "content": "申请写样机测试，现场增加联合诊断，补的工作确认没有写清受益项目。"
+    },
+    {
+      "event_id": "EXH011-E01",
+      "sample_id": "EXH011",
+      "event_at": "2026-08-13T11:00:00+08:00",
+      "actor": "财务审核",
+      "action": "OBSERVED",
+      "content": "员工说已上传工作确认，审核留言仍要求说明实际任务；打开附件发现只列到场日期。"
+    },
+    {
+      "event_id": "EXH011-R01",
+      "sample_id": "EXH011",
+      "event_at": "2026-08-13T16:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "补充了具体工作内容，审核记录注明不再重复索取原票据。"
+    },
+    {
+      "event_id": "EXH011-E02",
+      "sample_id": "EXH011",
+      "event_at": "2026-08-13T19:00:00+08:00",
+      "actor": "项目负责人",
+      "action": "OBSERVED",
+      "content": "填报一个项目编号，但任务记录出现两个项目；负责人尚未确认受益关系。"
+    },
+    {
+      "event_id": "EXH011-R02",
+      "sample_id": "EXH011",
+      "event_at": "2026-08-14T02:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "取得双方项目意见后才完成归属确认；不从姓名或所属部门直接确定。"
+    },
+    {
+      "event_id": "EXH011-END",
+      "sample_id": "EXH011",
+      "event_at": "2026-08-14T10:00:00+08:00",
+      "actor": "调查记录岗",
+      "action": "CLOSED",
+      "content": "本次跟踪的待核事项已处理；不据此推定所有经营问题消失。"
+    },
+    {
+      "event_id": "EXH012-E00",
+      "sample_id": "EXH012",
+      "event_at": "2026-08-14T09:00:00+08:00",
+      "actor": "服务登记岗",
+      "action": "RECEIVED",
+      "content": "部门批准以后项目归属改了，但导出的付款单还是旧项目。"
+    },
+    {
+      "event_id": "EXH012-E01",
+      "sample_id": "EXH012",
+      "event_at": "2026-08-14T12:00:00+08:00",
+      "actor": "审批岗位",
+      "action": "OBSERVED",
+      "content": "补充材料改变项目或核定金额，现有批准仍对应旧版。"
+    },
+    {
+      "event_id": "EXH012-R01",
+      "sample_id": "EXH012",
+      "event_at": "2026-08-14T18:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "补齐受影响事项的确认后形成新批准，保留旧版本。"
+    },
+    {
+      "event_id": "EXH012-E02",
+      "sample_id": "EXH012",
+      "event_at": "2026-08-14T22:00:00+08:00",
+      "actor": "出纳",
+      "action": "OBSERVED",
+      "content": "付款候选表引用的版本与费用系统不同，出纳暂不能据此付款。"
+    },
+    {
+      "event_id": "EXH012-R02",
+      "sample_id": "EXH012",
+      "event_at": "2026-08-15T07:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "出纳核对有效批准及新清单后结束差异核对；未发生重复付款。"
+    },
+    {
+      "event_id": "EXH012-END",
+      "sample_id": "EXH012",
+      "event_at": "2026-08-15T12:00:00+08:00",
+      "actor": "调查记录岗",
+      "action": "CLOSED",
+      "content": "本次跟踪的待核事项已处理；不据此推定所有经营问题消失。"
+    },
+    {
+      "event_id": "EXH013-E00",
+      "sample_id": "EXH013",
+      "event_at": "2026-08-15T09:00:00+08:00",
+      "actor": "服务登记岗",
+      "action": "RECEIVED",
+      "content": "撤回申请的预占释放了，新的预算表和昨天截图不一样。"
+    },
+    {
+      "event_id": "EXH013-E01",
+      "sample_id": "EXH013",
+      "event_at": "2026-08-15T13:00:00+08:00",
+      "actor": "信息中心",
+      "action": "OBSERVED",
+      "content": "项目页面余额可见，制单人未确认预占是否已经扣除；另有待批申请。"
+    },
+    {
+      "event_id": "EXH013-R01",
+      "sample_id": "EXH013",
+      "event_at": "2026-08-15T20:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "信息人员提供导出时点及预占口径，财务按同一截面复核。"
+    },
+    {
+      "event_id": "EXH013-END",
+      "sample_id": "EXH013",
+      "event_at": "2026-08-16T02:00:00+08:00",
+      "actor": "调查记录岗",
+      "action": "CLOSED",
+      "content": "本次跟踪的待核事项已处理；不据此推定所有经营问题消失。"
+    },
+    {
+      "event_id": "EXH014-E00",
+      "sample_id": "EXH014",
+      "event_at": "2026-08-16T09:00:00+08:00",
+      "actor": "服务登记岗",
+      "action": "RECEIVED",
+      "content": "合肥验收当天往返，交通票和工作确认已齐。"
+    },
+    {
+      "event_id": "EXH014-END",
+      "sample_id": "EXH014",
+      "event_at": "2026-08-16T16:00:00+08:00",
+      "actor": "调查记录岗",
+      "action": "CLOSED",
+      "content": "本次跟踪结束；普通对照无所列六类异常。"
+    },
+    {
+      "event_id": "EXH015-E00",
+      "sample_id": "EXH015",
+      "event_at": "2026-08-17T09:00:00+08:00",
+      "actor": "服务登记岗",
+      "action": "RECEIVED",
+      "content": "住宿超标的原因写在工作群，正式说明只写了按现场要求。"
+    },
+    {
+      "event_id": "EXH015-E01",
+      "sample_id": "EXH015",
+      "event_at": "2026-08-17T11:00:00+08:00",
+      "actor": "财务审核",
+      "action": "OBSERVED",
+      "content": "员工说已上传工作确认，审核留言仍要求说明实际任务；打开附件发现只列到场日期。"
+    },
+    {
+      "event_id": "EXH015-R01",
+      "sample_id": "EXH015",
+      "event_at": "2026-08-17T20:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "补充了具体工作内容，审核记录注明不再重复索取原票据。"
+    },
+    {
+      "event_id": "EXH015-E02",
+      "sample_id": "EXH015",
+      "event_at": "2026-08-17T23:00:00+08:00",
+      "actor": "财务负责人",
+      "action": "OBSERVED",
+      "content": "住宿超过普通标准，员工说明与现场安排有关，但尚未提供安排记录。"
+    },
+    {
+      "event_id": "EXH015-R02",
+      "sample_id": "EXH015",
+      "event_at": "2026-08-18T05:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "补充现场安排后按例外程序复核；记录只证明完成复核，不代表全部超标获准。"
+    },
+    {
+      "event_id": "EXH015-END",
+      "sample_id": "EXH015",
+      "event_at": "2026-08-18T13:00:00+08:00",
+      "actor": "调查记录岗",
+      "action": "CLOSED",
+      "content": "本次跟踪的待核事项已处理；不据此推定所有经营问题消失。"
+    },
+    {
+      "event_id": "EXH016-E00",
+      "sample_id": "EXH016",
+      "event_at": "2026-08-03T09:00:00+08:00",
+      "actor": "服务登记岗",
+      "action": "RECEIVED",
+      "content": "想把联合任务分到两个项目，页面余额是哪一个批次的数据？"
+    },
+    {
+      "event_id": "EXH016-E01",
+      "sample_id": "EXH016",
+      "event_at": "2026-08-03T12:00:00+08:00",
+      "actor": "项目负责人",
+      "action": "OBSERVED",
+      "content": "填报一个项目编号，但任务记录出现两个项目；负责人尚未确认受益关系。"
+    },
+    {
+      "event_id": "EXH016-R01",
+      "sample_id": "EXH016",
+      "event_at": "2026-08-03T22:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "取得双方项目意见后才完成归属确认；不从姓名或所属部门直接确定。"
+    },
+    {
+      "event_id": "EXH016-E02",
+      "sample_id": "EXH016",
+      "event_at": "2026-08-04T02:00:00+08:00",
+      "actor": "信息中心",
+      "action": "OBSERVED",
+      "content": "项目页面余额可见，制单人未确认预占是否已经扣除；另有待批申请。"
+    },
+    {
+      "event_id": "EXH016-R02",
+      "sample_id": "EXH016",
+      "event_at": "2026-08-04T10:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "信息人员提供导出时点及预占口径，财务按同一截面复核。"
+    },
+    {
+      "event_id": "EXH016-END",
+      "sample_id": "EXH016",
+      "event_at": "2026-08-04T15:00:00+08:00",
+      "actor": "调查记录岗",
+      "action": "CLOSED",
+      "content": "本次跟踪的待核事项已处理；不据此推定所有经营问题消失。"
+    },
+    {
+      "event_id": "EXH017-E00",
+      "sample_id": "EXH017",
+      "event_at": "2026-08-04T09:00:00+08:00",
+      "actor": "服务登记岗",
+      "action": "RECEIVED",
+      "content": "新上传的工作记录变更了项目，但审批人之前同意的是单项目。"
+    },
+    {
+      "event_id": "EXH017-E01",
+      "sample_id": "EXH017",
+      "event_at": "2026-08-04T13:00:00+08:00",
+      "actor": "审批岗位",
+      "action": "OBSERVED",
+      "content": "补充材料改变项目或核定金额，现有批准仍对应旧版。"
+    },
+    {
+      "event_id": "EXH017-R01",
+      "sample_id": "EXH017",
+      "event_at": "2026-08-05T00:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "补齐受影响事项的确认后形成新批准，保留旧版本。"
+    },
+    {
+      "event_id": "EXH017-END",
+      "sample_id": "EXH017",
+      "event_at": "2026-08-05T06:00:00+08:00",
+      "actor": "调查记录岗",
+      "action": "CLOSED",
+      "content": "本次跟踪的待核事项已处理；不据此推定所有经营问题消失。"
+    },
+    {
+      "event_id": "EXH018-E00",
+      "sample_id": "EXH018",
+      "event_at": "2026-08-05T09:00:00+08:00",
+      "actor": "服务登记岗",
+      "action": "RECEIVED",
+      "content": "按普通标准办理南京差旅，金额和申请项目一致。"
+    },
+    {
+      "event_id": "EXH018-END",
+      "sample_id": "EXH018",
+      "event_at": "2026-08-05T16:00:00+08:00",
+      "actor": "调查记录岗",
+      "action": "CLOSED",
+      "content": "本次跟踪结束；普通对照无所列六类异常。"
+    },
+    {
+      "event_id": "EXH019-E00",
+      "sample_id": "EXH019",
+      "event_at": "2026-08-06T09:00:00+08:00",
+      "actor": "服务登记岗",
+      "action": "RECEIVED",
+      "content": "回单写已到场，财务希望确认实际做了哪些测试。"
+    },
+    {
+      "event_id": "EXH019-E01",
+      "sample_id": "EXH019",
+      "event_at": "2026-08-06T11:00:00+08:00",
+      "actor": "财务审核",
+      "action": "OBSERVED",
+      "content": "员工说已上传工作确认，审核留言仍要求说明实际任务；打开附件发现只列到场日期。"
+    },
+    {
+      "event_id": "EXH019-R01",
+      "sample_id": "EXH019",
+      "event_at": "2026-08-06T15:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "补充了具体工作内容，审核记录注明不再重复索取原票据。"
+    },
+    {
+      "event_id": "EXH019-END",
+      "sample_id": "EXH019",
+      "event_at": "2026-08-06T23:00:00+08:00",
+      "actor": "调查记录岗",
+      "action": "CLOSED",
+      "content": "本次跟踪的待核事项已处理；不据此推定所有经营问题消失。"
+    },
+    {
+      "event_id": "EXH020-E00",
+      "sample_id": "EXH020",
+      "event_at": "2026-08-07T09:00:00+08:00",
+      "actor": "服务登记岗",
+      "action": "RECEIVED",
+      "content": "跨项目试验又涉及住宿例外，项目同意和财务批准需要分别办理吗？"
+    },
+    {
+      "event_id": "EXH020-E01",
+      "sample_id": "EXH020",
+      "event_at": "2026-08-07T12:00:00+08:00",
+      "actor": "项目负责人",
+      "action": "OBSERVED",
+      "content": "填报一个项目编号，但任务记录出现两个项目；负责人尚未确认受益关系。"
+    },
+    {
+      "event_id": "EXH020-R01",
+      "sample_id": "EXH020",
+      "event_at": "2026-08-07T17:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "取得双方项目意见后才完成归属确认；不从姓名或所属部门直接确定。"
+    },
+    {
+      "event_id": "EXH020-E02",
+      "sample_id": "EXH020",
+      "event_at": "2026-08-07T21:00:00+08:00",
+      "actor": "财务负责人",
+      "action": "OBSERVED",
+      "content": "住宿超过普通标准，员工说明与现场安排有关，但尚未提供安排记录。"
+    },
+    {
+      "event_id": "EXH020-R02",
+      "sample_id": "EXH020",
+      "event_at": "2026-08-08T04:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "补充现场安排后按例外程序复核；记录只证明完成复核，不代表全部超标获准。"
+    },
+    {
+      "event_id": "EXH020-END",
+      "sample_id": "EXH020",
+      "event_at": "2026-08-08T09:00:00+08:00",
+      "actor": "调查记录岗",
+      "action": "CLOSED",
+      "content": "本次跟踪的待核事项已处理；不据此推定所有经营问题消失。"
+    },
+    {
+      "event_id": "EXH021-E00",
+      "sample_id": "EXH021",
+      "event_at": "2026-08-08T09:00:00+08:00",
+      "actor": "服务登记岗",
+      "action": "RECEIVED",
+      "content": "修改费用归属后，预算还占原项目，付款清单没有更新。"
+    },
+    {
+      "event_id": "EXH021-E01",
+      "sample_id": "EXH021",
+      "event_at": "2026-08-08T13:00:00+08:00",
+      "actor": "信息中心",
+      "action": "OBSERVED",
+      "content": "项目页面余额可见，制单人未确认预占是否已经扣除；另有待批申请。"
+    },
+    {
+      "event_id": "EXH021-R01",
+      "sample_id": "EXH021",
+      "event_at": "2026-08-08T19:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "信息人员提供导出时点及预占口径，财务按同一截面复核。"
+    },
+    {
+      "event_id": "EXH021-E02",
+      "sample_id": "EXH021",
+      "event_at": "2026-08-09T00:00:00+08:00",
+      "actor": "审批岗位",
+      "action": "OBSERVED",
+      "content": "补充材料改变项目或核定金额，现有批准仍对应旧版。"
+    },
+    {
+      "event_id": "EXH021-R02",
+      "sample_id": "EXH021",
+      "event_at": "2026-08-09T09:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "补齐受影响事项的确认后形成新批准，保留旧版本。"
+    },
+    {
+      "event_id": "EXH021-E03",
+      "sample_id": "EXH021",
+      "event_at": "2026-08-09T11:00:00+08:00",
+      "actor": "出纳",
+      "action": "OBSERVED",
+      "content": "付款候选表引用的版本与费用系统不同，出纳暂不能据此付款。"
+    },
+    {
+      "event_id": "EXH021-R03",
+      "sample_id": "EXH021",
+      "event_at": "2026-08-09T14:00:00+08:00",
+      "actor": "相关责任岗位",
+      "action": "CONFIRMED",
+      "content": "出纳核对有效批准及新清单后结束差异核对；未发生重复付款。"
+    },
+    {
+      "event_id": "EXH021-END",
+      "sample_id": "EXH021",
+      "event_at": "2026-08-09T20:00:00+08:00",
+      "actor": "调查记录岗",
+      "action": "CLOSED",
+      "content": "本次跟踪的待核事项已处理；不据此推定所有经营问题消失。"
+    },
+    {
+      "event_id": "EXH022-E00",
+      "sample_id": "EXH022",
+      "event_at": "2026-08-09T09:00:00+08:00",
+      "actor": "服务登记岗",
+      "action": "RECEIVED",
+      "content": "材料未变，负责人已经批准，等待周五付款批次。"
+    },
+    {
+      "event_id": "EXH022-END",
+      "sample_id": "EXH022",
+      "event_at": "2026-08-09T16:00:00+08:00",
+      "actor": "调查记录岗",
+      "action": "CLOSED",
+      "content": "本次跟踪结束；普通对照无所列六类异常。"
+    },
+    {
+      "event_id": "EXH023-E00",
+      "sample_id": "EXH023",
+      "event_at": "2026-08-10T09:00:00+08:00",
+      "actor": "服务登记岗",
+      "action": "RECEIVED",
+      "content": "周五下午才完成审核，出纳说明下周二付款，我已经知悉。"
+    },
+    {
+      "event_id": "EXH023-END",
+      "sample_id": "EXH023",
+      "event_at": "2026-08-10T17:00:00+08:00",
+      "actor": "调查记录岗",
+      "action": "CLOSED",
+      "content": "本次跟踪结束；普通对照无所列六类异常。"
+    },
+    {
+      "event_id": "EXH024-E00",
+      "sample_id": "EXH024",
+      "event_at": "2026-08-11T09:00:00+08:00",
+      "actor": "服务登记岗",
+      "action": "RECEIVED",
+      "content": "交通住宿和供餐声明完整，付款回执已经收到。"
+    },
+    {
+      "event_id": "EXH024-END",
+      "sample_id": "EXH024",
+      "event_at": "2026-08-11T14:00:00+08:00",
+      "actor": "调查记录岗",
+      "action": "CLOSED",
+      "content": "本次跟踪结束；普通对照无所列六类异常。"
+    }
+  ]
+}

@@ -1,0 +1,3513 @@
+{
+  "schemaVersion": 1,
+  "id": "internal-service",
+  "version": "1.0.0",
+  "snapshot": "2026-09-10T09:00:00+08:00",
+  "title": "栈鹭循章 · 内部信息服务",
+  "company": "栈鹭循章企业服务公司",
+  "industry": "企业服务 / 内部协作",
+  "background": "企业为零售门店提供运营软件与实施服务。员工遇到资料、项目访问或需求登记问题，会在文档、部门群与信息服务组之间寻找下一步；沿具体事项调查怎样才能继续办事。",
+  "initialRequest": "# 初次沟通记录\n\n记录日期：2026-09-10。发起岗位：信息部门负责人。接收方：项目调研组。\n\n公司的制度、操作说明和业务报告其实不少，但同事遇到事情还是到处问，经常不知道该找谁。支持部门也说，很多问题解释过好几次了，还在反复处理。能不能用 AI，让员工办事更顺畅，也让这些部门少一些重复工作？\n\n我希望先看清楚大家每天到底在处理什么。上个月企业微信和协作表导出了一批记录，但部门群里解决的小问题不一定登记。不要只看回答速度，有的同事拿到回复还是不知道下一步找谁。我也不希望为了让数字好看，要求全员再多填一张表。\n\n可以联系信息服务组轮值、实施顾问、运营报表负责人和项目负责人。经营明细只开放样例，不提供整份管理层资料。先从现有材料开始，缺什么请说明用途。\n",
+  "roles": [
+    {
+      "id": "director",
+      "name": "顾予衡",
+      "title": "信息部门负责人",
+      "accountId": "U16",
+      "departmentId": "D04",
+      "bio": "理解员工办事结果、服务组负担与跨部门边界；可按委托提供历史研究样本。",
+      "style": "先问能否继续办事，不用关闭率替代结果。",
+      "goals": [
+        "看清当前服务需求",
+        "避免为了统计增加重复登记"
+      ],
+      "unknowns": [
+        "U20尚未批准的分摊方案",
+        "全部历史请求真实根因",
+        "未获批准的模型部署与接口",
+        "PRJ-B业务审批"
+      ],
+      "greeting": "你好，我是顾予衡，担任信息部门负责人。你想先了解哪个具体事项？",
+      "factIds": [
+        "internal-service.director.mandate",
+        "internal-service.director.sample",
+        "internal-service.director.authority",
+        "internal-service.director.systems",
+        "internal-service.director.undecided",
+        "internal-service.director.maintenance"
+      ],
+      "assetIds": [
+        "internal-service-mandate",
+        "internal-service-organization",
+        "internal-service-export",
+        "internal-service-history",
+        "internal-service-events",
+        "internal-service-current",
+        "internal-service-accounts",
+        "internal-service-members",
+        "internal-service-catalog",
+        "internal-service-systems",
+        "internal-service-interface",
+        "internal-service-k01",
+        "internal-service-k02",
+        "internal-service-k02-old",
+        "internal-service-k03",
+        "internal-service-k04",
+        "internal-service-k08",
+        "internal-service-k09",
+        "internal-service-k10",
+        "internal-service-c002",
+        "internal-service-c004",
+        "internal-service-c005",
+        "internal-service-c006",
+        "internal-service-interview-director"
+      ],
+      "disclosurePolicy": {
+        "facts": "按本人知识与提问主题查事实；来源记录与亲历区分，不倾倒全案答案。",
+        "assets": "用户明确索取后，按本人资产目录发放原件或标注派生范围的摘录；发放不是业务批准。",
+        "unknowns": "来源不足时说明尚未确认和有权负责岗位；学员转述不是事实。"
+      }
+    },
+    {
+      "id": "duty",
+      "name": "苏澄",
+      "title": "信息服务轮值甲",
+      "accountId": "U13",
+      "departmentId": "D04",
+      "bio": "维护通用导航，处理本人轮值请求、登记与转交；不代表U14/U15的亲历。",
+      "style": "先确认原话、文件版本和下一承接人；用具体记录说明。",
+      "goals": [
+        "减少来回重复问背景",
+        "让同事拿到回复后继续工作"
+      ],
+      "unknowns": [
+        "U14/U15对话的全部细节",
+        "客户项目访问批准",
+        "产品排期",
+        "经营明细与K09受限草稿"
+      ],
+      "greeting": "你好，我是苏澄，担任信息服务轮值甲。你想先了解哪个具体事项？",
+      "factIds": [
+        "internal-service.duty.entry",
+        "internal-service.duty.c001",
+        "internal-service.duty.c004",
+        "internal-service.duty.handover",
+        "internal-service.duty.effort",
+        "internal-service.duty.urgent"
+      ],
+      "assetIds": [
+        "internal-service-organization",
+        "internal-service-export",
+        "internal-service-form",
+        "internal-service-k01",
+        "internal-service-k02",
+        "internal-service-k02-old",
+        "internal-service-k03",
+        "internal-service-k04",
+        "internal-service-k05",
+        "internal-service-k06",
+        "internal-service-k10",
+        "internal-service-c001",
+        "internal-service-c004",
+        "internal-service-duty-history",
+        "internal-service-duty-events",
+        "internal-service-duty-current",
+        "internal-service-interview-duty"
+      ],
+      "disclosurePolicy": {
+        "facts": "按本人知识与提问主题查事实；来源记录与亲历区分，不倾倒全案答案。",
+        "assets": "用户明确索取后，按本人资产目录发放原件或标注派生范围的摘录；发放不是业务批准。",
+        "unknowns": "来源不足时说明尚未确认和有权负责岗位；学员转述不是事实。"
+      }
+    },
+    {
+      "id": "consultant",
+      "name": "叶知遥",
+      "title": "实施顾问",
+      "accountId": "U05",
+      "departmentId": "D02",
+      "bio": "参与PRJ-A；还原本人C001访问经历和自己登记的验收导出需求。",
+      "style": "从客户交付时下一步能否操作出发，区分我申请的查看与导出。",
+      "goals": [
+        "能查看所参与项目进度",
+        "减少补交和重复解释"
+      ],
+      "unknowns": [
+        "U07全部个人对话",
+        "项目负责人的最终批准",
+        "PRJ-A看板是否已实际开通",
+        "其他项目明细"
+      ],
+      "greeting": "你好，我是叶知遥，担任实施顾问。你想先了解哪个具体事项？",
+      "factIds": [
+        "internal-service.consultant.experience",
+        "internal-service.consultant.c001",
+        "internal-service.consultant.registered"
+      ],
+      "assetIds": [
+        "internal-service-organization",
+        "internal-service-demands",
+        "internal-service-form",
+        "internal-service-k01",
+        "internal-service-k02",
+        "internal-service-k02-old",
+        "internal-service-k05",
+        "internal-service-k06",
+        "internal-service-c001",
+        "internal-service-consultant-current",
+        "internal-service-project-members",
+        "internal-service-interview-consultant"
+      ],
+      "disclosurePolicy": {
+        "facts": "按本人知识与提问主题查事实；来源记录与亲历区分，不倾倒全案答案。",
+        "assets": "用户明确索取后，按本人资产目录发放原件或标注派生范围的摘录；发放不是业务批准。",
+        "unknowns": "来源不足时说明尚未确认和有权负责岗位；学员转述不是事实。"
+      }
+    },
+    {
+      "id": "project",
+      "name": "周景安",
+      "title": "PRJ-A项目负责人",
+      "accountId": "U06",
+      "departmentId": "D02",
+      "bio": "确认PRJ-A成员及访问申请；维护PRJ-A交付周报，不代替PRJ-B负责人。",
+      "style": "先查项目身份、范围和用途，明确哪些外部反馈仍待确认。",
+      "goals": [
+        "交付信息在合适范围共享",
+        "访问和导出范围得到明确确认"
+      ],
+      "unknowns": [
+        "PRJ-B的批准",
+        "客户尚未回复的权限确认",
+        "没有批准记录的申请执行结果",
+        "产品研发排期"
+      ],
+      "greeting": "你好，我是周景安，担任PRJ-A项目负责人。你想先了解哪个具体事项？",
+      "factIds": [
+        "internal-service.project.membership",
+        "internal-service.project.scope",
+        "internal-service.project.nonmember",
+        "internal-service.project.progress"
+      ],
+      "assetIds": [
+        "internal-service-organization",
+        "internal-service-k01",
+        "internal-service-k02",
+        "internal-service-k02-old",
+        "internal-service-k07",
+        "internal-service-c001",
+        "internal-service-c004",
+        "internal-service-project-current",
+        "internal-service-project-members",
+        "internal-service-interview-project"
+      ],
+      "disclosurePolicy": {
+        "facts": "按本人知识与提问主题查事实；来源记录与亲历区分，不倾倒全案答案。",
+        "assets": "用户明确索取后，按本人资产目录发放原件或标注派生范围的摘录；发放不是业务批准。",
+        "unknowns": "来源不足时说明尚未确认和有权负责岗位；学员转述不是事实。"
+      }
+    },
+    {
+      "id": "product",
+      "name": "陆闻溪",
+      "title": "产品经理",
+      "accountId": "U11",
+      "departmentId": "D03",
+      "bio": "维护需求登记办法，审阅和去重REQ项；PRJ-A需求的产品承接人，不因此成为PRJ-A明细读者。",
+      "style": "区分问题描述、正式登记、评审和计划；要求具体脱敏样例。",
+      "goals": [
+        "让需求可澄清可追踪",
+        "避免重复编号"
+      ],
+      "unknowns": [
+        "未经评审的研发排期",
+        "客户项目访问批准",
+        "PRJ-A交付周报正文",
+        "未提供的使用字段和脱敏样例"
+      ],
+      "greeting": "你好，我是陆闻溪，担任产品经理。你想先了解哪个具体事项？",
+      "factIds": [
+        "internal-service.product.registration",
+        "internal-service.product.c003",
+        "internal-service.product.fields",
+        "internal-service.product.review"
+      ],
+      "assetIds": [
+        "internal-service-organization",
+        "internal-service-demands",
+        "internal-service-form",
+        "internal-service-k01",
+        "internal-service-k05",
+        "internal-service-c003",
+        "internal-service-product-current",
+        "internal-service-interview-product"
+      ],
+      "disclosurePolicy": {
+        "facts": "按本人知识与提问主题查事实；来源记录与亲历区分，不倾倒全案答案。",
+        "assets": "用户明确索取后，按本人资产目录发放原件或标注派生范围的摘录；发放不是业务批准。",
+        "unknowns": "来源不足时说明尚未确认和有权负责岗位；学员转述不是事实。"
+      }
+    },
+    {
+      "id": "operations",
+      "name": "沈语岑",
+      "title": "运营报表维护员",
+      "accountId": "U18",
+      "departmentId": "D05",
+      "bio": "维护K03服务周报口径；可核对脱敏服务状态，不等于U20运营负责人。",
+      "style": "先确认截止时间、范围和状态定义，再比较数字。",
+      "goals": [
+        "保持服务报表可解释",
+        "只提供所需授权汇总"
+      ],
+      "unknowns": [
+        "U20的分摊决定和受限K09草稿",
+        "管理层经营附件明细",
+        "其他部门请求原话",
+        "日志未确认的下游业务完成"
+      ],
+      "greeting": "你好，我是沈语岑，担任运营报表维护员。你想先了解哪个具体事项？",
+      "factIds": [
+        "internal-service.operations.pending",
+        "internal-service.operations.c002",
+        "internal-service.operations.closure",
+        "internal-service.operations.time"
+      ],
+      "assetIds": [
+        "internal-service-organization",
+        "internal-service-export",
+        "internal-service-k01",
+        "internal-service-k03",
+        "internal-service-c002",
+        "internal-service-operations-current",
+        "internal-service-status-history",
+        "internal-service-status-events",
+        "internal-service-interview-operations"
+      ],
+      "disclosurePolicy": {
+        "facts": "按本人知识与提问主题查事实；来源记录与亲历区分，不倾倒全案答案。",
+        "assets": "用户明确索取后，按本人资产目录发放原件或标注派生范围的摘录；发放不是业务批准。",
+        "unknowns": "来源不足时说明尚未确认和有权负责岗位；学员转述不是事实。"
+      }
+    },
+    {
+      "id": "hr",
+      "name": "许清宁",
+      "title": "人事入职专员",
+      "accountId": "U21",
+      "departmentId": "D06",
+      "bio": "维护新员工说明，发起入职账号开通并记录培训；不批准客户项目权限。",
+      "style": "解释入口和职责，但不把所有重复问题都归因新人。",
+      "goals": [
+        "新人知道办事入口",
+        "培训后能自己完成查找和登记"
+      ],
+      "unknowns": [
+        "全员重复咨询比例",
+        "客户项目批准结果",
+        "尚未提供的具体员工培训完成记录",
+        "信息系统实际搜索权限实现"
+      ],
+      "greeting": "你好，我是许清宁，担任人事入职专员。你想先了解哪个具体事项？",
+      "factIds": [
+        "internal-service.hr.access",
+        "internal-service.hr.repeat",
+        "internal-service.hr.training"
+      ],
+      "assetIds": [
+        "internal-service-organization",
+        "internal-service-accounts",
+        "internal-service-form",
+        "internal-service-k01",
+        "internal-service-k05",
+        "internal-service-k06",
+        "internal-service-interview-hr"
+      ],
+      "disclosurePolicy": {
+        "facts": "按本人知识与提问主题查事实；来源记录与亲历区分，不倾倒全案答案。",
+        "assets": "用户明确索取后，按本人资产目录发放原件或标注派生范围的摘录；发放不是业务批准。",
+        "unknowns": "来源不足时说明尚未确认和有权负责岗位；学员转述不是事实。"
+      }
+    }
+  ],
+  "facts": [
+    {
+      "id": "internal-service.director.mandate",
+      "roleIds": [
+        "director"
+      ],
+      "topic": "员工办事与服务组负担是双重目标",
+      "text": "负责人想先看清每天处理什么；拿到回复仍不知道找谁，不等于问题办成；不希望为美化数字再让全员多填一张表。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/初始材料/01-负责人委托.md",
+          "locator": "原文对应段落",
+          "quote": "我希望先看清楚大家每天到底在处理什么。上个月企业微信和协作表导出了一批记录，但部门群里解决的小问题不一定登记。不要只看回答速度，有的同事拿到回复还是不知道下一步找谁。我也不希望为了让数字好看，要求全员再多填一张表。",
+          "assetId": "internal-service-mandate"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.director.sample",
+      "roleIds": [
+        "director"
+      ],
+      "topic": "研究样本、计数粒度与人工估计边界",
+      "text": "历史240条H请求和720条节点不是公司全量；部门群自解未登记事项未纳入。active_minutes只估轮值操作，不含申请人与其他部门工作；类别不是查明根因。当前6项C事项另列。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/初始材料/03-历史导出说明.md",
+          "locator": "原文对应段落",
+          "quote": "导出范围：2026-08-10—2026-09-02登记的240条研究样本",
+          "assetId": "internal-service-export"
+        },
+        {
+          "path": "source-materials/internal-service/初始材料/03-历史导出说明.md",
+          "locator": "原文对应段落",
+          "quote": "active_minutes为轮值事后估计的实际操作分钟，未含申请人和其他部门工作量，不能拿它当全流程总人工成本。",
+          "assetId": "internal-service-export"
+        },
+        {
+          "path": "source-materials/internal-service/初始材料/03-历史导出说明.md",
+          "locator": "原文对应段落",
+          "quote": "关联事件保留发起、首次回应、关闭三个节点，未保存全部聊天回合",
+          "assetId": "internal-service-export"
+        },
+        {
+          "path": "source-materials/internal-service/初始材料/03-历史导出说明.md",
+          "locator": "原文对应段落",
+          "quote": "当前待处理事项使用C编号，单列不混入历史关闭率。",
+          "assetId": "internal-service-export"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.director.authority",
+      "roleIds": [
+        "director"
+      ],
+      "topic": "部门协作与访问执行不等于业务批准",
+      "text": "服务组可登记和查询状态，不批准项目访问或排产品版本；项目负责人确认项目范围，人事和产品各负责自己的事项。24账号是约240员工中的研究样本。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/初始材料/02-组织与工作安排.md",
+          "locator": "原文对应段落",
+          "quote": "服务组可以登记及查询状态，不批准客户项目访问，不自行排入产品版本。",
+          "assetId": "internal-service-organization"
+        },
+        {
+          "path": "source-materials/internal-service/初始材料/02-组织与工作安排.md",
+          "locator": "原文对应段落",
+          "quote": "企业约240名员工，本包账号表仅选取24个与研究有关的角色，不能据此推算全员比例。",
+          "assetId": "internal-service-organization"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.director.systems",
+      "roleIds": [
+        "director"
+      ],
+      "topic": "现有入口、权限与接口审批条件",
+      "text": "SYS-IM只提供所选导出记录；消息自动接收权限待核对。SYS-REG没有已开通给Agent的写入接口；服务身份可见不能授予所有提问人。模型、服务器、持久化和接口尚未批准。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/企业环境/现有系统与权限.md",
+          "locator": "原文对应段落",
+          "quote": "目前仅提供所选记录，不交付全员聊天历史或任何凭证。可否自动接收消息，需要管理员在下一阶段核对权限。",
+          "assetId": "internal-service-systems"
+        },
+        {
+          "path": "source-materials/internal-service/企业环境/现有系统与权限.md",
+          "locator": "原文对应段落",
+          "quote": "当前不存在已开通给Agent的写入接口。",
+          "assetId": "internal-service-systems"
+        },
+        {
+          "path": "source-materials/internal-service/企业环境/现有系统与权限.md",
+          "locator": "原文对应段落",
+          "quote": "不能把服务账户可见范围直接授予所有提问人。",
+          "assetId": "internal-service-systems"
+        },
+        {
+          "path": "source-materials/internal-service/企业环境/现有系统与权限.md",
+          "locator": "原文对应段落",
+          "quote": "模型方案、服务器、持久化和具体接口权限尚未批准",
+          "assetId": "internal-service-systems"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.director.undecided",
+      "roleIds": [
+        "director"
+      ],
+      "topic": "C005没有已批准的服务额度规则",
+      "text": "K09是仅U16/U20可见的0.3草稿，按人数还是实际使用量尚未决定；9月15日讨论是计划。C005应交U20确认临时处理方式并留决定来源，不能替负责人选规则或公布草稿。",
+      "kind": "unknown",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/业务文件/10-服务额度分摊-草稿.md",
+          "locator": "原文对应段落",
+          "quote": "尚未批准。新设跨部门项目的服务额度拟按实际使用量分摊，部分部门建议按人头分摊；尚未决定。",
+          "assetId": "internal-service-k09"
+        },
+        {
+          "path": "source-materials/internal-service/业务文件/10-服务额度分摊-草稿.md",
+          "locator": "原文对应段落",
+          "quote": "可见范围：U16,U20。",
+          "assetId": "internal-service-k09"
+        },
+        {
+          "path": "source-materials/internal-service/补充调研/C005-沟通记录.md",
+          "locator": "原文对应段落",
+          "quote": "把未定事项交U20确认临时处理方式，并保留决定来源；不能替负责人选一个规则。",
+          "assetId": "internal-service-c005"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.director.maintenance",
+      "roleIds": [
+        "director"
+      ],
+      "topic": "C006计划维护与实际恢复分开",
+      "text": "C006要在9月12日20:30提交且不能重复；K04计划20:00—22:00维护，不证明已恢复。窗口后需核对公告与原任务状态。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/补充调研/C006-沟通记录.md",
+          "locator": "原文对应段落",
+          "quote": "9月12日20:30想提交导入任务。",
+          "assetId": "internal-service-c006"
+        },
+        {
+          "path": "source-materials/internal-service/补充调研/C006-沟通记录.md",
+          "locator": "原文对应段落",
+          "quote": "通知只是计划，实际恢复需公告。",
+          "assetId": "internal-service-c006"
+        },
+        {
+          "path": "source-materials/internal-service/业务文件/05-9月维护窗口.md",
+          "locator": "原文对应段落",
+          "quote": "提交申请在恢复后确认是否成功。",
+          "assetId": "internal-service-k04"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.duty.entry",
+      "roleIds": [
+        "duty"
+      ],
+      "topic": "入口与有效答复应连接下一步工作",
+      "text": "资料导航按项目编号找项目资料、K04找维护、K05找需求；找不到时需原问题、已查位置、项目编号和要继续的工作，不能只回复一个链接。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/业务文件/01-内部资料导航.md",
+          "locator": "原文对应段落",
+          "quote": "找不到时向轮值提供原问题、已经查过的位置、项目编号和需要继续的工作。",
+          "assetId": "internal-service-k01"
+        },
+        {
+          "path": "source-materials/internal-service/初始材料/04-岗位初访.md",
+          "locator": "首轮岗位访谈：仅本人段落",
+          "quote": "轮值甲：不少说明已经写过，发链接最快。不过有人打不开，有人看的是同名旧文件；也有问题根本不是我们能批准。",
+          "assetId": "internal-service-interview-duty"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.duty.c001",
+      "roleIds": [
+        "duty"
+      ],
+      "topic": "C001澄清的是只读范围而非已经导出",
+      "text": "U05用了旧链接；补充确认项目为PRJ-A、只看交付进度到本月底。K02现行2.0还需截止日期；已有成员身份不免除U06确认，U13只完整转交，不声称已开通。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/补充调研/C001-沟通记录.md",
+          "locator": "原文对应段落",
+          "quote": "是PRJ-A，只看交付进度，到本月底。",
+          "assetId": "internal-service-c001"
+        },
+        {
+          "path": "source-materials/internal-service/补充调研/C001-沟通记录.md",
+          "locator": "原文对应段落",
+          "quote": "你在现有项目成员里，但访问申请仍要项目负责人确认。我会把这些信息一起交U06，不需要你再从头描述。",
+          "assetId": "internal-service-c001"
+        },
+        {
+          "path": "source-materials/internal-service/业务文件/02-项目看板访问申请-现行.md",
+          "locator": "原文对应段落",
+          "quote": "默认只读；导出须单独说明。",
+          "assetId": "internal-service-k02"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.duty.c004",
+      "roleIds": [
+        "duty"
+      ],
+      "topic": "C004拒绝越权仍要给合法下一步",
+      "text": "U02明确不在项目组，不能直接转发PRJ-A明细；可先提供全员通用资料，由U06确认项目内容范围。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/补充调研/C004-沟通记录.md",
+          "locator": "原文对应段落",
+          "quote": "我不在项目组，只想借鉴一下。",
+          "assetId": "internal-service-c004"
+        },
+        {
+          "path": "source-materials/internal-service/补充调研/C004-沟通记录.md",
+          "locator": "原文对应段落",
+          "quote": "可以先提供全员可见的通用资料；项目专属内容需获得批准。",
+          "assetId": "internal-service-c004"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.duty.handover",
+      "roleIds": [
+        "duty"
+      ],
+      "topic": "转交不是把人推给另一个群",
+      "text": "交接需保留原话、项目、已核对文件和版本、当前缺项以及需要对方决定的事；发路径后仍要确认能否继续工作。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/业务文件/11-服务组交接要求.md",
+          "locator": "原文对应段落",
+          "quote": "转交时保留请求原话、项目、已核对文件和版本、当前缺项、需要对方决定的事项。回复文件路径后仍需确认申请人能否继续工作。",
+          "assetId": "internal-service-k10"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.duty.effort",
+      "roleIds": [
+        "duty"
+      ],
+      "topic": "追问、转交与本人主动操作估计",
+      "text": "本人处理记录只能按handler_id=U13筛选；追问次数和转交次数是原台账计数字段，三节点事件没有完整聊天回合。本人操作估计不含等待他部门或他人的工作。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/初始材料/04-岗位初访.md",
+          "locator": "首轮岗位访谈：仅本人段落",
+          "quote": "我估的操作时间只含我自己这边，等别的部门期间还会处理其他请求。",
+          "assetId": "internal-service-interview-duty"
+        },
+        {
+          "path": "source-materials/internal-service/初始材料/03-历史导出说明.md",
+          "locator": "原文对应段落",
+          "quote": "关联事件保留发起、首次回应、关闭三个节点，未保存全部聊天回合",
+          "assetId": "internal-service-export"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.duty.urgent",
+      "roleIds": [
+        "duty"
+      ],
+      "topic": "紧急故障升级不能被普通登记替代",
+      "text": "紧急系统中断应联系值班人员，普通登记提问不能代替故障升级；计划维护与恢复状态另查。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/业务文件/11-服务组交接要求.md",
+          "locator": "原文对应段落",
+          "quote": "紧急系统中断联系值班人员，登记提问不能替代故障升级。",
+          "assetId": "internal-service-k10"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.consultant.experience",
+      "roleIds": [
+        "consultant"
+      ],
+      "topic": "教程存在仍可能办不成事",
+      "text": "本人关心下一步能否操作；问能否导出却可能只收到教程，客户项目权限未开时教程本身无用。这是一般亲历，不把C001的只读请求改称导出。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/初始材料/04-岗位初访.md",
+          "locator": "首轮岗位访谈：仅本人段落",
+          "quote": "实施顾问：我关心下一步怎么做。我问“能否导出”，有时收到一个教程，但客户项目权限没开，教程看了也没用。",
+          "assetId": "internal-service-interview-consultant"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.consultant.c001",
+      "roleIds": [
+        "consultant"
+      ],
+      "topic": "本人的C001旧链接、范围与期限",
+      "text": "本人U05按旧链接填写A项目，C001尚待补充申请范围；补充说清PRJ-A、只看交付进度到本月底。成员表有U05，但没有材料证明访问已经开通。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/补充调研/C001-沟通记录.md",
+          "locator": "原文对应段落",
+          "quote": "我按同事发来的旧链接填了表，项目写的是A项目。",
+          "assetId": "internal-service-c001"
+        },
+        {
+          "path": "source-materials/internal-service/补充调研/C001-沟通记录.md",
+          "locator": "原文对应段落",
+          "quote": "是PRJ-A，只看交付进度，到本月底。",
+          "assetId": "internal-service-c001"
+        },
+        {
+          "path": "source-materials/internal-service/派生岗位摘录/project-members.csv",
+          "locator": "project_id=PRJ-A,user_id=U05",
+          "quote": "PRJ-A,U05,成员",
+          "assetId": "internal-service-project-members"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.consultant.registered",
+      "roleIds": [
+        "consultant"
+      ],
+      "topic": "本人原有导出需求仍在澄清",
+      "text": "已有REQ-0818-01由U05提出，主题是实施验收清单导出；当前待需求澄清，缺使用对象与具体样例，planned_release为空。已有编号不是已经排期。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/业务数据/已有需求登记.csv",
+          "locator": "demand_id=REQ-0818-01",
+          "quote": "REQ-0818-01,PRJ-A,U05,实施验收清单导出,2026-08-18T11:20:00,待需求澄清,使用对象与具体样例,,U11",
+          "assetId": "internal-service-demands"
+        },
+        {
+          "path": "source-materials/internal-service/业务文件/06-业务需求登记办法.md",
+          "locator": "原文对应段落",
+          "quote": "编号REQ仅表示已登记，不代表研发排期或预算批准。",
+          "assetId": "internal-service-k05"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.project.membership",
+      "roleIds": [
+        "project"
+      ],
+      "topic": "项目成员与访问批准是两个条件",
+      "text": "PRJ-A由U06负责，U05/U07/U09是成员；成员资格不等于申请已批准，K02要求负责人确认后信息部门执行，不替PRJ-B审批。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/派生岗位摘录/project-members.csv",
+          "locator": "PRJ-A负责人行",
+          "quote": "PRJ-A,U06,负责人",
+          "assetId": "internal-service-project-members"
+        },
+        {
+          "path": "source-materials/internal-service/初始材料/02-组织与工作安排.md",
+          "locator": "原文对应段落",
+          "quote": "成员U05/U07/U09；PRJ-B由U08负责",
+          "assetId": "internal-service-organization"
+        },
+        {
+          "path": "source-materials/internal-service/业务文件/02-项目看板访问申请-现行.md",
+          "locator": "原文对应段落",
+          "quote": "项目负责人确认后由信息部门执行。",
+          "assetId": "internal-service-k02"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.project.scope",
+      "roleIds": [
+        "project"
+      ],
+      "topic": "只读、导出、用途和有效期分别确认",
+      "text": "K02自2026-08-20用2.0版，需项目编号、申请岗位、用途、只读或导出以及截止日期；默认只读，导出须单独说明，紧急也不能绕过批准。C001当前是只读到本月底，不能当已批准导出。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/业务文件/02-项目看板访问申请-现行.md",
+          "locator": "原文对应段落",
+          "quote": "申请需填写项目编号、申请人岗位、用途、只读或导出权限、截止日期。",
+          "assetId": "internal-service-k02"
+        },
+        {
+          "path": "source-materials/internal-service/业务文件/02-项目看板访问申请-现行.md",
+          "locator": "原文对应段落",
+          "quote": "默认只读；导出须单独说明。紧急事项可先登记并通知负责人，不能因此绕过批准。",
+          "assetId": "internal-service-k02"
+        },
+        {
+          "path": "source-materials/internal-service/补充调研/C001-沟通记录.md",
+          "locator": "原文对应段落",
+          "quote": "是PRJ-A，只看交付进度，到本月底。",
+          "assetId": "internal-service-c001"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.project.nonmember",
+      "roleIds": [
+        "project"
+      ],
+      "topic": "非成员参考请求需要确认分享范围",
+      "text": "C004的U02不是PRJ-A成员，知道文件名或想借鉴不代表可拿到K07正文；由U06确认能提供的范围，可先给全员通用资料。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/补充调研/C004-沟通记录.md",
+          "locator": "原文对应段落",
+          "quote": "我不在项目组，只想借鉴一下。",
+          "assetId": "internal-service-c004"
+        },
+        {
+          "path": "source-materials/internal-service/业务文件/08-PRJ-A交付周报.md",
+          "locator": "原文对应段落",
+          "quote": "面向非项目成员只能给出申请访问路径，不转发正文。",
+          "assetId": "internal-service-k07"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.project.progress",
+      "roleIds": [
+        "project"
+      ],
+      "topic": "周报待回复不等于项目组未开始",
+      "text": "PRJ-A截至9月6日18:00有4个检查项：定义确认、权限复核待客户回复、导入演练完成、培训待排；待外部确认不能由内部自动回复替代。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/业务文件/08-PRJ-A交付周报.md",
+          "locator": "原文对应段落",
+          "quote": "截至9月6日18:00，PRJ-A有4个上线检查项：清单定义已确认、权限复核待客户联系人回复、导入演练已完成、培训时间待排。这里的“待回复”不是项目组未发起工作；外部确认不能通过内部自动回复替代。",
+          "assetId": "internal-service-k07"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.product.registration",
+      "roleIds": [
+        "product"
+      ],
+      "topic": "群里提过、已登记与排期是不同状态",
+      "text": "群里说过不等正式登记；同义问题若重复建号会增加去重，已有相同需求应追加并关联。登记后不能自动承诺排期。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/初始材料/04-岗位初访.md",
+          "locator": "首轮岗位访谈：仅本人段落",
+          "quote": "产品经理：群里说过不等于正式登记。相同问题可能换个人又说一次，如果各生成一个编号，我反而要花时间去重。登记后不能自动承诺排期。",
+          "assetId": "internal-service-interview-product"
+        },
+        {
+          "path": "source-materials/internal-service/业务文件/06-业务需求登记办法.md",
+          "locator": "原文对应段落",
+          "quote": "与已有项相同的需求追加信息并关联，不另造一个新需求。",
+          "assetId": "internal-service-k05"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.product.c003",
+      "roleIds": [
+        "product"
+      ],
+      "topic": "C003应关联原有REQ而非再造编号",
+      "text": "C003是U07群里提验收导出，尚未确认登记；补充记录确认与REQ-0818-01同一个问题，可补脱敏清单并追加原号，U11仍需评审。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/补充调研/C003-沟通记录.md",
+          "locator": "原文对应段落",
+          "quote": "同一个问题，我这次可以补一份脱敏清单。",
+          "assetId": "internal-service-c003"
+        },
+        {
+          "path": "source-materials/internal-service/补充调研/C003-沟通记录.md",
+          "locator": "原文对应段落",
+          "quote": "收到样例后追加到原编号，登记不代表已经排期，U11需要继续评审。",
+          "assetId": "internal-service-c003"
+        },
+        {
+          "path": "source-materials/internal-service/业务数据/已有需求登记.csv",
+          "locator": "已有demand_id与原requester_id",
+          "quote": "REQ-0818-01,PRJ-A,U05,实施验收清单导出",
+          "assetId": "internal-service-demands"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.product.fields",
+      "roleIds": [
+        "product"
+      ],
+      "topic": "登记需要可继续沟通的信息",
+      "text": "登记需问题、使用岗位、影响业务、频率或样例、现有替代方式和沟通时间；REQ-0818-01仍缺使用对象和具体样例，planned_release空白不能当计划完成。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/业务文件/06-业务需求登记办法.md",
+          "locator": "原文对应段落",
+          "quote": "登记需说明问题、使用岗位、受影响业务、频率或样例、现有替代方式及希望沟通时间。",
+          "assetId": "internal-service-k05"
+        },
+        {
+          "path": "source-materials/internal-service/业务数据/已有需求登记.csv",
+          "locator": "REQ-0818-01 status/missing/planned_release/owner_id",
+          "quote": "待需求澄清,使用对象与具体样例,,U11",
+          "assetId": "internal-service-demands"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.product.review",
+      "roleIds": [
+        "product"
+      ],
+      "topic": "固定评审节奏不是自动开发承诺",
+      "text": "产品经理每周二审阅，紧急事项需业务负责人说明影响；纳入开发计划需另行评审，表单已登记不是已承诺。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/业务文件/06-业务需求登记办法.md",
+          "locator": "原文对应段落",
+          "quote": "产品经理每周二审阅，紧急事项由业务负责人说明影响。",
+          "assetId": "internal-service-k05"
+        },
+        {
+          "path": "source-materials/internal-service/业务表单/事项登记空表与填写示例.md",
+          "locator": "原文对应段落",
+          "quote": "决定纳入开发计划需要另行评审，表单中“已登记”不代表“已承诺”。",
+          "assetId": "internal-service-form"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.operations.pending",
+      "roleIds": [
+        "operations"
+      ],
+      "topic": "服务队列待处理与部门未关闭不同",
+      "text": "K03的待处理仅指当前需轮值动作的服务组队列；等待申请人补充和等待业务负责人决定另列，不合入待处理。收到量按唯一请求首次登记算，重复提醒不新增。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/业务文件/04-服务周报口径.md",
+          "locator": "原文对应段落",
+          "quote": "待处理为当前在服务组队列中需要轮值动作的请求；等待申请人补充和等待业务负责人决定分别列示，不合入服务组待处理。",
+          "assetId": "internal-service-k03"
+        },
+        {
+          "path": "source-materials/internal-service/业务文件/04-服务周报口径.md",
+          "locator": "原文对应段落",
+          "quote": "收到量按首次登记日期统计唯一请求；重复提醒不增加收到量。",
+          "assetId": "internal-service-k03"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.operations.c002",
+      "roleIds": [
+        "operations"
+      ],
+      "topic": "C002先对齐截止范围再给授权汇总",
+      "text": "C002需先核对两张表的截止时间和范围；K03截止周日18:00。U17只需各状态数量，不需要其他部门同事原话，不能默认发完整明细。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/补充调研/C002-沟通记录.md",
+          "locator": "原文对应段落",
+          "quote": "先确定两张表的截止时间和范围，再比较。",
+          "assetId": "internal-service-c002"
+        },
+        {
+          "path": "source-materials/internal-service/补充调研/C002-沟通记录.md",
+          "locator": "原文对应段落",
+          "quote": "我只需要各状态数量，不需要其他部门同事的请求原话。",
+          "assetId": "internal-service-c002"
+        },
+        {
+          "path": "source-materials/internal-service/业务文件/04-服务周报口径.md",
+          "locator": "原文对应段落",
+          "quote": "周报截止周日18:00；当周未结束请求继续结转。",
+          "assetId": "internal-service-k03"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.operations.closure",
+      "roleIds": [
+        "operations"
+      ],
+      "topic": "关闭标签要连同关闭事件核对",
+      "text": "历史关闭包括已解决、登记完成及转交完成，不能都当业务办成；H0005已转交并关闭，但关闭事件只证明登记/转交、后续另跟踪。K03明确已回复不等于已解决。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/派生岗位摘录/status-history.csv",
+          "locator": "request_id=H0005",
+          "quote": "H0005,访问申请,2026-08-10T11:52:00,2026-08-10T11:57:00,2026-08-12T12:02:00,已转交并关闭,关闭表示本轮服务结束；登记与转交不代表下游业务已完成",
+          "assetId": "internal-service-status-history"
+        },
+        {
+          "path": "source-materials/internal-service/派生岗位摘录/status-events.csv",
+          "locator": "H0005-E3关闭事件content",
+          "quote": "保留依据K02版本1.0；事项已登记/转交，后续状态另跟踪。",
+          "assetId": "internal-service-status-events"
+        },
+        {
+          "path": "source-materials/internal-service/业务文件/04-服务周报口径.md",
+          "locator": "原文对应段落",
+          "quote": "已回复不等于已解决。",
+          "assetId": "internal-service-k03"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.operations.time",
+      "roleIds": [
+        "operations"
+      ],
+      "topic": "自然响应、工作时间与未完事项分母",
+      "text": "历史起止自然时间包含非工作时段，组织只给工作日9:00—18:00值班；无完整节假日调休表不能算工作时间SLA。历史请求与C当前事项不混为关闭率分母，缺少时间不算0。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/初始材料/03-历史导出说明.md",
+          "locator": "原文对应段落",
+          "quote": "开始到关闭的自然时间包含非工作时间。",
+          "assetId": "internal-service-export"
+        },
+        {
+          "path": "source-materials/internal-service/初始材料/02-组织与工作安排.md",
+          "locator": "原文对应段落",
+          "quote": "工作日9:00—18:00值班",
+          "assetId": "internal-service-organization"
+        },
+        {
+          "path": "source-materials/internal-service/初始材料/03-历史导出说明.md",
+          "locator": "原文对应段落",
+          "quote": "当前待处理事项使用C编号，单列不混入历史关闭率。",
+          "assetId": "internal-service-export"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.hr.access",
+      "roleIds": [
+        "hr"
+      ],
+      "topic": "入职账号、岗位与项目成员分别确认",
+      "text": "人事发起入职账号、信息部门开通；通用文档可见不等于客户项目可见，先由主管确认岗位再入对应项目。人事不代替项目负责人批准。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/业务文件/07-新员工操作说明.md",
+          "locator": "原文对应段落",
+          "quote": "入职账号由人事发起、信息部门开通。通用文档可见不意味着所有客户项目可见。先由直属主管确认岗位，再加入对应项目。",
+          "assetId": "internal-service-k06"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.hr.repeat",
+      "roleIds": [
+        "hr"
+      ],
+      "topic": "重复询问不能都归因于新人",
+      "text": "入口可整理得更清楚，但不能认为所有重复问题来自新人，老员工换项目也会重新申请；24账号样本不能证明全员新人比例。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/初始材料/04-岗位初访.md",
+          "locator": "首轮岗位访谈：仅本人段落",
+          "quote": "人事专员：新人不知道公司各个入口，这部分确实可以整理得更清楚。但不能假设所有重复问题都来自新人，老员工换项目也会重新申请。",
+          "assetId": "internal-service-interview-hr"
+        },
+        {
+          "path": "source-materials/internal-service/初始材料/02-组织与工作安排.md",
+          "locator": "原文对应段落",
+          "quote": "本包账号表仅选取24个与研究有关的角色，不能据此推算全员比例。",
+          "assetId": "internal-service-organization"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service.hr.training",
+      "roleIds": [
+        "hr"
+      ],
+      "topic": "培训应验证查找和登记能力",
+      "text": "培训结束要完成一次资料查找和一次模拟事项登记，由人事记录；仅看过教程不能自动算培训完成，本包未提供每人的完成记录。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/internal-service/业务文件/07-新员工操作说明.md",
+          "locator": "原文对应段落",
+          "quote": "培训结束要完成一次资料查找及一次模拟事项登记，完成情况由人事记录。",
+          "assetId": "internal-service-k06"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    }
+  ],
+  "assets": [
+    {
+      "id": "internal-service-mandate",
+      "path": "source-materials/internal-service/初始材料/01-负责人委托.md",
+      "title": "01-负责人委托",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "90516fa19ad063c921f8fc551723ef250eb60b6b997394b799eae712c9478cac",
+      "sizeBytes": 948,
+      "roleIds": [
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-organization",
+      "path": "source-materials/internal-service/初始材料/02-组织与工作安排.md",
+      "title": "02-组织与工作安排",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "e29bc60435f9117894c1e60a598870c3179063f6f272c904f1d298f127b7ca59",
+      "sizeBytes": 1200,
+      "roleIds": [
+        "director",
+        "duty",
+        "consultant",
+        "project",
+        "product",
+        "operations",
+        "hr"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-export",
+      "path": "source-materials/internal-service/初始材料/03-历史导出说明.md",
+      "title": "03-历史导出说明",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "8b1bb83c5a84c8e42dc49083d96bd496be30cf1d2870d91a7bad27135c4503c2",
+      "sizeBytes": 960,
+      "roleIds": [
+        "director",
+        "duty",
+        "operations"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-history",
+      "path": "source-materials/internal-service/业务数据/历史服务请求.csv",
+      "title": "历史服务请求",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "b36b508d4de667e1de49235a2db33ab44ecb4c6720eaa0e213afa28a8ed82db9",
+      "sizeBytes": 67538,
+      "roleIds": [
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-events",
+      "path": "source-materials/internal-service/业务数据/历史处理事件.csv",
+      "title": "历史处理事件",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "96ba638e51faf4c47e20209dc67e754be8a86d715c06fcdd3b16785406ae9167",
+      "sizeBytes": 81553,
+      "roleIds": [
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-current",
+      "path": "source-materials/internal-service/业务数据/当前未完事项.csv",
+      "title": "当前未完事项",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "82d23bd37db886a65e6574f215cf5cef1114e87d2349fd94cca9f32af9ed3634",
+      "sizeBytes": 836,
+      "roleIds": [
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-accounts",
+      "path": "source-materials/internal-service/业务数据/岗位账号.csv",
+      "title": "岗位账号",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "f5beed27ebc1fee8a547a278538ef4e5920e7ce27224c47b07280e1c470f0220",
+      "sizeBytes": 1272,
+      "roleIds": [
+        "director",
+        "hr"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-members",
+      "path": "source-materials/internal-service/业务数据/项目成员.csv",
+      "title": "项目成员",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "1caba89230c0728a285356ab47ff35fc36e1f6ed552f66ef73ac9e56f912a5a2",
+      "sizeBytes": 160,
+      "roleIds": [
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-demands",
+      "path": "source-materials/internal-service/业务数据/已有需求登记.csv",
+      "title": "已有需求登记",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "8b2b088be1f554bc86373214ccf1260c6c884912fd1eb556d2db69dd105494e2",
+      "sizeBytes": 212,
+      "roleIds": [
+        "product",
+        "consultant"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-catalog",
+      "path": "source-materials/internal-service/业务数据/文件目录与版本.csv",
+      "title": "文件目录与版本",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "78598e50855dd3d8ed4f55dc32c0ee8b3378dee06074cc1c3b6addd1cf5385bc",
+      "sizeBytes": 1333,
+      "roleIds": [
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-systems",
+      "path": "source-materials/internal-service/企业环境/现有系统与权限.md",
+      "title": "现有系统与权限",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "1a6136265c6083e76356fb5b320a3364b8e47b9f1ebd0f894727391fd8907998",
+      "sizeBytes": 1543,
+      "roleIds": [
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-interface",
+      "path": "source-materials/internal-service/企业环境/现有导出接口样例.json",
+      "title": "现有导出接口样例",
+      "mime": "application/json",
+      "version": "snapshot-2026-09-10",
+      "sha256": "29958a2f94ab64b5781088a467e1d31413a876326b9f784995ceb13e90ec3f22",
+      "sizeBytes": 702,
+      "roleIds": [
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-form",
+      "path": "source-materials/internal-service/业务表单/事项登记空表与填写示例.md",
+      "title": "事项登记空表与填写示例",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "be438f47afdb214ab1bb9d17135924bacd3387bfa2bee90ab75a1ea50a6b3e2d",
+      "sizeBytes": 790,
+      "roleIds": [
+        "product",
+        "duty",
+        "consultant",
+        "hr"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-k01",
+      "path": "source-materials/internal-service/业务文件/01-内部资料导航.md",
+      "title": "01-内部资料导航",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "58a12abdd5ace59c7efed45b99d45594ab3256f3727f184109ada2fa231639f6",
+      "sizeBytes": 522,
+      "roleIds": [
+        "director",
+        "duty",
+        "consultant",
+        "project",
+        "product",
+        "operations",
+        "hr"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-k02",
+      "path": "source-materials/internal-service/业务文件/02-项目看板访问申请-现行.md",
+      "title": "02-项目看板访问申请-现行",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "b2e3be673c3bf0d46c1cc70725d151380a6f9dd18e888ca1e15c366c74b5c54b",
+      "sizeBytes": 607,
+      "roleIds": [
+        "director",
+        "duty",
+        "consultant",
+        "project"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-k02-old",
+      "path": "source-materials/internal-service/业务文件/03-项目看板访问申请-历史.md",
+      "title": "03-项目看板访问申请-历史",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "33258bfd0a431da6a341ff063586b28cb204343563c35e19a2a592ab92a2d372",
+      "sizeBytes": 476,
+      "roleIds": [
+        "director",
+        "duty",
+        "consultant",
+        "project"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-k03",
+      "path": "source-materials/internal-service/业务文件/04-服务周报口径.md",
+      "title": "04-服务周报口径",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "861f718eddbb673c03310d1b404f3d01d3a92e33c2e05f73f058486c504da680",
+      "sizeBytes": 617,
+      "roleIds": [
+        "director",
+        "duty",
+        "operations"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-k04",
+      "path": "source-materials/internal-service/业务文件/05-9月维护窗口.md",
+      "title": "05-9月维护窗口",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "c3cea96af1516862eef92b872f382f879fec948121beacbda46f198a1c35996b",
+      "sizeBytes": 518,
+      "roleIds": [
+        "director",
+        "duty"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-k05",
+      "path": "source-materials/internal-service/业务文件/06-业务需求登记办法.md",
+      "title": "06-业务需求登记办法",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "89072e9c1cb42eefb22cdbfb2c9a48abbea5e60eaea7b64bc4e85837ec49378a",
+      "sizeBytes": 621,
+      "roleIds": [
+        "product",
+        "duty",
+        "consultant",
+        "hr"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-k06",
+      "path": "source-materials/internal-service/业务文件/07-新员工操作说明.md",
+      "title": "07-新员工操作说明",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "f3e1ffb803313164bc6c64cf6556d4eda5aa25c79db185195d4608222c7442b0",
+      "sizeBytes": 552,
+      "roleIds": [
+        "hr",
+        "duty",
+        "consultant"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-k07",
+      "path": "source-materials/internal-service/业务文件/08-PRJ-A交付周报.md",
+      "title": "08-PRJ-A交付周报",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "f5b5508856f762684996dfc2a33e42c15bdf11bc599634e0fff4e119c06c4cbd",
+      "sizeBytes": 644,
+      "roleIds": [
+        "project"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-k08",
+      "path": "source-materials/internal-service/业务文件/09-经营附件访问说明.md",
+      "title": "09-经营附件访问说明",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "9a21156e2a08cb596c7bf12494b5d9e1981369db1eb374f8d67406e742700fd5",
+      "sizeBytes": 549,
+      "roleIds": [
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-k09",
+      "path": "source-materials/internal-service/业务文件/10-服务额度分摊-草稿.md",
+      "title": "10-服务额度分摊-草稿",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "7cc2ab9c8abe462cd91f575b0c683e5eb66f283d91cdf3fd8c12e435c6c1437f",
+      "sizeBytes": 541,
+      "roleIds": [
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-k10",
+      "path": "source-materials/internal-service/业务文件/11-服务组交接要求.md",
+      "title": "11-服务组交接要求",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "f4ba68555def75901a6aae3ce5b2e644cfe0210135b04eb8348a71208fb24205",
+      "sizeBytes": 579,
+      "roleIds": [
+        "director",
+        "duty"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-c001",
+      "path": "source-materials/internal-service/补充调研/C001-沟通记录.md",
+      "title": "C001-沟通记录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "ebe6bbba8e66d700cbee68abdbe2dcfd560aa269346cd5a9e6f2979add18d8eb",
+      "sizeBytes": 516,
+      "roleIds": [
+        "duty",
+        "consultant",
+        "project"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-c002",
+      "path": "source-materials/internal-service/补充调研/C002-沟通记录.md",
+      "title": "C002-沟通记录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "10fbe0bb5d10d1f83f2e7e5de78e5dc8f939c6d4113ff6239fb29d50935ea394",
+      "sizeBytes": 474,
+      "roleIds": [
+        "director",
+        "operations"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-c003",
+      "path": "source-materials/internal-service/补充调研/C003-沟通记录.md",
+      "title": "C003-沟通记录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "2be39a7d32189febf076fe42c9776b622b7f14515f14e4c5cb710278a4fc25bf",
+      "sizeBytes": 438,
+      "roleIds": [
+        "product"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-c004",
+      "path": "source-materials/internal-service/补充调研/C004-沟通记录.md",
+      "title": "C004-沟通记录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "884452cb0c16bd4be85f5eb404f53119bdbd7fbc94fc84dd7f3c169ac2493249",
+      "sizeBytes": 430,
+      "roleIds": [
+        "director",
+        "duty",
+        "project"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-c005",
+      "path": "source-materials/internal-service/补充调研/C005-沟通记录.md",
+      "title": "C005-沟通记录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "be7055c5ece2839144252d2b19dac423a09bf244c35ebacca08a80cba712908e",
+      "sizeBytes": 454,
+      "roleIds": [
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-c006",
+      "path": "source-materials/internal-service/补充调研/C006-沟通记录.md",
+      "title": "C006-沟通记录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "eeeab6954de618ea234d6547067fe61bc145c7503b1f10e9bb42da76cf08304e",
+      "sizeBytes": 421,
+      "roleIds": [
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-duty-history",
+      "path": "source-materials/internal-service/派生岗位摘录/duty-history.csv",
+      "title": "轮值甲U13本人处理请求摘录",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "b7756041306562aad6eab9c8ba1214e4419df7a004c06ffd50fa5811a70ba737",
+      "sizeBytes": 22902,
+      "roleIds": [
+        "duty"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-duty-events",
+      "path": "source-materials/internal-service/派生岗位摘录/duty-events.csv",
+      "title": "轮值甲U13本人请求的原始事件摘录",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "0a5f08fa0147befb7583efd3192ae2da8d7e5b948086f1dde1b86310f0cda414",
+      "sizeBytes": 27221,
+      "roleIds": [
+        "duty"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-duty-current",
+      "path": "source-materials/internal-service/派生岗位摘录/duty-current.csv",
+      "title": "U13直接参与的C001与C004事项",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "03b5b2d8d750b5472349672cfd71441dbee53283c0312e68f384780d22b3a3dd",
+      "sizeBytes": 358,
+      "roleIds": [
+        "duty"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-consultant-current",
+      "path": "source-materials/internal-service/派生岗位摘录/consultant-current.csv",
+      "title": "实施顾问U05本人的当前事项",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "ef5996c13f1ab2c52408dcb42bca8ab8039930acbac46ae2d6ded0a9a7788f76",
+      "sizeBytes": 243,
+      "roleIds": [
+        "consultant"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-project-current",
+      "path": "source-materials/internal-service/派生岗位摘录/project-current.csv",
+      "title": "PRJ-A负责人待核实访问事项",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "03b5b2d8d750b5472349672cfd71441dbee53283c0312e68f384780d22b3a3dd",
+      "sizeBytes": 358,
+      "roleIds": [
+        "project"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-project-members",
+      "path": "source-materials/internal-service/派生岗位摘录/project-members.csv",
+      "title": "PRJ-A项目成员原始行摘录",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "41bc2eb9b2634ea7745ca90d8b7f4f560fe852425a390f578f2ce5845bd360d1",
+      "sizeBytes": 103,
+      "roleIds": [
+        "project",
+        "consultant"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-product-current",
+      "path": "source-materials/internal-service/派生岗位摘录/product-current.csv",
+      "title": "产品承接的C003需求登记事项",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "2a5bf91c13a5ccabcb6af208d28c200ac99e7cd937d5fc064114b6605ccc2836",
+      "sizeBytes": 225,
+      "roleIds": [
+        "product"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-operations-current",
+      "path": "source-materials/internal-service/派生岗位摘录/operations-current.csv",
+      "title": "报表维护岗位需核对的C002事项",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "abf2cdf79c52d5239ad81543ec915347d76056f95d7d75d6a32230d9e2347e59",
+      "sizeBytes": 232,
+      "roleIds": [
+        "operations"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-status-history",
+      "path": "source-materials/internal-service/派生岗位摘录/status-history.csv",
+      "title": "历史服务状态核对摘录（不含他人原话与账号）",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "bd1dd2aab55c28618353155d64b04555fb4de78d56fc94e0e2f6d8256a58cef7",
+      "sizeBytes": 42673,
+      "roleIds": [
+        "operations"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-status-events",
+      "path": "source-materials/internal-service/派生岗位摘录/status-events.csv",
+      "title": "首次回应与关闭事件摘录（不含发起原话与账号）",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "aae2f1460fc06abaa62e54f464c6102adea58528aab9b2f8179f5dfc11bc7b11",
+      "sizeBytes": 55656,
+      "roleIds": [
+        "operations"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-interview-director",
+      "path": "source-materials/internal-service/派生岗位摘录/interview-director.md",
+      "title": "信息部门负责人本人来源摘录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "743055fd2731bc4e5eefa015b5ade70350fbef88a2110649aab7baa66ec00515",
+      "sizeBytes": 4018,
+      "roleIds": [
+        "director"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-interview-duty",
+      "path": "source-materials/internal-service/派生岗位摘录/interview-duty.md",
+      "title": "信息服务轮值甲本人来源摘录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "9fbd848ce1c4f8be7a37841e691990fa96c433ae2be9dc58df58ca05f5dada1c",
+      "sizeBytes": 2693,
+      "roleIds": [
+        "duty"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-interview-consultant",
+      "path": "source-materials/internal-service/派生岗位摘录/interview-consultant.md",
+      "title": "实施顾问本人来源摘录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "ee107979478c0f21f1819f0bf7da3fc97434b3580d6b5bf28f51b81068a52f00",
+      "sizeBytes": 1430,
+      "roleIds": [
+        "consultant"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-interview-project",
+      "path": "source-materials/internal-service/派生岗位摘录/interview-project.md",
+      "title": "PRJ-A项目负责人本人来源摘录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "f710741cd639fcdbc085901649a6ebfb5538db479889ea6bd8d6296804b8cdfe",
+      "sizeBytes": 2153,
+      "roleIds": [
+        "project"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-interview-product",
+      "path": "source-materials/internal-service/派生岗位摘录/interview-product.md",
+      "title": "产品经理本人来源摘录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "332133fab582752c255940c63069972188668eb91d2269dceafd989d1e9b0d6f",
+      "sizeBytes": 2217,
+      "roleIds": [
+        "product"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-interview-operations",
+      "path": "source-materials/internal-service/派生岗位摘录/interview-operations.md",
+      "title": "运营报表维护员本人来源摘录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "93db43240f84acd4923a3feb8f1591ff1d3f6c4beb7007a9b43d90ced973bea0",
+      "sizeBytes": 2507,
+      "roleIds": [
+        "operations"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "internal-service-interview-hr",
+      "path": "source-materials/internal-service/派生岗位摘录/interview-hr.md",
+      "title": "人事入职专员本人来源摘录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "ec5cd96e3104cdf61c16a64bbd588b6d951910d67d0784a3212ec80e0f7f1b6e",
+      "sizeBytes": 1265,
+      "roleIds": [
+        "hr"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    }
+  ],
+  "discoveries": [
+    {
+      "id": "internal-service.director.mandate",
+      "roleId": "director",
+      "title": "员工办事与服务组负担是双重目标",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "internal-service.director.mandate"
+      ],
+      "requiredAssetIds": [
+        "internal-service-mandate"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：负责人想先看清每天处理什么；拿到回复仍不知道找谁，不等于问题办成；不希望为美化数字再让全员多填一张表。",
+      "positiveExample": "只提高回复速度或要求多登记，能否代表这次目标达成？请说明您关心的两侧结果。",
+      "negativeExample": "只提关键词、学员自行断言、未提交流式文字或没有本人引用均不成立。",
+      "hints": [
+        "您最近仍被追问的事情，要怎样才算同事能继续办事？",
+        "只提高回复速度或要求多登记，能否代表这次目标达成？请说明您关心的两侧结果。"
+      ],
+      "reportSections": [
+        "原始诉求与调查范围"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "closure"
+      ],
+      "businessMeaning": "员工办事与服务组负担是双重目标",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/初始材料/01-负责人委托.md",
+          "locator": "原文对应段落"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.director.sample",
+      "roleId": "director",
+      "title": "研究样本、计数粒度与人工估计边界",
+      "type": "quantitative",
+      "required": true,
+      "factIds": [
+        "internal-service.director.sample"
+      ],
+      "requiredAssetIds": [
+        "internal-service-history",
+        "internal-service-events",
+        "internal-service-export",
+        "internal-service-current",
+        "internal-service-organization"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：历史240条H请求和720条节点不是公司全量；部门群自解未登记事项未纳入。active_minutes只估轮值操作，不含申请人与其他部门工作；类别不是查明根因。当前6项C事项另列。",
+      "positiveExample": "请提供历史请求、处理事件、导出说明、当前事项与值班安排，说明H和C编号、节点与请求、主动投入与等待的区别。",
+      "negativeExample": "把720事件当720请求、把24账号当全体员工、把轮值估计工时当全部人力或外推公司全年收益均不成立。",
+      "hints": [
+        "这批台账覆盖哪些请求，谁的投入能从中量化？",
+        "请提供历史请求、处理事件、导出说明、当前事项与值班安排，说明H和C编号、节点与请求、主动投入与等待的区别。"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "closure"
+      ],
+      "businessMeaning": "研究样本、计数粒度与人工估计边界",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/初始材料/03-历史导出说明.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/初始材料/03-历史导出说明.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/初始材料/03-历史导出说明.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/初始材料/03-历史导出说明.md",
+          "locator": "原文对应段落"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.director.authority",
+      "roleId": "director",
+      "title": "部门协作与访问执行不等于业务批准",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "internal-service.director.authority"
+      ],
+      "requiredAssetIds": [
+        "internal-service-organization",
+        "internal-service-accounts"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：服务组可登记和查询状态，不批准项目访问或排产品版本；项目负责人确认项目范围，人事和产品各负责自己的事项。24账号是约240员工中的研究样本。",
+      "positiveExample": "请用项目访问或需求排期说明登记、确认、执行由谁负责；账号表能否当全员花名册？",
+      "negativeExample": "只提关键词、学员自行断言、未提交流式文字或没有本人引用均不成立。",
+      "hints": [
+        "信息服务组能决定哪些事，哪些必须由业务岗位承接？",
+        "请用项目访问或需求排期说明登记、确认、执行由谁负责；账号表能否当全员花名册？"
+      ],
+      "reportSections": [
+        "业务背景与组织职责"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "registration"
+      ],
+      "businessMeaning": "部门协作与访问执行不等于业务批准",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/初始材料/02-组织与工作安排.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/初始材料/02-组织与工作安排.md",
+          "locator": "原文对应段落"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.director.systems",
+      "roleId": "director",
+      "title": "现有入口、权限与接口审批条件",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "internal-service.director.systems"
+      ],
+      "requiredAssetIds": [
+        "internal-service-systems",
+        "internal-service-interface",
+        "internal-service-k08",
+        "internal-service-catalog"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：SYS-IM只提供所选导出记录；消息自动接收权限待核对。SYS-REG没有已开通给Agent的写入接口；服务身份可见不能授予所有提问人。模型、服务器、持久化和接口尚未批准。",
+      "positiveExample": "请给出系统说明、导出接口样例、经营附件访问说明与文件目录，区分已有导出、尚未批准的自动接收和写入能力。",
+      "negativeExample": "只提关键词、学员自行断言、未提交流式文字或没有本人引用均不成立。",
+      "hints": [
+        "现有哪些可用导出和实际权限，还有哪些接入条件没确认？",
+        "请给出系统说明、导出接口样例、经营附件访问说明与文件目录，区分已有导出、尚未批准的自动接收和写入能力。"
+      ],
+      "reportSections": [
+        "数据系统与企业条件"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "access"
+      ],
+      "businessMeaning": "现有入口、权限与接口审批条件",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/企业环境/现有系统与权限.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/企业环境/现有系统与权限.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/企业环境/现有系统与权限.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/企业环境/现有系统与权限.md",
+          "locator": "原文对应段落"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.director.undecided",
+      "roleId": "director",
+      "title": "C005没有已批准的服务额度规则",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "internal-service.director.undecided"
+      ],
+      "requiredAssetIds": [
+        "internal-service-k09",
+        "internal-service-c005"
+      ],
+      "allowUnknown": true,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：K09是仅U16/U20可见的0.3草稿，按人数还是实际使用量尚未决定；9月15日讨论是计划。C005应交U20确认临时处理方式并留决定来源，不能替负责人选规则或公布草稿。",
+      "positiveExample": "请核实C005能否按传闻直接分摊，现行规则和临时处理方式分别缺谁的决定。",
+      "negativeExample": "把K09草稿或9月15日讨论当已生效制度、让U18替U20批准，均不成立。",
+      "hints": [
+        "有哪些问题即使搜遍文档也还需要负责人作决定？",
+        "请核实C005能否按传闻直接分摊，现行规则和临时处理方式分别缺谁的决定。"
+      ],
+      "reportSections": [
+        "数据系统与企业条件"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "registration"
+      ],
+      "businessMeaning": "C005没有已批准的服务额度规则",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/业务文件/10-服务额度分摊-草稿.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/业务文件/10-服务额度分摊-草稿.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/补充调研/C005-沟通记录.md",
+          "locator": "原文对应段落"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.director.maintenance",
+      "roleId": "director",
+      "title": "C006计划维护与实际恢复分开",
+      "type": "interview",
+      "required": false,
+      "factIds": [
+        "internal-service.director.maintenance"
+      ],
+      "requiredAssetIds": [
+        "internal-service-k04",
+        "internal-service-c006"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：C006要在9月12日20:30提交且不能重复；K04计划20:00—22:00维护，不证明已恢复。窗口后需核对公告与原任务状态。",
+      "positiveExample": "请区分C006的计划时间、实际恢复公告和防重复提交的状态核对。",
+      "negativeExample": "只提关键词、学员自行断言、未提交流式文字或没有本人引用均不成立。",
+      "hints": [
+        "如果同事要在维护窗口提交任务，需要确认哪些状态？",
+        "请区分C006的计划时间、实际恢复公告和防重复提交的状态核对。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "registration"
+      ],
+      "businessMeaning": "C006计划维护与实际恢复分开",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/补充调研/C006-沟通记录.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/补充调研/C006-沟通记录.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/业务文件/05-9月维护窗口.md",
+          "locator": "原文对应段落"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.duty.entry",
+      "roleId": "duty",
+      "title": "入口与有效答复应连接下一步工作",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "internal-service.duty.entry"
+      ],
+      "requiredAssetIds": [
+        "internal-service-k01",
+        "internal-service-interview-duty"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：资料导航按项目编号找项目资料、K04找维护、K05找需求；找不到时需原问题、已查位置、项目编号和要继续的工作，不能只回复一个链接。",
+      "positiveExample": "怎么区分找不到文件、版本不对与无权访问？向同事补问哪些上下文？",
+      "negativeExample": "只提关键词、学员自行断言、未提交流式文字或没有本人引用均不成立。",
+      "hints": [
+        "请还原您接到一个问题后如何确认下一步，而不只发链接。",
+        "怎么区分找不到文件、版本不对与无权访问？向同事补问哪些上下文？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "access"
+      ],
+      "businessMeaning": "入口与有效答复应连接下一步工作",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/业务文件/01-内部资料导航.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/初始材料/04-岗位初访.md",
+          "locator": "首轮岗位访谈：仅本人段落"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.duty.c001",
+      "roleId": "duty",
+      "title": "C001澄清的是只读范围而非已经导出",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "internal-service.duty.c001"
+      ],
+      "requiredAssetIds": [
+        "internal-service-c001",
+        "internal-service-k02",
+        "internal-service-k02-old",
+        "internal-service-duty-current"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：U05用了旧链接；补充确认项目为PRJ-A、只看交付进度到本月底。K02现行2.0还需截止日期；已有成员身份不免除U06确认，U13只完整转交，不声称已开通。",
+      "positiveExample": "请给出C001记录、新旧申请表，分清查看/导出、项目、期限和仍待批准的部分。",
+      "negativeExample": "把C001只读诉求改写成导出申请、把成员资格当已开通、称U13已批准均不成立。",
+      "hints": [
+        "拿C001看，您要补清哪些信息才能交给负责人？",
+        "请给出C001记录、新旧申请表，分清查看/导出、项目、期限和仍待批准的部分。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "access"
+      ],
+      "businessMeaning": "C001澄清的是只读范围而非已经导出",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/补充调研/C001-沟通记录.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/补充调研/C001-沟通记录.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/业务文件/02-项目看板访问申请-现行.md",
+          "locator": "原文对应段落"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.duty.c004",
+      "roleId": "duty",
+      "title": "C004拒绝越权仍要给合法下一步",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "internal-service.duty.c004"
+      ],
+      "requiredAssetIds": [
+        "internal-service-c004",
+        "internal-service-duty-current"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：U02明确不在项目组，不能直接转发PRJ-A明细；可先提供全员通用资料，由U06确认项目内容范围。",
+      "positiveExample": "请提供C004沟通记录，说明不能发什么、现在能给什么、谁可确认后续范围。",
+      "negativeExample": "只提关键词、学员自行断言、未提交流式文字或没有本人引用均不成立。",
+      "hints": [
+        "同事知道文件名却不在项目里，您会如何接续？",
+        "请提供C004沟通记录，说明不能发什么、现在能给什么、谁可确认后续范围。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "access"
+      ],
+      "businessMeaning": "C004拒绝越权仍要给合法下一步",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/补充调研/C004-沟通记录.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/补充调研/C004-沟通记录.md",
+          "locator": "原文对应段落"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.duty.handover",
+      "roleId": "duty",
+      "title": "转交不是把人推给另一个群",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "internal-service.duty.handover"
+      ],
+      "requiredAssetIds": [
+        "internal-service-k10"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：交接需保留原话、项目、已核对文件和版本、当前缺项以及需要对方决定的事；发路径后仍要确认能否继续工作。",
+      "positiveExample": "请提供现行交接要求，说明回复链接和服务结束之间还需做什么确认。",
+      "negativeExample": "只提关键词、学员自行断言、未提交流式文字或没有本人引用均不成立。",
+      "hints": [
+        "一份让下一岗位能接着办的交接记录应包含什么？",
+        "请提供现行交接要求，说明回复链接和服务结束之间还需做什么确认。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "registration"
+      ],
+      "businessMeaning": "转交不是把人推给另一个群",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/业务文件/11-服务组交接要求.md",
+          "locator": "原文对应段落"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.duty.effort",
+      "roleId": "duty",
+      "title": "追问、转交与本人主动操作估计",
+      "type": "quantitative",
+      "required": true,
+      "factIds": [
+        "internal-service.duty.effort"
+      ],
+      "requiredAssetIds": [
+        "internal-service-duty-history",
+        "internal-service-duty-events",
+        "internal-service-export",
+        "internal-service-interview-duty"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：本人处理记录只能按handler_id=U13筛选；追问次数和转交次数是原台账计数字段，三节点事件没有完整聊天回合。本人操作估计不含等待他部门或他人的工作。",
+      "positiveExample": "请给出U13本人处理的请求与对应事件，说明哪些人工和聊天细节没有被测量。",
+      "negativeExample": "只提关键词、学员自行断言、未提交流式文字或没有本人引用均不成立。",
+      "hints": [
+        "您记录的操作分钟和追问转交，能说明哪些负担？",
+        "请给出U13本人处理的请求与对应事件，说明哪些人工和聊天细节没有被测量。"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "closure"
+      ],
+      "businessMeaning": "追问、转交与本人主动操作估计",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/初始材料/04-岗位初访.md",
+          "locator": "首轮岗位访谈：仅本人段落"
+        },
+        {
+          "path": "source-materials/internal-service/初始材料/03-历史导出说明.md",
+          "locator": "原文对应段落"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.duty.urgent",
+      "roleId": "duty",
+      "title": "紧急故障升级不能被普通登记替代",
+      "type": "interview",
+      "required": false,
+      "factIds": [
+        "internal-service.duty.urgent"
+      ],
+      "requiredAssetIds": [
+        "internal-service-k10"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：紧急系统中断应联系值班人员，普通登记提问不能代替故障升级；计划维护与恢复状态另查。",
+      "positiveExample": "请用现行交接要求解释故障升级边界。",
+      "negativeExample": "只提关键词、学员自行断言、未提交流式文字或没有本人引用均不成立。",
+      "hints": [
+        "紧急中断与普通查询走的接续方式有什么区别？",
+        "请用现行交接要求解释故障升级边界。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "registration"
+      ],
+      "businessMeaning": "紧急故障升级不能被普通登记替代",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/业务文件/11-服务组交接要求.md",
+          "locator": "原文对应段落"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.consultant.experience",
+      "roleId": "consultant",
+      "title": "教程存在仍可能办不成事",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "internal-service.consultant.experience"
+      ],
+      "requiredAssetIds": [
+        "internal-service-interview-consultant"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：本人关心下一步能否操作；问能否导出却可能只收到教程，客户项目权限未开时教程本身无用。这是一般亲历，不把C001的只读请求改称导出。",
+      "positiveExample": "请分清一般导出经历和C001当次的实际查看诉求，哪些障碍不是再解释教程能消除？",
+      "negativeExample": "只提关键词、学员自行断言、未提交流式文字或没有本人引用均不成立。",
+      "hints": [
+        "最近拿到说明却仍不能继续工作的经历是什么？",
+        "请分清一般导出经历和C001当次的实际查看诉求，哪些障碍不是再解释教程能消除？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "access"
+      ],
+      "businessMeaning": "教程存在仍可能办不成事",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/初始材料/04-岗位初访.md",
+          "locator": "首轮岗位访谈：仅本人段落"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.consultant.c001",
+      "roleId": "consultant",
+      "title": "本人的C001旧链接、范围与期限",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "internal-service.consultant.c001"
+      ],
+      "requiredAssetIds": [
+        "internal-service-consultant-current",
+        "internal-service-c001",
+        "internal-service-project-members",
+        "internal-service-k02-old",
+        "internal-service-k02"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：本人U05按旧链接填写A项目，C001尚待补充申请范围；补充说清PRJ-A、只看交付进度到本月底。成员表有U05，但没有材料证明访问已经开通。",
+      "positiveExample": "请提供C001本人记录、新旧表和PRJ-A成员摘录；哪些已经明确、哪个批准还不能说完成？",
+      "negativeExample": "只提关键词、学员自行断言、未提交流式文字或没有本人引用均不成立。",
+      "hints": [
+        "请还原您当次填了哪份表，希望看什么、到何时。",
+        "请提供C001本人记录、新旧表和PRJ-A成员摘录；哪些已经明确、哪个批准还不能说完成？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "access"
+      ],
+      "businessMeaning": "本人的C001旧链接、范围与期限",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/补充调研/C001-沟通记录.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/补充调研/C001-沟通记录.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/派生岗位摘录/project-members.csv",
+          "locator": "project_id=PRJ-A,user_id=U05"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.consultant.registered",
+      "roleId": "consultant",
+      "title": "本人原有导出需求仍在澄清",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "internal-service.consultant.registered"
+      ],
+      "requiredAssetIds": [
+        "internal-service-demands",
+        "internal-service-k05"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：已有REQ-0818-01由U05提出，主题是实施验收清单导出；当前待需求澄清，缺使用对象与具体样例，planned_release为空。已有编号不是已经排期。",
+      "positiveExample": "请提供已有需求行，说明编号、缺项和空的计划版本分别意味着什么。",
+      "negativeExample": "只提关键词、学员自行断言、未提交流式文字或没有本人引用均不成立。",
+      "hints": [
+        "您之前提的验收导出需求，现在有哪些可核实记录？",
+        "请提供已有需求行，说明编号、缺项和空的计划版本分别意味着什么。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "registration"
+      ],
+      "businessMeaning": "本人原有导出需求仍在澄清",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/业务数据/已有需求登记.csv",
+          "locator": "demand_id=REQ-0818-01"
+        },
+        {
+          "path": "source-materials/internal-service/业务文件/06-业务需求登记办法.md",
+          "locator": "原文对应段落"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.project.membership",
+      "roleId": "project",
+      "title": "项目成员与访问批准是两个条件",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "internal-service.project.membership"
+      ],
+      "requiredAssetIds": [
+        "internal-service-project-members",
+        "internal-service-k02"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：PRJ-A由U06负责，U05/U07/U09是成员；成员资格不等于申请已批准，K02要求负责人确认后信息部门执行，不替PRJ-B审批。",
+      "positiveExample": "请给出PRJ-A成员行及现行申请规则，说明本人权限不覆盖哪个项目。",
+      "negativeExample": "只提关键词、学员自行断言、未提交流式文字或没有本人引用均不成立。",
+      "hints": [
+        "谁属于您负责的项目，成员资格与访问批准有什么关系？",
+        "请给出PRJ-A成员行及现行申请规则，说明本人权限不覆盖哪个项目。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "access"
+      ],
+      "businessMeaning": "项目成员与访问批准是两个条件",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/派生岗位摘录/project-members.csv",
+          "locator": "PRJ-A负责人行"
+        },
+        {
+          "path": "source-materials/internal-service/初始材料/02-组织与工作安排.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/业务文件/02-项目看板访问申请-现行.md",
+          "locator": "原文对应段落"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.project.scope",
+      "roleId": "project",
+      "title": "只读、导出、用途和有效期分别确认",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "internal-service.project.scope"
+      ],
+      "requiredAssetIds": [
+        "internal-service-k02",
+        "internal-service-c001",
+        "internal-service-project-current"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：K02自2026-08-20用2.0版，需项目编号、申请岗位、用途、只读或导出以及截止日期；默认只读，导出须单独说明，紧急也不能绕过批准。C001当前是只读到本月底，不能当已批准导出。",
+      "positiveExample": "请对照C001说明只读与导出、用途、期限和紧急申请的边界。",
+      "negativeExample": "只提关键词、学员自行断言、未提交流式文字或没有本人引用均不成立。",
+      "hints": [
+        "批准看板访问时分别需要核实哪些范围？",
+        "请对照C001说明只读与导出、用途、期限和紧急申请的边界。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "access"
+      ],
+      "businessMeaning": "只读、导出、用途和有效期分别确认",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/业务文件/02-项目看板访问申请-现行.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/业务文件/02-项目看板访问申请-现行.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/补充调研/C001-沟通记录.md",
+          "locator": "原文对应段落"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.project.nonmember",
+      "roleId": "project",
+      "title": "非成员参考请求需要确认分享范围",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "internal-service.project.nonmember"
+      ],
+      "requiredAssetIds": [
+        "internal-service-c004",
+        "internal-service-project-members",
+        "internal-service-k07"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：C004的U02不是PRJ-A成员，知道文件名或想借鉴不代表可拿到K07正文；由U06确认能提供的范围，可先给全员通用资料。",
+      "positiveExample": "请核对C004、PRJ-A成员表与K07可见范围，说明怎样提供合法下一步。",
+      "negativeExample": "只提关键词、学员自行断言、未提交流式文字或没有本人引用均不成立。",
+      "hints": [
+        "销售同事想借鉴项目明细，什么情况下可以分享？",
+        "请核对C004、PRJ-A成员表与K07可见范围，说明怎样提供合法下一步。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "access"
+      ],
+      "businessMeaning": "非成员参考请求需要确认分享范围",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/补充调研/C004-沟通记录.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/业务文件/08-PRJ-A交付周报.md",
+          "locator": "原文对应段落"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.project.progress",
+      "roleId": "project",
+      "title": "周报待回复不等于项目组未开始",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "internal-service.project.progress"
+      ],
+      "requiredAssetIds": [
+        "internal-service-k07"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：PRJ-A截至9月6日18:00有4个检查项：定义确认、权限复核待客户回复、导入演练完成、培训待排；待外部确认不能由内部自动回复替代。",
+      "positiveExample": "请提供授权范围内K07原件，指出已做工作与仍需外部确认的部分。",
+      "negativeExample": "只提关键词、学员自行断言、未提交流式文字或没有本人引用均不成立。",
+      "hints": [
+        "同一份项目周报中的已完成和待回复，各指哪一步？",
+        "请提供授权范围内K07原件，指出已做工作与仍需外部确认的部分。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "closure"
+      ],
+      "businessMeaning": "周报待回复不等于项目组未开始",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/业务文件/08-PRJ-A交付周报.md",
+          "locator": "原文对应段落"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.product.registration",
+      "roleId": "product",
+      "title": "群里提过、已登记与排期是不同状态",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "internal-service.product.registration"
+      ],
+      "requiredAssetIds": [
+        "internal-service-k05",
+        "internal-service-interview-product"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：群里说过不等正式登记；同义问题若重复建号会增加去重，已有相同需求应追加并关联。登记后不能自动承诺排期。",
+      "positiveExample": "相同问题换人再提时，怎样避免重复编号和默认承诺？",
+      "negativeExample": "只提关键词、学员自行断言、未提交流式文字或没有本人引用均不成立。",
+      "hints": [
+        "从群里一句话到可审阅事项，需要跨过哪些步骤？",
+        "相同问题换人再提时，怎样避免重复编号和默认承诺？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "registration"
+      ],
+      "businessMeaning": "群里提过、已登记与排期是不同状态",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/初始材料/04-岗位初访.md",
+          "locator": "首轮岗位访谈：仅本人段落"
+        },
+        {
+          "path": "source-materials/internal-service/业务文件/06-业务需求登记办法.md",
+          "locator": "原文对应段落"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.product.c003",
+      "roleId": "product",
+      "title": "C003应关联原有REQ而非再造编号",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "internal-service.product.c003"
+      ],
+      "requiredAssetIds": [
+        "internal-service-product-current",
+        "internal-service-c003",
+        "internal-service-demands"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：C003是U07群里提验收导出，尚未确认登记；补充记录确认与REQ-0818-01同一个问题，可补脱敏清单并追加原号，U11仍需评审。",
+      "positiveExample": "请提供C003与已有登记行，说明为什么U07这次应补原编号、还等谁做什么。",
+      "negativeExample": "只提关键词、学员自行断言、未提交流式文字或没有本人引用均不成立。",
+      "hints": [
+        "请拿C003核对群聊事项和已有需求的关系。",
+        "请提供C003与已有登记行，说明为什么U07这次应补原编号、还等谁做什么。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "registration"
+      ],
+      "businessMeaning": "C003应关联原有REQ而非再造编号",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/补充调研/C003-沟通记录.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/补充调研/C003-沟通记录.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/业务数据/已有需求登记.csv",
+          "locator": "已有demand_id与原requester_id"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.product.fields",
+      "roleId": "product",
+      "title": "登记需要可继续沟通的信息",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "internal-service.product.fields"
+      ],
+      "requiredAssetIds": [
+        "internal-service-form",
+        "internal-service-demands"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：登记需问题、使用岗位、影响业务、频率或样例、现有替代方式和沟通时间；REQ-0818-01仍缺使用对象和具体样例，planned_release空白不能当计划完成。",
+      "positiveExample": "请给出登记空表与现有项，指出缺项、已有替代办法与排期证据边界。",
+      "negativeExample": "只提关键词、学员自行断言、未提交流式文字或没有本人引用均不成立。",
+      "hints": [
+        "要让您接着澄清需求，哪些字段不能只写一句想要功能？",
+        "请给出登记空表与现有项，指出缺项、已有替代办法与排期证据边界。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "registration"
+      ],
+      "businessMeaning": "登记需要可继续沟通的信息",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/业务文件/06-业务需求登记办法.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/业务数据/已有需求登记.csv",
+          "locator": "REQ-0818-01 status/missing/planned_release/owner_id"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.product.review",
+      "roleId": "product",
+      "title": "固定评审节奏不是自动开发承诺",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "internal-service.product.review"
+      ],
+      "requiredAssetIds": [
+        "internal-service-k05",
+        "internal-service-form"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：产品经理每周二审阅，紧急事项需业务负责人说明影响；纳入开发计划需另行评审，表单已登记不是已承诺。",
+      "positiveExample": "请依据现行制度说明谁补影响、何时审阅、何时才能谈开发计划。",
+      "negativeExample": "只提关键词、学员自行断言、未提交流式文字或没有本人引用均不成立。",
+      "hints": [
+        "登记后怎样进入评审，紧急诉求与排期承诺有什么区别？",
+        "请依据现行制度说明谁补影响、何时审阅、何时才能谈开发计划。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "registration"
+      ],
+      "businessMeaning": "固定评审节奏不是自动开发承诺",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/业务文件/06-业务需求登记办法.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/业务表单/事项登记空表与填写示例.md",
+          "locator": "原文对应段落"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.operations.pending",
+      "roleId": "operations",
+      "title": "服务队列待处理与部门未关闭不同",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "internal-service.operations.pending"
+      ],
+      "requiredAssetIds": [
+        "internal-service-k03",
+        "internal-service-interview-operations"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：K03的待处理仅指当前需轮值动作的服务组队列；等待申请人补充和等待业务负责人决定另列，不合入待处理。收到量按唯一请求首次登记算，重复提醒不新增。",
+      "positiveExample": "请提供K03，区分待轮值、待申请人和待负责人决定，说明计数单位。",
+      "negativeExample": "只提关键词、学员自行断言、未提交流式文字或没有本人引用均不成立。",
+      "hints": [
+        "为什么部门表与服务周报都叫待处理，却可能不一样？",
+        "请提供K03，区分待轮值、待申请人和待负责人决定，说明计数单位。"
+      ],
+      "reportSections": [
+        "数据系统与企业条件"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "closure"
+      ],
+      "businessMeaning": "服务队列待处理与部门未关闭不同",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/业务文件/04-服务周报口径.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/业务文件/04-服务周报口径.md",
+          "locator": "原文对应段落"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.operations.c002",
+      "roleId": "operations",
+      "title": "C002先对齐截止范围再给授权汇总",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "internal-service.operations.c002"
+      ],
+      "requiredAssetIds": [
+        "internal-service-c002",
+        "internal-service-operations-current",
+        "internal-service-k03"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：C002需先核对两张表的截止时间和范围；K03截止周日18:00。U17只需各状态数量，不需要其他部门同事原话，不能默认发完整明细。",
+      "positiveExample": "请依据沟通与口径说明，核对截止、范围和最小必要汇总，不索取无权原话。",
+      "negativeExample": "只提关键词、学员自行断言、未提交流式文字或没有本人引用均不成立。",
+      "hints": [
+        "面对C002的数字差异，比较前先对齐什么、能给什么？",
+        "请依据沟通与口径说明，核对截止、范围和最小必要汇总，不索取无权原话。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "closure"
+      ],
+      "businessMeaning": "C002先对齐截止范围再给授权汇总",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/补充调研/C002-沟通记录.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/补充调研/C002-沟通记录.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/业务文件/04-服务周报口径.md",
+          "locator": "原文对应段落"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.operations.closure",
+      "roleId": "operations",
+      "title": "关闭标签要连同关闭事件核对",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "internal-service.operations.closure"
+      ],
+      "requiredAssetIds": [
+        "internal-service-status-history",
+        "internal-service-status-events",
+        "internal-service-k03"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：历史关闭包括已解决、登记完成及转交完成，不能都当业务办成；H0005已转交并关闭，但关闭事件只证明登记/转交、后续另跟踪。K03明确已回复不等于已解决。",
+      "positiveExample": "请提供脱敏状态与关闭事件，沿H0005指出已确认服务动作和未知的下游结果。",
+      "negativeExample": "closed_at非空就记业务成功、把未知算失败，或把转交当访问批准均不成立。",
+      "hints": [
+        "关闭意味着哪件事结束，怎样核实而不猜解决率？",
+        "请提供脱敏状态与关闭事件，沿H0005指出已确认服务动作和未知的下游结果。"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "closure"
+      ],
+      "businessMeaning": "关闭标签要连同关闭事件核对",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/派生岗位摘录/status-history.csv",
+          "locator": "request_id=H0005"
+        },
+        {
+          "path": "source-materials/internal-service/派生岗位摘录/status-events.csv",
+          "locator": "H0005-E3关闭事件content"
+        },
+        {
+          "path": "source-materials/internal-service/业务文件/04-服务周报口径.md",
+          "locator": "原文对应段落"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.operations.time",
+      "roleId": "operations",
+      "title": "自然响应、工作时间与未完事项分母",
+      "type": "quantitative",
+      "required": true,
+      "factIds": [
+        "internal-service.operations.time"
+      ],
+      "requiredAssetIds": [
+        "internal-service-export",
+        "internal-service-organization",
+        "internal-service-status-history"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：历史起止自然时间包含非工作时段，组织只给工作日9:00—18:00值班；无完整节假日调休表不能算工作时间SLA。历史请求与C当前事项不混为关闭率分母，缺少时间不算0。",
+      "positiveExample": "请给出导出说明和值班安排，说明自然时钟、缺失日历、H/C样本边界。",
+      "negativeExample": "只提关键词、学员自行断言、未提交流式文字或没有本人引用均不成立。",
+      "hints": [
+        "报表时间能直接当人工耗时或工作时间承诺吗？",
+        "请给出导出说明和值班安排，说明自然时钟、缺失日历、H/C样本边界。"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "closure"
+      ],
+      "businessMeaning": "自然响应、工作时间与未完事项分母",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/初始材料/03-历史导出说明.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/初始材料/02-组织与工作安排.md",
+          "locator": "原文对应段落"
+        },
+        {
+          "path": "source-materials/internal-service/初始材料/03-历史导出说明.md",
+          "locator": "原文对应段落"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.hr.access",
+      "roleId": "hr",
+      "title": "入职账号、岗位与项目成员分别确认",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "internal-service.hr.access"
+      ],
+      "requiredAssetIds": [
+        "internal-service-k06",
+        "internal-service-organization"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：人事发起入职账号、信息部门开通；通用文档可见不等于客户项目可见，先由主管确认岗位再入对应项目。人事不代替项目负责人批准。",
+      "positiveExample": "请提供新员工说明，区分入职账号、岗位确认和客户项目范围。",
+      "negativeExample": "只提关键词、学员自行断言、未提交流式文字或没有本人引用均不成立。",
+      "hints": [
+        "新人能看入职文档却进不了项目，分别要谁确认什么？",
+        "请提供新员工说明，区分入职账号、岗位确认和客户项目范围。"
+      ],
+      "reportSections": [
+        "业务背景与组织职责"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "access"
+      ],
+      "businessMeaning": "入职账号、岗位与项目成员分别确认",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/业务文件/07-新员工操作说明.md",
+          "locator": "原文对应段落"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.hr.repeat",
+      "roleId": "hr",
+      "title": "重复询问不能都归因于新人",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "internal-service.hr.repeat"
+      ],
+      "requiredAssetIds": [
+        "internal-service-interview-hr",
+        "internal-service-accounts"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：入口可整理得更清楚，但不能认为所有重复问题来自新人，老员工换项目也会重新申请；24账号样本不能证明全员新人比例。",
+      "positiveExample": "请区分入口熟悉度和老员工换项目的权限变化；账号样本能证明什么比例？",
+      "negativeExample": "只提关键词、学员自行断言、未提交流式文字或没有本人引用均不成立。",
+      "hints": [
+        "重复询问除了新人不熟悉，还有哪些不能忽略的情况？",
+        "请区分入口熟悉度和老员工换项目的权限变化；账号样本能证明什么比例？"
+      ],
+      "reportSections": [
+        "原始诉求与调查范围"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "registration"
+      ],
+      "businessMeaning": "重复询问不能都归因于新人",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/初始材料/04-岗位初访.md",
+          "locator": "首轮岗位访谈：仅本人段落"
+        },
+        {
+          "path": "source-materials/internal-service/初始材料/02-组织与工作安排.md",
+          "locator": "原文对应段落"
+        }
+      ]
+    },
+    {
+      "id": "internal-service.hr.training",
+      "roleId": "hr",
+      "title": "培训应验证查找和登记能力",
+      "type": "interview",
+      "required": false,
+      "factIds": [
+        "internal-service.hr.training"
+      ],
+      "requiredAssetIds": [
+        "internal-service-k06",
+        "internal-service-form"
+      ],
+      "allowUnknown": false,
+      "completionRule": "必须有本岗位已提交回答，结合本轮取得的指定原件明确说明：培训结束要完成一次资料查找和一次模拟事项登记，由人事记录；仅看过教程不能自动算培训完成，本包未提供每人的完成记录。",
+      "positiveExample": "请给出既有培训要求及登记样例；没有个人完成记录时可确认到哪一步？",
+      "negativeExample": "只提关键词、学员自行断言、未提交流式文字或没有本人引用均不成立。",
+      "hints": [
+        "如何确认同事真的会查资料和登记，而不只是看过说明？",
+        "请给出既有培训要求及登记样例；没有个人完成记录时可确认到哪一步？"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "requiredNumericValues": [],
+      "deterministicChecks": [],
+      "scenarioIds": [
+        "registration"
+      ],
+      "businessMeaning": "培训应验证查找和登记能力",
+      "sourceLocations": [
+        {
+          "path": "source-materials/internal-service/业务文件/07-新员工操作说明.md",
+          "locator": "原文对应段落"
+        }
+      ]
+    }
+  ],
+  "calculations": [
+    {
+      "id": "internal-service.workload",
+      "title": "追问、转交与轮值主动投入",
+      "operation": "internal_service_workload",
+      "inputs": [
+        "internal-service-history",
+        "internal-service-events",
+        "internal-service-export"
+      ],
+      "columns": {
+        "join": "request_id",
+        "history": [
+          "created_at",
+          "first_reply_at",
+          "closed_at",
+          "recorded_category",
+          "handler_id",
+          "followup_count",
+          "transfer_count",
+          "active_minutes",
+          "closing_status",
+          "closing_note"
+        ],
+        "events": [
+          "event_id",
+          "event_at",
+          "action",
+          "content"
+        ]
+      },
+      "unit": "次；估计主动分钟",
+      "definition": "按唯一H请求汇总followup_count、transfer_count、active_minutes，使用recorded_category原分类与handler_id分组；事件行数不作请求分母。",
+      "denominator": "登记日2026-08-10至2026-09-02的唯一H编号研究请求；当前C事项不混入；时间均值仅使用两端完整记录。",
+      "filter": {
+        "registrationDateFrom": "2026-08-10",
+        "registrationDateThrough": "2026-09-02",
+        "timezone": "Asia/Shanghai",
+        "currentItemsSeparate": true
+      },
+      "version": "1.0.0",
+      "requiresAllInputsGranted": true,
+      "allowArbitraryCode": false
+    },
+    {
+      "id": "internal-service.elapsed",
+      "title": "首次响应与关闭的自然历时",
+      "operation": "internal_service_elapsed",
+      "inputs": [
+        "internal-service-history",
+        "internal-service-events",
+        "internal-service-current",
+        "internal-service-export",
+        "internal-service-organization"
+      ],
+      "columns": {
+        "join": "request_id",
+        "history": [
+          "created_at",
+          "first_reply_at",
+          "closed_at",
+          "recorded_category",
+          "handler_id",
+          "followup_count",
+          "transfer_count",
+          "active_minutes",
+          "closing_status",
+          "closing_note"
+        ],
+        "events": [
+          "event_id",
+          "event_at",
+          "action",
+          "content"
+        ]
+      },
+      "unit": "自然分钟",
+      "definition": "由created_at至first_reply_at/closed_at计算自然分钟并核对事件时间；标记跨已知非值班时段，不补造工作日历；C未完事项和缺失时间单列。",
+      "denominator": "登记日2026-08-10至2026-09-02的唯一H编号研究请求；当前C事项不混入；时间均值仅使用两端完整记录。",
+      "filter": {
+        "registrationDateFrom": "2026-08-10",
+        "registrationDateThrough": "2026-09-02",
+        "timezone": "Asia/Shanghai",
+        "currentItemsSeparate": true
+      },
+      "version": "1.0.0",
+      "requiresAllInputsGranted": true,
+      "allowArbitraryCode": false
+    },
+    {
+      "id": "internal-service.closure",
+      "title": "关闭状态与下游结果证据",
+      "operation": "internal_service_closure",
+      "inputs": [
+        "internal-service-history",
+        "internal-service-events",
+        "internal-service-current",
+        "internal-service-export",
+        "internal-service-k03"
+      ],
+      "columns": {
+        "join": "request_id",
+        "history": [
+          "created_at",
+          "first_reply_at",
+          "closed_at",
+          "recorded_category",
+          "handler_id",
+          "followup_count",
+          "transfer_count",
+          "active_minutes",
+          "closing_status",
+          "closing_note"
+        ],
+        "events": [
+          "event_id",
+          "event_at",
+          "action",
+          "content"
+        ]
+      },
+      "unit": "条；状态",
+      "definition": "逐请求关联closing_status/closing_note与关闭事件，区分获得说明、登记转交和记录恢复；下游操作未确认列unknown，不把closed_at非空当业务解决。",
+      "denominator": "登记日2026-08-10至2026-09-02的唯一H编号研究请求；当前C事项不混入；时间均值仅使用两端完整记录。",
+      "filter": {
+        "registrationDateFrom": "2026-08-10",
+        "registrationDateThrough": "2026-09-02",
+        "timezone": "Asia/Shanghai",
+        "currentItemsSeparate": true
+      },
+      "version": "1.0.0",
+      "requiresAllInputsGranted": true,
+      "allowArbitraryCode": false
+    }
+  ],
+  "report": {
+    "version": "1.0.0",
+    "title": "业务现状诊断与 AI 机会评估报告",
+    "sections": [
+      "原始诉求与调查范围",
+      "业务背景与组织职责",
+      "现状流程与协作关系",
+      "数据系统与企业条件",
+      "问题量化与基线",
+      "AI价值分析与推荐方向",
+      "证据索引与数据字典"
+    ],
+    "requirements": [
+      "开头用简明主线交代业务怎样运转、问题在哪里、优先研究什么，再展开证据。",
+      "区分负责人意见、原件事实、固定计算、尚未批准与未知结果。",
+      "闭合服务记录不等业务办成，不能从教学样本外推全员发生率、人力成本或AI收益。",
+      "比较知识检索、版本治理、权限治理、事项澄清和跟进辅助，不预设RAG或自动审批是唯一方案。",
+      "未批准的规则、接口、模型部署和未发生的维护恢复不得写成已实现。"
+    ]
+  },
+  "scenarios": [
+    {
+      "id": "access",
+      "title": "有教程仍无法继续：版本、范围和访问批准",
+      "anchorIds": [
+        "C001",
+        "C004"
+      ],
+      "roles": [
+        "consultant",
+        "duty",
+        "project",
+        "director",
+        "hr"
+      ]
+    },
+    {
+      "id": "closure",
+      "title": "已经回复或关闭，事情是否真的结束",
+      "anchorIds": [
+        "C002",
+        "H0005",
+        "H0006",
+        "H0009"
+      ],
+      "roles": [
+        "director",
+        "duty",
+        "operations",
+        "project"
+      ]
+    },
+    {
+      "id": "registration",
+      "title": "群里的一句话如何成为可跟进事项",
+      "anchorIds": [
+        "C003",
+        "C005",
+        "C006",
+        "REQ-0818-01"
+      ],
+      "roles": [
+        "consultant",
+        "product",
+        "director",
+        "duty",
+        "hr"
+      ]
+    }
+  ],
+  "sourcePolicy": {
+    "snapshot": "2026-09-10T09:00:00+08:00",
+    "teacherExcluded": [
+      "教师核对",
+      "研发"
+    ],
+    "futureExcluded": [
+      "后续演练"
+    ],
+    "mixedRoleExcluded": [
+      "初始材料/04-岗位初访.md"
+    ],
+    "roleExtracts": "派生岗位摘录只保留本人原文/明确负责范围；完整40原件保持字节不变。",
+    "dataNature": "公司、姓名及业务数据为教学拟制；姓名补充不改变U账号身份。",
+    "specialAccess": {
+      "K07": [
+        "project"
+      ],
+      "K08": [
+        "director"
+      ],
+      "K09": [
+        "director"
+      ],
+      "U13History": "handler_id=U13 only",
+      "U18": "脱敏状态和首次回应/关闭事件，不提供他人请求原话"
+    }
+  }
+}

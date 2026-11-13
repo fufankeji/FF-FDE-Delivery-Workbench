@@ -2,7 +2,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { WorkspaceId } from '@deepseek-ai/dsh-workspace'
-import { makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
+import { makeTranslate, contextMenuHook } from '@deepseek-ai/dsh-client-test-runtime'
 import { ProjectResourceComposerAction, ProjectResourceUploadAction } from '../src/client/ProjectResourceUploadAction.tsx'
 import { zh } from '../src/client/locales.ts'
 
@@ -16,6 +16,7 @@ const t = makeTranslate(zh) as never
 function mount(fetchImpl: typeof fetch) {
   vi.stubGlobal('fetch', fetchImpl)
   return render(<ProjectResourceUploadAction
+    useContextMenu={contextMenuHook()}
     useRemoteAccess={() => true} useSessionAccess={() => true} useWorkspaceAccess={() => true} useSessionRetainInfo={() => undefined} usePanelInfo={(() => undefined) as never} useSessionStatus={(() => new Map()) as never} useResource={(() => undefined) as never} useSessions={(() => undefined) as never}
     useWorkspaces={(() => undefined) as never}
     workspaceId={'workspace-1' as WorkspaceId}
@@ -28,6 +29,7 @@ function mount(fetchImpl: typeof fetch) {
 describe('ProjectResourceUploadAction', () => {
   it('shows one small project-scoped upload action inside the native composer', () => {
     render(<ProjectResourceComposerAction
+      useContextMenu={contextMenuHook()}
       sessionId={'session-1' as never}
       useAccess={(() => undefined) as never}
       useSession={(() => undefined) as never}

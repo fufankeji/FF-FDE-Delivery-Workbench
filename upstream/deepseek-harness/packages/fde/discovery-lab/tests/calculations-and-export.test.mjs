@@ -6,7 +6,7 @@ import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {TrainingService} from '../src/vendor/training.js';
 import {calculateMetric} from '../src/vendor/metrics.js';
-const root=fileURLToPath(new URL('../.assets/',import.meta.url));
+const root=fileURLToPath(new URL('../assets/',import.meta.url));
 test('All packaged calculations retain input grant gates and export Markdown/PDF without a model',async t=>{
   const dir=mkdtempSync(join(tmpdir(),'fde-lab-calculations-'));
   const service=new TrainingService({on(){}},{root,dataDir:dir});

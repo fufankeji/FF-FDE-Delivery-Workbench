@@ -8,7 +8,7 @@ import {createServer} from 'node:http';
 import {TrainingService} from '../src/vendor/training.js';
 import {createApiHandler} from '../src/vendor/http.js';
 import {newerVersion} from '../src/vendor/cases.js';
-const root=join(dirname(fileURLToPath(import.meta.url)),'../.assets');
+const root=join(dirname(fileURLToPath(import.meta.url)),'../assets');
 function fixture(t){const dir=mkdtempSync(join(tmpdir(),'fde-version-'));const service=new TrainingService({on(){}},{root,dataDir:dir});service.native={messages:()=>[],events:()=>[],dispose:async()=>{}};t.after(()=>{service.store.close();rmSync(dir,{recursive:true,force:true});});return service;}
 function installNext(service){const old=service.cases.get('finance');const next={...old,version:'99.0.0',background:'新版本底稿'};service.cases.set('finance',next);service.store.exec('INSERT INTO cases VALUES(?,?,?)',next.id,next.version,JSON.stringify(next));return next;}
 test('Upgrade is explicit and idempotent; old case, progress, report and other runs survive',async t=>{

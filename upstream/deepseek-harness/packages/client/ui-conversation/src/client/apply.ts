@@ -1,3 +1,4 @@
+import type {} from '@deepseek-ai/dsh-client-ui-context-menu/client'
 /** Registers the target-neutral Conversation assembly, shell, input, and docks. */
 import type {} from '@deepseek-ai/dsh-client-product-analytics/client'
 import type { Context } from '@deepseek-ai/cordis'
@@ -32,6 +33,7 @@ import type { IConversation } from './service.ts'
 import { ComposerBlockRegistry } from './input/blocks.ts'
 import type { ComposerBlock } from './contract/composer-blocks.ts'
 import { InputHub } from './input/hub.ts'
+import { createComposerFileIntake } from './input/file-intake.ts'
 import { ComposerSubmissionPolicy } from './input/submission-policy.ts'
 import { queueDockEntry } from './queue/QueueDock.tsx'
 import { EnterBehaviorRow } from './settings/EnterBehaviorRow.tsx'
@@ -45,7 +47,8 @@ import { InputBar } from './skeleton/InputBar.tsx'
 import { todoDockEntry } from './skeleton/TodoPanel.tsx'
 import { installStopShortcut } from './stop-shortcut.ts'
 import { TRAJECTORY_VIEW_ID, resolveActiveView } from './view-selection.ts'
-import { en, NS, zh, type ConversationKey } from './locales.ts'
+import { createViewPins } from './view-pins.ts'
+import { en, ja, es, fr, de, ru, pt, NS, zh, type ConversationKey } from './locales.ts'
 import { CONVERSATION_SETTINGS_NAMESPACE, type ConversationSettings } from '../submission-settings.ts'
 
 declare module '@deepseek-ai/dsh-client-ui-slots' {
@@ -157,7 +160,7 @@ export function apply(ctx: Context, config: Config = Config({})): void {
   const slots = ctx.slots
   // Schemastery's field default is materialized before Cordis calls apply.
   const maxConcurrentFileUploads = config.maxConcurrentFileUploads as number
-  const workspaceNavigation = ctx.get('uiWorkspace') as unknown as WorkspaceNavigation
+  const workspaceNavigation = ctx.get('uiWorkspace') as WorkspaceNavigation
   const uiConversation = new UiConversation(ctx, sessions)
   uiConversation.userText.register(sessionReferenceRule)
   uiConversation.userText.register(collapseWhitespaceRule)
@@ -184,17 +187,17 @@ export function apply(ctx: Context, config: Config = Config({})): void {
     yield slots.register({ name: 'conversation.user.text.node', key: 'session', priority: 100 }, SessionReference)
   })
 
-  ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'ui-conversation: dictionaries')
+  ctx.effect(() => ctx.locale.register(NS, { zh, en, ja, es, fr, de, ru, pt }), 'ui-conversation: dictionaries')
   const t = ctx.locale.bind(NS)
   const conversationStore = createConversationStore()
-  const viewActions = new Map<SessionId, BoundActions<typeof conversationStore>>()
+  const sessionViewActions = new Map<SessionId, BoundActions<typeof conversationStore>>()
   const pendingViews = new Map<SessionId, string>()
   const bindViews = (id: SessionId, actions: BoundActions<typeof conversationStore>): void => {
-    viewActions.set(id, actions)
+    sessionViewActions.set(id, actions)
     const pending = pendingViews.get(id)
     if (pending !== undefined) { actions.setView(pending); pendingViews.delete(id) }
   }
-  ctx.effect(() => () => { viewActions.clear(); pendingViews.clear() }, 'fde: scoped view navigation')
+  ctx.effect(() => () => { sessionViewActions.clear(); pendingViews.clear() }, 'fde: scoped view navigation')
   const submissionPolicy = new ComposerSubmissionPolicy(
     ctx.configForms.get<ConversationSettings>(CONVERSATION_SETTINGS_NAMESPACE),
   )
@@ -233,6 +236,11 @@ export function apply(ctx: Context, config: Config = Config({})): void {
     activateView(sessionId, readConversationViewPreference(sessionId))
   }
   const conversationViews = createSnapshotStore<readonly ViewTab[]>(viewTabs())
+  const viewPins = createViewPins()
+  const viewActions = {
+    getSnapshot: () => slots.entriesOfSlot('conversation.session.header.views.actions').length > 0,
+    subscribe: (listener: () => void) => slots.subscribe('conversation.session.header.views.actions', listener),
+  }
   const bindings = new Set<SessionBinding>()
   const trackedBindings = new WeakSet<SessionBinding>()
   const trackBinding = (binding: SessionBinding): void => {
@@ -351,6 +359,7 @@ export function apply(ctx: Context, config: Config = Config({})): void {
       'conversation.composer.bar': { kind: 'single', scope: 'session-maybe' },
       'conversation.input.dock': { kind: 'list', scope: 'session' },
       'conversation.hero.content': { kind: 'single', scope: 'root' },
+      'conversation.hero.frame': { kind: 'hoc', scope: 'root' },
       'conversation.hero.brand.mark': { kind: 'single', scope: 'root' },
       'conversation.hero.workspace': { kind: 'single', scope: 'root' },
       'conversation.hero.agentPreset': { kind: 'single', scope: 'session-maybe' },
@@ -367,14 +376,19 @@ export function apply(ctx: Context, config: Config = Config({})): void {
       selectWorkspace: workspaceId => workspaceNavigation.openWorkspace(workspaceId, (nextId) => {
         if (sessionId !== undefined && nextId !== sessionId) {
           const from = inputHub.shell(sessionId)
+          // A draft with a submission in flight stays with the Session that is admitting it.
+          if (from.snapshot.phase !== 'plain' && from.snapshot.phase !== 'claimed') return
           const draft = from.draftSnapshot
           const attachmentIds = from.snapshot.attachmentIds
           const next = inputHub.shell(nextId)
           if (attachmentIds.length === 0 || next.addAttachments(attachmentIds)) {
-            if (sessions.binding(nextId) === undefined) {
+            const binding = sessions.binding(nextId)
+            if (binding === undefined) {
               throw new Error(`ui-conversation: session "${nextId}" resolved no binding`)
             }
-            concreteConversation(ctx).rebindDraftFiles(nextId, attachmentIds)
+            // The same rule as intake: only an ordinary Session stages image uploads.
+            const ordinary = binding.session.getSnapshot().subagent === null
+            concreteConversation(ctx).rebindDraftFiles(nextId, attachmentIds, ordinary)
             if (draft.text !== '') {
               next.setDraft(draft)
               from.setDraft('')
@@ -443,10 +457,12 @@ export function apply(ctx: Context, config: Config = Config({})): void {
       'conversation.session.header.actions': { kind: 'list', scope: 'session' },
       'conversation.session.header.utilities': { kind: 'list', scope: 'session' },
       'conversation.session.header.corner': { kind: 'single', scope: 'session' },
+      'conversation.session.header.views.actions': { kind: 'list', scope: 'root' },
     },
     store: conversationStore,
     inject: (sessionId: SessionId, actions: BoundActions<typeof conversationStore>): ConversationSessionHeaderInjected => ({
-      hooks: { conversationViews },
+      hooks: { conversationViews, entryPins: viewPins.unpinned, entryActions: viewActions },
+      setPinned: viewPins.setPinned,
       open: (id) => { workspaceNavigation.openSession(id) },
       selectView: (view) => {
         activateView(sessionId, view)
@@ -455,6 +471,7 @@ export function apply(ctx: Context, config: Config = Config({})): void {
     }),
   }, ConversationSessionHeader)
 
+  const fileIntake = createComposerFileIntake()
   const registerComposerBar = () => slots.register({
     name: 'conversation.composer.bar',
     locale: NS,
@@ -472,6 +489,7 @@ export function apply(ctx: Context, config: Config = Config({})): void {
     inject: (sessionId: SessionId | undefined): ComposerBarInjected => {
       if (sessionId === undefined) {
         return {
+          registerFileIntake: fileIntake,
           keyboard: undefined,
           addFiles: undefined,
           removeAttachment: undefined,
@@ -479,6 +497,7 @@ export function apply(ctx: Context, config: Config = Config({})): void {
           retryFileUpload: undefined,
           toggleCommandMenu: undefined,
           stop: undefined,
+          retry: undefined,
           hooks: {
             stopShortcut,
             busyEnter: submissionPolicy.busyEnter,
@@ -494,10 +513,12 @@ export function apply(ctx: Context, config: Config = Config({})): void {
       const inputTriggers = inputHub.inputTriggers(sessionId)
       const bridge = hostPathBridge()
       return {
+        registerFileIntake: fileIntake,
         keyboard: shell,
         addFiles: (files, directories = new Set()) => {
           if (sessions.binding(sessionId) === undefined) return t('file.sessionUnavailable')
-          if (shell.snapshot.phase === 'adjudicating' || shell.snapshot.phase === 'submitting') {
+          const { phase } = shell.snapshot
+          if (phase === 'adjudicating' || phase === 'submitting' || phase === 'sending') {
             return t('attachment.dropBlocked')
           }
           const uploads: File[] = []
@@ -523,7 +544,9 @@ export function apply(ctx: Context, config: Config = Config({})): void {
             })
           }
           try {
-            const drafts = conversation.createDrafts(sessionId, uploads)
+            // The Host stages uploads for ordinary Sessions only; a subagent continuation's images travel inline.
+            const ordinary = sessions.binding(sessionId)?.session.getSnapshot().subagent === null
+            const drafts = conversation.createDrafts(sessionId, uploads, ordinary)
             if (!shell.addFiles(references, drafts.map(draft => draft.id))) {
               conversation.releaseDraftAttachments(drafts)
               return t('attachment.dropBlocked')
@@ -555,6 +578,7 @@ export function apply(ctx: Context, config: Config = Config({})): void {
             })
           },
         stop: () => { stop(sessionId) },
+        retry: (failureSeq) => { inputHub.retry(sessionId, failureSeq) },
         hooks: {
           stopShortcut,
           busyEnter: submissionPolicy.busyEnter,
@@ -587,7 +611,7 @@ export function apply(ctx: Context, config: Config = Config({})): void {
     maxConcurrentFileUploads,
     selectView: (sessionId, view) => {
       activateView(sessionId, view)
-      const actions = viewActions.get(sessionId)
+      const actions = sessionViewActions.get(sessionId)
       if (actions === undefined) pendingViews.set(sessionId, view)
       else actions.setView(view)
     },

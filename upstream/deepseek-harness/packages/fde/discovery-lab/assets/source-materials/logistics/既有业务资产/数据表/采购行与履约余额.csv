@@ -1,0 +1,4 @@
+﻿po_line_id,po_id,supplier_id,warehouse_id,sku_id,ordered,received,open_qty,confirmed_open_qty,expected_saleable_date,status,shipment_id
+PO-260901-01-L1,PO-260901-01,S1,W-KL,T01-BL-M,48,0,48,48,2026-09-22,运输中延误,SH01
+PO-260903-02-L1,PO-260903-02,S2,W-KL,S02-SD-M,72,68,4,0,,部分收货短少待查,SH02
+PO-260905-03-L1,PO-260905-03,S3,W-KL,P03-BK-L,96,0,96,96,2026-09-25,供应商已确认待发货,SH03

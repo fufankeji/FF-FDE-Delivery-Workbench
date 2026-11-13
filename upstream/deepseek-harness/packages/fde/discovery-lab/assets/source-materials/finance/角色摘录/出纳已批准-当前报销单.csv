@@ -1,0 +1,3 @@
+claim_id,application_id,employee_id,department_id,project_id,first_submitted_at,requested_yuan,approved_yuan,paid_yuan,state,policy_version,snapshot_at
+C001,A001,E01,D01,P101,2026-09-10T09:00:00+08:00,2106.00,2106.00,2106.00,PAID,V2.1,2026-09-14T09:00:00+08:00
+C007,A007,E06,D03,P103,2026-09-10T09:00:00+08:00,2106.00,2106.00,0.00,PAYMENT_QUEUED,V2.1,2026-09-14T09:00:00+08:00

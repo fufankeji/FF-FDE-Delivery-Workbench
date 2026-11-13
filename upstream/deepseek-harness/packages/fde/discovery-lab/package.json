@@ -15,7 +15,11 @@
   },
   "files": [
     "lib",
+    "assets",
+    "assets-manifest.json",
+    "src/assets.ts",
     "scripts",
+    "THIRD_PARTY_NOTICES.md",
     "SOURCE.md",
     "source-manifest.json"
   ],
@@ -23,9 +27,11 @@
   "private": true,
   "scripts": {
     "import:assets": "python3 scripts/import-assets.py",
-    "bundle": "tsdown"
+    "verify:assets": "node scripts/verify-assets.mjs",
+    "bundle": "node scripts/verify-assets.mjs && tsdown"
   },
   "dependencies": {
+    "@deepseek-ai/dsh-tool-executor-native": "workspace:*",
     "@deepseek-ai/schemastery": "workspace:~",
     "pdfkit": "0.17.2"
   },
@@ -41,6 +47,7 @@
     "@deepseek-ai/dsh-tools": "workspace:*"
   },
   "devDependencies": {
+    "@deepseek-ai/dsh-tool-testkit": "workspace:*",
     "@deepseek-ai/cordis-plugin-include": "workspace:~",
     "@deepseek-ai/dsh-agent-loop": "workspace:*",
     "@deepseek-ai/dsh-session": "workspace:*",

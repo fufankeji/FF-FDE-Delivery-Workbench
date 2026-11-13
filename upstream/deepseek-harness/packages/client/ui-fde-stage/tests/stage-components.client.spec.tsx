@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, render, screen } from '@testing-library/react'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { WorkspaceId } from '@deepseek-ai/dsh-workspace'
-import { makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
+import { makeTranslate, contextMenuHook } from '@deepseek-ai/dsh-client-test-runtime'
 import { StageHeaderStatus } from '../src/client/StageHeaderStatus.tsx'
 import { zh } from '../src/client/locales.ts'
 import type { FdeStageProgressSnapshot } from '../src/client/controller.ts'
@@ -34,6 +34,7 @@ const useWorkspaces = hook({
 
 function runtime(stageSnapshot: FdeStageProgressSnapshot = ready) {
   return {
+    useContextMenu: contextMenuHook(),
     useRemoteAccess: () => true, useSessionAccess: () => true, useWorkspaceAccess: () => true, useSessionRetainInfo: () => undefined,
     sessionId,
     useAccess: (() => undefined) as never,

@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://inventory.example.invalid/api/parts/PT-HEAD-B",
+    "identity": "E08"
+  },
+  "response": {
+    "http_status": 504,
+    "error": "UPSTREAM_TIMEOUT",
+    "retry_after_seconds": 30
+  },
+  "last_cached": {
+    "as_of": "2026-09-13T16:00:00+08:00",
+    "on_hand": 1,
+    "reserved": 0,
+    "available_to_promise": 1
+  },
+  "display_rule": "显示旧缓存时间，不可据旧缓存承诺现货；需仓库复核"
+}

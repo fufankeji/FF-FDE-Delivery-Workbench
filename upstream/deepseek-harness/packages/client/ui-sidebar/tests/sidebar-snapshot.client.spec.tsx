@@ -56,7 +56,7 @@ async function bench(options: { locale?: 'en' } = {}) {
 describe('sidebar shell snapshots', () => {
   it('renders the expanded column in the default locale (zh, no setLocale)', async () => {
     const { runtime } = await bench()
-    const slot = runtime.renderSlot('sidebar', { collapsed: false, width: 300 })
+    const slot = runtime.renderSlot('sidebar', { collapsed: false, width: 300, drawer: false })
     expect(slot.view.queryByRole('button', { name: '新建会话' })).toBeNull()
     expect(slot.view.getByRole('button', { name: '收起侧边栏' })).toBeTruthy()
     expect(slot.container).toMatchSnapshot()
@@ -65,7 +65,7 @@ describe('sidebar shell snapshots', () => {
 
   it('renders the expanded column (wordmark, capsule, empty holes)', async () => {
     const { runtime } = await bench({ locale: 'en' })
-    const slot = runtime.renderSlot('sidebar', { collapsed: false, width: 300 })
+    const slot = runtime.renderSlot('sidebar', { collapsed: false, width: 300, drawer: false })
     expect(slot.view.queryByRole('button', { name: 'New session' })).toBeNull()
     expect(slot.view.getByRole('button', { name: 'Collapse sidebar' })).toBeTruthy()
     expect(slot.container).toMatchSnapshot()
@@ -74,9 +74,9 @@ describe('sidebar shell snapshots', () => {
 
   it('renders the collapsed rail after the crossfade settles, in place', async () => {
     const { runtime } = await bench({ locale: 'en' })
-    const slot = runtime.renderSlot('sidebar', { collapsed: false, width: 300 })
+    const slot = runtime.renderSlot('sidebar', { collapsed: false, width: 300, drawer: false })
     const shell = slot.container.firstElementChild
-    slot.update({ collapsed: true, width: 56 })
+    slot.update({ collapsed: true, width: 56, drawer: false })
     // The wide brand identity unmounts at the 150ms settle; the rail retains
     // only the sidebar expansion control.
     await waitFor(() => {
@@ -91,7 +91,7 @@ describe('sidebar shell snapshots', () => {
 
   it('a locale switch refreshes mounted copy without re-registration', async () => {
     const { runtime, locale } = await bench()
-    const slot = runtime.renderSlot('sidebar', { collapsed: false, width: 300 })
+    const slot = runtime.renderSlot('sidebar', { collapsed: false, width: 300, drawer: false })
     expect(slot.view.getByRole('button', { name: '收起侧边栏' })).toBeTruthy()
     // Same fiber, same registration: setLocale alone re-renders the outlet.
     act(() => { locale.setLocale('en') })
@@ -104,10 +104,10 @@ describe('sidebar shell snapshots', () => {
     document.documentElement.setAttribute('data-windows-titlebar', '')
     const { runtime } = await bench({ locale: 'en' })
     try {
-      const slot = runtime.renderSlot('sidebar', { collapsed: false, width: 300 })
+      const slot = runtime.renderSlot('sidebar', { collapsed: false, width: 300, drawer: false })
       expect(slot.container).toMatchSnapshot('windows expanded')
-      slot.update({ collapsed: true, width: 0 })
-      expect(slot.view.getAllByRole('button', { name: 'New session' })).toHaveLength(1)
+      slot.update({ collapsed: true, width: 0, drawer: false })
+      expect(slot.view.queryByRole('button', { name: 'New session' })).toBeNull()
       expect(slot.container).toMatchSnapshot('windows collapsed')
     } finally {
       await runtime.dispose()

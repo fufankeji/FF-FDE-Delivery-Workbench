@@ -9,7 +9,7 @@
 <p align="center">
   <a href="https://github.com/fufankeji/FF-FDE-Delivery-Workbench/stargazers"><img src="https://img.shields.io/github/stars/fufankeji/FF-FDE-Delivery-Workbench?style=flat&amp;logo=github&amp;label=Stars" alt="GitHub Stars"></a>
   <img src="https://img.shields.io/badge/Workspace-Web-2563EB" alt="浏览器工作台">
-  <a href="upstream/deepseek-harness.lock.json"><img src="https://img.shields.io/badge/Harness-0.2.1--rc.2-4D6BFE" alt="基于 DeepSeek Harness 0.2.1-rc.2"></a>
+  <a href="upstream/deepseek-harness.lock.json"><img src="https://img.shields.io/badge/Harness-0.2.2--rc.2-4D6BFE" alt="基于 DeepSeek Harness 0.2.2-rc.2"></a>
   <img src="https://img.shields.io/badge/Delivery-8%20Stages-6366F1" alt="八阶段项目交付">
   <img src="https://img.shields.io/badge/Skills-7%20Built--in-0F9D8A" alt="第一阶段七个内置中文 Skills">
 </p>
@@ -69,7 +69,7 @@ FF - FDE 交付工作台服务于承担企业 AI 项目交付责任的 FDE（For
 | 系统架构、API 文档与图谱 | 查看项目 API 文档，审阅和导出系统架构；确有业务需要时，使用 Semantica 路线维护语义定义、知识候选与项目图谱。 |
 | 项目运行与调试 | 启动、停止和预览项目；只读查看 Agent 的运行输出，或在独立手动终端中排查问题。 |
 | 用量分析与评估优化 | 汇总项目内会话及 Token 用量，组织验证方案、真实证据、评估报告和基线比较。模型评估需要单独确认费用。 |
-| 独立业务挖掘实验室 | 在五个案例中练习岗位访谈、资料取证、计算和报告；不要求创建项目，也不改变项目阶段。需另行导入授权素材。 |
+| 独立业务挖掘实验室 | 五案例完整运行素材随源码提供，安装后可直接选择案例与岗位，练习访谈、取证、计算和报告；不要求创建项目，也不改变项目阶段。 |
 | 中文场景判断挑战 | 10 道中文 FDE 情境题、5 分钟限时，交卷后查看解析和练习建议；支持恢复与最近 20 次本机记录，不需要模型密钥。 |
 | 界面主题与个性化 | 切换内置皮肤、浅色或深色主题，以及仅保存在当前浏览器的自定义背景。 |
 
@@ -190,13 +190,13 @@ Skill 帮助组织工作，不替代现场证据，也不授予额外权限。�
 
 打开大厅、选择岗位和恢复记录不调用模型；提交访谈、证据核对与报告生成可能产生模型费用。实验室使用独立模型路由，不跟随项目中的模型选择；同一服务共享每个案例的当前训练轮次，不提供个人账号或班级隔离。
 
-实验室素材不随源码公开分发。取得授权的 `0.3.2` 完整交付 ZIP 后，在 `upstream/deepseek-harness/` 执行：
+五案例运行素材已包含在源码中，无需额外 ZIP。安装前可在仓库根目录检查完整性：
 
 ```bash
-corepack pnpm --filter @deepseek-ai/dsh-fde-discovery-lab import:assets /absolute/path/to/FDE-业务挖掘实验室-完整交付-v0.3.2-2026-09-15.zip
+node upstream/deepseek-harness/packages/fde/discovery-lab/scripts/verify-assets.mjs
 ```
 
-缺少素材时，实验室会提示未就绪，其他模块仍可使用。安装、Python、模型路由和训练数据保留说明见[实验室包说明](upstream/deepseek-harness/packages/fde/discovery-lab/README.zh.md)。
+正常结果为 5 个案例、234 份引用资料、248 个文件。完整构建也会校验；缺少或损坏时应重新获取完整源码，不能视为实验室部署成功。计算、模型路由和训练数据保留说明见[实验室包说明](upstream/deepseek-harness/packages/fde/discovery-lab/README.zh.md)。
 
 <a id="quick-start"></a>
 
@@ -206,10 +206,10 @@ corepack pnpm --filter @deepseek-ai/dsh-fde-discovery-lab import:assets /absolut
 
 ### 环境要求
 
-- 推荐 **Node.js 24+**；Harness 声明支持 `^22.19.0 || >=24.0.0`，实验室按 Node.js 24+ 使用。
+- 使用 **Node.js 24.x，且不低于 24.9.0**；Harness 新版声明要求 `>=24.9.0`。
 - **Corepack**，按工程声明调用 **pnpm 11.28.5**。
 - 首次安装和构建需要网络；模型密钥不是安装与浏览的前置条件。
-- 使用实验室需 Python 3.9+ 与授权素材；重新运行 Semantica 需单独准备其运行环境。
+- 实验室素材已内置，运行确定性计算需 Python 3.9+；重新运行 Semantica 需单独准备其运行环境。
 
 ### 1. 获取源码并导入示例
 
@@ -262,7 +262,7 @@ DSH_HOME="$PWD/../../.runtime/dsh-home" \
 | 服务或资源 | 什么时候需要 | 如何准备 | 费用与边界 |
 | --- | --- | --- | --- |
 | DeepSeek 或其他兼容模型服务 | 与项目 Agent 对话、执行模型任务 | 在工作台设置中配置自己的提供方、模型与 API Key，或使用账号入口 | 依提供方计费；资料可能发送至所选服务，使用前确认授权。 |
-| 实验室授权素材与模型路由 | 使用完整实验室案例和访谈 | 导入交付 ZIP，按实验室包说明配置 Provider/Model | 访谈、核对、报告可能计费；素材需另行获得授权。 |
+| 实验室计算与模型路由 | 使用内置完整案例和访谈 | 素材随源码就绪；准备 Python，按实验室包说明配置 Provider/Model | 案例浏览不计费；访谈、核对、报告可能计费。 |
 | Semantica 0.6.7 | 重新抽取、构建或验证本体路线 | 安装兼容 SDK，并配置 `FDE_SEMANTICA_PYTHON` 与 `FDE_SEMANTICA_SOURCE` | 查看已有图谱不需要 SDK；当前集成规则管线不要求模型密钥。 |
 
 凭证保存在实际使用的本地运行区，不写入源码、提交或公开日志。不要复制作者或其他项目的凭据。查看文件、浏览已有阶段材料和运行附带业务示例，可以先不配置模型。
@@ -341,14 +341,14 @@ corepack pnpm run build
 corepack pnpm exec vitest run packages/client/ui-settings-models/tests/apply.client.spec.ts packages/client/ui-settings-models/tests/onboarding-dialog.client.spec.tsx packages/bundle/web-app/tests/onboarding-defaults.spec.ts
 ```
 
-按改动范围选择测试，不把示例历史报告当成当前机器的验证结果。开发规范与中文规格链见 [AGENTS.md](AGENTS.md)；本次 Harness 升级的实际构建、定向测试和剩余人工验收项见[验证记录](docs/verification/2026-10-23-harness-021-compatibility.md)。
+按改动范围选择测试，不把示例历史报告当成当前机器的验证结果。开发规范与中文规格链见 [AGENTS.md](AGENTS.md)；本次 Harness 升级的实际构建、定向测试和剩余人工验收项见[验证记录](docs/verification/2026-11-12-harness-022-compatibility.md)。
 
 ## 数据保留、更新与局域网访问
 
 - **每次启动都显式指定同一个 `DSH_HOME`。** 不省略它，不误读全局或其他项目运行区。
 - **Git 同步源码，不同步你的业务数据。** `.runtime/` 不进入 Git；项目文件、会话、训练记录和业务草稿需要自行保留，不能一概作为缓存删除。
 - **示例更新不覆盖已导入副本。** 新素材可导入新目录；旧副本有个人修改时先保留，不通过重签摘要“修复”失效证据。
-- **新版先在隔离副本验证。** 官方会话迁移保留旧代原件；代码回退不等于数据回退。具体流程见[基座升级说明](docs/architecture/harness-021-upgrade.md)。
+- **新版先在隔离副本验证。** 官方会话迁移保留旧代原件；代码回退不等于数据回退。具体流程见[基座升级说明](docs/architecture/harness-022-upgrade.md)。
 - **局域网使用具体 IP 与浏览器授权。** 通过 `--host` 指定本机实际局域网 IP，每台获准设备使用启动授权链接；旧 `--lan` 已退役，不开放公网。独立 `*.localhost` 项目预览仍是本机能力。
 - **手动终端与 Agent 共用项目文件和端口。** 人工命令不会自动记入 Agent 对话，改变服务后需重新核验运行状态。
 
@@ -377,7 +377,7 @@ DSH_HOME="$PWD/../../.runtime/fde-agent-sample/dsh-home" \
 
 **为什么实验室提示缺少素材？**
 
-完整案例素材需要独立授权与导入，不包含在公开源码内。无需素材即可使用工作台其他功能。
+当前完整源码自带五案例素材。此提示说明使用了旧包、源码未完整下载或文件损坏；运行上述素材校验命令，重新获取完整源码并构建重启，不要删除已有训练数据。
 
 **为什么有报告或图谱，阶段仍未完成？**
 
@@ -385,7 +385,7 @@ DSH_HOME="$PWD/../../.runtime/fde-agent-sample/dsh-home" \
 
 ## 与 DeepSeek Harness、Studio 的关系
 
-本项目由赋范空间维护，是基于 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的独立 FDE 工作台，不是 DeepSeek 官方发行版。当前锁定 `0.2.1-rc.2`，版本与提交以[基座锁定文件](upstream/deepseek-harness.lock.json)为准；不会自动跟随官方主分支升级。
+本项目由赋范空间维护，是基于 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的独立 FDE 工作台，不是 DeepSeek 官方发行版。当前锁定 `0.2.2-rc.2`，版本与提交以[基座锁定文件](upstream/deepseek-harness.lock.json)为准；不会自动跟随官方主分支升级。
 
 同属赋范空间的 [DeepSeek Harness Studio](https://github.com/fufankeji/deepseek-harness-studio) 聚焦通用桌面增强、插件与 Preset 生态；本项目聚焦一个企业 AI 项目从业务发现到验收交接的持续工作。两者是不同产品，不将 Studio 的桌面安装包、插件市场或本地模型入口作为本工作台的已交付能力。
 
@@ -394,13 +394,13 @@ DSH_HOME="$PWD/../../.runtime/fde-agent-sample/dsh-home" \
 - [完整部署手册](DEPLOYMENT_AGENT.md)：Git/ZIP、macOS/Linux/Windows、模型配置、数据保留与验收。
 - [产品需求](docs/PRD.md)与[产品总规格](docs/specs/product-spec.md)：范围、共享行为与验收依据。
 - [架构说明](docs/architecture/architecture.md)：FDE 与 Harness 的职责划分。
-- [基座升级与回退](docs/architecture/harness-021-upgrade.md)：版本升级、隔离验证和恢复条件。
+- [基座升级与回退](docs/architecture/harness-022-upgrade.md)：版本升级、隔离验证和恢复条件。
 - [FDE-Agent 素材](source-materials/fde-agent/README.md)：案例内容、导入、运行与更新。
 - [Semantica 集成](upstream/deepseek-harness/packages/fde/semantica/README.zh.md)：本体路线、SDK 和模型边界。
 
 ## 许可说明
 
-当前仓库未设置统一的根目录许可证。上游基座和第三方内容各自保留许可声明，参见 [Harness LICENSE](upstream/deepseek-harness/LICENSE)、[第三方声明](upstream/deepseek-harness/THIRD_PARTY_NOTICES.md)及相应包目录。平台 Skill 下载包保留必要许可文件；实验室素材的授权与源码访问分开管理。
+当前仓库未设置统一的根目录许可证。上游基座和第三方内容各自保留许可声明，参见 [Harness LICENSE](upstream/deepseek-harness/LICENSE)、[第三方声明](upstream/deepseek-harness/THIRD_PARTY_NOTICES.md)及相应包目录。平台 Skill 下载包保留必要许可文件；实验室运行素材经授权随本项目交付，保留其声明，不另行授予整体 MIT 许可。
 
 ---
 

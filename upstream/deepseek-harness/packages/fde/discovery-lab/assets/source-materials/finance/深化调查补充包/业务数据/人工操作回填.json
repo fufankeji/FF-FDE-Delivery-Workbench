@@ -1,0 +1,256 @@
+{
+  "rows": [
+    {
+      "work_id": "EXH001-W01",
+      "sample_id": "EXH001",
+      "issue_code": "Q1",
+      "actor": "财务审核",
+      "active_minutes": 10,
+      "related_event_id": "EXH001-E01",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    },
+    {
+      "work_id": "EXH001-W02",
+      "sample_id": "EXH001",
+      "issue_code": "Q2",
+      "actor": "项目负责人",
+      "active_minutes": 11,
+      "related_event_id": "EXH001-E02",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    },
+    {
+      "work_id": "EXH002-W01",
+      "sample_id": "EXH002",
+      "issue_code": "Q2",
+      "actor": "项目负责人",
+      "active_minutes": 11,
+      "related_event_id": "EXH002-E01",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    },
+    {
+      "work_id": "EXH002-W02",
+      "sample_id": "EXH002",
+      "issue_code": "Q3",
+      "actor": "信息中心",
+      "active_minutes": 12,
+      "related_event_id": "EXH002-E02",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    },
+    {
+      "work_id": "EXH003-W01",
+      "sample_id": "EXH003",
+      "issue_code": "Q4",
+      "actor": "财务负责人",
+      "active_minutes": 12,
+      "related_event_id": "EXH003-E01",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    },
+    {
+      "work_id": "EXH004-W01",
+      "sample_id": "EXH004",
+      "issue_code": "Q5",
+      "actor": "审批岗位",
+      "active_minutes": 13,
+      "related_event_id": "EXH004-E01",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    },
+    {
+      "work_id": "EXH004-W02",
+      "sample_id": "EXH004",
+      "issue_code": "Q6",
+      "actor": "出纳",
+      "active_minutes": 14,
+      "related_event_id": "EXH004-E02",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    },
+    {
+      "work_id": "EXH006-W01",
+      "sample_id": "EXH006",
+      "issue_code": "Q1",
+      "actor": "财务审核",
+      "active_minutes": 15,
+      "related_event_id": "EXH006-E01",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    },
+    {
+      "work_id": "EXH007-W01",
+      "sample_id": "EXH007",
+      "issue_code": "Q2",
+      "actor": "项目负责人",
+      "active_minutes": 16,
+      "related_event_id": "EXH007-E01",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    },
+    {
+      "work_id": "EXH008-W01",
+      "sample_id": "EXH008",
+      "issue_code": "Q3",
+      "actor": "信息中心",
+      "active_minutes": 17,
+      "related_event_id": "EXH008-E01",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    },
+    {
+      "work_id": "EXH009-W01",
+      "sample_id": "EXH009",
+      "issue_code": "Q4",
+      "actor": "财务负责人",
+      "active_minutes": 18,
+      "related_event_id": "EXH009-E01",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    },
+    {
+      "work_id": "EXH009-W02",
+      "sample_id": "EXH009",
+      "issue_code": "Q5",
+      "actor": "审批岗位",
+      "active_minutes": 19,
+      "related_event_id": "EXH009-E02",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    },
+    {
+      "work_id": "EXH011-W01",
+      "sample_id": "EXH011",
+      "issue_code": "Q1",
+      "actor": "财务审核",
+      "active_minutes": 20,
+      "related_event_id": "EXH011-E01",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    },
+    {
+      "work_id": "EXH011-W02",
+      "sample_id": "EXH011",
+      "issue_code": "Q2",
+      "actor": "项目负责人",
+      "active_minutes": 8,
+      "related_event_id": "EXH011-E02",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    },
+    {
+      "work_id": "EXH012-W01",
+      "sample_id": "EXH012",
+      "issue_code": "Q5",
+      "actor": "审批岗位",
+      "active_minutes": 8,
+      "related_event_id": "EXH012-E01",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    },
+    {
+      "work_id": "EXH012-W02",
+      "sample_id": "EXH012",
+      "issue_code": "Q6",
+      "actor": "出纳",
+      "active_minutes": 9,
+      "related_event_id": "EXH012-E02",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    },
+    {
+      "work_id": "EXH013-W01",
+      "sample_id": "EXH013",
+      "issue_code": "Q3",
+      "actor": "信息中心",
+      "active_minutes": 9,
+      "related_event_id": "EXH013-E01",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    },
+    {
+      "work_id": "EXH015-W01",
+      "sample_id": "EXH015",
+      "issue_code": "Q1",
+      "actor": "财务审核",
+      "active_minutes": 11,
+      "related_event_id": "EXH015-E01",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    },
+    {
+      "work_id": "EXH015-W02",
+      "sample_id": "EXH015",
+      "issue_code": "Q4",
+      "actor": "财务负责人",
+      "active_minutes": 12,
+      "related_event_id": "EXH015-E02",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    },
+    {
+      "work_id": "EXH016-W01",
+      "sample_id": "EXH016",
+      "issue_code": "Q2",
+      "actor": "项目负责人",
+      "active_minutes": 12,
+      "related_event_id": "EXH016-E01",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    },
+    {
+      "work_id": "EXH016-W02",
+      "sample_id": "EXH016",
+      "issue_code": "Q3",
+      "actor": "信息中心",
+      "active_minutes": 13,
+      "related_event_id": "EXH016-E02",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    },
+    {
+      "work_id": "EXH017-W01",
+      "sample_id": "EXH017",
+      "issue_code": "Q5",
+      "actor": "审批岗位",
+      "active_minutes": 13,
+      "related_event_id": "EXH017-E01",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    },
+    {
+      "work_id": "EXH019-W01",
+      "sample_id": "EXH019",
+      "issue_code": "Q1",
+      "actor": "财务审核",
+      "active_minutes": 15,
+      "related_event_id": "EXH019-E01",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    },
+    {
+      "work_id": "EXH020-W01",
+      "sample_id": "EXH020",
+      "issue_code": "Q2",
+      "actor": "项目负责人",
+      "active_minutes": 16,
+      "related_event_id": "EXH020-E01",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    },
+    {
+      "work_id": "EXH020-W02",
+      "sample_id": "EXH020",
+      "issue_code": "Q4",
+      "actor": "财务负责人",
+      "active_minutes": 17,
+      "related_event_id": "EXH020-E02",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    },
+    {
+      "work_id": "EXH021-W01",
+      "sample_id": "EXH021",
+      "issue_code": "Q3",
+      "actor": "信息中心",
+      "active_minutes": 17,
+      "related_event_id": "EXH021-E01",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    },
+    {
+      "work_id": "EXH021-W02",
+      "sample_id": "EXH021",
+      "issue_code": "Q5",
+      "actor": "审批岗位",
+      "active_minutes": 18,
+      "related_event_id": "EXH021-E02",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    },
+    {
+      "work_id": "EXH021-W03",
+      "sample_id": "EXH021",
+      "issue_code": "Q6",
+      "actor": "出纳",
+      "active_minutes": 19,
+      "related_event_id": "EXH021-E03",
+      "measurement": "事后回填的近似净操作分钟，非系统计时"
+    }
+  ]
+}

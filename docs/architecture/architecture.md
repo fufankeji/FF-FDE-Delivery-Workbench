@@ -1,7 +1,7 @@
 ---
 document: architecture
 status: draft
-updated: "2026-09-16"
+updated: "2026-11-12"
 prd: docs/PRD.md
 product_spec: docs/specs/product-spec.md
 ---
@@ -10,11 +10,12 @@ product_spec: docs/specs/product-spec.md
 
 ## 1. 状态、范围与事实来源
 
+2026-11-12 已将官方基座更新为 `0.2.2-rc.2`。F030 构建、定向回归与隔离历史读取已验证，产品体验仍待用户手动确认。源码检查点、数据副本和回退见 [F030 升级说明](harness-022-upgrade.md)；F027 记录保留为历史。
+
 - 本文记录已经确认的技术方向，以及启动官方 Web 后必须用运行证据验证的架构假设。
 - 强制基座：`https://github.com/deepseek-ai/deepseek-harness` 官方源码。
 - 架构排除：`/Users/muyu/MuYuProjectBuild/DeepSeekHarnessDesktop` 及其他赋范分叉不作为 Agent、Host 或 Web 运行架构基线；F016 仅按用户明确授权复用该 Studio 的主题资源和已经验证的换肤交互，仍接入当前官方 Harness 插件与 ThemeRuntime。
-- 当前官方快照：`deepseek-ai/deepseek-harness@687f282e8625c6b8d11ff58211a90524be2e4317`，标签 `dsh-v0.2.1-rc.2`。上一基线为 `0a15e36e…` / `0.1.6-alpha.1`。接口、依赖和运行变化见[升级说明](harness-021-upgrade.md)。
-- 2026-10-23 已授权 F027 兼容 `dsh-v0.2.1-rc.2`，当前仍未切换。先按[本轮升级方案](harness-021-upgrade.md)完成三方合并、隔离历史数据验证与人工验收；不更改既有产品合同、不自动创建 worktree。
+- 当前官方快照：`deepseek-ai/deepseek-harness@ddac96760b6edf8fa0fe17cbdcf0b512f4c12b2c`，标签 `dsh-v0.2.2-rc.2`。上一基线为 `687f282e…` / `0.2.1-rc.2`。接口、依赖和运行变化见[升级说明](harness-022-upgrade.md)。
 - 官方状态：developer preview，明确允许破坏性变更；因此 V1 必须固定版本，不自动跟随 `master`。
 - 当前已完成锁定官方源码、官方 Web 基线、FDE 品牌、项目优先导航、结构化项目创建、项目资料持久化/稳定身份/本地识别/双入口预览、六阶段提示、完整独立项目进度与只读项目详情、API 文档、系统架构、用量分析、评估优化页面和浏览器本地界面主题；正在增加由当前 Agent 驱动的项目运行、持久终端和内嵌预览；FDE 行为继续以独立 Host/Client Plugins 和最小下游 UI 适配实现。
 
@@ -30,11 +31,11 @@ product_spec: docs/specs/product-spec.md
 
 ### 独立业务挖掘实验室（F024）
 
-实验室以 `packages/fde/discovery-lab` Host 插件和 `packages/client/ui-fde-discovery-lab` Client 插件接入当前 `0.2.1-rc.2` 基座，不维护自定义 Agent Loop。Host 复用官方 Agent、Session、Tools、LLM 和持久化；仅维护实验室自己的轮次数据库和岗位会话，不注入 Workspace、FDE Stage 或项目服务。原插件 `0.3.2` 的业务代码保留来源说明，以最小修改适配当前会话事件接口和权限边界。
+实验室以 `packages/fde/discovery-lab` Host 插件和 `packages/client/ui-fde-discovery-lab` Client 插件接入当前 `0.2.2-rc.2` 基座，不维护自定义 Agent Loop。Host 复用官方 Agent、Session、Tools、LLM 和持久化；仅维护实验室自己的轮次数据库和岗位会话，不注入 Workspace、FDE Stage 或项目服务。原插件 `0.3.2` 的业务代码保留来源说明，以最小修改适配当前会话事件接口和权限边界。
 
 Client 在首页及项目中心的 `fde.workbench.module.action` 和原 `sidebar.footer.action` 增加入口，在 `shell.overlay` 挂载独立页面。模块入口槽由 `ui-fde-project` 的全屏页面声明和渲染，不传入项目数据；实验室通过 Slot 注册共享自身导航 Store，不依赖侧栏可见性，也不调用项目控制器。原像素办公室应用由当前宿主的专属路径提供，并在 iframe 中运行，隔离原应用的全局 CSS 与 React 生命周期；不是另起宿主或局域网代理。关闭页面仅改变该插件的浏览状态，不重置项目选择或阶段；返回后保留原工作台。接口采用独立 `/api/fde-discovery-lab` 命名空间，并复用工作台的 Host/Origin/Fetch-Metadata 信任校验。
 
-训练数据位于显式 `DSH_HOME/fde-discovery-lab/`，每案例共享一个当前轮次；原生 Session 日志仍由宿主持久化，但不登记到项目 Workspace。业务原件、案例定义、固定计算模块和 PDF 字体从用户授权的 `0.3.2` 运行包按摘要及白名单导入 Host 包的 `.assets/`，该目录不进 Git，可用导入脚本重建；不导入源码归档的教师和未来事件目录。运行数据不随素材重建覆盖。适配源码、导入脚本和来源摘要受 Git 管理，构建与依赖继续使用当前仓库路径。
+训练数据位于显式 `DSH_HOME/fde-discovery-lab/`，每案例共享一个当前轮次；原生 Session 日志仍由宿主持久化，但不登记到项目 Workspace。业务原件、案例定义、固定计算模块和 PDF 字体以 Host 包 `assets/` 的固定静态内容随源码交付，逐文件清单由构建与初始化校验；正常安装不需要额外 ZIP。只包含用户于 2026-11-13 授权发放的原运行白名单，不含教师和未来事件材料。运行数据不随素材重建覆盖。适配源码、导入脚本和来源摘要受 Git 管理，构建与依赖继续使用当前仓库路径。
 
 打开入口、案例列表或恢复已存在记录不触发模型。真实访谈、核对和报告调用共用宿主模型凭据，保持实验室原 `DEEPSEEK_PROVIDER/DEEPSEEK_MODEL` 环境变量及默认路由，不跟随、不改变普通项目模型选择。开发只运行无密钥验证；真实模型和人工体验不以构建、HTTP 成功或模拟响应代替。当前宿主的空 Session 延迟写入，适配层按精确 Session 原生记录决定创建或恢复，并使用 `sessions.flush(session)` 完成持久化检查点。
 
@@ -255,7 +256,7 @@ FDE Project (= Harness Workspace)
 
 ### 5.8 项目用量分析
 
-- 固定 `dsh-observe@0.2.12`（Apache-2.0），适配当前 Session 事件接口，消费 `session/event`，生成 Turn/Step/Tool/LLM spans、Token/成本指标，支持 Langfuse/OTLP、发送前脱敏、有界 storage-domain 缓冲、重试和运行时状态 Remote。
+- 固定 `dsh-observe@0.2.27`（Apache-2.0），适配当前 Session 事件接口，消费 `session/event`，生成 Turn/Step/Tool/LLM spans、Token/成本指标，支持 Langfuse/OTLP、发送前脱敏、有界 storage-domain 缓冲、重试和运行时状态 Remote。
 - Web Profile 默认装载但 `enabled: false`，没有明确后端和启用配置时不采集外发；本项目不读取其他本地项目的 Langfuse 凭据，也不自动部署 Langfuse。
 - `ui-fde-project` 以 Workspace `sessionIds` 读取官方 Session 摘要中的 `sessionStats` 和 `tokenUsage`，形成项目本地运行列表；当前 Session Trajectory 保持独立。
 - 当前 Bundle 的 `dsh-observe` 为 disabled，且该插件会在注册 Remote 前返回，因此页面明确显示“外部导出未启用”，不猜测后端、队列或缓冲健康。未来启用 Langfuse/OTLP 时再接入真实 Remote 状态。
@@ -378,7 +379,7 @@ FDE Workspace 与阶段 2/3 证据
 ### 8.2 代码视图边界
 
 - 官方源码没有 Monaco 或完整 VS Code Workbench；LSP 目前主要是 Agent 的只读导航工具。
-- 当前锁定 `dsh-better-sidebar@0.19.1` 与 `dsh-file-review-tab@0.5.0`（MIT）。右侧面板由官方 Sidebar 承载，Agent 持久终端从 Better Sidebar 的 bottomSplits 定位；Git Diff 与 Agent Review 保留不同来源语义。当前兼容性依据是本次隔离构建、定向测试和启动记录。
+- 当前锁定 `dsh-better-sidebar@0.31.1` 与 `dsh-file-review-tab@0.5.0`（MIT）。右侧面板由官方 Sidebar 承载，Agent 持久终端从 Better Sidebar 的 bottomSplits 定位；Git Diff 与 Agent Review 保留不同来源语义。当前兼容性依据是本次隔离构建、定向测试和启动记录。
 - `@lsq64737/dsh-workbench-layout@0.1.5`、其左侧 Activity Rail patch、Bundle row 和依赖全部移除；被用户否定的页面形态不保留为隐藏备选入口。
 - Better Sidebar 复用会话 Header/Overlay，并以固定面板 Host 和布局变量为中央区域让出右侧空间；不 shadow 项目 Sidebar、不重排 Conversation 到另一列，也不占用官方 `details`。
 - 默认开发 Dock 只展示 Files/Editor、Git、Diff 与 File Review；Subagent、Side Chat 和底部面板继续禁用。Browser、Terminal 与 Agent Terminal tools 只在 FDE 明确执行“启动项目/停止项目”时开启，服务当前项目运行与预览；这不扩展为通用网页浏览器、任意命令面板、调试器、扩展市场、完整语言诊断或 VS Code Extension Host。
@@ -487,7 +488,7 @@ FDE Workspace 与阶段 2/3 证据
 | 项目文件 | 官方 Workspace/FS＋项目 `fde-resources/`/`.fde/sources`/`.fde/derived` | 客户原件、稳定来源身份、本地派生、工程产物和交付文件 | 原件只保存一份并对两个入口可见；派生可再生成且不覆盖原件 |
 | 图片 | 官方 Attachment Store | 对话图片与持久引用 | 官方已有内容寻址、限制、恢复和模型适配 |
 | 普通文件 | `fde-source`＋`@jiaoqsh/dsh-document`＋`@file-viewer/react`/三个 Office Renderer | PDF、Office、文本、表格等原件、识别和只读预览 | 官方未支持通用附件；以独立 Host/Client 能力实现，按需打包且不自动接入 Agent |
-| 代码视图 | `dsh-better-sidebar@0.19.1`＋`dsh-file-review-tab@0.5.0` | 右侧 Files/Editor/Git/Agent Review Dock | 保持左侧项目导航和中央对话稳定；插件可移除、可扩展，当前组合已验证隔离加载，不承诺完整 VS Code |
+| 代码视图 | `dsh-better-sidebar@0.31.1`＋`dsh-file-review-tab@0.5.0` | 右侧 Files/Editor/Git/Agent Review Dock | 保持左侧项目导航和中央对话稳定；插件可移除、可扩展，当前组合已验证隔离加载，不承诺完整 VS Code |
 | 评估/部署 | 官方工具执行＋FDE 记录/门槛插件 | Evals、测试、健康检查、部署和回退证据 | 复用执行层，新增 FDE 产品语义 |
 
 ## 14. 服务与目录边界

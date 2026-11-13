@@ -1,0 +1,4 @@
+﻿warehouse_id,name,country,timezone,store_id,purpose,saleable
+W-KL,吉隆坡合作仓,马来西亚,Asia/Kuala_Lumpur,MY01,主销售仓,True
+W-JB,新山合作仓,马来西亚,Asia/Kuala_Lumpur,MY02,区域销售仓及调拨候选,True
+W-CN,国内集货点,中国,Asia/Shanghai,,运输节点，不汇入海外可售,False

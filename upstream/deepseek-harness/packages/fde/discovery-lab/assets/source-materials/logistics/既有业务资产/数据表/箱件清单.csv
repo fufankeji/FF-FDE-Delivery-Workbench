@@ -1,0 +1,10 @@
+﻿carton_id,shipment_id,sku_id,declared_qty,identifier_type,label_status,image_id
+CTN-2301,SH01,T01-BL-M,24,内部教学箱号，非SSCC,装箱单声明,IMG04
+CTN-2302,SH01,T01-BL-M,24,内部教学箱号，非SSCC,装箱单声明,IMG06
+CTN-2401,SH02,S02-SD-M,24,内部教学箱号，非SSCC,装箱单声明,IMG05
+CTN-2402,SH02,S02-SD-M,24,内部教学箱号，非SSCC,装箱单声明,
+CTN-2403,SH02,S02-SD-M,24,内部教学箱号，非SSCC,装箱单声明,
+PLAN-2501,SH03,P03-BK-L,24,内部教学箱号，非SSCC,计划尚未贴标,
+PLAN-2502,SH03,P03-BK-L,24,内部教学箱号，非SSCC,计划尚未贴标,
+PLAN-2503,SH03,P03-BK-L,24,内部教学箱号，非SSCC,计划尚未贴标,
+PLAN-2504,SH03,P03-BK-L,24,内部教学箱号，非SSCC,计划尚未贴标,

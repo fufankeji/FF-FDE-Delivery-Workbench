@@ -5,6 +5,7 @@ import { boot } from '@deepseek-ai/dsh-app-boot'
 import { ToolCallId } from '@deepseek-ai/dsh-llm'
 import type { Agent } from '@deepseek-ai/dsh-agent'
 import type { AgentContextResult } from '../../src/types.ts'
+import { MemoryCredentials } from '../../../../credentials/credentials/tests/memory.ts'
 
 const root = process.env.FDE_TEST_ROOT!
 const project = join(root, 'project')
@@ -12,16 +13,18 @@ await mkdir(project)
 // Loader persists explicit disposal as disabled; each run owns its config copy.
 const configPath = join(root, 'cordis.yml')
 await writeFile(configPath, await readFile(new URL('./cordis.yml', import.meta.url)))
-const ctx = await boot('semantica-tools-test', configPath, undefined, undefined, new URL('./', import.meta.url).href)
+const ctx = await boot('semantica-tools-test', configPath, undefined, async ctx => {
+  await ctx.plugin(MemoryCredentials)
+}, new URL('./', import.meta.url).href)
 try {
   await ctx.workspaceRegistry.create(project)
   const session = ctx.sessions.create(undefined, { meta: { cwd: project } })
   // Direct tool dispatch supplies a real Session; no model or loop turn is claimed.
   const agent = { session, ctx } as unknown as Agent
-  const call = async (action: string, input: Record<string, unknown> = {}) => ctx.tools.execute({
-    agent, signal: new AbortController().signal, callId: ToolCallId(action),
-    name: 'semantic_workspace', arguments: { action, ...input },
-  })
+  const call = async (action: string, input: Record<string, unknown> = {}) => (await ctx.tools.execute({
+    agent, signal: new AbortController().signal,
+    calls: [{ type: 'tool-call', id: ToolCallId(action), name: 'semantic_workspace', arguments: JSON.stringify({ action, ...input }) }],
+  })).results[0]!.result
   const inspected = await call('inspect')
   assert.equal(inspected.isError, false, JSON.stringify(inspected.content))
   const content = inspected.content[0]
@@ -75,10 +78,11 @@ try {
     const state = await readSemanticWorkspace(project)
     assert.equal(state.validation?.status, 'passed')
     const before = await readFile(join(project, '.fde/design/semantica/workspace.json'), 'utf8')
-    const query = () => ctx.tools.execute({
-      agent, signal: new AbortController().signal, callId: ToolCallId('consume'), name: 'semantic_context_query',
-      arguments: { purpose: 'consume', questionId: 'author_articles', query: '查询作品的作者并列出来源', maxDepth: 1 },
-    })
+    const query = async () => (await ctx.tools.execute({
+      agent, signal: new AbortController().signal,
+      calls: [{ type: 'tool-call', id: ToolCallId('consume'), name: 'semantic_context_query',
+        arguments: JSON.stringify({ purpose: 'consume', questionId: 'author_articles', query: '查询作品的作者并列出来源', maxDepth: 1 }) }],
+    })).results[0]!.result
     const consumed = await query()
     assert.equal(consumed.isError, false, JSON.stringify(consumed.content))
     const answer = JSON.parse((consumed.content[0] as { text: string }).text) as AgentContextResult

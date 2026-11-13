@@ -1,0 +1,49 @@
+{
+  "snapshot_at": "2026-09-14T09:00:00+08:00",
+  "employees": [
+    {
+      "employee_id": "E09",
+      "name": "程见微",
+      "department_id": "D02",
+      "job": "系统验证工程师",
+      "manager_id": "M02"
+    },
+    {
+      "employee_id": "E10",
+      "name": "温书白",
+      "department_id": "D01",
+      "job": "测试工程师",
+      "manager_id": "M01"
+    }
+  ],
+  "applications": [
+    {
+      "application_id": "A009",
+      "employee_id": "E09",
+      "destination": "武汉",
+      "departure_date": "2026-09-08",
+      "return_date": "2026-09-10",
+      "estimated_yuan": 2600,
+      "candidate_projects": [
+        "P101"
+      ],
+      "approved_at": "2026-09-04T15:00:00+08:00",
+      "approver_id": "M02",
+      "task": "样机接口验证，现场增加联合诊断任务"
+    },
+    {
+      "application_id": "A010",
+      "employee_id": "E10",
+      "destination": "南京",
+      "departure_date": "2026-09-07",
+      "return_date": "2026-09-09",
+      "estimated_yuan": 2600,
+      "candidate_projects": [
+        "P101"
+      ],
+      "approved_at": "2026-09-04T14:00:00+08:00",
+      "approver_id": "M01",
+      "task": "振动采集模块验证"
+    }
+  ]
+}

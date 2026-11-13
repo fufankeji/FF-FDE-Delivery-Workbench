@@ -1,0 +1,77 @@
+schema_version = 1
+public_name = "FF - FDE 交付工作台"
+source_root = "."
+bundle_root = "FDEDeliveryWorkbench"
+archive_name = "FF-FDE交付工作台-完整源码-2026-11-13.zip"
+release_date = "2026-11-13"
+output_dir = "dist"
+include = [".gitignore", "frontend", "source-materials/fde-agent", "upstream/deepseek-harness", "upstream/deepseek-harness.lock.json"]
+exclude_names = ["lib", ".agents", ".claude", ".assets", ".dsh-build", ".artifacts", "recordings", "playwright-report", "test-results"]
+exclude_globs = ["**/*.tsbuildinfo", "**/*.log", "**/*.pid", "**/.DS_Store", "upstream/deepseek-harness/apps/web/scripts/record/**"]
+
+# Fixed public test fixtures contain deliberately invalid keys for masking/parser tests.
+reviewed_test_credential_files = [
+  "upstream/deepseek-harness/apps/desktop/tests/welcome-flow.e2e.ts",
+  "upstream/deepseek-harness/packages/client/ui-secret-mask/tests/secret-rule.client.spec.ts",
+  "upstream/deepseek-harness/packages/credentials/credentials-local/tests/local.spec.ts",
+  "upstream/deepseek-harness/packages/session/session-telemetry-otel/tests/fixtures/driver.ts",
+  "upstream/deepseek-harness/packages/session/session-telemetry-otel/tests/loader-composition.e2e.ts",
+]
+# Preserve already published sample evidence bytes; these are not executable configuration.
+reviewed_historical_path_files = [
+  "source-materials/fde-agent/project/docs/verification/2026-09-07-stage5-integration.md",
+  "source-materials/fde-agent/project/fde-deliverables/05-poc-eval/evaluation-baseline.md",
+]
+
+[[delivery_files]]
+source = "student-delivery/README.md"
+target = "README.md"
+[[delivery_files]]
+source = "student-delivery/AGENTS.md"
+target = "AGENTS.md"
+[[delivery_files]]
+source = "student-delivery/DEPLOYMENT_AGENT.md"
+target = "DEPLOYMENT_AGENT.md"
+[[delivery_files]]
+source = "student-delivery/SOURCE_VERSION.json"
+target = "SOURCE_VERSION.json"
+[[delivery_files]]
+source = "student-delivery/verify-source.mjs"
+target = "verify-source.mjs"
+
+[[validation.commands]]
+id = "source-integrity"
+stage = "diagnostic"
+command = "node verify-source.mjs"
+required = true
+timeout_seconds = 120
+[[validation.commands]]
+id = "install"
+stage = "install"
+command = "cd upstream/deepseek-harness && corepack pnpm install --frozen-lockfile"
+required = true
+timeout_seconds = 1800
+[[validation.commands]]
+id = "build"
+stage = "build"
+command = "DSH_CLIENT_COMMIT_HASH=$(node -p 'require(\"./SOURCE_VERSION.json\").sourceCommit') && export DSH_CLIENT_COMMIT_HASH && cd upstream/deepseek-harness && corepack pnpm run build --serial"
+required = true
+timeout_seconds = 1800
+[[validation.commands]]
+id = "lab-materials"
+stage = "diagnostic"
+command = "node upstream/deepseek-harness/packages/fde/discovery-lab/scripts/verify-assets.mjs"
+required = true
+timeout_seconds = 120
+[[validation.commands]]
+id = "sample-tests"
+stage = "test"
+command = "node --test source-materials/fde-agent/load.test.mjs source-materials/fde-agent/project/backend/tests/workflow.test.mjs"
+required = true
+timeout_seconds = 180
+[[validation.commands]]
+id = "sample-import"
+stage = "diagnostic"
+command = "node source-materials/fde-agent/load.mjs"
+required = true
+timeout_seconds = 120

@@ -13,7 +13,9 @@ import Include from '@deepseek-ai/cordis-plugin-include'
 import LlmRuntime, { LlmAdapter, ReasoningEffortId, ToolCallId, createUserMessage, type GenerateOptions, type LlmResolvedModelInfo, type StreamChunk } from '@deepseek-ai/dsh-llm'
 import SessionStore, { SessionId } from '@deepseek-ai/dsh-session'
 import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
-import ToolRuntime, { defineContentToolFixture } from '@deepseek-ai/dsh-tools'
+import ToolRuntime from '@deepseek-ai/dsh-tools'
+import { defineContentToolFixture } from '@deepseek-ai/dsh-tool-testkit'
+import * as NativeExecutor from '@deepseek-ai/dsh-tool-executor-native'
 import AgentRegistry from '@deepseek-ai/dsh-agent'
 import SessionProjections from '@deepseek-ai/dsh-session-projection'
 import AgentLoop from '@deepseek-ai/dsh-agent-loop'
@@ -86,7 +88,7 @@ async function mount(adapter: OfflineAdapter) {
   const configPath = join(directory, 'cordis.yml')
   const modules = new Map<string, unknown>([
     ['llm', LlmRuntime], ['session', SessionStore], ['prompt', SystemPrompt],
-    ['projections', SessionProjections], ['tools', ToolRuntime], ['agents', AgentRegistry], ['loop', AgentLoop],
+    ['projections', SessionProjections], ['tools', ToolRuntime], ['native-executor', NativeExecutor], ['agents', AgentRegistry], ['loop', AgentLoop],
     ['connection', { apply(ctx: Context) {
       const peer = new Peer(ctx, { principal: { kind: 'owner' } })
       ctx.effect(() => () => peer.dispose(), 'test owner peer')
@@ -95,7 +97,7 @@ async function mount(adapter: OfflineAdapter) {
   ])
   await writeFile(configPath, [
     '- name: connection', '- name: llm', '- name: session', '- name: prompt', "  config: { personaPrefix: 'WORKSPACE_ONLY_CONTEXT' }",
-    '- name: projections', '- name: tools', '- name: agents', '- name: loop', '  config: { agents: [] }',
+    '- name: projections', '- name: tools', '- name: native-executor', '- name: agents', '- name: loop', '  config: { agents: [] }',
     '- name: persistence', '  config:', '    root: ' + JSON.stringify(join(directory, 'sessions')),
     '- name: web', "  config: { host: '127.0.0.1', port: 0 }", '- name: lab', '',
   ].join('\n'))
@@ -129,7 +131,7 @@ it('isolates roles and globals, persists native evidence, restores idle roles an
   vi.stubEnv('DSH_HOME', directory)
   vi.stubEnv('DEEPSEEK_PROVIDER', 'offline-lab')
   vi.stubEnv('DEEPSEEK_MODEL', 'scripted')
-  const c = JSON.parse(await readFile(new URL('../.assets/cases/finance/case.json', import.meta.url), 'utf8'))
+  const c = JSON.parse(await readFile(new URL('../assets/cases/finance/case.json', import.meta.url), 'utf8'))
   const role = c.roles.find((r: { id: string }) => r.id === 'employee')
   const asset = c.assets.find((a: { id: string; releaseGate?: unknown }) => role.assetIds.includes(a.id) && !a.releaseGate)
   const other = c.assets.find((a: { id: string }) => !role.assetIds.includes(a.id))

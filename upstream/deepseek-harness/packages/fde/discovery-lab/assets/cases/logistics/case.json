@@ -1,0 +1,2282 @@
+{
+  "schemaVersion": 1,
+  "id": "logistics",
+  "version": "1.0.0",
+  "snapshot": "2026-09-10T09:00:00+08:00",
+  "title": "栖鲸织岸商贸 · 智能物流",
+  "company": "栖鲸织岸商贸",
+  "industry": "跨境商贸 / 库存与供货",
+  "background": "从国内采购服装，经跨境运输和马来西亚两仓供货。沿一个规格的供货疑问，核对采购、运输、库存与运营材料，查清反复确认发生在哪里。",
+  "initialRequest": "# 负责人首次委托\n\n日期：2026-09-10 08:55。参会岗位：经营负责人、采购负责人。调查截面：同日09:00。\n\n有些款卖得好，却经常补不上；还有一些货一直压着。采购、仓库和运营都很忙，但我问现在该补什么、哪些货来得及，往往还要等他们重新核对。能不能用 AI 帮我们把库存和供货管得更好，少一些缺货，也少压一些资金？\n\n这次先看马来西亚两仓和三款服装，范围不要一下扩到全公司。采购说货已经买了，运营又说卖不了，我想知道两边到底各在说什么。需要新增预算可以讨论，但先把现在的问题拿出具体依据。不要把销量波动全部算成供货的责任，也不要只做一张看起来更清楚、大家仍然需要重新填数的表。\n\n可以找采购、运营、物流和仓库了解最近发生的事。我们给出的历史协作台账不是所有订单明细，取消订单也不一定因为缺货。\n",
+  "investigationFocus": [
+    "库存与可售口径",
+    "供货日期与实收依据",
+    "规格差异和跨岗核对"
+  ],
+  "roles": [
+    {
+      "id": "lead",
+      "name": "苏问川",
+      "title": "采购负责人",
+      "bio": "确认供货调查范围、跨岗协作与资源安排",
+      "style": "重视具体依据与后续责任",
+      "goals": [
+        "减少反复追问",
+        "确认异常交给谁继续处理"
+      ],
+      "unknowns": [
+        "不是经营负责人或财务的无限授权代表",
+        "不能承诺批准新采购或已实现收益"
+      ],
+      "greeting": "你好，我是苏问川，负责确认供货调查范围、跨岗协作与资源安排。你想从哪次供货疑问开始？",
+      "factIds": [
+        "logistics.lead.scope",
+        "logistics.lead.handoff",
+        "logistics.lead.sample",
+        "logistics.lead.systems",
+        "logistics.lead.stockage"
+      ],
+      "assetIds": [
+        "logistics-letter",
+        "logistics-workflow",
+        "logistics-handover",
+        "logistics-systems",
+        "logistics-history",
+        "logistics-events",
+        "logistics-gaps",
+        "logistics-observation",
+        "logistics-doc09",
+        "logistics-doc10",
+        "logistics-voice-lead"
+      ]
+    },
+    {
+      "id": "buyer",
+      "name": "宋时宜",
+      "title": "采购专员",
+      "bio": "维护采购行、供应商条件、询价与申请资料",
+      "style": "先对规格、采购行和报价条件",
+      "goals": [
+        "资料一次对齐",
+        "明确等待谁回复"
+      ],
+      "unknowns": [
+        "不能批准下单付款或广告",
+        "不知道未回传的实收质量结论"
+      ],
+      "greeting": "你好，我是宋时宜，负责维护采购行、供应商条件、询价与申请资料。你想从哪次供货疑问开始？",
+      "factIds": [
+        "logistics.buyer.join",
+        "logistics.buyer.freshness",
+        "logistics.buyer.conditions",
+        "logistics.buyer.time",
+        "logistics.buyer.alternatives"
+      ],
+      "assetIds": [
+        "logistics-workflow",
+        "logistics-handover",
+        "logistics-systems",
+        "logistics-history",
+        "logistics-events",
+        "logistics-observation",
+        "logistics-products",
+        "logistics-warehouses",
+        "logistics-po",
+        "logistics-supplier",
+        "logistics-aliases",
+        "logistics-freshness",
+        "logistics-routes",
+        "logistics-doc01",
+        "logistics-doc02",
+        "logistics-doc06",
+        "logistics-doc07",
+        "logistics-doc10",
+        "logistics-img01",
+        "logistics-img02",
+        "logistics-img03",
+        "logistics-voice-buyer"
+      ]
+    },
+    {
+      "id": "logistics",
+      "name": "陆清和",
+      "title": "物流协调员",
+      "bio": "按货运批次核对更新通知、装箱和预计可售日期",
+      "style": "明确日期表示的业务节点",
+      "goals": [
+        "新通知有据可追溯",
+        "避免重复计算同一批在途"
+      ],
+      "unknowns": [
+        "不能保证外部运输永不延迟",
+        "不能以外箱照片代替仓库清点"
+      ],
+      "greeting": "你好，我是陆清和，负责按货运批次核对更新通知、装箱和预计可售日期。你想从哪次供货疑问开始？",
+      "factIds": [
+        "logistics.logistics.date",
+        "logistics.logistics.samebatch",
+        "logistics.logistics.images",
+        "logistics.logistics.external"
+      ],
+      "assetIds": [
+        "logistics-workflow",
+        "logistics-shipments",
+        "logistics-cartons",
+        "logistics-aliases",
+        "logistics-routes",
+        "logistics-doc01",
+        "logistics-doc02",
+        "logistics-doc08",
+        "logistics-img04",
+        "logistics-img05",
+        "logistics-img06",
+        "logistics-voice-logistics"
+      ]
+    },
+    {
+      "id": "warehouse",
+      "name": "沈言初",
+      "title": "海外仓对接员",
+      "bio": "核对两仓清点、库存、预留和隔离状态",
+      "style": "给原始行，区分清点与处置",
+      "goals": [
+        "实收不重复入账",
+        "质量待办有责任人"
+      ],
+      "unknowns": [
+        "尚无质检释放或短少补寄结果",
+        "不能承诺另一仓货无条件全部调走"
+      ],
+      "greeting": "你好，我是沈言初，负责核对两仓清点、库存、预留和隔离状态。你想从哪次供货疑问开始？",
+      "factIds": [
+        "logistics.warehouse.available",
+        "logistics.warehouse.receipt",
+        "logistics.warehouse.quality",
+        "logistics.warehouse.source",
+        "logistics.warehouse.transfer"
+      ],
+      "assetIds": [
+        "logistics-workflow",
+        "logistics-products",
+        "logistics-warehouses",
+        "logistics-stock",
+        "logistics-cartons",
+        "logistics-receipts",
+        "logistics-bridge",
+        "logistics-freshness",
+        "logistics-doc03",
+        "logistics-doc04",
+        "logistics-doc08",
+        "logistics-img04",
+        "logistics-img05",
+        "logistics-img06",
+        "logistics-voice-warehouse"
+      ]
+    },
+    {
+      "id": "operations",
+      "name": "温知夏",
+      "title": "店铺运营",
+      "bio": "查看规格履约、可售机会和活动安排",
+      "style": "关注哪几天有货可卖，先分规格",
+      "goals": [
+        "活动承诺与供货相符",
+        "区别卖不动与没机会卖"
+      ],
+      "unknowns": [
+        "缺访问尺码选择和取消原因明细",
+        "不能用零销量估计真实未成交需求"
+      ],
+      "greeting": "你好，我是温知夏，负责查看规格履约、可售机会和活动安排。你想从哪次供货疑问开始？",
+      "factIds": [
+        "logistics.operations.decision",
+        "logistics.operations.zerodays",
+        "logistics.operations.gaps",
+        "logistics.operations.sku"
+      ],
+      "assetIds": [
+        "logistics-workflow",
+        "logistics-gaps",
+        "logistics-products",
+        "logistics-warehouses",
+        "logistics-daily",
+        "logistics-advertising",
+        "logistics-doc02",
+        "logistics-doc05",
+        "logistics-img01",
+        "logistics-img02",
+        "logistics-img03",
+        "logistics-voice-operations"
+      ]
+    },
+    {
+      "id": "finance",
+      "name": "季明书",
+      "title": "财务审批岗",
+      "bio": "核对新增费用、预算范围和审批条件",
+      "style": "只按同一口径比较费用和授权",
+      "goals": [
+        "完整记录适用范围和版本",
+        "避免拆单绕开复核"
+      ],
+      "unknowns": [
+        "不批准仓库质检或采购业务适用性",
+        "预算内不等于已付款或供应商接单"
+      ],
+      "greeting": "你好，我是季明书，负责核对新增费用、预算范围和审批条件。你想从哪次供货疑问开始？",
+      "factIds": [
+        "logistics.finance.cost",
+        "logistics.finance.approval",
+        "logistics.finance.version"
+      ],
+      "assetIds": [
+        "logistics-workflow",
+        "logistics-doc09",
+        "logistics-voice-finance"
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "id": "logistics.lead.scope",
+      "roleIds": [
+        "lead"
+      ],
+      "topic": "供货调查范围与决策目的",
+      "text": "先看两仓三款服装，以具体供货疑问查证反复核对；并非已经决定采购或开发系统。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/logistics/初始材料/01-负责人委托.md",
+          "locator": "原文段落或标识行",
+          "quote": "这次先看马来西亚两仓和三款服装，范围不要一下扩到全公司。",
+          "assetId": "logistics-letter"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics.lead.handoff",
+      "roleIds": [
+        "lead"
+      ],
+      "topic": "核对结束与供货问题解决",
+      "text": "既要减少反复追问，也要查异常是否交给人继续办；部分必须等待确认，不能把等待全部算可消除工时。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/logistics/初始材料/04-首轮岗位原话.md",
+          "locator": "原文段落或标识行",
+          "quote": "我想减少反复追问，也要看到异常有没有交给人继续办。",
+          "assetId": "logistics-voice-lead"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics.lead.sample",
+      "roleIds": [
+        "lead"
+      ],
+      "topic": "协作样本范围与收益边界",
+      "text": "42件问题和126个节点是研究样本；初始主题不是根因，关闭可能只是答复交接，操作分钟为回忆值且等待含夜间。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/logistics/初始材料/03-资料交接与口径提醒.md",
+          "locator": "原文段落或标识行",
+          "quote": "历史操作分钟是各岗位合计回忆值，并非工时系统测量。",
+          "assetId": "logistics-handover"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics.lead.systems",
+      "roleIds": [
+        "lead"
+      ],
+      "topic": "现有系统能力与待确认接口",
+      "text": "OMS/WMS导出不是实时接口；没有授予新系统自动采购、调拨、付款、改广告权限，合作仓权限更新频率仍需确认。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/logistics/企业环境/系统与访问条件.md",
+          "locator": "原文段落或标识行",
+          "quote": "当前没有授予任何新系统自动下采购单、调拨、付款或改广告的权限。",
+          "assetId": "logistics-systems"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics.lead.stockage",
+      "roleIds": [
+        "lead"
+      ],
+      "topic": "库存多与价值判断",
+      "text": "需结合销量活动和库龄；当前快照及14天履约不能算每件货库龄或直接判存货减值。",
+      "kind": "unknown",
+      "sources": [
+        {
+          "path": "source-materials/logistics/补充调研/Q04-是否应该给整款继续投放.md",
+          "locator": "原文段落或标识行",
+          "quote": "当前快照与14天履约不足以算出每件货的库龄，也不能直接给存货减值结论。",
+          "assetId": "logistics-voice-lead"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics.buyer.join",
+      "roleIds": [
+        "buyer"
+      ],
+      "topic": "采购记录与同一规格关联",
+      "text": "采购记录已有，库存、物流日期和运营目标不在同一张表；先按SKU、仓库、采购行关联，不凭款名混合。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/logistics/初始材料/04-首轮岗位原话.md",
+          "locator": "原文段落或标识行",
+          "quote": "难的是仓库库存、物流日期和运营想要的日期不在同一张表里。",
+          "assetId": "logistics-voice-buyer"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics.buyer.freshness",
+      "roleIds": [
+        "buyer"
+      ],
+      "topic": "资料时点和旧快照",
+      "text": "各快照与批次有独立时间，旧行需单独标记；不能合并为今日确定库存。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/logistics/补充调研/Q01-同一个有货为什么说法不同.md",
+          "locator": "原文段落或标识行",
+          "quote": "快照及批次表有各自时间。若某行旧，就单独标出来",
+          "assetId": "logistics-voice-buyer"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics.buyer.conditions",
+      "roleIds": [
+        "buyer"
+      ],
+      "topic": "普通报价和采购批准的区别",
+      "text": "普通供货按每SKU起订及整包条件；报价尚无正式补单，内部批准不等于供应商接单确认。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/logistics/既有业务资产/业务原件/DOC06-S1普通采购报价.md",
+          "locator": "原文段落或标识行",
+          "quote": "当前仅提供报价，尚未收到上述补单的正式采购要求。",
+          "assetId": "logistics-doc06"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics.buyer.time",
+      "roleIds": [
+        "buyer"
+      ],
+      "topic": "操作与等待及核对结果",
+      "text": "协作期间含整理操作、供应商回复及夜间等待；关闭仅为本轮核对有结果，回忆操作时间要通过陪跑验证。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/logistics/补充调研/Q05-是否所有等待都能被缩短.md",
+          "locator": "原文段落或标识行",
+          "quote": "台账操作分钟是大家回忆值，关闭只是本轮核对有结果。",
+          "assetId": "logistics-voice-buyer"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics.buyer.alternatives",
+      "roleIds": [
+        "buyer"
+      ],
+      "topic": "方案条件尚未等于行动",
+      "text": "普通、加急、跨仓调货须按同一时段比费用可售日期与限制；当前没有新增批准。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/logistics/补充调研/Q06-能采购与值得采购的区别.md",
+          "locator": "原文段落或标识行",
+          "quote": "加急有现货数量、可售日期、费用和预算限制。",
+          "assetId": "logistics-voice-buyer"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics.logistics.date",
+      "roleIds": [
+        "logistics"
+      ],
+      "topic": "预计可售日期变化与通知依据",
+      "text": "SH01蓝M48件未到仓，预计可售由9月18日变9月22日；包含收货上架并非到港，日期是预计不是承诺。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/logistics/既有业务资产/业务原件/DOC02-SH01物流延误通知.md",
+          "locator": "原文段落或标识行",
+          "quote": "9月22日是包含收货和上架安排后的预计可售日期，不是单纯的干线到港日期。",
+          "assetId": "logistics-doc02"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics.logistics.samebatch",
+      "roleIds": [
+        "logistics"
+      ],
+      "topic": "同批采购箱单运输不能累加",
+      "text": "SH01采购、装箱和照片指同批48件，当前未收货，不重复计供给；W-CN只是节点。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/logistics/既有业务资产/业务原件/DOC01-SH01采购与装箱单.md",
+          "locator": "原文段落或标识行",
+          "quote": "本表、采购单、装箱单和照片描述的是同一批48件，不是四笔可累加供货。",
+          "assetId": "logistics-doc01"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics.logistics.images",
+      "roleIds": [
+        "logistics"
+      ],
+      "topic": "箱唛图像的证据边界",
+      "text": "IMG04/06可核箱号，IMG06尺码行遮挡；装箱单提供应为M的依据，但箱内数量与实际尺码需清点，不凭照片作实收。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/logistics/既有业务资产/业务原件/DOC01-SH01采购与装箱单.md",
+          "locator": "原文段落或标识行",
+          "quote": "第二张照片单独不能确认尺码",
+          "assetId": "logistics-doc01"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics.logistics.external",
+      "roleIds": [
+        "logistics"
+      ],
+      "topic": "通知及时与客观运输限制",
+      "text": "日期会变化，消息中的到需区分到港到仓；只能及时同步通知，不能保证外部运输不延误。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/logistics/初始材料/04-首轮岗位原话.md",
+          "locator": "原文段落或标识行",
+          "quote": "我能够及时同步新通知，但不能保证外部运输完全不延误。",
+          "assetId": "logistics-voice-logistics"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics.warehouse.available",
+      "roleIds": [
+        "warehouse"
+      ],
+      "topic": "实物预留隔离与可售",
+      "text": "T01-BL-M/W-KL实物96、预留24、隔离0、可售72；在途48未包含且不加今日可售。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/logistics/补充调研/Q01-同一个有货为什么说法不同.md",
+          "locator": "原文段落或标识行",
+          "quote": "T01-BL-M在吉隆坡实物96件，24件已预留，所以当前可售72件。",
+          "assetId": "logistics-voice-warehouse"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics.warehouse.receipt",
+      "roleIds": [
+        "warehouse"
+      ],
+      "topic": "收货与快照勾稽不重复增加",
+      "text": "SH02声明72、实收68、隔离24、短少4；原32+实收68=100，扣隔离24和预留20=56，收货已入账不可再加。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/logistics/补充调研/Q03-收货不等于全部可售.md",
+          "locator": "原文段落或标识行",
+          "quote": "这个SKU原有32件，加实收68件变为实物100件，再扣24隔离及20预留，目前可售56件。",
+          "assetId": "logistics-voice-warehouse"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics.warehouse.quality",
+      "roleIds": [
+        "warehouse"
+      ],
+      "topic": "外箱受潮与待检状态",
+      "text": "IMG05只有外观线索；24件隔离不等于报废或可售，4件短少不等于已安排补寄，需仓库检查及采购查补差。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/logistics/补充调研/Q03-收货不等于全部可售.md",
+          "locator": "原文段落或标识行",
+          "quote": "图片是外观线索，处置要等检查结果。短少4件也没有确认补寄日期。",
+          "assetId": "logistics-voice-warehouse"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics.warehouse.source",
+      "roleIds": [
+        "warehouse"
+      ],
+      "topic": "两仓库存与数据新旧",
+      "text": "不同SKU快照时间可不同；旧行不能作当前确定数，历史实收已入当前库存。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/logistics/既有业务资产/数据表/海外仓库存快照.csv",
+          "locator": "原文段落或标识行",
+          "quote": "隔离已含实物，预留与隔离不重叠；不能再叠加历史收货",
+          "assetId": "logistics-stock"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics.warehouse.transfer",
+      "roleIds": [
+        "warehouse"
+      ],
+      "topic": "调拨前需核实调出仓条件",
+      "text": "新山库存不能无条件全部调走，须核可用数量、保留要求及运输安排；还未形成调拨执行。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/logistics/补充调研/Q06-能采购与值得采购的区别.md",
+          "locator": "原文段落或标识行",
+          "quote": "要先看新山可用数量、保留要求和调拨安排",
+          "assetId": "logistics-voice-warehouse"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics.operations.decision",
+      "roleIds": [
+        "operations"
+      ],
+      "topic": "运营需要哪几天有货",
+      "text": "能否补上针对活动期间供货日期，不是只问买多少；推广可能调整，不假定未来每天销量恒定。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/logistics/初始材料/04-首轮岗位原话.md",
+          "locator": "原文段落或标识行",
+          "quote": "通常不是只问还能买多少，而是活动期间哪几天有货。",
+          "assetId": "logistics-voice-operations"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics.operations.zerodays",
+      "roleIds": [
+        "operations"
+      ],
+      "topic": "零销量与可售机会",
+      "text": "白S14天只有4天可售、履约40，最近7天不可售；40/4是可售期间履约参考速度，不是每个缺货日10件损失。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/logistics/补充调研/Q02-销量为零是否意味着没有需求.md",
+          "locator": "原文段落或标识行",
+          "quote": "40除以4可以作为可售期间的履约速度参考",
+          "assetId": "logistics-voice-operations"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics.operations.gaps",
+      "roleIds": [
+        "operations"
+      ],
+      "topic": "真实需求仍缺哪些证据",
+      "text": "缺商品访问、规格选择、取消原因和缺货页面提示；504行未含这些明细，不能把零销量或取消都归缺货。",
+      "kind": "unknown",
+      "sources": [
+        {
+          "path": "source-materials/logistics/补充调研/Q02-销量为零是否意味着没有需求.md",
+          "locator": "原文段落或标识行",
+          "quote": "商品访问、规格选择、取消原因和缺货时的页面提示记录。",
+          "assetId": "logistics-voice-operations"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics.operations.sku",
+      "roleIds": [
+        "operations"
+      ],
+      "topic": "整款活动与规格差异",
+      "text": "AD01进入整款六规格页面，蓝L库存较多；蓝M紧张不等于整款停卖，尚未批准新广告动作。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/logistics/补充调研/Q04-是否应该给整款继续投放.md",
+          "locator": "原文段落或标识行",
+          "quote": "广告AD01进入的是整款商品页面，六个规格可选。",
+          "assetId": "logistics-voice-operations"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics.finance.cost",
+      "roleIds": [
+        "finance"
+      ],
+      "topic": "新增费用同口径与预算",
+      "text": "专项可用预算2000人民币；新增采购、运输及调运一并计，既有SH01不重复计新增；此额度不是全公司余额。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/logistics/既有业务资产/业务原件/DOC09-专项预算与采购批复规则.md",
+          "locator": "原文段落或标识行",
+          "quote": "本次专项可用预算为2000元人民币。",
+          "assetId": "logistics-doc09"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics.finance.approval",
+      "roleIds": [
+        "finance"
+      ],
+      "topic": "预算内与业务批准接单付款",
+      "text": "预算内不代表适用或自动批准；采购负责人核范围、财务核金额，批准不等于供应商接单或付款。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/logistics/既有业务资产/业务原件/DOC09-专项预算与采购批复规则.md",
+          "locator": "原文段落或标识行",
+          "quote": "财务复核预算不等于付款已经完成，采购负责人批准也不等于供应商已经确认接单。",
+          "assetId": "logistics-doc09"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics.finance.version",
+      "roleIds": [
+        "finance"
+      ],
+      "topic": "同一需求改版与复核责任",
+      "text": "申请保留对象、版本、费用和前提；改版旧版不继续下单，超预算升级不能拆单规避。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/logistics/既有业务资产/业务原件/DOC09-专项预算与采购批复规则.md",
+          "locator": "原文段落或标识行",
+          "quote": "不得将一笔组合方案拆成多笔低于限额的申请以避开复核。",
+          "assetId": "logistics-doc09"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-10T09:00:00+08:00"
+    }
+  ],
+  "assets": [
+    {
+      "id": "logistics-letter",
+      "path": "source-materials/logistics/初始材料/01-负责人委托.md",
+      "title": "01-负责人委托",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "bfa840b995229ed8e5f8a655d7de92bb31fe9d49a9c75507b738ff3e9e637b5f",
+      "sizeBytes": 990,
+      "roleIds": [
+        "lead"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-workflow",
+      "path": "source-materials/logistics/初始材料/02-岗位与现状流程.md",
+      "title": "02-岗位与现状流程",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "414df29f09b49935a2d622858fc764419489b58ffeb1df4ad85367f2e539e318",
+      "sizeBytes": 1442,
+      "roleIds": [
+        "lead",
+        "buyer",
+        "logistics",
+        "warehouse",
+        "operations",
+        "finance"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-handover",
+      "path": "source-materials/logistics/初始材料/03-资料交接与口径提醒.md",
+      "title": "03-资料交接与口径提醒",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "1fe31f668629373f6d55cbd8abc10b5a0f2ccf8ac20eaa0418c0e41e43b067d6",
+      "sizeBytes": 1403,
+      "roleIds": [
+        "lead",
+        "buyer"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-systems",
+      "path": "source-materials/logistics/企业环境/系统与访问条件.md",
+      "title": "系统与访问条件",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "0a88d46ed20a1cb38c0919e6deb35b27fa15dd323393914ed14f0a22b38c5079",
+      "sizeBytes": 1360,
+      "roleIds": [
+        "lead",
+        "buyer"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-history",
+      "path": "source-materials/logistics/调查数据/历史供货协作请求.csv",
+      "title": "历史供货协作请求",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "6d4055da785b4acae6120df68e0e22c576d334257195344e59936f6f902608df",
+      "sizeBytes": 12745,
+      "roleIds": [
+        "lead",
+        "buyer"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-events",
+      "path": "source-materials/logistics/调查数据/历史协作节点.csv",
+      "title": "历史协作节点",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "bba3a3ea5dff3926442480dfedb946e4a530b7209a019a5c0546b9cd088b8ad4",
+      "sizeBytes": 15737,
+      "roleIds": [
+        "lead",
+        "buyer"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-gaps",
+      "path": "source-materials/logistics/调查数据/尚缺资料登记.csv",
+      "title": "尚缺资料登记",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "b6855d7f459995c6d12a4f4ff66d7c2f49a1893cb34575ff7cf9a0719fdba60b",
+      "sizeBytes": 832,
+      "roleIds": [
+        "lead",
+        "operations"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-observation",
+      "path": "source-materials/logistics/调查工具/一次供货问题观察表.md",
+      "title": "一次供货问题观察表",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "b4fee29636f32047b609c04534ee26426868cdfcc26648efd810998fd7b95cff",
+      "sizeBytes": 777,
+      "roleIds": [
+        "lead",
+        "buyer"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-products",
+      "path": "source-materials/logistics/既有业务资产/数据表/商品主数据.csv",
+      "title": "商品主数据",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "b08c9db204e57ec8b32bfaddf2b0c9ba0b671ff4da0ceb49f09fa2428fca1b8f",
+      "sizeBytes": 2059,
+      "roleIds": [
+        "buyer",
+        "warehouse",
+        "operations"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-warehouses",
+      "path": "source-materials/logistics/既有业务资产/数据表/仓库与店铺.csv",
+      "title": "仓库与店铺",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "f36395b2170842382422f2c8abde7b0ccfa34472f90128a9d864a1ef83144cdb",
+      "sizeBytes": 325,
+      "roleIds": [
+        "buyer",
+        "warehouse",
+        "operations"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-stock",
+      "path": "source-materials/logistics/既有业务资产/数据表/海外仓库存快照.csv",
+      "title": "海外仓库存快照",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "29a1c7e336827b6ee50085d7e10b59dace3ae3b55f379b52958845e30da8e0b0",
+      "sizeBytes": 6223,
+      "roleIds": [
+        "warehouse"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-daily",
+      "path": "source-materials/logistics/既有业务资产/数据表/每日履约与可售记录.csv",
+      "title": "每日履约与可售记录",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "99bb88fdab65f9d1b917cc14cf531d93aa2a4182bb8594d4ca8cacf7385e581f",
+      "sizeBytes": 28701,
+      "roleIds": [
+        "operations"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-po",
+      "path": "source-materials/logistics/既有业务资产/数据表/采购行与履约余额.csv",
+      "title": "采购行与履约余额",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "d89f764717d04efe8fb0f15f319c7f8182f19dd902addf3496143b251866d681",
+      "sizeBytes": 420,
+      "roleIds": [
+        "buyer"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-shipments",
+      "path": "source-materials/logistics/既有业务资产/数据表/货运批次.csv",
+      "title": "货运批次",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "2d64c62e03492db8cca97ef2a3d1ca68b222359a84cc512a4f4d5c6c25121da6",
+      "sizeBytes": 456,
+      "roleIds": [
+        "logistics"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-cartons",
+      "path": "source-materials/logistics/既有业务资产/数据表/箱件清单.csv",
+      "title": "箱件清单",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "c2d442d6a24ebde450b5435c9467084b45ad6dadfaff3e19458651a34101ecd7",
+      "sizeBytes": 772,
+      "roleIds": [
+        "logistics",
+        "warehouse"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-receipts",
+      "path": "source-materials/logistics/既有业务资产/数据表/收货与质量结果.csv",
+      "title": "收货与质量结果",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "ab691bbb7308fbd8856be053002019b5f13b3f47c0ba1f1f0205e22ec3a6fd6f",
+      "sizeBytes": 413,
+      "roleIds": [
+        "warehouse"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-bridge",
+      "path": "source-materials/logistics/既有业务资产/数据表/SH02库存衔接.csv",
+      "title": "SH02库存衔接",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "7ec36880bc4f1000ed864f81d2fc045992d4bf1a3aa7afc12893ce9298068ed3",
+      "sizeBytes": 244,
+      "roleIds": [
+        "warehouse"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-supplier",
+      "path": "source-materials/logistics/既有业务资产/数据表/供应商供货条件.csv",
+      "title": "供应商供货条件",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "d831134cf656ab449a0426a9724b2da771334167f0efab005166c9a940c0650f",
+      "sizeBytes": 467,
+      "roleIds": [
+        "buyer"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-aliases",
+      "path": "source-materials/logistics/既有业务资产/数据表/商品别名对应.csv",
+      "title": "商品别名对应",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "6e4d49e8e77aef228e66fa2f5e8b0d57d3891aeb93d20f86aaf99a9bccfc654d",
+      "sizeBytes": 1915,
+      "roleIds": [
+        "buyer",
+        "logistics"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-freshness",
+      "path": "source-materials/logistics/既有业务资产/数据表/数据批次与时效.csv",
+      "title": "数据批次与时效",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "a06806801671cf47d44828f7f6c479cbff35de389c513d7a4eff5131239aebad",
+      "sizeBytes": 565,
+      "roleIds": [
+        "buyer",
+        "warehouse"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-advertising",
+      "path": "source-materials/logistics/既有业务资产/数据表/广告与SKU贡献.csv",
+      "title": "广告与SKU贡献",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "52d47cbd3f7b945c29667389a9dae1171ebde4ea9344ece535666df369debbf9",
+      "sizeBytes": 717,
+      "roleIds": [
+        "operations"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-routes",
+      "path": "source-materials/logistics/既有业务资产/数据表/运输与调拨选项.csv",
+      "title": "运输与调拨选项",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-10",
+      "sha256": "5e47ba59ba2810e5847048bdd1a0597eae6eee164644dbb3882bbf1096d06848",
+      "sizeBytes": 488,
+      "roleIds": [
+        "buyer",
+        "logistics"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-doc01",
+      "path": "source-materials/logistics/既有业务资产/业务原件/DOC01-SH01采购与装箱单.md",
+      "title": "DOC01-SH01采购与装箱单",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "b390a28e03067697700df2c5f9f992ed0e64b70ee65cf82a64722b728acd2d49",
+      "sizeBytes": 2388,
+      "roleIds": [
+        "buyer",
+        "logistics"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-doc02",
+      "path": "source-materials/logistics/既有业务资产/业务原件/DOC02-SH01物流延误通知.md",
+      "title": "DOC02-SH01物流延误通知",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "f5b65bb16753484b7f3ed3a3b5e927ed0ed892da877fe570061908a114a7549e",
+      "sizeBytes": 1793,
+      "roleIds": [
+        "logistics",
+        "buyer",
+        "operations"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-doc03",
+      "path": "source-materials/logistics/既有业务资产/业务原件/DOC03-SH02收货清点与短少登记.md",
+      "title": "DOC03-SH02收货清点与短少登记",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "d949a57ba0f499d1c250fb905cf8c45d635ef7975f604da0b296dd2229fd63f4",
+      "sizeBytes": 2148,
+      "roleIds": [
+        "warehouse"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-doc04",
+      "path": "source-materials/logistics/既有业务资产/业务原件/DOC04-SH02隔离与质检待办.md",
+      "title": "DOC04-SH02隔离与质检待办",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "c89eb5141366fde50d197522f4a6bb0eea347996df30a686e8f9fa905bfcf185",
+      "sizeBytes": 1978,
+      "roleIds": [
+        "warehouse"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-doc05",
+      "path": "source-materials/logistics/既有业务资产/业务原件/DOC05-运营活动与广告咨询.md",
+      "title": "DOC05-运营活动与广告咨询",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "f198ce69a6806df4c477ee76c9deb8d681f5b6a326c4c7fc00247b5f1a063a5c",
+      "sizeBytes": 2063,
+      "roleIds": [
+        "operations"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-doc06",
+      "path": "source-materials/logistics/既有业务资产/业务原件/DOC06-S1普通采购报价.md",
+      "title": "DOC06-S1普通采购报价",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "e6a4945d2731f970826539cf5b553a7697f217b3b335790ed289b37a58ba585a",
+      "sizeBytes": 1878,
+      "roleIds": [
+        "buyer"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-doc07",
+      "path": "source-materials/logistics/既有业务资产/业务原件/DOC07-S1加急现货报价.md",
+      "title": "DOC07-S1加急现货报价",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "fdc0c90928189694ea1ef4cf2c95483a7fcc16f6c44a1acb3ac9c07facada7dd",
+      "sizeBytes": 1476,
+      "roleIds": [
+        "buyer"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-doc08",
+      "path": "source-materials/logistics/既有业务资产/业务原件/DOC08-新山至吉隆坡调拨核实.md",
+      "title": "DOC08-新山至吉隆坡调拨核实",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "37f5b34a7fcf7a9534b2d6b954158f1975f9984e65fe48f0ab831610ebe587fa",
+      "sizeBytes": 1919,
+      "roleIds": [
+        "warehouse",
+        "logistics"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-doc09",
+      "path": "source-materials/logistics/既有业务资产/业务原件/DOC09-专项预算与采购批复规则.md",
+      "title": "DOC09-专项预算与采购批复规则",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "2dd6c14a8412926ce8311e471bbad9d42dbeafd3021ea90ad089cc670d797885",
+      "sizeBytes": 2277,
+      "roleIds": [
+        "finance",
+        "lead"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-doc10",
+      "path": "source-materials/logistics/既有业务资产/业务原件/DOC10-采购物流当前交接单.md",
+      "title": "DOC10-采购物流当前交接单",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "6f64be9d9d677489be42df4ab4b812764249ff5aa62c83093acbcb7a9e46f19b",
+      "sizeBytes": 2752,
+      "roleIds": [
+        "buyer",
+        "lead"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-img01",
+      "path": "source-materials/logistics/既有业务资产/图片/IMG01.png",
+      "title": "IMG01",
+      "mime": "image/png",
+      "version": "snapshot-2026-09-10",
+      "sha256": "8dfb158a174efa7360393b47aca7033e2d8fe18f72b84acefdd5e68c24720c0c",
+      "sizeBytes": 2405188,
+      "roleIds": [
+        "buyer",
+        "operations"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-img02",
+      "path": "source-materials/logistics/既有业务资产/图片/IMG02.png",
+      "title": "IMG02",
+      "mime": "image/png",
+      "version": "snapshot-2026-09-10",
+      "sha256": "41ecb3b8305f03982fc762e948196e3dbc20ea458feafa9b44cc0cf87603a177",
+      "sizeBytes": 2189087,
+      "roleIds": [
+        "buyer",
+        "operations"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-img03",
+      "path": "source-materials/logistics/既有业务资产/图片/IMG03.png",
+      "title": "IMG03",
+      "mime": "image/png",
+      "version": "snapshot-2026-09-10",
+      "sha256": "44fc04f6fbddf0fe8f55b21fb4dafe9f326111431cbb8ad83250887d06683f57",
+      "sizeBytes": 2623332,
+      "roleIds": [
+        "buyer",
+        "operations"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-img04",
+      "path": "source-materials/logistics/既有业务资产/图片/IMG04.png",
+      "title": "IMG04",
+      "mime": "image/png",
+      "version": "snapshot-2026-09-10",
+      "sha256": "1cfbaf6221fc8e3d1b5d6af53d42e1267becb97fc8017b2bfd5ad05a7624e085",
+      "sizeBytes": 2512526,
+      "roleIds": [
+        "logistics",
+        "warehouse"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-img05",
+      "path": "source-materials/logistics/既有业务资产/图片/IMG05.png",
+      "title": "IMG05",
+      "mime": "image/png",
+      "version": "snapshot-2026-09-10",
+      "sha256": "2d96adfb97fad05cc949d954d977f0c09daf52e15ac8d03489c7e4041f4651d9",
+      "sizeBytes": 2374463,
+      "roleIds": [
+        "logistics",
+        "warehouse"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-img06",
+      "path": "source-materials/logistics/既有业务资产/图片/IMG06.png",
+      "title": "IMG06",
+      "mime": "image/png",
+      "version": "snapshot-2026-09-10",
+      "sha256": "5b45aaa9eb9245d2c430e18c55fe029548d959c0ed22d85242d359f89a0064b9",
+      "sizeBytes": 2520497,
+      "roleIds": [
+        "logistics",
+        "warehouse"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-voice-lead",
+      "path": "source-materials/logistics/岗位摘录/lead-访谈原话.md",
+      "title": "lead-访谈原话",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "961f7a0552dcb10eab651074b4c9562f5add1bf91069ab2db0e5cc46df5e881b",
+      "sizeBytes": 814,
+      "roleIds": [
+        "lead"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-voice-buyer",
+      "path": "source-materials/logistics/岗位摘录/buyer-访谈原话.md",
+      "title": "buyer-访谈原话",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "0735704e42adc53ef706a9761b988fab9bf55c32a905dcf97736d2007d17f453",
+      "sizeBytes": 1225,
+      "roleIds": [
+        "buyer"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-voice-logistics",
+      "path": "source-materials/logistics/岗位摘录/logistics-访谈原话.md",
+      "title": "logistics-访谈原话",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "8b986624c8b3ef1b22f91fd2ee6d0f4a5da35bb271806fbd5ea19fccbffb52de",
+      "sizeBytes": 574,
+      "roleIds": [
+        "logistics"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-voice-warehouse",
+      "path": "source-materials/logistics/岗位摘录/warehouse-访谈原话.md",
+      "title": "warehouse-访谈原话",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "23a0ecc835815edb0e4a920fd929196bc8e54099f743c0b1fc6b828d2613a3f0",
+      "sizeBytes": 1284,
+      "roleIds": [
+        "warehouse"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-voice-operations",
+      "path": "source-materials/logistics/岗位摘录/operations-访谈原话.md",
+      "title": "operations-访谈原话",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "fd7d68956aacd689ed474063c27f39377abcb63bd6a807b94a3820270b41f415",
+      "sizeBytes": 1476,
+      "roleIds": [
+        "operations"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    },
+    {
+      "id": "logistics-voice-finance",
+      "path": "source-materials/logistics/岗位摘录/finance-访谈原话.md",
+      "title": "finance-访谈原话",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-10",
+      "sha256": "5c6270741ead09b29c3f613fef59b6ef8448024559a1ab100f1d278c5bff2bdf",
+      "sizeBytes": 375,
+      "roleIds": [
+        "finance"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-10T09:00:00+08:00"
+    }
+  ],
+  "discoveries": [
+    {
+      "id": "logistics.lead.scope",
+      "roleId": "lead",
+      "title": "供货调查范围与决策目的",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "logistics.lead.scope"
+      ],
+      "requiredAssetIds": [
+        "logistics-letter"
+      ],
+      "allowUnknown": false,
+      "completionRule": "以本人已提交回答和本轮原件确认：先看两仓三款服装，以具体供货疑问查证反复核对；并非已经决定采购或开发系统。",
+      "positiveExample": "受访者用本次具体记录解释该主题并给出能核对的依据；所需原件已发放。",
+      "negativeExample": "仅提问关键词、学员自报结论、无原件的泛泛回答或教师参考方案不计完成。",
+      "hints": [
+        "可以向苏问川了解供货调查范围与决策目的。",
+        "请围绕供货调查范围与决策目的追问一次具体经历、已有记录和仍需谁核实，并索取相关原件。"
+      ],
+      "reportSections": [
+        "原始诉求与调查范围"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      }
+    },
+    {
+      "id": "logistics.lead.handoff",
+      "roleId": "lead",
+      "title": "核对结束与供货问题解决",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "logistics.lead.handoff"
+      ],
+      "requiredAssetIds": [
+        "logistics-voice-lead",
+        "logistics-workflow"
+      ],
+      "allowUnknown": false,
+      "completionRule": "以本人已提交回答和本轮原件确认：既要减少反复追问，也要查异常是否交给人继续办；部分必须等待确认，不能把等待全部算可消除工时。",
+      "positiveExample": "受访者用本次具体记录解释该主题并给出能核对的依据；所需原件已发放。",
+      "negativeExample": "仅提问关键词、学员自报结论、无原件的泛泛回答或教师参考方案不计完成。",
+      "hints": [
+        "可以向苏问川了解核对结束与供货问题解决。",
+        "请围绕核对结束与供货问题解决追问一次具体经历、已有记录和仍需谁核实，并索取相关原件。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      }
+    },
+    {
+      "id": "logistics.lead.sample",
+      "roleId": "lead",
+      "title": "协作样本范围与收益边界",
+      "type": "quantitative",
+      "required": true,
+      "factIds": [
+        "logistics.lead.sample"
+      ],
+      "requiredAssetIds": [
+        "logistics-history",
+        "logistics-events",
+        "logistics-handover",
+        "logistics-observation"
+      ],
+      "allowUnknown": false,
+      "completionRule": "以本人已提交回答和本轮原件确认：42件问题和126个节点是研究样本；初始主题不是根因，关闭可能只是答复交接，操作分钟为回忆值且等待含夜间。",
+      "positiveExample": "受访者用本次具体记录解释该主题并给出能核对的依据；所需原件已发放。",
+      "negativeExample": "仅提问关键词、学员自报结论、无原件的泛泛回答或教师参考方案不计完成。",
+      "hints": [
+        "可以向苏问川了解协作样本范围与收益边界。",
+        "请围绕协作样本范围与收益边界追问一次具体经历、已有记录和仍需谁核实，并索取相关原件。"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      }
+    },
+    {
+      "id": "logistics.lead.systems",
+      "roleId": "lead",
+      "title": "现有系统能力与待确认接口",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "logistics.lead.systems"
+      ],
+      "requiredAssetIds": [
+        "logistics-systems"
+      ],
+      "allowUnknown": true,
+      "completionRule": "以本人已提交回答和本轮原件确认：OMS/WMS导出不是实时接口；没有授予新系统自动采购、调拨、付款、改广告权限，合作仓权限更新频率仍需确认。 明确缺失的证据及核实责任，允许已证实未知。",
+      "positiveExample": "受访者用本次具体记录解释该主题并给出能核对的依据；所需原件已发放。",
+      "negativeExample": "仅提问关键词、学员自报结论、无原件的泛泛回答或教师参考方案不计完成。",
+      "hints": [
+        "可以向苏问川了解现有系统能力与待确认接口。",
+        "请围绕现有系统能力与待确认接口追问一次具体经历、已有记录和仍需谁核实，并索取相关原件。"
+      ],
+      "reportSections": [
+        "数据系统与企业条件"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      }
+    },
+    {
+      "id": "logistics.lead.stockage",
+      "roleId": "lead",
+      "title": "库存多与价值判断",
+      "type": "interview",
+      "required": false,
+      "factIds": [
+        "logistics.lead.stockage"
+      ],
+      "requiredAssetIds": [],
+      "allowUnknown": true,
+      "completionRule": "以本人已提交回答和本轮原件确认：需结合销量活动和库龄；当前快照及14天履约不能算每件货库龄或直接判存货减值。 明确缺失的证据及核实责任，允许已证实未知。",
+      "positiveExample": "受访者用本次具体记录解释该主题并给出能核对的依据；所需原件已发放。",
+      "negativeExample": "仅提问关键词、学员自报结论、无原件的泛泛回答或教师参考方案不计完成。",
+      "hints": [
+        "可以向苏问川了解库存多与价值判断。",
+        "请围绕库存多与价值判断追问一次具体经历、已有记录和仍需谁核实，并索取相关原件。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      }
+    },
+    {
+      "id": "logistics.buyer.join",
+      "roleId": "buyer",
+      "title": "采购记录与同一规格关联",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "logistics.buyer.join"
+      ],
+      "requiredAssetIds": [
+        "logistics-po",
+        "logistics-products",
+        "logistics-aliases",
+        "logistics-voice-buyer"
+      ],
+      "allowUnknown": false,
+      "completionRule": "以本人已提交回答和本轮原件确认：采购记录已有，库存、物流日期和运营目标不在同一张表；先按SKU、仓库、采购行关联，不凭款名混合。",
+      "positiveExample": "受访者用本次具体记录解释该主题并给出能核对的依据；所需原件已发放。",
+      "negativeExample": "仅提问关键词、学员自报结论、无原件的泛泛回答或教师参考方案不计完成。",
+      "hints": [
+        "可以向宋时宜了解采购记录与同一规格关联。",
+        "请围绕采购记录与同一规格关联追问一次具体经历、已有记录和仍需谁核实，并索取相关原件。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      }
+    },
+    {
+      "id": "logistics.buyer.freshness",
+      "roleId": "buyer",
+      "title": "资料时点和旧快照",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "logistics.buyer.freshness"
+      ],
+      "requiredAssetIds": [
+        "logistics-freshness"
+      ],
+      "allowUnknown": false,
+      "completionRule": "以本人已提交回答和本轮原件确认：各快照与批次有独立时间，旧行需单独标记；不能合并为今日确定库存。",
+      "positiveExample": "受访者用本次具体记录解释该主题并给出能核对的依据；所需原件已发放。",
+      "negativeExample": "仅提问关键词、学员自报结论、无原件的泛泛回答或教师参考方案不计完成。",
+      "hints": [
+        "可以向宋时宜了解资料时点和旧快照。",
+        "请围绕资料时点和旧快照追问一次具体经历、已有记录和仍需谁核实，并索取相关原件。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      }
+    },
+    {
+      "id": "logistics.buyer.conditions",
+      "roleId": "buyer",
+      "title": "普通报价和采购批准的区别",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "logistics.buyer.conditions"
+      ],
+      "requiredAssetIds": [
+        "logistics-doc06",
+        "logistics-supplier"
+      ],
+      "allowUnknown": false,
+      "completionRule": "以本人已提交回答和本轮原件确认：普通供货按每SKU起订及整包条件；报价尚无正式补单，内部批准不等于供应商接单确认。",
+      "positiveExample": "受访者用本次具体记录解释该主题并给出能核对的依据；所需原件已发放。",
+      "negativeExample": "仅提问关键词、学员自报结论、无原件的泛泛回答或教师参考方案不计完成。",
+      "hints": [
+        "可以向宋时宜了解普通报价和采购批准的区别。",
+        "请围绕普通报价和采购批准的区别追问一次具体经历、已有记录和仍需谁核实，并索取相关原件。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      }
+    },
+    {
+      "id": "logistics.buyer.time",
+      "roleId": "buyer",
+      "title": "操作与等待及核对结果",
+      "type": "quantitative",
+      "required": true,
+      "factIds": [
+        "logistics.buyer.time"
+      ],
+      "requiredAssetIds": [
+        "logistics-history",
+        "logistics-events"
+      ],
+      "allowUnknown": false,
+      "completionRule": "以本人已提交回答和本轮原件确认：协作期间含整理操作、供应商回复及夜间等待；关闭仅为本轮核对有结果，回忆操作时间要通过陪跑验证。",
+      "positiveExample": "受访者用本次具体记录解释该主题并给出能核对的依据；所需原件已发放。",
+      "negativeExample": "仅提问关键词、学员自报结论、无原件的泛泛回答或教师参考方案不计完成。",
+      "hints": [
+        "可以向宋时宜了解操作与等待及核对结果。",
+        "请围绕操作与等待及核对结果追问一次具体经历、已有记录和仍需谁核实，并索取相关原件。"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      }
+    },
+    {
+      "id": "logistics.buyer.alternatives",
+      "roleId": "buyer",
+      "title": "方案条件尚未等于行动",
+      "type": "interview",
+      "required": false,
+      "factIds": [
+        "logistics.buyer.alternatives"
+      ],
+      "requiredAssetIds": [
+        "logistics-doc07",
+        "logistics-routes"
+      ],
+      "allowUnknown": false,
+      "completionRule": "以本人已提交回答和本轮原件确认：普通、加急、跨仓调货须按同一时段比费用可售日期与限制；当前没有新增批准。",
+      "positiveExample": "受访者用本次具体记录解释该主题并给出能核对的依据；所需原件已发放。",
+      "negativeExample": "仅提问关键词、学员自报结论、无原件的泛泛回答或教师参考方案不计完成。",
+      "hints": [
+        "可以向宋时宜了解方案条件尚未等于行动。",
+        "请围绕方案条件尚未等于行动追问一次具体经历、已有记录和仍需谁核实，并索取相关原件。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      }
+    },
+    {
+      "id": "logistics.logistics.date",
+      "roleId": "logistics",
+      "title": "预计可售日期变化与通知依据",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "logistics.logistics.date"
+      ],
+      "requiredAssetIds": [
+        "logistics-doc02",
+        "logistics-shipments"
+      ],
+      "allowUnknown": false,
+      "completionRule": "以本人已提交回答和本轮原件确认：SH01蓝M48件未到仓，预计可售由9月18日变9月22日；包含收货上架并非到港，日期是预计不是承诺。",
+      "positiveExample": "受访者用本次具体记录解释该主题并给出能核对的依据；所需原件已发放。",
+      "negativeExample": "仅提问关键词、学员自报结论、无原件的泛泛回答或教师参考方案不计完成。",
+      "hints": [
+        "可以向陆清和了解预计可售日期变化与通知依据。",
+        "请围绕预计可售日期变化与通知依据追问一次具体经历、已有记录和仍需谁核实，并索取相关原件。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      }
+    },
+    {
+      "id": "logistics.logistics.samebatch",
+      "roleId": "logistics",
+      "title": "同批采购箱单运输不能累加",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "logistics.logistics.samebatch"
+      ],
+      "requiredAssetIds": [
+        "logistics-doc01",
+        "logistics-cartons"
+      ],
+      "allowUnknown": false,
+      "completionRule": "以本人已提交回答和本轮原件确认：SH01采购、装箱和照片指同批48件，当前未收货，不重复计供给；W-CN只是节点。",
+      "positiveExample": "受访者用本次具体记录解释该主题并给出能核对的依据；所需原件已发放。",
+      "negativeExample": "仅提问关键词、学员自报结论、无原件的泛泛回答或教师参考方案不计完成。",
+      "hints": [
+        "可以向陆清和了解同批采购箱单运输不能累加。",
+        "请围绕同批采购箱单运输不能累加追问一次具体经历、已有记录和仍需谁核实，并索取相关原件。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      }
+    },
+    {
+      "id": "logistics.logistics.images",
+      "roleId": "logistics",
+      "title": "箱唛图像的证据边界",
+      "type": "document",
+      "required": true,
+      "factIds": [
+        "logistics.logistics.images"
+      ],
+      "requiredAssetIds": [
+        "logistics-img04",
+        "logistics-img06"
+      ],
+      "allowUnknown": false,
+      "completionRule": "以本人已提交回答和本轮原件确认：IMG04/06可核箱号，IMG06尺码行遮挡；装箱单提供应为M的依据，但箱内数量与实际尺码需清点，不凭照片作实收。",
+      "positiveExample": "受访者用本次具体记录解释该主题并给出能核对的依据；所需原件已发放。",
+      "negativeExample": "仅提问关键词、学员自报结论、无原件的泛泛回答或教师参考方案不计完成。",
+      "hints": [
+        "可以向陆清和了解箱唛图像的证据边界。",
+        "请围绕箱唛图像的证据边界追问一次具体经历、已有记录和仍需谁核实，并索取相关原件。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      }
+    },
+    {
+      "id": "logistics.logistics.external",
+      "roleId": "logistics",
+      "title": "通知及时与客观运输限制",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "logistics.logistics.external"
+      ],
+      "requiredAssetIds": [
+        "logistics-voice-logistics"
+      ],
+      "allowUnknown": false,
+      "completionRule": "以本人已提交回答和本轮原件确认：日期会变化，消息中的到需区分到港到仓；只能及时同步通知，不能保证外部运输不延误。",
+      "positiveExample": "受访者用本次具体记录解释该主题并给出能核对的依据；所需原件已发放。",
+      "negativeExample": "仅提问关键词、学员自报结论、无原件的泛泛回答或教师参考方案不计完成。",
+      "hints": [
+        "可以向陆清和了解通知及时与客观运输限制。",
+        "请围绕通知及时与客观运输限制追问一次具体经历、已有记录和仍需谁核实，并索取相关原件。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      }
+    },
+    {
+      "id": "logistics.warehouse.available",
+      "roleId": "warehouse",
+      "title": "实物预留隔离与可售",
+      "type": "quantitative",
+      "required": true,
+      "factIds": [
+        "logistics.warehouse.available"
+      ],
+      "requiredAssetIds": [
+        "logistics-stock",
+        "logistics-products",
+        "logistics-warehouses",
+        "logistics-voice-warehouse"
+      ],
+      "allowUnknown": false,
+      "completionRule": "以本人已提交回答和本轮原件确认：T01-BL-M/W-KL实物96、预留24、隔离0、可售72；在途48未包含且不加今日可售。",
+      "positiveExample": "受访者用本次具体记录解释该主题并给出能核对的依据；所需原件已发放。",
+      "negativeExample": "仅提问关键词、学员自报结论、无原件的泛泛回答或教师参考方案不计完成。",
+      "hints": [
+        "可以向沈言初了解实物预留隔离与可售。",
+        "请围绕实物预留隔离与可售追问一次具体经历、已有记录和仍需谁核实，并索取相关原件。"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      }
+    },
+    {
+      "id": "logistics.warehouse.receipt",
+      "roleId": "warehouse",
+      "title": "收货与快照勾稽不重复增加",
+      "type": "quantitative",
+      "required": true,
+      "factIds": [
+        "logistics.warehouse.receipt"
+      ],
+      "requiredAssetIds": [
+        "logistics-doc03",
+        "logistics-receipts",
+        "logistics-bridge"
+      ],
+      "allowUnknown": false,
+      "completionRule": "以本人已提交回答和本轮原件确认：SH02声明72、实收68、隔离24、短少4；原32+实收68=100，扣隔离24和预留20=56，收货已入账不可再加。",
+      "positiveExample": "受访者用本次具体记录解释该主题并给出能核对的依据；所需原件已发放。",
+      "negativeExample": "仅提问关键词、学员自报结论、无原件的泛泛回答或教师参考方案不计完成。",
+      "hints": [
+        "可以向沈言初了解收货与快照勾稽不重复增加。",
+        "请围绕收货与快照勾稽不重复增加追问一次具体经历、已有记录和仍需谁核实，并索取相关原件。"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      }
+    },
+    {
+      "id": "logistics.warehouse.quality",
+      "roleId": "warehouse",
+      "title": "外箱受潮与待检状态",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "logistics.warehouse.quality"
+      ],
+      "requiredAssetIds": [
+        "logistics-doc04",
+        "logistics-img05"
+      ],
+      "allowUnknown": true,
+      "completionRule": "以本人已提交回答和本轮原件确认：IMG05只有外观线索；24件隔离不等于报废或可售，4件短少不等于已安排补寄，需仓库检查及采购查补差。 明确缺失的证据及核实责任，允许已证实未知。",
+      "positiveExample": "受访者用本次具体记录解释该主题并给出能核对的依据；所需原件已发放。",
+      "negativeExample": "仅提问关键词、学员自报结论、无原件的泛泛回答或教师参考方案不计完成。",
+      "hints": [
+        "可以向沈言初了解外箱受潮与待检状态。",
+        "请围绕外箱受潮与待检状态追问一次具体经历、已有记录和仍需谁核实，并索取相关原件。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      }
+    },
+    {
+      "id": "logistics.warehouse.source",
+      "roleId": "warehouse",
+      "title": "两仓库存与数据新旧",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "logistics.warehouse.source"
+      ],
+      "requiredAssetIds": [
+        "logistics-freshness"
+      ],
+      "allowUnknown": false,
+      "completionRule": "以本人已提交回答和本轮原件确认：不同SKU快照时间可不同；旧行不能作当前确定数，历史实收已入当前库存。",
+      "positiveExample": "受访者用本次具体记录解释该主题并给出能核对的依据；所需原件已发放。",
+      "negativeExample": "仅提问关键词、学员自报结论、无原件的泛泛回答或教师参考方案不计完成。",
+      "hints": [
+        "可以向沈言初了解两仓库存与数据新旧。",
+        "请围绕两仓库存与数据新旧追问一次具体经历、已有记录和仍需谁核实，并索取相关原件。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      }
+    },
+    {
+      "id": "logistics.warehouse.transfer",
+      "roleId": "warehouse",
+      "title": "调拨前需核实调出仓条件",
+      "type": "interview",
+      "required": false,
+      "factIds": [
+        "logistics.warehouse.transfer"
+      ],
+      "requiredAssetIds": [
+        "logistics-doc08"
+      ],
+      "allowUnknown": false,
+      "completionRule": "以本人已提交回答和本轮原件确认：新山库存不能无条件全部调走，须核可用数量、保留要求及运输安排；还未形成调拨执行。",
+      "positiveExample": "受访者用本次具体记录解释该主题并给出能核对的依据；所需原件已发放。",
+      "negativeExample": "仅提问关键词、学员自报结论、无原件的泛泛回答或教师参考方案不计完成。",
+      "hints": [
+        "可以向沈言初了解调拨前需核实调出仓条件。",
+        "请围绕调拨前需核实调出仓条件追问一次具体经历、已有记录和仍需谁核实，并索取相关原件。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      }
+    },
+    {
+      "id": "logistics.operations.decision",
+      "roleId": "operations",
+      "title": "运营需要哪几天有货",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "logistics.operations.decision"
+      ],
+      "requiredAssetIds": [
+        "logistics-voice-operations"
+      ],
+      "allowUnknown": false,
+      "completionRule": "以本人已提交回答和本轮原件确认：能否补上针对活动期间供货日期，不是只问买多少；推广可能调整，不假定未来每天销量恒定。",
+      "positiveExample": "受访者用本次具体记录解释该主题并给出能核对的依据；所需原件已发放。",
+      "negativeExample": "仅提问关键词、学员自报结论、无原件的泛泛回答或教师参考方案不计完成。",
+      "hints": [
+        "可以向温知夏了解运营需要哪几天有货。",
+        "请围绕运营需要哪几天有货追问一次具体经历、已有记录和仍需谁核实，并索取相关原件。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      }
+    },
+    {
+      "id": "logistics.operations.zerodays",
+      "roleId": "operations",
+      "title": "零销量与可售机会",
+      "type": "quantitative",
+      "required": true,
+      "factIds": [
+        "logistics.operations.zerodays"
+      ],
+      "requiredAssetIds": [
+        "logistics-daily"
+      ],
+      "allowUnknown": false,
+      "completionRule": "以本人已提交回答和本轮原件确认：白S14天只有4天可售、履约40，最近7天不可售；40/4是可售期间履约参考速度，不是每个缺货日10件损失。",
+      "positiveExample": "受访者用本次具体记录解释该主题并给出能核对的依据；所需原件已发放。",
+      "negativeExample": "仅提问关键词、学员自报结论、无原件的泛泛回答或教师参考方案不计完成。",
+      "hints": [
+        "可以向温知夏了解零销量与可售机会。",
+        "请围绕零销量与可售机会追问一次具体经历、已有记录和仍需谁核实，并索取相关原件。"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      }
+    },
+    {
+      "id": "logistics.operations.gaps",
+      "roleId": "operations",
+      "title": "真实需求仍缺哪些证据",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "logistics.operations.gaps"
+      ],
+      "requiredAssetIds": [
+        "logistics-gaps"
+      ],
+      "allowUnknown": true,
+      "completionRule": "以本人已提交回答和本轮原件确认：缺商品访问、规格选择、取消原因和缺货页面提示；504行未含这些明细，不能把零销量或取消都归缺货。 明确缺失的证据及核实责任，允许已证实未知。",
+      "positiveExample": "受访者用本次具体记录解释该主题并给出能核对的依据；所需原件已发放。",
+      "negativeExample": "仅提问关键词、学员自报结论、无原件的泛泛回答或教师参考方案不计完成。",
+      "hints": [
+        "可以向温知夏了解真实需求仍缺哪些证据。",
+        "请围绕真实需求仍缺哪些证据追问一次具体经历、已有记录和仍需谁核实，并索取相关原件。"
+      ],
+      "reportSections": [
+        "数据系统与企业条件"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      }
+    },
+    {
+      "id": "logistics.operations.sku",
+      "roleId": "operations",
+      "title": "整款活动与规格差异",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "logistics.operations.sku"
+      ],
+      "requiredAssetIds": [
+        "logistics-advertising",
+        "logistics-doc05"
+      ],
+      "allowUnknown": false,
+      "completionRule": "以本人已提交回答和本轮原件确认：AD01进入整款六规格页面，蓝L库存较多；蓝M紧张不等于整款停卖，尚未批准新广告动作。",
+      "positiveExample": "受访者用本次具体记录解释该主题并给出能核对的依据；所需原件已发放。",
+      "negativeExample": "仅提问关键词、学员自报结论、无原件的泛泛回答或教师参考方案不计完成。",
+      "hints": [
+        "可以向温知夏了解整款活动与规格差异。",
+        "请围绕整款活动与规格差异追问一次具体经历、已有记录和仍需谁核实，并索取相关原件。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      }
+    },
+    {
+      "id": "logistics.finance.cost",
+      "roleId": "finance",
+      "title": "新增费用同口径与预算",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "logistics.finance.cost"
+      ],
+      "requiredAssetIds": [
+        "logistics-doc09"
+      ],
+      "allowUnknown": false,
+      "completionRule": "以本人已提交回答和本轮原件确认：专项可用预算2000人民币；新增采购、运输及调运一并计，既有SH01不重复计新增；此额度不是全公司余额。",
+      "positiveExample": "受访者用本次具体记录解释该主题并给出能核对的依据；所需原件已发放。",
+      "negativeExample": "仅提问关键词、学员自报结论、无原件的泛泛回答或教师参考方案不计完成。",
+      "hints": [
+        "可以向季明书了解新增费用同口径与预算。",
+        "请围绕新增费用同口径与预算追问一次具体经历、已有记录和仍需谁核实，并索取相关原件。"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      }
+    },
+    {
+      "id": "logistics.finance.approval",
+      "roleId": "finance",
+      "title": "预算内与业务批准接单付款",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "logistics.finance.approval"
+      ],
+      "requiredAssetIds": [
+        "logistics-workflow"
+      ],
+      "allowUnknown": false,
+      "completionRule": "以本人已提交回答和本轮原件确认：预算内不代表适用或自动批准；采购负责人核范围、财务核金额，批准不等于供应商接单或付款。",
+      "positiveExample": "受访者用本次具体记录解释该主题并给出能核对的依据；所需原件已发放。",
+      "negativeExample": "仅提问关键词、学员自报结论、无原件的泛泛回答或教师参考方案不计完成。",
+      "hints": [
+        "可以向季明书了解预算内与业务批准接单付款。",
+        "请围绕预算内与业务批准接单付款追问一次具体经历、已有记录和仍需谁核实，并索取相关原件。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      }
+    },
+    {
+      "id": "logistics.finance.version",
+      "roleId": "finance",
+      "title": "同一需求改版与复核责任",
+      "type": "interview",
+      "required": true,
+      "factIds": [
+        "logistics.finance.version"
+      ],
+      "requiredAssetIds": [],
+      "allowUnknown": false,
+      "completionRule": "以本人已提交回答和本轮原件确认：申请保留对象、版本、费用和前提；改版旧版不继续下单，超预算升级不能拆单规避。",
+      "positiveExample": "受访者用本次具体记录解释该主题并给出能核对的依据；所需原件已发放。",
+      "negativeExample": "仅提问关键词、学员自报结论、无原件的泛泛回答或教师参考方案不计完成。",
+      "hints": [
+        "可以向季明书了解同一需求改版与复核责任。",
+        "请围绕同一需求改版与复核责任追问一次具体经历、已有记录和仍需谁核实，并索取相关原件。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      }
+    }
+  ],
+  "calculations": [
+    {
+      "id": "logistics-stock",
+      "title": "物流库存状态核对",
+      "operation": "logistics_stock",
+      "inputs": [
+        "logistics-stock",
+        "logistics-products",
+        "logistics-receipts",
+        "logistics-bridge",
+        "logistics-po",
+        "logistics-shipments",
+        "logistics-freshness"
+      ],
+      "columns": {},
+      "unit": "件",
+      "definition": "可售=实物−预留−隔离；同批收货已包含快照，不另加在途。",
+      "denominator": "每个SKU×仓库的独立快照",
+      "filter": {
+        "snapshot": "2026-09-10T09:00:00+08:00",
+        "historyWindow": [
+          "2026-08-27",
+          "2026-09-09"
+        ],
+        "scope": "两仓三款教学研究样本"
+      },
+      "version": "1.0.0",
+      "requiresAllInputsGranted": true,
+      "allowArbitraryCode": false
+    },
+    {
+      "id": "logistics-fulfillment",
+      "title": "14天可售与履约参考",
+      "operation": "logistics_fulfillment",
+      "inputs": [
+        "logistics-daily",
+        "logistics-products"
+      ],
+      "columns": {},
+      "unit": "件 / 可售日",
+      "definition": "分SKU仓库统计14天履约与可售天数；履约÷可售天数，零分母不适用。",
+      "denominator": "可售天数，不是全部天数或客户订单",
+      "filter": {
+        "snapshot": "2026-09-10T09:00:00+08:00",
+        "historyWindow": [
+          "2026-08-27",
+          "2026-09-09"
+        ],
+        "scope": "两仓三款教学研究样本"
+      },
+      "version": "1.0.0",
+      "requiresAllInputsGranted": true,
+      "allowArbitraryCode": false
+    },
+    {
+      "id": "logistics-collaboration",
+      "title": "跨岗协作样本基线",
+      "operation": "logistics_collaboration",
+      "inputs": [
+        "logistics-history",
+        "logistics-events",
+        "logistics-handover"
+      ],
+      "columns": {},
+      "unit": "自然分钟 / 回忆操作分钟 / 次",
+      "definition": "每request_id核对首次响应、关闭与事件，人工回忆投入、跨岗联络分别汇总。",
+      "denominator": "42件研究请求，126事件不当独立请求",
+      "filter": {
+        "snapshot": "2026-09-10T09:00:00+08:00",
+        "historyWindow": [
+          "2026-08-27",
+          "2026-09-09"
+        ],
+        "scope": "两仓三款教学研究样本"
+      },
+      "version": "1.0.0",
+      "requiresAllInputsGranted": true,
+      "allowArbitraryCode": false
+    }
+  ],
+  "report": {
+    "version": "1.0.0",
+    "title": "业务现状诊断与 AI 机会评估报告",
+    "sections": [
+      "原始诉求与调查范围",
+      "业务背景与组织职责",
+      "现状流程与协作关系",
+      "数据系统与企业条件",
+      "问题量化与基线",
+      "AI价值分析与推荐方向",
+      "证据索引与数据字典"
+    ],
+    "requirements": [
+      "开头简明说明业务如何运转、证据支持的问题与优先研究范围",
+      "区分采购、发运、收货、隔离、可售；不把缺货线索当丢失销量",
+      "42件协作记录是教学样本，不外推公司全年损失或AI收益",
+      "比较资料识别与关联、时效核对、异常跟踪、人工职责治理；运输预算质量约束不因AI消失",
+      "只引用本轮原件与固定计算；DOC报价和预算条件不等于批准，不预置最终采购方案"
+    ]
+  }
+}

@@ -1,8 +1,13 @@
 /** Build the pinned FDE eval plugin whose Git package omits its compiled entry. */
 import { createRequire } from 'node:module'
 import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import ts from 'typescript'
+import { verifyBundledAssets } from '../packages/fde/discovery-lab/src/assets.ts'
+
+const materials = verifyBundledAssets(fileURLToPath(new URL('../packages/fde/discovery-lab/', import.meta.url)))
+console.log(`FDE laboratory: verified ${materials.cases} cases and ${materials.files} material files`)
 
 const require = createRequire(new URL('../packages/bundle/web-app/package.json', import.meta.url))
 const root = dirname(require.resolve('dsh-eval-harness/package.json'))

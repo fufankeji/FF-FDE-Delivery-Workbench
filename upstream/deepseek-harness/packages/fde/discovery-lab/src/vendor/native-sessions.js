@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { mkdirSync } from 'node:fs';
 import { createUserMessage } from '@deepseek-ai/dsh-llm';
+import * as NativeToolExecutor from '@deepseek-ai/dsh-tool-executor-native';
 
 export const textContent = message => (message?.content ?? []).filter(x => x.type === 'text').map(x => x.text).join('\n');
 
@@ -22,8 +23,8 @@ export class NativeSessions {
     if (this.pending.has(sessionId)) return this.pending.get(sessionId);
     const operation = (async () => {
       const allowed = new Set(tools.map(t => t.name));
-      const setup = scope => {
-        scope.tools.presentAs('native');
+      const setup = async scope => {
+        await scope.plugin(NativeToolExecutor);
         scope.tools.restrict({allow: []});
         scope.tools.guard(exec => allowed.has(exec.name) ? undefined : '该人物只能使用被授权的业务工具。');
         for (const tool of tools) scope.tools.register(tool);

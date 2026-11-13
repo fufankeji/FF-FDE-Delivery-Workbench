@@ -1,0 +1,2458 @@
+{
+  "schemaVersion": 1,
+  "id": "operations",
+  "version": "1.0.0",
+  "snapshot": "2026-09-14T09:00:00+08:00",
+  "title": "澄屿栖物 · 运营数据分析",
+  "industry": "线上零售 / 经营分析",
+  "background": "澄屿栖物经营家居收纳商品，已有搜索、内容和会员渠道报表。经营波动后，多岗位仍要反复追问、核对口径和补分析，才能讨论下一步动作。",
+  "initialRequest": "# REQ-0914｜经营分析改进诉求\n\n发件岗位：业务负责人（虚拟人物周砚禾）  \n收件岗位：分析负责人、交付团队  \n时间：2026-09-14 08:35  \n业务单元：BU-01；关联报表：BI-0914\n\n公司已经有不少报表了，但每次业务有波动，会上还是要不停地问为什么，分析团队再回去查。等下一版结果出来，有些事情已经过去了。我希望业务负责人能更快看明白发生了什么，及时决定下一步怎么做。能不能借助 AI 改善这件事？\n\n补充：下午 14:00 要讨论下周预算。不要只给我“转化率下降”，我要知道这个变化值得先处理哪一件事、哪些判断还有疑点。现在不要求你们承诺一个系统形态，请先把我们做决定时缺少的东西问清楚。\n",
+  "roles": [
+    {
+      "id": "lead",
+      "name": "周砚禾",
+      "title": "业务负责人",
+      "bio": "业务负责人，围绕本人工作与已授权材料接受访谈。",
+      "style": "重视行动时点，先问结论支持什么决定",
+      "goals": [
+        "按本人原件解释现状并指出待确认条件"
+      ],
+      "unknowns": [
+        "预算尚未批准修改，不知道支付技术根因或未测销售损失"
+      ],
+      "factIds": [
+        "operations.lead.decision",
+        "operations.lead.signal",
+        "operations.lead.action"
+      ],
+      "assetIds": [
+        "operations-letter",
+        "operations-weekly",
+        "operations-weekly-values",
+        "operations-metrics",
+        "operations-meeting",
+        "operations-request-lead"
+      ],
+      "greeting": "你好，我是周砚禾，负责业务负责人相关工作。你想先了解哪件事？",
+      "disclosurePolicy": {
+        "facts": "根据问题逐步回答；清楚问到的已有事实不要故意隐藏。",
+        "assets": "明确索取后返回本角色白名单原件，不仿写替代；跨角色请求说明找谁。",
+        "unknowns": "资料不足说明具体缺口，不把学员转述自动变成本人确认。"
+      }
+    },
+    {
+      "id": "growth",
+      "name": "梁知棠",
+      "title": "增长负责人",
+      "bio": "增长负责人，围绕本人工作与已授权材料接受访谈。",
+      "style": "先比较渠道自身与新回访结构，不把低转化直接归责投放",
+      "goals": [
+        "按本人原件解释现状并指出待确认条件"
+      ],
+      "unknowns": [
+        "不能确认支付根因、退款归属或因果收益"
+      ],
+      "factIds": [
+        "operations.growth.request",
+        "operations.growth.campaign",
+        "operations.growth.causality",
+        "operations.growth.identity"
+      ],
+      "assetIds": [
+        "operations-weekly",
+        "operations-weekly-values",
+        "operations-metrics",
+        "operations-meeting",
+        "operations-request-growth",
+        "operations-campaigns",
+        "operations-channels",
+        "operations-channel_spend"
+      ],
+      "greeting": "你好，我是梁知棠，负责增长负责人相关工作。你想先了解哪件事？",
+      "disclosurePolicy": {
+        "facts": "根据问题逐步回答；清楚问到的已有事实不要故意隐藏。",
+        "assets": "明确索取后返回本角色白名单原件，不仿写替代；跨角色请求说明找谁。",
+        "unknowns": "资料不足说明具体缺口，不把学员转述自动变成本人确认。"
+      }
+    },
+    {
+      "id": "finance",
+      "name": "许庭舟",
+      "title": "财务负责人",
+      "bio": "财务负责人，围绕本人工作与已授权材料接受访谈。",
+      "style": "先核对金额口径和退款观察时间",
+      "goals": [
+        "按本人原件解释现状并指出待确认条件"
+      ],
+      "unknowns": [
+        "不能批准投放，不掌握客户浏览序列或商品成本"
+      ],
+      "factIds": [
+        "operations.finance.cash",
+        "operations.finance.cohort",
+        "operations.finance.refund",
+        "operations.finance.limits"
+      ],
+      "assetIds": [
+        "operations-weekly",
+        "operations-weekly-values",
+        "operations-old-bi",
+        "operations-metrics",
+        "operations-dictionary",
+        "operations-access",
+        "operations-meeting",
+        "operations-request-finance",
+        "operations-sup-finance",
+        "operations-orders",
+        "operations-payments",
+        "operations-refunds"
+      ],
+      "greeting": "你好，我是许庭舟，负责财务负责人相关工作。你想先了解哪件事？",
+      "disclosurePolicy": {
+        "facts": "根据问题逐步回答；清楚问到的已有事实不要故意隐藏。",
+        "assets": "明确索取后返回本角色白名单原件，不仿写替代；跨角色请求说明找谁。",
+        "unknowns": "资料不足说明具体缺口，不把学员转述自动变成本人确认。"
+      }
+    },
+    {
+      "id": "member",
+      "name": "闻芷",
+      "title": "会员运营",
+      "bio": "会员运营，围绕本人工作与已授权材料接受访谈。",
+      "style": "区分会员触达、回访和再次购买",
+      "goals": [
+        "按本人原件解释现状并指出待确认条件"
+      ],
+      "unknowns": [
+        "不能确认跨设备身份，不能把回访当再购"
+      ],
+      "factIds": [
+        "operations.member.touch",
+        "operations.member.return",
+        "operations.member.retention"
+      ],
+      "assetIds": [
+        "operations-weekly",
+        "operations-weekly-values",
+        "operations-metrics",
+        "operations-request-member",
+        "operations-channels"
+      ],
+      "greeting": "你好，我是闻芷，负责会员运营相关工作。你想先了解哪件事？",
+      "disclosurePolicy": {
+        "facts": "根据问题逐步回答；清楚问到的已有事实不要故意隐藏。",
+        "assets": "明确索取后返回本角色白名单原件，不仿写替代；跨角色请求说明找谁。",
+        "unknowns": "资料不足说明具体缺口，不把学员转述自动变成本人确认。"
+      }
+    },
+    {
+      "id": "goods",
+      "name": "江颂岚",
+      "title": "商品运营",
+      "bio": "商品运营，围绕本人工作与已授权材料接受访谈。",
+      "style": "先看件数、整单优惠和具体素材依据",
+      "goals": [
+        "按本人原件解释现状并指出待确认条件"
+      ],
+      "unknowns": [
+        "不能把客户退款理由当质检结论，不掌握退回件数"
+      ],
+      "factIds": [
+        "operations.goods.price",
+        "operations.goods.reason",
+        "operations.goods.missing"
+      ],
+      "assetIds": [
+        "operations-weekly",
+        "operations-weekly-values",
+        "operations-metrics",
+        "operations-request-goods",
+        "operations-goods-feedback",
+        "operations-products"
+      ],
+      "greeting": "你好，我是江颂岚，负责商品运营相关工作。你想先了解哪件事？",
+      "disclosurePolicy": {
+        "facts": "根据问题逐步回答；清楚问到的已有事实不要故意隐藏。",
+        "assets": "明确索取后返回本角色白名单原件，不仿写替代；跨角色请求说明找谁。",
+        "unknowns": "资料不足说明具体缺口，不把学员转述自动变成本人确认。"
+      }
+    },
+    {
+      "id": "analyst",
+      "name": "程叙白",
+      "title": "分析负责人",
+      "bio": "分析负责人，围绕本人工作与已授权材料接受访谈。",
+      "style": "先明确时间、版本、维度、水位，区分计算和解释",
+      "goals": [
+        "按本人原件解释现状并指出待确认条件"
+      ],
+      "unknowns": [
+        "不能编造跨设备身份、支付根因、未提供成本或AI收益"
+      ],
+      "factIds": [
+        "operations.analyst.contract",
+        "operations.analyst.versions",
+        "operations.analyst.grain",
+        "operations.analyst.work",
+        "operations.analyst.action",
+        "operations.analyst.tools",
+        "operations.analyst.access",
+        "operations.analyst.optional-price"
+      ],
+      "assetIds": [
+        "operations-weekly",
+        "operations-weekly-values",
+        "operations-old-bi",
+        "operations-metrics",
+        "operations-dictionary",
+        "operations-access",
+        "operations-sql",
+        "operations-api",
+        "operations-work",
+        "operations-notes",
+        "operations-meeting",
+        "operations-request-analyst",
+        "operations-sup-analyst",
+        "operations-channels",
+        "operations-channel_spend",
+        "operations-products",
+        "operations-users",
+        "operations-sessions",
+        "operations-orders",
+        "operations-order_items",
+        "operations-payments",
+        "operations-refunds",
+        "operations-daily_kpi"
+      ],
+      "greeting": "你好，我是程叙白，负责分析负责人相关工作。你想先了解哪件事？",
+      "disclosurePolicy": {
+        "facts": "根据问题逐步回答；清楚问到的已有事实不要故意隐藏。",
+        "assets": "明确索取后返回本角色白名单原件，不仿写替代；跨角色请求说明找谁。",
+        "unknowns": "资料不足说明具体缺口，不把学员转述自动变成本人确认。"
+      }
+    },
+    {
+      "id": "platform",
+      "name": "顾栩宁",
+      "title": "支付平台值班工程师",
+      "bio": "支付平台值班工程师，围绕本人工作与已授权材料接受访谈。",
+      "style": "按变更、错误码、日志覆盖说话，说明尚未结案",
+      "goals": [
+        "按本人原件解释现状并指出待确认条件"
+      ],
+      "unknowns": [
+        "不能决定经营预算，不能承诺回滚或修复效果"
+      ],
+      "factIds": [
+        "operations.platform.incident",
+        "operations.platform.status",
+        "operations.platform.coverage"
+      ],
+      "assetIds": [
+        "operations-metrics",
+        "operations-dictionary",
+        "operations-access",
+        "operations-api",
+        "operations-incident",
+        "operations-payments"
+      ],
+      "greeting": "你好，我是顾栩宁，负责支付平台值班工程师相关工作。你想先了解哪件事？",
+      "disclosurePolicy": {
+        "facts": "根据问题逐步回答；清楚问到的已有事实不要故意隐藏。",
+        "assets": "明确索取后返回本角色白名单原件，不仿写替代；跨角色请求说明找谁。",
+        "unknowns": "资料不足说明具体缺口，不把学员转述自动变成本人确认。"
+      }
+    }
+  ],
+  "facts": [
+    {
+      "id": "operations.lead.decision",
+      "roleIds": [
+        "lead"
+      ],
+      "topic": "决策时点与原始诉求",
+      "text": "需要在当日预算讨论前获得可复核判断与疑点，尚未指定系统形态或决定调整哪个预算。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/operations/初始业务材料/需求与工作现场/REQ-0914-负责人来信.md",
+          "locator": "原文：下午 14:00 要讨论下周预算。",
+          "quote": "下午 14:00 要讨论下周预算。",
+          "assetId": "operations-letter"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations.lead.signal",
+      "roleIds": [
+        "lead"
+      ],
+      "topic": "周报波动只是调查起点",
+      "text": "两周访问一样而支付订单下降是调查起点，不能直接归因投放或支付故障；会话不等于人数。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/operations/初始业务材料/已有报表/BI-0914-经营周报.md",
+          "locator": "原文：此周报只提示波动，不含根因结论。",
+          "quote": "此周报只提示波动，不含根因结论。",
+          "assetId": "operations-weekly"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations.lead.action",
+      "roleIds": [
+        "lead"
+      ],
+      "topic": "会议行动与业务决策分工",
+      "text": "已按既定预算执行一周并安排增长、财务提供说明，分析结果仍待交付、预算尚未批准修改；行动需要证据、责任人、截止和复查条件。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/operations/岗位派生摘录/MEET-0907-会议事实与行动.md",
+          "locator": "原文：ACT-03 仍待完成。下周预算尚未批准修改。",
+          "quote": "ACT-03 仍待完成。下周预算尚未批准修改。",
+          "assetId": "operations-meeting"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations.growth.request",
+      "roleIds": [
+        "growth"
+      ],
+      "topic": "渠道结构与新回访对照",
+      "text": "需要三个渠道四周访问、付款、费用及新回访对照；总转化率变化不能单独评价投放。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/operations/岗位派生摘录/REQ-growth.md",
+          "locator": "原文：别把总转化率直接拿来评价投放。",
+          "quote": "别把总转化率直接拿来评价投放。",
+          "assetId": "operations-request-growth"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations.growth.campaign",
+      "roleIds": [
+        "growth"
+      ],
+      "topic": "活动同时变化的证据",
+      "text": "内容扩量同时改变人群及素材开头，并后加每单优惠；搜索预算未变，会员无全员促销，不能把多种变化当单因素实验。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/operations/补充访谈与业务原件/SUP-01-增长访谈与活动台账.md",
+          "locator": "原文：素材和人群都变了，所以不能只拿两周对比声称是哪一个造成变化。",
+          "quote": "素材和人群都变了，所以不能只拿两周对比声称是哪一个造成变化。",
+          "assetId": "operations-campaigns"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations.growth.causality",
+      "roleIds": [
+        "growth"
+      ],
+      "topic": "缺失曝光与实验的因果边界",
+      "text": "没有曝光和完整随机对照，试投未证明长期增量；ROAS不是增量收入或利润，需补受控方案。",
+      "kind": "unknown",
+      "sources": [
+        {
+          "path": "source-materials/operations/补充访谈与业务原件/SUP-01-增长访谈与活动台账.md",
+          "locator": "原文：曝光和完整创意实验分组没有进这个数据包。",
+          "quote": "曝光和完整创意实验分组没有进这个数据包。",
+          "assetId": "operations-campaigns"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations.growth.identity",
+      "roleIds": [
+        "growth"
+      ],
+      "topic": "渠道不能代替访客身份",
+      "text": "新访客要按first_seen_at和访问日期确认，渠道不是新老客身份，需分析人员有权处理。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/operations/补充访谈与业务原件/SUP-01-增长访谈与活动台账.md",
+          "locator": "原文：不能把 CONTENT 自动等同于新客。",
+          "quote": "不能把 CONTENT 自动等同于新客。",
+          "assetId": "operations-campaigns"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations.finance.cash",
+      "roleIds": [
+        "finance"
+      ],
+      "topic": "付款成交与净回款不同",
+      "text": "付款成交额与按退款处理日现金流出不同；净回款非利润，缺采购仓储配送等成本，不把口径差异一律当数据错。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/operations/岗位派生摘录/SUP-04-finance.md",
+          "locator": "原文：若讨论商品体验，则要按同一批订单观察七天退款，两类表不要混在一起。",
+          "quote": "若讨论商品体验，则要按同一批订单观察七天退款，两类表不要混在一起。",
+          "assetId": "operations-sup-finance"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations.finance.cohort",
+      "roleIds": [
+        "finance"
+      ],
+      "topic": "统一七天退款与未成熟订单",
+      "text": "按支付订单所属周关联退款，统一支付后七天观察；未满窗口单列，不当无退款，退款处理日不能直接除当周订单。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/operations/岗位派生摘录/REQ-finance.md",
+          "locator": "原文：本周没有满七天的单请标出来。",
+          "quote": "本周没有满七天的单请标出来。",
+          "assetId": "operations-request-finance"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations.finance.refund",
+      "roleIds": [
+        "finance"
+      ],
+      "topic": "付款与申请成功粒度",
+      "text": "已退款订单仍曾付款，退款申请数、成功退款订单数、成功退款金额分别定义；pending不能当现金流出。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/operations/初始业务材料/口径与系统/指标词典与版本.md",
+          "locator": "原文：pending 不扣；允许退款所属订单在上一周",
+          "quote": "pending 不扣；允许退款所属订单在上一周",
+          "assetId": "operations-metrics"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations.finance.limits",
+      "roleIds": [
+        "finance"
+      ],
+      "topic": "金额职责与未定条件",
+      "text": "财务确认金额但不能代增长调预算；指标跨部门审批维护、复杂结论质量评价、数据出域仍待确认，不可将未成熟小样本当预测。",
+      "kind": "unknown",
+      "sources": [
+        {
+          "path": "source-materials/operations/岗位派生摘录/SUP-04-finance.md",
+          "locator": "原文：哪些数据允许送给外部模型。",
+          "quote": "哪些数据允许送给外部模型。",
+          "assetId": "operations-sup-finance"
+        },
+        {
+          "path": "source-materials/operations/初始业务材料/口径与系统/数据权限与更新限制.md",
+          "locator": "权限表财务行",
+          "quote": "确认金额口径，不能单独修改投放",
+          "assetId": "operations-access"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations.member.touch",
+      "roleIds": [
+        "member"
+      ],
+      "topic": "会员触达目标与渠道比较",
+      "text": "会员上周为老客搭配触达而非全员优惠，需先看私域是否跟随变化，不能套用内容促销。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/operations/岗位派生摘录/REQ-member.md",
+          "locator": "原文：我们上周发的是老客搭配建议，不是全员优惠。",
+          "quote": "我们上周发的是老客搭配建议，不是全员优惠。",
+          "assetId": "operations-request-member"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations.member.return",
+      "roleIds": [
+        "member"
+      ],
+      "topic": "回访与再购不等价",
+      "text": "需要把回来浏览与再次购买区分，访问留存不证明再购；详细留存可交分析按有权数据另算。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/operations/岗位派生摘录/REQ-member.md",
+          "locator": "原文：并区分回来浏览与再次购买，不要把两件事混成留存。",
+          "quote": "并区分回来浏览与再次购买，不要把两件事混成留存。",
+          "assetId": "operations-request-member"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations.member.retention",
+      "roleIds": [
+        "member"
+      ],
+      "topic": "选学：成熟D7访问队列",
+      "text": "RETURN-D7是首次访问后恰好第七自然日有访问，未成熟队列不纳入；不推断跨设备终身新客。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/operations/初始业务材料/口径与系统/指标词典与版本.md",
+          "locator": "原文：9 月 7 日及以后队列未成熟",
+          "quote": "9 月 7 日及以后队列未成熟",
+          "assetId": "operations-metrics"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations.goods.price",
+      "roleIds": [
+        "goods"
+      ],
+      "topic": "整单优惠和商品件价",
+      "text": "收纳盒内容渠道优惠为每单减而非每件减；客单价不是商品单价，应看应付、件数及折扣。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/operations/补充访谈与业务原件/SUP-03-商品与客服往来.md",
+          "locator": "原文：买两件仍是整单减 10 元。",
+          "quote": "买两件仍是整单减 10 元。",
+          "assetId": "operations-goods-feedback"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations.goods.reason",
+      "roleIds": [
+        "goods"
+      ],
+      "topic": "退款理由与质量结论",
+      "text": "SIZE_EXPECTATION是客户预期理由而非质检结论；应回看素材版本、具体订单与实际尺寸，不直接判规格不合格。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/operations/补充访谈与业务原件/SUP-03-商品与客服往来.md",
+          "locator": "原文：这个原因是客户提出的理由，不是质检判定",
+          "quote": "这个原因是客户提出的理由，不是质检判定",
+          "assetId": "operations-goods-feedback"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations.goods.missing",
+      "roleIds": [
+        "goods"
+      ],
+      "topic": "素材版本及退回件数缺失",
+      "text": "缺用户看到的素材版本、详情变更、退款具体描述和退回件数；不能算净销量/库存入库或补造质检结论。",
+      "kind": "unknown",
+      "sources": [
+        {
+          "path": "source-materials/operations/补充访谈与业务原件/SUP-03-商品与客服往来.md",
+          "locator": "原文：退回件数没有入包，所以不能计算净销量或库存入库。",
+          "quote": "退回件数没有入包，所以不能计算净销量或库存入库。",
+          "assetId": "operations-goods-feedback"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations.analyst.contract",
+      "roleIds": [
+        "analyst"
+      ],
+      "topic": "分析问题的四项输入",
+      "text": "先约定时间、指标版本、维度、水位；跨设备身份合并无证据，支付错误需工程提供。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/operations/岗位派生摘录/REQ-analyst.md",
+          "locator": "原文：请先给每个问题绑定时间、指标版本、维度和数据截至时间。",
+          "quote": "请先给每个问题绑定时间、指标版本、维度和数据截至时间。",
+          "assetId": "operations-request-analyst"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations.analyst.versions",
+      "roleIds": [
+        "analyst"
+      ],
+      "topic": "两张成交报表与版本回算",
+      "text": "旧看板提交订单，新周报付款且四周回算；保留原表解释争议，退款后paid_at仍保留，不能只筛paid状态。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/operations/岗位派生摘录/SUP-04-analyst.md",
+          "locator": "原文：旧看板把提交订单当成交，标题一直没改。",
+          "quote": "旧看板把提交订单当成交，标题一直没改。",
+          "assetId": "operations-sup-analyst"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations.analyst.grain",
+      "roleIds": [
+        "analyst"
+      ],
+      "topic": "关联粒度与转化复算输入",
+      "text": "会话、订单、商品行、付款尝试与退款粒度不同；订单以ID去重、付款状态核对；聚合再关联费用，订单行不能当单数。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/operations/初始业务材料/口径与系统/数据字典与关联.md",
+          "locator": "原文：先各自聚合，再关联，避免把一笔渠道费用乘上订单数。",
+          "quote": "先各自聚合，再关联，避免把一笔渠道费用乘上订单数。",
+          "assetId": "operations-dictionary"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations.analyst.work",
+      "roleIds": [
+        "analyst"
+      ],
+      "topic": "分析主动工作与等待",
+      "text": "REQ-0907经过380分钟，日志375分钟含主动220和等待155、另有5分钟间隔；等待期间可处理其他请求，不全部视为可省人力。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/operations/初始业务材料/需求与工作现场/ANA-0907-分析员原始笔记.md",
+          "locator": "原文：人工工作 220 分钟，等待确认或材料 155 分钟。",
+          "quote": "人工工作 220 分钟，等待确认或材料 155 分钟。",
+          "assetId": "operations-notes"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations.analyst.action",
+      "roleIds": [
+        "analyst"
+      ],
+      "topic": "返工原因与错过决策窗口",
+      "text": "重确认时间/口径、追加渠道、等待活动及退款说明导致多版；V4晚于投放锁定，不证明销售损失，行动机制仍为人工。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/operations/初始业务材料/需求与工作现场/ANA-0907-分析员原始笔记.md",
+          "locator": "原文：没有证据证明这个延误造成了多少销售损失。",
+          "quote": "没有证据证明这个延误造成了多少销售损失。",
+          "assetId": "operations-notes"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations.analyst.tools",
+      "roleIds": [
+        "analyst"
+      ],
+      "topic": "既有SQL与接口可以做什么",
+      "text": "已有SQL/BI可普通切分，困难还包括变化的问题、跨团队材料与证据行动关联；可比较规则模板、指标治理与AI，不预设自由SQL Agent。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/operations/岗位派生摘录/SUP-04-analyst.md",
+          "locator": "原文：普通数据切分现有 SQL 和 BI 都能做",
+          "quote": "普通数据切分现有 SQL 和 BI 都能做",
+          "assetId": "operations-sup-analyst"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations.analyst.access",
+      "roleIds": [
+        "analyst"
+      ],
+      "topic": "只读限制水位与未定集成",
+      "text": "现有只读聚合限时间/维度/行数与超时，小组隐藏；业务只授权聚合、分析沙箱SELECT，水位截至9月13日，SSO行级审计并发出域待定。",
+      "kind": "unknown",
+      "sources": [
+        {
+          "path": "source-materials/operations/初始业务材料/口径与系统/数据权限与更新限制.md",
+          "locator": "原文：当前资料只给业务合同，不替代生产安全设计。",
+          "quote": "当前资料只给业务合同，不替代生产安全设计。",
+          "assetId": "operations-access"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations.analyst.optional-price",
+      "roleIds": [
+        "analyst"
+      ],
+      "topic": "选学：商品件价与数据缺口",
+      "text": "商品行有数量，客单价不能当件价；件数与金额可从授权商品行核对，但缺成本与退回件数，不推断毛利或净销量。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/operations/初始业务材料/口径与系统/数据字典与关联.md",
+          "locator": "原文：本教学集每单一商品行，数量可大于一",
+          "quote": "本教学集每单一商品行，数量可大于一",
+          "assetId": "operations-dictionary"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations.platform.incident",
+      "roleIds": [
+        "platform"
+      ],
+      "topic": "搜索支付异常与变更线索",
+      "text": "搜索移动结算路径参数调整后出现GW_TIMEOUT，内容会员不走该分支；时间相关不等于根因已证，需分析日期渠道设备。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/operations/补充访谈与业务原件/SUP-02-支付平台值班记录.md",
+          "locator": "原文：值班记录尚未完成根因结案",
+          "quote": "值班记录尚未完成根因结案",
+          "assetId": "operations-incident"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations.platform.status",
+      "roleIds": [
+        "platform"
+      ],
+      "topic": "尝试超时不等于必然流失",
+      "text": "success才对应付款，timeout该尝试无成功结果；教学每单一次最终核对尝试，生产可重试或延迟回调，不能把超时数等于必然损失订单。",
+      "kind": "fact",
+      "sources": [
+        {
+          "path": "source-materials/operations/补充访谈与业务原件/SUP-02-支付平台值班记录.md",
+          "locator": "原文：不能把“超时一次”直接换算为一笔必定流失的购买。",
+          "quote": "不能把“超时一次”直接换算为一笔必定流失的购买。",
+          "assetId": "operations-incident"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations.platform.coverage",
+      "roleIds": [
+        "platform"
+      ],
+      "topic": "水位与未完成的排查",
+      "text": "工程已接排查但未确认回滚/效果；分区完整仅排除已检查水位问题，不能证明全部埋点无漏，不提前加入恢复订单。",
+      "kind": "unknown",
+      "sources": [
+        {
+          "path": "source-materials/operations/补充访谈与业务原件/SUP-02-支付平台值班记录.md",
+          "locator": "原文：尚未确认回滚，也未给出修复后效果。",
+          "quote": "尚未确认回滚，也未给出修复后效果。",
+          "assetId": "operations-incident"
+        }
+      ],
+      "disclosure": "on_topic",
+      "validAt": "2026-09-14T09:00:00+08:00"
+    }
+  ],
+  "assets": [
+    {
+      "id": "operations-letter",
+      "path": "source-materials/operations/初始业务材料/需求与工作现场/REQ-0914-负责人来信.md",
+      "title": "负责人原始来信",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "d91c222e63de7baf6afbd1e8e24679a72063cb89463f260d02c60ae7f67b89bc",
+      "sizeBytes": 806,
+      "roleIds": [
+        "lead"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-weekly",
+      "path": "source-materials/operations/初始业务材料/已有报表/BI-0914-经营周报.md",
+      "title": "现行经营周报",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "ab61420853e33b089005f0c5f9ff1881240963ce78449d078970b2d7a3a46aab",
+      "sizeBytes": 1369,
+      "roleIds": [
+        "lead",
+        "growth",
+        "finance",
+        "member",
+        "goods",
+        "analyst"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-weekly-values",
+      "path": "source-materials/operations/初始业务材料/已有报表/BI-0914-经营周报.csv",
+      "title": "现行经营周报原值",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "17ecdde7af66dfa3f356af31cf43d3b5dd2672e62608335cd7a41da634233d77",
+      "sizeBytes": 549,
+      "roleIds": [
+        "lead",
+        "growth",
+        "finance",
+        "member",
+        "goods",
+        "analyst"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-old-bi",
+      "path": "source-materials/operations/初始业务材料/已有报表/BI-OLD-历史看板导出.csv",
+      "title": "历史看板原始导出",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "e99cf1450c523ab00213221ef02b60a4e3c76bba550f966aeca85d7a82a4355e",
+      "sizeBytes": 254,
+      "roleIds": [
+        "analyst",
+        "finance"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-metrics",
+      "path": "source-materials/operations/初始业务材料/口径与系统/指标词典与版本.md",
+      "title": "指标词典与版本",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "29226c12f4739513599fe18744a4741a6c347940c4ffcf08422a998b330e2f3a",
+      "sizeBytes": 2723,
+      "roleIds": [
+        "lead",
+        "growth",
+        "finance",
+        "member",
+        "goods",
+        "analyst",
+        "platform"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-dictionary",
+      "path": "source-materials/operations/初始业务材料/口径与系统/数据字典与关联.md",
+      "title": "数据字典与关联",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "e203e03c8eee387c332476295b9f0be8368604511eb7de53b5372d924466d474",
+      "sizeBytes": 3182,
+      "roleIds": [
+        "analyst",
+        "finance",
+        "platform"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-access",
+      "path": "source-materials/operations/初始业务材料/口径与系统/数据权限与更新限制.md",
+      "title": "数据权限与更新限制",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "d8de21b078b07b26a0b1c48c5c25a16e69a05e1f90da00ed00bf45c60dcac69d",
+      "sizeBytes": 2204,
+      "roleIds": [
+        "analyst",
+        "platform",
+        "finance"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-sql",
+      "path": "source-materials/operations/初始业务材料/口径与系统/现行SQL样例.sql",
+      "title": "现行SQL样例",
+      "mime": "text/plain",
+      "version": "snapshot-2026-09-14",
+      "sha256": "298e28c4c44cc04f560bd27527198c6ef2f4491ecb14aefe5d79bb3db9980c11",
+      "sizeBytes": 1262,
+      "roleIds": [
+        "analyst"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-api",
+      "path": "source-materials/operations/初始业务材料/口径与系统/现行接口业务样例.json",
+      "title": "现行接口业务样例",
+      "mime": "application/json",
+      "version": "snapshot-2026-09-14",
+      "sha256": "e1404dfe35a87aecbc9fa3bb1a2d8e2d11996c7ad72d162bac0c201831b8be47",
+      "sizeBytes": 1363,
+      "roleIds": [
+        "analyst",
+        "platform"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-work",
+      "path": "source-materials/operations/初始业务材料/需求与工作现场/ANA-历史分析工作记录.csv",
+      "title": "历史分析工作记录",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "884820940c55028a41b5e54f75a64d0507894fdf9e0453bfabe89eff2423d5a2",
+      "sizeBytes": 1181,
+      "roleIds": [
+        "analyst"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-notes",
+      "path": "source-materials/operations/初始业务材料/需求与工作现场/ANA-0907-分析员原始笔记.md",
+      "title": "分析员原始笔记",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "96c346c426e68866957e53d87e40293ff911a0fb6dcb00c304aa9edf0fdd9985",
+      "sizeBytes": 1288,
+      "roleIds": [
+        "analyst"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-meeting",
+      "path": "source-materials/operations/岗位派生摘录/MEET-0907-会议事实与行动.md",
+      "title": "经营会议与行动原文摘录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "ea2e945cbcf3fc7d5620832bd974024eb1ab8486394f66caef67ed1a4f461c95",
+      "sizeBytes": 1049,
+      "roleIds": [
+        "lead",
+        "growth",
+        "finance",
+        "analyst"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-request-lead",
+      "path": "source-materials/operations/岗位派生摘录/REQ-lead.md",
+      "title": "本岗位分析请求与追问",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "6661174eb8391c5b31a9c271f10022b3fbb15f0ccce37aa575c31a83a8b97851",
+      "sizeBytes": 265,
+      "roleIds": [
+        "lead"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-request-growth",
+      "path": "source-materials/operations/岗位派生摘录/REQ-growth.md",
+      "title": "本岗位分析请求与追问",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "b48260f78ef61990fda9611fe914549281102720d9fa982d6f3bbc96f007e1c0",
+      "sizeBytes": 425,
+      "roleIds": [
+        "growth"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-request-finance",
+      "path": "source-materials/operations/岗位派生摘录/REQ-finance.md",
+      "title": "本岗位分析请求与追问",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "b6ae9e20e7dbf82455313cdb78b753fde52ba3a86f7c53a85660bf185448cadc",
+      "sizeBytes": 351,
+      "roleIds": [
+        "finance"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-request-member",
+      "path": "source-materials/operations/岗位派生摘录/REQ-member.md",
+      "title": "本岗位分析请求与追问",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "b513a035b618d5442d51ffda04aecfee093716c33733609a61456be12a1c22ca",
+      "sizeBytes": 319,
+      "roleIds": [
+        "member"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-request-goods",
+      "path": "source-materials/operations/岗位派生摘录/REQ-goods.md",
+      "title": "本岗位分析请求与追问",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "d8667d1a49c60f4e6339825cc8ca6254dd06c1c8c6e9ca9153d7f76a2243819c",
+      "sizeBytes": 330,
+      "roleIds": [
+        "goods"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-request-analyst",
+      "path": "source-materials/operations/岗位派生摘录/REQ-analyst.md",
+      "title": "本岗位分析请求与追问",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "697abf39cf8e1deed1ba92c1432b22fcb41fbe3ab965e764140093c3274f298c",
+      "sizeBytes": 325,
+      "roleIds": [
+        "analyst"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-sup-finance",
+      "path": "source-materials/operations/岗位派生摘录/SUP-04-finance.md",
+      "title": "财务与分析补充访谈：finance",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "f0df4cabc83bcfe15fdba61d04cebd0d3768a7dacd1eeec166028c61f93d91ca",
+      "sizeBytes": 787,
+      "roleIds": [
+        "finance"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-sup-analyst",
+      "path": "source-materials/operations/岗位派生摘录/SUP-04-analyst.md",
+      "title": "财务与分析补充访谈：analyst",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "82ef89a6288f5d96b5c36c4e421147684632d6e5f0968d6cb7d646248dec304e",
+      "sizeBytes": 833,
+      "roleIds": [
+        "analyst"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-campaigns",
+      "path": "source-materials/operations/补充访谈与业务原件/SUP-01-增长访谈与活动台账.md",
+      "title": "增长访谈与活动台账",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "ea7d31c54138b28ce5ccdae5dda09bed20270e835a090cd949c0f4c348c553a2",
+      "sizeBytes": 1763,
+      "roleIds": [
+        "growth"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-incident",
+      "path": "source-materials/operations/补充访谈与业务原件/SUP-02-支付平台值班记录.md",
+      "title": "支付平台值班记录",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "708232b5d09c132c76b11d9fec2239a1b23050322d9d9113437f2946bf35440b",
+      "sizeBytes": 1472,
+      "roleIds": [
+        "platform"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-goods-feedback",
+      "path": "source-materials/operations/补充访谈与业务原件/SUP-03-商品与客服往来.md",
+      "title": "商品与客服往来",
+      "mime": "text/markdown",
+      "version": "snapshot-2026-09-14",
+      "sha256": "fa441f9097a0d6fc9ff6606af8c955c107a3cdfa6f8b34e7b6d32206b191e923",
+      "sizeBytes": 1396,
+      "roleIds": [
+        "goods"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-channels",
+      "path": "source-materials/operations/初始业务材料/经营数据/channels.csv",
+      "title": "渠道维表",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "3509d60946622fee9dfff30e72a220a81ed1dd6562afdbf455d9685e80538717",
+      "sizeBytes": 149,
+      "roleIds": [
+        "analyst",
+        "growth",
+        "member"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-channel_spend",
+      "path": "source-materials/operations/初始业务材料/经营数据/channel_spend.csv",
+      "title": "每日渠道费用",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "7ccc29047dc326540eb2771a8080b2b79c393aafe8bb7cf2c854e4525255d305",
+      "sizeBytes": 2954,
+      "roleIds": [
+        "analyst",
+        "growth"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-products",
+      "path": "source-materials/operations/初始业务材料/经营数据/products.csv",
+      "title": "商品规格与标价",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "a3ca2141d75bfd13b8f323208d93d0b1cec4a0c164fb6af22f6dbd944634c13b",
+      "sizeBytes": 173,
+      "roleIds": [
+        "analyst",
+        "goods"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-users",
+      "path": "source-materials/operations/初始业务材料/经营数据/users.csv",
+      "title": "脱敏用户标识",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "ee31995f5cf6eecafad82708ff26c0c04dfa87a915e0f7edd288679a778c2307",
+      "sizeBytes": 154102,
+      "roleIds": [
+        "analyst"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-sessions",
+      "path": "source-materials/operations/初始业务材料/经营数据/sessions.csv",
+      "title": "访问会话明细",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "a82f702d4003147a5a0c666f8b76f651b92de73fed3e9c0252d3b05934f0cbfc",
+      "sizeBytes": 392726,
+      "roleIds": [
+        "analyst"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-orders",
+      "path": "source-materials/operations/初始业务材料/经营数据/orders.csv",
+      "title": "订单明细",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "341552fbf652eadc1cab10d3986e2f12ffe90a690b32012fdaa6b0ab3024dab9",
+      "sizeBytes": 140901,
+      "roleIds": [
+        "analyst",
+        "finance"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-order_items",
+      "path": "source-materials/operations/初始业务材料/经营数据/order_items.csv",
+      "title": "订单商品行",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "a0bce944244cb3ad309f93d4ff52b464ba78024b35bd3f55a2f6cccc6e01d14c",
+      "sizeBytes": 45196,
+      "roleIds": [
+        "analyst"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-payments",
+      "path": "source-materials/operations/初始业务材料/经营数据/payments.csv",
+      "title": "付款尝试明细",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "fcf8b2bf7a2e8f161d3a1364d515fbc903fe8683804d5432017f6218ed917e4c",
+      "sizeBytes": 76382,
+      "roleIds": [
+        "analyst",
+        "platform",
+        "finance"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-refunds",
+      "path": "source-materials/operations/初始业务材料/经营数据/refunds.csv",
+      "title": "退款申请明细",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "45b6687b6d32bd366119aa72dbe4174e3cf3c96ea4b9e501288ef58a8c896ade",
+      "sizeBytes": 4251,
+      "roleIds": [
+        "analyst",
+        "finance"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    },
+    {
+      "id": "operations-daily_kpi",
+      "path": "source-materials/operations/初始业务材料/经营数据/daily_kpi.csv",
+      "title": "现有日报汇总",
+      "mime": "text/csv",
+      "version": "snapshot-2026-09-14",
+      "sha256": "8752890737c164a2af7f2526e4e6151db7483855e65317158205bef437af912a",
+      "sizeBytes": 986,
+      "roleIds": [
+        "analyst"
+      ],
+      "release": "on_request",
+      "availableAt": "2026-09-14T09:00:00+08:00"
+    }
+  ],
+  "discoveries": [
+    {
+      "id": "operations.lead.decision",
+      "roleId": "lead",
+      "title": "决策时点与原始诉求",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "operations.lead.decision"
+      ],
+      "requiredAssetIds": [
+        "operations-letter",
+        "operations-request-lead"
+      ],
+      "allowUnknown": false,
+      "completionRule": "本人已完成访谈明确说明：需要在当日预算讨论前获得可复核判断与疑点，尚未指定系统形态或决定调整哪个预算。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "最近一次波动要支持什么决定？",
+        "请问负责人决策时间、尚未决定什么，并索取原始来信和本人请求。"
+      ],
+      "reportSections": [
+        "原始诉求与调查范围"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "决策时点与原始诉求支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/初始业务材料/需求与工作现场/REQ-0914-负责人来信.md#原文：下午 14:00 要讨论下周预算。"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "operations.lead.signal",
+      "roleId": "lead",
+      "title": "周报波动只是调查起点",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "operations.lead.signal"
+      ],
+      "requiredAssetIds": [
+        "operations-weekly",
+        "operations-weekly-values"
+      ],
+      "allowUnknown": false,
+      "completionRule": "本人已完成访谈明确说明：两周访问一样而支付订单下降是调查起点，不能直接归因投放或支付故障；会话不等于人数。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "先核对负责人看到哪张报表。",
+        "请索取现行周报及原值，询问波动能确认什么、不能确认什么。"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "周报波动只是调查起点支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/初始业务材料/已有报表/BI-0914-经营周报.md#原文：此周报只提示波动，不含根因结论。"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "operations.lead.action",
+      "roleId": "lead",
+      "title": "会议行动与业务决策分工",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "operations.lead.action"
+      ],
+      "requiredAssetIds": [
+        "operations-meeting"
+      ],
+      "allowUnknown": false,
+      "completionRule": "本人已完成访谈明确说明：已按既定预算执行一周并安排增长、财务提供说明，分析结果仍待交付、预算尚未批准修改；行动需要证据、责任人、截止和复查条件。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "上一轮会上采取了什么动作？",
+        "请索取会议与行动摘录，确认当前完成与未完成事项。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "会议行动与业务决策分工支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/岗位派生摘录/MEET-0907-会议事实与行动.md#原文：ACT-03 仍待完成。下周预算尚未批准修改。"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "operations.growth.request",
+      "roleId": "growth",
+      "title": "渠道结构与新回访对照",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "operations.growth.request"
+      ],
+      "requiredAssetIds": [
+        "operations-request-growth",
+        "operations-weekly-values",
+        "operations-channels",
+        "operations-channel_spend"
+      ],
+      "allowUnknown": false,
+      "completionRule": "本人已完成访谈明确说明：需要三个渠道四周访问、付款、费用及新回访对照；总转化率变化不能单独评价投放。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "总量之外增长岗位还需看什么？",
+        "请问增长如何拆渠道和新回访，并索取费用、渠道及周报原值。"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "渠道结构与新回访对照支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/岗位派生摘录/REQ-growth.md#原文：别把总转化率直接拿来评价投放。"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "operations.growth.campaign",
+      "roleId": "growth",
+      "title": "活动同时变化的证据",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "operations.growth.campaign"
+      ],
+      "requiredAssetIds": [
+        "operations-campaigns"
+      ],
+      "allowUnknown": false,
+      "completionRule": "本人已完成访谈明确说明：内容扩量同时改变人群及素材开头，并后加每单优惠；搜索预算未变，会员无全员促销，不能把多种变化当单因素实验。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "最近活动改过哪些条件？",
+        "请索取活动台账，问预算、人群、素材、优惠是否同时改变。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "活动同时变化的证据支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/补充访谈与业务原件/SUP-01-增长访谈与活动台账.md#原文：素材和人群都变了，所以不能只拿两周对比声称是哪一个造成变化。"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "operations.growth.causality",
+      "roleId": "growth",
+      "title": "缺失曝光与实验的因果边界",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "operations.growth.causality"
+      ],
+      "requiredAssetIds": [
+        "operations-campaigns"
+      ],
+      "allowUnknown": true,
+      "completionRule": "本人已完成访谈明确说明：没有曝光和完整随机对照，试投未证明长期增量；ROAS不是增量收入或利润，需补受控方案。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "现有记录能否证明投放带来多少新增？",
+        "请问增长尚缺什么对照或曝光资料，不要求其承诺收益。"
+      ],
+      "reportSections": [
+        "AI价值分析与推荐方向"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "缺失曝光与实验的因果边界支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/补充访谈与业务原件/SUP-01-增长访谈与活动台账.md#原文：曝光和完整创意实验分组没有进这个数据包。"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "operations.growth.identity",
+      "roleId": "growth",
+      "title": "渠道不能代替访客身份",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "operations.growth.identity"
+      ],
+      "requiredAssetIds": [
+        "operations-campaigns",
+        "operations-metrics"
+      ],
+      "allowUnknown": false,
+      "completionRule": "本人已完成访谈明确说明：新访客要按first_seen_at和访问日期确认，渠道不是新老客身份，需分析人员有权处理。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "内容访客是否全部是新客？",
+        "请问需要什么身份定义以及应由谁取得明细。"
+      ],
+      "reportSections": [
+        "数据系统与企业条件"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "渠道不能代替访客身份支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/补充访谈与业务原件/SUP-01-增长访谈与活动台账.md#原文：不能把 CONTENT 自动等同于新客。"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "operations.finance.cash",
+      "roleId": "finance",
+      "title": "付款成交与净回款不同",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "operations.finance.cash"
+      ],
+      "requiredAssetIds": [
+        "operations-sup-finance",
+        "operations-weekly-values",
+        "operations-metrics",
+        "operations-old-bi"
+      ],
+      "allowUnknown": false,
+      "completionRule": "本人已完成访谈明确说明：付款成交额与按退款处理日现金流出不同；净回款非利润，缺采购仓储配送等成本，不把口径差异一律当数据错。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "财务收到的销售额和周报为什么不同？",
+        "请索取新旧报表、口径词典及财务访谈摘录，核对各自回答的问题。"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "付款成交与净回款不同支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/岗位派生摘录/SUP-04-finance.md#原文：若讨论商品体验，则要按同一批订单观察七天退款，两类表不要混在一起。"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "operations.finance.cohort",
+      "roleId": "finance",
+      "title": "统一七天退款与未成熟订单",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "operations.finance.cohort"
+      ],
+      "requiredAssetIds": [
+        "operations-request-finance",
+        "operations-orders",
+        "operations-refunds",
+        "operations-metrics",
+        "operations-dictionary"
+      ],
+      "allowUnknown": false,
+      "completionRule": "本人已完成访谈明确说明：按支付订单所属周关联退款，统一支付后七天观察；未满窗口单列，不当无退款，退款处理日不能直接除当周订单。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "比较不同周退款应先统一什么？",
+        "请索取订单、退款和字典，问订单所属周期、观察截止及未成熟处理。"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "统一七天退款与未成熟订单支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/岗位派生摘录/REQ-finance.md#原文：本周没有满七天的单请标出来。"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "operations.finance.refund",
+      "roleId": "finance",
+      "title": "付款与申请成功粒度",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "operations.finance.refund"
+      ],
+      "requiredAssetIds": [
+        "operations-metrics",
+        "operations-orders",
+        "operations-refunds",
+        "operations-payments"
+      ],
+      "allowUnknown": false,
+      "completionRule": "本人已完成访谈明确说明：已退款订单仍曾付款，退款申请数、成功退款订单数、成功退款金额分别定义；pending不能当现金流出。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "申请、退款成功、订单付款是同一个状态吗？",
+        "请财务用原件说明付款后退款及待处理申请怎样计数。"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "付款与申请成功粒度支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/初始业务材料/口径与系统/指标词典与版本.md#原文：pending 不扣；允许退款所属订单在上一周"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "operations.finance.limits",
+      "roleId": "finance",
+      "title": "金额职责与未定条件",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "operations.finance.limits"
+      ],
+      "requiredAssetIds": [
+        "operations-sup-finance",
+        "operations-access"
+      ],
+      "allowUnknown": true,
+      "completionRule": "本人已完成访谈明确说明：财务确认金额但不能代增长调预算；指标跨部门审批维护、复杂结论质量评价、数据出域仍待确认，不可将未成熟小样本当预测。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "谁确认金额，哪些条件仍未定？",
+        "请问审批维护与数据出域是否已有方案，以及小样本结论限制。"
+      ],
+      "reportSections": [
+        "AI价值分析与推荐方向"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "金额职责与未定条件支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/岗位派生摘录/SUP-04-finance.md#原文：哪些数据允许送给外部模型。"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "operations.member.touch",
+      "roleId": "member",
+      "title": "会员触达目标与渠道比较",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "operations.member.touch"
+      ],
+      "requiredAssetIds": [
+        "operations-request-member",
+        "operations-weekly-values"
+      ],
+      "allowUnknown": false,
+      "completionRule": "本人已完成访谈明确说明：会员上周为老客搭配触达而非全员优惠，需先看私域是否跟随变化，不能套用内容促销。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "会员最近发的是什么活动？",
+        "请索取会员本人请求及周报，询问触达对象与需要比较的变化。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "会员触达目标与渠道比较支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/岗位派生摘录/REQ-member.md#原文：我们上周发的是老客搭配建议，不是全员优惠。"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "operations.member.return",
+      "roleId": "member",
+      "title": "回访与再购不等价",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "operations.member.return"
+      ],
+      "requiredAssetIds": [
+        "operations-request-member",
+        "operations-metrics"
+      ],
+      "allowUnknown": false,
+      "completionRule": "本人已完成访谈明确说明：需要把回来浏览与再次购买区分，访问留存不证明再购；详细留存可交分析按有权数据另算。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "回来一次就算再次购买吗？",
+        "请会员解释回访和再购区别并索取定义。"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "回访与再购不等价支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/岗位派生摘录/REQ-member.md#原文：并区分回来浏览与再次购买，不要把两件事混成留存。"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "operations.member.retention",
+      "roleId": "member",
+      "title": "选学：成熟D7访问队列",
+      "type": "cross_source",
+      "required": false,
+      "factIds": [
+        "operations.member.retention"
+      ],
+      "requiredAssetIds": [
+        "operations-metrics"
+      ],
+      "allowUnknown": false,
+      "completionRule": "本人已完成访谈明确说明：RETURN-D7是首次访问后恰好第七自然日有访问，未成熟队列不纳入；不推断跨设备终身新客。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "可选深入了解留存队列。",
+        "若研究留存，请核对首次访问、D+7与样本成熟条件。"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "选学：成熟D7访问队列支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/初始业务材料/口径与系统/指标词典与版本.md#原文：9 月 7 日及以后队列未成熟"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "operations.goods.price",
+      "roleId": "goods",
+      "title": "整单优惠和商品件价",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "operations.goods.price"
+      ],
+      "requiredAssetIds": [
+        "operations-goods-feedback",
+        "operations-request-goods",
+        "operations-products",
+        "operations-metrics"
+      ],
+      "allowUnknown": false,
+      "completionRule": "本人已完成访谈明确说明：收纳盒内容渠道优惠为每单减而非每件减；客单价不是商品单价，应看应付、件数及折扣。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "商品运营需要的是客单价还是件价？",
+        "请索取商品与客服往来、商品表和本人请求，说明优惠如何作用。"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "整单优惠和商品件价支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/补充访谈与业务原件/SUP-03-商品与客服往来.md#原文：买两件仍是整单减 10 元。"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "operations.goods.reason",
+      "roleId": "goods",
+      "title": "退款理由与质量结论",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "operations.goods.reason"
+      ],
+      "requiredAssetIds": [
+        "operations-goods-feedback"
+      ],
+      "allowUnknown": false,
+      "completionRule": "本人已完成访谈明确说明：SIZE_EXPECTATION是客户预期理由而非质检结论；应回看素材版本、具体订单与实际尺寸，不直接判规格不合格。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "退款理由能够证明质量不合格吗？",
+        "请商品岗位索取客服往来，核对理由与独立验证之间差别。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "退款理由与质量结论支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/补充访谈与业务原件/SUP-03-商品与客服往来.md#原文：这个原因是客户提出的理由，不是质检判定"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "operations.goods.missing",
+      "roleId": "goods",
+      "title": "素材版本及退回件数缺失",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "operations.goods.missing"
+      ],
+      "requiredAssetIds": [
+        "operations-goods-feedback"
+      ],
+      "allowUnknown": true,
+      "completionRule": "本人已完成访谈明确说明：缺用户看到的素材版本、详情变更、退款具体描述和退回件数；不能算净销量/库存入库或补造质检结论。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "当前商品判断还缺哪些原件？",
+        "请问素材与退回件数是否提供，哪些结论暂不能给出。"
+      ],
+      "reportSections": [
+        "AI价值分析与推荐方向"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "素材版本及退回件数缺失支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/补充访谈与业务原件/SUP-03-商品与客服往来.md#原文：退回件数没有入包，所以不能计算净销量或库存入库。"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "operations.analyst.contract",
+      "roleId": "analyst",
+      "title": "分析问题的四项输入",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "operations.analyst.contract"
+      ],
+      "requiredAssetIds": [
+        "operations-request-analyst",
+        "operations-dictionary"
+      ],
+      "allowUnknown": false,
+      "completionRule": "本人已完成访谈明确说明：先约定时间、指标版本、维度、水位；跨设备身份合并无证据，支付错误需工程提供。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "分析人员收到一个为什么时先补问什么？",
+        "请索取分析岗位请求和字典，明确问题输入及身份边界。"
+      ],
+      "reportSections": [
+        "数据系统与企业条件"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "分析问题的四项输入支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/岗位派生摘录/REQ-analyst.md#原文：请先给每个问题绑定时间、指标版本、维度和数据截至时间。"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "operations.analyst.versions",
+      "roleId": "analyst",
+      "title": "两张成交报表与版本回算",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "operations.analyst.versions"
+      ],
+      "requiredAssetIds": [
+        "operations-sup-analyst",
+        "operations-old-bi",
+        "operations-weekly-values",
+        "operations-metrics"
+      ],
+      "allowUnknown": false,
+      "completionRule": "本人已完成访谈明确说明：旧看板提交订单，新周报付款且四周回算；保留原表解释争议，退款后paid_at仍保留，不能只筛paid状态。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "两个成交值不同就必然有一个错吗？",
+        "请索取新旧原表及词典，展示相应行并解释定义/回算。"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "两张成交报表与版本回算支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/岗位派生摘录/SUP-04-analyst.md#原文：旧看板把提交订单当成交，标题一直没改。"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "operations.analyst.grain",
+      "roleId": "analyst",
+      "title": "关联粒度与转化复算输入",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "operations.analyst.grain"
+      ],
+      "requiredAssetIds": [
+        "operations-dictionary",
+        "operations-sessions",
+        "operations-orders",
+        "operations-payments",
+        "operations-channels",
+        "operations-channel_spend",
+        "operations-weekly-values",
+        "operations-metrics"
+      ],
+      "allowUnknown": false,
+      "completionRule": "本人已完成访谈明确说明：会话、订单、商品行、付款尝试与退款粒度不同；订单以ID去重、付款状态核对；聚合再关联费用，订单行不能当单数。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "从现行周报下钻需要哪些键和原表？",
+        "请索取会话、订单、付款、渠道费用和定义，说明去重关联及支付转化口径。"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "关联粒度与转化复算输入支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/初始业务材料/口径与系统/数据字典与关联.md#原文：先各自聚合，再关联，避免把一笔渠道费用乘上订单数。"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "operations.analyst.work",
+      "roleId": "analyst",
+      "title": "分析主动工作与等待",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "operations.analyst.work"
+      ],
+      "requiredAssetIds": [
+        "operations-notes",
+        "operations-work"
+      ],
+      "allowUnknown": false,
+      "completionRule": "本人已完成访谈明确说明：REQ-0907经过380分钟，日志375分钟含主动220和等待155、另有5分钟间隔；等待期间可处理其他请求，不全部视为可省人力。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "补一版的时间花在计算还是等待？",
+        "请索取分析工单和笔记，按request_id区分操作、等待和经过时间。"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "分析主动工作与等待支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/初始业务材料/需求与工作现场/ANA-0907-分析员原始笔记.md#原文：人工工作 220 分钟，等待确认或材料 155 分钟。"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "operations.analyst.action",
+      "roleId": "analyst",
+      "title": "返工原因与错过决策窗口",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "operations.analyst.action"
+      ],
+      "requiredAssetIds": [
+        "operations-notes",
+        "operations-meeting"
+      ],
+      "allowUnknown": false,
+      "completionRule": "本人已完成访谈明确说明：重确认时间/口径、追加渠道、等待活动及退款说明导致多版；V4晚于投放锁定，不证明销售损失，行动机制仍为人工。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "最新一版出来时决策发生了吗？",
+        "请结合会议行动与工作笔记解释返工原因、时点和不能外推的影响。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "返工原因与错过决策窗口支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/初始业务材料/需求与工作现场/ANA-0907-分析员原始笔记.md#原文：没有证据证明这个延误造成了多少销售损失。"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "operations.analyst.tools",
+      "roleId": "analyst",
+      "title": "既有SQL与接口可以做什么",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "operations.analyst.tools"
+      ],
+      "requiredAssetIds": [
+        "operations-sup-analyst",
+        "operations-sql",
+        "operations-api"
+      ],
+      "allowUnknown": false,
+      "completionRule": "本人已完成访谈明确说明：已有SQL/BI可普通切分，困难还包括变化的问题、跨团队材料与证据行动关联；可比较规则模板、指标治理与AI，不预设自由SQL Agent。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "哪些事情已有工具能做？",
+        "请索取现有SQL/API，并问哪些协作问题不靠重画图解决。"
+      ],
+      "reportSections": [
+        "AI价值分析与推荐方向"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "既有SQL与接口可以做什么支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/岗位派生摘录/SUP-04-analyst.md#原文：普通数据切分现有 SQL 和 BI 都能做"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "operations.analyst.access",
+      "roleId": "analyst",
+      "title": "只读限制水位与未定集成",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "operations.analyst.access"
+      ],
+      "requiredAssetIds": [
+        "operations-access",
+        "operations-api"
+      ],
+      "allowUnknown": true,
+      "completionRule": "本人已完成访谈明确说明：现有只读聚合限时间/维度/行数与超时，小组隐藏；业务只授权聚合、分析沙箱SELECT，水位截至9月13日，SSO行级审计并发出域待定。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "数据库样例是否等于可以生产直连？",
+        "请索取权限更新约束和接口，问缺权限/未就绪/超时如何处理。"
+      ],
+      "reportSections": [
+        "数据系统与企业条件"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "只读限制水位与未定集成支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/初始业务材料/口径与系统/数据权限与更新限制.md#原文：当前资料只给业务合同，不替代生产安全设计。"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "operations.analyst.optional-price",
+      "roleId": "analyst",
+      "title": "选学：商品件价与数据缺口",
+      "type": "cross_source",
+      "required": false,
+      "factIds": [
+        "operations.analyst.optional-price"
+      ],
+      "requiredAssetIds": [
+        "operations-dictionary",
+        "operations-order_items",
+        "operations-products",
+        "operations-daily_kpi",
+        "operations-users"
+      ],
+      "allowUnknown": false,
+      "completionRule": "本人已完成访谈明确说明：商品行有数量，客单价不能当件价；件数与金额可从授权商品行核对，但缺成本与退回件数，不推断毛利或净销量。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "可选深入商品数量与访问身份分析。",
+        "若继续研究商品件价，请索取商品行并明确金额/数量/净销量的边界。"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "选学：商品件价与数据缺口支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/初始业务材料/口径与系统/数据字典与关联.md#原文：本教学集每单一商品行，数量可大于一"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "operations.platform.incident",
+      "roleId": "platform",
+      "title": "搜索支付异常与变更线索",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "operations.platform.incident"
+      ],
+      "requiredAssetIds": [
+        "operations-incident",
+        "operations-payments"
+      ],
+      "allowUnknown": false,
+      "completionRule": "本人已完成访谈明确说明：搜索移动结算路径参数调整后出现GW_TIMEOUT，内容会员不走该分支；时间相关不等于根因已证，需分析日期渠道设备。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "从提交到付款可能发生什么？",
+        "请索取值班记录和付款尝试，问变更范围、错误码及是否结案。"
+      ],
+      "reportSections": [
+        "现状流程与协作关系"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "搜索支付异常与变更线索支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/补充访谈与业务原件/SUP-02-支付平台值班记录.md#原文：值班记录尚未完成根因结案"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "operations.platform.status",
+      "roleId": "platform",
+      "title": "尝试超时不等于必然流失",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "operations.platform.status"
+      ],
+      "requiredAssetIds": [
+        "operations-incident",
+        "operations-dictionary"
+      ],
+      "allowUnknown": false,
+      "completionRule": "本人已完成访谈明确说明：success才对应付款，timeout该尝试无成功结果；教学每单一次最终核对尝试，生产可重试或延迟回调，不能把超时数等于必然损失订单。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "一次超时能确定损失一笔订单吗？",
+        "请问付款尝试、订单付款和生产重试如何区分。"
+      ],
+      "reportSections": [
+        "问题量化与基线"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "尝试超时不等于必然流失支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/补充访谈与业务原件/SUP-02-支付平台值班记录.md#原文：不能把“超时一次”直接换算为一笔必定流失的购买。"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    },
+    {
+      "id": "operations.platform.coverage",
+      "roleId": "platform",
+      "title": "水位与未完成的排查",
+      "type": "cross_source",
+      "required": true,
+      "factIds": [
+        "operations.platform.coverage"
+      ],
+      "requiredAssetIds": [
+        "operations-incident",
+        "operations-access",
+        "operations-api"
+      ],
+      "allowUnknown": true,
+      "completionRule": "本人已完成访谈明确说明：工程已接排查但未确认回滚/效果；分区完整仅排除已检查水位问题，不能证明全部埋点无漏，不提前加入恢复订单。；成功取得指定原件并可引用相应事实，不能只有学员转述或只发文件。",
+      "positiveExample": "本人说明上述关系/边界，引用取得的原件且不将假设说成结论。",
+      "negativeExample": "只提关键词、泛问忙不忙、学员宣称、未提交回答、只发附件，或把相关性/缺失误写已证因果均不完成。",
+      "hints": [
+        "异常是否只是数据没入仓？是否已修复？",
+        "请核对值班记录与水位，分别说明排除范围、尚未处理或提供的证据。"
+      ],
+      "reportSections": [
+        "数据系统与企业条件"
+      ],
+      "evidencePolicy": {
+        "requiresCommittedAssistant": true,
+        "learnerAssertionCounts": false,
+        "allRequiredAssets": true,
+        "requiresQuoteSupport": true
+      },
+      "businessMeaning": "水位与未完成的排查支持三组调查链中的事实定位与下一步责任判断。",
+      "sourceLocations": [
+        "source-materials/operations/补充访谈与业务原件/SUP-02-支付平台值班记录.md#原文：尚未确认回滚，也未给出修复后效果。"
+      ],
+      "requiredNumericValues": [],
+      "deterministicChecks": []
+    }
+  ],
+  "calculations": [
+    {
+      "id": "operations.weekly",
+      "title": "按周与渠道访问支付转化",
+      "operation": "operations_weekly_channel_conversion",
+      "inputs": [
+        "operations-sessions",
+        "operations-orders",
+        "operations-payments",
+        "operations-channels",
+        "operations-channel_spend",
+        "operations-weekly-values",
+        "operations-dictionary",
+        "operations-metrics"
+      ],
+      "columns": {},
+      "unit": "次 / 笔 / 分钟 / 元 / %",
+      "definition": "按会话进入自然周与渠道，以成功付款非测试去重订单/会话计算，并并列付款会话口径；校验付款记录、日期、键和原周报；费用独立聚合；输出W3到W4渠道订单变化及相邻周加权结构分解，不解释因果。",
+      "denominator": "各周渠道去重会话数；退款订单仍保留付款事实，非订单商品行/去重人数",
+      "filter": {
+        "startDate": "2026-08-17",
+        "endExclusive": "2026-09-14",
+        "dataAsOf": "2026-09-13T23:59:59+08:00",
+        "observationDays": 7
+      },
+      "version": "1.0.0",
+      "requiresAllInputsGranted": true,
+      "allowArbitraryCode": false
+    },
+    {
+      "id": "operations.work",
+      "title": "分析工单主动操作与等待",
+      "operation": "operations_analysis_work",
+      "inputs": [
+        "operations-work",
+        "operations-notes",
+        "operations-meeting"
+      ],
+      "columns": {},
+      "unit": "次 / 笔 / 分钟 / 元 / %",
+      "definition": "按request_id汇总active_minutes、wait_minutes、返工原因、首末经过和未记录间隔，检查行内时间及重叠；不把等待称为可节省人力。",
+      "denominator": "已有8条活动记录归属1个教学request，不外推全团队",
+      "filter": {
+        "startDate": "2026-08-17",
+        "endExclusive": "2026-09-14",
+        "dataAsOf": "2026-09-13T23:59:59+08:00",
+        "observationDays": 7
+      },
+      "version": "1.0.0",
+      "requiresAllInputsGranted": true,
+      "allowArbitraryCode": false
+    },
+    {
+      "id": "operations.refund",
+      "title": "统一七天观察的订单退款",
+      "operation": "operations_refund_cohort_d7",
+      "inputs": [
+        "operations-orders",
+        "operations-refunds",
+        "operations-payments",
+        "operations-metrics",
+        "operations-dictionary"
+      ],
+      "columns": {},
+      "unit": "次 / 笔 / 分钟 / 元 / %",
+      "definition": "按支付周分组，每笔支付订单观察支付后7×24小时；完整水位之前满窗才入比较分母；分别列申请数、成功退款去重订单、成功金额和pending，未成熟订单单列且不当零退款。",
+      "denominator": "成熟且非测试已支付订单；成功退款率按去重订单/成熟支付订单；金额人民币分转元",
+      "filter": {
+        "startDate": "2026-08-17",
+        "endExclusive": "2026-09-14",
+        "dataAsOf": "2026-09-13T23:59:59+08:00",
+        "observationDays": 7
+      },
+      "version": "1.0.0",
+      "requiresAllInputsGranted": true,
+      "allowArbitraryCode": false
+    }
+  ],
+  "report": {
+    "version": "1.0.0",
+    "title": "业务现状诊断与 AI 机会评估报告",
+    "sections": [
+      "原始诉求与调查范围",
+      "业务背景与组织职责",
+      "现状流程与协作关系",
+      "数据系统与企业条件",
+      "问题量化与基线",
+      "AI价值分析与推荐方向",
+      "证据索引与数据字典"
+    ],
+    "requirements": [
+      "开篇简明说明企业业务如何运转、决策被何种信息障碍拖慢和建议研究范围，再展开证据。",
+      "区分访谈意见、原件事实、确定性计算、尚未验证的因果；保留三组相互关联的调查情景。",
+      "只用本轮授权证据；支付、提交、退款粒度和时间口径分开；金额分转元。",
+      "比较指标治理、明确分析请求、既有SQL/BI、AI辅助解释与人工经营决策，不预设唯一SQL Agent。",
+      "缺少实验、曝光、跨设备身份、成本及生产出域条件，不能推断利润、销售损失或AI已实现收益。"
+    ]
+  }
+}
