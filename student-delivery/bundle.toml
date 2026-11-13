@@ -11,6 +11,9 @@ exclude_globs = ["**/*.tsbuildinfo", "**/*.log", "**/*.pid", "**/.DS_Store", "up
 
 # Fixed public test fixtures contain deliberately invalid keys for masking/parser tests.
 reviewed_test_credential_files = [
+  "upstream/deepseek-harness/apps/web/tests/deepseek-messages-settings.e2e.ts",
+  "upstream/deepseek-harness/apps/web/tests/rich-text-quotes.e2e.ts",
+  "upstream/deepseek-harness/packages/session/message-quotes/tests/quote-user-text.client.spec.tsx",
   "upstream/deepseek-harness/apps/desktop/tests/welcome-flow.e2e.ts",
   "upstream/deepseek-harness/packages/client/ui-secret-mask/tests/secret-rule.client.spec.ts",
   "upstream/deepseek-harness/packages/credentials/credentials-local/tests/local.spec.ts",
