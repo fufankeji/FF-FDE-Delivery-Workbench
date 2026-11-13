@@ -1,7 +1,7 @@
 ---
 document: feature-tasks
 feature: F031
-status: completed
+status: in-progress
 updated: "2026-11-13"
 ---
 
@@ -59,4 +59,4 @@ updated: "2026-11-13"
 | 日期 | 状态变化 | 完成证据 | 偏差/剩余项 |
 |---|---|---|---|
 | 2026-11-13 | planned | 用户确认素材入仓、推送与源码包 | 技术实施与验包待完成 |
-| 2026-11-13 | completed | T001～T006 完成；见 [完整验证记录](../../verification/2026-11-13-f031-lab-source-delivery.md) | 不包含真实模型、Windows/Linux 新机或全量视觉验收；旧桌面原数据保留 |
+| 2026-11-13 | in-progress | T001～T006 技术任务与本次源码交付完成；见 [完整验证记录](../../verification/2026-11-13-f031-lab-source-delivery.md) | F024、F030 的既有人工验收尚未关闭，因此依赖链状态不标 completed；不影响本次素材包已通过独立验收 |
