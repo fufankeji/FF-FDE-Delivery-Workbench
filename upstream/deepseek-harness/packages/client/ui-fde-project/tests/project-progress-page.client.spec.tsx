@@ -124,8 +124,9 @@ describe('ProjectProgressOverlay standalone page', () => {
     frame.remove()
   })
 
-  it('renders the V2 project detail from real stage, source, work-item, and artifact values', () => {
-    const enterProject = vi.fn()
+  it('renders the V2 detail with project-local upload and navigation to the selected stage', async () => {
+    const enterProject = vi.fn(async () => {})
+    const renderFactorySlot = vi.fn(() => null)
     const retryStage = vi.fn()
     const props = {
       useProjectPage: hook({ open: true, view: 'project' as const, workspaceId: 'workspace-1' }),
@@ -156,12 +157,14 @@ describe('ProjectProgressOverlay standalone page', () => {
       completeRequirements: vi.fn(), completeSolution: vi.fn(), completeDevelopment: vi.fn(), completeValidation: vi.fn(), completePilot: vi.fn(), completeHandoff: vi.fn(), returnToPrevious: vi.fn(),
       acceptValidationMetric: vi.fn(), waiveValidationIssue: vi.fn(), acceptDeploymentTrialIssue: vi.fn(), confirmDeploymentTrialReadiness: vi.fn(), recordAcceptanceHandoverDecision: vi.fn(),
       loadProjectSources: vi.fn(), parseProjectSource: vi.fn(), openProjectCreation: vi.fn(), enterProject,
-      reviewProjectArchitecture: vi.fn(), closeProjectPage: vi.fn(), showProjectOverview: vi.fn(), showProjectTimeline: vi.fn(), showProjectDetail: vi.fn(), renderSlot: vi.fn(() => null), t: makeTranslate(zh),
+      reviewProjectArchitecture: vi.fn(), closeProjectPage: vi.fn(), showProjectOverview: vi.fn(),
+      showProjectTimeline: vi.fn(), showProjectDetail: vi.fn(), renderFactorySlot, renderSlot: vi.fn(() => null), t: makeTranslate(zh),
     } as unknown as ProjectProgressOverlayProps
 
     render(<ProjectProgressOverlay {...props} />)
     expect(retryStage).toHaveBeenCalledWith('workspace-1')
     expect(document.querySelector('[data-v2-project-detail]')).toBeTruthy()
+    expect(renderFactorySlot).toHaveBeenCalledWith('fde.project.resources.upload', { workspaceId: 'workspace-1', path: '/project/one' })
     expect(screen.getByRole('region', { name: '项目关键状态' })).toBeTruthy()
     const navigation = screen.getByRole('navigation', { name: '八阶段交付地图' })
     expect(within(navigation).getAllByRole('button')).toHaveLength(8)
@@ -170,8 +173,15 @@ describe('ProjectProgressOverlay standalone page', () => {
     expect(screen.getAllByText('仍需确认负责人').length).toBeGreaterThan(0)
     fireEvent.click(within(navigation).getByRole('button', { name: '查看阶段 2：定义结果、范围与责任' }))
     expect(screen.getByRole('heading', { name: '定义结果、范围与责任' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '打开此阶段工作台' }))
+    await waitFor(() => { expect(enterProject).toHaveBeenCalledWith('workspace-1', 'definition') })
+    await waitFor(() => { expect(screen.getByRole('button', { name: '打开此阶段工作台' })).not.toHaveProperty('disabled', true) })
     fireEvent.click(screen.getAllByRole('button', { name: /进入项目交付/ })[0] as HTMLElement)
-    expect(enterProject).toHaveBeenCalledWith('workspace-1')
+    await waitFor(() => { expect(enterProject).toHaveBeenLastCalledWith('workspace-1', 'discovery') })
+    await waitFor(() => { expect(screen.getByRole('button', { name: '打开此阶段工作台' })).not.toHaveProperty('disabled', true) })
+    enterProject.mockRejectedValueOnce(new Error('阶段暂时不可用'))
+    fireEvent.click(screen.getByRole('button', { name: '打开此阶段工作台' }))
+    expect(await screen.findByRole('alert')).toHaveProperty('textContent', '阶段暂时不可用')
   })
 
   it('shows every real project by default and keeps decision filtering separate from portfolio summaries', () => {

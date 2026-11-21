@@ -2443,10 +2443,14 @@
 .projectV2Detail {
   display: flex;
   height: 100%;
+  min-height: 0;
   min-width: 0;
   flex-direction: column;
   padding: 0 42px 15px;
-  overflow: hidden;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  container: fde-project-detail / inline-size;
   box-sizing: border-box;
   background: var(--dsw-alias-button-elevated-fill);
 }
@@ -2478,7 +2482,7 @@
 .projectV2LatestReturn { position: absolute; z-index: 2; bottom: 72px; left: 66px; margin: 0; color: color-mix(in srgb, var(--dsw-alias-label-primary-inverted) 78%, transparent); font-size: 13px; }
 .projectV2Actions { position: absolute; z-index: 3; top: 61px; right: 30px; display: flex; gap: 12px; }
 .projectV2Actions button { min-height: 42px; padding: 0 17px; border: 1px solid color-mix(in srgb, var(--dsw-alias-label-primary-inverted) 72%, transparent); border-radius: 8px; color: var(--dsw-alias-label-primary-inverted); background: color-mix(in srgb, var(--dsw-alias-label-primary) 24%, transparent); font-size: 14px; font-weight: 600; cursor: pointer; }
-.projectV2Actions button:last-child { border-color: var(--dsw-alias-button-info-fill); background: var(--dsw-alias-button-info-fill); box-shadow: 0 8px 20px color-mix(in srgb, var(--dsw-alias-button-info-fill) 42%, transparent); }
+.projectV2Actions > button:last-child { border-color: var(--dsw-alias-button-info-fill); background: var(--dsw-alias-button-info-fill); box-shadow: 0 8px 20px color-mix(in srgb, var(--dsw-alias-button-info-fill) 42%, transparent); }
 .projectV2Metrics {
   position: relative;
   z-index: 4;
@@ -2502,12 +2506,12 @@
 .projectV2Metrics strong small { color: var(--dsw-alias-label-caption); font-size: 13px; font-weight: 500; }
 .projectV2Metrics p { overflow: hidden; margin: 7px 0 0; color: var(--dsw-alias-label-secondary); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
 
-.projectV2Main { display: grid; min-height: 573px; flex: 1 1 573px; grid-template-columns: 232px minmax(0, 1fr) 485px; gap: 15px; min-width: 0; margin-top: 14px; overflow: hidden; box-sizing: border-box; }
+.projectV2Main { display: grid; flex: none; grid-template-columns: minmax(200px, .65fr) minmax(340px, 1.15fr) minmax(280px, 1fr); gap: 16px; min-width: 0; margin-top: 14px; box-sizing: border-box; align-items: start; }
 .projectV2StageRail,
 .projectV2Workspace > header,
 .projectV2EvidenceCard,
 .projectV2ActionColumn > section { min-width: 0; overflow: hidden; box-sizing: border-box; border: .5px solid var(--dsw-alias-border-l2); border-radius: 12px; background: var(--dsw-alias-button-elevated-fill); }
-.projectV2StageRail { height: 100%; box-sizing: border-box; }
+.projectV2StageRail { box-sizing: border-box; }
 .projectV2StageRail > header { padding: 12px 15px 6px; border-bottom: .5px solid var(--dsw-alias-border-l1); }
 .projectV2StageRail > header > span,
 .projectV2Workspace > header > div > span,
@@ -2526,17 +2530,18 @@
 .projectV2StageRail .stageNavigatorText strong { font-size: 14px; font-weight: 600; }
 .projectV2StageRail .stageNavigatorText small { font-size: 12px; }
 
-.projectV2Workspace { display: grid; height: 100%; min-width: 0; min-height: 0; grid-template-rows: 185px minmax(0, 1fr); gap: 10px; overflow: hidden; }
+.projectV2Workspace { display: grid; min-width: 0; grid-template-rows: auto auto; gap: 12px; align-content: start; }
 .projectV2Workspace > header { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-content: start; padding: 12px 22px; }
 .projectV2Workspace > header h2 { display: block; margin: 6px 0 0; font-size: 28px; font-weight: 650; letter-spacing: -.025em; }
 .projectV2Workspace > header p { overflow: hidden; margin: 6px 0 0; color: var(--dsw-alias-label-secondary); font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
 .projectV2Workspace > header > strong { align-self: start; margin-top: 13px; padding: 6px 11px; border: .5px solid var(--dsw-alias-border-l2); border-radius: 8px; color: var(--dsw-alias-state-business-primary); background: var(--dsw-alias-state-business-tertiary); font: var(--dsw-font-xxs-12); }
 .projectV2Workspace > header > strong[data-state='done'] { color: var(--dsw-alias-state-success-primary); background: var(--dsw-alias-state-success-tertiary); }
-.projectV2StageFacts { display: grid; grid-column: 1 / -1; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin: 2px 0 0; padding-top: 7px; border-top: .5px solid var(--dsw-alias-border-l1); }
+.projectV2StageFacts { display: grid; grid-column: 1 / -1; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px 0; margin: 12px 0 0; padding-top: 12px; border-top: .5px solid var(--dsw-alias-border-l1); }
 .projectV2StageFacts > div { min-width: 0; padding: 0 17px; border-right: .5px dashed var(--dsw-alias-border-l2); }
 .projectV2StageFacts > div:first-child { padding-left: 0; }
 .projectV2StageFacts > div:last-child { padding-right: 0; border-right: 0; }
-.projectV2StageFacts dt { display: flex; align-items: center; gap: 8px; color: var(--dsw-alias-state-business-primary); font-size: 13px; }
+.projectV2StageFacts dt { display: flex; align-items: center; gap: 8px; color: var(--dsw-alias-state-business-primary); font-size: 13px; white-space: nowrap; }
+.projectV2StageFacts dt svg { flex-shrink: 0; }
 .projectV2StageFacts dd { margin: 3px 0 0; font-size: 16px; font-weight: 650; }
 .projectV2StageFacts small { display: block; overflow: hidden; margin-top: 2px; color: var(--dsw-alias-label-caption); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
 .projectV2StageFactIcon { width: 26px; height: 26px; flex: none; stroke: currentcolor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.6; }
@@ -2560,7 +2565,7 @@
 .projectV2Conditions li strong { color: var(--dsw-alias-state-warn-label); font-size: 12px; }
 .projectV2EmptyLine { margin: 18px 0 0; color: var(--dsw-alias-label-secondary); font: var(--dsw-font-xxs-12); }
 
-.projectV2ActionColumn { display: grid; height: 100%; min-width: 0; min-height: 0; grid-template-rows: 186px 149px minmax(218px, 1fr); gap: 10px; overflow: hidden; }
+.projectV2ActionColumn { display: grid; min-width: 0; grid-template-rows: auto auto auto; gap: 12px; align-content: start; }
 .projectV2NextAction { position: relative; padding: 18px 24px; }
 .projectV2NextAction h2 { position: relative; z-index: 1; max-width: 280px; margin: 8px 0 0; font-size: 22px; }
 .projectV2NextAction p { position: relative; z-index: 1; max-width: 300px; margin: 7px 0 0; color: var(--dsw-alias-label-secondary); font-size: 14px; line-height: 1.5; }
@@ -2629,7 +2634,7 @@
   .projectV2GateKpis strong,
   .projectV2Conditions li p { font-size: 14px; }
   .projectV2Conditions h3 { font-size: 16px; }
-  .projectV2ActionColumn { grid-template-rows: 200px 164px minmax(218px, 1fr); }
+  .projectV2ActionColumn { grid-template-rows: auto auto auto; }
   .projectV2NextAction h2 { font-size: 24px; }
   .projectV2NextAction p { font-size: 15px; }
   .projectV2WorkItems h3,
@@ -4852,12 +4857,13 @@
 .projectV2Detail .projectV2HeroFacts dd { color: var(--dsw-alias-label-primary); font-size: 14px; line-height: 22px; font-weight: 500; }
 .projectV2Detail .projectV2Actions { position: static; flex-wrap: wrap; align-self: center; gap: 8px; }
 .projectV2Detail .projectV2Actions button { min-height: 32px; padding: 6px 12px; border: .5px solid var(--dsw-alias-border-l2); border-radius: var(--dsw-radius-md); color: var(--dsw-alias-label-primary); background: var(--dsw-alias-bg-layer-1); font-size: 13px; line-height: 20px; }
-.projectV2Detail .projectV2Actions button:last-child { background: var(--dsw-alias-button-primary-fill); color: var(--dsw-alias-label-primary-foreground); border-color: transparent; }
+.projectV2Detail .projectV2Actions > button:last-child { background: var(--dsw-alias-button-primary-fill); color: var(--dsw-alias-label-primary-foreground); border-color: transparent; }
 .projectV2Detail .projectV2Metrics { margin: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .projectV2Detail .projectV2Metrics article { padding: 8px 16px; gap: 12px; }
 .projectV2Detail .projectV2Metrics strong { font-size: 24px; line-height: 32px; font-weight: 500; }
 .projectV2Detail :is(.projectV2StageRail, .projectV2Workspace > header, .projectV2EvidenceCard, .projectV2NextAction) { border-radius: var(--dsw-radius-xl); background: var(--dsw-alias-bg-layer-1); box-shadow: none; }
-.projectV2Detail .projectV2Workspace { grid-template-rows: auto minmax(0, 1fr); }
+.projectV2Detail .projectV2Workspace { grid-template-rows: auto auto; }
+.projectV2StageOpen { margin-top: 12px; }
 .projectV2Detail .projectV2Workspace > header { padding: 16px 20px; }
 .projectV2Detail .projectV2Workspace > header h2 { font-size: 20px; line-height: 28px; font-weight: 500; letter-spacing: normal; }
 .projectV2Detail .projectV2Workspace > header p { white-space: normal; font-size: 13px; line-height: 20px; }
@@ -4888,6 +4894,18 @@
 .deliveryBrand :is(span, strong) { font-weight: 500; letter-spacing: normal; }
 .deliveryHeroActions button { border-radius: 8px; box-shadow: none; }
 .deliveryDecisionCard { box-shadow: none; border-radius: 12px; }
+@container fde-project-detail (max-width: 1100px) {
+  .projectV2Main { grid-template-columns: 200px minmax(0, 1fr); }
+  .projectV2StageRail { grid-row: 1 / span 2; }
+  .projectV2ActionColumn { grid-column: 2; }
+}
+@container fde-project-detail (max-width: 760px) {
+  .projectV2Main { grid-template-columns: minmax(0, 1fr); }
+  .projectV2StageRail { grid-row: auto; }
+  .projectV2ActionColumn { grid-column: 1; }
+  .projectV2Metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .projectV2GateBanner { height: auto; flex-wrap: wrap; gap: 8px; padding: 12px; }
+}
 @media (max-width: 760px) {
   .projectV2Detail .projectV2HeroMain { flex-basis: 100%; }
   .projectV2Detail .projectV2Actions { width: 100%; }

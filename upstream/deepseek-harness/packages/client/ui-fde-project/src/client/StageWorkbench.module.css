@@ -5108,3 +5108,35 @@
 .projectSidebar .stageMethodItem { border-radius: var(--dsw-radius-md); min-height: 32px; }
 .projectSidebar .stageMethodItem strong { font-size: 12px; line-height: 18px; font-weight: 400; }
 .projectSidebar .stageMethodItem:hover { background: var(--dsw-alias-interactive-bg-hover); }
+
+/* FDE stages dock the existing Composer in flow. Chat and trajectory retain their own seats. */
+:global([data-conversation-content][data-content-phase] [data-conversation-scroll]:has([data-conversation-composer-layout^='stage-'][data-conversation-composer-overlay]:not([data-hide-stage-composer='true']))) {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+:global([data-conversation-content][data-content-phase] [data-conversation-scroll]:has([data-conversation-composer-layout^='stage-'][data-conversation-composer-overlay]:not([data-hide-stage-composer='true'])) > [data-slot='conversation.session'] > *) {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: hidden;
+}
+:global([data-conversation-content][data-content-phase] [data-conversation-scroll]:has([data-conversation-composer-layout^='stage-'][data-conversation-composer-overlay]:not([data-hide-stage-composer='true'])) > [data-composer-seat]) {
+  --dsh-composer-text-max-height: min(336px, 40dvh);
+  position: static;
+  inset: auto;
+  flex: 0 0 auto;
+  margin-top: 0;
+  width: auto;
+  will-change: auto;
+  background: var(--dsw-alias-bg-base);
+}
+:global([data-conversation-content][data-content-phase] [data-conversation-composer-layout^='stage-'][data-conversation-composer-overlay]:not([data-hide-stage-composer='true'])) {
+  --dsh-composer-height: 0px;
+  height: 100%;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  padding-bottom: 16px;
+  box-sizing: border-box;
+}

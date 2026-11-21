@@ -111,6 +111,10 @@ Improvement uses a navy illustrated header, grouped evidence counts, source-grou
 
 Stage-one recommendation actions prepare Chinese business questions about extra work and its causes, measurement definitions, non-AI comparisons, and the next human decision. They still only prefill the native composer, preserve existing drafts, and never send or advance a project automatically. Machine identifiers in technical repair instructions retain their exact spelling.
 
+V2 Project Details owns its scrolling viewport and reflows by available content width. Milestone facts wrap into rows instead of squeezing their labels vertically. Open this stage enters the selected stage through the existing Workspace-scoped browsing state; it does not advance the lifecycle. Add project files uses the shared upload factory and works before any Session exists, with the same persistence, recognition and refresh behavior as the project sidebar.
+
+Active stage views dock the existing native Composer below their scrollable content, including when a draft grows. They do not copy or remount the input. Historical and future stages retain their read-only policy; Chat and Trajectory keep their existing composer layout.
+
 ## Model Experience
 
 ### Project start and stop instructions

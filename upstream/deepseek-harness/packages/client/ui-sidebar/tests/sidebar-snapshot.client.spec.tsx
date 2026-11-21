@@ -72,6 +72,16 @@ describe('sidebar shell snapshots', () => {
     await runtime.dispose()
   })
 
+  it('retains the session-action extension without restoring a global New-session button', async () => {
+    const { runtime } = await bench({ locale: 'en' })
+    const slot = runtime.renderSlot('sidebar', { collapsed: false, width: 300, drawer: false })
+    const layer = slot.container.querySelector('[data-slot="sidebar.session.action"]')
+    expect(layer).not.toBeNull()
+    expect(layer?.children).toHaveLength(0)
+    expect(slot.view.queryByRole('button', { name: 'New session' })).toBeNull()
+    await runtime.dispose()
+  })
+
   it('renders the collapsed rail after the crossfade settles, in place', async () => {
     const { runtime } = await bench({ locale: 'en' })
     const slot = runtime.renderSlot('sidebar', { collapsed: false, width: 300, drawer: false })

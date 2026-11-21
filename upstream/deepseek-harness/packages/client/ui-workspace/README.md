@@ -16,7 +16,9 @@ The browser renders grouped or flat Session rows from the global runtime hooks a
 Search remains a section-header action while New project is the full-width primary action above it. In the rail, New project and search render as 36px controls on the shell's shared horizontal entry path with a 12px vertical gap; the wide-only section header occupies no rail space. Activating search expands the field across the header; an outside click collapses only a query that is empty after trimming — except while the rail search gesture is still in flight (until focus lands in the input after the column slide), so the expanding click cannot dismiss the search it opened — while the clear control always resets and collapses it. A non-blank search query replaces either browsing mode with one flat result list: case-insensitive title and Workspace substring matches appear immediately, while a 250 ms debounced Host request adds ranked current-conversation content matches and snippets. The English search input and its defensive request path remove NUL, cap the query at the wire schema's 500 UTF-16 code units without splitting a surrogate pair, and preserve the existing debounce and cancellation behavior. Each new query aborts the preceding request; a failed content search leaves metadata matches visible with a warning. The list is capped at 20, asks the user to narrow broader queries, and opens the selected Session without clearing the query or jumping to a specific event.
 
 The picker lists real Host Workspace entities as user-visible projects through the global `useWorkspaces` hook. Selecting a project invokes the slot owner's `onPick` callback to retarget the frontend Session object. Distinct canonical paths remain separate id-keyed projects when their basenames and display titles match; the sidebar hover detail adds stored company and estimated/pending delivery facts to the existing path and creation time. Each registration declares a **directory-flow child hole** (`single` kind: `conversation.hero.workspace.directoryFlow` / `sidebar.workspaces.directoryFlow`) that the composed picker package's client half fills with its picking interaction — the [`-native`](../../host/directory-picker-native/README.md) backend's renderless OS-chooser driver today, an in-app browsing dialog under a `-browse` composition. In the sidebar form this one flow either selects a storage parent or imports an existing project, while the conversation picker continues to adopt a selected project directory directly. Cancellation is silent and failures return to the form with the current fields retained. The project row's **Remove from workbench** action explicitly states that the local directory and Session logs remain; success removes the group while its Sessions remain under Ungrouped. Session rename, archive, and blank-row behavior remain unchanged.
+
 Desktop product events use the optional [product analytics service](../product-analytics/README.md); ordinary Web interactions are excluded.
+
 ## Summary
 
 This package lets users browse grouped or flat Session lists, choose a Workspace for a new Session, and manage Workspaces and Sessions through add, rename, reorder, search, fork, archive, and Workspace deletion; the Session row menu and its hover buttons are slot lists that client plugins extend. Pending interactions appear as warning dots, and subagent-origin Sessions remain hidden. An idle, unarchived Session row with active scheduled tasks shows a clock mark, and its hover card lists those tasks. Canonically distinct folder paths remain separate Workspaces. Adding a Workspace requires a composed directory picker; without one, adding is unavailable.
@@ -126,6 +128,42 @@ Client callers can pass `prompt`, `whenDraftExists`, and `clearPreviousDraft` in
 ### The directory-flow hole
 
 Project Center creation requests always open this package's existing project form, even when the directory-flow surface is missing or loading. The form shows an explicit availability message and disables create, location selection and import until the surface returns; recovery retains the draft. A missing surface cannot issue directory or Workspace writes. The sidebar's own unavailable add action remains hidden.
+
+Each registration declares a **directory-flow child hole** (`single` kind: `conversation.hero.workspace.directoryFlow` / `sidebar.workspaces.directoryFlow`), and the `workspace.picker` Factory declares `workspace.picker.directoryFlow`; the composed picker package's client half fills all three with its picking interaction — the `-native` backend's renderless OS-chooser driver, an in-app browsing dialog under a `-browse` composition. The flat **Add workspace...** action renders only while the surface's hole is occupied; an empty hole means the composition has no picking affordance. The sidebar Add workspace action preserves an existing blank Session and its draft. This package owns the trigger and the adoption: the occupant reports one picked path per open through the hole's owner conversation (`open`/`busy`/`onPicked`/`onCancel`/`onError`), and the owner adopts it through the object layer, selecting the committed Workspace only after its list projection has refreshed.
+
+### The reusable Workspace picker
+
+Another plugin renders the hero's Workspace picker through the root-scoped `workspace.picker` Component Factory instead of importing this package's component. Its caller input, the type `WorkspacePickerInput` from `ui-workspace/client`, is the hero's owner props: `open`, `anchorRef`, `selectedId`, `onPick`, and `onClose`. The caller owns the anchor control, the open state, and what a pick means, and closes the menu in `onPick`. An occurrence lists the existing Workspaces and, while a directory-picker package occupies `workspace.picker.directoryFlow`, **Add workspace...**, which runs that flow, calls `workspaces.create({ path })`, and passes the new Workspace id to `onPick`; adoption failures stay in this package's folder-error dialog. The definition and its hole are registered directly in `apply`, because they depend on no other declaration, and leave with this plugin.
+
+A caller needs only the standard `renderFactorySlot` prop that every registered component receives and the type-only `ui-workspace/client` import that loads the Factory declaration; its own registration declares nothing for the call. Without ui-workspace the call renders its optional `fallback`. The menu portals to the document body and positions against `anchorRef`, above a primitives `Modal`, so an occurrence may render inside the caller's dialog.
+
+```tsx
+import { useRef, useState } from 'react'
+import type { WorkspaceId } from '@deepseek-ai/dsh-api-workspace-controller/client'
+import type { PropsRenderFactories } from '@deepseek-ai/dsh-client-ui-slots'
+import type {} from '@deepseek-ai/dsh-client-ui-workspace/client'
+
+function WorkspaceField({ label, renderFactorySlot }: PropsRenderFactories & { label: string }) {
+  const anchorRef = useRef<HTMLButtonElement>(null)
+  const [open, setOpen] = useState(false)
+  const [workspaceId, setWorkspaceId] = useState<WorkspaceId | undefined>(undefined)
+  return (
+    <>
+      <button ref={anchorRef} type="button" onClick={() => { setOpen(value => !value) }}>{label}</button>
+      {renderFactorySlot('workspace.picker', {
+        open,
+        anchorRef,
+        selectedId: workspaceId,
+        onPick: (picked) => {
+          setOpen(false)
+          setWorkspaceId(picked)
+        },
+        onClose: () => { setOpen(false) },
+      })}
+    </>
+  )
+}
+```
 
 Each registration declares a **directory-flow child hole** (`single` kind: `conversation.hero.workspace.directoryFlow` / `sidebar.workspaces.directoryFlow`) that the composed picker package's client half fills with its picking interaction — the `-native` backend's renderless OS-chooser driver, an in-app browsing dialog under a `-browse` composition. The flat **Add workspace...** action renders only while the surface's hole is occupied; an empty hole means the composition has no picking affordance. This package owns the trigger and the adoption: the occupant reports one picked path per open through the hole's owner conversation (`open`/`busy`/`onPicked`/`onCancel`/`onError`), and the owner adopts it through the object layer, selecting the committed Workspace only after its list projection has refreshed.
 ### Session row actions

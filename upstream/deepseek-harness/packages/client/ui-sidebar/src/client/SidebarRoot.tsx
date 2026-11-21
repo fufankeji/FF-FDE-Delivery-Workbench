@@ -64,10 +64,12 @@ export function SidebarRoot({
   drawer,
   toggleSidebar,
   useShortcuts,
+  useRemoteAccess,
   t,
   renderSlot,
   renderFactorySlot,
 }: SidebarRootComponentProps) {
+  const canStartSession = useRemoteAccess('session/create')
   const shortcut = useShortcuts(rows => rows.find(row => row.id === 'sidebar.left.toggle'))
   const toggleLabel = collapsed ? t('toggle.open') : t('toggle.collapse')
   // Wide content stays mounted while the collapse animates (fading via
@@ -248,6 +250,7 @@ export function SidebarRoot({
         {!darwinDesktop && toggle}
       </div>
 
+      {canStartSession && renderSlot('sidebar.session.action', { wide }, { children: null })}
 
       <div className={css.scrollRegion}>
         <div

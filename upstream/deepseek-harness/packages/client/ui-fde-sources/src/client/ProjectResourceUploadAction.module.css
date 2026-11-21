@@ -45,6 +45,19 @@
     transform 120ms cubic-bezier(.22, 1, .36, 1);
 }
 
+.root[data-page] .button {
+  width: auto;
+  height: auto;
+  min-height: 32px;
+  gap: 6px;
+  padding: 6px 12px;
+  border: .5px solid var(--dsw-alias-border-l2);
+  border-radius: var(--dsw-radius-md);
+  color: var(--dsw-alias-label-primary);
+  background: var(--dsw-alias-bg-layer-1);
+  font: 400 13px/20px var(--dsw-font-family);
+}
+
 @media (hover: hover) and (pointer: fine) {
   .button:hover:not(:disabled) {
     background: var(--dsw-alias-interactive-bg-hover);

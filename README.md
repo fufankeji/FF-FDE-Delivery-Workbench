@@ -9,7 +9,7 @@
 <p align="center">
   <a href="https://github.com/fufankeji/FF-FDE-Delivery-Workbench/stargazers"><img src="https://img.shields.io/github/stars/fufankeji/FF-FDE-Delivery-Workbench?style=flat&amp;logo=github&amp;label=Stars" alt="GitHub Stars"></a>
   <img src="https://img.shields.io/badge/Workspace-Web-2563EB" alt="浏览器工作台">
-  <a href="upstream/deepseek-harness.lock.json"><img src="https://img.shields.io/badge/Harness-0.2.2--rc.2-4D6BFE" alt="基于 DeepSeek Harness 0.2.2-rc.2"></a>
+  <a href="upstream/deepseek-harness.lock.json"><img src="https://img.shields.io/badge/Harness-0.2.2--rc.5-4D6BFE" alt="基于 DeepSeek Harness 0.2.2-rc.5"></a>
   <img src="https://img.shields.io/badge/Delivery-8%20Stages-6366F1" alt="八阶段项目交付">
   <img src="https://img.shields.io/badge/Skills-7%20Built--in-0F9D8A" alt="第一阶段七个内置中文 Skills">
 </p>
@@ -390,7 +390,7 @@ DSH_HOME="$PWD/../../.runtime/fde-agent-sample/dsh-home" \
 
 ## 与 DeepSeek Harness、Studio 的关系
 
-本项目由赋范空间维护，是基于 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的独立 FDE 工作台，不是 DeepSeek 官方发行版。当前锁定 `0.2.2-rc.2`，版本与提交以[基座锁定文件](upstream/deepseek-harness.lock.json)为准；不会自动跟随官方主分支升级。
+本项目由赋范空间维护，是基于 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的独立 FDE 工作台，不是 DeepSeek 官方发行版。当前锁定 `0.2.2-rc.5`，版本与提交以[基座锁定文件](upstream/deepseek-harness.lock.json)为准；不会自动跟随官方主分支升级。
 
 同属赋范空间的 [DeepSeek Harness Studio](https://github.com/fufankeji/deepseek-harness-studio) 聚焦通用桌面增强、插件与 Preset 生态；本项目聚焦一个企业 AI 项目从业务发现到验收交接的持续工作。两者是不同产品，不将 Studio 的桌面安装包、插件市场或本地模型入口作为本工作台的已交付能力。
 

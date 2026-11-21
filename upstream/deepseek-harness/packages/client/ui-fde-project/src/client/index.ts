@@ -45,7 +45,7 @@ import type {
   ProjectViewInjected,
   DiscoveryAction,
 } from './slots.ts'
-import { ProjectStageController } from './stage-controller.ts'
+import { ProjectStageController, type FdeV2StageId } from './stage-controller.ts'
 import { ProjectStageViewController } from './stage-view-controller.ts'
 import { ProjectSourceController } from './source-controller.ts'
 import { projectViewVisible, type FdeProjectViewId } from './view-availability.ts'
@@ -143,7 +143,7 @@ export function apply(ctx: ClientContext): void {
     collapseProjectToolPanel()
   }
 
-  const enterProject = async (workspaceId: string, viewId?: string): Promise<void> => {
+  const enterProject = async (workspaceId: string, viewId?: string, stage?: FdeV2StageId): Promise<void> => {
     const sessionId = await resolveProjectSession(workspaceId)
     enteredProject = { workspaceId, sessionId: String(sessionId) }
     const targetView = viewId ?? 'fde-stage-workbench'
@@ -151,6 +151,7 @@ export function apply(ctx: ClientContext): void {
     const scoped = ctx.sessions.scope(sessionId)
     const conversation = scoped?.get('conversation')
     if (conversation === undefined) throw new Error('当前项目会话暂时无法打开。')
+    if (stage !== undefined) stageView.view(workspaceId, stage)
     conversation.selectView(targetView)
     page.close()
     // Opening the session can restore its last chat panel state. Apply the
@@ -247,7 +248,7 @@ export function apply(ctx: ClientContext): void {
     openProjectCreation: () => {
       window.dispatchEvent(new Event(FDE_PROJECT_CREATE_OPEN_EVENT, { cancelable: true }))
     },
-    enterProject: async (workspaceId) => { await enterProject(workspaceId) },
+    enterProject: async (workspaceId, stage) => { await enterProject(workspaceId, undefined, stage) },
     reviewProjectArchitecture: async (workspaceId) => { await enterProject(workspaceId, 'fde-architecture') },
     closeProjectPage: page.close,
     openProjectPage: () => { showWorkbenchPage(page.open) },

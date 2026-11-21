@@ -1,6 +1,6 @@
 /** Slot component props and injected FDE project faces. */
 
-import type { InjectFace, PropsLocale, PropsRenderSlots, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
+import type { InjectFace, PropsLocale, PropsRenderFactories, PropsRenderSlots, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type {} from '@deepseek-ai/dsh-client-ui-layout/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
@@ -89,7 +89,7 @@ export interface ProjectPageInjected {
   loadProjectSources: (workspaceId: string, force?: boolean) => void
   parseProjectSource: (workspaceId: string, sourceId: string) => Promise<void>
   openProjectCreation: () => void
-  enterProject: (workspaceId: string) => Promise<void>
+  enterProject: (workspaceId: string, stage?: FdeV2StageId) => Promise<void>
   openActivitySession: (workspaceId: string, sessionId: string) => Promise<void>
   loadProjectMetadata: (workspaceId: string, path: string, force?: boolean) => void
   reviewProjectArchitecture: (workspaceId: string) => Promise<void>
@@ -228,6 +228,7 @@ export type ProjectProgressLauncherProps =
 /** Props for the root Project Progress overlay. */
 export type ProjectProgressOverlayProps =
   PropsRuntime<'shell.overlay'>
+  & PropsRenderFactories
   & PropsRenderSlots<'fde.project.source.preview' | 'fde.workbench.lab.summary'>
   & InjectFace<ProjectPageInjected>
   & PropsLocale<'fdeProject'>

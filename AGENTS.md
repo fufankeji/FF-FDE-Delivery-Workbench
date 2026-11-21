@@ -68,7 +68,7 @@ FDEDeliveryWorkbench/
 - 独立业务挖掘实验室位于 `packages/fde/discovery-lab` 与 `packages/client/ui-fde-discovery-lab`；其内置素材与训练数据边界见[包说明](upstream/deepseek-harness/packages/fde/discovery-lab/README.zh.md)。不要把 `DSH_HOME/fde-discovery-lab` 当作可重建素材缓存，也不要将训练轮次登记为项目或阶段。
 - 中文场景挑战位于 `packages/fde/scenario-challenge` 与 `packages/client/ui-fde-scenario-challenge`，通过实验室子插槽接入，不调用模型。记录保存在 `DSH_HOME/fde-scenario-challenge/state.json`；不得当作缓存删除，也不与业务训练数据库或项目阶段合并。行为与本轮范围见 [F029](docs/specs/F029-chinese-scenario-challenge/spec.md)。
 
-- 前端：锁定官方 DeepSeek Harness `0.2.2-rc.2` 的 React/Vite Web Client、拆分后的 Session/Workspace Controllers、Store 与 UI Slots；FDE UI 以独立 Client Plugins 适配。
+- 前端：锁定官方 DeepSeek Harness `0.2.2-rc.5` 的 React/Vite Web Client、拆分后的 Session/Workspace Controllers、Store 与 UI Slots；FDE UI 以独立 Client Plugins 适配。
 - 后端：锁定官方 DeepSeek Harness Cordis/TypeScript Host，复用 Workspace、Session、Agent Loop、Tools、FS、Shell、Terminal、LSP、Approval 和 Web API；FDE 领域以 Host Plugins 扩展。
 - 数据与模型：Workspace 负责项目文件，主 Session 与自定义 `fde/*` Events/Projection 负责项目事件和状态；图片复用官方 Attachment，普通文件由待开发的 FDE Source capability 负责；模型通过官方 LLM/Credentials 配置。
 - 安装：从当前根仓库或 Feature worktree 进入其 `upstream/deepseek-harness/`，执行 `corepack pnpm install --frozen-lockfile`。
@@ -82,9 +82,9 @@ FDEDeliveryWorkbench/
 
 ## 官方基座维护
 
-- 当前标签与提交见 `upstream/deepseek-harness.lock.json`，本次升级与回退见 `docs/architecture/harness-022-upgrade.md`。
+- 当前标签与提交见 `upstream/deepseek-harness.lock.json`，本次升级与回退见 `docs/architecture/harness-0225-upgrade.md`，上一轮记录保留在 `harness-022-upgrade.md`。
 - 官方根树映射在子目录中，升级使用旧官方树、当前下游树和新官方树做三方合并，不直接覆盖目录或执行 `git pull upstream master`。
-- 当前要求 Node.js `>=24.9.0`，使用官方锁定的 `pnpm@11.28.5`。完整构建中的 `build:fde-integrations` 为固定 Eval 插件适配版本化日志与 v4 工具消息；生成 lib 不提交。File Review 0.5.0 的兼容补丁精确声明 Harness 0.2.2-rc.2，不授予全局版本豁免。
+- 当前要求 Node.js `>=24.9.0`，使用官方锁定的 `pnpm@11.28.5`。完整构建中的 `build:fde-integrations` 为固定 Eval 插件适配版本化日志与 v4 工具消息；生成 lib 不提交。File Review 0.5.0 的兼容补丁精确声明 Harness 0.2.2-rc.5，不授予全局版本豁免。
 - 首次升级先用隔离副本验证官方 Session 逐代迁移；保留旧格式原件。代码回退不会自动撤销新版本会话写入，回退时必须同时选回升级前的数据副本。
 
 ## 单阶段开发与文档同步

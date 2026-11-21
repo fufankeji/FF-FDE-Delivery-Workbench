@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'reac
 import {
   IconPaperclipOutlineMedium, Toast, Tooltip,
 } from '@deepseek-ai/dsh-client-ui-primitives'
-import type { PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
+import type { FactoryComponentPropsOf, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type {} from '@deepseek-ai/dsh-client-ui-workspace/client'
 import css from './ProjectResourceUploadAction.module.css'
@@ -82,11 +82,12 @@ async function recognizeProjectResource(
   if (payload.ok !== true) throw new Error('invalid-response')
 }
 
-function ProjectResourceUploadControl({ workspaceId, path, t, composer = false }: {
+function ProjectResourceUploadControl({ workspaceId, path, t, composer = false, page = false }: {
   readonly workspaceId: string
   readonly path: string
   readonly t: ProjectResourceUploadActionProps['t']
   readonly composer?: boolean
+  readonly page?: boolean
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
@@ -99,6 +100,7 @@ function ProjectResourceUploadControl({ workspaceId, path, t, composer = false }
   }, [])
 
   useEffect(() => {
+    if (page) return
     const openForProject = (event: Event): void => {
       const detail = (event as CustomEvent<{ workspaceId?: unknown }>).detail
       if (detail?.workspaceId !== String(workspaceId) || busy) return
@@ -106,7 +108,7 @@ function ProjectResourceUploadControl({ workspaceId, path, t, composer = false }
     }
     window.addEventListener(PROJECT_RESOURCE_UPLOAD_OPEN_EVENT, openForProject)
     return () => { window.removeEventListener(PROJECT_RESOURCE_UPLOAD_OPEN_EVENT, openForProject) }
-  }, [busy, workspaceId])
+  }, [busy, workspaceId, page])
 
   const onChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const files = Array.from(event.currentTarget.files ?? [])
@@ -137,7 +139,7 @@ function ProjectResourceUploadControl({ workspaceId, path, t, composer = false }
 
   const label = busy ? t('uploading') : composer ? t('composerAction') : t('action')
   return (
-    <span className={css.root} data-composer={composer ? 'true' : undefined}>
+    <span className={css.root} data-composer={composer ? 'true' : undefined} data-page={page || undefined}>
       <input
         ref={inputRef}
         className={css.input}
@@ -147,7 +149,7 @@ function ProjectResourceUploadControl({ workspaceId, path, t, composer = false }
         aria-hidden
         onChange={onChange}
       />
-      <Tooltip label={label} side="top" delayMs={500} disabled={composer}>
+      <Tooltip label={label} side="top" delayMs={500} disabled={composer || page}>
         <button
           type="button"
           className={css.button}
@@ -161,7 +163,7 @@ function ProjectResourceUploadControl({ workspaceId, path, t, composer = false }
           }}
         >
           <IconPaperclipOutlineMedium size={14} />
-          {composer && <span>{label}</span>}
+          {(composer || page) && <span>{label}</span>}
         </button>
       </Tooltip>
       {toast !== null && (
@@ -174,6 +176,15 @@ function ProjectResourceUploadControl({ workspaceId, path, t, composer = false }
 /** Project-row file picker that persists files without creating a message or Agent turn. */
 export function ProjectResourceUploadAction({ workspaceId, path, t }: ProjectResourceUploadActionProps) {
   return <ProjectResourceUploadControl workspaceId={String(workspaceId)} path={path} t={t} />
+}
+
+/**
+ * Upload without creating a Session or broadcasting to hidden pickers.
+ * @param props - Addressed project and localized upload labels.
+ * @returns A visible project-page upload control.
+ */
+export function ProjectResourcePageAction({ workspaceId, path, t }: Pick<FactoryComponentPropsOf<'fde.project.resources.upload'>, 'workspaceId' | 'path' | 't'>) {
+  return <ProjectResourceUploadControl workspaceId={workspaceId} path={path} t={t} page />
 }
 
 /** Project-scoped lightweight upload control inside the native composer tool row. */

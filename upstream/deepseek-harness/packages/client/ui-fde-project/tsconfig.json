@@ -32,6 +32,9 @@
       "path": "../ui-workspace"
     },
     {
+      "path": "../ui-fde-sources"
+    },
+    {
       "path": "../ui-slots"
     },
     {

@@ -35,6 +35,10 @@ exports[`sidebar shell snapshots > renders Windows caption controls in expanded 
       </button>
     </div>
     <div
+      data-slot="sidebar.session.action"
+      style="display: contents;"
+    />
+    <div
       class="scrollRegion"
     >
       <div
@@ -163,6 +167,10 @@ exports[`sidebar shell snapshots > renders Windows caption controls in expanded 
         />
       </button>
     </div>
+    <div
+      data-slot="sidebar.session.action"
+      style="display: contents;"
+    />
     <div
       class="scrollRegion"
     >
@@ -294,6 +302,10 @@ exports[`sidebar shell snapshots > renders the collapsed rail after the crossfad
       </button>
     </div>
     <div
+      data-slot="sidebar.session.action"
+      style="display: contents;"
+    />
+    <div
       class="scrollRegion"
     >
       <div
@@ -424,6 +436,10 @@ exports[`sidebar shell snapshots > renders the expanded column (wordmark, capsul
       </button>
     </div>
     <div
+      data-slot="sidebar.session.action"
+      style="display: contents;"
+    />
+    <div
       class="scrollRegion"
     >
       <div
@@ -553,6 +569,10 @@ exports[`sidebar shell snapshots > renders the expanded column in the default lo
         />
       </button>
     </div>
+    <div
+      data-slot="sidebar.session.action"
+      style="display: contents;"
+    />
     <div
       class="scrollRegion"
     >

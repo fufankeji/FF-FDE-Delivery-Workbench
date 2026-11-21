@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { WorkspaceId } from '@deepseek-ai/dsh-workspace'
 import { makeTranslate, contextMenuHook } from '@deepseek-ai/dsh-client-test-runtime'
-import { ProjectResourceComposerAction, ProjectResourceUploadAction } from '../src/client/ProjectResourceUploadAction.tsx'
+import { ProjectResourceComposerAction, ProjectResourcePageAction, ProjectResourceUploadAction } from '../src/client/ProjectResourceUploadAction.tsx'
 import { zh } from '../src/client/locales.ts'
 
 afterEach(() => {
@@ -27,6 +27,26 @@ function mount(fetchImpl: typeof fetch) {
 }
 
 describe('ProjectResourceUploadAction', () => {
+  it('uploads from a zero-session page without opening hidden pickers or submitting a message', async () => {
+    const fetchImpl = vi.fn(async (_url: RequestInfo | URL, init?: RequestInit) => {
+      expect((init?.body as FormData).get('workspaceId')).toBe('workspace-new')
+      return new Response(JSON.stringify({ ok: true, value: { directory: 'fde-resources', files: [
+        { sourceId: 'source-one', storedName: '现场.txt', parse: { status: 'ready' } },
+      ] } }), { status: 200 })
+    })
+    vi.stubGlobal('fetch', fetchImpl)
+    const view = render(<ProjectResourcePageAction workspaceId="workspace-new" path="/projects/new" t={t} />)
+    const input = view.container.querySelector('input[type="file"]') as HTMLInputElement
+    const click = vi.spyOn(input, 'click').mockImplementation(() => undefined)
+    window.dispatchEvent(new CustomEvent('fde:project-source-upload-open', { detail: { workspaceId: 'workspace-new' } }))
+    expect(click).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: '添加项目资料' }))
+    expect(click).toHaveBeenCalledOnce()
+    fireEvent.change(input, { target: { files: [new File(['事实'], '现场.txt')] } })
+    expect((await screen.findByRole('alert')).textContent).toContain('已将 1 个文件保存')
+    expect(fetchImpl).toHaveBeenCalledTimes(1)
+    expect(fetchImpl.mock.calls[0]?.[0]).toBe('/api/fde-project-resources/upload')
+  })
   it('shows one small project-scoped upload action inside the native composer', () => {
     render(<ProjectResourceComposerAction
       useContextMenu={contextMenuHook()}

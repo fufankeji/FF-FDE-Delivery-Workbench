@@ -1,8 +1,8 @@
 {
   "product": "FF - FDE 交付工作台",
-  "releaseDate": "2026-11-13",
+  "releaseDate": "2026-11-21",
   "repository": "https://github.com/fufankeji/FF-FDE-Delivery-Workbench",
-  "harnessVersion": "0.2.2-rc.2",
+  "harnessVersion": "0.2.2-rc.5",
   "nodeMajor": 24,
   "nodeMinimum": "24.9.0",
   "packageManager": "pnpm@11.28.5",

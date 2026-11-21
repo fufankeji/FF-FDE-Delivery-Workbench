@@ -2,6 +2,8 @@
 
 import { Fragment, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Button, IconPlusOutlineRegular } from '@deepseek-ai/dsh-client-ui-primitives'
+import type { PropsLocale, PropsRenderFactories } from '@deepseek-ai/dsh-client-ui-slots'
+import type {} from '@deepseek-ai/dsh-client-ui-fde-sources/client'
 import type { CSSProperties, RefObject } from 'react'
 import type {
   AcceptanceHandoverDecision,
@@ -690,12 +692,12 @@ function ProjectStageFactIcon({ type }: { readonly type: 'input' | 'record' | 'b
   </svg>
 }
 
-function ProjectV2Detail({ row, sourceState, surfaceState, returnToPrevious, enterProject, back }: {
+function ProjectV2Detail({ row, sourceState, surfaceState, returnToPrevious, enterProject, back, renderFactorySlot, t }: PropsRenderFactories & PropsLocale<'fdeProject'> & {
   readonly row: ProjectRow
   readonly sourceState: ProjectSourceLoadState | undefined
   readonly surfaceState: ProjectSurfaceLoadState | undefined
   readonly returnToPrevious: (revision: number, reason: string) => Promise<void>
-  readonly enterProject: () => void
+  readonly enterProject: (stage?: FdeV2StageId) => Promise<void>
   readonly back: () => void
 }) {
   const stageValue = row.stage?.status === 'ready' ? row.stage.value : undefined
@@ -706,6 +708,15 @@ function ProjectV2Detail({ row, sourceState, surfaceState, returnToPrevious, ent
   const [returnReason, setReturnReason] = useState('')
   const [returnError, setReturnError] = useState<string>()
   const [returnSubmitting, setReturnSubmitting] = useState(false)
+  const [openingStage, setOpeningStage] = useState(false)
+  const [navigationError, setNavigationError] = useState<string>()
+  const openStage = (stage: FdeV2StageId): void => {
+    setOpeningStage(true)
+    setNavigationError(undefined)
+    void enterProject(stage).catch((error: unknown) => {
+      setNavigationError(error instanceof Error ? error.message : t('progress.stageOpenFailed'))
+    }).finally(() => { setOpeningStage(false) })
+  }
   useEffect(() => {
     setViewedStage(currentStage)
     setReturnOpen(false)
@@ -774,9 +785,11 @@ function ProjectV2Detail({ row, sourceState, surfaceState, returnToPrevious, ent
           : latestLegacyReturn !== undefined && <p className={css.projectV2LatestReturn}>最近一次阶段调整：{latestLegacyReturn.from === 'completed' ? '项目完成' : STAGE_NAMES[latestLegacyReturn.from]} → {STAGE_NAMES[latestLegacyReturn.to]}</p>}
         <div className={css.projectV2Actions} data-v2-detail-actions="">
           {canReturn && <button type="button" onClick={() => { setReturnOpen(true) }}>{returnLabel}</button>}
-          <button type="button" onClick={enterProject}>进入项目交付 <span aria-hidden="true">→</span></button>
+          {renderFactorySlot('fde.project.resources.upload', { workspaceId: row.workspaceId, path: row.path })}
+          <button type="button" disabled={openingStage} onClick={() => { openStage(currentStage) }}>进入项目交付 <span aria-hidden="true">→</span></button>
         </div>
       </header>
+      {navigationError !== undefined && <p role="alert">{navigationError}</p>}
 
       <section className={css.projectV2Metrics} data-v2-detail-metrics="" aria-label="项目关键状态">
         <article><ProjectDetailMetricIcon type="stage" /><div><span>当前阶段</span><strong>{String(currentStageIndex + 1).padStart(2, '0')} <small>/ 08</small></strong><p>{V2_STAGE_NAMES[currentStage]}</p></div></article>
@@ -803,7 +816,7 @@ function ProjectV2Detail({ row, sourceState, surfaceState, returnToPrevious, ent
 
         <section className={css.projectV2Workspace} data-v2-stage-workspace="">
           <header>
-            <div><span>当前阶段里程碑 · {String(viewedIndex + 1).padStart(2, '0')} / 08</span><h2>{V2_STAGE_NAMES[viewedStage]}</h2><p>{V2_STAGE_SUMMARIES[viewedStage]}</p></div>
+            <div><span>当前阶段里程碑 · {String(viewedIndex + 1).padStart(2, '0')} / 08</span><h2>{V2_STAGE_NAMES[viewedStage]}</h2><p>{V2_STAGE_SUMMARIES[viewedStage]}</p><Button className={css.projectV2StageOpen} disabled={openingStage} onClick={() => { openStage(viewedStage) }}>{t(openingStage ? 'progress.openingStage' : 'progress.openViewedStage')}</Button></div>
             <strong data-state={viewedState}>{stageStateLabel(viewedState)}</strong>
             <dl className={css.projectV2StageFacts} data-v2-stage-facts="">
               <div><dt><ProjectStageFactIcon type="input" />阶段输入</dt><dd>{inputCount} 项</dd><small>{viewedStage === 'discovery' ? `${String(parsedSources)} 份已识别` : '来自上一阶段固定记录'}</small></div>
@@ -832,7 +845,7 @@ function ProjectV2Detail({ row, sourceState, surfaceState, returnToPrevious, ent
           <section className={css.projectV2NextAction}>
             <ProjectDetailDocumentArt />
             <span>建议下一步</span><h2>{currentWork?.title ?? action.action}</h2><p>{currentWork?.purpose ?? action.reason}</p>
-            <button type="button" onClick={enterProject}>进入项目交付 <span aria-hidden="true">→</span></button>
+            <button type="button" disabled={openingStage} onClick={() => { openStage(viewedStage) }}>进入项目交付 <span aria-hidden="true">→</span></button>
           </section>
           <section className={css.projectV2WorkItems}>
             <header><h3>本阶段工作项</h3><strong>{completedWork} / {workItems.length}</strong></header>
@@ -848,7 +861,7 @@ function ProjectV2Detail({ row, sourceState, surfaceState, returnToPrevious, ent
       </div>
 
       <footer className={css.projectV2GateBanner} data-v2-gate-banner="" data-state={projectCompleted || historical ? 'complete' : reviewReady ? 'ready' : 'pending'}>
-        <i aria-hidden="true">✓</i><div><strong>{gateTitle}</strong><span>{gateDetail}</span></div><button type="button" onClick={enterProject}>查看并继续 <span aria-hidden="true">→</span></button>
+        <i aria-hidden="true">✓</i><div><strong>{gateTitle}</strong><span>{gateDetail}</span></div><button type="button" disabled={openingStage} onClick={() => { openStage(viewedStage) }}>查看并继续 <span aria-hidden="true">→</span></button>
       </footer>
     </main>
   )
@@ -2940,7 +2953,7 @@ export function ProjectProgressOverlay({
   recordAcceptanceHandoverDecision,
   showProjectOverview, showProjectTimeline, showProjectDetail,
   showWorkbenchOverview, showWorkbenchLab, showWorkbenchSkills,
-  renderSlot, t,
+  renderSlot, renderFactorySlot, t,
 }: ProjectProgressOverlayProps) {
   const page = useProjectPage(state => state)
   const workspaces = useWorkspaces(state => state.items)
@@ -3124,8 +3137,10 @@ export function ProjectProgressOverlay({
                 throw error
               }
             }}
-            enterProject={() => { void enterProject(detailRow.workspaceId) }}
+            enterProject={stage => enterProject(detailRow.workspaceId, stage)}
             back={showProjectOverview}
+            renderFactorySlot={renderFactorySlot}
+            t={t}
           />
           : <ProjectDetail
           row={detailRow}

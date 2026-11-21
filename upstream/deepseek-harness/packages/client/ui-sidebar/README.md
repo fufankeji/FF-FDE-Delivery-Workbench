@@ -39,6 +39,8 @@ The expanded brand row renders `sidebar.brand.mark` and `sidebar.brand.name` as 
 
 ### Global panel entries
 
+The FDE distribution deliberately omits the global New Session button: project entry owns Session creation. It retains the upstream `sidebar.session.action` HOC extension with `children: null` and the `session/create` access gate, so optional extension controls remain reachable without restoring a duplicate creation path. The upstream button geometry described elsewhere applies only when that button is present.
+
 `sidebar.panels` renders the same authorized entries, pin choices and More menu in the native sidebar or an alternate shell. This factory owns `sidebar.panellist.actions`; the shell must not declare that list again. Its required `wide` prop selects the row or compact presentation. An optional `beforeNavigate` releases an outer page before panel selection, plugin discovery or a Creator draft; without it navigation is unchanged. Pinning and menu dismissal never invoke that callback.
 
 Plugins add an icon component to the root-scoped `sidebar.panellist` list with an `id`, optional `order`, and a string or locale-aware `label`. The same id addresses the component registered in the layout's root-scoped `main` keyed slot; selecting a missing main entry throws without changing the current selection. The label supplies plain visible text, the accessible name, and the collapsed tooltip. Expanded navigation rows are 32px high with a 2px gap; collapsed rail controls remain 36px high with a 12px gap. Each row reads its own selected state through `usePanelInfo`; moving DOM focus to search or a directory picker does not change the displayed panel or its selected row. With no panel registrations, neither the list nor spacing for it is rendered. The shipped composition registers no example panel.
@@ -50,6 +52,8 @@ While the root-scoped `sidebar.panellist.actions` list has registrations, a **Mo
 The sidebar and conversation-header toggles show the effective shortcut from the command catalog in their hover and keyboard-focus tooltips and `aria-keyshortcuts`. An unbound command shows only the action label.
 
 The top expand button hosts the optional, non-interactive `sidebar.toggle.badge` slot while collapsed. Its occupant supplies status and tooltip content without adding another action or changing the button's navigation behavior.
+
+The root-scoped `sidebar.session.action` HOC layer wraps the New Session row's content: an occupant receives the row's Tooltip and button as `children` and returns them, possibly wrapped, together with its own controls, so it decorates the row without adding a wrapper element. It receives only `wide`, and an occupant that adds nothing must return `children`. Expanded, the controls share the New Session row and the button takes the remaining width; in the rail they stack below its icon. The row renders only while New Session renders, and each occupant still checks its own access.
 
 Expanded content follows the frame's column width, including its transitions. During a live collapse, the content fades out at its frozen expanded width, the upper controls share one fade and leftward translation into the 56px rail, and the layout's column slide ends the motion. A page that starts collapsed renders the rail statically, and reduced-motion mode disables both transitions. The bottom-pinned `sidebar.settings` control shares the fade timing but has no horizontal translation.
 

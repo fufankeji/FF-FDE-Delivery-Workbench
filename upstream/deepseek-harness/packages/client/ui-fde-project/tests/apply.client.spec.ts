@@ -96,7 +96,7 @@ describe('ui-fde-project apply', () => {
     const selectPanel = vi.fn((activePanelId: MainPanelId | null) => { panelInfo.set({ activePanelId }) })
     ctx.provide('layout', {
       panelInfo, selectPanel,
-      toggleSidebar: vi.fn(), collapseSidebar, openDetails: vi.fn(), closeDetails: vi.fn(),
+      toggleSidebar: vi.fn(), openSidebar: vi.fn(), collapseSidebar, openDetails: vi.fn(), closeDetails: vi.fn(),
     } as never)
     const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
       const path = requestPath(input)
@@ -214,6 +214,8 @@ describe('ui-fde-project apply', () => {
     expect(notify).toHaveBeenCalledWith('info', '输入框已有内容，已为你保留。请补充完整后再发送。')
 
     const injected = (slots.entries('shell.overlay')[0]!.inject as unknown as () => ProjectPageInjected)()
+    await injected.enterProject('workspace-1', 'definition')
+    expect(stageInjected.hooks.stageView.getSnapshot().byWorkspace['workspace-1']).toBe('definition')
     injected.showProjectDetail('workspace-1')
     const openedBeforeNavigation = openSession.mock.calls.length
     injected.suspendWorkbenchForNative()

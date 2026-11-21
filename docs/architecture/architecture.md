@@ -10,12 +10,12 @@ product_spec: docs/specs/product-spec.md
 
 ## 1. 状态、范围与事实来源
 
-2026-11-12 已将官方基座更新为 `0.2.2-rc.2`。F030 构建、定向回归与隔离历史读取已验证，产品体验仍待用户手动确认。源码检查点、数据副本和回退见 [F030 升级说明](harness-022-upgrade.md)；F027 记录保留为历史。
+2026-11-21 将官方基座更新为 `0.2.2-rc.5`，并修复项目详情滚动、阶段/上传入口和当前阶段底部输入区占位；实施与回退见 [F034 升级说明](harness-0225-upgrade.md)。F030 的历史读取证据保留在 [此前升级说明](harness-022-upgrade.md)，不把此前证据冒充本轮全量验收。
 
 - 本文记录已经确认的技术方向，以及启动官方 Web 后必须用运行证据验证的架构假设。
 - 强制基座：`https://github.com/deepseek-ai/deepseek-harness` 官方源码。
 - 架构排除：`/Users/muyu/MuYuProjectBuild/DeepSeekHarnessDesktop` 及其他赋范分叉不作为 Agent、Host 或 Web 运行架构基线；F016 仅按用户明确授权复用该 Studio 的主题资源和已经验证的换肤交互，仍接入当前官方 Harness 插件与 ThemeRuntime。
-- 当前官方快照：`deepseek-ai/deepseek-harness@ddac96760b6edf8fa0fe17cbdcf0b512f4c12b2c`，标签 `dsh-v0.2.2-rc.2`。上一基线为 `687f282e…` / `0.2.1-rc.2`。接口、依赖和运行变化见[升级说明](harness-022-upgrade.md)。
+- 当前官方快照：`deepseek-ai/deepseek-harness@9c2670d3bce5275e0d1610272958121af87787bb`，标签 `dsh-v0.2.2-rc.5`。上一基线为 `ddac9676…` / `0.2.2-rc.2`。接口、依赖和运行变化见[升级说明](harness-0225-upgrade.md)。
 - 官方状态：developer preview，明确允许破坏性变更；因此 V1 必须固定版本，不自动跟随 `master`。
 - 当前已完成锁定官方源码、官方 Web 基线、FDE 品牌、项目优先导航、结构化项目创建、项目资料持久化/稳定身份/本地识别/双入口预览、六阶段提示、完整独立项目进度与只读项目详情、API 文档、系统架构、用量分析、评估优化页面和浏览器本地界面主题；正在增加由当前 Agent 驱动的项目运行、持久终端和内嵌预览；FDE 行为继续以独立 Host/Client Plugins 和最小下游 UI 适配实现。
 
@@ -39,7 +39,7 @@ product_spec: docs/specs/product-spec.md
 
 ### 独立业务挖掘实验室（F024）
 
-实验室以 `packages/fde/discovery-lab` Host 插件和 `packages/client/ui-fde-discovery-lab` Client 插件接入当前 `0.2.2-rc.2` 基座，不维护自定义 Agent Loop。Host 复用官方 Agent、Session、Tools、LLM 和持久化；仅维护实验室自己的轮次数据库和岗位会话，不注入 Workspace、FDE Stage 或项目服务。原插件 `0.3.2` 的业务代码保留来源说明，以最小修改适配当前会话事件接口和权限边界。
+实验室以 `packages/fde/discovery-lab` Host 插件和 `packages/client/ui-fde-discovery-lab` Client 插件接入当前 `0.2.2-rc.5` 基座，不维护自定义 Agent Loop。Host 复用官方 Agent、Session、Tools、LLM 和持久化；仅维护实验室自己的轮次数据库和岗位会话，不注入 Workspace、FDE Stage 或项目服务。原插件 `0.3.2` 的业务代码保留来源说明，以最小修改适配当前会话事件接口和权限边界。
 
 Client 在首页及项目中心的 `fde.workbench.module.action` 和原 `sidebar.footer.action` 增加入口，在 `shell.overlay` 挂载独立页面。模块入口槽由 `ui-fde-project` 的全屏页面声明和渲染，不传入项目数据；实验室通过 Slot 注册共享自身导航 Store，不依赖侧栏可见性，也不调用项目控制器。原像素办公室应用由当前宿主的专属路径提供，并在 iframe 中运行，隔离原应用的全局 CSS 与 React 生命周期；不是另起宿主或局域网代理。关闭页面仅改变该插件的浏览状态，不重置项目选择或阶段；返回后保留原工作台。接口采用独立 `/api/fde-discovery-lab` 命名空间，并复用工作台的 Host/Origin/Fetch-Metadata 信任校验。
 

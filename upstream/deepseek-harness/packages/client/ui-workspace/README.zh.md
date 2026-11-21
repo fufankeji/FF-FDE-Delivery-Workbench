@@ -16,7 +16,9 @@ kind: "package-reference"
 搜索继续作为区头动作，新建项目则成为其上方的整宽主操作。在轨道中，新建项目和搜索会渲染为沿外壳共用横向进入路径移动的 36px 控件，两者纵向相距 12px，只用于展开态的区头不在轨道中占位。激活搜索后，输入框会扩展并占据区头；点击外部只会收起经清除首尾空白后为空的查询——但轨道搜索手势仍在进行期间（直至列滑动结束、焦点落入输入框）除外，这样触发展开的那次点击不会收起它刚打开的搜索——而清除控件总会重置并收起搜索。非空白查询会以单一扁平结果列表替代任一浏览模式：不区分大小写的标题和 Workspace 子串匹配项会立即显示，经 250 ms 防抖的 Host 请求则会加入经过排序的当前对话内容匹配项及其摘要片段。英文搜索输入框及其防御性请求路径会移除 NUL，将查询限制在传输 schema 规定的 500 个 UTF-16 代码单元内且不会拆分代理项对，并保留现有的防抖与取消行为。每次新查询都会中止前一个请求；内容搜索失败时，元数据匹配项仍会显示，同时给出警告。列表最多显示 20 条结果，并会在查询过宽时提示用户缩小范围；打开所选 Session 时既不会清除查询，也不会跳转至特定事件。
 
 该选择器通过全局 `useWorkspaces` hook 把真实 Host Workspace 实体呈现为用户可见项目。选择项目会调用 slot owner 的 `onPick` 回调，重新定位前端 Session 对象。不同的规范化路径即使 basename 和显示标题相同，仍会作为由 id 区分的独立项目；侧边栏悬停详情会在原有路径和创建时间之外显示已保存的企业和待确认／预计周期。每个注册各自声明一个**目录流子 slot**（`single` kind：`conversation.hero.workspace.directoryFlow`／`sidebar.workspaces.directoryFlow`），由组合的选择器包 client half 填入其选取交互——今天是 [`-native`](../../host/directory-picker-native/README.zh.md) 后端的无渲染 OS 选择器驱动，`-browse` 组合下则是应用内浏览对话框。在侧边栏表单中，同一流程用于选择存储父目录或导入已有项目；会话区项目选择器仍直接接纳所选项目目录。取消不提示，失败会返回表单并保留当前输入。项目行的**从工作台移除**动作会明确说明本地目录和 Session 日志继续保留；成功后分组移除，Session 留在 Ungrouped 下。Session 的重命名、归档与空白行行为保持不变。
+
 桌面端产品事件使用可选的[产品埋点服务](../product-analytics/README.zh.md)，不包含普通 Web 交互。
+
 ## 概述
 
 本包让用户浏览分组或扁平的 Session 列表、为新 Session 选择 Workspace，并通过添加、重命名、重排序、搜索、fork、归档和删除 Workspace 来管理 Workspace 与 Session；Session 行菜单及其悬停按钮是可由客户端插件扩展的 slot 列表。待处理交互显示为警告点，subagent 来源的 Session 则保持隐藏。处于空闲状态且未归档、其 Session 有活动定时任务的 Session 行会显示时钟标记，其悬浮卡片会列出这些任务。规范化后仍有差异的文件夹路径会保留为独立 Workspace。添加 Workspace 需要组合目录选择器；没有目录选择器时，添加操作不可用。
@@ -127,7 +129,44 @@ Session 行可通过 Tab 聚焦，使用不带修饰键的 Enter 或空格打开
 
 项目中心发起的创建请求始终打开本包已有的项目表单，即使目录流界面缺失或正在加载。表单明确显示可用性提示，并在界面恢复前禁用创建、位置选择和导入；恢复时保留草稿。缺少目录界面时不会发起目录或 Workspace 写入；侧栏自身不可用的添加入口仍保持隐藏。
 
+每个注册各自声明一个**目录流子 slot**（`single` kind：`conversation.hero.workspace.directoryFlow`／`sidebar.workspaces.directoryFlow`），`workspace.picker` Factory 则声明 `workspace.picker.directoryFlow`；组合的选择器包 client half 向这三处填入其选取交互——`-native` 后端的无渲染 OS 选择器驱动，`-browse` 组合下则是应用内浏览对话框。平铺显示的**添加工作区…** 操作仅在当前界面的 slot 被占用时渲染；slot 为空意味着该组合没有目录选择能力。侧栏的添加工作区操作保留已有空白 Session 及其草稿。本包持有触发与接纳：占用方通过 slot 的属主交互约定（`open`/`busy`/`onPicked`/`onCancel`/`onError`）每次打开上报一个所选路径，owner 通过对象层接纳它，并等待 Workspace 列表投影刷新后才选中已提交的 Workspace。
+
+### 可复用的 Workspace 选择器
+
+其他插件通过 root 作用域的 `workspace.picker` Component Factory 渲染 hero 的 Workspace 选择器，而不导入本包的组件。其调用方输入即 `ui-workspace/client` 中的 `WorkspacePickerInput` 类型，与 hero 的 owner props 相同：`open`、`anchorRef`、`selectedId`、`onPick` 与 `onClose`。调用方持有锚点控件、打开状态以及选中的含义，并在 `onPick` 中关闭菜单。每个实例列出现有 Workspace；当某个目录选择器包占用 `workspace.picker.directoryFlow` 时，还会显示**添加工作区…**，它运行该流程、调用 `workspaces.create({ path })`，并把新 Workspace 的 id 传给 `onPick`；接纳失败留在本包的文件夹错误对话框中。该定义及其子 slot 直接在 `apply` 中注册，因为它们不依赖其他声明，并随本插件一起卸载。
+
+调用方只需每个已注册组件都会收到的标准 `renderFactorySlot` prop，以及加载该 Factory 声明的纯类型 `ui-workspace/client` import；调用方自己的注册无需为此声明任何内容。未加载 ui-workspace 时，该调用渲染其可选的 `fallback`。菜单 portal 到 document body，并相对 `anchorRef` 定位，层级高于 primitives 的 `Modal`，因此实例可以渲染在调用方的对话框内。
+
+```tsx
+import { useRef, useState } from 'react'
+import type { WorkspaceId } from '@deepseek-ai/dsh-api-workspace-controller/client'
+import type { PropsRenderFactories } from '@deepseek-ai/dsh-client-ui-slots'
+import type {} from '@deepseek-ai/dsh-client-ui-workspace/client'
+
+function WorkspaceField({ label, renderFactorySlot }: PropsRenderFactories & { label: string }) {
+  const anchorRef = useRef<HTMLButtonElement>(null)
+  const [open, setOpen] = useState(false)
+  const [workspaceId, setWorkspaceId] = useState<WorkspaceId | undefined>(undefined)
+  return (
+    <>
+      <button ref={anchorRef} type="button" onClick={() => { setOpen(value => !value) }}>{label}</button>
+      {renderFactorySlot('workspace.picker', {
+        open,
+        anchorRef,
+        selectedId: workspaceId,
+        onPick: (picked) => {
+          setOpen(false)
+          setWorkspaceId(picked)
+        },
+        onClose: () => { setOpen(false) },
+      })}
+    </>
+  )
+}
+```
+
 每个注册各自声明一个**目录流子 slot**（`single` kind：`conversation.hero.workspace.directoryFlow`／`sidebar.workspaces.directoryFlow`），由组合的选择器包 client half 填入其选取交互——`-native` 后端的无渲染 OS 选择器驱动，`-browse` 组合下则是应用内浏览对话框。平铺显示的**添加工作区…** 操作仅在当前界面的 slot 被占用时渲染；slot 为空意味着该组合没有目录选择能力。本包持有触发与接纳：占用方通过 slot 的属主交互约定（`open`/`busy`/`onPicked`/`onCancel`/`onError`）每次打开上报一个所选路径，owner 通过对象层接纳它，并等待 Workspace 列表投影刷新后才选中已提交的 Workspace。
+
 <a id="session-row-actions"></a>
 ### Session 行 action
 
