@@ -37,6 +37,8 @@
 
 目标仅为 `origin/main`：`https://github.com/fufankeji/FF-FDE-Delivery-Workbench`。推送前 fetch 后 ahead/behind 为 0/0；不使用 force、不修改保护设置。保留仓库原有受控 `docs/`，遵循用户“docs 也提交”及项目合同，不套用通用发布模板删除它们。
 
-本轮发布记录待推送后补充。已有未跟踪 `.agents/`、`lefthook.yml`、`docs/verification/2026-10-30-student-source-package.md` 不纳入提交。
+源码提交 `0e849a8600b31a448c80add7954dfaadf8b1e9f4` 已普通推送至 origin/main，`git ls-remote origin refs/heads/main` 返回同一 SHA。GitHub 对当前账户的普通推送提示 `Bypassed rule violations / Cannot update this protected ref` 后接受更新；未添加绕过参数、强推或修改仓库保护规则。该 SHA 的 Actions 查询返回 0 个运行，不声称远端 CI 通过。此记录随后以独立文档提交同步。
 
-依赖仍复用原 `upstream/deepseek-harness/node_modules`（约 2.9 GiB，可重新安装）；验证日志/下载缓存约 4 MiB，另有一次性公开样例运行区。后者仅用于本轮验收，停止 3084 实例后可清理；用户一旦在其中新增资料，应先另行保存。原 `.runtime/harness-022-validation` 和桌面旧源码包未改动。
+已有未跟踪 `.agents/`、`lefthook.yml`、`docs/verification/2026-10-30-student-source-package.md` 未纳入提交。发布安全扫描没有未解冲突、秘密或超限文件 blocker；剩余 docs 排除提示按前述明确项目合同处理。
+
+依赖仍复用原 `upstream/deepseek-harness/node_modules`（约 2.9 GiB，可重新安装）；本轮 `.runtime/harness-0225-upgrade` 总计约 6.6 MiB，其中一次性公开样例运行区约 2.4 MiB。样例服务保留在 127.0.0.1:3084，启动授权链接仅保存在本机 `web.log`，未提交。该目录仅用于本轮验收，停止 3084 实例后可清理；用户一旦在其中新增资料，应先另行保存。原 `.runtime/harness-022-validation` 和桌面旧源码包未改动。
